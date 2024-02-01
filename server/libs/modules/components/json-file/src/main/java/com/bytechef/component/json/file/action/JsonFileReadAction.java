@@ -97,7 +97,7 @@ public class JsonFileReadAction {
     }
 
     @SuppressWarnings("unchecked")
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         JsonFileConstants.FileType fileType = getFileType(inputParameters);
@@ -151,6 +151,6 @@ public class JsonFileReadAction {
             result = context.json(json -> json.read((String) context.file(file -> file.readToString(fileEntry))));
         }
 
-        return result;
+        return Map.of("result", result);
     }
 }

@@ -76,7 +76,7 @@ public class OdsFileWriteAction {
                 .required(true)
                 .defaultValue("file.ods")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(OdsFileWriteAction::perform);
 
     private static Object[] getHeaderValues(Set<String> names) {
@@ -100,15 +100,17 @@ public class OdsFileWriteAction {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    protected static FileEntry perform(
+    protected static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String fileName = inputParameters.getString(FILENAME, "file.ods");
         List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
         String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
 
-        return context.file(file -> file.storeContent(
-            fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
+        return Map.of(
+            "fileEntry",
+            context.file(file -> file.storeContent(
+                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))))));
     }
 
     private static byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {

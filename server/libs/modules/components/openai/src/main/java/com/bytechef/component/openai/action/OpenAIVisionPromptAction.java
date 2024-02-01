@@ -101,7 +101,7 @@ public class OpenAIVisionPromptAction extends AbstractChatCompletionAction {
             TOOLS_PROPERTY,
             TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
-        .output(OpenAIUtils::getOutputSchema)
+        .output(OpenAIUtils::getOutput)
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIVisionPromptAction() {

@@ -66,7 +66,7 @@ public class FilesystemComponentHandlerIntTest {
         FileEntry fileEntry = fileStorageService.storeFileContent(
             FileEntryConstants.FILES_DIR, "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
-        assertThat(outputs.get("readLocalFile"))
+        assertThat(((Map<?, ?>) outputs.get("readLocalFile")).get("fileEntry"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "sample.txt")
@@ -82,10 +82,9 @@ public class FilesystemComponentHandlerIntTest {
             ENCODER.encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
-                fileStorageService
-                    .storeFileContent(
-                        FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
-                        Files.contentOf(getFile(), StandardCharsets.UTF_8)),
+                fileStorageService.storeFileContent(
+                    FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
+                    Files.contentOf(getFile(), StandardCharsets.UTF_8)),
                 "filename", tempFile.getAbsolutePath()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -96,9 +95,10 @@ public class FilesystemComponentHandlerIntTest {
     }
 
     private File getFile() {
-        return new File(FilesystemComponentHandlerIntTest.class
-            .getClassLoader()
-            .getResource("dependencies/filesystem/sample.txt")
-            .getFile());
+        return new File(
+            FilesystemComponentHandlerIntTest.class
+                .getClassLoader()
+                .getResource("dependencies/filesystem/sample.txt")
+                .getFile());
     }
 }

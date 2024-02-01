@@ -27,6 +27,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -68,9 +69,12 @@ class GoogleMailGetThreadActionTest extends AbstractGoogleMailActionTest {
         when(mockedGet.execute())
             .thenReturn(mockedThread);
 
-        Thread result = GoogleMailGetThreadAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Thread> handleMap = GoogleMailGetThreadAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(mockedThread, result);
+        Thread thread = handleMap.get("thread");
+
+        assertEquals(mockedThread, thread);
         assertEquals("me", userIdArgumentCaptor.getValue());
         assertEquals("id", idArgumentCaptor.getValue());
         assertEquals("minimal", formatArgumentCaptor.getValue());

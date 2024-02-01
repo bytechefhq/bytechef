@@ -5,13 +5,13 @@
     "componentDescription": "Helper component which contains operations to help you work with text.",
     "componentTitle": "Text Helper",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Extract content from the HTML content.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "extractContentFromHtml",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -132,8 +132,8 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Extract Content from HTML",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

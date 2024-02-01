@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -47,81 +48,79 @@ public class PipedriveNewActivityTrigger {
         .description("Trigger off whenever a new activity is added.")
         .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
         .outputSchema(
-            object()
-                .properties(
-                    integer("id"),
-                    integer("company_id"),
-                    integer("user_id"),
-                    bool("done"),
-                    string("type"),
-                    string("reference_type"),
-                    integer("reference_id"),
-                    string("conference_meeting_client"),
-                    string("conference_meeting_url"),
-                    string("conference_meeting_id"),
-                    string("due_date"),
-                    time("due_time"),
-                    time("duration"),
-                    bool("busy_flag"),
-                    dateTime("add_time"),
-                    dateTime("marked_as_done_time"),
-                    dateTime("last_notification_time"),
-                    integer("last_notification_user_id"),
-                    integer("notification_language_id"),
-                    string("subject"),
-                    string("public_description"),
-                    string("calendar_sync_include_context"),
-                    string("location"),
-                    integer("org_id"),
+            integer("id"),
+            integer("company_id"),
+            integer("user_id"),
+            bool("done"),
+            string("type"),
+            string("reference_type"),
+            integer("reference_id"),
+            string("conference_meeting_client"),
+            string("conference_meeting_url"),
+            string("conference_meeting_id"),
+            string("due_date"),
+            time("due_time"),
+            time("duration"),
+            bool("busy_flag"),
+            dateTime("add_time"),
+            dateTime("marked_as_done_time"),
+            dateTime("last_notification_time"),
+            integer("last_notification_user_id"),
+            integer("notification_language_id"),
+            string("subject"),
+            string("public_description"),
+            string("calendar_sync_include_context"),
+            string("location"),
+            integer("org_id"),
+            integer("person_id"),
+            integer("deal_id"),
+            string("lead_id"),
+            bool("active_flag"),
+            dateTime("update_time"),
+            integer("update_user_id"),
+            string("gcal_event_id"),
+            string("google_calendar_id"),
+            string("google_calendar_etag"),
+            string("source_timezone"),
+            string("rec_rule"),
+            string("rec_rule_extension"),
+            integer("rec_master_activity_id"),
+            array("series"),
+            string("note"),
+            integer("created_by_user_id"),
+            string("location_subpremise"),
+            string("location_street_number"),
+            string("location_route"),
+            string("location_sublocality"),
+            string("location_locality"),
+            string("location_admin_area_level_1"),
+            string("location_admin_area_level_2"),
+            string("location_country"),
+            string("location_postal_code"),
+            string("location_formatted_address"),
+            array("attendees").items(
+                object().properties(
+                    string("email_address"),
+                    integer("is_organizer"),
+                    string("name"),
                     integer("person_id"),
-                    integer("deal_id"),
-                    string("lead_id"),
-                    bool("active_flag"),
-                    dateTime("update_time"),
-                    integer("update_user_id"),
-                    string("gcal_event_id"),
-                    string("google_calendar_id"),
-                    string("google_calendar_etag"),
-                    string("source_timezone"),
-                    string("rec_rule"),
-                    string("rec_rule_extension"),
-                    integer("rec_master_activity_id"),
-                    array("series"),
-                    string("note"),
-                    integer("created_by_user_id"),
-                    string("location_subpremise"),
-                    string("location_street_number"),
-                    string("location_route"),
-                    string("location_sublocality"),
-                    string("location_locality"),
-                    string("location_admin_area_level_1"),
-                    string("location_admin_area_level_2"),
-                    string("location_country"),
-                    string("location_postal_code"),
-                    string("location_formatted_address"),
-                    array("attendees").items(
-                        object().properties(
-                            string("email_address"),
-                            integer("is_organizer"),
-                            string("name"),
-                            integer("person_id"),
-                            string("status"),
-                            string("user_id"))),
-                    array("participants").items(
-                        object().properties(
-                            integer("person_id"),
-                            bool("primary_flag"))),
-                    string("org_name"),
-                    string("person_name"),
-                    string("deal_title"),
-                    string("owner_name"),
-                    string("person_dropbox_bcc"),
-                    string("deal_dropbox_bcc"),
-                    integer("assigned_to_user_id"),
-                    object("file").properties(
-                        string("id"),
-                        string("clean_name"),
-                        string("url"))))
+                    string("status"),
+                    string("user_id"))),
+            array("participants").items(
+                object().properties(
+                    integer("person_id"),
+                    bool("primary_flag"))),
+            string("org_name"),
+            string("person_name"),
+            string("deal_title"),
+            string("owner_name"),
+            string("person_dropbox_bcc"),
+            string("deal_dropbox_bcc"),
+            integer("assigned_to_user_id"),
+            object("file").properties(
+                string("id"),
+                string("clean_name"),
+                string("url")))
         .sampleOutput(
             """
                 {
@@ -233,10 +232,10 @@ public class PipedriveNewActivityTrigger {
     }
 
     @SuppressWarnings("unchecked")
-    protected static Object dynamicWebhookRequest(
+    protected static Map<String, ?> dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
-        return ((Map<String, ?>) body.getContent()).get("current");
+        return (Map<String, ?>) (body.getContent(new TypeReference<Map<String, ?>>() {})).get("current");
     }
 }

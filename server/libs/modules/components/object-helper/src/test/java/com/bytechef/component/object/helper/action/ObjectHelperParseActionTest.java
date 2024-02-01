@@ -46,8 +46,9 @@ public class ObjectHelperParseActionTest {
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(Map.of("key", 3));
 
-        assertThat(ObjectHelperParseAction.perform(parameters, parameters, context))
-            .isEqualTo(Map.of("key", 3));
+        assertThat(ObjectHelperParseAction.perform(parameters, parameters, context)
+            .get("result"))
+                .isEqualTo(Map.of("key", 3));
 
         Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
             .thenReturn(
@@ -61,7 +62,8 @@ public class ObjectHelperParseActionTest {
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(List.of(Map.of("key", 3)));
 
-        assertThat(ObjectHelperParseAction.perform(parameters, parameters, context))
-            .isEqualTo(List.of(Map.of("key", 3)));
+        assertThat(ObjectHelperParseAction.perform(parameters, parameters, context)
+            .get("result"))
+                .isEqualTo(List.of(Map.of("key", 3)));
     }
 }

@@ -17,7 +17,6 @@
 package com.bytechef.component.schedule.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
@@ -61,11 +60,9 @@ public class ScheduleIntervalTrigger {
                     option("Month", 4))
                 .required(true))
         .outputSchema(
-            object()
-                .properties(
-                    string(DATETIME),
-                    integer(INTERVAL),
-                    integer(TIME_UNIT)))
+            string(DATETIME),
+            integer(INTERVAL),
+            integer(TIME_UNIT))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

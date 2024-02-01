@@ -44,8 +44,7 @@ public class VarComponentHandlerIntTest {
     @Test
     public void testVar() {
         Job job = componentJobTestExecutor.execute(
-            ENCODER.encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
-            Map.of());
+            ENCODER.encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)), Map.of());
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 

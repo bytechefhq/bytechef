@@ -87,21 +87,19 @@ public class ScheduleEveryDayTrigger {
                 .description("The timezone at which the cron expression will be scheduled.")
                 .options(ScheduleUtils.getTimeZoneOptions()))
         .outputSchema(
-            object()
+            string(DATETIME),
+            integer(HOUR),
+            integer(MINUTE),
+            object(DAY_OF_WEEK)
                 .properties(
-                    string(DATETIME),
-                    integer(HOUR),
-                    integer(MINUTE),
-                    object(DAY_OF_WEEK)
-                        .properties(
-                            bool("1"),
-                            bool("2"),
-                            bool("3"),
-                            bool("4"),
-                            bool("5"),
-                            bool("6"),
-                            bool("7")),
-                    string(TIMEZONE)))
+                    bool("1"),
+                    bool("2"),
+                    bool("3"),
+                    bool("4"),
+                    bool("5"),
+                    bool("6"),
+                    bool("7")),
+            string(TIMEZONE))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

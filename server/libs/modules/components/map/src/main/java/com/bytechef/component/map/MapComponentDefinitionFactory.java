@@ -37,11 +37,13 @@ public class MapComponentDefinitionFactory implements ComponentDefinitionFactory
         .description(
             "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.")
         .icon("path:assets/map.svg")
-        .actions(action(MAP)
-            .properties(
-                array(LIST)
-                    .label("List of items")
-                    .description("List of items to iterate over.")));
+        .actions(
+            action(MAP)
+                .properties(
+                    array(LIST)
+                        .label("List of items")
+                        .description("List of items to iterate over."))
+                .output());
 
     @Override
     public ComponentDefinition getDefinition() {

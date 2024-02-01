@@ -29,12 +29,13 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,34 +45,9 @@ import java.util.List;
  */
 public class OpenAIUtils {
 
-    public static final ObjectProperty outputSchemaResponseForStream =
-        object()
-            .properties(
-                array("stream")
-                    .items(
-                        string("id"),
-                        string("object"),
-                        integer("created"),
-                        string("model"),
-                        array("choices")
-                            .items(
-                                object()
-                                    .properties(
-                                        integer("index"),
-                                        object("message")
-                                            .properties(
-                                                string("role"),
-                                                string("content"),
-                                                string("name"),
-                                                object("functionCall")
-                                                    .properties(
-                                                        string("name"),
-                                                        object("arguments"))),
-                                        string("finishReason")))));
-
-    public static final ObjectProperty outputSchemaResponse =
-        object()
-            .properties(
+    public static final ModifiableArrayProperty OUTPUT_SCHEMA_RESPONSE_FOR_STREAM =
+        array("stream")
+            .items(
                 string("id"),
                 string("object"),
                 integer("created"),
@@ -90,12 +66,33 @@ public class OpenAIUtils {
                                             .properties(
                                                 string("name"),
                                                 object("arguments"))),
-                                string("finishReason"))),
-                object("usage")
+                                string("finishReason"))));
+
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> OUTPUT_SCHEMA_RESPONSE = List.of(
+        string("id"),
+        string("object"),
+        integer("created"),
+        string("model"),
+        array("choices")
+            .items(
+                object()
                     .properties(
-                        integer("promptTokens"),
-                        integer("completionTokens"),
-                        integer("totalTokens")));
+                        integer("index"),
+                        object("message")
+                            .properties(
+                                string("role"),
+                                string("content"),
+                                string("name"),
+                                object("functionCall")
+                                    .properties(
+                                        string("name"),
+                                        object("arguments"))),
+                        string("finishReason"))),
+        object("usage")
+            .properties(
+                integer("promptTokens"),
+                integer("completionTokens"),
+                integer("totalTokens")));
 
     private OpenAIUtils() {
     }
@@ -146,15 +143,15 @@ public class OpenAIUtils {
         return List.of(string, n);
     }
 
-    public static Output getOutputSchema(
+    public static Output getOutput(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         boolean stream = inputParameters.getRequiredBoolean(STREAM);
 
         if (stream) {
-            return new Output(outputSchemaResponseForStream);
+            return new Output(OUTPUT_SCHEMA_RESPONSE_FOR_STREAM);
         } else {
-            return new Output(outputSchemaResponse);
+            return new Output(OUTPUT_SCHEMA_RESPONSE);
         }
     }
 }

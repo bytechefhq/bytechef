@@ -98,76 +98,37 @@ public class PipedriveSearchPersonsAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .outputSchema(
-            object()
-                .properties(
-                    object(
-                        "data")
-                            .properties(
-                                array("items")
-                                    .items(
-                                        object()
-                                            .properties(number("result_score").description("Search result relevancy")
-                                                .required(false),
-                                                object("item")
-                                                    .properties(integer("id").description("The ID of the person")
-                                                        .required(false),
-                                                        string("type").description("The type of the item")
-                                                            .required(false),
-                                                        string("name").description("The name of the person")
-                                                            .required(false),
-                                                        array("phones")
-                                                            .items(string().description("An array of phone numbers"))
-                                                            .description("An array of phone numbers")
-                                                            .required(false),
-                                                        array("emails")
-                                                            .items(string().description("An array of email addresses"))
-                                                            .description("An array of email addresses")
-                                                            .required(false),
-                                                        integer("visible_to")
-                                                            .description("The visibility of the person")
-                                                            .required(false),
-                                                        object("owner").properties(integer("id")
-                                                            .description("The ID of the owner of the person")
-                                                            .required(false))
-                                                            .required(false),
-                                                        object("organization").properties(integer(
-                                                            "id").description(
-                                                                "The ID of the organization the person is associated with")
-                                                                .required(false),
-                                                            string("name").description(
-                                                                "The name of the organization the person is associated with")
-                                                                .required(false))
-                                                            .required(false),
-                                                        array("custom_fields")
-                                                            .items(string().description("Custom fields"))
-                                                            .description("Custom fields")
-                                                            .required(false),
-                                                        array("notes").items(string().description("An array of notes"))
-                                                            .description("An array of notes")
-                                                            .required(false))
-                                                    .required(false))
-                                            .description("The array of found items"))
-                                    .description("The array of found items")
+            object("data")
+                .properties(array("items")
+                    .items(number("result_score").required(false),
+                        object("item")
+                            .properties(integer("id").required(false), string("type").required(false),
+                                string("name").required(false), array("phones").items(string())
+                                    .required(false),
+                                array("emails").items(string())
+                                    .required(false),
+                                integer("visible_to").required(false),
+                                object("owner").properties(integer("id").required(false))
+                                    .required(false),
+                                object("organization")
+                                    .properties(integer("id").required(false), string("name").required(false))
+                                    .required(false),
+                                array("custom_fields").items(string())
+                                    .required(false),
+                                array("notes").items(string())
                                     .required(false))
-                            .required(false),
-                    bool("success").description("If the response is successful or not")
-                        .required(false),
-                    object("additional_data")
-                        .properties(object("pagination").properties(integer("start").description("Pagination start")
-                            .required(false),
-                            integer("limit").description("Items shown per page")
-                                .required(false),
-                            bool("more_items_in_collection")
-                                .description("Whether there are more list items in the collection than displayed")
-                                .required(false),
-                            integer("next_start").description("Next pagination start")
-                                .required(false))
-                            .description("Pagination details of the list")
                             .required(false))
-                        .required(false))
-                .metadata(
-                    Map.of(
-                        "responseType", ResponseType.JSON)))
+                    .required(false))
+                .required(false),
+            bool("success").required(false),
+            object("additional_data")
+                .properties(object("pagination")
+                    .properties(integer("start").required(false), integer("limit").required(false),
+                        bool("more_items_in_collection").required(false), integer("next_start").required(false))
+                    .required(false))
+                .required(false))
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
             Map.entry("data",
                 Map.<String, Object>ofEntries(Map.entry("items",

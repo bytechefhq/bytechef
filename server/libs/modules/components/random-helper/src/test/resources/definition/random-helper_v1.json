@@ -5,13 +5,13 @@
     "componentDescription": "The Random Helper allows you to generate random values.",
     "componentTitle": "Random Helper",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Generates a random integer value.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "randomInt",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -30,8 +30,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The maximum possible generated value.",
@@ -49,13 +49,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Int",
-    "perform": { },
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -63,7 +62,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "result",
         "type": "INTEGER",
         "defaultValue": null,
         "exampleValue": null,
@@ -72,24 +71,66 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      },
-      "sampleOutput": null
-    }
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "result",
+          "type": "INTEGER",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "maxValue": null,
+          "minValue": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
+        } ],
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "randomHelper",
     "componentDescription": "The Random Helper allows you to generate random values.",
     "componentTitle": "Random Helper",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Generates a random float value.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "randomFloat",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -108,8 +149,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The maximum possible generated value.",
@@ -127,13 +168,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Float",
-    "perform": { },
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -141,7 +181,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "result",
         "type": "NUMBER",
         "defaultValue": null,
         "exampleValue": null,
@@ -153,11 +193,56 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
-      },
-      "sampleOutput": null
-    }
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "result",
+          "type": "NUMBER",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "maxNumberPrecision": null,
+          "maxValue": null,
+          "minNumberPrecision": null,
+          "minValue": null,
+          "numberPrecision": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
+        } ],
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

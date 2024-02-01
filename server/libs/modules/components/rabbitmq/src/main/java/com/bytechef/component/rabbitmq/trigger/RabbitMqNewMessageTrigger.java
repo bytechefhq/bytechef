@@ -26,9 +26,7 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAM
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
@@ -56,18 +54,9 @@ public class RabbitMqNewMessageTrigger {
             string(QUEUE)
                 .description("The name of the queue to read from")
                 .required(true))
-        .output(RabbitMqNewMessageTrigger::output)
+        .output()
         .listenerEnable(RabbitMqNewMessageTrigger::listenerEnable)
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
-
-    protected static Output output(
-        Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        TriggerContext context) {
-
-        // TODO
-
-        return null;
-    }
 
     protected static void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
@@ -95,7 +84,7 @@ public class RabbitMqNewMessageTrigger {
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 
-            listenerEmitter.emit(context.json(json -> json.readMap(message)));
+            listenerEmitter.emit(context.json(json -> Map.of("message", json.readMap(message))));
         };
 
         channel.basicConsume(inputParameters.getString(QUEUE), true, deliverCallback, consumerTag -> {});

@@ -37,6 +37,7 @@ import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.DataService;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -104,7 +105,7 @@ public final class QuickbooksCreateCustomerAction {
                 .maxLength(100))
         .description("Has conditionally required parameters.")
         .outputSchema(
-            object()
+            object("customer")
                 .properties(
                     string("id")
                         .label("ID")
@@ -145,7 +146,7 @@ public final class QuickbooksCreateCustomerAction {
     private QuickbooksCreateCustomerAction() {
     }
 
-    public static Customer perform(
+    public static Map<String, Customer> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws FMSException {
 
         Customer customer = new Customer();
@@ -159,6 +160,6 @@ public final class QuickbooksCreateCustomerAction {
 
         DataService dataService = QuickbooksUtils.getDataService(connectionParameters);
 
-        return dataService.add(customer);
+        return Map.of("customer", dataService.add(customer));
     }
 }

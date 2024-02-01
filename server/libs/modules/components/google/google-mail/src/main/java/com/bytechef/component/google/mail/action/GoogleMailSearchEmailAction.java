@@ -26,7 +26,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.IN
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY_FUNCTION;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.Q;
@@ -41,6 +41,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -79,29 +80,32 @@ public class GoogleMailSearchEmailAction {
                 .description("Include messages from SPAM and TRASH in the results.")
                 .required(false))
         .outputSchema(
-            object().properties(
-                array(MESSAGES)
-                    .items(MESSAGE_PROPERTY),
-                string(NEXT_PAGE_TOKEN),
-                number(RESULT_SIZE_ESTIMATE)))
+            object("result")
+                .properties(
+                    array(MESSAGES)
+                        .items(MESSAGE_PROPERTY_FUNCTION.apply(null)),
+                    string(NEXT_PAGE_TOKEN),
+                    number(RESULT_SIZE_ESTIMATE)))
         .perform(GoogleMailSearchEmailAction::perform);
 
     private GoogleMailSearchEmailAction() {
     }
 
-    public static ListMessagesResponse perform(
+    public static Map<String, ListMessagesResponse> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Gmail service = GoogleMailUtils.getMail(connectionParameters);
 
-        return service.users()
-            .messages()
-            .list("me")
-            .setMaxResults(inputParameters.getLong(MAX_RESULTS))
-            .setPageToken(inputParameters.getString(PAGE_TOKEN))
-            .setQ(inputParameters.getString(Q))
-            .setLabelIds(inputParameters.getList(LABEL_IDS, String.class, List.of()))
-            .setIncludeSpamTrash(inputParameters.getBoolean(INCLUDE_SPAM_TRASH))
-            .execute();
+        return Map.of(
+            "result",
+            service.users()
+                .messages()
+                .list("me")
+                .setMaxResults(inputParameters.getLong(MAX_RESULTS))
+                .setPageToken(inputParameters.getString(PAGE_TOKEN))
+                .setQ(inputParameters.getString(Q))
+                .setLabelIds(inputParameters.getList(LABEL_IDS, String.class, List.of()))
+                .setIncludeSpamTrash(inputParameters.getBoolean(INCLUDE_SPAM_TRASH))
+                .execute());
     }
 }

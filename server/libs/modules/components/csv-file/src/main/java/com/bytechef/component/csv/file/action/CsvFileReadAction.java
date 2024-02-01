@@ -88,7 +88,7 @@ public class CsvFileReadAction {
         .output()
         .perform(CsvFileReadAction::perform);
 
-    protected static List<Map<String, Object>> perform(
+    protected static Map<String, List<Map<String, Object>>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         String delimiter = inputParameters.getString(CsvFileConstants.DELIMITER, ",");
@@ -110,12 +110,14 @@ public class CsvFileReadAction {
                 rangeEndRow = rangeStartRow + pageSize;
             }
 
-            return read(
-                inputStream,
-                new ReadConfiguration(
-                    delimiter, headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString),
-                context);
+            return Map.of(
+                "result",
+                read(
+                    inputStream,
+                    new ReadConfiguration(
+                        delimiter, headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                        rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString),
+                    context));
         }
     }
 

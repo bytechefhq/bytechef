@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "readCsvFile",
-    "value": "${readCsvFile}"
+    "value": "${readCsvFile.result}"
   } ],
   "tasks": [ {
     "name": "readCsvFile",

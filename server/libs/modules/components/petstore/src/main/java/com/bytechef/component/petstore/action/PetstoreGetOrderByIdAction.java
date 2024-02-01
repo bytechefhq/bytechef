@@ -19,7 +19,6 @@ package com.bytechef.component.petstore.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -48,8 +47,7 @@ public class PetstoreGetOrderByIdAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(PetstoreOrderProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)));
+        .outputSchema(PetstoreOrderProperties.PROPERTIES)
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON));
 }

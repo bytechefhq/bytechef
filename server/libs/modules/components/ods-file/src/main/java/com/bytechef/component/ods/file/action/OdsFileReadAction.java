@@ -86,7 +86,7 @@ public class OdsFileReadAction {
         .output()
         .perform(OdsFileReadAction::perform);
 
-    protected static List<Map<String, ?>> perform(
+    protected static Map<String, List<Map<String, ?>>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         boolean headerRow = inputParameters.getBoolean(OdsFileConstants.HEADER_ROW, true);
@@ -112,11 +112,13 @@ public class OdsFileReadAction {
                 rangeEndRow = rangeStartRow + pageSize;
             }
 
-            return read(
-                inputStream,
-                new ReadConfiguration(
-                    headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName));
+            return Map.of(
+                "result",
+                read(
+                    inputStream,
+                    new ReadConfiguration(
+                        headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                        rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName)));
         }
     }
 

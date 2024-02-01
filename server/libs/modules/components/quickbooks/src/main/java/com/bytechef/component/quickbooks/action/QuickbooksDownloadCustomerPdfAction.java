@@ -37,6 +37,7 @@ import com.intuit.ipp.services.QueryResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -50,14 +51,14 @@ public final class QuickbooksDownloadCustomerPdfAction {
             string(CUSTOMER_ID)
                 .label("Customer")
                 .description("The id of a customer to download the pdf for.")
-                .options((ActionOptionsFunction) QuickbooksDownloadCustomerPdfAction::getAllCustomerOptions))
-        .outputSchema(fileEntry())
+                .options((ActionOptionsFunction<String>) QuickbooksDownloadCustomerPdfAction::getAllCustomerOptions))
+        .outputSchema(fileEntry("fileEntry"))
         .perform(QuickbooksDownloadCustomerPdfAction::perform);
 
     private QuickbooksDownloadCustomerPdfAction() {
     }
 
-    public static FileEntry perform(
+    public static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws FMSException, IOException {
 
@@ -68,7 +69,9 @@ public final class QuickbooksDownloadCustomerPdfAction {
         customer.setId(inputParameters.getRequiredString(CUSTOMER_ID));
 
         try (InputStream inputStream = service.downloadPDF(customer)) {
-            return actionContext.file(file -> file.storeContent("QuickbooksCustomer " + customer.getId(), inputStream));
+            return Map.of(
+                "fileEntry",
+                actionContext.file(file -> file.storeContent("QuickbooksCustomer " + customer.getId(), inputStream)));
         }
     }
 

@@ -79,8 +79,24 @@ public class XlsxFileWriteAction {
                 .required(true)
                 .defaultValue("file.xlsx")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(XlsxFileWriteAction::perform);
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    protected static Map<String, FileEntry> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        String fileName = inputParameters.getString(FILENAME, getaDefaultFileName());
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
+        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
+
+        return Map.of(
+            "fileEntry",
+            context.file(file -> file.storeContent(
+                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))))));
+    }
 
     private static String getaDefaultFileName() {
         String xlsxName = XlsxFileConstants.FileFormat.XLSX.name();
@@ -90,20 +106,6 @@ public class XlsxFileWriteAction {
 
     private static Workbook getWorkbook() {
         return new XSSFWorkbook();
-    }
-
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        String fileName = inputParameters.getString(FILENAME, getaDefaultFileName());
-        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
-        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
-
-        return context.file(file -> file.storeContent(
-            fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
     }
 
     private static byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {

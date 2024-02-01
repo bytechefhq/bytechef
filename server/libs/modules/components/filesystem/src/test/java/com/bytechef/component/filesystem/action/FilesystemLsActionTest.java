@@ -25,6 +25,7 @@ import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -46,8 +47,10 @@ public class FilesystemLsActionTest {
         Mockito.when(parameters.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
             .thenReturn(true);
 
-        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
+        Map<String, List<FilesystemLsAction.FileInfo>> performMap = FilesystemLsAction.perform(
             parameters, parameters, Mockito.mock(ActionContext.class));
+
+        List<FilesystemLsAction.FileInfo> files = performMap.get("files");
 
         Assertions.assertEquals(
             Set.of("C.txt", "B.txt", "A.txt"),
@@ -66,8 +69,10 @@ public class FilesystemLsActionTest {
         Mockito.when(parameters.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
             .thenReturn(true);
 
-        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
+        Map<String, List<FilesystemLsAction.FileInfo>> performMap = FilesystemLsAction.perform(
             parameters, parameters, Mockito.mock(ActionContext.class));
+
+        List<FilesystemLsAction.FileInfo> files = performMap.get("files");
 
         Assertions.assertEquals(
             Set.of("sub1/C.txt", "B.txt", "A.txt"),
@@ -86,8 +91,10 @@ public class FilesystemLsActionTest {
         Mockito.when(parameters.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
             .thenReturn(false);
 
-        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
+        Map<String, List<FilesystemLsAction.FileInfo>> performMap = FilesystemLsAction.perform(
             parameters, parameters, Mockito.mock(ActionContext.class));
+
+        List<FilesystemLsAction.FileInfo> files = performMap.get("files");
 
         Assertions.assertEquals(
             Set.of("B.txt", "A.txt"),

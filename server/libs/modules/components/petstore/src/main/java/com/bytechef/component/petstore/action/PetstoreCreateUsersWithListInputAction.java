@@ -48,8 +48,7 @@ public class PetstoreCreateUsersWithListInputAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(array().items(object().properties(PetstoreUserProperties.PROPERTIES))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)));
+        .outputSchema(array("result").items(PetstoreUserProperties.PROPERTIES))
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON));
 }

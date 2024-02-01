@@ -26,6 +26,7 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 
@@ -42,17 +43,22 @@ public class AwsS3GetUrlAction {
                 .label("Key")
                 .description("The object key.")
                 .required(true))
-        .outputSchema(string())
+        .outputSchema(string("url"))
         .perform(AwsS3GetUrlAction::perform);
 
-    protected static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Map<String, String> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
-            return s3Client.utilities()
-                .getUrl(GetUrlRequest.builder()
-                    .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
-                    .key(inputParameters.getRequiredString(KEY))
-                    .build())
-                .toString();
+            return Map.of(
+                "url",
+                s3Client
+                    .utilities()
+                    .getUrl(GetUrlRequest.builder()
+                        .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
+                        .key(inputParameters.getRequiredString(KEY))
+                        .build())
+                    .toString());
         }
     }
 }

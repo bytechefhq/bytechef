@@ -32,6 +32,7 @@ import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -113,7 +114,7 @@ public class DataStorageSetValueInListAction {
                 .required(true))
         .perform(DataStorageSetValueInListAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         // TODO

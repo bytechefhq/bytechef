@@ -16,7 +16,6 @@
 
 package com.bytechef.component.schedule.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
@@ -53,11 +52,9 @@ public class ScheduleCronTrigger {
                 .description("The timezone at which the cron expression will be scheduled.")
                 .options(ScheduleUtils.getTimeZoneOptions()))
         .outputSchema(
-            object()
-                .properties(
-                    string(DATETIME),
-                    string(EXPRESSION),
-                    string(TIMEZONE)))
+            string(DATETIME),
+            string(EXPRESSION),
+            string(TIMEZONE))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

@@ -2,9 +2,9 @@
 label: "Alter output"
 outputs:
 - name: "stringNumber"
-  value: "${stringNumber}"
+  value: "${stringNumber.value}"
 - name: "intNumber"
-  value: "${intNumber}"
+  value: "${intNumber.value}"
 tasks:
 - name: "stringNumber"
   type: "var/v1/set"
@@ -13,4 +13,4 @@ tasks:
 - name: "intNumber"
   type: "var/v1/set"
   parameters:
-    value: "${int(stringNumber)}"
+    value: "${int(stringNumber.value)}"

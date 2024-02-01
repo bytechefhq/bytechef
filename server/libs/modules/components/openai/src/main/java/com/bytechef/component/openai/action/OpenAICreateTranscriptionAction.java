@@ -44,6 +44,7 @@ import com.theokanning.openai.audio.TranscriptionResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -156,7 +157,7 @@ public class OpenAICreateTranscriptionAction {
                 .maxValue(1)
                 .required(false))
         .outputSchema(
-            object().properties(
+            object("transcription").properties(
                 string("text"),
                 string("task"),
                 string("language"),
@@ -183,7 +184,7 @@ public class OpenAICreateTranscriptionAction {
     private OpenAICreateTranscriptionAction() {
     }
 
-    public static TranscriptionResult perform(
+    public static Map<String, TranscriptionResult> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
@@ -198,7 +199,9 @@ public class OpenAICreateTranscriptionAction {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
-        return openAiService.createTranscription(
-            createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry)));
+        return Map.of(
+            "transcription",
+            openAiService.createTranscription(
+                createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry))));
     }
 }

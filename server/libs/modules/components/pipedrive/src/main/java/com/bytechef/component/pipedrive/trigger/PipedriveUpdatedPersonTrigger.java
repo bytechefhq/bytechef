@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -48,85 +49,83 @@ public class PipedriveUpdatedPersonTrigger {
         .description("Trigger off whenever an existing person is updated.")
         .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
         .outputSchema(
-            object()
-                .properties(
-                    integer("id"),
-                    integer("company_id"),
-                    object("owner_id").properties(
-                        integer("id"),
-                        string("name"),
-                        string("email"),
-                        integer("has_pic"),
-                        string("pic_hash"),
-                        bool("active_flag"),
-                        integer("value")),
-                    object("org_id").properties(
-                        integer("id"),
-                        integer("people_count"),
-                        integer("owner_id"),
-                        string("address"),
-                        bool("active_flag"),
-                        string("cc_email"),
-                        integer("value")),
-                    string("name"),
-                    string("first_name"),
-                    string("last_name"),
-                    integer("open_deals_count"),
-                    integer("related_open_deals_count"),
-                    integer("closed_deals_count"),
-                    integer("related_closed_deals_count"),
-                    integer("participant_open_deals_count"),
-                    integer("participant_closed_deals_count"),
-                    integer("email_messages_count"),
-                    integer("activities_count"),
-                    integer("done_activities_count"),
-                    integer("undone_activities_count"),
-                    integer("files_count"),
-                    integer("notes_count"),
-                    integer("followers_count"),
-                    integer("won_deals_count"),
-                    integer("related_won_deals_count"),
-                    integer("lost_deals_count"),
-                    integer("related_lost_deals_count"),
-                    bool("active_flag"),
-                    array("phone").items(
-                        object().properties(
-                            string("label"),
-                            string("value"),
-                            bool("primary"))),
-                    array("email").items(
-                        object().properties(
-                            string("label"),
-                            string("value"),
-                            bool("primary"))),
-                    string("primary_email"),
-                    string("first_char"),
-                    dateTime("update_time"),
-                    dateTime("add_time"),
-                    string("visible_to"),
-                    string("marketing_status"),
-                    object("picture_id").properties(
-                        string("item_type"),
-                        integer("item_id"),
-                        bool("active_flag"),
-                        dateTime("add_time"),
-                        dateTime("update_time"),
-                        integer("added_by_user_id"),
-                        object("pictures").properties(
-                            string("128"),
-                            string("512")),
-                        integer("value")),
-                    date("next_activity_date"),
-                    time("next_activity_time"),
-                    integer("next_activity_id"),
-                    integer("last_activity_id"),
-                    date("last_activity_date"),
-                    dateTime("last_incoming_mail_time"),
-                    dateTime("last_outgoing_mail_time"),
-                    integer("label"),
-                    string("org_name"),
-                    string("owner_name"),
-                    string("cc_email")))
+            integer("id"),
+            integer("company_id"),
+            object("owner_id").properties(
+                integer("id"),
+                string("name"),
+                string("email"),
+                integer("has_pic"),
+                string("pic_hash"),
+                bool("active_flag"),
+                integer("value")),
+            object("org_id").properties(
+                integer("id"),
+                integer("people_count"),
+                integer("owner_id"),
+                string("address"),
+                bool("active_flag"),
+                string("cc_email"),
+                integer("value")),
+            string("name"),
+            string("first_name"),
+            string("last_name"),
+            integer("open_deals_count"),
+            integer("related_open_deals_count"),
+            integer("closed_deals_count"),
+            integer("related_closed_deals_count"),
+            integer("participant_open_deals_count"),
+            integer("participant_closed_deals_count"),
+            integer("email_messages_count"),
+            integer("activities_count"),
+            integer("done_activities_count"),
+            integer("undone_activities_count"),
+            integer("files_count"),
+            integer("notes_count"),
+            integer("followers_count"),
+            integer("won_deals_count"),
+            integer("related_won_deals_count"),
+            integer("lost_deals_count"),
+            integer("related_lost_deals_count"),
+            bool("active_flag"),
+            array("phone").items(
+                object().properties(
+                    string("label"),
+                    string("value"),
+                    bool("primary"))),
+            array("email").items(
+                object().properties(
+                    string("label"),
+                    string("value"),
+                    bool("primary"))),
+            string("primary_email"),
+            string("first_char"),
+            dateTime("update_time"),
+            dateTime("add_time"),
+            string("visible_to"),
+            string("marketing_status"),
+            object("picture_id").properties(
+                string("item_type"),
+                integer("item_id"),
+                bool("active_flag"),
+                dateTime("add_time"),
+                dateTime("update_time"),
+                integer("added_by_user_id"),
+                object("pictures").properties(
+                    string("128"),
+                    string("512")),
+                integer("value")),
+            date("next_activity_date"),
+            time("next_activity_time"),
+            integer("next_activity_id"),
+            integer("last_activity_id"),
+            date("last_activity_date"),
+            dateTime("last_incoming_mail_time"),
+            dateTime("last_outgoing_mail_time"),
+            integer("label"),
+            string("org_name"),
+            string("owner_name"),
+            string("cc_email"))
 //        .sampleOutput(
 //            """
 //                {
@@ -237,10 +236,10 @@ public class PipedriveUpdatedPersonTrigger {
     }
 
     @SuppressWarnings("unchecked")
-    protected static Object dynamicWebhookRequest(
+    protected static Map<String, ?> dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
-        return (Map<String, ?>) ((Map<String, ?>) body.getContent()).get("current");
+        return (Map<String, ?>) (body.getContent(new TypeReference<Map<String, ?>>() {})).get("current");
     }
 }

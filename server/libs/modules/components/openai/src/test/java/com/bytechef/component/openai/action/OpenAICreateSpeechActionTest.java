@@ -33,6 +33,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.theokanning.openai.audio.CreateSpeechRequest;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
+import java.util.Map;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -68,7 +69,10 @@ public class OpenAICreateSpeechActionTest extends AbstractOpenAIActionTest {
             (openAiService, context) -> when(openAiService.createSpeech(any()))
                 .thenReturn(mockedResponseBody))) {
 
-            FileEntry fileEntry = OpenAICreateSpeechAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, FileEntry> handleMap = OpenAICreateSpeechAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
+
+            FileEntry fileEntry = handleMap.get("fileEntry");
 
             List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 

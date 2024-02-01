@@ -16,6 +16,7 @@
 
 package com.bytechef.component.openai.util;
 
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
@@ -136,9 +137,10 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(true);
 
-        Output output = OpenAIUtils.getOutputSchema(mockedParameters, mockedParameters, mockedContext);
+        Output output = OpenAIUtils.getOutput(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(OpenAIUtils.outputSchemaResponseForStream, output.outputSchema());
+        Assertions.assertEquals(
+            object().properties(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE_FOR_STREAM), output.getOutputSchema());
     }
 
     @Test
@@ -146,9 +148,10 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(false);
 
-        Output output = OpenAIUtils.getOutputSchema(
+        Output output = OpenAIUtils.getOutput(
             mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(OpenAIUtils.outputSchemaResponse, output.outputSchema());
+        Assertions.assertEquals(
+            object().properties(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE), output.getOutputSchema());
     }
 }

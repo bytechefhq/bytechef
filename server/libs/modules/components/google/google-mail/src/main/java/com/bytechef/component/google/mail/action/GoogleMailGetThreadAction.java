@@ -26,7 +26,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GE
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY_FUNCTION;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
 
@@ -38,6 +38,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -57,28 +58,30 @@ public class GoogleMailGetThreadAction {
                 .description("When given and format is METADATA, only include headers specified.")
                 .required(false))
         .outputSchema(
-            object()
+            object("thread")
                 .properties(
                     string(ID),
                     string(SNIPPET),
                     string(HISTORY_ID),
                     array(MESSAGES)
-                        .items(MESSAGE_PROPERTY)))
+                        .items(MESSAGE_PROPERTY_FUNCTION.apply(null))))
         .perform(GoogleMailGetThreadAction::perform);
 
     private GoogleMailGetThreadAction() {
     }
 
-    public static Thread perform(
+    public static Map<String, Thread> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Gmail service = GoogleMailUtils.getMail(connectionParameters);
 
-        return service.users()
-            .threads()
-            .get("me", inputParameters.getRequiredString(ID))
-            .setFormat(inputParameters.getString(FORMAT))
-            .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-            .execute();
+        return Map.of(
+            "thread",
+            service.users()
+                .threads()
+                .get("me", inputParameters.getRequiredString(ID))
+                .setFormat(inputParameters.getString(FORMAT))
+                .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
+                .execute());
     }
 }

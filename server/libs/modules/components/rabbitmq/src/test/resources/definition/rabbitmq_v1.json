@@ -5,13 +5,13 @@
     "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
     "componentTitle": "RabbitMQ",
     "componentVersion": 1,
+    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Send a new RabbitMQ message.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sendMessage",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -54,8 +54,8 @@
       "optionsDataSource": null
     } ],
     "title": "Send Message",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -161,13 +161,13 @@
     "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
     "componentTitle": "RabbitMQ",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Triggers on new RabbitMQ messages.",
     "nodeDescriptionFunction": null,
     "help": null,
     "name": "newMessage",
-    "defaultOutputFunction": false,
-    "outputFunction": { },
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -194,16 +194,16 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "deduplicate": null,
     "poll": null,
+    "output": null,
     "listenerDisable": { },
     "listenerEnable": { },
     "webhookValidate": null,
-    "output": null
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null
   } ],
   "allowedConnections": null
 }

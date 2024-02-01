@@ -47,14 +47,10 @@ public class PipedriveDeleteDealAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object().properties(bool("success").description("If the request was successful or not")
-            .required(false),
-            object("data").properties(integer("id").description("The ID of the deal that was deleted")
-                .required(false))
-                .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)))
+        .outputSchema(bool("success").required(false), object("data").properties(integer("id").required(false))
+            .required(false))
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
             Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", 123)))));
 }

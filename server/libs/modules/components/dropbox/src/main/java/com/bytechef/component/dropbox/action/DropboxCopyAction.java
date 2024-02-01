@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.RelocationResult;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -52,39 +53,42 @@ public final class DropboxCopyAction {
                 .description("The path which the file or folder should be copyed to.")
                 .required(true))
         .outputSchema(
-            object().properties(
-                object("metadata")
-                    .properties(
-                        string("name")
-                            .label("Name")
-                            .required(true),
-                        string("pathLower")
-                            .label("Path lowercase")
-                            .required(true),
-                        string("pathDisplay")
-                            .label("Path display")
-                            .required(true),
-                        string("parentSharedFolderId")
-                            .label("Parent shared folder")
-                            .required(true),
-                        string("previewUrl")
-                            .label("Preview URL")
-                            .required(true))
-                    .label("Metadata")))
+            object("result")
+                .properties(
+                    object("metadata")
+                        .properties(
+                            string("name")
+                                .label("Name")
+                                .required(true),
+                            string("pathLower")
+                                .label("Path lowercase")
+                                .required(true),
+                            string("pathDisplay")
+                                .label("Path display")
+                                .required(true),
+                            string("parentSharedFolderId")
+                                .label("Parent shared folder")
+                                .required(true),
+                            string("previewUrl")
+                                .label("Preview URL")
+                                .required(true))
+                        .label("Metadata")))
         .perform(DropboxCopyAction::perform);
 
     private DropboxCopyAction() {
     }
 
-    public static RelocationResult perform(
+    public static Map<String, RelocationResult> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return dbxUserFilesRequests.copyV2(
+        RelocationResult relocationResult = dbxUserFilesRequests.copyV2(
             inputParameters.getRequiredString(SOURCE_FILENAME),
             inputParameters.getRequiredString(DESTINATION_FILENAME));
+
+        return Map.of("result", relocationResult);
     }
 }

@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.SearchV2Result;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -51,40 +52,41 @@ public final class DropboxSearchAction {
                     "The string to search for. May match across multiple fields based on the request arguments."
                         + "Must have length of at most 1000 and not be null.")
                 .required(true))
-        .outputSchema(object()
-            .properties(
-                array("matches")
-                    .items(
-                        object()
-                            .properties(
-                                array("highlightSpans")
-                                    .items(
-                                        string("highlightStr")
-                                            .label("Highlight string")
-                                            .required(true),
-                                        bool("isHighlighted")
-                                            .label("Is highlighted")
-                                            .required(true))
-                                    .label("Highlight spans")))
-                    .label("Matches"),
-                bool("hasMore")
-                    .label("Has more")
-                    .required(true),
-                string("cursor")
-                    .label("Cursor")
-                    .required(true)))
+        .outputSchema(
+            object("result")
+                .properties(
+                    array("matches")
+                        .items(
+                            object()
+                                .properties(
+                                    array("highlightSpans")
+                                        .items(
+                                            string("highlightStr")
+                                                .label("Highlight string")
+                                                .required(true),
+                                            bool("isHighlighted")
+                                                .label("Is highlighted")
+                                                .required(true))
+                                        .label("Highlight spans")))
+                        .label("Matches"),
+                    bool("hasMore")
+                        .label("Has more")
+                        .required(true),
+                    string("cursor")
+                        .label("Cursor")
+                        .required(true)))
         .perform(DropboxSearchAction::perform);
 
     private DropboxSearchAction() {
     }
 
-    public static SearchV2Result perform(
+    public static Map<String, SearchV2Result> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING));
+        return Map.of("result", dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING)));
     }
 }

@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -139,6 +140,21 @@ public class HttpClientActionUtils {
         } else {
             return response.getBody();
         }
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    public static PerformFunction getPerform(RequestMethod requestMethod) {
+        return (inputParameters, connectionParameters, context) -> {
+            Object result = HttpClientActionUtils.execute(inputParameters, requestMethod, context);
+
+            if (result instanceof Map map) {
+                return map;
+            } else {
+                return Map.of("result", result);
+            }
+        };
     }
 
     @SafeVarargs

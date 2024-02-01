@@ -83,7 +83,7 @@ public class JsonFileWriteAction {
                 .required(true)
                 .defaultValue("file.json")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(JsonFileWriteAction::perform);
 
     private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
@@ -93,7 +93,7 @@ public class JsonFileWriteAction {
     }
 
     @SuppressWarnings("unchecked")
-    protected static FileEntry perform(
+    protected static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         JsonFileConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
@@ -114,8 +114,10 @@ public class JsonFileWriteAction {
         }
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-            return context.file(file -> file.storeContent(
-                getDefaultFileName(fileType, inputParameters.getString(FILENAME)), inputStream));
+            return Map.of(
+                "fileEntry",
+                context.file(file -> file.storeContent(
+                    getDefaultFileName(fileType, inputParameters.getString(FILENAME)), inputStream)));
         }
     }
 }

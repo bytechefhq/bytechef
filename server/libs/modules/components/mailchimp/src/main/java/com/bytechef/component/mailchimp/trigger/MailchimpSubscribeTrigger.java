@@ -55,20 +55,21 @@ public class MailchimpSubscribeTrigger {
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact."))
         .outputSchema(
-            object()
+            object("result")
                 .properties(
-                    object("data").properties(
-                        string("email"),
-                        string("email_type"),
-                        string("id"),
-                        string("ip_opt"),
-                        string("ip_signup"),
-                        string("list_id"),
-                        object("merges").properties(
-                            string("EMAIL"),
-                            string("FNAME"),
-                            string("INTERESTS"),
-                            string("LNAME"))),
+                    object("data")
+                        .properties(
+                            string("email"),
+                            string("email_type"),
+                            string("id"),
+                            string("ip_opt"),
+                            string("ip_signup"),
+                            string("list_id"),
+                            object("merges").properties(
+                                string("EMAIL"),
+                                string("FNAME"),
+                                string("INTERESTS"),
+                                string("LNAME"))),
                     dateTime("fired_at"),
                     string("type")))
         .dynamicWebhookDisable(MailchimpSubscribeTrigger::dynamicWebhookDisable)
@@ -113,11 +114,11 @@ public class MailchimpSubscribeTrigger {
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Map<String, ?> dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         TriggerContext context) {
 
-        return body.getContent();
+        return Map.of("result", body.getContent());
     }
 }

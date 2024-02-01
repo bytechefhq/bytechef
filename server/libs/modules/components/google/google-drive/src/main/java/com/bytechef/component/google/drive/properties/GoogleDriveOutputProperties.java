@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 
 /**
  * @author Mario Cvjetojevic
@@ -83,7 +84,7 @@ public final class GoogleDriveOutputProperties {
         string(PHOTO_LINK)
     };
 
-    public static final ComponentDSL.ModifiableObjectProperty FILE_PROPERTY = object()
+    public static final ModifiableObjectProperty FILE_PROPERTY = object("file")
         .properties(
             bool(COPY_REQUIRES_WRITER_PERMISSION),
             dateTime(CREATED_TIME),

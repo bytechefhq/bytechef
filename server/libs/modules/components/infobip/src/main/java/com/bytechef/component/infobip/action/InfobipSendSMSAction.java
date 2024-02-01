@@ -102,6 +102,7 @@ import com.infobip.model.SmsTextualMessage;
 import com.infobip.model.SmsTracking;
 import com.infobip.model.SmsUrlOptions;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -464,7 +465,7 @@ public class InfobipSendSMSAction {
                 .defaultValue(false)
                 .required(false))
         .outputSchema(
-            object()
+            object("smsResponse")
                 .properties(
                     string(BULK_ID),
                     array(MESSAGES)
@@ -485,7 +486,7 @@ public class InfobipSendSMSAction {
     private InfobipSendSMSAction() {
     }
 
-    public static SmsResponse perform(
+    public static Map<String, SmsResponse> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws ApiException {
 
         ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(connectionParameters.getRequiredString(VALUE)))
@@ -508,8 +509,11 @@ public class InfobipSendSMSAction {
             .includeSmsCountInResponse(inputParameters.getBoolean(INCLUDE_SMS_COUNT_IN_RESPONSE))
             .messages(smsTextualMessages);
 
-        return smsApi.sendSmsMessage(smsAdvancedTextualRequest)
-            .execute();
+        return Map.of(
+            "smsResponse",
+            smsApi
+                .sendSmsMessage(smsAdvancedTextualRequest)
+                .execute());
 
     }
 }

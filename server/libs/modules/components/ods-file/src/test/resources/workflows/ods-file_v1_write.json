@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "writeOdsFile",
-    "value": "${writeOdsFile}"
+    "value": "${writeOdsFile.fileEntry}"
   } ],
   "tasks": [ {
     "name": "writeOdsFile",

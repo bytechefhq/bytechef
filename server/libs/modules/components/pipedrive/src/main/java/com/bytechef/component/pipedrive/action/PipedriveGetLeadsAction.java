@@ -115,66 +115,27 @@ public class PipedriveGetLeadsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object()
-            .properties(bool("success").required(false), array("data").items(object().properties(
-                string("id").description("The unique ID of the lead in the UUID format")
+        .outputSchema(bool("success").required(false), array("data")
+            .items(string("id").required(false), string("title").required(false), integer("owner_id").required(false),
+                integer("creator_id").required(false), array("label_ids").items(string())
                     .required(false),
-                string("title").description("The title of the lead")
-                    .required(false),
-                integer("owner_id").description("The ID of the user who owns the lead")
-                    .required(false),
-                integer("creator_id").description("The ID of the user who created the lead")
-                    .required(false),
-                array("label_ids")
-                    .items(string().description("The IDs of the lead labels which are associated with the lead"))
-                    .description("The IDs of the lead labels which are associated with the lead")
-                    .required(false),
-                integer("person_id").description("The ID of a person which this lead is linked to")
-                    .required(false),
-                integer("organization_id").description("The ID of an organization which this lead is linked to")
-                    .required(false),
-                string("source_name").description(
-                    "Defines where the lead comes from. Will be `API` if the lead was created through the Public API and will be `Manually created` if the lead was created manually through the UI.\n")
-                    .required(false),
-                bool("is_archived").description("A flag indicating whether the lead is archived or not")
-                    .required(false),
-                bool("was_seen")
-                    .description("A flag indicating whether the lead was seen by someone in the Pipedrive UI")
-                    .required(false),
+                integer("person_id").required(false), integer("organization_id").required(false),
+                string("source_name").required(false), bool("is_archived").required(false),
+                bool("was_seen").required(false),
                 object("value").properties(number("amount").required(true), string("currency").required(true))
-                    .description("The potential value of the lead")
                     .required(false),
-                date("expected_close_date").description(
-                    "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
+                date("expected_close_date").required(false), integer("next_activity_id").required(false),
+                dateTime("add_time").required(false), dateTime("update_time").required(false),
+                string("visible_to").options(option("1", "1"), option("3", "3"), option("5", "5"), option("7", "7"))
                     .required(false),
-                integer("next_activity_id").description("The ID of the next activity associated with the lead")
-                    .required(false),
-                dateTime("add_time")
-                    .description(
-                        "The date and time of when the lead was created. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
-                    .required(false),
-                dateTime("update_time").description(
-                    "The date and time of when the lead was last updated. In ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.")
-                    .required(false),
-                string("visible_to").description(
-                    "The visibility of the lead. If omitted, the visibility will be set to the default visibility setting of this item type for the authorized user.<table><tr><th>Value</th><th>Description</th></tr><tr><td>`1`</td><td>Owner &amp; followers (private)</td></tr><tr><td>`3`</td><td>Entire company (shared)</td></tr></table>")
-                    .options(option("1", "1"), option("3", "3"), option("5", "5"), option("7", "7"))
-                    .required(false),
-                string("cc_email").description("The BCC email of the lead")
-                    .required(false)))
-                .required(false),
-                object("additional_data").properties(integer("start").description("Pagination start")
-                    .required(false),
-                    integer("limit").description("Items shown per page")
-                        .required(false),
-                    bool("more_items_in_collection")
-                        .description("If there are more list items in the collection than displayed or not")
-                        .required(false))
-                    .description("The additional data of the list")
-                    .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)))
+                string("cc_email").required(false))
+            .required(false),
+            object("additional_data")
+                .properties(integer("start").required(false), integer("limit").required(false),
+                    bool("more_items_in_collection").required(false))
+                .required(false))
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
             Map.entry("data",
                 List.of(Map.<String, Object>ofEntries(Map.entry("id", "adf21080-0e10-11eb-879b-05d71fb426ec"),

@@ -44,13 +44,15 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 
 /**
  * @author Monika Domiter
  */
 public abstract class AbstractChatCompletionAction {
 
-    public static final ComponentDSL.ModifiableStringProperty MODEL_PROPERTY = string(MODEL)
+    public static final ModifiableStringProperty MODEL_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
         .required(true);
@@ -65,7 +67,7 @@ public abstract class AbstractChatCompletionAction {
         .maxValue(2)
         .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
+    public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
         .label("Logit bias")
         .description("Modify the likelihood of specified tokens appearing in the completion.")
         .defaultValue(null)
@@ -92,7 +94,7 @@ public abstract class AbstractChatCompletionAction {
         .maxValue(2)
         .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty RESPONSE_FORMAT_PROPERTY = object(RESPONSE_FORMAT)
+    public static final ModifiableObjectProperty RESPONSE_FORMAT_PROPERTY = object(RESPONSE_FORMAT)
         .label("Response format")
         .description(
             "An object specifying the format that the model must output. Compatible with gpt-4-1106-preview and " +
@@ -108,7 +110,7 @@ public abstract class AbstractChatCompletionAction {
                 "monitor changes in the backend.")
         .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty STOP_PROPERTY = object(STOP)
+    public static final ModifiableObjectProperty STOP_PROPERTY = object(STOP)
         .label("Stop")
         .description("Up to 4 sequences where the API will stop generating further tokens.")
         .defaultValue(null)
@@ -175,12 +177,12 @@ public abstract class AbstractChatCompletionAction {
                             .required(false))))
         .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty TOOL_CHOICE_PROPERTY = object(TOOL_CHOICE)
+    public static final ModifiableObjectProperty TOOL_CHOICE_PROPERTY = object(TOOL_CHOICE)
         .label("Tool choice")
         .description("")
         .required(false);
 
-    public static final ComponentDSL.ModifiableStringProperty USER_PROPERTY = string(USER)
+    public static final ModifiableStringProperty USER_PROPERTY = string(USER)
         .label("User")
         .description(
             "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.")

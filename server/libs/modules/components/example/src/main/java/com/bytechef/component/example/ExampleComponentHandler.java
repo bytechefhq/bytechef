@@ -17,11 +17,11 @@
 package com.bytechef.component.example;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.component.googledrive.constant.ExampleConstants.EXAMPLE;
+import static com.bytechef.component.example.constant.ExampleConstants.EXAMPLE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.googledrive.action.ExampleDummyAction;
+import com.bytechef.component.example.action.ExampleDummyAction;
 import com.google.auto.service.AutoService;
 
 /**

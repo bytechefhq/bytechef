@@ -28,6 +28,7 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -66,9 +67,12 @@ class GoogleCalendarCreateQuickEventActionTest extends AbstractGoogleCalendarAct
             googleCalendarUtilsMockedStatic.when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
                 .thenReturn(mockedCalendar);
 
-            Event result = GoogleCalendarCreateQuickEventAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, Event> handleMap = GoogleCalendarCreateQuickEventAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(mockedEvent, result);
+            Event event = handleMap.get("event");
+
+            assertEquals(mockedEvent, event);
             assertEquals("primary", calendarIdArgumentCaptor.getValue());
             assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
             assertEquals("text", eventTextArgumentCaptor.getValue());

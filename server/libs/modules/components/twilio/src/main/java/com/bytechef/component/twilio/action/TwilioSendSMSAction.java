@@ -73,6 +73,7 @@ import java.net.URI;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -251,7 +252,7 @@ public class TwilioSendSMSAction {
                         "your Templates.")
                 .required(false))
         .outputSchema(
-            object()
+            object("message")
                 .properties(
                     string("body"),
                     string("numSegments"),
@@ -295,7 +296,7 @@ public class TwilioSendSMSAction {
 
     }
 
-    protected static Message perform(
+    protected static Map<String, Message> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         String username = connectionParameters.getRequiredString(USERNAME);
@@ -315,7 +316,7 @@ public class TwilioSendSMSAction {
         if (isFirstCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), messagingServiceSID, mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // second case: pathAccountSid, to, messagingServiceSid, mediaUrl
@@ -324,7 +325,7 @@ public class TwilioSendSMSAction {
             MessageCreator messageCreator = Message.creator(
                 pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // third case: to, messagingServiceSid, body
@@ -332,7 +333,7 @@ public class TwilioSendSMSAction {
         if (isThirdCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), messagingServiceSID, body);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // fourth case: pathAccountSid, to, messagingServiceSid, body
@@ -341,7 +342,7 @@ public class TwilioSendSMSAction {
             MessageCreator messageCreator = Message.creator(
                 pathAccountSid, new PhoneNumber(to), messagingServiceSID, body);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // fifth case: to, from, mediaUrl
@@ -349,7 +350,7 @@ public class TwilioSendSMSAction {
         if (isFifthCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), new PhoneNumber(from), mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // sixth case: pathAccountSid, to, from, mediaUrl
@@ -358,7 +359,7 @@ public class TwilioSendSMSAction {
             MessageCreator messageCreator = Message.creator(
                 pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // seventh case: to, from, body
@@ -366,7 +367,7 @@ public class TwilioSendSMSAction {
         if (isSeventhCase(from, body, pathAccountSid)) {
             MessageCreator messageCreator = Message.creator(new PhoneNumber(to), new PhoneNumber(from), body);
 
-            return getMessage(inputParameters, messageCreator);
+            return Map.of("message", getMessage(inputParameters, messageCreator));
         }
 
         // eighth case: pathAccountSid, to, from, body
@@ -374,7 +375,7 @@ public class TwilioSendSMSAction {
         MessageCreator messageCreator = Message.creator(
             pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body);
 
-        return getMessage(inputParameters, messageCreator);
+        return Map.of("message", getMessage(inputParameters, messageCreator));
 
     }
 

@@ -119,7 +119,7 @@ public class MicrosoftOutlook365Constants {
         .description("Represents a time zone, for example, 'Pacific Standard Time'.")
         .required(false);
 
-    public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
+    public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object("message")
         .properties(
             array(BCC_RECIPIENTS)
                 .items(

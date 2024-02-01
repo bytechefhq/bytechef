@@ -5,13 +5,13 @@
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "get",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -194,23 +194,165 @@
       "properties": null,
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
+    }, {
+      "advancedOption": true,
+      "description": "Returns the full response data instead of only the body.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "fullResponse",
+      "type": "BOOLEAN",
+      "defaultValue": false,
+      "exampleValue": null,
+      "label": "Full Response",
+      "placeholder": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "label": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
+    }, {
+      "advancedOption": true,
+      "description": "Follow non-GET HTTP 3xx redirects.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "followAllRedirects",
+      "type": "BOOLEAN",
+      "defaultValue": false,
+      "exampleValue": null,
+      "label": "Follow All Redirects",
+      "placeholder": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "label": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
+    }, {
+      "advancedOption": true,
+      "description": "Follow GET HTTP 3xx redirects.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "followRedirect",
+      "type": "BOOLEAN",
+      "defaultValue": false,
+      "exampleValue": null,
+      "label": "Follow GET Redirect",
+      "placeholder": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "label": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
+    }, {
+      "advancedOption": true,
+      "description": "Succeeds also when the status code is not 2xx.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "ignoreResponseCode",
+      "type": "BOOLEAN",
+      "defaultValue": false,
+      "exampleValue": null,
+      "label": "Ignore Response Code",
+      "placeholder": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "label": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
+    }, {
+      "advancedOption": true,
+      "description": "HTTP proxy to use.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "proxy",
+      "type": "STRING",
+      "defaultValue": "",
+      "exampleValue": null,
+      "label": "Proxy",
+      "placeholder": "https://myproxy:3128",
+      "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": true,
+      "description": "Time in ms to wait for the server to send a response before aborting the request.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "timeout",
+      "type": "INTEGER",
+      "defaultValue": 1000,
+      "exampleValue": null,
+      "label": "Timeout",
+      "placeholder": null,
+      "maxValue": null,
+      "minValue": 1,
+      "options": null,
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "GET",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "post",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1119,21 +1261,21 @@
       "optionsDataSource": null
     } ],
     "title": "POST",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "put",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2042,21 +2184,21 @@
       "optionsDataSource": null
     } ],
     "title": "PUT",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "patch",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2965,21 +3107,21 @@
       "optionsDataSource": null
     } ],
     "title": "PATCH",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "delete",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -3306,21 +3448,21 @@
       "optionsDataSource": null
     } ],
     "title": "DELETE",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The request method to use.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "head",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -3647,8 +3789,8 @@
       "optionsDataSource": null
     } ],
     "title": "HEAD",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {

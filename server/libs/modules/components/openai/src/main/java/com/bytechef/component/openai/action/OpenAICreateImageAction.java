@@ -46,6 +46,7 @@ import com.bytechef.component.openai.util.OpenAIUtils;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -104,16 +105,17 @@ public class OpenAICreateImageAction {
                         "abuse.")
                 .required(false))
         .outputSchema(
-            object().properties(
-                integer("created"),
-                array("data")
-                    .items(
-                        object()
-                            .properties(
-                                string("url")
-                                    .controlType(Property.ControlType.URL),
-                                string("b64Json"),
-                                string("revisedPrompt"))))
+            object("image")
+                .properties(
+                    integer("created"),
+                    array("data")
+                        .items(
+                            object()
+                                .properties(
+                                    string("url")
+                                        .controlType(Property.ControlType.URL),
+                                    string("b64Json"),
+                                    string("revisedPrompt"))))
 
         )
         .perform(OpenAICreateImageAction::perform);
@@ -121,7 +123,7 @@ public class OpenAICreateImageAction {
     private OpenAICreateImageAction() {
     }
 
-    public static ImageResult perform(
+    public static Map<String, ImageResult> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String token = (String) connectionParameters.get(TOKEN);
@@ -139,6 +141,6 @@ public class OpenAICreateImageAction {
         createImageRequest.setStyle(inputParameters.getString(STYLE));
         createImageRequest.setUser(inputParameters.getString(USER));
 
-        return openAiService.createImage(createImageRequest);
+        return Map.of("image", openAiService.createImage(createImageRequest));
     }
 }

@@ -68,7 +68,7 @@ public final class GoogleDriveCreateNewFolderAction {
     private GoogleDriveCreateNewFolderAction() {
     }
 
-    public static File perform(
+    public static Map<String, File> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
@@ -80,18 +80,21 @@ public final class GoogleDriveCreateNewFolderAction {
             folderFile.setDriveId(inputParameters.getString(DRIVE_ID));
         }
 
-        return drive.files()
-            .create(
-                folderFile,
-                new FileContent("application/vnd.google-apps.folder", java.io.File.createTempFile("New File", "")))
-            .setFields("id")
-            .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
-            .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
-            .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
-            .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-            .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
-            .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
-            .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
-            .execute();
+        return Map.of(
+            "file",
+            drive
+                .files()
+                .create(
+                    folderFile,
+                    new FileContent("application/vnd.google-apps.folder", java.io.File.createTempFile("New File", "")))
+                .setFields("id")
+                .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
+                .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
+                .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
+                .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
+                .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
+                .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
+                .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
+                .execute());
     }
 }

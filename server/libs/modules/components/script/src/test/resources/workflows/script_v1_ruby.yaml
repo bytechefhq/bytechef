@@ -6,7 +6,7 @@ inputs:
   required: true
 outputs:
 - name: "result"
-  value: "${script1}"
+  value: "${script1.result}"
 tasks:
 - name: "var1"
   label: "Set value"

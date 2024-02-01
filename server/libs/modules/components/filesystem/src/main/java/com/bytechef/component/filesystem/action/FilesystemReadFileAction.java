@@ -29,6 +29,7 @@ import com.bytechef.component.definition.Parameters;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -42,17 +43,17 @@ public class FilesystemReadFileAction {
             .description("The path of the file to read.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(FilesystemReadFileAction::perform);
 
-    protected static FileEntry perform(
+    protected static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws IOException {
 
         String filename = inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
-            return context.file(file -> file.storeContent(filename, inputStream));
+            return Map.of("fileEntry", context.file(file -> file.storeContent(filename, inputStream)));
         }
     }
 }

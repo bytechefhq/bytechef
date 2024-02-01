@@ -5,13 +5,13 @@
     "componentDescription": "Reads and writes data from a XLS/XLSX file.",
     "componentTitle": "XLSX File",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Reads data from a XLS/XLSX file.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "read",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -193,8 +193,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -212,8 +212,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -250,13 +250,13 @@
     "componentDescription": "Reads and writes data from a XLS/XLSX file.",
     "componentTitle": "XLSX File",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the data to a XLS/XLSX file.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "write",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": true,
@@ -346,8 +346,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -363,8 +363,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -382,8 +382,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -419,8 +419,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -455,21 +455,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
@@ -493,7 +493,7 @@
     "title": "Write to file",
     "perform": { },
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -501,7 +501,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "fileEntry",
         "type": "FILE_ENTRY",
         "defaultValue": null,
         "exampleValue": null,
@@ -585,8 +585,122 @@
           "optionsDataSource": null
         } ],
         "controlType": "FILE_ENTRY"
-      },
-      "sampleOutput": null
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "fileEntry",
+          "type": "FILE_ENTRY",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "extension",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "mimeType",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "name",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "url",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "FILE_ENTRY"
+        } ],
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      }
     }
   } ],
   "category": null,

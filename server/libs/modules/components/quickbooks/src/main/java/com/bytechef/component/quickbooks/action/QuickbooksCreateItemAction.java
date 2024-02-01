@@ -47,6 +47,7 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -92,7 +93,7 @@ public final class QuickbooksCreateItemAction {
                 .description("Expense account id")
                 .options((ActionOptionsFunction<String>) QuickbooksCreateItemAction::getExpenseAccountIdOptions))
         .outputSchema(
-            object()
+            object("item")
                 .properties(
                     string("id")
                         .label("ID")
@@ -108,7 +109,7 @@ public final class QuickbooksCreateItemAction {
     private QuickbooksCreateItemAction() {
     }
 
-    public static Item perform(
+    public static Map<String, Item> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws FMSException {
 
         DataService dataService = QuickbooksUtils.getDataService(connectionParameters);
@@ -147,7 +148,7 @@ public final class QuickbooksCreateItemAction {
                     "Invalid Quickbooks item type input: " + inputParameters.getRequiredString(TYPE));
             });
 
-        return dataService.add(item);
+        return Map.of("item", dataService.add(item));
     }
 
     @SuppressWarnings("unchecked")

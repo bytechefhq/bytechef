@@ -20,7 +20,6 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -131,11 +130,9 @@ public class JiraGetIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object().properties(JiraIssueBeanProperties.PROPERTIES)
-            .description("Details about an issue.")
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)))
+        .outputSchema(JiraIssueBeanProperties.PROPERTIES)
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON))
         .sampleOutput(
             Map.<String, Object>ofEntries(Map.entry("id", 10002.0),
                 Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10002"), Map.entry("key", "ED-1"),

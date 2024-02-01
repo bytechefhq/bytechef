@@ -114,13 +114,15 @@ class ResendSendEmailActionTest {
                     () -> ResendUtils.getAttachments(mockedParameters, mockedContext))
                     .thenReturn(attachments);
 
-                CreateEmailResponse result =
-                    ResendSendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+                Map<String, CreateEmailResponse> handleMap = ResendSendEmailAction.perform(
+                    mockedParameters, mockedParameters, mockedContext);
+
+                CreateEmailResponse response = handleMap.get("response");
 
                 List<Resend> resends = resendMockedConstruction.constructed();
 
                 assertEquals(1, resends.size());
-                assertEquals(mockedCreateEmailResponse, result);
+                assertEquals(mockedCreateEmailResponse, response);
 
                 Resend resend = resends.getFirst();
 

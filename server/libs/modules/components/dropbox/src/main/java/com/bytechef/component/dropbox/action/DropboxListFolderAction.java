@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.ListFolderResult;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -48,46 +49,47 @@ public final class DropboxListFolderAction {
                     "\" (/(.|[\\\\r\\\\n])*)?|id:.*|(ns:[0-9]+(/.*)?)\" and not be null.")
                 .required(true))
         .outputSchema(
-            object().properties(
-                array("entries").items(
-                    object()
-                        .properties(
-                            object("metadata")
-                                .properties(
-                                    string("name")
-                                        .label("Name")
-                                        .required(true),
-                                    string("pathLower")
-                                        .label("Path lowercase")
-                                        .required(true),
-                                    string("pathDisplay")
-                                        .label("Path display")
-                                        .required(true),
-                                    string("parentSharedFolderId")
-                                        .label("Parent shared folder")
-                                        .required(true),
-                                    string("previewUrl")
-                                        .label("Preview URL")
-                                        .required(true))
-                                .label("Entries"))),
-                string("cursor")
-                    .label("Cursor")
-                    .required(true),
-                bool("hasMore")
-                    .label("Has more")
-                    .required(true)))
+            object("result")
+                .properties(
+                    array("entries").items(
+                        object()
+                            .properties(
+                                object("metadata")
+                                    .properties(
+                                        string("name")
+                                            .label("Name")
+                                            .required(true),
+                                        string("pathLower")
+                                            .label("Path lowercase")
+                                            .required(true),
+                                        string("pathDisplay")
+                                            .label("Path display")
+                                            .required(true),
+                                        string("parentSharedFolderId")
+                                            .label("Parent shared folder")
+                                            .required(true),
+                                        string("previewUrl")
+                                            .label("Preview URL")
+                                            .required(true))
+                                    .label("Entries"))),
+                    string("cursor")
+                        .label("Cursor")
+                        .required(true),
+                    bool("hasMore")
+                        .label("Has more")
+                        .required(true)))
         .perform(DropboxListFolderAction::perform);
 
     private DropboxListFolderAction() {
     }
 
-    public static ListFolderResult perform(
+    public static Map<String, ListFolderResult> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME));
+        return Map.of("result", dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME)));
     }
 }

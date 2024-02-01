@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -150,11 +149,9 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object().properties(JiraSearchResultsProperties.PROPERTIES)
-            .description("The result of a JQL search.")
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)))
+        .outputSchema(JiraSearchResultsProperties.PROPERTIES)
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("expand", "names,schema"), Map.entry("startAt", 0),
             Map.entry("maxResults", 50), Map.entry("total", 1),
             Map.entry("issues", List.of(Map.<String, Object>ofEntries(Map.entry("expand", ""), Map.entry("id", 10002.0),

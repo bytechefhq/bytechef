@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.RelocationResult;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -54,7 +55,7 @@ public final class DropboxMoveAction {
                     "\"(/(.|[\\\\r\\\\n])*)|(ns:[0-9]+(/.*)?)|(id:.*)\" and not be null.")
                 .required(true))
         .outputSchema(
-            object()
+            object("result")
                 .properties(
                     object("metadata")
                         .properties(
@@ -79,15 +80,17 @@ public final class DropboxMoveAction {
     private DropboxMoveAction() {
     }
 
-    public static RelocationResult perform(
+    public static Map<String, RelocationResult> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return dbxUserFilesRequests.moveV2(
+        RelocationResult relocationResult = dbxUserFilesRequests.moveV2(
             inputParameters.getRequiredString(SOURCE_FILENAME),
             inputParameters.getRequiredString(DESTINATION_FILENAME));
+
+        return Map.of("result", relocationResult);
     }
 }

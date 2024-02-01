@@ -27,7 +27,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_ADDRESS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY_FUNCTION;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
@@ -55,6 +55,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.codec.binary.Base64;
 
@@ -114,13 +115,13 @@ public class GoogleMailSendEmailAction {
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry()))
-        .outputSchema(MESSAGE_PROPERTY)
+        .outputSchema(MESSAGE_PROPERTY_FUNCTION.apply("message"))
         .perform(GoogleMailSendEmailAction::perform);
 
     private GoogleMailSendEmailAction() {
     }
 
-    public static Message perform(
+    public static Map<String, Message> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, MessagingException {
 
@@ -182,9 +183,12 @@ public class GoogleMailSendEmailAction {
 
         message.setRaw(encodedEmail);
 
-        return service.users()
-            .messages()
-            .send("me", message)
-            .execute();
+        return Map.of(
+            "message",
+            service
+                .users()
+                .messages()
+                .send("me", message)
+                .execute());
     }
 }

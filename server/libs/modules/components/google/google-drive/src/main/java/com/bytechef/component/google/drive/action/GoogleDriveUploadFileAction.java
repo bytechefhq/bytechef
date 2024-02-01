@@ -71,7 +71,7 @@ public final class GoogleDriveUploadFileAction {
     private GoogleDriveUploadFileAction() {
     }
 
-    public static File perform(
+    public static Map<String, File> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
@@ -84,20 +84,23 @@ public final class GoogleDriveUploadFileAction {
             file.setDriveId(inputParameters.getString(DRIVE_ID));
         }
 
-        return drive.files()
-            .create(
-                file,
-                new FileContent(
-                    fileEntry.getMimeType(),
-                    actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
-            .setFields("id")
-            .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
-            .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
-            .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
-            .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-            .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
-            .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
-            .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
-            .execute();
+        return Map.of(
+            "file",
+            drive
+                .files()
+                .create(
+                    file,
+                    new FileContent(
+                        fileEntry.getMimeType(),
+                        actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
+                .setFields("id")
+                .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
+                .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
+                .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
+                .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
+                .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
+                .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
+                .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
+                .execute());
     }
 }

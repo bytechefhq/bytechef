@@ -17,7 +17,6 @@
 package com.bytechef.component.schedule.trigger;
 
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
@@ -79,13 +78,11 @@ public class ScheduleEveryWeekTrigger {
                 .description("The timezone at which the cron expression will be scheduled.")
                 .options(ScheduleUtils.getTimeZoneOptions()))
         .outputSchema(
-            object()
-                .properties(
-                    string(DATETIME),
-                    integer(HOUR),
-                    integer(MINUTE),
-                    integer(DAY_OF_WEEK),
-                    string(TIMEZONE)))
+            string(DATETIME),
+            integer(HOUR),
+            integer(MINUTE),
+            integer(DAY_OF_WEEK),
+            string(TIMEZONE))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

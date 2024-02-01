@@ -6,7 +6,7 @@
   } ],
   "outputs": [ {
     "name": "writeXMLFile",
-    "value": "${writeXMLFile}"
+    "value": "${writeXMLFile.fileEntry}"
   } ],
   "tasks": [ {
     "name": "writeXMLFile",

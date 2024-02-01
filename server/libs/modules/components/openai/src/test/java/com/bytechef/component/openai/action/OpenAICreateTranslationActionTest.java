@@ -35,6 +35,7 @@ import com.theokanning.openai.audio.TranslationResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -72,8 +73,10 @@ public class OpenAICreateTranslationActionTest extends AbstractOpenAIActionTest 
             (openAiService, context) -> when(openAiService.createTranslation(any(), any(File.class)))
                 .thenReturn(mockedTranslationResult))) {
 
-            TranslationResult translationResult =
-                OpenAICreateTranslationAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, TranslationResult> handleMap = OpenAICreateTranslationAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
+
+            TranslationResult translationResult = handleMap.get("translation");
 
             List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 

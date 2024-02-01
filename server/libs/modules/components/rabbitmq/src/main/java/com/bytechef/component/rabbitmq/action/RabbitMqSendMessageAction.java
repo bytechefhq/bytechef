@@ -51,7 +51,6 @@ public class RabbitMqSendMessageAction {
             object(MESSAGE)
                 .description("The name of the queue to read from")
                 .required(true))
-        .output()
         .perform(RabbitMqSendMessageAction::perform);
 
     protected static Map<String, ?> perform(

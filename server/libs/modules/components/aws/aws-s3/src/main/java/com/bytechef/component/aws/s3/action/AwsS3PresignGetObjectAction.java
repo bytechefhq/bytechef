@@ -23,12 +23,14 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SIGNATURE_DU
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.aws.s3.constant.AwsS3Constants;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
@@ -49,10 +51,12 @@ public class AwsS3PresignGetObjectAction {
                 .label("Signature Duration")
                 .placeholder("15M, 10H, PT-6H3M, etc.")
                 .required(true))
-        .outputSchema(string())
+        .outputSchema(string(AwsS3Constants.URL))
         .perform(AwsS3PresignGetObjectAction::perform);
 
-    protected static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    protected static Map<String, String> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connectionParameters)) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
                 presignedObjectBuilder -> presignedObjectBuilder
@@ -66,7 +70,7 @@ public class AwsS3PresignGetObjectAction {
 
             URL url = presignedGetObjectRequest.url();
 
-            return url.toString();
+            return Map.of(AwsS3Constants.URL, url.toString());
         }
     }
 }

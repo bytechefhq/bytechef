@@ -24,6 +24,7 @@ import static com.bytechef.component.file.storage.constant.FileStorageConstants.
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
 import java.io.BufferedInputStream;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -56,13 +58,13 @@ public class FileStorageDownloadAction {
                 .description(
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(FileStorageDownloadAction::perform);
 
     /**
      * performs the download of a file (given its URL).
      */
-    protected static Object perform(
+    protected static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
@@ -82,8 +84,10 @@ public class FileStorageDownloadAction {
             }
 
             try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
-                return context.file(file -> file.storeContent(
-                    inputParameters.getRequiredString(FILENAME), fileInputStream));
+                return Map.of(
+                    "fileEntry",
+                    context.file(file -> file.storeContent(
+                        inputParameters.getRequiredString(FILENAME), fileInputStream)));
             }
         }
 

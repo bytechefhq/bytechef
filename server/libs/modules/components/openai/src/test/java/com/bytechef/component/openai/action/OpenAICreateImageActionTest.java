@@ -36,6 +36,7 @@ import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -73,8 +74,10 @@ public class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
             (openAiService, context) -> when(openAiService.createImage(any()))
                 .thenReturn(mockedImageResult))) {
 
-            ImageResult imageResult = OpenAICreateImageAction.perform(
+            Map<String, ImageResult> performMap = OpenAICreateImageAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
+
+            ImageResult imageResult = performMap.get("image");
 
             List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 

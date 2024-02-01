@@ -19,9 +19,7 @@ package com.bytechef.component.http.client.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
 
@@ -46,11 +44,5 @@ public class HttpClientHeadAction {
 
             HttpClientActionUtils.options(false)))
         .output()
-        .perform(HttpClientHeadAction::perform);
-
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return HttpClientActionUtils.execute(inputParameters, RequestMethod.HEAD, context);
-    }
+        .perform(HttpClientActionUtils.getPerform(RequestMethod.HEAD));
 }

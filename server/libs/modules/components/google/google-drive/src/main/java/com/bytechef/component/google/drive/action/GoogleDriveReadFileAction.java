@@ -71,19 +71,22 @@ public final class GoogleDriveReadFileAction {
     private GoogleDriveReadFileAction() {
     }
 
-    public static File perform(
+    public static Map<String, File> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
         Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
 
-        return drive.files()
-            .get(inputParameters.getRequiredString(FILE_ID))
-            .setAcknowledgeAbuse(inputParameters.getBoolean(ACKNOWLEDGE_ABUSE))
-            .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-            .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
-            .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
-            .execute();
+        return Map.of(
+            "file",
+            drive
+                .files()
+                .get(inputParameters.getRequiredString(FILE_ID))
+                .setAcknowledgeAbuse(inputParameters.getBoolean(ACKNOWLEDGE_ABUSE))
+                .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
+                .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
+                .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
+                .execute());
     }
 
     private static List<ModifiableOption<String>> getFileOptions(

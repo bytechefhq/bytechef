@@ -89,7 +89,7 @@ public final class GoogleDriveCreateNewTextFileAction {
     private GoogleDriveCreateNewTextFileAction() {
     }
 
-    public static File perform(
+    public static Map<String, File> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
@@ -111,16 +111,19 @@ public final class GoogleDriveCreateNewTextFileAction {
             bufferedWriter.write(inputParameters.getString(TEXT));
         }
 
-        return drive.files()
-            .create(googleFile, new FileContent(inputParameters.getString(MIME_TYPE), file))
-            .setFields("id")
-            .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
-            .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
-            .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
-            .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-            .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
-            .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
-            .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
-            .execute();
+        return Map.of(
+            "file",
+            drive
+                .files()
+                .create(googleFile, new FileContent(inputParameters.getString(MIME_TYPE), file))
+                .setFields("id")
+                .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
+                .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
+                .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
+                .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
+                .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
+                .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
+                .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
+                .execute());
     }
 }

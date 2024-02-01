@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -48,9 +49,9 @@ public class HttpClientDeleteAction {
         .output()
         .perform(HttpClientDeleteAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return HttpClientActionUtils.execute(inputParameters, RequestMethod.DELETE, context);
+        return Map.of("result", HttpClientActionUtils.execute(inputParameters, RequestMethod.DELETE, context));
     }
 }

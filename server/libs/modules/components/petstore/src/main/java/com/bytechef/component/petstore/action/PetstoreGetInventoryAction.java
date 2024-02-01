@@ -17,8 +17,6 @@
 package com.bytechef.component.petstore.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -40,8 +38,7 @@ public class PetstoreGetInventoryAction {
 
             ))
         .properties()
-        .outputSchema(object().additionalProperties(integer())
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)));
+        .outputSchema()
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON));
 }

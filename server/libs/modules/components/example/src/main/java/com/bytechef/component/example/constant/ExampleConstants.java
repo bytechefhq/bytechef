@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.constant;
+package com.bytechef.component.example.constant;
 
 /**
  * @author Mario Cvjetojevic

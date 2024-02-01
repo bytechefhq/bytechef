@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -55,7 +56,7 @@ public class DataStorageAtomicIncrementAction {
         .output()
         .perform(DataStorageAtomicIncrementAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         // TODO

@@ -112,9 +112,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         taskExecution.setJobId(4567L);
 
-        List<?> results = taskHandler.handle(taskExecution);
+        Map<String, List<?>> handleMap = taskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(List.of(1, 2, 3), results);
+        List<?> result = handleMap.get("result");
+
+        Assertions.assertEquals(List.of(1, 2, 3), result);
     }
 
     @Test

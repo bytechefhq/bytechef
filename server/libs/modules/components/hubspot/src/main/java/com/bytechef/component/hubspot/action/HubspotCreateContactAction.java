@@ -51,8 +51,7 @@ public class HubspotCreateContactAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object().properties(HubspotSimplePublicObjectProperties.PROPERTIES)
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)));
+        .outputSchema(HubspotSimplePublicObjectProperties.PROPERTIES)
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON));
 }

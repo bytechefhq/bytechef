@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.microsoft.graph.requests.MessageCollectionPage;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -38,13 +39,13 @@ public class MicrosoftOutlook365SearchEmailAction {
         )
         .outputSchema(
             // TODO
-            string())
+            string("page"))
         .perform(MicrosoftOutlook365SearchEmailAction::perform);
 
     private MicrosoftOutlook365SearchEmailAction() {
     }
 
-    public static MessageCollectionPage perform(
+    public static Map<String, MessageCollectionPage> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         // TODO

@@ -40,12 +40,12 @@ public class XmlHelperParseAction {
                 .label("Source")
                 .description("The XML string to convert to the data.")
                 .required(true))
-        .outputSchema(object())
+        .outputSchema(object("result"))
         .perform(XmlHelperParseAction::perform);
 
     protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.xml(xml -> xml.read(inputParameters.getRequiredString(SOURCE)));
+        return Map.of("result", context.xml(xml -> xml.read(inputParameters.getRequiredString(SOURCE))));
     }
 }

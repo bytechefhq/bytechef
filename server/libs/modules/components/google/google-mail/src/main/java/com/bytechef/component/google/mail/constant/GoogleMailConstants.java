@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import java.util.function.Function;
 
 /**
  * @author Monika Domiter
@@ -92,32 +93,31 @@ public class GoogleMailConstants {
                 option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
             .required(false);
 
-    public static final ModifiableObjectProperty MESSAGE_PROPERTY =
-        object()
-            .properties(
-                string(ID),
-                string(THREAD_ID),
-                array(LABEL_IDS)
-                    .items(string()),
-                string(SNIPPET),
-                string(HISTORY_ID),
-                number(INTERNAL_DATE),
-                object(PAYLOAD)
-                    .properties(
-                        string(PART_ID),
-                        string(MIME_TYPE),
-                        string(FILENAME),
-                        array(HEADERS)
-                            .items(
-                                string(NAME),
-                                string(VALUE)),
-                        object(BODY)
-                            .properties(
-                                string(ATTACHMENT_ID),
-                                integer(SIZE),
-                                string(DATA)),
-                        array(PARTS)
-                            .items()),
-                integer(SIZE_ESTIMATE),
-                string(RAW));
+    public static final Function<String, ModifiableObjectProperty> MESSAGE_PROPERTY_FUNCTION = (name) -> object(name)
+        .properties(
+            string(ID),
+            string(THREAD_ID),
+            array(LABEL_IDS)
+                .items(string()),
+            string(SNIPPET),
+            string(HISTORY_ID),
+            number(INTERNAL_DATE),
+            object(PAYLOAD)
+                .properties(
+                    string(PART_ID),
+                    string(MIME_TYPE),
+                    string(FILENAME),
+                    array(HEADERS)
+                        .items(
+                            string(NAME),
+                            string(VALUE)),
+                    object(BODY)
+                        .properties(
+                            string(ATTACHMENT_ID),
+                            integer(SIZE),
+                            string(DATA)),
+                    array(PARTS)
+                        .items()),
+            integer(SIZE_ESTIMATE),
+            string(RAW));
 }

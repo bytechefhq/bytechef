@@ -19,6 +19,7 @@ package com.bytechef.component.aws.s3.action;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.LIST_OBJECTS;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PREFIX;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.RESULT;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -32,6 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -52,10 +54,11 @@ public class AwsS3ListObjectsAction {
                 .label("Prefix")
                 .description("The prefix of an AWS S3 objects.")
                 .required(true))
-        .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
+        .outputSchema(
+            array(RESULT).items(object().properties(string("key"), string("suffix"), string("uri"))))
         .perform(AwsS3ListObjectsAction::perform);
 
-    protected static List<S3ObjectDescription> perform(
+    protected static Map<String, List<S3ObjectDescription>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
@@ -64,11 +67,13 @@ public class AwsS3ListObjectsAction {
                 .prefix(inputParameters.getRequiredString(PREFIX))
                 .build());
 
-            return response.contents()
-                .stream()
-                .map(o -> new S3ObjectDescription(
-                    connectionParameters.getRequiredString(BUCKET_NAME), o))
-                .collect(Collectors.toList());
+            return Map.of(
+                RESULT,
+                response.contents()
+                    .stream()
+                    .map(o -> new S3ObjectDescription(
+                        connectionParameters.getRequiredString(BUCKET_NAME), o))
+                    .collect(Collectors.toList()));
         }
     }
 

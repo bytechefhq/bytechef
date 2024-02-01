@@ -81,11 +81,9 @@ public class JiraCreateIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .outputSchema(object().properties(JiraCreatedIssueProperties.PROPERTIES)
-            .description("Details about a created issue or subtask.")
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON)))
+        .outputSchema(JiraCreatedIssueProperties.PROPERTIES)
+        .outputSchemaMetadata(Map.of(
+            "responseType", ResponseType.JSON))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", 10000.0), Map.entry("key", "ED-24"),
             Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10000"),
             Map.entry("transition",

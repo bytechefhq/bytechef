@@ -29,6 +29,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -82,10 +83,12 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
         when(mockedList.execute())
             .thenReturn(mockedListMessagesResponse);
 
-        ListMessagesResponse result =
-            GoogleMailSearchEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, ListMessagesResponse> handleMap = GoogleMailSearchEmailAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(mockedListMessagesResponse, result);
+        ListMessagesResponse response = handleMap.get("result");
+
+        assertEquals(mockedListMessagesResponse, response);
         assertEquals("me", userIdArgumentCaptor.getValue());
         assertEquals(1, maxResultsArgumentCaptor.getValue());
         assertEquals("pageToken", pageTokenArgumentCaptor.getValue());

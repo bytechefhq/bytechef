@@ -72,6 +72,7 @@ import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import com.microsoft.graph.models.Message;
 import com.microsoft.graph.models.UserSendMailParameterSet;
 import com.microsoft.graph.requests.GraphServiceClient;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -292,7 +293,7 @@ public class MicrosoftOutlook365SendEmailAction {
     private MicrosoftOutlook365SendEmailAction() {
     }
 
-    public static Object perform(
+    public static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         GraphServiceClient<?> graphClient = MicrosoftOutlook365Utils.getGraphServiceClient();

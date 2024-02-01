@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.action;
+package com.bytechef.component.example.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.googledrive.constant.ExampleConstants.DUMMY;
+import static com.bytechef.component.example.constant.ExampleConstants.DUMMY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -33,13 +34,13 @@ public final class ExampleDummyAction {
         .title("Title")
         .description("Description")
         .properties()
-        .outputSchema(string())
+        .outputSchema(string("result"))
         .perform(ExampleDummyAction::perform);
 
     private ExampleDummyAction() {
     }
 
-    public static Object perform(
+    public static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return null;

@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.random.helper.constant.RandomHelperConstants;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -41,19 +42,19 @@ public class RandomHelperRandomIntAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .outputSchema(integer())
+        .outputSchema(integer("result"))
         .perform(RandomHelperRandomIntAction::perform);
 
     /**
      * Generates a random integer.
      */
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         int startInclusive = inputParameters.getInteger(RandomHelperConstants.START_INCLUSIVE, 0);
         int endInclusive = inputParameters.getInteger(RandomHelperConstants.END_INCLUSIVE, 100);
 
-        return nextInt(startInclusive, endInclusive);
+        return Map.of("result", nextInt(startInclusive, endInclusive));
     }
 
     private static int nextInt(final int startInclusive, final int endExclusive) {

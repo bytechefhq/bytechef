@@ -108,7 +108,7 @@ public class HubspotSubscribeTrigger {
                 .displayCondition("eventType.includes('.propertyChange')")
                 .required(true))
         .outputSchema(
-            array().items(
+            array("result").items(
                 object()
                     .properties(
                         object("data").properties(
@@ -125,23 +125,25 @@ public class HubspotSubscribeTrigger {
                             integer("attemptNumber"),
                             integer("messageId"),
                             string("messageType")))))
-//        .sampleOutput("""
-//            [
-//                {
-//                    "objectId": 1246965,
-//                    "propertyName": "lifecyclestage",
-//                    "propertyValue": "subscriber",
-//                    "changeSource": "ACADEMY",
-//                    "eventId": 3816279340,
-//                    "subscriptionId": 25,
-//                    "portalId": 33,
-//                    "appId": 1160452,
-//                    "occurredAt": 1462216307945,
-//                    "eventType":"contact.propertyChange",
-//                    "attemptNumber": 0
-//               }
-//            ]
-//            """)
+        .sampleOutput("""
+            {
+                "result": [
+                    {
+                        "objectId": 1246965,
+                        "propertyName": "lifecyclestage",
+                        "propertyValue": "subscriber",
+                        "changeSource": "ACADEMY",
+                        "eventId": 3816279340,
+                        "subscriptionId": 25,
+                        "portalId": 33,
+                        "appId": 1160452,
+                        "occurredAt": 1462216307945,
+                        "eventType":"contact.propertyChange",
+                        "attemptNumber": 0
+                   }
+                ]
+            }
+            """)
         .dynamicWebhookDisable(HubspotSubscribeTrigger::dynamicWebhookDisable)
         .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
         .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
@@ -184,11 +186,11 @@ public class HubspotSubscribeTrigger {
         return null;
     }
 
-    protected static Object dynamicWebhookRequest(
+    protected static Map<String, ?> dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         Context context) {
 
-        return body.getContent();
+        return Map.of("result", body.getContent());
     }
 }

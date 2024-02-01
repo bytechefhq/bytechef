@@ -35,6 +35,7 @@ import com.dropbox.core.v2.files.PaperCreateResult;
 import com.dropbox.core.v2.files.PaperCreateUploader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -51,25 +52,26 @@ public final class DropboxCreateNewTextFileAction {
                 .placeholder("/New_text_file.txt")
                 .required(true))
         .outputSchema(
-            object().properties(
-                string("url")
-                    .label("URL")
-                    .required(true),
-                string("resultPath")
-                    .label("Result path")
-                    .required(true),
-                string("fileId")
-                    .label("File ID")
-                    .required(true),
-                integer("paperRevision")
-                    .label("Paper revision")
-                    .required(true)))
+            object("result")
+                .properties(
+                    string("url")
+                        .label("URL")
+                        .required(true),
+                    string("resultPath")
+                        .label("Result path")
+                        .required(true),
+                    string("fileId")
+                        .label("File ID")
+                        .required(true),
+                    integer("paperRevision")
+                        .label("Paper revision")
+                        .required(true)))
         .perform(DropboxCreateNewTextFileAction::perform);
 
     private DropboxCreateNewTextFileAction() {
     }
 
-    public static PaperCreateResult perform(
+    public static Map<String, PaperCreateResult> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException, IOException {
 
@@ -79,7 +81,7 @@ public final class DropboxCreateNewTextFileAction {
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
             inputParameters.getRequiredString(DESTINATION_FILENAME), ImportFormat.PLAIN_TEXT)) {
 
-            return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
+            return Map.of("result", paperCreateUploader.uploadAndFinish(InputStream.nullInputStream()));
         }
     }
 }

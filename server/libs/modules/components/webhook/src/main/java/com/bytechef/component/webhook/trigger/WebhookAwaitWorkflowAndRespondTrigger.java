@@ -46,7 +46,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
                 .label("Timeout (ms)")
                 .description(
                     "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
-        .output(WebhookUtils::getWebhookOutputSchema)
-        .staticWebhookRequest(WebhookUtils::getWebhookOutput)
+        .output(WebhookUtils::getOutput)
+        .staticWebhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils.getWebhookValidateFunction());
 }

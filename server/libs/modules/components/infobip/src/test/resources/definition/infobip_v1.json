@@ -5,13 +5,13 @@
     "componentDescription": "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",
     "componentTitle": "Infobip",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send a new SMS message",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sendSMS",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -155,8 +155,8 @@
           "minItems": 1,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The exact time of day to start sending messages. Time is expressed in the UTC time zone. If set, use it together with the to property with minimum 1 hour difference.",
@@ -191,8 +191,8 @@
             "maxValue": 23,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": "Minute when the time window opens.",
@@ -210,11 +210,11 @@
             "maxValue": 59,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The exact time of day to end sending messages. Time is expressed in the UTC time zone. If set, use it together with the from property with minimum 1 hour difference.",
@@ -249,8 +249,8 @@
             "maxValue": 23,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": "Minute when the time window closes.",
@@ -268,14 +268,14 @@
             "maxValue": 59,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "An array of destination objects for where messages are being sent. A valid destination is required.",
@@ -333,8 +333,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Allows for sending a flash SMS to automatically appear on recipient devices without interaction. Set to true to enable flash SMS, or leave the default value, false to send a standard SMS.",
@@ -463,8 +463,8 @@
           } ],
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Preferred delivery report content type.",
@@ -586,8 +586,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "IYS regulations specific parameters required for sending promotional SMS to phone numbers registered in Turkey.",
@@ -622,8 +622,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": "Recipient Type",
@@ -654,8 +654,8 @@
             } ],
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Use case dependent parameters for sending SMS to phone numbers registered in South Korea.",
@@ -690,14 +690,14 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Date and time when the message is to be sent. Used for scheduled SMS. It can only be scheduled for no later than 180 days in advance.",
@@ -730,8 +730,8 @@
           "label": "Date time",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -752,8 +752,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Content of the message being sent.",
@@ -862,8 +862,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": "Required for entity use in a send request for outbound traffic. Returned in notification events.",
@@ -907,8 +907,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Limits the send speed when sending messages in bulk to deliver messages over a longer period of time. You may wish to use this to allow your systems or agents to handle large amounts of incoming traffic, e.g., if you are expecting recipients to follow through with a call-to-action option from a message you sent. Not setting a send speed limit can overwhelm your resources with incoming traffic.",
@@ -943,8 +943,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": "The time unit to define when setting a messaging speed limit.",
@@ -980,8 +980,8 @@
         } ],
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Sets up URL shortening and tracking feature. Not compatible with old tracking feature.",
@@ -1116,8 +1116,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Sets up tracking parameters to track conversion metrics and type.",
@@ -1212,8 +1212,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Set to true to return smsCount in the response. smsCount is the total count of SMS submitted in the request. SMS messages have a character limit and messages longer than that limit will be split into multiple SMS and reflected in the total count of SMS submitted.",
@@ -1244,7 +1244,7 @@
     "title": "Send SMS",
     "perform": { },
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1252,7 +1252,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "smsResponse",
         "type": "OBJECT",
         "defaultValue": null,
         "exampleValue": null,
@@ -1366,8 +1366,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1385,8 +1385,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1445,8 +1445,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1483,20 +1483,293 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      },
-      "sampleOutput": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "smsResponse",
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "options": null,
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "bulkId",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "messages",
+            "type": "ARRAY",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "items": [ {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "messageId",
+              "type": "STRING",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
+              "options": null,
+              "optionsDataSource": null
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "status",
+              "type": "OBJECT",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "additionalProperties": null,
+              "multipleValues": null,
+              "options": null,
+              "properties": [ {
+                "advancedOption": null,
+                "description": null,
+                "displayCondition": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "metadata": { },
+                "required": null,
+                "name": "groupName",
+                "type": "STRING",
+                "defaultValue": null,
+                "exampleValue": null,
+                "label": null,
+                "placeholder": null,
+                "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
+                "options": null,
+                "optionsDataSource": null
+              }, {
+                "advancedOption": null,
+                "description": null,
+                "displayCondition": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "metadata": { },
+                "required": null,
+                "name": "id",
+                "type": "INTEGER",
+                "defaultValue": null,
+                "exampleValue": null,
+                "label": null,
+                "placeholder": null,
+                "maxValue": null,
+                "minValue": null,
+                "options": null,
+                "optionsDataSource": null,
+                "controlType": "INTEGER"
+              }, {
+                "advancedOption": null,
+                "description": null,
+                "displayCondition": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "metadata": { },
+                "required": null,
+                "name": "groupId",
+                "type": "INTEGER",
+                "defaultValue": null,
+                "exampleValue": null,
+                "label": null,
+                "placeholder": null,
+                "maxValue": null,
+                "minValue": null,
+                "options": null,
+                "optionsDataSource": null,
+                "controlType": "INTEGER"
+              }, {
+                "advancedOption": null,
+                "description": null,
+                "displayCondition": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "metadata": { },
+                "required": null,
+                "name": "name",
+                "type": "STRING",
+                "defaultValue": null,
+                "exampleValue": null,
+                "label": null,
+                "placeholder": null,
+                "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
+                "options": null,
+                "optionsDataSource": null
+              }, {
+                "advancedOption": null,
+                "description": null,
+                "displayCondition": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "metadata": { },
+                "required": null,
+                "name": "action",
+                "type": "STRING",
+                "defaultValue": null,
+                "exampleValue": null,
+                "label": null,
+                "placeholder": null,
+                "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
+                "options": null,
+                "optionsDataSource": null
+              }, {
+                "advancedOption": null,
+                "description": null,
+                "displayCondition": null,
+                "expressionEnabled": null,
+                "hidden": null,
+                "metadata": { },
+                "required": null,
+                "name": "description",
+                "type": "STRING",
+                "defaultValue": null,
+                "exampleValue": null,
+                "label": null,
+                "placeholder": null,
+                "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
+                "options": null,
+                "optionsDataSource": null
+              } ],
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "to",
+              "type": "STRING",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
+              "options": null,
+              "optionsDataSource": null
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "smsCount",
+              "type": "INTEGER",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "maxValue": null,
+              "minValue": null,
+              "options": null,
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
+            } ],
+            "maxItems": null,
+            "minItems": null,
+            "multipleValues": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
+          } ],
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
+        } ],
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      }
     }
   }, {
     "batch": null,
@@ -1504,13 +1777,13 @@
     "componentDescription": "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",
     "componentTitle": "Infobip",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Send a new SMS message",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sendWhatsappTextMessage",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1632,8 +1905,8 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Custom client data that will be included in a Delivery Report.",
@@ -1806,8 +2079,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Required for entity use in a send request for outbound traffic. Returned in notification events.",
@@ -1850,7 +2123,7 @@
     "title": "Send Whatsapp Text Message",
     "perform": { },
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1858,7 +2131,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "messageInfo",
         "type": "OBJECT",
         "defaultValue": null,
         "exampleValue": null,
@@ -1903,8 +2176,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1958,8 +2231,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1996,8 +2269,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2056,13 +2329,246 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      },
-      "sampleOutput": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "messageInfo",
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "options": null,
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "to",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "messageCount",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "messageId",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "status",
+            "type": "OBJECT",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "additionalProperties": null,
+            "multipleValues": null,
+            "options": null,
+            "properties": [ {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "groupId",
+              "type": "INTEGER",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "maxValue": null,
+              "minValue": null,
+              "options": null,
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "groupName",
+              "type": "STRING",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
+              "options": null,
+              "optionsDataSource": null
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "id",
+              "type": "INTEGER",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "maxValue": null,
+              "minValue": null,
+              "options": null,
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "name",
+              "type": "STRING",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
+              "options": null,
+              "optionsDataSource": null
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "description",
+              "type": "STRING",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
+              "options": null,
+              "optionsDataSource": null
+            }, {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": "action",
+              "type": "STRING",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
+              "options": null,
+              "optionsDataSource": null
+            } ],
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
+          } ],
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
+        } ],
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      }
     }
   } ],
   "category": null,
@@ -2095,16 +2601,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "apply": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
-      "clientId": null,
       "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "apply": null,
+      "clientId": null
     } ],
     "componentName": "infobip",
     "componentDescription": "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",

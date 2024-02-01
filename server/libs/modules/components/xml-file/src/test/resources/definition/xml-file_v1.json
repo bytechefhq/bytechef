@@ -5,13 +5,13 @@
     "componentDescription": "Reads and writes data from a XML file.",
     "componentTitle": "XML File",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Reads data from a XML file.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "read",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -167,8 +167,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -186,8 +186,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Read from file",
     "output": null,
@@ -198,13 +198,13 @@
     "componentDescription": "Reads and writes data from a XML file.",
     "componentTitle": "XML File",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the data to a XML file.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "write",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -233,8 +233,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -253,8 +253,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The aray to write to the file.",
@@ -274,8 +274,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xml\" will be used.",
@@ -298,7 +298,7 @@
     } ],
     "title": "Write to file",
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -306,7 +306,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "fileEntry",
         "type": "FILE_ENTRY",
         "defaultValue": null,
         "exampleValue": null,
@@ -390,8 +390,122 @@
           "optionsDataSource": null
         } ],
         "controlType": "FILE_ENTRY"
-      },
-      "sampleOutput": null
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "fileEntry",
+          "type": "FILE_ENTRY",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "extension",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "mimeType",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "name",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": true,
+            "name": "url",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "FILE_ENTRY"
+        } ],
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      }
     },
     "perform": { }
   } ],

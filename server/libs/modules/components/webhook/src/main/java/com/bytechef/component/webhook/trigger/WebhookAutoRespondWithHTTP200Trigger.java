@@ -32,6 +32,6 @@ public class WebhookAutoRespondWithHTTP200Trigger {
         .description(
             "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.")
         .type(TriggerType.STATIC_WEBHOOK)
-        .output(WebhookUtils::getWebhookOutputSchema)
-        .staticWebhookRequest(WebhookUtils::getWebhookOutput);
+        .output(WebhookUtils::getOutput)
+        .staticWebhookRequest(WebhookUtils::getWebhookResult);
 }

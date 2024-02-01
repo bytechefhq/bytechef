@@ -38,7 +38,15 @@ import java.util.Objects;
  */
 public class WebhookUtils {
 
-    public static Object getWebhookOutput(
+    public static Output getOutput(
+        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext context) {
+
+        return context.output(output -> output.get(
+            getWebhookResult(inputParameters, headers, parameters, body, method, context)));
+    }
+
+    public static Map<String, ?> getWebhookResult(
         Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
         WebhookMethod method, TriggerContext context) {
 
@@ -54,14 +62,6 @@ public class WebhookUtils {
                 HEADERS, headers,
                 PARAMETERS, parameters);
         }
-    }
-
-    public static Output getWebhookOutputSchema(
-        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-        WebhookMethod method, TriggerContext context) {
-
-        return context.outputSchema(outputSchema -> outputSchema.get(
-            getWebhookOutput(inputParameters, headers, parameters, body, method, context)));
     }
 
     public static WebhookValidateFunction getWebhookValidateFunction() {

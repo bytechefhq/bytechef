@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "readXMLFile",
-    "value": "${readXMLFile}"
+    "value": "${readXMLFile.result}"
   } ],
   "tasks": [ {
     "name": "readXMLFile",

@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
@@ -49,11 +50,11 @@ public class BashExecuteAction {
             .label("Script")
             .description("Script written in bash.")
             .required(true))
-        .outputSchema(string())
-        .sampleOutput("Sample Result")
+        .outputSchema(string("result"))
+        .sampleOutput(Map.of("result", "Sample result"))
         .perform(BashExecuteAction::perform);
 
-    protected static String perform(
+    protected static Map<String, String> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, InterruptedException, TimeoutException {
 
@@ -72,19 +73,21 @@ public class BashExecuteAction {
                 throw new IllegalStateException("Failed to chmod %s".formatted(chmodRetCode));
             }
 
-            return new ProcessExecutor()
-                .command(scriptFile.getAbsolutePath())
-                .readOutput(true)
-                .execute()
-                .outputUTF8();
+            return Map.of(
+                "result",
+                new ProcessExecutor()
+                    .command(scriptFile.getAbsolutePath())
+                    .readOutput(true)
+                    .execute()
+                    .outputUTF8());
         } finally {
             deleteRecursively(scriptFile.toPath());
         }
     }
 
-    private static boolean deleteRecursively(Path root) throws IOException {
+    private static void deleteRecursively(Path root) throws IOException {
         if (root == null || !Files.exists(root)) {
-            return false;
+            return;
         }
 
         Files.walkFileTree(root, new SimpleFileVisitor<>() {
@@ -103,7 +106,6 @@ public class BashExecuteAction {
             }
         });
 
-        return true;
     }
 
     private static void writeStringToFile(File file, String str) throws IOException {

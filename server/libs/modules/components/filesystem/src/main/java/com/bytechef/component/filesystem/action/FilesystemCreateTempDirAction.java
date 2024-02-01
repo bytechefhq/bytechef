@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -36,18 +37,18 @@ public class FilesystemCreateTempDirAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .title("Create Temp Directory")
         .description("Creates a temporary directory on the filesystem.")
-        .outputSchema(string())
-        .sampleOutput("/sample_tmp_dir")
+        .outputSchema(string("path"))
+        .sampleOutput(Map.of("path", "/sample_tmp_dir"))
         .perform(FilesystemCreateTempDirAction::perform);
 
-    protected static String perform(
+    protected static Map<String, String> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         Path path = Files.createTempDirectory("createTempDir_");
 
         File file = path.toFile();
 
-        return file.getAbsolutePath();
+        return Map.of("path", file.getAbsolutePath());
 
     }
 }

@@ -27,6 +27,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xml.helper.constant.XmlHelperConstants;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -53,12 +54,12 @@ public class XmlHelperStringifyAction {
                 .description("The array to convert to XML string.")
                 .displayCondition("type === 2")
                 .required(true))
-        .outputSchema(string())
+        .outputSchema(string("result"))
         .perform(XmlHelperStringifyAction::perform);
 
-    protected static String perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.xml(xml -> xml.write(inputParameters.getRequired(XmlHelperConstants.SOURCE)));
+        return Map.of("result", context.xml(xml -> xml.write(inputParameters.getRequired(XmlHelperConstants.SOURCE))));
     }
 }

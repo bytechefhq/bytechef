@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import java.util.Map;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -51,20 +52,22 @@ public class AwsS3GetObjectAction {
                 .label("Key")
                 .description("The object key.")
                 .required(true))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(AwsS3GetObjectAction::perform);
 
-    protected static FileEntry perform(
+    protected static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
-            return context.file(file -> file.storeContent(inputParameters.getRequiredString(FILENAME),
-                s3Client.getObject(
-                    GetObjectRequest.builder()
-                        .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
-                        .key(inputParameters.getRequiredString(KEY))
-                        .build(),
-                    ResponseTransformer.toInputStream())));
+            return Map.of(
+                "fileEntry",
+                context.file(file -> file.storeContent(inputParameters.getRequiredString(FILENAME),
+                    s3Client.getObject(
+                        GetObjectRequest.builder()
+                            .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
+                            .key(inputParameters.getRequiredString(KEY))
+                            .build(),
+                        ResponseTransformer.toInputStream()))));
         }
     }
 }

@@ -36,6 +36,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.constant.ScriptConstants;
+import java.util.Map;
 
 /**
  * @author Matija Petanjek
@@ -60,9 +61,9 @@ public class ScriptJavaAction {
         .output()
         .perform(ScriptJavaAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return ScriptConstants.POLYGLOT_ENGINE.execute("java", inputParameters);
+        return Map.of("result", ScriptConstants.POLYGLOT_ENGINE.execute("java", inputParameters));
     }
 }

@@ -49,6 +49,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 import io.reactivex.Flowable;
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -99,13 +100,13 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
             TOOLS_PROPERTY,
             TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
-        .output(OpenAIUtils::getOutputSchema)
+        .output(OpenAIUtils::getOutput)
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIAskChatGPTAction() {
     }
 
-    public static Object perform(
+    public static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN), Duration.ZERO);
@@ -119,12 +120,12 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
             Flowable<ChatCompletionChunk> chatCompletionChunkFlowable =
                 openAiService.streamChatCompletion(chatCompletionRequest);
 
-            return chatCompletionChunkFlowable.toList();
+            return Map.of("result", chatCompletionChunkFlowable.toList());
         } else {
             setChatCompletionRequestValues(inputParameters, chatCompletionRequest);
             chatCompletionRequest.setStream(false);
 
-            return openAiService.createChatCompletion(chatCompletionRequest);
+            return Map.of("result", openAiService.createChatCompletion(chatCompletionRequest));
         }
     }
 

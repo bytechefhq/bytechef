@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.microsoft.graph.models.Message;
 import com.microsoft.graph.requests.MessageRequest;
 import com.microsoft.graph.requests.MessageRequestBuilder;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -48,9 +49,12 @@ class MicrosoftOutlook365GetMailActionTest extends AbstractMicrosoftOutlook365Ac
         when(mockedMessageRequest.get())
             .thenReturn(mockedMessage);
 
-        Message result = MicrosoftOutlook365GetMailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Message> handleMap = MicrosoftOutlook365GetMailAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(mockedMessage, result);
+        Message message = handleMap.get("message");
+
+        assertEquals(mockedMessage, message);
         assertEquals("id", messageIdArgumentCaptor.getValue());
     }
 }

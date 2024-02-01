@@ -47,8 +47,8 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(bool())
-        .sampleOutput(true)
+        .outputSchema(bool("deleted"))
+        .sampleOutput(Map.of("deleted", true))
         .perform(FilesystemRmAction::perform);
 
     /**
@@ -58,7 +58,7 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    protected static Map<String, ?> perform(
+    protected static Map<String, Boolean> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         File file = new File(inputParameters.getRequiredString(PATH));

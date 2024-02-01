@@ -42,8 +42,8 @@ public class FilesystemMkdirAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(string())
-        .sampleOutput("/sample_data")
+        .outputSchema(string("path"))
+        .sampleOutput(Map.of("path", "/sample_data"))
         .perform(FilesystemMkdirAction::perform);
 
     /**
@@ -52,7 +52,7 @@ public class FilesystemMkdirAction {
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
      */
-    protected static Map<String, ?> perform(
+    protected static Map<String, String> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         return Map.of(

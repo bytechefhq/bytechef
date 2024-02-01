@@ -35,6 +35,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.theokanning.openai.audio.CreateSpeechRequest;
 import com.theokanning.openai.service.OpenAiService;
+import java.util.Map;
 import okhttp3.ResponseBody;
 
 /**
@@ -86,13 +87,13 @@ public class OpenAICreateSpeechAction {
                 .minValue(0.25)
                 .maxValue(4.0)
                 .required(false))
-        .outputSchema(fileEntry())
+        .outputSchema(fileEntry("fileEntry"))
         .perform(OpenAICreateSpeechAction::perform);
 
     private OpenAICreateSpeechAction() {
     }
 
-    public static FileEntry perform(
+    public static Map<String, FileEntry> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String token = (String) connectionParameters.get(TOKEN);
@@ -108,9 +109,10 @@ public class OpenAICreateSpeechAction {
         createSpeechRequest.setSpeed(inputParameters.getDouble(SPEED));
 
         try (ResponseBody speech = openAiService.createSpeech(createSpeechRequest)) {
-            return context
-                .file(file -> file.storeContent(
-                    "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
+            return Map.of(
+                "fileEntry",
+                context.file(file -> file.storeContent(
+                    "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream())));
         }
     }
 }

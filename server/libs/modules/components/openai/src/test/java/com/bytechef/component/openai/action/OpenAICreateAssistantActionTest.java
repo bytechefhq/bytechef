@@ -77,8 +77,10 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
             (openAiService, context) -> when(openAiService.createAssistant(any()))
                 .thenReturn(mockedAssistant))) {
 
-            Assistant assistant = OpenAICreateAssistantAction.perform(
+            Map<String, Assistant> handleMap = OpenAICreateAssistantAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
+
+            Assistant assistant = handleMap.get("assistant");
 
             List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 

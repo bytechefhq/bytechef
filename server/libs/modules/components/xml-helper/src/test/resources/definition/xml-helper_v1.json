@@ -5,13 +5,13 @@
     "componentDescription": "Converts between XML string and object/array.",
     "componentTitle": "XML Helper",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Converts the XML string to object/array.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "parse",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -36,6 +36,29 @@
     "title": "Convert from XML string",
     "perform": { },
     "output": {
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": "result",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": null,
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -53,11 +76,30 @@
         "additionalProperties": null,
         "multipleValues": null,
         "options": null,
-        "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      },
-      "sampleOutput": null
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "result",
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "options": null,
+          "properties": null,
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
+        } ],
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      }
     }
   }, {
     "batch": null,
@@ -65,13 +107,13 @@
     "componentDescription": "Converts between XML string and object/array.",
     "componentTitle": "XML Helper",
     "componentVersion": 1,
+    "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the object/array to a XML string.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "stringify",
-    "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -100,8 +142,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to convert to XML string.",
@@ -120,8 +162,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array to convert to XML string.",
@@ -141,13 +183,13 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Convert to XML string",
     "perform": { },
     "output": {
-      "outputSchema": {
+      "properties": [ {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -155,7 +197,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": null,
+        "name": "result",
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
@@ -166,8 +208,49 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": null
-      },
-      "sampleOutput": null
+      } ],
+      "metadata": null,
+      "sampleOutput": null,
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "result",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        } ],
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      }
     }
   } ],
   "category": null,
