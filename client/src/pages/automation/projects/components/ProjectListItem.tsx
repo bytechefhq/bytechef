@@ -25,7 +25,7 @@ import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWo
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
-import {ProjectTagKeys} from '@/queries/automation/projectTags.quries';
+import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

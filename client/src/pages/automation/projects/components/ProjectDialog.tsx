@@ -15,7 +15,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {CategoryModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/mutations/automation/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/queries/automation/projectCategories.queries';
-import {ProjectTagKeys, useGetProjectTagsQuery} from '@/queries/automation/projectTags.quries';
+import {ProjectTagKeys, useGetProjectTagsQuery} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

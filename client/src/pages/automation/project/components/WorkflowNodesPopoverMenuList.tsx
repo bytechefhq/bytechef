@@ -84,6 +84,7 @@ const WorkflowNodesPopoverMenuList = memo(
                         ),
                         label: clickedItem?.title,
                         name: getFormattedName(clickedItem.name!, nodes),
+                        type: 'workflow',
                     },
                     id: getRandomId(),
                     position: {

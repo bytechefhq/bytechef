@@ -1,5 +1,4 @@
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import getRandomId from '@/utils/getRandomId';
 import {useQueryClient} from '@tanstack/react-query';
@@ -10,6 +9,7 @@ import {Edge, Node, useReactFlow} from 'reactflow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
+import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export default function useHandleDrop(): [
     (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,

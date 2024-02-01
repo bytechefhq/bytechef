@@ -3,7 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetProjectCategoriesQuery} from '@/queries/automation/projectCategories.queries';
-import {useGetProjectTagsQuery} from '@/queries/automation/projectTags.quries';
+import {useGetProjectTagsQuery} from '@/queries/automation/projectTags.queries';
 import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
 import {FolderIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
