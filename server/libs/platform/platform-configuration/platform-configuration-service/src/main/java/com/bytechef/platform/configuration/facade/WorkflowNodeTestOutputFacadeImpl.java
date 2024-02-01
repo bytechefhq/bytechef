@@ -25,11 +25,14 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.Output;
+import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
+import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,6 +50,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     private final ActionDefinitionService actionDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
@@ -55,12 +59,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
         ActionDefinitionService actionDefinitionService, ActionDefinitionFacade actionDefinitionFacade,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        TriggerDefinitionService triggerDefinitionService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
-        this.actionDefinitionService = actionDefinitionService;
 
+        this.actionDefinitionService = actionDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowService = workflowService;
@@ -72,48 +77,82 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
         Optional<WorkflowTestConfiguration> workflowTestConfiguration = workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(workflowId);
 
-        WorkflowTestConfigurationConnection connection = CollectionUtils.findFirstOrElse(
-            OptionalUtils.mapOrElse(
-                workflowTestConfiguration, WorkflowTestConfiguration::getConnections, List.of()),
-            curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName),
-            null);
+        Long connectionId = OptionalUtils.map(
+            CollectionUtils.findFirst(
+                OptionalUtils.mapOrElse(
+                    workflowTestConfiguration, WorkflowTestConfiguration::getConnections, List.of()),
+                curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName)),
+            WorkflowTestConfigurationConnection::getConnectionId);
 
-        ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
+        return OptionalUtils.mapOrElseGet(
+            WorkflowTrigger.fetch(workflow, workflowNodeName),
+            workflowTrigger -> {
+                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-        if (actionDefinition.isOutputFunctionDefined()) {
-            Output output = actionDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(),
-                workflowTask.evaluateParameters(
-                    MapUtils.concat(
-                        (Map<String, Object>) OptionalUtils.mapOrElse(
-                            workflowTestConfiguration, WorkflowTestConfiguration::getInputs, Map.of()),
-                        workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(workflowId, workflowTask.getName()))),
-                connection == null ? null : connection.getConnectionId());
+                TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                    workflowNodeType.componentOperationName());
 
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
-        } else {
-            Map<String, ?> result = actionDefinitionFacade.executePerform(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), 0, null, workflowId, null,
-                workflowTask.evaluateParameters(
-                    MapUtils.concat(
-                        (Map<String, Object>) OptionalUtils.mapOrElse(
-                            workflowTestConfiguration, WorkflowTestConfiguration::getInputs, Map.of()),
-                        workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(workflowId, workflowTask.getName()))),
-                connection == null ? null : connection.getConnectionId());
+                if (triggerDefinition.isOutputFunctionDefined()) {
+                    Output output = actionDefinitionFacade.executeOutput(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                        workflowNodeType.componentOperationName(),
+                        workflowTrigger.evaluateParameters(
+                            MapUtils.concat(
+                                (Map<String, Object>) OptionalUtils.mapOrElse(
+                                    workflowTestConfiguration, WorkflowTestConfiguration::getInputs, Map.of()),
+                                workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                                    workflowId, workflowTrigger.getName()))),
+                        connectionId);
 
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
-        }
+                    return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
+                } else {
+                    // TODO
+                    Map<String, ?> result = null;
+
+                    return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
+                }
+            },
+            () -> {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                    workflowNodeType.componentOperationName());
+
+                if (actionDefinition.isOutputFunctionDefined()) {
+                    Output output = actionDefinitionFacade.executeOutput(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                        workflowNodeType.componentOperationName(),
+                        workflowTask.evaluateParameters(
+                            MapUtils.concat(
+                                (Map<String, Object>) OptionalUtils.mapOrElse(
+                                    workflowTestConfiguration, WorkflowTestConfiguration::getInputs, Map.of()),
+                                workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                                    workflowId, workflowTask.getName()))),
+                        connectionId);
+
+                    return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
+                } else {
+                    Map<String, ?> result = actionDefinitionFacade.executePerform(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                        workflowNodeType.componentOperationName(), 0, null, workflowId, null,
+                        workflowTask.evaluateParameters(
+                            MapUtils.concat(
+                                (Map<String, Object>) OptionalUtils.mapOrElse(
+                                    workflowTestConfiguration, WorkflowTestConfiguration::getInputs, Map.of()),
+                                workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                                    workflowId, workflowTask.getName()))),
+                        connectionId);
+
+                    return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
+                }
+            });
     }
 
     @Override
