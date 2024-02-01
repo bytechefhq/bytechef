@@ -1,72 +1,53 @@
 import {
-    CreateWorkflowTestConfigurationRequest,
-    UpdateWorkflowTestConfigurationConnectionRequest,
-    UpdateWorkflowTestConfigurationInputsRequest,
-    UpdateWorkflowTestConfigurationRequest,
+    SaveWorkflowTestConfigurationConnectionRequest,
+    SaveWorkflowTestConfigurationInputsRequest,
+    SaveWorkflowTestConfigurationRequest,
     WorkflowTestConfigurationApi,
     WorkflowTestConfigurationModel,
 } from '@/middleware/platform/configuration/';
 import {useMutation} from '@tanstack/react-query';
 
-type CreateWorkflowTestConfigurationMutationProps = {
-    onSuccess?: (result: WorkflowTestConfigurationModel, variables: CreateWorkflowTestConfigurationRequest) => void;
-    onError?: (error: Error, variables: CreateWorkflowTestConfigurationRequest) => void;
+type SaveWorkflowTestConfigurationMutationProps = {
+    onSuccess?: (result: WorkflowTestConfigurationModel, variables: SaveWorkflowTestConfigurationRequest) => void;
+    onError?: (error: Error, variables: SaveWorkflowTestConfigurationRequest) => void;
 };
 
-export const useCreateWorkflowTestConfigurationMutation = (
-    mutationProps?: CreateWorkflowTestConfigurationMutationProps
-) =>
+export const useSaveWorkflowTestConfigurationMutation = (mutationProps?: SaveWorkflowTestConfigurationMutationProps) =>
     useMutation({
-        mutationFn: (request: CreateWorkflowTestConfigurationRequest) => {
-            return new WorkflowTestConfigurationApi().createWorkflowTestConfiguration(request);
+        mutationFn: (request: SaveWorkflowTestConfigurationRequest) => {
+            return new WorkflowTestConfigurationApi().saveWorkflowTestConfiguration(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateWorkflowTestConfigurationMutationProps = {
-    onSuccess?: (result: WorkflowTestConfigurationModel, variables: UpdateWorkflowTestConfigurationRequest) => void;
-    onError?: (error: Error, variables: UpdateWorkflowTestConfigurationRequest) => void;
+type SaveWorkflowTestConfigurationConnectionRequestProps = {
+    onSuccess?: (result: void, variables: SaveWorkflowTestConfigurationConnectionRequest) => void;
+    onError?: (error: Error, variables: SaveWorkflowTestConfigurationConnectionRequest) => void;
 };
 
-export const useUpdateWorkflowTestConfigurationMutation = (
-    mutationProps?: UpdateWorkflowTestConfigurationMutationProps
+export const useSaveWorkflowTestConfigurationConnectionMutation = (
+    mutationProps?: SaveWorkflowTestConfigurationConnectionRequestProps
 ) =>
     useMutation({
-        mutationFn: (request: UpdateWorkflowTestConfigurationRequest) => {
-            return new WorkflowTestConfigurationApi().updateWorkflowTestConfiguration(request);
+        mutationFn: (request: SaveWorkflowTestConfigurationConnectionRequest) => {
+            return new WorkflowTestConfigurationApi().saveWorkflowTestConfigurationConnection(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateWorkflowTestConfigurationConnectionRequestProps = {
-    onSuccess?: (result: void, variables: UpdateWorkflowTestConfigurationConnectionRequest) => void;
-    onError?: (error: Error, variables: UpdateWorkflowTestConfigurationConnectionRequest) => void;
+type SaveWorkflowTestConfigurationInputsRequestProps = {
+    onSuccess?: (result: void, variables: SaveWorkflowTestConfigurationInputsRequest) => void;
+    onError?: (error: Error, variables: SaveWorkflowTestConfigurationInputsRequest) => void;
 };
 
-export const useUpdateWorkflowTestConfigurationConnectionMutation = (
-    mutationProps?: UpdateWorkflowTestConfigurationConnectionRequestProps
+export const useSaveWorkflowTestConfigurationInputsMutation = (
+    mutationProps?: SaveWorkflowTestConfigurationInputsRequestProps
 ) =>
     useMutation({
-        mutationFn: (request: UpdateWorkflowTestConfigurationConnectionRequest) => {
-            return new WorkflowTestConfigurationApi().updateWorkflowTestConfigurationConnection(request);
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-type UpdateWorkflowTestConfigurationInputsRequestProps = {
-    onSuccess?: (result: void, variables: UpdateWorkflowTestConfigurationInputsRequest) => void;
-    onError?: (error: Error, variables: UpdateWorkflowTestConfigurationInputsRequest) => void;
-};
-
-export const useUpdateWorkflowTestConfigurationInputsMutation = (
-    mutationProps?: UpdateWorkflowTestConfigurationInputsRequestProps
-) =>
-    useMutation({
-        mutationFn: (request: UpdateWorkflowTestConfigurationInputsRequest) => {
-            return new WorkflowTestConfigurationApi().updateWorkflowTestConfigurationInputs(request);
+        mutationFn: (request: SaveWorkflowTestConfigurationInputsRequest) => {
+            return new WorkflowTestConfigurationApi().saveWorkflowTestConfigurationInputs(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

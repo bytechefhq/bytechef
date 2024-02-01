@@ -20,10 +20,7 @@ import {
     WorkflowTestConfigurationModel,
 } from '@/middleware/platform/configuration';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
-import {
-    useCreateWorkflowTestConfigurationMutation,
-    useUpdateWorkflowTestConfigurationMutation,
-} from '@/mutations/platform/workflowTestConfigurations.mutations';
+import {useSaveWorkflowTestConfigurationMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
@@ -98,14 +95,7 @@ const WorkflowTestConfigurationDialog = ({
 
     const queryClient = useQueryClient();
 
-    const createWorkflowTestConfigurationMutation = useCreateWorkflowTestConfigurationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
-
-            onClose();
-        },
-    });
-    const updateWorkflowTestConfigurationMutation = useUpdateWorkflowTestConfigurationMutation({
+    const saveWorkflowTestConfigurationMutation = useSaveWorkflowTestConfigurationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
 
@@ -114,17 +104,10 @@ const WorkflowTestConfigurationDialog = ({
     });
 
     function saveWorkflowTestConfiguration(workflowTestConfigurationModel: WorkflowTestConfigurationModel) {
-        if (workflowTestConfigurationModel.workflowId) {
-            updateWorkflowTestConfigurationMutation.mutate({
-                workflowId: workflowTestConfigurationModel.workflowId!,
-                workflowTestConfigurationModel,
-            });
-        } else {
-            createWorkflowTestConfigurationMutation.mutate({
-                workflowId: workflow.id!,
-                workflowTestConfigurationModel,
-            });
-        }
+        saveWorkflowTestConfigurationMutation.mutate({
+            workflowId: workflow.id!,
+            workflowTestConfigurationModel,
+        });
     }
 
     return (

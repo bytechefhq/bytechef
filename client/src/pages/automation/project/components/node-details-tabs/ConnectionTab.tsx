@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
-import {useUpdateWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
+import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {
     WorkflowTestConfigurationKeys,
     useGetWorkflowTestConfigurationConnectionsQuery,
@@ -57,7 +57,7 @@ const ConnectionTab = ({
 
     const queryClient = useQueryClient();
 
-    const mutation = useUpdateWorkflowTestConfigurationConnectionMutation({
+    const saveWorkflowTestConfigurationConnectionMutation = useSaveWorkflowTestConfigurationConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
@@ -66,8 +66,8 @@ const ConnectionTab = ({
     });
 
     const handleValueChange = (connectionId: number) => {
-        mutation.mutate({
-            updateWorkflowTestConfigurationConnectionRequestModel: {
+        saveWorkflowTestConfigurationConnectionMutation.mutate({
+            saveWorkflowTestConfigurationConnectionRequestModel: {
                 connectionId,
             },
             workflowConnectionKey,

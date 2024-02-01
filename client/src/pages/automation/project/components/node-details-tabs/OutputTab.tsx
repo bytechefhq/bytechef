@@ -1,14 +1,38 @@
-import {Button} from '@/components/ui/button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {PropertyModel} from '@/middleware/platform/configuration';
-import {PropertyType} from '@/types/projectTypes';
-import {ChevronDownIcon} from 'lucide-react';
-
 /// <reference types="vite-plugin-svgr/client" />
 
+import {Button} from '@/components/ui/button';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {PropertyModel} from '@/middleware/platform/configuration';
+import {
+    useSaveWorkflowNodeTestOutputMutation,
+    useUploadSampleOutputRequestMutation,
+} from '@/mutations/platform/workflowNodeTestOutputs.mutations';
+import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
+import {PropertyType} from '@/types/projectTypes';
+import {useQueryClient} from '@tanstack/react-query';
+import {useState} from 'react';
+import {NodeProps} from 'reactflow';
 import {TYPE_ICONS} from 'shared/typeIcons';
+import {twMerge} from 'tailwind-merge';
 
-import {useWorkflowNodeDetailsPanelStore} from '../../stores/useWorkflowNodeDetailsPanelStore';
+import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
+
+const AnimateSpin = ({className}: {className?: string}) => (
+    <svg
+        className={twMerge('animate-spin -ml-1 mr-3 h-5 w-5', className)}
+        fill="none"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+
+        <path
+            className="opacity-75"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            fill="currentColor"
+        ></path>
+    </svg>
+);
 
 const PropertyField = ({data, label = 'item'}: {data: PropertyType; label: string}) => (
     <div className="inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
@@ -46,19 +70,96 @@ const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
     </ul>
 );
 
-const OutputTab = ({outputSchema}: {outputSchema: PropertyModel}) => {
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+const OutputTab = ({
+    currentNode,
+    outputSchema,
+    workflowId,
+}: {
+    currentNode: NodeProps['data'];
+    outputSchema: PropertyModel;
+    workflowId: string;
+}) => {
+    const [showUploadDialog, setShowUploadDialog] = useState(false);
+
+    const queryClient = useQueryClient();
+
+    const saveWorkflowNodeTestOutputMutation = useSaveWorkflowNodeTestOutputMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
+            });
+        },
+    });
+
+    const uploadSampleOutputRequestMutation = useUploadSampleOutputRequestMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
+            });
+        },
+    });
+
+    const handleTestComponentClick = () => {
+        saveWorkflowNodeTestOutputMutation.mutate({
+            workflowId,
+            workflowNodeName: currentNode.name,
+        });
+    };
+
+    const handleSampleDataDialogUpload = (value: string) => {
+        console.log(JSON.parse(value));
+        uploadSampleOutputRequestMutation.mutate({
+            uploadWorkflowNodeSampleOutputRequestModel: {
+                sampleOutput: JSON.parse(value),
+            },
+            workflowId,
+            workflowNodeName: currentNode.name,
+        });
+
+        setShowUploadDialog(false);
+    };
 
     return (
         <div className="h-full p-4">
             {outputSchema ? (
                 <>
-                    <div className="mb-1 flex items-center">
-                        <span title={outputSchema.type}>
-                            {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
-                        </span>
+                    <div className="mt-2 flex items-center">
+                        <div className="flex items-center">
+                            <span title={outputSchema.type}>
+                                {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
+                            </span>
 
-                        <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
+                            <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
+                        </div>
+
+                        <div className="absolute right-4">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
+                                        {(saveWorkflowNodeTestOutputMutation.isPending ||
+                                            uploadSampleOutputRequestMutation.isPending) && (
+                                            <>
+                                                <AnimateSpin />
+                                                Testing...
+                                            </>
+                                        )}
+
+                                        {!saveWorkflowNodeTestOutputMutation.isPending &&
+                                            !uploadSampleOutputRequestMutation.isPending && <>Regenerate</>}
+                                    </Button>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent align="end" className="w-56 cursor-pointer">
+                                    <DropdownMenuItem onClick={handleTestComponentClick}>
+                                        Test Component
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
+                                        Upload Sample Value
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
 
                     {(outputSchema as PropertyType)?.properties && (
@@ -72,33 +173,50 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel}) => {
             ) : (
                 <div className="flex size-full items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <div>Generate Schema and Sample Data</div>
+                        <div>Generate Schema</div>
 
-                        <div>
-                            <div className="inline-flex rounded-md shadow-sm">
-                                <Button
-                                    className="relative inline-flex items-center rounded-l-md rounded-r-none px-3 py-2 text-sm focus:z-10"
-                                    type="button"
-                                >
-                                    Test component
-                                </Button>
+                        <div className="inline-flex flex-col gap-3 rounded-md shadow-sm">
+                            <Button
+                                disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                onClick={handleTestComponentClick}
+                                type="button"
+                            >
+                                {saveWorkflowNodeTestOutputMutation.isPending && (
+                                    <>
+                                        <AnimateSpin />
+                                        Testing...
+                                    </>
+                                )}
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild className="relative -ml-px block">
-                                        <Button className="relative inline-flex items-center rounded-l-none rounded-r-md p-2 focus:z-10">
-                                            <ChevronDownIcon aria-hidden="true" className="size-5" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
+                            </Button>
 
-                                    <DropdownMenuContent align="end" className="w-56 cursor-pointer">
-                                        <DropdownMenuLabel>Upload sample data</DropdownMenuLabel>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+                            <div className="text-center">or</div>
+
+                            <Button
+                                disabled={uploadSampleOutputRequestMutation.isPending}
+                                onClick={() => setShowUploadDialog(true)}
+                                type="button"
+                            >
+                                {uploadSampleOutputRequestMutation.isPending && (
+                                    <>
+                                        <AnimateSpin />
+                                        Uploading...
+                                    </>
+                                )}
+
+                                {!uploadSampleOutputRequestMutation.isPending && <>Upload Sample Value</>}
+                            </Button>
                         </div>
                     </div>
                 </div>
             )}
+
+            <OutputTabSampleDataDialog
+                onClose={() => setShowUploadDialog(false)}
+                onUpload={handleSampleDataDialogUpload}
+                open={showUploadDialog}
+            />
         </div>
     );
 };

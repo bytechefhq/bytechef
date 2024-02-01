@@ -44,7 +44,8 @@ public record Output(List<ModifiableValueProperty<?, ?>> properties, Object samp
 
     @Override
     public ObjectProperty getOutputSchema() {
-        return TaskDispatcherDSL.object()
+        return TaskDispatcherDSL
+            .object()
             .properties(properties);
     }
 

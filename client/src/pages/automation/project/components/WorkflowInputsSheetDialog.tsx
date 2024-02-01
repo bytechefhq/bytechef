@@ -15,10 +15,7 @@ import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import {
-    useCreateWorkflowTestConfigurationMutation,
-    useUpdateWorkflowTestConfigurationMutation,
-} from '@/mutations/platform/workflowTestConfigurations.mutations';
+import {useSaveWorkflowTestConfigurationInputsMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinition} from '@/types/types';
@@ -61,49 +58,29 @@ const WorkflowInputsSheetDialog = ({
 
     const queryClient = useQueryClient();
 
-    const createWorkflowTestConfigurationMutation = useCreateWorkflowTestConfigurationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
-
-            closeDialog();
-        },
-    });
-
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(projectId),
             });
 
-            if (workflowTestConfiguration?.workflowId) {
-                updateWorkflowTestConfigurationMutation.mutate({
-                    workflowId: workflowTestConfiguration.workflowId!,
-                    workflowTestConfigurationModel: {
-                        ...workflowTestConfiguration,
-                        inputs: {
-                            ...workflowTestConfiguration.inputs,
-                            [getValues().name]: getValues().testValue,
-                        },
+            saveWorkflowTestConfigurationInputsMutation.mutate({
+                saveWorkflowTestConfigurationInputsRequestModel: {
+                    inputs: {
+                        ...(workflowTestConfiguration ? workflowTestConfiguration.inputs : {}),
+                        [getValues().name]: getValues().testValue,
                     },
-                });
-            } else {
-                createWorkflowTestConfigurationMutation.mutate({
-                    workflowId: workflow.id!,
-                    workflowTestConfigurationModel: {
-                        inputs: {
-                            [workflow.inputs![inputIndex]?.name]: getValues().testValue,
-                        },
-                    },
-                });
-            }
+                },
+                workflowId: workflow.id!,
+            });
         },
     });
 
-    const updateWorkflowTestConfigurationMutation = useUpdateWorkflowTestConfigurationMutation({
-        onSuccess: (workflowTestConfiguration) => {
+    const saveWorkflowTestConfigurationInputsMutation = useSaveWorkflowTestConfigurationInputsMutation({
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration({
-                    workflowId: workflowTestConfiguration.workflowId!,
+                    workflowId: workflow.id!,
                 }),
             });
 

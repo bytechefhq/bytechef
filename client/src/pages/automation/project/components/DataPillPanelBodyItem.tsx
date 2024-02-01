@@ -22,7 +22,7 @@ const DataPillPanelBodyItem = ({
     const currentComponentAction = componentActions.find(
         (action) => action.workflowNodeName === componentAction.workflowNodeName
     );
-
+    console.log(componentAction?.properties?.[0]);
     return (
         <>
             <AccordionTrigger
@@ -54,32 +54,32 @@ const DataPillPanelBodyItem = ({
                 className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${componentAction.workflowNodeName}`}
             >
+                <DataPill
+                    componentAlias={componentAction.workflowNodeName}
+                    componentIcon={componentAction.componentDefinition.icon}
+                    property={componentAction?.outputSchema}
+                    root={true}
+                />
+
                 {filteredProperties.length ? (
                     <>
-                        <DataPill
-                            componentAlias={componentAction.workflowNodeName}
-                            componentIcon={componentAction.componentDefinition.icon}
-                        />
-
-                        {(componentAction.outputSchema as PropertyType)?.type !== 'FILE_ENTRY' && (
-                            <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
-                                {filteredProperties?.map((property) => (
-                                    <DataPill
-                                        componentAlias={componentAction.workflowNodeName}
-                                        componentIcon={componentAction.componentDefinition.icon}
-                                        key={property.name}
-                                        property={property}
-                                    />
-                                ))}
-                            </ul>
-                        )}
+                        <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
+                            {filteredProperties?.map((property) => (
+                                <DataPill
+                                    componentAlias={componentAction.workflowNodeName}
+                                    componentIcon={componentAction.componentDefinition.icon}
+                                    key={property.name}
+                                    property={property}
+                                />
+                            ))}
+                        </ul>
                     </>
                 ) : (
                     <div className="flex flex-col gap-4 px-6 py-4">
                         <div className="font-semibold">Test component</div>
 
                         <div className="text-sm">
-                            This component needs to be tested, to generate schema and sample data. Please go to the
+                            This component needs to be tested, to generate output schema. Please go to the
                             &quot;Output&quot; tab of the component.
                         </div>
 

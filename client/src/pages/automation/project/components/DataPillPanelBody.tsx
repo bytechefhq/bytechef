@@ -30,33 +30,10 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
 
                     const properties: Array<PropertyType> | undefined = outputSchema?.properties;
 
-                    let existingProperties = properties?.filter((property) => {
-                        if (property.name) {
-                            return true;
-                        } else {
-                            if (property.properties || property.items) {
-                                return true;
-                            }
-                        }
-                    });
-
-                    if (outputSchemaDefinition && outputSchemaDefinition.type === 'FILE_ENTRY') {
-                        existingProperties = [
-                            {
-                                controlType: outputSchema.controlType,
-                                description: outputSchema.description,
-                                label: outputSchema.label,
-                                name: outputSchema.name || componentAction.workflowNodeName,
-                                required: outputSchema.required,
-                                type: outputSchema.type,
-                            },
-                        ];
-                    }
-
-                    const filteredProperties = existingProperties?.length
+                    const filteredProperties = properties?.length
                         ? getFilteredProperties({
                               filterQuery: dataPillFilterQuery,
-                              properties: existingProperties,
+                              properties,
                           })
                         : [];
 

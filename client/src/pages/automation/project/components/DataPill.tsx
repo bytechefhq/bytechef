@@ -2,7 +2,6 @@ import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/store
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyType} from '@/types/projectTypes';
 import {MouseEvent} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const DataPill = ({
@@ -12,6 +11,7 @@ const DataPill = ({
     parentProperty,
     path,
     property,
+    root = false,
 }: {
     arrayIndex?: number;
     componentIcon?: string;
@@ -20,6 +20,7 @@ const DataPill = ({
     parentProperty?: PropertyType;
     property?: PropertyType;
     path?: string;
+    root?: boolean;
 }) => {
     const {focusedInput} = useWorkflowNodeDetailsPanelStore();
 
@@ -56,13 +57,15 @@ const DataPill = ({
     const getSubPropertyPath = (subPropertyName = '[0]') =>
         path ? `${path}/${subPropertyName}` : `${property?.name || `[${arrayIndex}]`}/${subPropertyName}`;
 
-    if (!property && componentIcon) {
+    if (root) {
         return (
             <div
                 className="inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
                 onClick={() => addDataPillToInput(componentAlias)}
             >
-                <InlineSVG className="size-6" src={componentIcon} />
+                <span className="mr-2" title={property?.type}>
+                    {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
+                </span>
 
                 <span>{componentAlias}</span>
             </div>
