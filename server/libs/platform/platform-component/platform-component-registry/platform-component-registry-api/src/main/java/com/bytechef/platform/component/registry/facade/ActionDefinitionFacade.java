@@ -30,7 +30,7 @@ public interface ActionDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> inputParameters, Long connectionId);
+        Map<String, ?> inputParameters, Long connectionId);
 
     String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

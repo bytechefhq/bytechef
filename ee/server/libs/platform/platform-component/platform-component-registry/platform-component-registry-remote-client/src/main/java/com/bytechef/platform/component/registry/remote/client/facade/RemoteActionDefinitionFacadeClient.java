@@ -41,6 +41,18 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
+    public List<Property> executeDynamicProperties(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        Map<String, ?> inputParameters, Long connectionId) {
+
+        return defaultRestClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
+            new PropertiesRequest(
+                componentName, componentVersion, actionName, inputParameters, connectionId, propertyName),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
     public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters) {
@@ -78,18 +90,6 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> inputParameters, Long connectionId) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
-            new PropertiesRequest(
-                componentName, componentVersion, actionName, inputParameters, connectionId, propertyName),
-            new ParameterizedTypeReference<>() {});
-    }
-
-    @Override
     public Map<String, ?> executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
         @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters, Long connectionId) {
@@ -123,7 +123,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PropertiesRequest(
-        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Long connectionId, String propertyName) {
     }
 }
