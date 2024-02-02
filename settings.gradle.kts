@@ -211,6 +211,7 @@ include("server:libs:modules:components:xlsx-file")
 include("server:libs:modules:components:xml-file")
 include("server:libs:modules:components:xml-helper")
 include("server:libs:modules:components:webhook")
+include("server:libs:modules:components:sendgrid")
 
 include("server:libs:modules:task-dispatchers:branch")
 include("server:libs:modules:task-dispatchers:condition")
@@ -265,3 +266,5 @@ include("ee:server:libs:platform:platform-workflow:platform-workflow-task-dispat
 include("ee:server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-rest")
 include("ee:server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest")
 include("ee:server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
+include("server:libs:modules:components:sendgrid")
+findProject(":server:libs:modules:components:sendgrid")?.name = "sendgrid"
