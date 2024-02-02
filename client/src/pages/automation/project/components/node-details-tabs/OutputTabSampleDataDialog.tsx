@@ -12,19 +12,17 @@ import Editor from '@monaco-editor/react';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useState} from 'react';
 
-const sampleValue = {
-    result: {
-        country: 'USA',
-        people: [
-            {
-                age: 28,
-                firstName: 'Joe',
-                gender: 'male',
-                lastName: 'Jackson',
-                number: '7349282382',
-            },
-        ],
-    },
+const sampleOutput = {
+    country: 'USA',
+    people: [
+        {
+            age: 28,
+            firstName: 'Joe',
+            gender: 'male',
+            lastName: 'Jackson',
+            number: '7349282382',
+        },
+    ],
 };
 
 const OutputTabSampleDataDialog = ({
@@ -36,14 +34,14 @@ const OutputTabSampleDataDialog = ({
     onClose: () => void;
     onUpload: (value: string) => void;
 }) => {
-    const [value, setValue] = useState<string>(JSON.stringify(sampleValue));
+    const [value, setValue] = useState<string>(JSON.stringify(sampleOutput));
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={open}>
             <DialogContent className="max-w-[800px]">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
-                        <DialogTitle>Upload Sample Value</DialogTitle>
+                        <DialogTitle>Upload Sample Output</DialogTitle>
 
                         <DialogClose asChild>
                             <Button size="icon" variant="ghost">
@@ -62,7 +60,7 @@ const OutputTabSampleDataDialog = ({
                         <Editor
                             defaultLanguage="json"
                             onChange={(value) => value && setValue(value)}
-                            value={JSON.stringify(sampleValue, null, 4)}
+                            value={JSON.stringify(sampleOutput, null, 4)}
                         />
                     </div>
                 </div>
