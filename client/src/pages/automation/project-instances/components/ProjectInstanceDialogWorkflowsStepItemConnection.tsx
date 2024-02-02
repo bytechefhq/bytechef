@@ -128,7 +128,6 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                         connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowNewConnectionDialog(false)}
-                        triggerNode={<Button>Create Connection</Button>}
                         useCreateConnectionMutation={useCreateConnectionMutation}
                         useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                         useUpdateConnectionMutation={useUpdateConnectionMutation}
