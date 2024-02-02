@@ -2,11 +2,14 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
+import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import Properties from 'components/Properties/Properties';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
 import {
@@ -14,11 +17,13 @@ import {
     useGetComponentDefinitionsQuery,
 } from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import getSubProperties from '../utils/getSubProperties';
+import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -55,6 +60,7 @@ const WorkflowNodeDetailsPanel = ({
     const [activeTab, setActiveTab] = useState('description');
     const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
     const [currentActionName, setCurrentActionName] = useState('');
+    const [currentComponentData, setCurrentComponentData] = useState<ComponentDataType>();
 
     const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -85,6 +91,18 @@ const WorkflowNodeDetailsPanel = ({
         }
     }
 
+    const {projectId} = useParams();
+
+    const queryClient = useQueryClient();
+
+    const updateWorkflowMutation = useUpdateWorkflowMutation({
+        onSuccess: () => {
+            if (projectId) {
+                queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(parseInt(projectId))});
+            }
+        },
+    });
+
     const handleActionSelectChange = (value: string) => {
         setCurrentActionName(value);
 
@@ -103,22 +121,33 @@ const WorkflowNodeDetailsPanel = ({
 
         if (currentComponent) {
             setComponentData([
-                ...componentData.filter(
-                    (component) => component.workflowNodeName !== currentNode.name || component.action !== value
-                ),
+                ...componentData.filter((component) => component.workflowNodeName !== currentNode.name),
                 {
-                    action: value,
-                    connection: currentComponent?.connection,
-                    name: currentComponent?.name,
-                    properties: {
-                        ...currentComponentData?.properties,
-                        [value]: {},
-                    },
-                    title: currentComponent?.title,
-                    version: currentComponent?.version,
-                    workflowNodeName: currentComponent?.workflowNodeName,
+                    ...currentComponent,
+                    actionName: value,
+                    componentName: currentNode.componentName || currentNode.id,
+                    workflowNodeName: currentNode.name,
                 },
             ]);
+
+            if (!currentComponentData) {
+                return;
+            }
+
+            const {componentName, icon, title, workflowNodeName} = currentComponentData;
+
+            saveWorkflowDefinition(
+                {
+                    actionName: value,
+                    componentName,
+                    icon,
+                    label: title,
+                    name: workflowNodeName!,
+                    type: `${componentName}/v1/${value}`,
+                },
+                workflow,
+                updateWorkflowMutation
+            );
         }
     };
 
@@ -254,17 +283,28 @@ const WorkflowNodeDetailsPanel = ({
         return true;
     });
 
-    let currentComponentData: ComponentDataType | undefined;
-
     const otherComponentData = componentData.filter((component) => {
         if (component.workflowNodeName === currentComponent?.workflowNodeName) {
-            currentComponentData = component;
-
             return false;
         } else {
             return true;
         }
     });
+
+    useEffect(() => {
+        if (currentComponentDefinition) {
+            // @ts-expect-error Backend needs to be updated to return the correct type
+            const {icon, name, title, workflowNodeName} = currentComponentDefinition;
+
+            setCurrentComponentData({
+                actionName: currentActionName,
+                componentName: name,
+                icon,
+                title,
+                workflowNodeName,
+            });
+        }
+    }, [currentActionName, currentComponent, currentComponentDefinition, workflow.tasks]);
 
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
@@ -278,7 +318,7 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentActions?.length, componentActions?.length, currentNode.name]);
+    }, [componentActions, currentNode.name]);
 
     // Set componentDefinitionNames depending on componentDefinitions
     useEffect(() => {
@@ -297,40 +337,6 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [availableDataPills.length]);
-
-    // Initialize or update component action
-    useEffect(() => {
-        if (currentComponentData?.action) {
-            if (currentComponent) {
-                setCurrentActionName(currentComponentData.action);
-
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        action: currentComponentData.action,
-                        name: currentComponent.name,
-                        workflowNodeName: currentComponent.workflowNodeName,
-                    },
-                ]);
-            }
-        } else if (currentComponent?.actions?.[0]?.name) {
-            if (currentComponent?.name) {
-                setCurrentActionName(currentComponent.actions[0].name);
-
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        action: currentComponent.actions[0].name,
-                        name: currentComponent.name,
-                        workflowNodeName: currentComponent.workflowNodeName,
-                    },
-                ]);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent?.workflowNodeName, currentComponentData?.workflowNodeName]);
 
     // Tab switching logic
     useEffect(() => {
@@ -364,89 +370,6 @@ const WorkflowNodeDetailsPanel = ({
         currentActionProperties?.length,
         currentComponent?.name,
     ]);
-
-    useEffect(() => {
-        if (currentActionDefinition && currentActionFetched && currentComponent) {
-            if (currentComponentData) {
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        action: currentActionDefinition.name,
-                        workflowNodeName: currentComponent.workflowNodeName,
-                    },
-                ]);
-            }
-
-            if (componentActions && currentComponent) {
-                const {name, workflowNodeName} = currentComponent;
-
-                const duplicateComponentActionIndex = componentActions.findIndex(
-                    (action) =>
-                        action.workflowNodeName?.match(new RegExp(/_\d$/)) &&
-                        action.workflowNodeName === workflowNodeName
-                );
-
-                if (duplicateComponentActionIndex !== -1) {
-                    componentActions.splice(duplicateComponentActionIndex, 1, {
-                        actionName: currentActionDefinition.name,
-                        componentName: name,
-                        workflowNodeName,
-                    });
-
-                    setComponentActions(componentActions);
-                } else {
-                    const orderedComponentActions = componentNames.map((componentName) => {
-                        const componentActionIndex = componentActions.findIndex(
-                            (componentAction) => componentAction.componentName === componentName
-                        );
-
-                        return componentActions[componentActionIndex];
-                    });
-
-                    const updatedComponentActions = [
-                        ...orderedComponentActions.slice(0, currentNodeIndex),
-                        {
-                            actionName: currentActionDefinition.name,
-                            componentName: name,
-                            workflowNodeName,
-                        },
-                        ...orderedComponentActions.slice(currentNodeIndex + 1),
-                    ];
-
-                    setComponentActions(updatedComponentActions);
-                }
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent?.workflowNodeName, currentActionDefinition?.name, currentActionFetched]);
-
-    useEffect(() => {
-        if (currentActionDefinition?.name) {
-            const componentDataIndex = componentData.findIndex(
-                (component) => component.workflowNodeName === currentComponent?.workflowNodeName
-            );
-
-            if (!componentDataIndex && currentComponent) {
-                setComponentData([
-                    ...componentData.filter((item) => item.workflowNodeName !== currentComponent!.workflowNodeName),
-                    {
-                        action: currentActionDefinition.name,
-                        connection: currentComponent.connection,
-                        name: currentComponent.name,
-                        properties: {
-                            ...currentComponentData?.properties,
-                            [currentActionDefinition.name]: {},
-                        },
-                        title: currentComponent.title,
-                        version: currentComponent.version,
-                        workflowNodeName: currentComponent.workflowNodeName,
-                    },
-                ]);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentActionDefinition?.name, currentComponent?.workflowNodeName]);
 
     useEffect(() => {
         if (currentNode.componentName && !componentNames.includes(currentNode.componentName)) {
@@ -550,6 +473,8 @@ const WorkflowNodeDetailsPanel = ({
                                                     dataPills={dataPills}
                                                     mention={!!dataPills?.length}
                                                     properties={currentActionProperties}
+                                                    updateWorkflowMutation={updateWorkflowMutation}
+                                                    workflow={workflow}
                                                 />
                                             ) : (
                                                 <div className="flex h-full items-center justify-center text-xl">

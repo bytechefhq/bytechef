@@ -20,25 +20,28 @@ export type ComponentActionType = {
 };
 
 export type ComponentDataType = {
-    action?: string;
-    name: string;
+    actionName: string;
     connection?: object;
+    componentName: string;
+    icon?: JSX.Element | string;
     notes?: string;
-    properties?: {
-        [key: string]: {
-            [key: string]: string;
-        };
+    parameters?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
     };
     title?: string;
     type?: string;
     version?: number;
-    workflowNodeName?: string;
+    workflowNodeName: string;
 };
 
 export type CurrentComponentType = {
     connection?: ConnectionDefinitionBasicModel;
     notes?: string;
-    properties?: object;
+    parameters?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
     workflowNodeName?: string;
 } & ComponentDefinitionModel;
 

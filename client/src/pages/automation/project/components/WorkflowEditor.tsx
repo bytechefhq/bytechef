@@ -1,11 +1,14 @@
-import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {ComponentActionType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/platform/configuration';
+import {UseMutationResult} from '@tanstack/react-query';
+import {
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
+    WorkflowModel,
+} from 'middleware/platform/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
@@ -28,12 +31,13 @@ export type WorkflowEditorProps = {
     projectId: number;
     workflowId: string;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 };
 
 const WorkflowEditor = ({
     componentDefinitions,
-    projectId,
     taskDispatcherDefinitions,
+    updateWorkflowMutation,
     workflowId,
 }: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
@@ -83,14 +87,6 @@ const WorkflowEditor = ({
         },
         !!componentNames.length
     );
-
-    const queryClient = useQueryClient();
-
-    const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId)});
-        },
-    });
 
     const onDrop: DragEventHandler = (event) => {
         const droppedNodeName = event.dataTransfer.getData('application/reactflow');
@@ -232,6 +228,7 @@ const WorkflowEditor = ({
         }
     }, [defaultNodesWithWorkflowNodes]);
 
+    // Only gets invoked when a new node is added to the workflow using the last node
     const handleNodeChange = async (changes: NodeDimensionChange[]) => {
         const changesIds = changes.map((change) => change.id);
 
@@ -253,6 +250,21 @@ const WorkflowEditor = ({
 
         saveWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutation);
     };
+
+    const workflowNodes = getNodes();
+
+    useEffect(() => {
+        if (workflowNodes?.length) {
+            const workflowNodeNames = workflowNodes.map((node) => {
+                if (node.data.type === 'workflow' && node?.data.name) {
+                    return node?.data.name;
+                }
+            });
+
+            setNodeNames(workflowNodeNames.filter((nodeName) => !!nodeName));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setNodeNames, workflowNodes?.length]);
 
     useEffect(() => {
         if (componentNames && previousComponentNames?.length) {

@@ -44,12 +44,12 @@ function renderApp() {
     const queryClient = new QueryClient();
 
     root.render(
-        <React.StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
+        // <React.StrictMode>
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
 
-                <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-            </QueryClientProvider>
-        </React.StrictMode>
+            <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+        </QueryClientProvider>
+        // </React.StrictMode>
     );
 }
