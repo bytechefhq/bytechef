@@ -30,6 +30,7 @@ import java.util.List;
  * @author Mario Cvjetojevic
  */
 public final class SlackConnection {
+
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(OAUTH2_AUTHORIZATION_CODE.toLowerCase(), OAUTH2_AUTHORIZATION_CODE)

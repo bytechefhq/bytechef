@@ -43,7 +43,7 @@ public final class SlackSendDirectMessageActionTest extends AbstractSlackActionT
 
     @Test
     public void testPerform() throws SlackApiException, IOException {
-        beforeTestPerform_whenMockedParametersThenReturn();
+        beforeTestPerformWhenMockedParametersThenReturn();
         when(mockedParameters.getRequiredString(USER_ID))
             .thenReturn(USER_ID);
 
@@ -53,7 +53,7 @@ public final class SlackSendDirectMessageActionTest extends AbstractSlackActionT
             .chatPostMessage(chatPostMessageRequestArgumentCaptor.capture());
         assertEquals(USER_ID, chatPostMessageRequestArgumentCaptor.getValue()
             .getChannel());
-        afterTestPerform_assertEquals();
+        afterTestPerformAssertEquals();
     }
 
     @Test
@@ -71,16 +71,21 @@ public final class SlackSendDirectMessageActionTest extends AbstractSlackActionT
             .thenReturn(mockedUserList);
         mockedUserList.forEach(user -> when(user.getName())
             .thenReturn("NOT searched text"));
-        when(mockedUserList.get(0)
-            .getName())
-                .thenReturn(SEARCH_TEXT + " more text");
 
-        List<Option<String>> options = SlackSendDirectMessageAction
-            .getUserOptions(mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
+        User user = mockedUserList.getFirst();
+
+        when(user.getName())
+            .thenReturn(SEARCH_TEXT + " more text");
+
+        List<Option<String>> options = SlackSendDirectMessageAction.getUserOptions(
+            mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
 
         verify(mockedMethodsClient, times(1))
             .usersList(any(UsersListRequest.class));
         assertEquals(1, options.size());
-        options.forEach(option -> assertTrue(StringUtils.startsWith(option.getLabel(), SEARCH_TEXT)));
+
+        Option<String> option = options.getFirst();
+
+        assertTrue(StringUtils.equals(option.getLabel(), SEARCH_TEXT + " more text"));
     }
 }

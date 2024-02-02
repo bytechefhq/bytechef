@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.slack.properties;
+package com.bytechef.component.slack.util;
 
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.slack.properties.SlackInputProperties.ATTACHMENTS;
-import static com.bytechef.component.slack.properties.SlackInputProperties.BLOCKS;
-import static com.bytechef.component.slack.properties.SlackInputProperties.CONTENT_TYPE;
-import static com.bytechef.component.slack.properties.SlackInputProperties.TEXT;
+import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS;
+import static com.bytechef.component.slack.constant.SlackConstants.BLOCKS;
+import static com.bytechef.component.slack.constant.SlackConstants.CONTENT_TYPE;
+import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,17 +34,18 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Mario Cvjetojevic
  */
-public final class SlackInputPropertiesTest {
-    protected ActionContext mockedContext = mock(ActionContext.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
+public final class SlackUtilsTest {
+
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
 
     @Test
-    public void testGetContentTypeProperties_attachments() {
+    public void testGetContentTypePropertiesAttachments() {
         when(mockedParameters.getRequiredString(CONTENT_TYPE))
             .thenReturn(ATTACHMENTS);
 
-        List<? extends Property.ValueProperty<?>> propertyList =
-            SlackInputProperties.getContentTypeProperties(mockedParameters, mockedParameters, mockedContext);
+        List<? extends ValueProperty<?>> propertyList =
+            SlackUtils.getContentTypeProperties(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, propertyList.size());
         Assertions.assertEquals(
@@ -57,12 +58,12 @@ public final class SlackInputPropertiesTest {
     }
 
     @Test
-    public void testGetContentTypeProperties_blocks() {
+    public void testGetContentTypePropertiesBlocks() {
         when(mockedParameters.getRequiredString(CONTENT_TYPE))
             .thenReturn(BLOCKS);
 
-        List<? extends Property.ValueProperty<?>> propertyList =
-            SlackInputProperties.getContentTypeProperties(mockedParameters, mockedParameters, mockedContext);
+        List<? extends ValueProperty<?>> propertyList = SlackUtils.getContentTypeProperties(
+            mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, propertyList.size());
         Assertions.assertEquals(
@@ -75,12 +76,12 @@ public final class SlackInputPropertiesTest {
     }
 
     @Test
-    public void testGetContentTypeProperties_text() {
+    public void testGetContentTypePropertiesText() {
         when(mockedParameters.getRequiredString(CONTENT_TYPE))
             .thenReturn(TEXT);
 
-        List<? extends Property.ValueProperty<?>> propertyList =
-            SlackInputProperties.getContentTypeProperties(mockedParameters, mockedParameters, mockedContext);
+        List<? extends ValueProperty<?>> propertyList = SlackUtils.getContentTypeProperties(
+            mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, propertyList.size());
         Assertions.assertEquals(

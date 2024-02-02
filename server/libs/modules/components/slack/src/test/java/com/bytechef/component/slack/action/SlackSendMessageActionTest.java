@@ -43,7 +43,7 @@ public final class SlackSendMessageActionTest extends AbstractSlackActionTest {
 
     @Test
     public void testPerform() throws SlackApiException, IOException {
-        beforeTestPerform_whenMockedParametersThenReturn();
+        beforeTestPerformWhenMockedParametersThenReturn();
         when(mockedParameters.getRequiredString(CHANNEL_ID))
             .thenReturn(CHANNEL_ID);
 
@@ -53,7 +53,7 @@ public final class SlackSendMessageActionTest extends AbstractSlackActionTest {
             .chatPostMessage(chatPostMessageRequestArgumentCaptor.capture());
         assertEquals(CHANNEL_ID, chatPostMessageRequestArgumentCaptor.getValue()
             .getChannel());
-        afterTestPerform_assertEquals();
+        afterTestPerformAssertEquals();
     }
 
     @Test
@@ -71,16 +71,21 @@ public final class SlackSendMessageActionTest extends AbstractSlackActionTest {
             .thenReturn(mockedConversationList);
         mockedConversationList.forEach(conversation -> when(conversation.getName())
             .thenReturn("NOT searched text"));
-        when(mockedConversationList.get(0)
-            .getName())
-                .thenReturn(SEARCH_TEXT + " more text");
 
-        List<Option<String>> options = SlackSendMessageAction
-            .getChannelOptions(mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
+        Conversation conversation = mockedConversationList.getFirst();
+
+        when(conversation.getName())
+            .thenReturn(SEARCH_TEXT + " more text");
+
+        List<Option<String>> options = SlackSendMessageAction.getChannelOptions(
+            mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
 
         verify(mockedMethodsClient, times(1))
             .conversationsList(any(ConversationsListRequest.class));
         assertEquals(1, options.size());
-        options.forEach(option -> assertTrue(StringUtils.startsWith(option.getLabel(), SEARCH_TEXT)));
+
+        Option<String> option = options.getFirst();
+
+        assertTrue(StringUtils.equals(option.getLabel(), SEARCH_TEXT + " more text"));
     }
 }

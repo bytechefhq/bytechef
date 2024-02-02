@@ -17,23 +17,24 @@
 package com.bytechef.component.slack.action;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.slack.constant.SlackConstants.AS_USER;
+import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS;
+import static com.bytechef.component.slack.constant.SlackConstants.BLOCKS;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL_ID;
+import static com.bytechef.component.slack.constant.SlackConstants.ICON_EMOJI;
+import static com.bytechef.component.slack.constant.SlackConstants.ICON_URL;
+import static com.bytechef.component.slack.constant.SlackConstants.LINK_NAMES;
+import static com.bytechef.component.slack.constant.SlackConstants.METADATA;
+import static com.bytechef.component.slack.constant.SlackConstants.MRKDWN;
+import static com.bytechef.component.slack.constant.SlackConstants.PARSE;
+import static com.bytechef.component.slack.constant.SlackConstants.REPLY_BROADCAST;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
-import static com.bytechef.component.slack.properties.SlackInputProperties.AS_USER;
-import static com.bytechef.component.slack.properties.SlackInputProperties.ATTACHMENTS;
-import static com.bytechef.component.slack.properties.SlackInputProperties.BLOCKS;
-import static com.bytechef.component.slack.properties.SlackInputProperties.ICON_EMOJI;
-import static com.bytechef.component.slack.properties.SlackInputProperties.ICON_URL;
-import static com.bytechef.component.slack.properties.SlackInputProperties.LINK_NAMES;
-import static com.bytechef.component.slack.properties.SlackInputProperties.METADATA;
-import static com.bytechef.component.slack.properties.SlackInputProperties.MRKDWN;
-import static com.bytechef.component.slack.properties.SlackInputProperties.PARSE;
-import static com.bytechef.component.slack.properties.SlackInputProperties.REPLY_BROADCAST;
-import static com.bytechef.component.slack.properties.SlackInputProperties.THREAD_TS;
-import static com.bytechef.component.slack.properties.SlackInputProperties.UNFURL_LINKS;
-import static com.bytechef.component.slack.properties.SlackInputProperties.UNFURL_MEDIA;
-import static com.bytechef.component.slack.properties.SlackInputProperties.USERNAME;
+import static com.bytechef.component.slack.constant.SlackConstants.THREAD_TS;
+import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_LINKS;
+import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_MEDIA;
+import static com.bytechef.component.slack.constant.SlackConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +53,9 @@ import org.mockito.Mockito;
  * @author Mario Cvjetojevic
  */
 public abstract class AbstractSlackActionTest {
+
     protected static final String SEARCH_TEXT = "12345";
+
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Parameters mockedParameters = mock(Parameters.class);
     protected MockedConstruction<App> mockedApp;
@@ -72,7 +75,7 @@ public abstract class AbstractSlackActionTest {
         mockedApp.close();
     }
 
-    protected void beforeTestPerform_whenMockedParametersThenReturn(){
+    protected void beforeTestPerformWhenMockedParametersThenReturn(){
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn(ACCESS_TOKEN);
         when(mockedParameters.getRequiredString(CHANNEL_ID))
@@ -109,38 +112,24 @@ public abstract class AbstractSlackActionTest {
             .thenReturn(USERNAME);
     }
 
-    protected void afterTestPerform_assertEquals() {
-        assertEquals(ACCESS_TOKEN, chatPostMessageRequestArgumentCaptor.getValue()
-            .getToken());
-        assertEquals(ATTACHMENTS, chatPostMessageRequestArgumentCaptor.getValue()
-            .getAttachmentsAsString());
-        assertEquals(BLOCKS, chatPostMessageRequestArgumentCaptor.getValue()
-            .getBlocksAsString());
-        assertEquals(TEXT, chatPostMessageRequestArgumentCaptor.getValue()
-            .getText());
-        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue()
-            .isAsUser());
-        assertEquals(ICON_EMOJI, chatPostMessageRequestArgumentCaptor.getValue()
-            .getIconEmoji());
-        assertEquals(ICON_URL, chatPostMessageRequestArgumentCaptor.getValue()
-            .getIconUrl());
-        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue()
-            .isLinkNames());
-        assertEquals(METADATA, chatPostMessageRequestArgumentCaptor.getValue()
-            .getMetadataAsString());
-        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue()
-            .isMrkdwn());
-        assertEquals(PARSE, chatPostMessageRequestArgumentCaptor.getValue()
-            .getParse());
-        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue()
-            .isReplyBroadcast());
-        assertEquals(THREAD_TS, chatPostMessageRequestArgumentCaptor.getValue()
-            .getThreadTs());
-        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue()
-            .isUnfurlLinks());
-        assertEquals(true, chatPostMessageRequestArgumentCaptor.getValue()
-            .isUnfurlMedia());
-        assertEquals(USERNAME, chatPostMessageRequestArgumentCaptor.getValue()
-            .getUsername());
+    protected void afterTestPerformAssertEquals() {
+        ChatPostMessageRequest chatPostMessageRequest = chatPostMessageRequestArgumentCaptor.getValue();
+
+        assertEquals(ACCESS_TOKEN, chatPostMessageRequest.getToken());
+        assertEquals(ATTACHMENTS, chatPostMessageRequest.getAttachmentsAsString());
+        assertEquals(BLOCKS, chatPostMessageRequest.getBlocksAsString());
+        assertEquals(TEXT, chatPostMessageRequest.getText());
+        assertEquals(true, chatPostMessageRequest.isAsUser());
+        assertEquals(ICON_EMOJI, chatPostMessageRequest.getIconEmoji());
+        assertEquals(ICON_URL, chatPostMessageRequest.getIconUrl());
+        assertTrue(chatPostMessageRequest.isLinkNames());
+        assertEquals(METADATA, chatPostMessageRequest.getMetadataAsString());
+        assertTrue(chatPostMessageRequest.isMrkdwn());
+        assertEquals(PARSE, chatPostMessageRequest.getParse());
+        assertTrue(chatPostMessageRequest.isReplyBroadcast());
+        assertEquals(THREAD_TS, chatPostMessageRequest.getThreadTs());
+        assertTrue(chatPostMessageRequest.isUnfurlLinks());
+        assertTrue(chatPostMessageRequest.isUnfurlMedia());
+        assertEquals(USERNAME, chatPostMessageRequest.getUsername());
     }
 }
