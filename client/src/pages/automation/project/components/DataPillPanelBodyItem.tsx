@@ -54,15 +54,15 @@ const DataPillPanelBodyItem = ({
                 className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${componentAction.workflowNodeName}`}
             >
-                <DataPill
-                    componentAlias={componentAction.workflowNodeName}
-                    componentIcon={componentAction.componentDefinition.icon}
-                    property={componentAction?.outputSchema}
-                    root={true}
-                />
-
                 {filteredProperties.length ? (
                     <>
+                        <DataPill
+                            componentAlias={componentAction.workflowNodeName}
+                            componentIcon={componentAction.componentDefinition.icon}
+                            property={componentAction?.outputSchema}
+                            root={true}
+                        />
+
                         <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
                             {filteredProperties?.map((property) => (
                                 <DataPill
@@ -75,7 +75,7 @@ const DataPillPanelBodyItem = ({
                         </ul>
                     </>
                 ) : (
-                    <div className="flex flex-col gap-4 px-6 py-4">
+                    <div className="flex flex-col gap-6 py-1">
                         <div className="font-semibold">Test component</div>
 
                         <div className="text-sm">
