@@ -472,10 +472,6 @@ paths:
           application/json:
             schema:
               type: "object"
-              properties:
-                sampleOutput:
-                  type: "object"
-                  additionalProperties: true
         required: true
       responses:
         "200":
