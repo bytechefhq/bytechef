@@ -18,27 +18,29 @@ const DescriptionTab = ({
     const {name, title} = componentDefinition;
     const {setComponentData} = useWorkflowDataStore();
 
-    const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) =>
-        setComponentData([
-            ...otherComponentData,
-            {
-                ...currentComponentData,
-                action: currentComponentData!.action,
-                name,
-                title: event.target.value,
-            },
-        ]);
+    const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (currentComponentData) {
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    title: event.target.value,
+                },
+            ]);
+        }
+    };
 
-    const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) =>
-        setComponentData([
-            ...otherComponentData,
-            {
-                ...currentComponentData,
-                action: currentComponentData!.action,
-                name,
-                notes: event.target.value,
-            },
-        ]);
+    const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        if (currentComponentData) {
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    notes: event.target.value,
+                },
+            ]);
+        }
+    };
 
     return (
         <div className="h-full flex-[1_1_1px] overflow-auto p-4">

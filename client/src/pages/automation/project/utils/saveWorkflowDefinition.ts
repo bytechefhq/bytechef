@@ -10,19 +10,25 @@ interface UpdateWorkflowRequest {
     workflowModel: WorkflowModel;
 }
 
+interface NodeDataType {
+    actionName?: string;
+    componentName: string;
+    icon?: JSX.Element | string;
+    label?: string;
+    name: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters?: {[key: string]: any};
+    type?: string;
+}
+
 export default async function saveWorkflowDefinition(
-    nodeData: {
-        componentName: string;
-        icon: JSX.Element;
-        label?: string;
-        name: string;
-        parameters?: {[key: string]: object};
-    },
+    nodeData: NodeDataType,
     workflow: WorkflowModel,
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
     index?: number
 ) {
-    const {componentName, label, name, parameters} = nodeData;
+    console.log('saving nodeData: ', nodeData);
+    const {actionName, componentName, label, name, parameters} = nodeData;
 
     const queryClient = new QueryClient();
 
@@ -35,23 +41,62 @@ export default async function saveWorkflowDefinition(
         return;
     }
 
+    // console.log('actionName: ', actionName);
+    // console.log('newNodeComponentDefinition: ', newNodeComponentDefinition);
+
     const newTask: WorkflowTaskModel = {
         label,
         name,
         parameters,
-        type: `${componentName}/v1/${newNodeComponentDefinition.actions?.[0].name}`,
+        type: `${componentName}/v1/${actionName || newNodeComponentDefinition.actions?.[0].name}`,
     };
 
-    const workflowNodeAlreadyExists = workflow.tasks?.some((task) => task.name === newTask.name);
+    const existingWorkflowTask = workflow.tasks?.find((task) => task.name === newTask.name);
 
-    if (workflowNodeAlreadyExists) {
+    if (existingWorkflowTask && !actionName) {
         return;
     }
 
     let tasks: WorkflowTaskModel[];
     const workflowDefinition: WorkflowDefinition = JSON.parse(workflow.definition!);
 
-    if (index) {
+    if (existingWorkflowTask) {
+        const existingTaskIndex = workflowDefinition.tasks?.findIndex(
+            (task) => task.name === existingWorkflowTask.name
+        );
+
+        if (existingTaskIndex === undefined) {
+            return;
+        }
+
+        // console.log('existingWorkflowTask: ', existingWorkflowTask);
+        // console.log('newTask: ', newTask);
+
+        tasks = [...(workflowDefinition.tasks || [])];
+
+        const combinedParameters = {
+            ...existingWorkflowTask.parameters,
+            ...newTask.parameters,
+        };
+
+        const combinedTask: WorkflowTaskModel = {
+            ...existingWorkflowTask,
+            ...newTask,
+            parameters: combinedParameters,
+        };
+
+        console.log('combinedTask: ', combinedTask);
+
+        tasks[existingTaskIndex] = combinedTask;
+
+        if (existingWorkflowTask.type !== newTask.type) {
+            delete tasks[existingTaskIndex].parameters;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        delete tasks[existingTaskIndex].connections;
+    } else if (index) {
         tasks = [...(workflowDefinition.tasks || [])];
 
         tasks.splice(index, 0, newTask);

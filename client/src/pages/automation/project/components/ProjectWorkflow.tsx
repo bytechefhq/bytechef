@@ -7,6 +7,7 @@ import 'reactflow/dist/base.css';
 import './ProjectWorkflow.css';
 
 import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
+import {useEffect} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -17,9 +18,10 @@ const ProjectWorkflow = ({
     componentDefinitions,
     projectId,
     taskDispatcherDefinitions,
+    updateWorkflowMutation,
     workflowId,
 }: WorkflowEditorProps) => {
-    const {componentActions} = useWorkflowDataStore();
+    const {componentActions, setComponentData, workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {data: workflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
@@ -29,6 +31,28 @@ const ProjectWorkflow = ({
         },
         !!componentActions?.length
     );
+
+    useEffect(() => {
+        const workflowComponentData = workflow.tasks?.map((task) => {
+            const {label, name, parameters, type} = task;
+
+            const [componentName, actionName] = type.split('/v1/');
+
+            return {
+                actionName,
+                componentName,
+                parameters,
+                title: label,
+                type,
+                workflowNodeName: name,
+            };
+        });
+
+        if (workflowComponentData) {
+            setComponentData(workflowComponentData);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflow.tasks]);
 
     const previousComponentDefinitions = workflowNodeOutputs
         ? workflowNodeOutputs.map(
@@ -46,6 +70,7 @@ const ProjectWorkflow = ({
                 componentDefinitions={componentDefinitions}
                 projectId={+projectId!}
                 taskDispatcherDefinitions={taskDispatcherDefinitions}
+                updateWorkflowMutation={updateWorkflowMutation}
                 workflowId={workflowId}
             />
 

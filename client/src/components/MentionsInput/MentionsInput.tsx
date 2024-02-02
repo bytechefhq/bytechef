@@ -7,10 +7,13 @@ import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
 
+import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
-import {DataPillType} from '@/types/types';
+import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
+import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 
 import MentionBlot from './MentionBlot';
@@ -36,6 +39,8 @@ const MentionInputListItem = (item: DataPillType) => {
 
 type MentionsInputProps = {
     controlType?: string;
+    currentComponent?: CurrentComponentType;
+    currentComponentData?: ComponentDataType;
     dataPills: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
@@ -48,12 +53,16 @@ type MentionsInputProps = {
     placeholder?: string;
     required?: boolean;
     singleMention?: boolean;
+    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    workflow?: WorkflowModel;
 };
 
 const MentionsInput = forwardRef(
     (
         {
             controlType,
+            currentComponent,
+            currentComponentData,
             dataPills,
             defaultValue,
             description,
@@ -66,10 +75,12 @@ const MentionsInput = forwardRef(
             placeholder = "Show data pills using '{'",
             required,
             singleMention,
+            updateWorkflowMutation,
+            workflow,
         }: MentionsInputProps,
         ref: Ref<ReactQuill>
     ) => {
-        const [value, setValue] = useState('');
+        const [value, setValue] = useState(defaultValue || '');
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
@@ -167,6 +178,18 @@ const MentionsInput = forwardRef(
 
         const isFocused = focusedInput?.props.id === elementId;
 
+        const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
+
+        const taskPropertyValue = name ? currentWorkflowTask?.parameters?.[name] : '';
+
+        useEffect(() => {
+            if (taskPropertyValue === undefined) {
+                return;
+            }
+
+            setValue(taskPropertyValue as string);
+        }, [taskPropertyValue]);
+
         useEffect(() => {
             // @ts-expect-error Quill false positive
             if (!ref?.current) {
@@ -230,6 +253,27 @@ const MentionsInput = forwardRef(
                         key={elementId}
                         // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                         modules={useMemo(() => modules, [])}
+                        onBlur={() => {
+                            if (!currentComponentData || !workflow || !updateWorkflowMutation) {
+                                return;
+                            }
+
+                            const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+
+                            saveWorkflowDefinition(
+                                {
+                                    actionName,
+                                    componentName,
+                                    name: workflowNodeName,
+                                    parameters: {
+                                        ...parameters,
+                                        [name as string]: value,
+                                    },
+                                },
+                                workflow,
+                                updateWorkflowMutation
+                            );
+                        }}
                         onChange={(value) => {
                             if (onChange) {
                                 onChange({
@@ -277,7 +321,7 @@ const MentionsInput = forwardRef(
                         onKeyPress={onKeyPress}
                         placeholder={placeholder}
                         ref={ref}
-                        value={defaultValue || value}
+                        value={value}
                     />
                 </div>
             </fieldset>

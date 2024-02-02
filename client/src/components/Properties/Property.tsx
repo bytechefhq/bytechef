@@ -1,13 +1,16 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
+import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {UseMutationResult} from '@tanstack/react-query';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
@@ -47,6 +50,8 @@ interface PropertyProps {
     property: PropertyType;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
+    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    workflow?: WorkflowModel;
 }
 
 const Property = ({
@@ -59,6 +64,8 @@ const Property = ({
     path = 'parameters',
     property,
     register,
+    updateWorkflowMutation,
+    workflow,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -140,8 +147,21 @@ const Property = ({
         showInputTypeSwitchButton = false;
     }
 
+    const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
+
+    const taskPropertyValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+
+    useEffect(() => {
+        if (taskPropertyValue === undefined) {
+            return;
+        }
+
+        isNumericalInput ? setNumericValue(taskPropertyValue || '') : setInputValue(taskPropertyValue || '');
+    }, [isNumericalInput, taskPropertyValue]);
+    console.log('taskPropertyValue: ', taskPropertyValue);
+
     const otherComponentData = componentData.filter((component) => {
-        if (component.name !== currentComponent?.name) {
+        if (component.componentName !== currentComponent?.name) {
             return true;
         } else {
             currentComponentData = component;
@@ -150,30 +170,60 @@ const Property = ({
         }
     });
 
-    if (actionName && name && currentComponentData?.properties?.[actionName]) {
-        defaultValue = currentComponentData?.properties?.[actionName][name];
+    if (actionName && name && currentComponentData?.parameters?.[name]) {
+        defaultValue = currentComponentData?.parameters?.[name];
     }
 
     const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log('handlePropertyChange');
         if (currentComponentData) {
-            const {action, name, properties} = currentComponentData;
+            const {parameters} = currentComponentData;
 
-            if (action && properties) {
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    parameters: {
+                        ...parameters,
+                        [event.target.name]: event.target.value,
+                    },
+                },
+            ]);
+        }
+    };
+
+    const handleSelectChange = (value: string, name: string | undefined) => {
+        if (currentComponentData) {
+            const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+
+            if (actionName) {
                 setComponentData([
                     ...otherComponentData,
                     {
                         ...currentComponentData,
-                        name,
-                        properties: {
-                            ...properties,
-                            [action]: {
-                                ...properties[action],
-                                [event.target.name]: event.target.value,
-                            },
+                        parameters: {
+                            ...parameters,
+                            [name!]: value,
                         },
                     },
                 ]);
+
+                if (!workflow || !updateWorkflowMutation) {
+                    return;
+                }
+
+                saveWorkflowDefinition(
+                    {
+                        actionName,
+                        componentName,
+                        name: workflowNodeName,
+                        parameters: {
+                            ...parameters,
+                            [name as string]: value,
+                        },
+                    },
+                    workflow,
+                    updateWorkflowMutation
+                );
             }
         }
     };
@@ -220,6 +270,30 @@ const Property = ({
 
             setErrorMessage('Incorrect value');
         }
+
+        if (!currentComponentData || !workflow || !updateWorkflowMutation) {
+            return;
+        }
+
+        const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+
+        if (!name) {
+            return;
+        }
+
+        saveWorkflowDefinition(
+            {
+                actionName,
+                componentName,
+                name: workflowNodeName,
+                parameters: {
+                    ...parameters,
+                    [name as string]: isNumericalInput ? numericValue : inputValue,
+                },
+            },
+            workflow,
+            updateWorkflowMutation
+        );
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -241,8 +315,6 @@ const Property = ({
             setInputValue(event.target.value);
         }
     };
-
-    console.log(name, ' property: ', property);
 
     if (type === 'OBJECT' && !properties?.length && !items?.length) {
         return <></>;
@@ -282,6 +354,8 @@ const Property = ({
                 {showMentionInput && !!dataPills?.length && (
                     <MentionsInput
                         controlType={controlType}
+                        currentComponent={currentComponent}
+                        currentComponentData={currentComponentData}
                         dataPills={dataPills}
                         defaultValue={defaultValue}
                         description={description}
@@ -297,6 +371,8 @@ const Property = ({
                         ref={editorRef}
                         required={required}
                         singleMention={controlType !== 'TEXT'}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflow={workflow}
                     />
                 )}
 
@@ -337,19 +413,13 @@ const Property = ({
                         )}
 
                         {type === 'FILE_ENTRY' && !!dataPills?.length && (
-                            <>
-                                {console.log('!!dataPills?.length: ', !!dataPills?.length)}
-
-                                <span>foo</span>
-
-                                <ObjectProperty
-                                    actionName={actionName}
-                                    currentComponent={currentComponent}
-                                    currentComponentData={currentComponentData}
-                                    dataPills={dataPills}
-                                    property={property}
-                                />
-                            </>
+                            <ObjectProperty
+                                actionName={actionName}
+                                currentComponent={currentComponent}
+                                currentComponentData={currentComponentData}
+                                dataPills={dataPills}
+                                property={property}
+                            />
                         )}
 
                         {register && isValidControlType && (
@@ -400,10 +470,11 @@ const Property = ({
 
                         {controlType === 'SELECT' && (
                             <Select
-                                defaultValue={defaultValue?.toString()}
+                                defaultValue={taskPropertyValue || defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                onValueChange={(value) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<ISelectOption>) || undefined || []}
                                 triggerClassName="w-full border border-gray-300"
                             />
