@@ -15,6 +15,7 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Title",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -37,8 +38,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": null,

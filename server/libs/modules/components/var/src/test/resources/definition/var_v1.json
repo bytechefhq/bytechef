@@ -277,8 +277,8 @@
       "controlType": "TIME"
     } ],
     "title": "Set value",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

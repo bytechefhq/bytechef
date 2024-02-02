@@ -34,8 +34,8 @@
       "optionsDataSource": null
     } ],
     "title": "Debug",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "logger",
@@ -71,8 +71,8 @@
       "optionsDataSource": null
     } ],
     "title": "Error",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "logger",
@@ -108,8 +108,8 @@
       "optionsDataSource": null
     } ],
     "title": "Info",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "logger",
@@ -145,8 +145,8 @@
       "optionsDataSource": null
     } ],
     "title": "Warn",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": null,

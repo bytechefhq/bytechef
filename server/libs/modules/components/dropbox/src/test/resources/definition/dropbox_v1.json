@@ -53,7 +53,6 @@
       "optionsDataSource": null
     } ],
     "title": "Copy",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -192,7 +191,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -228,7 +228,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -559,7 +558,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -595,7 +595,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create new text file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -695,7 +694,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -731,7 +731,6 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -870,7 +869,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -906,7 +906,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get file link",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1547,7 +1546,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -1583,7 +1583,6 @@
       "optionsDataSource": null
     } ],
     "title": "List folder",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1808,7 +1807,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -1863,7 +1863,6 @@
       "optionsDataSource": null
     } ],
     "title": "Move",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2002,7 +2001,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -2038,7 +2038,6 @@
       "optionsDataSource": null
     } ],
     "title": "Search",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2214,7 +2213,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dropbox",
@@ -2342,7 +2342,6 @@
       "optionsDataSource": null
     } ],
     "title": "Upload file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2944,7 +2943,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -2995,6 +2995,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3003,8 +3004,7 @@
       "scopes": null,
       "tokenUrl": { },
       "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     } ],
     "componentName": "dropbox",
     "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",

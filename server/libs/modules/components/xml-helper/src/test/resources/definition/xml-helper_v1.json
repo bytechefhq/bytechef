@@ -34,7 +34,6 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from XML string",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -58,7 +57,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "xmlHelper",
@@ -145,7 +145,6 @@
       "optionsDataSource": null
     } ],
     "title": "Convert to XML string",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -168,7 +167,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

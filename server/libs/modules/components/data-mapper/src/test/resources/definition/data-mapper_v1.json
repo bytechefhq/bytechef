@@ -114,8 +114,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map Keys",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -191,8 +191,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map list to object",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -328,8 +328,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map multiple values between objects\n",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -613,8 +613,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map objects",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -739,8 +739,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map objects to list",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -1832,8 +1832,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map one value",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -2347,8 +2347,8 @@
       "optionsDataSource": null
     } ],
     "title": "Map values",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

@@ -1242,7 +1242,6 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Send SMS",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1497,7 +1496,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "infobip",
@@ -1848,7 +1848,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send Whatsapp Text Message",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2063,7 +2062,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {

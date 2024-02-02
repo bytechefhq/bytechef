@@ -3281,7 +3281,7 @@
     "output": {
       "outputSchema": {
         "advancedOption": null,
-        "description": null,
+        "description": "Details about a created issue or subtask.",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3734,7 +3734,7 @@
     "output": {
       "outputSchema": {
         "advancedOption": null,
-        "description": null,
+        "description": "Details about an issue.",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -8968,6 +8968,12 @@
           },
           "updated": 1,
           "project": {
+            "avatarUrls": {
+              "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
+              "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
+              "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
+              "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
+            },
             "projectCategory": {
               "id": 10000.0,
               "description": "First Project Category",
@@ -8983,15 +8989,20 @@
             "insight": {
               "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
               "totalIssueCount": 100
-            },
-            "avatarUrls": {
-              "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
-              "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
-              "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
-              "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
             }
           },
           "worklog": [ {
+            "comment": {
+              "version": 1,
+              "content": [ {
+                "content": [ {
+                  "text": "I did some work here.",
+                  "type": "text"
+                } ],
+                "type": "paragraph"
+              } ],
+              "type": "doc"
+            },
             "started": "2021-01-17T12:34:00.000+0000",
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
             "updated": "2021-01-18T23:45:00.000+0000",
@@ -9015,29 +9026,11 @@
             },
             "timeSpentSeconds": 12000,
             "issueId": 10002.0,
-            "id": 100028.0,
-            "comment": {
-              "version": 1,
-              "content": [ {
-                "content": [ {
-                  "text": "I did some work here.",
-                  "type": "text"
-                } ],
-                "type": "paragraph"
-              } ],
-              "type": "doc"
-            }
+            "id": 100028.0
           } ],
           "attachment": [ {
-            "filename": "picture.jpg",
-            "id": 10000,
-            "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
-            "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
-            "created": "2022-11-30T07:18:19.441+0000",
-            "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
-            "size": 23123,
-            "mimeType": "image/jpeg",
             "author": {
+              "accountId": "5b10a2844c20165700ede21g",
               "accountType": "atlassian",
               "active": false,
               "key": "",
@@ -9049,9 +9042,16 @@
                 "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48"
               },
               "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-              "name": "",
-              "accountId": "5b10a2844c20165700ede21g"
-            }
+              "name": ""
+            },
+            "filename": "picture.jpg",
+            "id": 10000,
+            "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
+            "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
+            "created": "2022-11-30T07:18:19.441+0000",
+            "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
+            "size": 23123,
+            "mimeType": "image/jpeg"
           } ],
           "issuelinks": [ {
             "outwardIssue": {
@@ -9104,6 +9104,7 @@
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers"
           },
           "comment": [ {
+            "created": "2021-01-17T12:34:00.000+0000",
             "updateAuthor": {
               "accountId": "5b10a2844c20165700ede21g",
               "active": false,
@@ -9134,8 +9135,7 @@
               "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
             },
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
-            "id": 10000.0,
-            "created": "2021-01-17T12:34:00.000+0000"
+            "id": 10000.0
           } ],
           "sub-tasks": [ {
             "outwardIssue": {
@@ -9427,7 +9427,7 @@
     "output": {
       "outputSchema": {
         "advancedOption": null,
-        "description": null,
+        "description": "The result of a JQL search.",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -15009,6 +15009,7 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
+        "expand": "names,schema",
         "maxResults": 50,
         "warningMessages": [ "The value 'bar' does not exist for the field 'foo'." ],
         "issues": [ {
@@ -15036,6 +15037,12 @@
             },
             "updated": 1,
             "project": {
+              "avatarUrls": {
+                "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
+                "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
+                "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
+                "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
+              },
               "projectCategory": {
                 "id": 10000.0,
                 "description": "First Project Category",
@@ -15051,15 +15058,20 @@
               "insight": {
                 "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
                 "totalIssueCount": 100
-              },
-              "avatarUrls": {
-                "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
-                "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
-                "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
-                "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
               }
             },
             "worklog": [ {
+              "comment": {
+                "version": 1,
+                "content": [ {
+                  "content": [ {
+                    "text": "I did some work here.",
+                    "type": "text"
+                  } ],
+                  "type": "paragraph"
+                } ],
+                "type": "doc"
+              },
               "started": "2021-01-17T12:34:00.000+0000",
               "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
               "updated": "2021-01-18T23:45:00.000+0000",
@@ -15083,29 +15095,11 @@
               },
               "timeSpentSeconds": 12000,
               "issueId": 10002.0,
-              "id": 100028.0,
-              "comment": {
-                "version": 1,
-                "content": [ {
-                  "content": [ {
-                    "text": "I did some work here.",
-                    "type": "text"
-                  } ],
-                  "type": "paragraph"
-                } ],
-                "type": "doc"
-              }
+              "id": 100028.0
             } ],
             "attachment": [ {
-              "filename": "picture.jpg",
-              "id": 10000,
-              "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
-              "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
-              "created": "2022-11-30T07:18:19.441+0000",
-              "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
-              "size": 23123,
-              "mimeType": "image/jpeg",
               "author": {
+                "accountId": "5b10a2844c20165700ede21g",
                 "accountType": "atlassian",
                 "active": false,
                 "key": "",
@@ -15117,9 +15111,16 @@
                   "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48"
                 },
                 "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-                "name": "",
-                "accountId": "5b10a2844c20165700ede21g"
-              }
+                "name": ""
+              },
+              "filename": "picture.jpg",
+              "id": 10000,
+              "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
+              "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
+              "created": "2022-11-30T07:18:19.441+0000",
+              "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
+              "size": 23123,
+              "mimeType": "image/jpeg"
             } ],
             "issuelinks": [ {
               "outwardIssue": {
@@ -15172,6 +15173,7 @@
               "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers"
             },
             "comment": [ {
+              "created": "2021-01-17T12:34:00.000+0000",
               "updateAuthor": {
                 "accountId": "5b10a2844c20165700ede21g",
                 "active": false,
@@ -15202,8 +15204,7 @@
                 "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
               },
               "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
-              "id": 10000.0,
-              "created": "2021-01-17T12:34:00.000+0000"
+              "id": 10000.0
             } ],
             "sub-tasks": [ {
               "outwardIssue": {
@@ -15230,8 +15231,7 @@
           "id": 10002.0
         } ],
         "startAt": 0,
-        "total": 1,
-        "expand": "names,schema"
+        "total": 1
       }
     }
   } ],
@@ -15284,7 +15284,6 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "apply": null,
@@ -15293,7 +15292,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -15341,7 +15341,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "apply": null,
@@ -15350,7 +15349,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "componentName": "jira",
     "componentDescription": "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and agile project management.",

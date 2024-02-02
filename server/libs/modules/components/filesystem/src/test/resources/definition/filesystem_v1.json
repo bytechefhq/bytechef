@@ -34,7 +34,6 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -130,7 +129,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -258,7 +258,6 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -303,7 +302,8 @@
       "sampleOutput": {
         "bytes": 1024
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -320,7 +320,6 @@
     "outputFunction": null,
     "properties": null,
     "title": "Create Temp Directory",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -343,7 +342,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_tmp_dir"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -379,7 +379,6 @@
       "optionsDataSource": null
     } ],
     "title": "File Path",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -402,7 +401,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -464,7 +464,6 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "List",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -566,7 +565,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -602,7 +602,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -625,7 +624,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -661,7 +661,6 @@
       "optionsDataSource": null
     } ],
     "title": "Remove",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -691,7 +690,8 @@
         "controlType": "CHECKBOX"
       },
       "sampleOutput": true
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

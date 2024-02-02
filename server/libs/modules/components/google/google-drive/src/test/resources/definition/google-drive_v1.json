@@ -290,7 +290,6 @@
       "optionsDataSource": null
     } ],
     "title": "Upload file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -329,13 +328,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleDrive",
@@ -464,7 +464,6 @@
       "optionsDataSource": null
     } ],
     "title": "Read file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -524,8 +523,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -857,8 +856,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1049,8 +1048,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1089,8 +1088,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1129,8 +1128,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1151,8 +1150,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1368,8 +1367,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1390,8 +1389,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1476,8 +1475,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1636,8 +1635,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1658,8 +1657,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1751,11 +1750,12 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleDrive",
@@ -1974,7 +1974,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2013,13 +2012,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleDrive",
@@ -2291,7 +2291,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create new text file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2330,13 +2329,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -2387,7 +2387,8 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -2395,8 +2396,7 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null
+      "authorizationCallback": null
     } ],
     "componentName": "googleDrive",
     "componentDescription": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",

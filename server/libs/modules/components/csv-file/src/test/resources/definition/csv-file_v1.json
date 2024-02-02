@@ -242,8 +242,8 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Read from file",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "csvFile",
@@ -404,6 +404,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -499,8 +500,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": null,
