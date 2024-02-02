@@ -38,4 +38,8 @@ public interface WorkflowTestConfigurationService {
         String workflowId, String workflowNodeName, String key, long connectionId);
 
     void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
+
+    Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId);
+
+    Long fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName);
 }

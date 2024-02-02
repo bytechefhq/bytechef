@@ -19,8 +19,6 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -36,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -164,12 +163,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    public Map<String, Object> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
-        return MapUtils.toMap(
-            CollectionUtils.filter(
-                getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
-                workflowNodeOutputDTO -> workflowNodeOutputDTO.sampleOutput() != null),
-            WorkflowNodeOutputDTO::workflowNodeName,
-            WorkflowNodeOutputDTO::sampleOutput);
+    public Map<String, ?> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
+        return getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
+            .stream()
+            .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.sampleOutput() != null)
+            .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
     }
 }

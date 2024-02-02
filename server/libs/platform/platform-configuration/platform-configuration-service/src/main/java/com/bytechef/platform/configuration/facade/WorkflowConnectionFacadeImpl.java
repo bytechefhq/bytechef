@@ -91,9 +91,10 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         Map<String, Map<String, Object>> connections, String componentName, int componentVersion,
         String workflowNodeName, boolean connectionRequired) {
 
-        return CollectionUtils.map(
-            connections.entrySet(),
-            entry -> {
+        return connections
+            .entrySet()
+            .stream()
+            .map(entry -> {
                 Map<String, Object> connectionMap = entry.getValue();
 
                 if (!connectionMap.containsKey(WorkflowConnection.ID) &&
@@ -111,7 +112,8 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
                     workflowNodeName, entry.getKey(), MapUtils.getLong(connectionMap, WorkflowConnection.ID),
                     MapUtils.getBoolean(
                         connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false) || connectionRequired);
-            });
+            })
+            .toList();
     }
 
     private List<WorkflowConnection> getWorkflowConnections(

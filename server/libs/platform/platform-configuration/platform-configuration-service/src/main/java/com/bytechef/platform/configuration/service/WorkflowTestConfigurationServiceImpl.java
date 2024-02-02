@@ -112,6 +112,25 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
         workflowTestConfigurationRepository.save(workflowTestConfiguration);
     }
 
+    @Override
+    public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId) {
+        return fetchWorkflowTestConfiguration(workflowId)
+            .map(WorkflowTestConfiguration::getInputs)
+            .orElse(Map.of());
+    }
+
+    @Override
+    public Long fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName) {
+        return fetchWorkflowTestConfiguration(workflowId)
+            .map(WorkflowTestConfiguration::getConnections)
+            .orElse(List.of())
+            .stream()
+            .filter(curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName))
+            .findFirst()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
+            .orElse(null);
+    }
+
     private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId) {
         return OptionalUtils.orElseGet(
             workflowTestConfigurationRepository.findByWorkflowId(workflowId),
