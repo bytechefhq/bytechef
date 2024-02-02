@@ -377,12 +377,6 @@ const Project = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectWorkflows, workflowId]);
 
-    useEffect(() => {
-        if (workflow?.id) {
-            navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
-        }
-    }, [workflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
-
     return (
         <>
             <LayoutContainer
