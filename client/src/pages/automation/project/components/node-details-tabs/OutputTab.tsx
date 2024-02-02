@@ -109,9 +109,7 @@ const OutputTab = ({
     const handleSampleDataDialogUpload = (value: string) => {
         console.log(JSON.parse(value));
         uploadSampleOutputRequestMutation.mutate({
-            uploadWorkflowNodeSampleOutputRequestModel: {
-                sampleOutput: JSON.parse(value),
-            },
+            body: JSON.parse(value),
             workflowId,
             workflowNodeName: currentNode.name,
         });
