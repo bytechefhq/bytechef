@@ -55,7 +55,6 @@ models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
 models/TriggerExecutionModel.ts
 models/TriggerTypeModel.ts
-models/UploadWorkflowNodeSampleOutputRequestModel.ts
 models/ValuePropertyModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts

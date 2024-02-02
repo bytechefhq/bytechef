@@ -46,7 +46,6 @@ export * from './TriggerDefinitionBasicModel';
 export * from './TriggerDefinitionModel';
 export * from './TriggerExecutionModel';
 export * from './TriggerTypeModel';
-export * from './UploadWorkflowNodeSampleOutputRequestModel';
 export * from './ValuePropertyModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';

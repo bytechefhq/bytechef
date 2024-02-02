@@ -15,12 +15,9 @@
 
 import * as runtime from '../runtime';
 import type {
-  UploadWorkflowNodeSampleOutputRequestModel,
   WorkflowNodeTestOutputModel,
 } from '../models/index';
 import {
-    UploadWorkflowNodeSampleOutputRequestModelFromJSON,
-    UploadWorkflowNodeSampleOutputRequestModelToJSON,
     WorkflowNodeTestOutputModelFromJSON,
     WorkflowNodeTestOutputModelToJSON,
 } from '../models/index';
@@ -33,7 +30,7 @@ export interface SaveWorkflowNodeTestOutputRequest {
 export interface UploadWorkflowNodeSampleOutputRequest {
     workflowId: string;
     workflowNodeName: string;
-    uploadWorkflowNodeSampleOutputRequestModel: UploadWorkflowNodeSampleOutputRequestModel;
+    body: object;
 }
 
 /**
@@ -90,8 +87,8 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling uploadWorkflowNodeSampleOutput.');
         }
 
-        if (requestParameters.uploadWorkflowNodeSampleOutputRequestModel === null || requestParameters.uploadWorkflowNodeSampleOutputRequestModel === undefined) {
-            throw new runtime.RequiredError('uploadWorkflowNodeSampleOutputRequestModel','Required parameter requestParameters.uploadWorkflowNodeSampleOutputRequestModel was null or undefined when calling uploadWorkflowNodeSampleOutput.');
+        if (requestParameters.body === null || requestParameters.body === undefined) {
+            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling uploadWorkflowNodeSampleOutput.');
         }
 
         const queryParameters: any = {};
@@ -105,7 +102,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UploadWorkflowNodeSampleOutputRequestModelToJSON(requestParameters.uploadWorkflowNodeSampleOutputRequestModel),
+            body: requestParameters.body as any,
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputModelFromJSON(jsonValue));
