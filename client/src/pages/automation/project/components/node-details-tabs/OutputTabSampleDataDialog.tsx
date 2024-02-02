@@ -66,7 +66,15 @@ const OutputTabSampleDataDialog = ({
                 </div>
 
                 <DialogFooter>
-                    <Button onClick={() => value && onUpload(value)} type="submit">
+                    <Button
+                        onClick={() => {
+                            if (value) {
+                                onUpload(value);
+                                setValue(JSON.stringify(sampleOutput));
+                            }
+                        }}
+                        type="submit"
+                    >
                         Upload
                     </Button>
                 </DialogFooter>
