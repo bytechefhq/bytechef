@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
+import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public final class GoogleDriveConstants {
             .label("Folder")
             .description(
                 "The id of a folder where the file is uploaded.")
-            .options((ActionOptionsFunction<String>) GoogleDriveUtils::getDriveOptions),
+            .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getDriveOptions),
         IGNORE_DEFAULT_VISIBILITY,
         bool(IGNORE_DEFAULT_VISIBILITY)
             .label("Ignore default visibility")
