@@ -5,7 +5,6 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.UploadWorkflowNodeSampleOutputRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-01T17:41:34.894265+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-02T18:49:47.325391+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output API")
 public interface WorkflowNodeTestOutputApi {
@@ -91,7 +90,7 @@ public interface WorkflowNodeTestOutputApi {
      *
      * @param workflowId The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
-     * @param uploadWorkflowNodeSampleOutputRequestModel  (required)
+     * @param body  (required)
      * @return The workflow node test output object. (status code 200)
      */
     @Operation(
@@ -115,7 +114,7 @@ public interface WorkflowNodeTestOutputApi {
     default ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
-        @Parameter(name = "UploadWorkflowNodeSampleOutputRequestModel", description = "", required = true) @Valid @RequestBody UploadWorkflowNodeSampleOutputRequestModel uploadWorkflowNodeSampleOutputRequestModel
+        @Parameter(name = "body", description = "", required = true) @Valid @RequestBody Object body
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
