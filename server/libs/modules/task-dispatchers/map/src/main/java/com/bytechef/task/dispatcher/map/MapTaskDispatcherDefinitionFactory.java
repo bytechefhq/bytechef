@@ -79,7 +79,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             variableProperties = object()
                 .properties(
                     (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                        ITEM, list.getFirst(), new PropertyFactory(list.getFirst())),
+                        list.getFirst(), ITEM, new PropertyFactory(list.getFirst())),
                     integer(INDEX));
         }
 

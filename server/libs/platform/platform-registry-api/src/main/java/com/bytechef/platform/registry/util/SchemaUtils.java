@@ -41,8 +41,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -52,13 +54,16 @@ public class SchemaUtils {
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
     public static com.bytechef.definition.BaseProperty getOutputSchema(
-        Object value, SchemaPropertyFactory propertyFactoryFunction) {
+        @NonNull Object value, @NonNull SchemaPropertyFactory propertyFactoryFunction) {
 
-        return getOutputSchema(null, value, propertyFactoryFunction);
+        return getOutputSchema(value, null, propertyFactoryFunction);
     }
 
     public static com.bytechef.definition.BaseProperty getOutputSchema(
-        String name, Object value, SchemaPropertyFactory propertyFactory) {
+        @NonNull Object value, String name, @NonNull SchemaPropertyFactory propertyFactory) {
+
+        Validate.notNull(value, "value must not be null");
+        Validate.notNull(propertyFactory, "propertyFactory must not be null");
 
         com.bytechef.definition.BaseProperty outputProperty;
         Class<?> valueClass = value.getClass();
@@ -84,14 +89,9 @@ public class SchemaUtils {
         } else if (value instanceof LocalTime) {
             outputProperty = propertyFactory.create(name, BaseTimeProperty.class);
         } else {
-            try {
-                outputProperty = getOutputSchema(
-                    "value", JsonUtils.convertValue(value, Map.class), propertyFactory);
-            } catch (IllegalArgumentException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(e.getMessage(), e);
-                }
-
+            if (JsonUtils.canConvert(value, Map.class)) {
+                outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
+            } else {
                 outputProperty = propertyFactory.create(name, com.bytechef.definition.BaseProperty.class);
             }
         }
@@ -99,7 +99,6 @@ public class SchemaUtils {
         return outputProperty;
     }
 
-    @SuppressWarnings("unchecked")
     public static <P extends BaseProperty, O extends com.bytechef.platform.registry.domain.BaseOutput<P>> O toOutput(
         BaseOutput<? extends com.bytechef.definition.BaseProperty> output,
         OutputFactoryFunction<P, O> outputFactoryFunction) {

@@ -48,6 +48,17 @@ public class JsonUtils {
     @SuppressFBWarnings("MS_PKGPROTECT")
     protected static ObjectMapper objectMapper;
 
+    public static boolean canConvert(Object fromValue, Class<?> toValueType) {
+        try {
+            objectMapper.convertValue(fromValue, toValueType);
+        } catch (Exception e) {
+            // ignore
+            return false;
+        }
+
+        return true;
+    }
+
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
         return objectMapper.convertValue(fromValue, toValueType);
     }

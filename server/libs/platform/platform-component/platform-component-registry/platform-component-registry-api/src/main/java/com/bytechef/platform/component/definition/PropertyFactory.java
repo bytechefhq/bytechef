@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import static com.bytechef.component.definition.ComponentDSL.object;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
@@ -76,7 +77,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
             if (!list.isEmpty()) {
                 arrayProperty.items(
                     (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                        null, list.getFirst(), new PropertyFactory(list.getFirst())));
+                        list.getFirst(), null, new PropertyFactory(list.getFirst())));
             }
         }
 
@@ -87,11 +88,18 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
         ModifiableObjectProperty objectProperty = object(name);
 
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
-        Map<?, ?> map = (Map<?, ?>) value;
+
+        Map<?, ?> map;
+
+        if (value instanceof Map<?, ?>) {
+            map = (Map<?, ?>) value;
+        } else {
+            map = JsonUtils.convertValue(value, Map.class);
+        }
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             properties.add((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                (String) entry.getKey(), entry.getValue(), new PropertyFactory(entry.getValue())));
+                entry.getValue(), (String) entry.getKey(), new PropertyFactory(entry.getValue())));
         }
 
         return objectProperty.properties(properties);
