@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.definition.WorkflowNodeType;
-import com.bytechef.platform.component.registry.domain.ObjectProperty;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
@@ -54,7 +53,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     public WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Object sampleOutput) {
 
-        ObjectProperty outputSchema = Property.toProperty(
+        Property outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
                 sampleOutput, new PropertyFactory(sampleOutput)));
 

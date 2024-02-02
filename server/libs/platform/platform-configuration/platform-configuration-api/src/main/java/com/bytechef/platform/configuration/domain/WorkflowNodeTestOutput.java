@@ -144,12 +144,12 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
         return new Output(getOutputSchema(), getSampleOutput());
     }
 
-    public ObjectProperty getOutputSchema() {
-        return MapUtils.get(outputSchema.getMap(), "outputSchema", ObjectProperty.class);
+    public Property getOutputSchema() {
+        return MapUtils.get(outputSchema.getMap(), "outputSchema", Property.class);
     }
 
     public Object getSampleOutput() {
-        return MapUtils.getMap(sampleOutput.getMap(), "sampleOutput");
+        return MapUtils.get(sampleOutput.getMap(), "sampleOutput");
     }
 
     public int getVersion() {
