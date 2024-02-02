@@ -47,7 +47,7 @@ public interface ProjectInstanceWorkflowConnectionRepository
             WHERE project_instance_workflow.project_instance_id = :projectInstanceId
             AND project_instance_workflow.workflow_id = :workflowId
             AND project_instance_workflow_connection.workflow_node_name = :workflowNodeName
-            AND project_instance_workflow_connection.workflow_connection_key = :workflowConnectionKey
+            AND project_instance_workflow_connection.key = :workflowConnectionKey
         """)
     Optional<ProjectInstanceWorkflowConnection> findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
         @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId,
