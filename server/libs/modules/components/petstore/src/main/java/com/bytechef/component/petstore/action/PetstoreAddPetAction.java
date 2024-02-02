@@ -47,7 +47,8 @@ public class PetstoreAddPetAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(PetstorePetProperties.PROPERTIES)
-        .outputSchemaMetadata(Map.of(
-            "responseType", ResponseType.JSON));
+        .outputSchema(object().properties(PetstorePetProperties.PROPERTIES)
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON)));
 }

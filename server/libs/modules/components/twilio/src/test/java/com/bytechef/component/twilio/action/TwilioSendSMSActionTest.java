@@ -63,7 +63,6 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -194,10 +193,8 @@ class TwilioSendSMSActionTest {
 
             mockMessageCreator();
 
-            Map<String, Message> handleMap = TwilioSendSMSAction.perform(
+            Message result = TwilioSendSMSAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
-
-            Message result = handleMap.get("message");
 
             assertEquals(mockedMessage, result);
 

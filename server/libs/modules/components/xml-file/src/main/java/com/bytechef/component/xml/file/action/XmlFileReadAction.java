@@ -75,7 +75,7 @@ public class XmlFileReadAction {
         .output()
         .perform(XmlFileReadAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);
@@ -118,6 +118,6 @@ public class XmlFileReadAction {
             result = context.xml(xml -> xml.read((String) context.file(file -> file.readToString(fileEntry))));
         }
 
-        return Map.of("result", result);
+        return result;
     }
 }

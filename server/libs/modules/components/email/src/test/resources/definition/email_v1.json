@@ -5,13 +5,13 @@
     "componentDescription": "The Email connector sends emails using an SMTP email server.",
     "componentTitle": "Email",
     "componentVersion": 1,
+    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Send an email to any address.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "send",
-    "defaultOutputFunction": false,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -345,8 +345,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": {

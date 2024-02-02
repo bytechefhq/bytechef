@@ -59,7 +59,6 @@ import com.infobip.model.WhatsAppSingleMessageInfo;
 import com.infobip.model.WhatsAppTextContent;
 import com.infobip.model.WhatsAppTextMessage;
 import com.infobip.model.WhatsAppUrlOptions;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -163,7 +162,7 @@ public class InfobipSendWhatsappTextMesageAction {
                 .maxLength(255)
                 .required(false))
         .outputSchema(
-            object("messageInfo")
+            object()
                 .properties(
                     string(TO),
                     integer(MESSAGE_COUNT),
@@ -181,7 +180,7 @@ public class InfobipSendWhatsappTextMesageAction {
     private InfobipSendWhatsappTextMesageAction() {
     }
 
-    public static Map<String, WhatsAppSingleMessageInfo> perform(
+    public static WhatsAppSingleMessageInfo perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws ApiException {
 
         ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(connectionParameters.getRequiredString(VALUE)))
@@ -200,10 +199,8 @@ public class InfobipSendWhatsappTextMesageAction {
             .entityId(inputParameters.getString(ENTITY_ID))
             .applicationId(inputParameters.getString(APPLICATION_ID));
 
-        return Map.of(
-            "messageInfo",
-            whatsAppApi
-                .sendWhatsAppTextMessage(whatsAppTextMessage)
-                .execute());
+        return whatsAppApi
+            .sendWhatsAppTextMessage(whatsAppTextMessage)
+            .execute();
     }
 }

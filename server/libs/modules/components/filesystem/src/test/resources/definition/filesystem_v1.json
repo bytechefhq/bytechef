@@ -34,8 +34,9 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -43,7 +44,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "fileEntry",
+        "name": null,
         "type": "FILE_ENTRY",
         "defaultValue": null,
         "exampleValue": null,
@@ -127,124 +128,9 @@
           "optionsDataSource": null
         } ],
         "controlType": "FILE_ENTRY"
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "fileEntry",
-          "type": "FILE_ENTRY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": true,
-            "name": "extension",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": true,
-            "name": "mimeType",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": true,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": true,
-            "name": "url",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "controlType": "FILE_ENTRY"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -372,31 +258,8 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "perform": { },
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": "bytes",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
-      } ],
-      "metadata": null,
-      "sampleOutput": {
-        "bytes": 1024
-      },
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -431,14 +294,16 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": {
+        "bytes": 1024
       }
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -455,8 +320,9 @@
     "outputFunction": null,
     "properties": null,
     "title": "Create Temp Directory",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -464,7 +330,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "path",
+        "name": null,
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
@@ -475,53 +341,9 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": null
-      } ],
-      "metadata": null,
-      "sampleOutput": {
-        "path": "/sample_tmp_dir"
       },
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "path",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+      "sampleOutput": "/sample_tmp_dir"
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -557,8 +379,9 @@
       "optionsDataSource": null
     } ],
     "title": "File Path",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -566,7 +389,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "path",
+        "name": null,
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
@@ -577,53 +400,9 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": null
-      } ],
-      "metadata": null,
-      "sampleOutput": {
-        "path": "/sample_data"
       },
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "path",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+      "sampleOutput": "/sample_data"
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -685,8 +464,9 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "List",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -694,7 +474,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "files",
+        "name": null,
         "type": "ARRAY",
         "defaultValue": null,
         "exampleValue": null,
@@ -772,142 +552,21 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "files",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "items": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": null,
-            "name": null,
-            "type": "OBJECT",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "additionalProperties": null,
-            "multipleValues": null,
-            "options": null,
-            "properties": [ {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": null,
-              "name": "fileName",
-              "type": "STRING",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": null,
-              "placeholder": null,
-              "controlType": "TEXT",
-              "maxLength": null,
-              "minLength": null,
-              "options": null,
-              "optionsDataSource": null
-            }, {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": null,
-              "name": "relativePath",
-              "type": "STRING",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": null,
-              "placeholder": null,
-              "controlType": "TEXT",
-              "maxLength": null,
-              "minLength": null,
-              "options": null,
-              "optionsDataSource": null
-            }, {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": null,
-              "name": "size",
-              "type": "INTEGER",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": null,
-              "placeholder": null,
-              "maxValue": null,
-              "minValue": null,
-              "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
-            } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
-          } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -943,8 +602,9 @@
       "optionsDataSource": null
     } ],
     "title": "Create",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -952,7 +612,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "path",
+        "name": null,
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
@@ -963,53 +623,9 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": null
-      } ],
-      "metadata": null,
-      "sampleOutput": {
-        "path": "/sample_data"
       },
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "path",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+      "sampleOutput": "/sample_data"
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -1045,8 +661,9 @@
       "optionsDataSource": null
     } ],
     "title": "Remove",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1054,7 +671,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "deleted",
+        "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
@@ -1072,60 +689,9 @@
           "value": true
         } ],
         "controlType": "CHECKBOX"
-      } ],
-      "metadata": null,
-      "sampleOutput": {
-        "deleted": true
       },
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "deleted",
-          "type": "BOOLEAN",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "options": [ {
-            "description": null,
-            "displayCondition": null,
-            "label": "True",
-            "value": true
-          }, {
-            "description": null,
-            "displayCondition": null,
-            "label": "False",
-            "value": true
-          } ],
-          "controlType": "CHECKBOX"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+      "sampleOutput": true
+    }
   } ],
   "category": null,
   "connection": null,

@@ -54,8 +54,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -109,8 +109,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -131,8 +131,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -171,8 +171,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -221,8 +221,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -243,15 +243,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -287,265 +287,12 @@
         } ],
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Add a new pet to the store",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "name",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "doggie",
-        "label": "Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "category",
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Category",
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "id",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 1,
-          "label": "Id",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "name",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "Dogs",
-          "label": "Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "photoUrls",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Photo Urls",
-        "placeholder": "Add to Photo Urls",
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "tags",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Tags",
-        "placeholder": "Add to Tags",
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "id",
-            "type": "INTEGER",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Id",
-            "placeholder": null,
-            "maxValue": null,
-            "minValue": null,
-            "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "pet status in the store",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "status",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Status",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "Available",
-          "value": "available"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Pending",
-          "value": "pending"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Sold",
-          "value": "sold"
-        } ],
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -582,8 +329,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -637,8 +384,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -659,8 +406,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -699,8 +446,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -749,8 +496,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -771,15 +518,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -815,11 +562,11 @@
           } ],
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -875,8 +622,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -930,8 +677,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -952,8 +699,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -992,8 +739,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1042,8 +789,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1064,15 +811,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -1108,265 +855,12 @@
         } ],
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update an existing pet",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "name",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "doggie",
-        "label": "Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "category",
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Category",
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "id",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 1,
-          "label": "Id",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "name",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "Dogs",
-          "label": "Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "photoUrls",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Photo Urls",
-        "placeholder": "Add to Photo Urls",
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "tags",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Tags",
-        "placeholder": "Add to Tags",
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "id",
-            "type": "INTEGER",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Id",
-            "placeholder": null,
-            "maxValue": null,
-            "minValue": null,
-            "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "pet status in the store",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "status",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Status",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "Available",
-          "value": "available"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Pending",
-          "value": "pending"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Sold",
-          "value": "sold"
-        } ],
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -1403,8 +897,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1458,8 +952,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1480,8 +974,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1520,8 +1014,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1570,8 +1064,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1592,15 +1086,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -1636,11 +1130,11 @@
           } ],
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1696,16 +1190,19 @@
       "optionsDataSource": null
     } ],
     "title": "Finds Pets by status",
+    "perform": null,
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
-        "metadata": { },
+        "metadata": {
+          "responseType": "JSON"
+        },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "ARRAY",
         "defaultValue": null,
         "exampleValue": null,
@@ -1718,294 +1215,17 @@
           "expressionEnabled": null,
           "hidden": null,
           "metadata": { },
-          "required": false,
-          "name": "id",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 10,
-          "label": "Id",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "name",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "doggie",
-          "label": "Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "category",
+          "required": null,
+          "name": null,
           "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
-          "label": "Category",
+          "label": null,
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
           "options": null,
           "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "id",
-            "type": "INTEGER",
-            "defaultValue": null,
-            "exampleValue": 1,
-            "label": "Id",
-            "placeholder": null,
-            "maxValue": null,
-            "minValue": null,
-            "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": "Dogs",
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "photoUrls",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Photo Urls",
-          "placeholder": "Add to Photo Urls",
-          "items": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": null,
-            "name": null,
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "tags",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Tags",
-          "placeholder": "Add to Tags",
-          "items": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": null,
-            "name": null,
-            "type": "OBJECT",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "additionalProperties": null,
-            "multipleValues": null,
-            "options": null,
-            "properties": [ {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": "Id",
-              "placeholder": null,
-              "maxValue": null,
-              "minValue": null,
-              "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
-            }, {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": false,
-              "name": "name",
-              "type": "STRING",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": "Name",
-              "placeholder": null,
-              "controlType": "TEXT",
-              "maxLength": null,
-              "minLength": null,
-              "options": null,
-              "optionsDataSource": null
-            } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
-          } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": "pet status in the store",
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "status",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Status",
-          "placeholder": null,
-          "controlType": "SELECT",
-          "maxLength": null,
-          "minLength": null,
-          "options": [ {
-            "description": null,
-            "displayCondition": null,
-            "label": "Available",
-            "value": "available"
-          }, {
-            "description": null,
-            "displayCondition": null,
-            "label": "Pending",
-            "value": "pending"
-          }, {
-            "description": null,
-            "displayCondition": null,
-            "label": "Sold",
-            "value": "sold"
-          } ],
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": {
-          "responseType": "JSON"
-        },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "items": [ {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
@@ -2022,8 +1242,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2077,8 +1297,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -2099,8 +1319,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2139,8 +1359,8 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2189,8 +1409,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "controlType": "INTEGER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "INTEGER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -2211,15 +1431,15 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": "pet status in the store",
@@ -2255,18 +1475,18 @@
             } ],
             "optionsDataSource": null
           } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "maxItems": null,
+        "minItems": null,
+        "multipleValues": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2324,20 +1544,23 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Finds Pets by tags",
+    "perform": null,
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
-        "metadata": { },
+        "metadata": {
+          "responseType": "JSON"
+        },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "ARRAY",
         "defaultValue": null,
         "exampleValue": null,
@@ -2350,294 +1573,17 @@
           "expressionEnabled": null,
           "hidden": null,
           "metadata": { },
-          "required": false,
-          "name": "id",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 10,
-          "label": "Id",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "name",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "doggie",
-          "label": "Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "category",
+          "required": null,
+          "name": null,
           "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
-          "label": "Category",
+          "label": null,
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
           "options": null,
           "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "id",
-            "type": "INTEGER",
-            "defaultValue": null,
-            "exampleValue": 1,
-            "label": "Id",
-            "placeholder": null,
-            "maxValue": null,
-            "minValue": null,
-            "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": "Dogs",
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "photoUrls",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Photo Urls",
-          "placeholder": "Add to Photo Urls",
-          "items": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": null,
-            "name": null,
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "tags",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Tags",
-          "placeholder": "Add to Tags",
-          "items": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": null,
-            "name": null,
-            "type": "OBJECT",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "additionalProperties": null,
-            "multipleValues": null,
-            "options": null,
-            "properties": [ {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": "Id",
-              "placeholder": null,
-              "maxValue": null,
-              "minValue": null,
-              "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
-            }, {
-              "advancedOption": null,
-              "description": null,
-              "displayCondition": null,
-              "expressionEnabled": null,
-              "hidden": null,
-              "metadata": { },
-              "required": false,
-              "name": "name",
-              "type": "STRING",
-              "defaultValue": null,
-              "exampleValue": null,
-              "label": "Name",
-              "placeholder": null,
-              "controlType": "TEXT",
-              "maxLength": null,
-              "minLength": null,
-              "options": null,
-              "optionsDataSource": null
-            } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
-          } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": "pet status in the store",
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "status",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Status",
-          "placeholder": null,
-          "controlType": "SELECT",
-          "maxLength": null,
-          "minLength": null,
-          "options": [ {
-            "description": null,
-            "displayCondition": null,
-            "label": "Available",
-            "value": "available"
-          }, {
-            "description": null,
-            "displayCondition": null,
-            "label": "Pending",
-            "value": "pending"
-          }, {
-            "description": null,
-            "displayCondition": null,
-            "label": "Sold",
-            "value": "sold"
-          } ],
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": {
-          "responseType": "JSON"
-        },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "items": [ {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
@@ -2654,8 +1600,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2709,8 +1655,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -2731,8 +1677,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2771,8 +1717,8 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2821,8 +1767,8 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "controlType": "INTEGER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "INTEGER"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -2843,15 +1789,15 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": "pet status in the store",
@@ -2887,18 +1833,18 @@
             } ],
             "optionsDataSource": null
           } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "maxItems": null,
+        "minItems": null,
+        "multipleValues": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2956,12 +1902,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Deletes a pet",
-    "output": null,
-    "perform": null
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2998,265 +1944,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Find pet by ID",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "name",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "doggie",
-        "label": "Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "category",
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Category",
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "id",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 1,
-          "label": "Id",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "name",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "Dogs",
-          "label": "Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "photoUrls",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Photo Urls",
-        "placeholder": "Add to Photo Urls",
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "tags",
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Tags",
-        "placeholder": "Add to Tags",
-        "items": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "id",
-            "type": "INTEGER",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Id",
-            "placeholder": null,
-            "maxValue": null,
-            "minValue": null,
-            "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "pet status in the store",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "status",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Status",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "Available",
-          "value": "available"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Pending",
-          "value": "pending"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Sold",
-          "value": "sold"
-        } ],
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3293,8 +1986,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -3348,8 +2041,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -3370,8 +2063,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -3410,8 +2103,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -3460,8 +2153,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -3482,15 +2175,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -3526,11 +2219,11 @@
           } ],
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3567,8 +2260,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Name of pet that needs to be updated",
@@ -3613,8 +2306,8 @@
       "optionsDataSource": null
     } ],
     "title": "Updates a pet in the store with form data",
-    "output": null,
-    "perform": null
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3653,8 +2346,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Additional Metadata",
@@ -3772,69 +2465,8 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "uploads an image",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "code",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Code",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "type",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Type",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "message",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Message",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3871,8 +2503,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -3912,11 +2544,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3936,12 +2568,8 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Returns pet inventories by status",
+    "perform": null,
     "output": {
-      "properties": [ ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -3958,15 +2586,34 @@
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "additionalProperties": null,
+        "additionalProperties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": null,
+          "type": "INTEGER",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "maxValue": null,
+          "minValue": null,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
+        } ],
         "multipleValues": null,
         "options": null,
-        "properties": [ ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "properties": null,
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -4022,8 +2669,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -4041,8 +2688,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -4060,8 +2707,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -4077,8 +2724,8 @@
         "label": "Ship Date",
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": "Order Status",
@@ -4140,150 +2787,12 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Place an order for a pet",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "petId",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 198772,
-        "label": "Pet Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "quantity",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 7,
-        "label": "Quantity",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "shipDate",
-        "type": "DATE_TIME",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Ship Date",
-        "placeholder": null,
-        "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "Order Status",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "status",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "approved",
-        "label": "Status",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "Placed",
-          "value": "placed"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Approved",
-          "value": "approved"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Delivered",
-          "value": "delivered"
-        } ],
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "complete",
-        "type": "BOOLEAN",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Complete",
-        "placeholder": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "False",
-          "value": true
-        } ],
-        "controlType": "CHECKBOX"
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -4320,8 +2829,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -4339,8 +2848,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -4358,8 +2867,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -4375,8 +2884,8 @@
           "label": "Ship Date",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": "Order Status",
@@ -4438,11 +2947,11 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -4479,12 +2988,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Delete purchase order by ID",
-    "output": null,
-    "perform": null
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -4521,150 +3030,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Find purchase order by ID",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "petId",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 198772,
-        "label": "Pet Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "quantity",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 7,
-        "label": "Quantity",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "shipDate",
-        "type": "DATE_TIME",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Ship Date",
-        "placeholder": null,
-        "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "Order Status",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "status",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "approved",
-        "label": "Status",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "Placed",
-          "value": "placed"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Approved",
-          "value": "approved"
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "Delivered",
-          "value": "delivered"
-        } ],
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "complete",
-        "type": "BOOLEAN",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Complete",
-        "placeholder": null,
-        "options": [ {
-          "description": null,
-          "displayCondition": null,
-          "label": "True",
-          "value": true
-        }, {
-          "description": null,
-          "displayCondition": null,
-          "label": "False",
-          "value": true
-        } ],
-        "controlType": "CHECKBOX"
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -4701,8 +3072,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -4720,8 +3091,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -4739,8 +3110,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -4756,8 +3127,8 @@
           "label": "Ship Date",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": "Order Status",
@@ -4819,11 +3190,11 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -4879,8 +3250,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -5012,171 +3383,15 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create user",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "theUser",
-        "label": "Username",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "firstName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "John",
-        "label": "First Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "lastName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "James",
-        "label": "Last Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "email",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "john@email.com",
-        "label": "Email",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "password",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "12345",
-        "label": "Password",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "phone",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "12345",
-        "label": "Phone",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "User Status",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "userStatus",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 1,
-        "label": "User Status",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -5213,8 +3428,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -5346,14 +3561,14 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -5423,8 +3638,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -5556,30 +3771,33 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Creates list of users with given input array",
+    "perform": null,
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
-        "metadata": { },
+        "metadata": {
+          "responseType": "JSON"
+        },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "ARRAY",
         "defaultValue": null,
         "exampleValue": null,
@@ -5592,197 +3810,17 @@
           "expressionEnabled": null,
           "hidden": null,
           "metadata": { },
-          "required": false,
-          "name": "id",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 10,
-          "label": "Id",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "username",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "theUser",
-          "label": "Username",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "firstName",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "John",
-          "label": "First Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "lastName",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "James",
-          "label": "Last Name",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "email",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "john@email.com",
-          "label": "Email",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "password",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "12345",
-          "label": "Password",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "phone",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": "12345",
-          "label": "Phone",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": "User Status",
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": false,
-          "name": "userStatus",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": 1,
-          "label": "User Status",
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
-        } ],
-        "maxItems": null,
-        "minItems": null,
-        "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": {
-          "responseType": "JSON"
-        },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
           "required": null,
-          "name": "result",
-          "type": "ARRAY",
+          "name": null,
+          "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
-          "items": [ {
+          "additionalProperties": null,
+          "multipleValues": null,
+          "options": null,
+          "properties": [ {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
@@ -5799,8 +3837,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -5932,21 +3970,21 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "maxItems": null,
+        "minItems": null,
+        "multipleValues": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -5987,8 +4025,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete user",
-    "output": null,
-    "perform": null
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -6029,164 +4067,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get user by user name",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "theUser",
-        "label": "Username",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "firstName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "John",
-        "label": "First Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "lastName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "James",
-        "label": "Last Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "email",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "john@email.com",
-        "label": "Email",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "password",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "12345",
-        "label": "Password",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "phone",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "12345",
-        "label": "Phone",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "User Status",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "userStatus",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 1,
-        "label": "User Status",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -6223,8 +4105,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -6356,14 +4238,14 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -6440,8 +4322,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -6573,171 +4455,15 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update user",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "id",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 10,
-        "label": "Id",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "theUser",
-        "label": "Username",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "firstName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "John",
-        "label": "First Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "lastName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "James",
-        "label": "Last Name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "email",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "john@email.com",
-        "label": "Email",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "password",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "12345",
-        "label": "Password",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "phone",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": "12345",
-        "label": "Phone",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "User Status",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "userStatus",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": 1,
-        "label": "User Status",
-        "placeholder": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -6774,8 +4500,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -6907,14 +4633,14 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      }
-    },
-    "perform": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
+      },
+      "sampleOutput": null
+    }
   } ],
   "category": null,
   "connection": {
@@ -6966,15 +4692,15 @@
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
       "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": null,
-      "authorizationUrl": { },
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -7023,15 +4749,15 @@
       "type": "API_KEY",
       "acquire": null,
       "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     } ],
     "componentName": "petstore",
     "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",

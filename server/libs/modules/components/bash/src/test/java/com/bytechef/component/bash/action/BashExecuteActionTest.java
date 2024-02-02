@@ -24,7 +24,6 @@ import com.bytechef.component.bash.BashComponentHandlerTest;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,10 +47,8 @@ public class BashExecuteActionTest {
         Mockito.when(parameters.getRequiredString(Mockito.eq(SCRIPT)))
             .thenReturn(script);
 
-        Map<String, String> performMap = BashExecuteAction.perform(
+        String result = BashExecuteAction.perform(
             parameters, parameters, Mockito.mock(ActionContext.class));
-
-        String result = performMap.get("result");
 
         Assertions.assertTrue(result.contains("build/resources/test/dependencies/bash/test.txt"));
     }

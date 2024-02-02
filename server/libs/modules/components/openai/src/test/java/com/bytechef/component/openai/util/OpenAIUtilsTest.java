@@ -16,7 +16,6 @@
 
 package com.bytechef.component.openai.util;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
@@ -108,8 +107,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_3);
 
-        List<ValueProperty<?>> modelProperties =
-            OpenAIUtils.getModelProperties(mockedParameters, mockedParameters, mockedContext);
+        List<ValueProperty<?>> modelProperties = OpenAIUtils.getModelProperties(
+            mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(2, modelProperties.size());
 
@@ -139,8 +138,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
         Output output = OpenAIUtils.getOutput(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(
-            object().properties(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE_FOR_STREAM), output.getOutputSchema());
+        Assertions.assertEquals(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE_FOR_STREAM, output.getOutputSchema());
     }
 
     @Test
@@ -148,10 +146,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(false);
 
-        Output output = OpenAIUtils.getOutput(
-            mockedParameters, mockedParameters, mockedContext);
+        Output output = OpenAIUtils.getOutput(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(
-            object().properties(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE), output.getOutputSchema());
+        Assertions.assertEquals(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE, output.getOutputSchema());
     }
 }

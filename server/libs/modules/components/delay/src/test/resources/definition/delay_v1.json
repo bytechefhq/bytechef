@@ -5,13 +5,13 @@
     "componentDescription": "Sets a value which can then be referenced in other tasks.",
     "componentTitle": "Delay",
     "componentVersion": 1,
+    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delay action execution.",
     "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sleep",
-    "defaultOutputFunction": false,
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -34,8 +34,8 @@
       "optionsDataSource": null
     } ],
     "title": "Sleep",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

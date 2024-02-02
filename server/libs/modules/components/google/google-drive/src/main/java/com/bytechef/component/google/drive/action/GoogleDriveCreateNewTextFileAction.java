@@ -17,22 +17,22 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.CREATE_NEW_TEXT_FILE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DRIVE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.IGNORE_DEFAULT_VISIBILITY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_LABELS;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_PERMISSIONS_FOR_VIEW;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.KEEP_REVISION_FOREVER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.OCR_LANGUAGE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PROPERTY_MAP;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.SUPPORTS_ALL_DRIVES;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.DRIVE_ID;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.IGNORE_DEFAULT_VISIBILITY;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_LABELS;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.KEEP_REVISION_FOREVER;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.OCR_LANGUAGE;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.SUPPORTS_ALL_DRIVES;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.USE_CONTENT_AS_INDEXABLE_TEXT;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.propertyMap;
-import static com.bytechef.component.google.drive.properties.GoogleDriveOutputProperties.FILE_PROPERTY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.USE_CONTENT_AS_INDEXABLE_TEXT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -74,22 +74,22 @@ public final class GoogleDriveCreateNewTextFileAction {
                     option("CSV", "text/csv"),
                     option("XML", "text/xml"))
                 .defaultValue("plain/text"),
-            propertyMap.get(DRIVE_ID),
-            propertyMap.get(IGNORE_DEFAULT_VISIBILITY),
-            propertyMap.get(KEEP_REVISION_FOREVER),
-            propertyMap.get(OCR_LANGUAGE),
-            propertyMap.get(SUPPORTS_ALL_DRIVES),
-            propertyMap.get(USE_CONTENT_AS_INDEXABLE_TEXT),
-            propertyMap.get(INCLUDE_PERMISSIONS_FOR_VIEW),
-            propertyMap.get(INCLUDE_LABELS))
-        .outputSchema(FILE_PROPERTY)
+            PROPERTY_MAP.get(DRIVE_ID),
+            PROPERTY_MAP.get(IGNORE_DEFAULT_VISIBILITY),
+            PROPERTY_MAP.get(KEEP_REVISION_FOREVER),
+            PROPERTY_MAP.get(OCR_LANGUAGE),
+            PROPERTY_MAP.get(SUPPORTS_ALL_DRIVES),
+            PROPERTY_MAP.get(USE_CONTENT_AS_INDEXABLE_TEXT),
+            PROPERTY_MAP.get(INCLUDE_PERMISSIONS_FOR_VIEW),
+            PROPERTY_MAP.get(INCLUDE_LABELS))
+        .outputSchema(object().properties(string("id")))
         .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
         .perform(GoogleDriveCreateNewTextFileAction::perform);
 
     private GoogleDriveCreateNewTextFileAction() {
     }
 
-    public static Map<String, File> perform(
+    public static File perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
@@ -111,19 +111,17 @@ public final class GoogleDriveCreateNewTextFileAction {
             bufferedWriter.write(inputParameters.getString(TEXT));
         }
 
-        return Map.of(
-            "file",
-            drive
-                .files()
-                .create(googleFile, new FileContent(inputParameters.getString(MIME_TYPE), file))
-                .setFields("id")
-                .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
-                .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
-                .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
-                .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-                .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
-                .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
-                .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
-                .execute());
+        return drive
+            .files()
+            .create(googleFile, new FileContent(inputParameters.getString(MIME_TYPE), file))
+            .setFields("id")
+            .setIgnoreDefaultVisibility(inputParameters.getBoolean("ignoreDefaultVisibility"))
+            .setKeepRevisionForever(inputParameters.getBoolean("keepRevisionForever"))
+            .setOcrLanguage(inputParameters.getString("ocrLanguage"))
+            .setSupportsAllDrives(inputParameters.getBoolean("supportsAllDrives"))
+            .setUseContentAsIndexableText(inputParameters.getBoolean("useContentAsIndexableText"))
+            .setIncludePermissionsForView(inputParameters.getString("includePermissionsForView"))
+            .setIncludeLabels(inputParameters.getString("includeLabels"))
+            .execute();
     }
 }

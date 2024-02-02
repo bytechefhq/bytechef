@@ -102,7 +102,7 @@ public class XlsxFileReadAction {
         .output()
         .perform(XlsxFileReadAction::perform);
 
-    protected static Map<String, List<Map<String, ?>>> perform(
+    protected static List<Map<String, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);
@@ -127,14 +127,12 @@ public class XlsxFileReadAction {
                 rangeEndRow = rangeStartRow + pageSize;
             }
 
-            return Map.of(
-                "result",
-                read(
-                    fileFormat, inputStream,
-                    new ReadConfiguration(
-                        headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
-                        rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName),
-                    context));
+            return read(
+                fileFormat, inputStream,
+                new ReadConfiguration(
+                    headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName),
+                context);
         }
     }
 

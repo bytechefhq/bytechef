@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "readXlsxFile",
-    "value": "${readXlsxFile.result}"
+    "value": "${readXlsxFile}"
   } ],
   "tasks": [ {
     "name": "readXlsxFile",

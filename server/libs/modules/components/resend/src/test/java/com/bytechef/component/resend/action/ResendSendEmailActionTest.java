@@ -110,14 +110,12 @@ class ResendSendEmailActionTest {
             })) {
 
             try (MockedStatic<ResendUtils> resendUtilsMockedStatic = mockStatic(ResendUtils.class)) {
-                resendUtilsMockedStatic.when(
-                    () -> ResendUtils.getAttachments(mockedParameters, mockedContext))
+                resendUtilsMockedStatic
+                    .when(() -> ResendUtils.getAttachments(mockedParameters, mockedContext))
                     .thenReturn(attachments);
 
-                Map<String, CreateEmailResponse> handleMap = ResendSendEmailAction.perform(
+                CreateEmailResponse response = ResendSendEmailAction.perform(
                     mockedParameters, mockedParameters, mockedContext);
-
-                CreateEmailResponse response = handleMap.get("response");
 
                 List<Resend> resends = resendMockedConstruction.constructed();
 

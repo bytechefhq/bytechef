@@ -34,6 +34,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -108,7 +109,7 @@ public class HubspotSubscribeTrigger {
                 .displayCondition("eventType.includes('.propertyChange')")
                 .required(true))
         .outputSchema(
-            array("result").items(
+            array().items(
                 object()
                     .properties(
                         object("data").properties(
@@ -126,23 +127,21 @@ public class HubspotSubscribeTrigger {
                             integer("messageId"),
                             string("messageType")))))
         .sampleOutput("""
-            {
-                "result": [
-                    {
-                        "objectId": 1246965,
-                        "propertyName": "lifecyclestage",
-                        "propertyValue": "subscriber",
-                        "changeSource": "ACADEMY",
-                        "eventId": 3816279340,
-                        "subscriptionId": 25,
-                        "portalId": 33,
-                        "appId": 1160452,
-                        "occurredAt": 1462216307945,
-                        "eventType":"contact.propertyChange",
-                        "attemptNumber": 0
-                   }
-                ]
-            }
+            [
+                {
+                    "objectId": 1246965,
+                    "propertyName": "lifecyclestage",
+                    "propertyValue": "subscriber",
+                    "changeSource": "ACADEMY",
+                    "eventId": 3816279340,
+                    "subscriptionId": 25,
+                    "portalId": 33,
+                    "appId": 1160452,
+                    "occurredAt": 1462216307945,
+                    "eventType":"contact.propertyChange",
+                    "attemptNumber": 0
+               }
+            ]
             """)
         .dynamicWebhookDisable(HubspotSubscribeTrigger::dynamicWebhookDisable)
         .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
@@ -186,11 +185,11 @@ public class HubspotSubscribeTrigger {
         return null;
     }
 
-    protected static Map<String, ?> dynamicWebhookRequest(
+    protected static List<?> dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         Context context) {
 
-        return Map.of("result", body.getContent());
+        return body.getContent(new Context.TypeReference<>() {});
     }
 }

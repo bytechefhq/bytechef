@@ -27,7 +27,6 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -69,10 +68,7 @@ class GoogleMailGetMailActionTest extends AbstractGoogleMailActionTest {
         when(mockedGet.execute())
             .thenReturn(mockedMessage);
 
-        Map<String, Message> handleMap = GoogleMailGetMailAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
-
-        Message message = handleMap.get("message");
+        Message message = GoogleMailGetMailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedMessage, message);
         assertEquals("me", userIdArgumentCaptor.getValue());

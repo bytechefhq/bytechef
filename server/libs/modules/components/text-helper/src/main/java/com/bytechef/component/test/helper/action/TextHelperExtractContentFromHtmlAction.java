@@ -31,7 +31,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -78,7 +77,7 @@ public class TextHelperExtractContentFromHtmlAction {
         .output()
         .perform(TextHelperExtractContentFromHtmlAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object result;
@@ -96,7 +95,7 @@ public class TextHelperExtractContentFromHtmlAction {
             result = items.collect(Collectors.joining(" "));
         }
 
-        return Map.of("result", result);
+        return result;
     }
 
     private static String getValue(Element element, Parameters inputParameters) {

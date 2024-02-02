@@ -27,7 +27,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -47,16 +46,16 @@ public class FileStorageWriteAction {
                 .description(
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
-        .outputSchema(fileEntry("fileEntry"))
+        .outputSchema(fileEntry())
         .perform(FileStorageWriteAction::perform);
 
-    protected static Map<String, FileEntry> perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object content = inputParameters.getRequired(CONTENT);
         String fileName = inputParameters.getString(FILENAME, "file.txt");
 
-        return Map.of("fileEntry", context.file(file -> file.storeContent(
-            fileName, content instanceof String string ? string : content.toString())));
+        return context.file(file -> file.storeContent(
+            fileName, content instanceof String string ? string : content.toString()));
     }
 }

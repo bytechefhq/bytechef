@@ -24,7 +24,6 @@ import static com.bytechef.component.logger.constant.LoggerConstants.TEXT;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +35,7 @@ public class LoggerDebugAction {
         .properties(string(TEXT))
         .perform(LoggerDebugAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object text = inputParameters.get(TEXT);

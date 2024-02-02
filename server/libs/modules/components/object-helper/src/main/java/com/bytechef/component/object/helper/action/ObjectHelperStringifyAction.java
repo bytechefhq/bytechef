@@ -28,7 +28,6 @@ import static com.bytechef.component.object.helper.constant.ObjectHelperConstant
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -58,11 +57,11 @@ public class ObjectHelperStringifyAction {
         .output()
         .perform(ObjectHelperStringifyAction::perform);
 
-    protected static Map<String, String> perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object input = inputParameters.getRequired(SOURCE);
 
-        return Map.of("result", context.json(json -> json.write(input)));
+        return context.json(json -> json.write(input));
     }
 }

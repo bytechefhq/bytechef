@@ -387,8 +387,8 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Append Value to List",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -482,8 +482,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Atomic Increment",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -577,8 +577,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Await Get Value",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -653,8 +653,8 @@
       "controlType": "SELECT"
     } ],
     "title": "Delete Value",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -748,8 +748,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Delete Value from List",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -805,8 +805,8 @@
       "controlType": "SELECT"
     } ],
     "title": "Get All Entries(Keys and Values)",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1143,8 +1143,8 @@
       "controlType": "TIME"
     } ],
     "title": "Get Value",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1481,8 +1481,8 @@
       "controlType": "TIME"
     } ],
     "title": "Set Value",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1838,8 +1838,8 @@
       "controlType": "TIME"
     } ],
     "title": "Set Value in List",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": null,

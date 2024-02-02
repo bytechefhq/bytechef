@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.SearchV2Result;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -53,7 +52,7 @@ public final class DropboxSearchAction {
                         + "Must have length of at most 1000 and not be null.")
                 .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     array("matches")
                         .items(
@@ -80,13 +79,13 @@ public final class DropboxSearchAction {
     private DropboxSearchAction() {
     }
 
-    public static Map<String, SearchV2Result> perform(
+    public static SearchV2Result perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return Map.of("result", dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING)));
+        return dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING));
     }
 }

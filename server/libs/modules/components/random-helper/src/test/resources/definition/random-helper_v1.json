@@ -54,7 +54,7 @@
     } ],
     "title": "Int",
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -62,7 +62,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "INTEGER",
         "defaultValue": null,
         "exampleValue": null,
@@ -73,49 +73,8 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INTEGER"
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "INTEGER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "maxValue": null,
-          "minValue": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
+      },
+      "sampleOutput": null
     },
     "perform": { }
   }, {
@@ -173,7 +132,7 @@
     } ],
     "title": "Float",
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -181,7 +140,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "NUMBER",
         "defaultValue": null,
         "exampleValue": null,
@@ -195,52 +154,8 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "NUMBER"
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "NUMBER",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "maxNumberPrecision": null,
-          "maxValue": null,
-          "minNumberPrecision": null,
-          "minValue": null,
-          "numberPrecision": null,
-          "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
+      },
+      "sampleOutput": null
     },
     "perform": { }
   } ],

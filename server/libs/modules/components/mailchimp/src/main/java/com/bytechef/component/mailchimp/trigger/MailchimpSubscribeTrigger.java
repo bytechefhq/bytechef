@@ -55,7 +55,7 @@ public class MailchimpSubscribeTrigger {
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact."))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     object("data")
                         .properties(
@@ -114,11 +114,11 @@ public class MailchimpSubscribeTrigger {
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
-    protected static Map<String, ?> dynamicWebhookRequest(
+    protected static Object dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         TriggerContext context) {
 
-        return Map.of("result", body.getContent());
+        return body.getContent();
     }
 }

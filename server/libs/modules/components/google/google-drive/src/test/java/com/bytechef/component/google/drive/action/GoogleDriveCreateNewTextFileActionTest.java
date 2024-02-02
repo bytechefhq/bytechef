@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,10 +58,12 @@ public class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveC
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(
                 content.getInputStream(), StandardCharsets.UTF_8);
+
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            assertEquals("text", bufferedReader.lines()
-                    .collect(Collectors.joining("\n")));
+            Stream<String> lines = bufferedReader.lines();
+
+            assertEquals("text", lines.collect(Collectors.joining("\n")));
         }
     }
 }

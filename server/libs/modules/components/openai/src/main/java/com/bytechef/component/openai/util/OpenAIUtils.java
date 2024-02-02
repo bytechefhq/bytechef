@@ -29,10 +29,10 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
@@ -68,31 +68,32 @@ public class OpenAIUtils {
                                                 object("arguments"))),
                                 string("finishReason"))));
 
-    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> OUTPUT_SCHEMA_RESPONSE = List.of(
-        string("id"),
-        string("object"),
-        integer("created"),
-        string("model"),
-        array("choices")
-            .items(
-                object()
-                    .properties(
-                        integer("index"),
-                        object("message")
-                            .properties(
-                                string("role"),
-                                string("content"),
-                                string("name"),
-                                object("functionCall")
-                                    .properties(
-                                        string("name"),
-                                        object("arguments"))),
-                        string("finishReason"))),
-        object("usage")
-            .properties(
-                integer("promptTokens"),
-                integer("completionTokens"),
-                integer("totalTokens")));
+    public static final ModifiableValueProperty<?, ?> OUTPUT_SCHEMA_RESPONSE = object()
+        .properties(
+            string("id"),
+            string("object"),
+            integer("created"),
+            string("model"),
+            array("choices")
+                .items(
+                    object()
+                        .properties(
+                            integer("index"),
+                            object("message")
+                                .properties(
+                                    string("role"),
+                                    string("content"),
+                                    string("name"),
+                                    object("functionCall")
+                                        .properties(
+                                            string("name"),
+                                            object("arguments"))),
+                            string("finishReason"))),
+            object("usage")
+                .properties(
+                    integer("promptTokens"),
+                    integer("completionTokens"),
+                    integer("totalTokens")));
 
     private OpenAIUtils() {
     }

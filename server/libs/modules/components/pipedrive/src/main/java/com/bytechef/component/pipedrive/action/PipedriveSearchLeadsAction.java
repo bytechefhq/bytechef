@@ -104,37 +104,90 @@ public class PipedriveSearchLeadsAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .outputSchema(
-            object("data")
-                .properties(array("items").items(number("result_score").required(false), object("item")
-                    .properties(string("id").required(false), string("type").required(false),
-                        string("title").required(false), object("owner").properties(integer("id").required(false))
+            object()
+                .properties(
+                    object(
+                        "data")
+                            .properties(
+                                array(
+                                    "items")
+                                        .items(
+                                            object()
+                                                .properties(
+                                                    number("result_score").description("Search result relevancy")
+                                                        .required(false),
+                                                    object("item")
+                                                        .properties(string("id").description("The ID of the lead")
+                                                            .required(false),
+                                                            string("type").description("The type of the item")
+                                                                .required(false),
+                                                            string("title").description("The title of the lead")
+                                                                .required(false),
+                                                            object("owner").properties(integer("id")
+                                                                .description("The ID of the owner of the lead")
+                                                                .required(false))
+                                                                .required(false),
+                                                            object("person").properties(integer(
+                                                                "id").description(
+                                                                    "The ID of the person the lead is associated with")
+                                                                    .required(false),
+                                                                string(
+                                                                    "name").description(
+                                                                        "The name of the person the lead is associated with")
+                                                                        .required(false))
+                                                                .required(false),
+                                                            object("organization").properties(integer("id").description(
+                                                                "The ID of the organization the lead is associated with")
+                                                                .required(false),
+                                                                string("name").description(
+                                                                    "The name of the organization the lead is associated with")
+                                                                    .required(false))
+                                                                .required(false),
+                                                            array("phones").items(string())
+                                                                .required(false),
+                                                            array("emails").items(string())
+                                                                .required(false),
+                                                            array("custom_fields")
+                                                                .items(string().description("Custom fields"))
+                                                                .description("Custom fields")
+                                                                .required(false),
+                                                            array("notes")
+                                                                .items(string().description("An array of notes"))
+                                                                .description("An array of notes")
+                                                                .required(false),
+                                                            integer("value").description("The value of the lead")
+                                                                .required(false),
+                                                            string("currency").description("The currency of the lead")
+                                                                .required(false),
+                                                            integer("visible_to")
+                                                                .description("The visibility of the lead")
+                                                                .required(false),
+                                                            bool("is_archived").description(
+                                                                "A flag indicating whether the lead is archived or not")
+                                                                .required(false))
+                                                        .required(false))
+                                                .description("The array of leads"))
+                                        .description("The array of leads")
+                                        .required(false))
                             .required(false),
-                        object("person").properties(integer("id").required(false), string("name").required(false))
+                    bool("success").description("If the response is successful or not")
+                        .required(false),
+                    object("additional_data")
+                        .properties(object("pagination").properties(integer("start").description("Pagination start")
                             .required(false),
-                        object("organization").properties(integer("id").required(false), string("name").required(false))
-                            .required(false),
-                        array("phones").items(string())
-                            .required(false),
-                        array("emails").items(string())
-                            .required(false),
-                        array("custom_fields").items(string())
-                            .required(false),
-                        array("notes").items(string())
-                            .required(false),
-                        integer("value").required(false), string("currency").required(false),
-                        integer("visible_to").required(false), bool("is_archived").required(false))
-                    .required(false))
-                    .required(false))
-                .required(false),
-            bool("success").required(false),
-            object("additional_data")
-                .properties(object("pagination")
-                    .properties(integer("start").required(false), integer("limit").required(false),
-                        bool("more_items_in_collection").required(false), integer("next_start").required(false))
-                    .required(false))
-                .required(false))
-        .outputSchemaMetadata(Map.of(
-            "responseType", ResponseType.JSON))
+                            integer("limit").description("Items shown per page")
+                                .required(false),
+                            bool("more_items_in_collection")
+                                .description("Whether there are more list items in the collection than displayed")
+                                .required(false),
+                            integer("next_start").description("Next pagination start")
+                                .required(false))
+                            .description("Pagination details of the list")
+                            .required(false))
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON)))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
             Map.entry("data", Map.<String, Object>ofEntries(Map.entry("items", List.of(Map.<String, Object>ofEntries(
                 Map.entry("result_score", 0.29),

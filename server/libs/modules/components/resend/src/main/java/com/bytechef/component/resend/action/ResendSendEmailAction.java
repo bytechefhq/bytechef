@@ -143,7 +143,7 @@ public final class ResendSendEmailAction {
                         .required(true))
                 .required(false))
         .outputSchema(
-            object("response")
+            object()
                 .properties(
                     string("id")))
         .perform(ResendSendEmailAction::perform);
@@ -151,7 +151,7 @@ public final class ResendSendEmailAction {
     private ResendSendEmailAction() {
     }
 
-    public static Map<String, CreateEmailResponse> perform(
+    public static CreateEmailResponse perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws ResendException {
 
@@ -175,6 +175,6 @@ public final class ResendSendEmailAction {
 
         Emails emails = resend.emails();
 
-        return Map.of("response", emails.send(createEmailOptions));
+        return emails.send(createEmailOptions);
     }
 }

@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -70,10 +69,10 @@ public class AwsS3PutObjectAction {
                     option("private", "private"),
                     option("public-read", "public-read"),
                     option("public-read-write", "public-read-write")))
-        .outputSchema(string("versionId"))
+        .outputSchema(string())
         .perform(AwsS3PutObjectAction::perform);
 
-    protected static Map<String, String> perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
@@ -93,7 +92,7 @@ public class AwsS3PutObjectAction {
                     .build(),
                 tempFilePath);
 
-            return Map.of("versionId", putObjectResponse.versionId());
+            return putObjectResponse.versionId();
         }
     }
 }

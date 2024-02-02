@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
@@ -50,11 +49,11 @@ public class BashExecuteAction {
             .label("Script")
             .description("Script written in bash.")
             .required(true))
-        .outputSchema(string("result"))
-        .sampleOutput(Map.of("result", "Sample result"))
+        .outputSchema(string())
+        .sampleOutput("Sample result")
         .perform(BashExecuteAction::perform);
 
-    protected static Map<String, String> perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, InterruptedException, TimeoutException {
 
@@ -73,13 +72,11 @@ public class BashExecuteAction {
                 throw new IllegalStateException("Failed to chmod %s".formatted(chmodRetCode));
             }
 
-            return Map.of(
-                "result",
-                new ProcessExecutor()
-                    .command(scriptFile.getAbsolutePath())
-                    .readOutput(true)
-                    .execute()
-                    .outputUTF8());
+            return new ProcessExecutor()
+                .command(scriptFile.getAbsolutePath())
+                .readOutput(true)
+                .execute()
+                .outputUTF8();
         } finally {
             deleteRecursively(scriptFile.toPath());
         }

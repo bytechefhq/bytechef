@@ -36,7 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
@@ -59,7 +58,7 @@ public class FilesystemLsAction {
                 .description("Should subdirectories be included.")
                 .defaultValue(false))
         .outputSchema(
-            array("files")
+            array()
                 .items(
                     object()
                         .properties(
@@ -68,20 +67,18 @@ public class FilesystemLsAction {
                             integer("size"))))
         .perform(FilesystemLsAction::perform);
 
-    protected static Map<String, List<FileInfo>> perform(
+    protected static List<FileInfo> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         Path root = Paths.get(inputParameters.getRequiredString(PATH));
         boolean recursive = inputParameters.getBoolean(RECURSIVE, false);
 
         try (Stream<Path> stream = Files.walk(root)) {
-            return Map.of(
-                "files",
-                stream
-                    .filter(path -> filter(path, recursive, root))
-                    .filter(Files::isRegularFile)
-                    .map(path -> getFileInfo(path, root))
-                    .collect(Collectors.toList()));
+            return stream
+                .filter(path -> filter(path, recursive, root))
+                .filter(Files::isRegularFile)
+                .map(path -> getFileInfo(path, root))
+                .collect(Collectors.toList());
         }
     }
 

@@ -85,49 +85,8 @@
       }
     } ],
     "title": "Creates a record",
+    "perform": null,
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "createdTime",
-        "type": "DATE_TIME",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": false,
-        "name": "fields",
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      } ],
-      "metadata": {
-        "responseType": "JSON"
-      },
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -187,9 +146,9 @@
         } ],
         "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null
-      }
-    },
-    "perform": null
+      },
+      "sampleOutput": null
+    }
   } ],
   "category": null,
   "connection": {
@@ -221,7 +180,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -230,7 +188,8 @@
       "scopes": null,
       "tokenUrl": null,
       "authorizationUrl": null,
-      "clientSecret": null
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "airtable",
     "componentDescription": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
@@ -328,16 +287,16 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": { },
+    "output": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
-    "output": null,
-    "deduplicate": null,
-    "poll": { },
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": null
+    "dynamicWebhookRequest": null
   } ],
   "allowedConnections": null
 }

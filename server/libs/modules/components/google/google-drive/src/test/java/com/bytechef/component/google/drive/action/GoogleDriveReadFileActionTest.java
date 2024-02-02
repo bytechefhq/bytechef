@@ -18,9 +18,6 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ACKNOWLEDGE_ABUSE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_LABELS;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.SUPPORTS_ALL_DRIVES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -50,11 +47,11 @@ public class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest
             .thenReturn("fileId");
         when(mockedParameters.getBoolean(ACKNOWLEDGE_ABUSE))
             .thenReturn(true);
-        when(mockedParameters.getBoolean(SUPPORTS_ALL_DRIVES))
+        when(mockedParameters.getBoolean("supportsAllDrives"))
             .thenReturn(true);
-        when(mockedParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
+        when(mockedParameters.getString("includePermissionsForView"))
             .thenReturn("includePermissionsForViewStub");
-        when(mockedParameters.getString(INCLUDE_LABELS))
+        when(mockedParameters.getString("includeLabels"))
             .thenReturn("includeLabelsStub");
         when(mockedFiles.get(getArgumentCaptor.capture()))
             .thenReturn(mockedGet);

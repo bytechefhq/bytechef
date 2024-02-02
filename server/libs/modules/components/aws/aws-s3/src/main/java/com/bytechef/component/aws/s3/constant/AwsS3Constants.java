@@ -38,5 +38,4 @@ public class AwsS3Constants {
     public static final String RESULT = "result";
     public static final String SECRET_ACCESS_KEY = "secretAccessKey";
     public static final String SIGNATURE_DURATION = "signatureDuration";
-    public static final String URL = "url";
 }

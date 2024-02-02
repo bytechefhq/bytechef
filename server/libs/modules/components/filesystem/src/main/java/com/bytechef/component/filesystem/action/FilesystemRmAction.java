@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -47,8 +46,8 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(bool("deleted"))
-        .sampleOutput(Map.of("deleted", true))
+        .outputSchema(bool())
+        .sampleOutput(true)
         .perform(FilesystemRmAction::perform);
 
     /**
@@ -58,13 +57,13 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    protected static Map<String, Boolean> perform(
+    protected static Boolean perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         File file = new File(inputParameters.getRequiredString(PATH));
 
         try {
-            return Map.of("deleted", deleteRecursively(file.toPath()));
+            return deleteRecursively(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

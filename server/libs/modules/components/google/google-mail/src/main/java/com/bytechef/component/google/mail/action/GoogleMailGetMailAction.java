@@ -23,7 +23,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY_FUNCTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 
 import com.bytechef.component.definition.ActionContext;
@@ -35,7 +35,6 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -56,24 +55,22 @@ public class GoogleMailGetMailAction {
                 .label("Metadata headers")
                 .description("When given and format is METADATA, only include headers specified.")
                 .required(false))
-        .outputSchema(MESSAGE_PROPERTY_FUNCTION.apply("message"))
+        .outputSchema(MESSAGE_PROPERTY)
         .perform(GoogleMailGetMailAction::perform);
 
     private GoogleMailGetMailAction() {
     }
 
-    public static Map<String, Message> perform(
+    public static Message perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Gmail service = GoogleMailUtils.getMail(connectionParameters);
 
-        return Map.of(
-            "message",
-            service.users()
-                .messages()
-                .get("me", inputParameters.getRequiredString(ID))
-                .setFormat(inputParameters.getString(FORMAT))
-                .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
-                .execute());
+        return service.users()
+            .messages()
+            .get("me", inputParameters.getRequiredString(ID))
+            .setFormat(inputParameters.getString(FORMAT))
+            .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
+            .execute();
     }
 }

@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "readJSONFile",
-    "value": "${readJSONFile.result}"
+    "value": "${readJSONFile}"
   } ],
   "tasks": [ {
     "name": "readJSONFile",

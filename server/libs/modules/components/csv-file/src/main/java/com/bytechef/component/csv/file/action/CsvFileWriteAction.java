@@ -62,19 +62,17 @@ public class CsvFileWriteAction {
                     "Filename to set for binary data. By default, \"file.csv\" will be used.")
                 .defaultValue("file.csv")
                 .advancedOption(true))
-        .outputSchema(fileEntry("fileEntry"))
+        .outputSchema(fileEntry())
         .perform(CsvFileWriteAction::perform);
 
-    protected static Map<String, FileEntry> perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         List<Map<String, ?>> rows =
             inputParameters.getList(CsvFileConstants.ROWS, new Context.TypeReference<>() {}, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
-            return Map.of(
-                "fileEntry",
-                context.file(file -> file.storeContent("file.csv", inputStream)));
+            return context.file(file -> file.storeContent("file.csv", inputStream));
         }
     }
 

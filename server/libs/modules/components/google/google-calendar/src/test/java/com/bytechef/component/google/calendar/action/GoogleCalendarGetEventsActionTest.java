@@ -48,7 +48,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -173,17 +172,15 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
 
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
             mockStatic(GoogleCalendarUtils.class)) {
-            googleCalendarUtilsMockedStatic.when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
                 .thenReturn(mockedCalendar);
 
-            googleCalendarUtilsMockedStatic.when(
-                () -> GoogleCalendarUtils.convertToDateViaSqlTimestamp(any()))
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.convertToDateViaSqlTimestamp(any()))
                 .thenReturn(date);
 
-            Map<String, Events> handleMap = GoogleCalendarGetEventsAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
-
-            Events result = handleMap.get("events");
+            Events result = GoogleCalendarGetEventsAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedEvent, result);
 

@@ -46,7 +46,8 @@ public class PetstoreCreateUserAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(PetstoreUserProperties.PROPERTIES)
-        .outputSchemaMetadata(Map.of(
-            "responseType", ResponseType.JSON));
+        .outputSchema(object().properties(PetstoreUserProperties.PROPERTIES)
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON)));
 }

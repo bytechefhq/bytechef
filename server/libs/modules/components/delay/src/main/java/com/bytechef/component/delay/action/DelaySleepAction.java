@@ -25,7 +25,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.time.Duration;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,7 +42,7 @@ public class DelaySleepAction {
             .defaultValue(1))
         .perform(DelaySleepAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws InterruptedException {
 

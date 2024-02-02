@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -68,10 +67,10 @@ public class XmlFileWriteAction {
                 .required(true)
                 .defaultValue("file.xml")
                 .advancedOption(true))
-        .outputSchema(fileEntry("fileEntry"))
+        .outputSchema(fileEntry())
         .perform(XmlFileWriteAction::perform);
 
-    protected static Map<String, FileEntry> perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         Object source = inputParameters.getRequired(XmlFileConstants.SOURCE);
@@ -82,10 +81,8 @@ public class XmlFileWriteAction {
         }
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-            return Map.of(
-                "fileEntry",
-                context.file(file -> file.storeContent(
-                    inputParameters.getString(XmlFileConstants.FILENAME, "file.xml"), inputStream)));
+            return context.file(file -> file.storeContent(
+                inputParameters.getString(XmlFileConstants.FILENAME, "file.xml"), inputStream));
         }
     }
 }

@@ -17,14 +17,13 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SEARCH_EMAIL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.microsoft.graph.requests.MessageCollectionPage;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -39,13 +38,13 @@ public class MicrosoftOutlook365SearchEmailAction {
         )
         .outputSchema(
             // TODO
-            string("page"))
+            object())
         .perform(MicrosoftOutlook365SearchEmailAction::perform);
 
     private MicrosoftOutlook365SearchEmailAction() {
     }
 
-    public static Map<String, MessageCollectionPage> perform(
+    public static MessageCollectionPage perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         // TODO

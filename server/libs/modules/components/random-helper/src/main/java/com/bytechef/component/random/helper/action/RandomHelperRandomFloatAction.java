@@ -24,7 +24,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.random.helper.constant.RandomHelperConstants;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -43,19 +42,19 @@ public class RandomHelperRandomFloatAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .outputSchema(number("result"))
+        .outputSchema(number())
         .perform(RandomHelperRandomFloatAction::perform);
 
     /**
      * Generates a random float.
      */
-    protected static Map<String, ?> perform(
+    protected static Float perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         int startInclusive = inputParameters.getInteger(RandomHelperConstants.START_INCLUSIVE, 0);
         int endInclusive = inputParameters.getInteger(RandomHelperConstants.END_INCLUSIVE, 100);
 
-        return Map.of("result", nextFloat(startInclusive, endInclusive));
+        return nextFloat(startInclusive, endInclusive);
     }
 
     private static float nextFloat(final float startInclusive, final float endExclusive) {

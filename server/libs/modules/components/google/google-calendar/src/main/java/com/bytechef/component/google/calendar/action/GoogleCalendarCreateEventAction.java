@@ -51,7 +51,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ENTRY_POINTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ENTRY_POINT_FEATURES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ENTRY_POINT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY_FUNCTION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE_PROPERTIES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EXTENDED_PROPERTIES;
@@ -134,7 +134,6 @@ import com.google.api.services.calendar.model.EventWorkingLocationProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -540,13 +539,13 @@ public class GoogleCalendarCreateEventAction {
                         "The event is private. This value is provided for compatibility reasons."))
                 .defaultValue(DEFAULT)
                 .required(false))
-        .outputSchema(EVENT_PROPERTY_FUNCTION.apply("event"))
+        .outputSchema(EVENT_PROPERTY)
         .perform(GoogleCalendarCreateEventAction::perform);
 
     private GoogleCalendarCreateEventAction() {
     }
 
-    public static Map<String, Event> perform(
+    public static Event perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException {
 
@@ -609,14 +608,12 @@ public class GoogleCalendarCreateEventAction {
 
         Calendar calendar = GoogleCalendarUtils.getCalendar(connectionParameters);
 
-        return Map.of(
-            "event",
-            calendar.events()
-                .insert("primary", event)
-                .setConferenceDataVersion(inputParameters.getInteger(CONFERENCE_DATA_VERSION))
-                .setMaxAttendees(inputParameters.getInteger(MAX_ATTENDEES))
-                .setSendUpdates(inputParameters.getString(SEND_UPDATES))
-                .setSupportsAttachments(inputParameters.getBoolean(SUPPORTS_ATTACHMENTS))
-                .execute());
+        return calendar.events()
+            .insert("primary", event)
+            .setConferenceDataVersion(inputParameters.getInteger(CONFERENCE_DATA_VERSION))
+            .setMaxAttendees(inputParameters.getInteger(MAX_ATTENDEES))
+            .setSendUpdates(inputParameters.getString(SEND_UPDATES))
+            .setSupportsAttachments(inputParameters.getBoolean(SUPPORTS_ATTACHMENTS))
+            .execute();
     }
 }

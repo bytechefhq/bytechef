@@ -49,7 +49,6 @@ import jakarta.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -105,7 +104,7 @@ public class SendEmailAction {
                 .items(fileEntry()))
         .perform(SendEmailAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MessagingException, IOException {
 

@@ -27,7 +27,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import java.util.function.Function;
 
 /**
  * @author Monika Domiter
@@ -198,7 +197,7 @@ public class GoogleCalendarConstants {
                 "zone offset is required unless a time zone is explicitly specified in timeZone.")
         .required(false);
 
-    public static final Function<String, ModifiableObjectProperty> EVENT_PROPERTY_FUNCTION = (name) -> object(name)
+    public static final ModifiableObjectProperty EVENT_PROPERTY = object()
         .properties(
             bool(ANYONE_CAN_ADD_SELF),
             array(ATTACHMENTS)

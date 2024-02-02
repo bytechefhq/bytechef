@@ -42,7 +42,6 @@ import com.infobip.model.SmsTextualMessage;
 import com.infobip.model.SmsTracking;
 import com.infobip.model.SmsUrlOptions;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -90,10 +89,7 @@ class InfobipSendSMSActionTest extends AbstractInfobipActionTest {
                 infobipUtilsMockedStatic.when(() -> InfobipUtils.createSmsTextualMessageList(anyList()))
                     .thenReturn(smsTextualMessages);
 
-                Map<String, SmsResponse> performMap = InfobipSendSMSAction.perform(
-                    mockedParameters, mockedParameters, mockedContext);
-
-                SmsResponse result = performMap.get("smsResponse");
+                SmsResponse result = InfobipSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
 
                 List<SmsApi> smsApis = smsApiMockedConstruction.constructed();
 

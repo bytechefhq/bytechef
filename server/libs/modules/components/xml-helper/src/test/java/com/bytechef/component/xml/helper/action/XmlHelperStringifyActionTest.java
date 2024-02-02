@@ -44,12 +44,11 @@ public class XmlHelperStringifyActionTest {
                 }
                 """);
 
-        assertThat(XmlHelperStringifyAction.perform(parameters, parameters, context)
-            .get("result"))
-                .isEqualTo("""
-                    {
-                        "key": 3
-                    }
-                    """);
+        assertThat(XmlHelperStringifyAction.perform(parameters, parameters, context))
+            .isEqualTo("""
+                {
+                    "key": 3
+                }
+                """);
     }
 }

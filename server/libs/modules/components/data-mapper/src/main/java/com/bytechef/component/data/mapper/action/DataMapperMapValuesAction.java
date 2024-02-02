@@ -37,7 +37,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -154,7 +153,7 @@ public class DataMapperMapValuesAction {
         .output()
         .perform(DataMapperMapValuesAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         // TODO

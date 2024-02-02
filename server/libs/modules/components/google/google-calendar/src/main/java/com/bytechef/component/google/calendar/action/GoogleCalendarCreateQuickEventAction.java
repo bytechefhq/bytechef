@@ -19,7 +19,7 @@ package com.bytechef.component.google.calendar.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_QUICK_EVENT;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY_FUNCTION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
@@ -31,7 +31,6 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -47,22 +46,20 @@ public class GoogleCalendarCreateQuickEventAction {
                 .description("The text describing the event to be created.")
                 .required(true),
             SEND_UPDATES_PROPERTY)
-        .outputSchema(EVENT_PROPERTY_FUNCTION.apply("event"))
+        .outputSchema(EVENT_PROPERTY)
         .perform(GoogleCalendarCreateQuickEventAction::perform);
 
     private GoogleCalendarCreateQuickEventAction() {
     }
 
-    public static Map<String, Event> perform(
+    public static Event perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Calendar calendar = GoogleCalendarUtils.getCalendar(connectionParameters);
 
-        return Map.of(
-            "event",
-            calendar.events()
-                .quickAdd("primary", inputParameters.getRequiredString(TEXT))
-                .setSendUpdates(inputParameters.getString(SEND_UPDATES))
-                .execute());
+        return calendar.events()
+            .quickAdd("primary", inputParameters.getRequiredString(TEXT))
+            .setSendUpdates(inputParameters.getString(SEND_UPDATES))
+            .execute();
     }
 }

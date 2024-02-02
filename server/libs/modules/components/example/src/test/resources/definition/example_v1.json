@@ -15,9 +15,8 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Title",
-    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -25,7 +24,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
@@ -36,50 +35,10 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": null
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    }
+      },
+      "sampleOutput": null
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

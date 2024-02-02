@@ -70,8 +70,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Email subject.",
@@ -129,8 +129,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Cc recipients email addresses.",
@@ -169,8 +169,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Reply-to email addresses.",
@@ -209,8 +209,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The HTML version of the message.",
@@ -305,8 +305,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A list of attachments to send with the email.",
@@ -418,8 +418,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -477,12 +477,13 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Send Email",
+    "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -490,7 +491,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "response",
+        "name": null,
         "type": "OBJECT",
         "defaultValue": null,
         "exampleValue": null,
@@ -519,73 +520,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "response",
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": null,
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": null,
-            "name": "id",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": null,
-            "placeholder": null,
-            "controlType": "TEXT",
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
-    },
-    "perform": { }
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
+    }
   } ],
   "category": null,
   "connection": {
@@ -618,15 +557,15 @@
       "type": "BEARER_TOKEN",
       "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null
     } ],
     "componentName": "resend",
     "componentDescription": "Resend is the email API for developers.",

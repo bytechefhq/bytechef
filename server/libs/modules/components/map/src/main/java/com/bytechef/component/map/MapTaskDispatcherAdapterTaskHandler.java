@@ -48,7 +48,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -57,7 +56,7 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  * @since Feb, 21 2020
  */
-public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<Map<String, List<?>>> {
+public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
     private final ObjectMapper objectMapper;
     private final TaskHandlerResolver taskHandlerResolver;
@@ -69,7 +68,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<Map<Stri
     }
 
     @Override
-    public Map<String, List<?>> handle(TaskExecution taskExecution) {
+    public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
@@ -143,7 +142,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<Map<Stri
             throw new RuntimeException(errorMessage.toString());
         }
 
-        return Map.of("result", result);
+        return result;
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {

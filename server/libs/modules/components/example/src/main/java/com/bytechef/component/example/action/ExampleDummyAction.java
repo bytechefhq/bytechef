@@ -23,7 +23,6 @@ import static com.bytechef.component.example.constant.ExampleConstants.DUMMY;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -34,13 +33,13 @@ public final class ExampleDummyAction {
         .title("Title")
         .description("Description")
         .properties()
-        .outputSchema(string("result"))
+        .outputSchema(string())
         .perform(ExampleDummyAction::perform);
 
     private ExampleDummyAction() {
     }
 
-    public static Map<String, ?> perform(
+    public static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return null;

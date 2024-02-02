@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import java.util.function.Function;
 
 /**
  * @author Monika Domiter
@@ -93,7 +92,7 @@ public class GoogleMailConstants {
                 option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
             .required(false);
 
-    public static final Function<String, ModifiableObjectProperty> MESSAGE_PROPERTY_FUNCTION = (name) -> object(name)
+    public static final ModifiableObjectProperty MESSAGE_PROPERTY = object()
         .properties(
             string(ID),
             string(THREAD_ID),

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
  * @author Mario Cvjetojevic
  */
 public class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveCreateActionTest {
+
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final File mockedFile = mock(File.class);
 

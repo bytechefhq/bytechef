@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.CreateFolderResult;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -47,7 +46,7 @@ public final class DropboxCreateNewFolderAction {
             .description("Path to create a folder on.")
             .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     object("folderMetadata")
                         .properties(
@@ -98,16 +97,14 @@ public final class DropboxCreateNewFolderAction {
     private DropboxCreateNewFolderAction() {
     }
 
-    public static Map<String, CreateFolderResult> perform(
+    public static CreateFolderResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        CreateFolderResult createFolderResult = dbxUserFilesRequests.createFolderV2(
+        return dbxUserFilesRequests.createFolderV2(
             inputParameters.getRequiredString(DESTINATION_FILENAME));
-
-        return Map.of("result", createFolderResult);
     }
 }

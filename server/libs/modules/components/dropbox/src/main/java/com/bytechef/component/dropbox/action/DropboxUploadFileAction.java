@@ -39,7 +39,6 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -60,7 +59,7 @@ public final class DropboxUploadFileAction {
                 .placeholder("/your_file.pdf")
                 .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     string("id")
                         .label("ID")
@@ -154,7 +153,7 @@ public final class DropboxUploadFileAction {
     private DropboxUploadFileAction() {
     }
 
-    public static Map<String, FileMetadata> perform(
+    public static FileMetadata perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException, IOException {
 
@@ -168,7 +167,7 @@ public final class DropboxUploadFileAction {
 
             UploadBuilder uploadBuilder = dbxUserFilesRequests.uploadBuilder(fileName);
 
-            return Map.of("result", uploadBuilder.uploadAndFinish(inputStream));
+            return uploadBuilder.uploadAndFinish(inputStream);
         }
     }
 }

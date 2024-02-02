@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.ListFolderResult;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -49,7 +48,7 @@ public final class DropboxListFolderAction {
                     "\" (/(.|[\\\\r\\\\n])*)?|id:.*|(ns:[0-9]+(/.*)?)\" and not be null.")
                 .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     array("entries").items(
                         object()
@@ -83,13 +82,13 @@ public final class DropboxListFolderAction {
     private DropboxListFolderAction() {
     }
 
-    public static Map<String, ListFolderResult> perform(
+    public static ListFolderResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return Map.of("result", dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME)));
+        return dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME));
     }
 }

@@ -31,7 +31,6 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.RelocationResult;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -53,7 +52,7 @@ public final class DropboxCopyAction {
                 .description("The path which the file or folder should be copyed to.")
                 .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     object("metadata")
                         .properties(
@@ -78,17 +77,15 @@ public final class DropboxCopyAction {
     private DropboxCopyAction() {
     }
 
-    public static Map<String, RelocationResult> perform(
+    public static RelocationResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        RelocationResult relocationResult = dbxUserFilesRequests.copyV2(
+        return dbxUserFilesRequests.copyV2(
             inputParameters.getRequiredString(SOURCE_FILENAME),
             inputParameters.getRequiredString(DESTINATION_FILENAME));
-
-        return Map.of("result", relocationResult);
     }
 }

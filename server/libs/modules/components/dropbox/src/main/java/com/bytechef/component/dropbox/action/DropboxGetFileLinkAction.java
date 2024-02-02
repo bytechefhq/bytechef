@@ -34,7 +34,6 @@ import com.bytechef.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.GetTemporaryLinkResult;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -55,7 +54,7 @@ public final class DropboxGetFileLinkAction {
                         "\" (/(.|[\\\\r\\\\n])*|id:.*)|(rev:[0-9a-f]{9,})|(ns:[0-9]+(/.*)?)\" and not be null.")
                 .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     object("metadata")
                         .properties(
@@ -153,16 +152,14 @@ public final class DropboxGetFileLinkAction {
     private DropboxGetFileLinkAction() {
     }
 
-    public static Map<String, GetTemporaryLinkResult> perform(
+    public static GetTemporaryLinkResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        GetTemporaryLinkResult getTemporaryLinkResult = dbxUserFilesRequests.getTemporaryLink(
+        return dbxUserFilesRequests.getTemporaryLink(
             inputParameters.getRequiredString(SOURCE_FILENAME));
-
-        return Map.of("result", getTemporaryLinkResult);
     }
 }

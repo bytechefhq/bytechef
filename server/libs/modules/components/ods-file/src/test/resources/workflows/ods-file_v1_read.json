@@ -8,7 +8,7 @@
   } ],
   "outputs": [ {
     "name": "readOdsFile",
-    "value": "${readOdsFile.result}"
+    "value": "${readOdsFile}"
   } ],
   "tasks": [ {
     "name": "readOdsFile",

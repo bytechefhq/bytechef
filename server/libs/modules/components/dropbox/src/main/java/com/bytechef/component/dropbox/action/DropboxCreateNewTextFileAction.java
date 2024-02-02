@@ -35,7 +35,6 @@ import com.dropbox.core.v2.files.PaperCreateResult;
 import com.dropbox.core.v2.files.PaperCreateUploader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -52,7 +51,7 @@ public final class DropboxCreateNewTextFileAction {
                 .placeholder("/New_text_file.txt")
                 .required(true))
         .outputSchema(
-            object("result")
+            object()
                 .properties(
                     string("url")
                         .label("URL")
@@ -71,7 +70,7 @@ public final class DropboxCreateNewTextFileAction {
     private DropboxCreateNewTextFileAction() {
     }
 
-    public static Map<String, PaperCreateResult> perform(
+    public static PaperCreateResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException, IOException {
 
@@ -81,7 +80,7 @@ public final class DropboxCreateNewTextFileAction {
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
             inputParameters.getRequiredString(DESTINATION_FILENAME), ImportFormat.PLAIN_TEXT)) {
 
-            return Map.of("result", paperCreateUploader.uploadAndFinish(InputStream.nullInputStream()));
+            return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
         }
     }
 }

@@ -36,29 +36,6 @@
     "title": "Convert from XML string",
     "perform": { },
     "output": {
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": "result",
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
       "outputSchema": {
         "advancedOption": null,
         "description": null,
@@ -76,30 +53,11 @@
         "additionalProperties": null,
         "multipleValues": null,
         "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
+        "properties": null,
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
     }
   }, {
     "batch": null,
@@ -142,8 +100,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to convert to XML string.",
@@ -162,8 +120,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The array to convert to XML string.",
@@ -183,13 +141,13 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Convert to XML string",
     "perform": { },
     "output": {
-      "properties": [ {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -197,7 +155,7 @@
         "hidden": null,
         "metadata": { },
         "required": null,
-        "name": "result",
+        "name": null,
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
@@ -208,49 +166,8 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": null
-      } ],
-      "metadata": null,
-      "sampleOutput": null,
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": "result",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }
+      },
+      "sampleOutput": null
     }
   } ],
   "category": null,

@@ -25,7 +25,6 @@ import static com.bytechef.component.file.storage.constant.FileStorageConstants.
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -40,14 +39,13 @@ public class FileStorageReadAction {
             .description(
                 "The object property which contains a reference to the file to read from.")
             .required(true))
-        .outputSchema(string("result"))
-        .sampleOutput(Map.of("result", "Sample content"))
+        .outputSchema(string())
+        .sampleOutput("Sample content")
         .perform(FileStorageReadAction::perform);
 
-    protected static Map<String, String> perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return Map.of(
-            "result", context.file(file -> file.readToString(inputParameters.getRequiredFileEntry(FILE_ENTRY))));
+        return context.file(file -> file.readToString(inputParameters.getRequiredFileEntry(FILE_ENTRY)));
     }
 }

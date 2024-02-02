@@ -27,7 +27,6 @@ import com.bytechef.component.definition.Parameters;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -42,8 +41,8 @@ public class FilesystemMkdirAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(string("path"))
-        .sampleOutput(Map.of("path", "/sample_data"))
+        .outputSchema(string())
+        .sampleOutput("/sample_data")
         .perform(FilesystemMkdirAction::perform);
 
     /**
@@ -52,10 +51,9 @@ public class FilesystemMkdirAction {
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
      */
-    protected static Map<String, String> perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        return Map.of(
-            "path", String.valueOf(Files.createDirectories(Paths.get(inputParameters.getRequiredString(PATH)))));
+        return String.valueOf(Files.createDirectories(Paths.get(inputParameters.getRequiredString(PATH))));
     }
 }

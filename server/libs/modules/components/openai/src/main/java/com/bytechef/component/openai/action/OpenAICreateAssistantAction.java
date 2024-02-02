@@ -42,7 +42,6 @@ import com.bytechef.component.definition.Parameters;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.service.OpenAiService;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -123,7 +122,7 @@ public class OpenAICreateAssistantAction {
                     string())
                 .required(false))
         .outputSchema(
-            object("assistant")
+            object()
                 .properties(
                     string("id"),
                     string("object"),
@@ -153,7 +152,7 @@ public class OpenAICreateAssistantAction {
     private OpenAICreateAssistantAction() {
     }
 
-    public static Map<String, Assistant> perform(
+    public static Assistant perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
@@ -168,6 +167,6 @@ public class OpenAICreateAssistantAction {
         assistantRequest.setFileIds(inputParameters.getList(FILE_IDS, new TypeReference<>() {}));
         assistantRequest.setMetadata(inputParameters.getMap(METADATA, new TypeReference<>() {}));
 
-        return Map.of("assistant", openAiService.createAssistant(assistantRequest));
+        return openAiService.createAssistant(assistantRequest);
     }
 }

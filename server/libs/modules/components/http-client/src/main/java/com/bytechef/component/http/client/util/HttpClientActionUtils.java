@@ -142,19 +142,9 @@ public class HttpClientActionUtils {
         }
     }
 
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
     public static PerformFunction getPerform(RequestMethod requestMethod) {
-        return (inputParameters, connectionParameters, context) -> {
-            Object result = HttpClientActionUtils.execute(inputParameters, requestMethod, context);
-
-            if (result instanceof Map map) {
-                return map;
-            } else {
-                return Map.of("result", result);
-            }
-        };
+        return (inputParameters, connectionParameters, context) -> HttpClientActionUtils.execute(
+            inputParameters, requestMethod, context);
     }
 
     @SafeVarargs

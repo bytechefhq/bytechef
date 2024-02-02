@@ -16,14 +16,6 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.DRIVE_ID;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.IGNORE_DEFAULT_VISIBILITY;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_LABELS;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.KEEP_REVISION_FOREVER;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.OCR_LANGUAGE;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.SUPPORTS_ALL_DRIVES;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.USE_CONTENT_AS_INDEXABLE_TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -44,6 +36,7 @@ import org.mockito.ArgumentCaptor;
  * @author Mario Cvjetojevic
  */
 public abstract class AbstractGoogleDriveCreateActionTest extends AbstractGoogleDriveActionTest {
+
     protected Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
     protected ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
     protected ArgumentCaptor<AbstractInputStreamContent> inputStreamArgumentCaptor =
@@ -51,79 +44,79 @@ public abstract class AbstractGoogleDriveCreateActionTest extends AbstractGoogle
 
     protected HashMap<String, ArgumentCaptor<?>> argumentCaptorMap = new HashMap<>() {
         {
-            put(DRIVE_ID, ArgumentCaptor.forClass(String.class));
-            put(IGNORE_DEFAULT_VISIBILITY, ArgumentCaptor.forClass(Boolean.class));
-            put(KEEP_REVISION_FOREVER, ArgumentCaptor.forClass(Boolean.class));
-            put(OCR_LANGUAGE, ArgumentCaptor.forClass(String.class));
-            put(SUPPORTS_ALL_DRIVES, ArgumentCaptor.forClass(Boolean.class));
-            put(USE_CONTENT_AS_INDEXABLE_TEXT, ArgumentCaptor.forClass(Boolean.class));
-            put(INCLUDE_PERMISSIONS_FOR_VIEW, ArgumentCaptor.forClass(String.class));
-            put(INCLUDE_LABELS, ArgumentCaptor.forClass(String.class));
+            put("driveId", ArgumentCaptor.forClass(String.class));
+            put("ignoreDefaultVisibility", ArgumentCaptor.forClass(Boolean.class));
+            put("keepRevisionForever", ArgumentCaptor.forClass(Boolean.class));
+            put("ocrLanguage", ArgumentCaptor.forClass(String.class));
+            put("supportsAllDrives", ArgumentCaptor.forClass(Boolean.class));
+            put("useContentAsIndexableText", ArgumentCaptor.forClass(Boolean.class));
+            put("includePermissionsForView", ArgumentCaptor.forClass(String.class));
+            put("includeLabels", ArgumentCaptor.forClass(String.class));
         }
     };
 
     @BeforeEach
     protected void beforeTestPerform() throws IOException {
-        when(mockedParameters.containsKey(DRIVE_ID))
+        when(mockedParameters.containsKey("driveId"))
             .thenReturn(true);
-        when(mockedParameters.getString(DRIVE_ID))
+        when(mockedParameters.getString("driveId"))
             .thenReturn("driveIdStub");
-        when(mockedParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
+        when(mockedParameters.getBoolean("ignoreDefaultVisibility"))
             .thenReturn(true);
-        when(mockedParameters.getBoolean(KEEP_REVISION_FOREVER))
+        when(mockedParameters.getBoolean("keepRevisionForever"))
             .thenReturn(true);
-        when(mockedParameters.getString(OCR_LANGUAGE))
+        when(mockedParameters.getString("ocrLanguage"))
             .thenReturn("ocrLanguageStub");
-        when(mockedParameters.getBoolean(SUPPORTS_ALL_DRIVES))
+        when(mockedParameters.getBoolean("supportsAllDrives"))
             .thenReturn(true);
-        when(mockedParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
+        when(mockedParameters.getBoolean("useContentAsIndexableText"))
             .thenReturn(true);
-        when(mockedParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
+        when(mockedParameters.getString("includePermissionsForView"))
             .thenReturn("includePermissionsForViewStub");
-        when(mockedParameters.getString(INCLUDE_LABELS))
+        when(mockedParameters.getString("includeLabels"))
             .thenReturn("includeLabelsStub");
         when(mockedFiles.create(any(), any()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setFields("id"))
             .thenReturn(mockedCreate);
         when(mockedCreate.setIgnoreDefaultVisibility(
-            (Boolean) argumentCaptorMap.get(IGNORE_DEFAULT_VISIBILITY).capture()))
+            (Boolean) argumentCaptorMap.get("ignoreDefaultVisibility").capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setKeepRevisionForever(
-            (Boolean) argumentCaptorMap.get(KEEP_REVISION_FOREVER).capture()))
+            (Boolean) argumentCaptorMap.get("keepRevisionForever").capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setOcrLanguage(
-            (String) argumentCaptorMap.get(OCR_LANGUAGE).capture()))
+            (String) argumentCaptorMap.get("ocrLanguage").capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setSupportsAllDrives(
-            (Boolean) argumentCaptorMap.get(SUPPORTS_ALL_DRIVES).capture()))
+            (Boolean) argumentCaptorMap.get("supportsAllDrives").capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setUseContentAsIndexableText(
-            (Boolean) argumentCaptorMap.get(USE_CONTENT_AS_INDEXABLE_TEXT).capture()))
+            (Boolean) argumentCaptorMap.get("useContentAsIndexableText").capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setIncludePermissionsForView(
-            (String) argumentCaptorMap.get(INCLUDE_PERMISSIONS_FOR_VIEW).capture()))
+            (String) argumentCaptorMap.get("includePermissionsForView").capture()))
             .thenReturn(mockedCreate);
         when(mockedCreate.setIncludeLabels(
-            (String) argumentCaptorMap.get(INCLUDE_LABELS).capture()))
+            (String) argumentCaptorMap.get("includeLabels").capture()))
             .thenReturn(mockedCreate);
     }
 
     @AfterEach
     protected void afterTestPerform() throws IOException {
-        assertEquals(true, argumentCaptorMap.get(IGNORE_DEFAULT_VISIBILITY)
+        assertEquals(true, argumentCaptorMap.get("ignoreDefaultVisibility")
             .getValue());
-        assertEquals(true, argumentCaptorMap.get(KEEP_REVISION_FOREVER)
+        assertEquals(true, argumentCaptorMap.get("keepRevisionForever")
             .getValue());
-        assertEquals("ocrLanguageStub", argumentCaptorMap.get(OCR_LANGUAGE)
+        assertEquals("ocrLanguageStub", argumentCaptorMap.get("ocrLanguage")
             .getValue());
-        assertEquals(true, argumentCaptorMap.get(SUPPORTS_ALL_DRIVES)
+        assertEquals(true, argumentCaptorMap.get("supportsAllDrives")
             .getValue());
-        assertEquals(true, argumentCaptorMap.get(USE_CONTENT_AS_INDEXABLE_TEXT)
+        assertEquals(true, argumentCaptorMap.get("useContentAsIndexableText")
             .getValue());
-        assertEquals("includePermissionsForViewStub", argumentCaptorMap.get(INCLUDE_PERMISSIONS_FOR_VIEW)
+        assertEquals("includePermissionsForViewStub", argumentCaptorMap.get("includePermissionsForView")
             .getValue());
-        assertEquals("includeLabelsStub", argumentCaptorMap.get(INCLUDE_LABELS)
+        assertEquals("includeLabelsStub", argumentCaptorMap.get("includeLabels")
             .getValue());
 
         verify(mockedCreate, times(1))

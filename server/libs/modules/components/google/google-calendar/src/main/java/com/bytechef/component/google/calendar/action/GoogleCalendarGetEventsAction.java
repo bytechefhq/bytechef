@@ -31,7 +31,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ETAG;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY_FUNCTION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GET_EVENTS;
@@ -71,7 +71,6 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Events;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -197,7 +196,7 @@ public class GoogleCalendarGetEventsAction {
                         "specified, entries deleted since this time will always be included regardless of showDeleted.")
                 .required(false))
         .outputSchema(
-            object("events")
+            object()
                 .properties(
                     string(KIND),
                     string(ETAG),
@@ -213,45 +212,43 @@ public class GoogleCalendarGetEventsAction {
                     string(NEXT_PAGE_TOKEN),
                     string(NEXT_SYNC_TOKEN),
                     array(EVENT)
-                        .items(EVENT_PROPERTY_FUNCTION.apply(null))))
+                        .items(EVENT_PROPERTY)))
         .perform(GoogleCalendarGetEventsAction::perform);
 
     private GoogleCalendarGetEventsAction() {
     }
 
-    public static Map<String, Events> perform(
+    public static Events perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Calendar service = GoogleCalendarUtils.getCalendar(connectionParameters);
 
-        return Map.of(
-            "events",
-            service.events()
-                .list("primary")
-                .setAlwaysIncludeEmail(inputParameters.getBoolean(ALWAYS_INCLUDE_EMAIL))
-                .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
-                .setICalUID(inputParameters.getString(ICAL_UID))
-                .setMaxAttendees(inputParameters.getInteger(MAX_ATTENDEES))
-                .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
-                .setOrderBy(inputParameters.getString(ORDER_BY))
-                .setPageToken(inputParameters.getString(PAGE_TOKEN))
-                .setPrivateExtendedProperty(inputParameters.getList(PRIVATE_EXTENDED_PROPERTY, String.class, List.of()))
-                .setQ(inputParameters.getString(Q))
-                .setSharedExtendedProperty(inputParameters.getList(SHARED_EXTENDED_PROPERTY, String.class, List.of()))
-                .setShowHiddenInvitations(inputParameters.getBoolean(SHOW_HIDDEN_INVITATIONS))
-                .setSingleEvents(inputParameters.getBoolean(SINGLE_EVENTS))
-                .setSyncToken(inputParameters.getString(SYNC_TOKEN))
-                .setTimeMax(
-                    new DateTime(
-                        GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MAX))))
-                .setTimeMin(
-                    new DateTime(
-                        GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MIN))))
-                .setTimeZone(inputParameters.getString(TIME_ZONE))
-                .setUpdatedMin(
-                    new DateTime(
-                        GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(UPDATE_MIN))))
-                .execute());
+        return service.events()
+            .list("primary")
+            .setAlwaysIncludeEmail(inputParameters.getBoolean(ALWAYS_INCLUDE_EMAIL))
+            .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
+            .setICalUID(inputParameters.getString(ICAL_UID))
+            .setMaxAttendees(inputParameters.getInteger(MAX_ATTENDEES))
+            .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
+            .setOrderBy(inputParameters.getString(ORDER_BY))
+            .setPageToken(inputParameters.getString(PAGE_TOKEN))
+            .setPrivateExtendedProperty(inputParameters.getList(PRIVATE_EXTENDED_PROPERTY, String.class, List.of()))
+            .setQ(inputParameters.getString(Q))
+            .setSharedExtendedProperty(inputParameters.getList(SHARED_EXTENDED_PROPERTY, String.class, List.of()))
+            .setShowHiddenInvitations(inputParameters.getBoolean(SHOW_HIDDEN_INVITATIONS))
+            .setSingleEvents(inputParameters.getBoolean(SINGLE_EVENTS))
+            .setSyncToken(inputParameters.getString(SYNC_TOKEN))
+            .setTimeMax(
+                new DateTime(
+                    GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MAX))))
+            .setTimeMin(
+                new DateTime(
+                    GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MIN))))
+            .setTimeZone(inputParameters.getString(TIME_ZONE))
+            .setUpdatedMin(
+                new DateTime(
+                    GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(UPDATE_MIN))))
+            .execute();
     }
 
 }

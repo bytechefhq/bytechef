@@ -17,29 +17,32 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ACKNOWLEDGE_ABUSE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_LABELS;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_PERMISSIONS_FOR_VIEW;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PROPERTY_MAP;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.READ_FILE;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_LABELS;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.SUPPORTS_ALL_DRIVES;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.propertyMap;
-import static com.bytechef.component.google.drive.properties.GoogleDriveOutputProperties.FILE_PROPERTY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.SUPPORTS_ALL_DRIVES;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.drive.constant.GoogleDriveConstants;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -61,32 +64,76 @@ public final class GoogleDriveReadFileAction {
                 .description(
                     "Whether the user is acknowledging the risk of downloading known malware or other " +
                         "abusive files. This is only applicable when alt=media."),
-            propertyMap.get(SUPPORTS_ALL_DRIVES),
-            propertyMap.get(INCLUDE_PERMISSIONS_FOR_VIEW),
-            propertyMap.get(INCLUDE_LABELS))
-        .outputSchema(FILE_PROPERTY)
-        .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
+            PROPERTY_MAP.get(SUPPORTS_ALL_DRIVES),
+            PROPERTY_MAP.get(INCLUDE_PERMISSIONS_FOR_VIEW),
+            PROPERTY_MAP.get(INCLUDE_LABELS))
+        .outputSchema(
+            object()
+                .properties(
+                    bool("copyRequiresWriterPermission"),
+                    dateTime("createdTime"),
+                    string("description"),
+                    bool("explicitlyTrashed"),
+                    string("fileExtension"),
+                    string("fullFileExtension"),
+                    bool("hasAugmentedPermissions"),
+                    bool("headRevisionId"),
+                    string("iconLink"),
+                    string("iconLink"),
+                    string("id"),
+                    bool("isAppAuthorized"),
+                    object("lastModifyingUser")
+                        .properties(GoogleDriveConstants.USER_PROPERTIES),
+                    string("md5Checksum"),
+                    string("name"),
+                    string("originalFilename"),
+                    array("owners")
+                        .items(GoogleDriveConstants.USER_PROPERTIES),
+                    array("parents")
+                        .items(
+                            string()),
+                    array("permissionIds")
+                        .items(
+                            string()),
+                    number("quotaBytesUsed"),
+                    string("resourceKey"),
+                    string("sha1Checksum"),
+                    string("sha256Checksum"),
+                    bool("shared"),
+                    object("sharingUser")
+                        .properties(GoogleDriveConstants.USER_PROPERTIES),
+                    number("size"),
+                    bool("starred"),
+                    string("teamDriveId"),
+                    string("thumbnailLink"),
+                    number("thumbnailVersion"),
+                    bool("trashed"),
+                    object("trashingUser")
+                        .properties(GoogleDriveConstants.USER_PROPERTIES),
+                    number("version"),
+                    bool("viewersCanCopyContent"),
+                    string("webContentLink"),
+                    string("webViewLink"),
+                    bool("writersCanShare")))
         .perform(GoogleDriveReadFileAction::perform);
 
     private GoogleDriveReadFileAction() {
     }
 
-    public static Map<String, File> perform(
+    public static File perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
         Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
 
-        return Map.of(
-            "file",
-            drive
-                .files()
-                .get(inputParameters.getRequiredString(FILE_ID))
-                .setAcknowledgeAbuse(inputParameters.getBoolean(ACKNOWLEDGE_ABUSE))
-                .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-                .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
-                .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
-                .execute());
+        return drive
+            .files()
+            .get(inputParameters.getRequiredString(FILE_ID))
+            .setAcknowledgeAbuse(inputParameters.getBoolean(ACKNOWLEDGE_ABUSE))
+            .setSupportsAllDrives(inputParameters.getBoolean("supportsAllDrives"))
+            .setIncludePermissionsForView(inputParameters.getString("includePermissionsForView"))
+            .setIncludeLabels(inputParameters.getString("includeLabels"))
+            .execute();
     }
 
     private static List<ModifiableOption<String>> getFileOptions(

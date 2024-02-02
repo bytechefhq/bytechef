@@ -19,6 +19,7 @@ package com.bytechef.component.petstore.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
@@ -49,7 +50,8 @@ public class PetstoreFindPetsByStatusAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)))
-        .outputSchema(array("result").items(PetstorePetProperties.PROPERTIES))
-        .outputSchemaMetadata(Map.of(
-            "responseType", ResponseType.JSON));
+        .outputSchema(array().items(object().properties(PetstorePetProperties.PROPERTIES))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON)));
 }

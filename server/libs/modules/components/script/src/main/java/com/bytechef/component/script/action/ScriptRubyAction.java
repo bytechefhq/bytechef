@@ -35,7 +35,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.constant.ScriptConstants;
-import java.util.Map;
 
 /**
  * @author Matija Petanjek
@@ -60,9 +59,9 @@ public class ScriptRubyAction {
         .output()
         .perform(ScriptRubyAction::perform);
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return Map.of("result", ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters));
+        return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters);
     }
 }

@@ -46,7 +46,6 @@ import com.bytechef.component.openai.util.OpenAIUtils;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -105,7 +104,7 @@ public class OpenAICreateImageAction {
                         "abuse.")
                 .required(false))
         .outputSchema(
-            object("image")
+            object()
                 .properties(
                     integer("created"),
                     array("data")
@@ -123,7 +122,7 @@ public class OpenAICreateImageAction {
     private OpenAICreateImageAction() {
     }
 
-    public static Map<String, ImageResult> perform(
+    public static ImageResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String token = (String) connectionParameters.get(TOKEN);
@@ -141,6 +140,6 @@ public class OpenAICreateImageAction {
         createImageRequest.setStyle(inputParameters.getString(STYLE));
         createImageRequest.setUser(inputParameters.getString(USER));
 
-        return Map.of("image", openAiService.createImage(createImageRequest));
+        return openAiService.createImage(createImageRequest);
     }
 }

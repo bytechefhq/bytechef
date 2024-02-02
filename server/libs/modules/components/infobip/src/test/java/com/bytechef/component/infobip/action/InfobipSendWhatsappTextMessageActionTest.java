@@ -41,7 +41,6 @@ import com.infobip.model.WhatsAppTextContent;
 import com.infobip.model.WhatsAppTextMessage;
 import com.infobip.model.WhatsAppUrlOptions;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -91,10 +90,8 @@ class InfobipSendWhatsappTextMessageActionTest extends AbstractInfobipActionTest
             when(mockedSendSmsMessageRequest.execute())
                 .thenReturn(mockedWhatsAppSingleMessageInfo);
 
-            Map<String, WhatsAppSingleMessageInfo> performMap = InfobipSendWhatsappTextMesageAction.perform(
+            WhatsAppSingleMessageInfo messageInfo = InfobipSendWhatsappTextMesageAction.perform(
                 mockedParameters, mockedParameters, mockedContext);
-
-            WhatsAppSingleMessageInfo messageInfo = performMap.get("messageInfo");
 
             List<WhatsAppApi> whatsAppApis = whatsAppApiMockedConstruction.constructed();
 

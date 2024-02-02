@@ -50,12 +50,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Send Message",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": {
@@ -99,8 +99,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -194,16 +194,16 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "deduplicate": null,
-    "poll": null,
-    "output": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null
+    "dynamicWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
+    "output": null,
+    "deduplicate": null,
+    "poll": null
   } ],
   "allowedConnections": null
 }
