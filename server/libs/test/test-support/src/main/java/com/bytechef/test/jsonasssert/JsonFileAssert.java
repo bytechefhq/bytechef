@@ -20,11 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.lang3.Validate;
 import org.json.JSONException;
@@ -48,10 +51,29 @@ public class JsonFileAssert {
         try {
             String value = OBJECT_MAPPER.writeValueAsString(object);
 
-            JSONAssert.assertEquals(Files.readString(Paths.get(getUri(path))), value, true);
+            JSONAssert.assertEquals(Files.readString(checkFileExists(Paths.get(getUri(path)), value)), value, true);
         } catch (IOException | JSONException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SuppressFBWarnings("NP")
+    private static Path checkFileExists(Path buildDirFilePath, String value) throws IOException {
+        Path srcTestDirFilePath = buildDirFilePath
+            .getParent()
+            .resolve("../../../../")
+            .resolve("src/test/resources/definition")
+            .resolve(buildDirFilePath.getFileName());
+
+        File file = srcTestDirFilePath.toFile();
+
+        if (file.exists()) {
+            return buildDirFilePath;
+        }
+
+        Files.writeString(srcTestDirFilePath, value);
+
+        return srcTestDirFilePath;
     }
 
     private static URI getUri(String path) throws URISyntaxException {
