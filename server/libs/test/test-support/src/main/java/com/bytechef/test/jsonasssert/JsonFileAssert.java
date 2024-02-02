@@ -47,33 +47,28 @@ public class JsonFileAssert {
         }
     };
 
-    public static void assertEquals(String path, Object object) {
+    public static void assertEquals(String filename, Object object) {
         try {
             String value = OBJECT_MAPPER.writeValueAsString(object);
 
-            JSONAssert.assertEquals(Files.readString(checkFileExists(Paths.get(getUri(path)), value)), value, true);
+            checkFileExists(filename, value);
+
+            JSONAssert.assertEquals(Files.readString(Paths.get(getUri(filename))), value, true);
         } catch (IOException | JSONException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
     @SuppressFBWarnings("NP")
-    private static Path checkFileExists(Path buildDirFilePath, String value) throws IOException {
-        Path srcTestDirFilePath = buildDirFilePath
-            .getParent()
-            .resolve("../../../../")
-            .resolve("src/test/resources/definition")
-            .resolve(buildDirFilePath.getFileName());
+    private static void checkFileExists(String filename, String value) throws IOException {
+        File file = new File("src/test/resources/" + filename).getAbsoluteFile();
 
-        File file = srcTestDirFilePath.toFile();
+        if (!file.exists()) {
+            Path path = file.toPath();
 
-        if (file.exists()) {
-            return buildDirFilePath;
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, value);
         }
-
-        Files.writeString(srcTestDirFilePath, value);
-
-        return srcTestDirFilePath;
     }
 
     private static URI getUri(String path) throws URISyntaxException {
