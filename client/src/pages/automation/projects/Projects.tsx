@@ -153,7 +153,7 @@ const Projects = () => {
                 loading={categoriesIsLoading || projectsIsLoading || tagsIsLoading}
             >
                 {projects && projects?.length > 0 ? (
-                    projects && tags && <ProjectList projects={projects} tags={projects} />
+                    projects && tags && <ProjectList projects={projects} tags={tags} />
                 ) : (
                     <EmptyList
                         button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
