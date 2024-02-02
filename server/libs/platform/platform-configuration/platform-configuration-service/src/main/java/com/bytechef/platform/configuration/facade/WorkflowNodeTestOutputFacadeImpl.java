@@ -142,7 +142,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @Override
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Map<String, ?> sampleOutput) {
+        String workflowId, String workflowNodeName, Object sampleOutput) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 

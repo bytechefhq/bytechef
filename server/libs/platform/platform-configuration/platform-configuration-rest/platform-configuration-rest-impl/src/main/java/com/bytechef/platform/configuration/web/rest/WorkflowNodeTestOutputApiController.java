@@ -55,12 +55,12 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     @Override
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
-        String workflowId, String workflowNodeName, UploadWorkflowNodeSampleOutputRequestModel model) {
+        String workflowId, String workflowNodeName, Object body) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                    workflowId, workflowNodeName, model.getSampleOutput()),
+                    workflowId, workflowNodeName, body),
                 WorkflowNodeTestOutputModel.class));
     }
 }

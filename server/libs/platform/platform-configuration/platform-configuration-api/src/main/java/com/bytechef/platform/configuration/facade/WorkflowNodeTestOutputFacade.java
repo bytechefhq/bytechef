@@ -27,5 +27,5 @@ public interface WorkflowNodeTestOutputFacade {
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
 
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Map<String, ?> sampleOutput);
+        String workflowId, String workflowNodeName, Object sampleOutput);
 }
