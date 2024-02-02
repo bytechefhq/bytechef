@@ -40,7 +40,6 @@ import com.bytechef.component.definition.TriggerNodeDescriptionFunction;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersImpl;
-import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -306,24 +305,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .stream()
             .map(TriggerDefinition::new)
             .toList();
-    }
-
-    @Override
-    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<WorkflowNodeType> workflowNodeTypes) {
-        List<TriggerDefinition> triggerDefinitions;
-
-        if (workflowNodeTypes.isEmpty()) {
-            triggerDefinitions = CollectionUtils.map(
-                componentDefinitionRegistry.getTriggerDefinitions(), TriggerDefinition::new);
-        } else {
-            triggerDefinitions = CollectionUtils.map(
-                workflowNodeTypes,
-                componentOperation -> getTriggerDefinition(
-                    componentOperation.componentName(), componentOperation.componentVersion(),
-                    componentOperation.componentOperationName()));
-        }
-
-        return triggerDefinitions;
     }
 
     @Override

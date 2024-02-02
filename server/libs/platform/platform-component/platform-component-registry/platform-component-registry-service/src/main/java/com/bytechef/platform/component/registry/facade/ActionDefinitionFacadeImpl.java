@@ -102,7 +102,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public Map<String, ?> executePerform(
+    public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull int type,
         Long instanceId, @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
         Long connectionId) {

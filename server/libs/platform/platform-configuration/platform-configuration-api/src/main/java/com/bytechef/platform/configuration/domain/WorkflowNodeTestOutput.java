@@ -148,7 +148,7 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
         return MapUtils.get(outputSchema.getMap(), "outputSchema", ObjectProperty.class);
     }
 
-    public Map<String, ?> getSampleOutput() {
+    public Object getSampleOutput() {
         return MapUtils.getMap(sampleOutput.getMap(), "sampleOutput");
     }
 
@@ -184,7 +184,7 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
         this.outputSchema = new MapWrapper(Map.of("outputSchema", outputSchema));
     }
 
-    public void setSampleOutput(Map<String, ?> sampleOutput) {
+    public void setSampleOutput(Object sampleOutput) {
         this.sampleOutput = new MapWrapper(Map.of("sampleOutput", sampleOutput));
     }
 

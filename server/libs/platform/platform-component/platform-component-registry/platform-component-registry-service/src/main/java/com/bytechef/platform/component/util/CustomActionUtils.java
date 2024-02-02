@@ -174,24 +174,22 @@ public class CustomActionUtils {
                 null));
     }
 
-    protected static Map<String, ?> perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Map<String, ?> headers = MapUtils.getMap(inputParameters, HEADERS, Map.of());
         Map<String, ?> queryParameters = MapUtils.getMap(inputParameters, QUERY_PARAMETERS, Map.of());
 
-        return Map.of(
-            "result",
-            context.http(
-                http -> http.exchange(
-                    MapUtils.getRequiredString(inputParameters, PATH),
-                    MapUtils.getRequired(inputParameters, METHOD, RequestMethod.class)))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .body(getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
-                .headers(MapUtils.toMap(headers, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
-                .queryParameters(
-                    MapUtils.toMap(queryParameters, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
-                .execute());
+        return context.http(
+            http -> http.exchange(
+                MapUtils.getRequiredString(inputParameters, PATH),
+                MapUtils.getRequired(inputParameters, METHOD, RequestMethod.class)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .body(getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
+            .headers(MapUtils.toMap(headers, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
+            .queryParameters(
+                MapUtils.toMap(queryParameters, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
+            .execute();
     }
 
     private static Body getBody(BodyContentType bodyContentType, Map<String, ?> inputParameters) {

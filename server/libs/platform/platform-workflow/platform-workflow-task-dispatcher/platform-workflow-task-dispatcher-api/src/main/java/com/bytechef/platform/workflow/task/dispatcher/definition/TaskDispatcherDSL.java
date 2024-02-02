@@ -1236,18 +1236,17 @@ public final class TaskDispatcherDSL {
         }
 
         public ModifiableTaskDispatcherDefinition output(
-            List<ModifiableValueProperty<?, ?>> outputSchemaProperties, Map<String, ?> sampleOutput) {
+            ModifiableValueProperty<?, ?> outputSchema, Map<String, ?> sampleOutput) {
 
-            this.output = new Output(outputSchemaProperties, sampleOutput);
+            this.output = new Output(outputSchema, sampleOutput);
 
             return this;
         }
 
-        @SafeVarargs
         public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition outputSchema(
-            P... properties) {
+            ModifiableValueProperty<?, ?> outputSchema) {
 
-            return output(List.of(properties), null);
+            return output(outputSchema, null);
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl) {

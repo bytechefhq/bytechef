@@ -492,10 +492,10 @@ public class ContextImpl implements Context {
         }
 
         @Override
-        public com.bytechef.component.definition.Output get(Map<String, ?> value) {
+        public com.bytechef.component.definition.Output get(Object value) {
             return new com.bytechef.component.definition.Output(
-                List.of((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value))),
-                null, value);
+                (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value)),
+                value);
         }
     }
 

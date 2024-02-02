@@ -23,7 +23,6 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.platform.component.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -47,11 +46,9 @@ public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
     }
 
     @Override
-    public Map<String, ?> handle(TaskExecution taskExecution) throws TaskExecutionException {
-        Map<String, ?> result = super.handle(taskExecution);
-
+    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         try {
-            return Map.of("result", openApiComponentHandler.postExecute(actionName, (Response) result.get("result")));
+            return openApiComponentHandler.postExecute(actionName, (Response) super.handle(taskExecution));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

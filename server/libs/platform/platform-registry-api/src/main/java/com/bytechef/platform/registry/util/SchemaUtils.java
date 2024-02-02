@@ -104,21 +104,16 @@ public class SchemaUtils {
         BaseOutput<? extends com.bytechef.definition.BaseProperty> output,
         OutputFactoryFunction<P, O> outputFactoryFunction) {
 
-        Map<String, ?> sampleOutput;
+        Object sampleOutput = output.getSampleOutput();
 
-        if (output.getSampleOutput() == null) {
-            sampleOutput = (Map<String, ?>) getSampleOutput(output.getOutputSchema());
-        } else if (output.getSampleOutput() instanceof Map map) {
-            sampleOutput = map;
-        } else if (output.getSampleOutput() instanceof String string) {
+        if (sampleOutput == null) {
+            sampleOutput = getSampleOutput(output.getOutputSchema());
+        } else if (sampleOutput instanceof String string) {
             try {
                 sampleOutput = JsonUtils.readMap(string);
             } catch (Exception e) {
                 //
-                sampleOutput = Map.of("result", output.getSampleOutput());
             }
-        } else {
-            sampleOutput = Map.of("result", output.getSampleOutput());
         }
 
         return outputFactoryFunction.apply(output.getOutputSchema(), sampleOutput);
@@ -170,7 +165,7 @@ public class SchemaUtils {
     @FunctionalInterface
     public interface OutputFactoryFunction<P extends BaseProperty, S extends com.bytechef.platform.registry.domain.BaseOutput<P>> {
 
-        S apply(com.bytechef.definition.BaseProperty property, Map<String, ?> value);
+        S apply(com.bytechef.definition.BaseProperty property, Object value);
     }
 
     @FunctionalInterface

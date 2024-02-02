@@ -1044,7 +1044,7 @@ public interface Context {
          * @param value
          * @return
          */
-        com.bytechef.component.definition.Output get(Map<String, ?> value);
+        com.bytechef.component.definition.Output get(Object value);
     }
 
     /**

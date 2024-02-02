@@ -17,14 +17,13 @@
 package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.platform.registry.domain.BaseOutput;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class Output extends BaseOutput<Property> {
 
-    public Output(Property outputSchema, Map<String, ?> sampleOutput) {
+    public Output(Property outputSchema, Object sampleOutput) {
         super(outputSchema, sampleOutput);
     }
 }

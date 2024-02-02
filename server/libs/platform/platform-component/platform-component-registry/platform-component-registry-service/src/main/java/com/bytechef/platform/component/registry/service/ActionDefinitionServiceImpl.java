@@ -133,7 +133,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Map<String, ?> executePerform(
+    public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 

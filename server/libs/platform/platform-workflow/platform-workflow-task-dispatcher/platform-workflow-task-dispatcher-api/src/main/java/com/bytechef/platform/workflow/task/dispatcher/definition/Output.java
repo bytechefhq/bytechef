@@ -17,36 +17,28 @@
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
 import com.bytechef.definition.BaseOutput;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record Output(List<ModifiableValueProperty<?, ?>> properties, Object sampleOutput)
-    implements BaseOutput<ObjectProperty> {
+public record Output(ModifiableValueProperty<?, ?> outputSchema, Object sampleOutput)
+    implements BaseOutput<Property.ValueProperty<?>> {
 
-    public Output(ModifiableValueProperty<?, ?>... properties) {
-        this(List.of(properties), null);
-    }
-
-    public Output(List<ModifiableValueProperty<?, ?>> properties) {
-        this(properties, null);
+    public Output(ModifiableValueProperty<?, ?> outputSchema) {
+        this(outputSchema, null);
     }
 
     public Output {
-        Objects.requireNonNull(properties, "'properties' mut not be null");
+        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
     }
 
     @Override
-    public ObjectProperty getOutputSchema() {
-        return TaskDispatcherDSL
-            .object()
-            .properties(properties);
+    public ModifiableValueProperty<?, ?> getOutputSchema() {
+        return outputSchema;
     }
 
     @Override

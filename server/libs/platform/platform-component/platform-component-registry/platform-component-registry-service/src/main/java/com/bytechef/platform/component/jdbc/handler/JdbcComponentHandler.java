@@ -88,7 +88,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .description(
                         "The list of properties which should be used as query parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
-            .output(getQueryOutputSchemaFunction())
+            .output(getQueryOutputFunction())
             .perform(this::performQuery),
         action(JdbcConstants.INSERT)
             .title("Insert")
@@ -241,9 +241,9 @@ public class JdbcComponentHandler implements ComponentHandler {
             outputSchema -> outputSchema.get(performInsert(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputFunction getQueryOutputSchemaFunction() {
+    protected ActionOutputFunction getQueryOutputFunction() {
         return (inputParameters, connectionParameters, context) -> context.output(
-            outputSchema -> outputSchema.get(performQuery(inputParameters, connectionParameters, context)));
+            output -> output.get(performQuery(inputParameters, connectionParameters, context)));
     }
 
     protected ActionOutputFunction getUpdateOutputSchemaFunction() {
@@ -269,10 +269,10 @@ public class JdbcComponentHandler implements ComponentHandler {
         return insertJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
-    protected Map<String, List<Map<String, Object>>> performQuery(
+    protected List<Map<String, Object>> performQuery(
         Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
 
-        return Map.of("result", queryJdbcOperation.execute(inputParameters, connectionParameters));
+        return queryJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
     protected Map<String, Integer> performUpdate(

@@ -17,8 +17,6 @@
 package com.bytechef.platform.registry.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -27,10 +25,10 @@ import java.util.Objects;
 public abstract class BaseOutput<P extends BaseProperty> {
 
     private final P outputSchema;
-    private final Map<String, ?> sampleOutput;
+    private final Object sampleOutput;
 
     @SuppressFBWarnings("EI")
-    public BaseOutput(P outputSchema, Map<String, ?> sampleOutput) {
+    public BaseOutput(P outputSchema, Object sampleOutput) {
         this.outputSchema = outputSchema;
         this.sampleOutput = sampleOutput;
     }
@@ -39,8 +37,8 @@ public abstract class BaseOutput<P extends BaseProperty> {
         return outputSchema;
     }
 
-    public Map<String, ?> getSampleOutput() {
-        return Collections.unmodifiableMap(sampleOutput);
+    public Object getSampleOutput() {
+        return sampleOutput;
     }
 
     @Override
@@ -64,7 +62,7 @@ public abstract class BaseOutput<P extends BaseProperty> {
     @Override
     public String toString() {
         return "BaseOutputSchema{" +
-            "definition=" + outputSchema +
+            "outputSchema=" + outputSchema +
             ", sampleOutput=" + sampleOutput +
             '}';
     }

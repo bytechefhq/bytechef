@@ -47,7 +47,7 @@ public class ComponentTaskHandler implements TaskHandler<Object> {
     }
 
     @Override
-    public Map<String, ?> handle(TaskExecution taskExecution) throws TaskExecutionException {
+    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         Map<String, Long> connectIdMap = MapUtils.getMap(
             taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 

@@ -244,8 +244,7 @@ public final class ComponentDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private Map<String, Object> outputSchemaMetadata;
-        private List<? extends ModifiableValueProperty<?, ?>> outputSchemaProperties;
+        private ModifiableValueProperty<?, ?> outputSchema;
         private ActionOutputFunction outputFunction;
         private List<? extends Property> properties;
         private Object sampleOutput;
@@ -337,22 +336,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition outputSchema(
-            P... properties) {
-
-            return outputSchema(List.of(properties));
-        }
-
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition outputSchema(List<P> properties) {
-            this.outputSchemaProperties = Collections.unmodifiableList(properties);
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition outputSchema(P outputSchema) {
+            this.outputSchema = outputSchema;
             this.defaultOutputFunction = true;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition outputSchemaMetadata(Map<String, Object> metadata) {
-            this.outputSchemaMetadata = Collections.unmodifiableMap(metadata);
 
             return this;
         }
@@ -366,13 +352,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition sampleOutput(String sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(Map<String, ?> sampleOutput) {
+        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
@@ -402,8 +382,7 @@ public final class ComponentDSL {
                 && Objects.equals(nodeDescriptionFunction, that.nodeDescriptionFunction)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(outputSchemaMetadata, that.outputSchemaMetadata)
-                && Objects.equals(outputSchemaProperties, that.outputSchemaProperties)
+                && Objects.equals(outputSchema, that.outputSchema)
                 && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
                 && Objects.equals(outputFunction, that.outputFunction)
                 && Objects.equals(sampleOutput, that.sampleOutput)
@@ -414,8 +393,7 @@ public final class ComponentDSL {
         public int hashCode() {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
                 deprecated, description, nodeDescriptionFunction, performFunction, help, metadata, name,
-                outputSchemaMetadata, outputSchemaProperties, defaultOutputFunction, outputFunction, sampleOutput,
-                properties, title);
+                outputSchema, defaultOutputFunction, outputFunction, sampleOutput, properties, title);
         }
 
         @Override
@@ -480,10 +458,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<Output> getOutput() {
-            return Optional.ofNullable(
-                outputSchemaProperties == null
-                    ? null
-                    : new Output(outputSchemaProperties, outputSchemaMetadata, sampleOutput));
+            return Optional.ofNullable(outputSchema == null ? null : new Output(outputSchema, sampleOutput));
         }
 
         @Override
@@ -2936,7 +2911,7 @@ public final class ComponentDSL {
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
-        private List<? extends ModifiableValueProperty<?, ?>> outputSchemaProperties;
+        private ModifiableValueProperty<?, ?> outputSchema;
         private TriggerOutputFunction outputFunction;
         private PollFunction pollFunction;
         private List<? extends Property> properties;
@@ -3071,15 +3046,8 @@ public final class ComponentDSL {
             return this;
         }
 
-        @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition outputSchema(
-            P... properties) {
-
-            return outputSchema(List.of(properties));
-        }
-
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition outputSchema(List<P> properties) {
-            this.outputSchemaProperties = Collections.unmodifiableList(properties);
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition outputSchema(P outputSchema) {
+            this.outputSchema = outputSchema;
             this.defaultOutputFunction = true;
 
             return this;
@@ -3100,13 +3068,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition sampleOutput(String sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(Map<String, ?> sampleOutput) {
+        public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
@@ -3179,7 +3141,7 @@ public final class ComponentDSL {
                 && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
                 && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
                 && Objects.equals(name, that.name)
-                && Objects.equals(outputSchemaProperties, that.outputSchemaProperties)
+                && Objects.equals(outputSchema, that.outputSchema)
                 && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
                 && Objects.equals(outputFunction, that.outputFunction)
                 && Objects.equals(sampleOutput, that.sampleOutput)
@@ -3198,7 +3160,7 @@ public final class ComponentDSL {
                 deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
                 nodeDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
-                outputSchemaProperties, defaultOutputFunction, outputFunction, sampleOutput,
+                outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
                 pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody, webhookValidateFunction,
                 workflowSyncExecution, workflowSyncValidation);
         }
@@ -3290,8 +3252,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<Output> getOutput() {
-            return Optional.ofNullable(
-                outputSchemaProperties == null ? null : new Output(outputSchemaProperties, null, sampleOutput));
+            return Optional.ofNullable(outputSchema == null ? null : new Output(outputSchema, sampleOutput));
         }
 
         @Override

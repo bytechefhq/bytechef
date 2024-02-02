@@ -8,10 +8,8 @@
 package com.bytechef.platform.component.registry.remote.client.service;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -165,15 +163,6 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
                 componentName,
                 componentVersion),
             new ParameterizedTypeReference<>() {});
-    }
-
-    @Override
-    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<WorkflowNodeType> workflowNodeTypes) {
-        return CollectionUtils.map(
-            workflowNodeTypes,
-            componentOperation -> getTriggerDefinition(
-                componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.componentOperationName()));
     }
 
     @Override

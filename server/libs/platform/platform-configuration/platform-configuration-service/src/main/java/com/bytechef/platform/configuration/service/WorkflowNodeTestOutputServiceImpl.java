@@ -25,7 +25,6 @@ import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.registry.util.SchemaUtils;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +52,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> sampleOutput) {
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Object sampleOutput) {
 
         ObjectProperty outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
@@ -72,7 +71,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     private WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
-        Property outputSchema, Map<String, ?> sampleOutput) {
+        Property outputSchema, Object sampleOutput) {
 
         WorkflowNodeTestOutput workflowNodeTestOutput = OptionalUtils.orElse(
             workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName),

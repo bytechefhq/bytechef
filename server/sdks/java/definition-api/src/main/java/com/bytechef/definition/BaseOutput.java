@@ -16,12 +16,12 @@
 
 package com.bytechef.definition;
 
-import com.bytechef.definition.BaseProperty.BaseObjectProperty;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 
 /**
  * @author Ivica Cardic
  */
-public interface BaseOutput<V extends BaseObjectProperty<?>> {
+public interface BaseOutput<V extends BaseValueProperty<?>> {
 
     V getOutputSchema();
 

@@ -18,7 +18,6 @@ package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -96,8 +95,6 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);
 
     List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion);
-
-    List<TriggerDefinition> getTriggerDefinitions(@NonNull List<WorkflowNodeType> workflowNodeTypes);
 
     WebhookTriggerFlags getWebhookTriggerFlags(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);

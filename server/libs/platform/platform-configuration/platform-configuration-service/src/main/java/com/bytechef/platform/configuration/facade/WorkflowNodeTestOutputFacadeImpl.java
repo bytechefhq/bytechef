@@ -80,12 +80,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Optional<WorkflowTestConfiguration> workflowTestConfiguration = workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(workflowId);
 
-        Long connectionId = OptionalUtils.map(
+        Long connectionId = OptionalUtils.mapOrElse(
             CollectionUtils.findFirst(
                 OptionalUtils.mapOrElse(
                     workflowTestConfiguration, WorkflowTestConfiguration::getConnections, List.of()),
                 curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName)),
-            WorkflowTestConfigurationConnection::getConnectionId);
+            WorkflowTestConfigurationConnection::getConnectionId, null);
 
         return OptionalUtils.mapOrElseGet(
             WorkflowTrigger.fetch(workflow, workflowNodeName),
@@ -139,7 +139,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
                     return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
                 } else {
-                    Map<String, ?> result = actionDefinitionFacade.executePerform(
+                    Object result = actionDefinitionFacade.executePerform(
                         workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                         workflowNodeType.componentOperationName(), 0, null, workflowId, null,
                         workflowTask.evaluateParameters(
