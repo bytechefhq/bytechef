@@ -57,7 +57,7 @@ const DataPillPanelBodyItem = ({
                 {filteredProperties.length ? (
                     <>
                         <DataPill
-                            componentAlias={componentAction.workflowNodeName}
+                            workflowNodeName={componentAction.workflowNodeName}
                             componentIcon={componentAction.componentDefinition.icon}
                             property={componentAction?.outputSchema}
                             root={true}
