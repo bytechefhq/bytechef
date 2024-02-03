@@ -72,8 +72,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        Long connectionId = workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
-            workflowId, workflowNodeName);
+        Long connectionId = workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+            .orElse(null);
 
         return WorkflowTrigger
             .fetch(workflow, workflowNodeName)

@@ -120,15 +120,14 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public Long fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName) {
+    public Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName) {
         return fetchWorkflowTestConfiguration(workflowId)
             .map(WorkflowTestConfiguration::getConnections)
             .orElse(List.of())
             .stream()
             .filter(curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName))
             .findFirst()
-            .map(WorkflowTestConfigurationConnection::getConnectionId)
-            .orElse(null);
+            .map(WorkflowTestConfigurationConnection::getConnectionId);
     }
 
     private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId) {

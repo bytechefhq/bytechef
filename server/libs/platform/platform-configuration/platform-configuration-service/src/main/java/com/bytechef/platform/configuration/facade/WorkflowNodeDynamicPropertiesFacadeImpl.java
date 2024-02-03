@@ -61,8 +61,9 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     public List<Property> getWorkflowNodeDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName) {
 
-        Long connectionId = workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
-            workflowId, workflowNodeName);
+        Long connectionId = workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+            .orElse(null);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 

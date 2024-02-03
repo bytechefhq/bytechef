@@ -41,5 +41,5 @@ public interface WorkflowTestConfigurationService {
 
     Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId);
 
-    Long fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName);
+    Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName);
 }

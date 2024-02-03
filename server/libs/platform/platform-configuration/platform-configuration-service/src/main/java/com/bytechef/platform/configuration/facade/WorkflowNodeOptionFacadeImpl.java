@@ -61,8 +61,9 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     public List<Option> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, String searchText) {
 
-        Long connectionId = workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
-            workflowId, workflowNodeName);
+        Long connectionId = workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+            .orElse(null);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
