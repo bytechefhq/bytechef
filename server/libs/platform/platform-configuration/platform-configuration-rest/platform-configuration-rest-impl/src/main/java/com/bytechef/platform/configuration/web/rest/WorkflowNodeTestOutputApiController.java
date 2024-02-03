@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
-import com.bytechef.platform.configuration.web.rest.model.UploadWorkflowNodeSampleOutputRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
