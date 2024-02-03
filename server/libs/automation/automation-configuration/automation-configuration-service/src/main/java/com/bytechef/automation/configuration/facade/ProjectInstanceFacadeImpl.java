@@ -125,14 +125,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
         List<ProjectInstanceWorkflow> projectInstanceWorkflows, ProjectInstance projectInstance) {
 
-        projectInstanceWorkflows = projectInstanceWorkflows == null
-            ? List.of()
-            : projectInstanceWorkflows;
-
         projectInstanceWorkflows = projectInstanceWorkflowService.create(
             projectInstanceWorkflows.stream()
                 .peek(projectInstanceWorkflow -> projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId()))
                 .toList());
+
         return projectInstanceWorkflows;
     }
 
