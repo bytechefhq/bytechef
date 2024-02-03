@@ -18,6 +18,8 @@ package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
 import java.util.Objects;
+
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -46,8 +48,8 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     }
 
     @Default
-    public ProjectInstanceWorkflowConnection(Long connectionId, String key, String workflowNodeName) {
-        this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
+    public ProjectInstanceWorkflowConnection(long connectionId, String key, String workflowNodeName) {
+        this.connectionId = AggregateReference.to(connectionId);
         this.key = key;
         this.workflowNodeName = workflowNodeName;
     }
