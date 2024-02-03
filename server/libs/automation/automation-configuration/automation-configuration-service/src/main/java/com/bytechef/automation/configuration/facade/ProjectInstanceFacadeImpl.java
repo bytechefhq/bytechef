@@ -156,6 +156,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                         projectInstanceWorkflow.getId()));
             }
 
+            if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
+                throw new IllegalStateException(
+                    "The ProjectInstance id=%s has executed workflows.".formatted(id));
+            }
+
             projectInstanceWorkflowService.delete(projectInstanceWorkflow.getId());
         }
 
