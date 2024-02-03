@@ -18,7 +18,7 @@ package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.AbstractConnectionTagApiController;
+import com.bytechef.platform.connection.web.rest.util.ConnectionTagApiControllerUtils;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.constant.Type;
@@ -35,15 +35,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.automation.connection.web.rest.ConnectionTagApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class ConnectionTagApiController extends AbstractConnectionTagApiController implements ConnectionTagApi {
+public class ConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        super(connectionFacade, conversionService);
-
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
@@ -59,6 +57,7 @@ public class ConnectionTagApiController extends AbstractConnectionTagApiControll
 
     @Override
     public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
-        return super.updateConnectionTags(id, updateTagsRequestModel);
+        return ConnectionTagApiControllerUtils.updateConnectionTags(
+            id, updateTagsRequestModel, connectionFacade, conversionService);
     }
 }

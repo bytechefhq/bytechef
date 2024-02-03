@@ -21,7 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.configuration.web.rest.AbstractWorkflowApiController;
+import com.bytechef.platform.configuration.web.rest.util.WorkflowApiControllerUtils;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.helios.configuration.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class WorkflowApiController extends AbstractWorkflowApiController implements WorkflowApi {
+public class WorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
@@ -47,8 +47,6 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
         ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
-
-        super(conversionService, workflowService);
 
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
@@ -79,7 +77,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
     @Override
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
-        return super.getWorkflow(id);
+        return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowService);
     }
 
     @Override
@@ -95,6 +93,6 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
     @Override
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
-        return super.updateWorkflow(id, workflowModel);
+        return WorkflowApiControllerUtils.updateWorkflow(id, workflowModel, conversionService, workflowService);
     }
 }

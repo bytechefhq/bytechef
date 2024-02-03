@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.web.rest;
+package com.bytechef.platform.connection.web.rest.util;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
@@ -28,18 +28,12 @@ import org.springframework.http.ResponseEntity;
 /**
  * @author Ivica Cardic
  */
-public class AbstractConnectionTagApiController {
+public class ConnectionTagApiControllerUtils {
 
-    private final ConnectionFacade connectionFacade;
-    private final ConversionService conversionService;
+    public static ResponseEntity<Void> updateConnectionTags(
+        Long id, UpdateTagsRequestModel updateTagsRequestModel, ConnectionFacade connectionFacade,
+        ConversionService conversionService) {
 
-    @SuppressFBWarnings("EI")
-    public AbstractConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        this.connectionFacade = connectionFacade;
-        this.conversionService = conversionService;
-    }
-
-    protected ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
         List<TagModel> tagModels = updateTagsRequestModel.getTags();
 
         connectionFacade.update(

@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.platform.configuration.web.rest.util;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractWorkflowApiController {
+public class WorkflowApiControllerUtils {
 
-    private final ConversionService conversionService;
-    private final WorkflowService workflowService;
-
-    @SuppressFBWarnings("EI2")
-    public AbstractWorkflowApiController(ConversionService conversionService, WorkflowService workflowService) {
-        this.conversionService = conversionService;
-        this.workflowService = workflowService;
-    }
-
-    protected ResponseEntity<WorkflowModel> getWorkflow(String id) {
+    public static ResponseEntity<WorkflowModel> getWorkflow(String id, ConversionService conversionService, WorkflowService workflowService) {
         return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class));
     }
 
-    protected ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
+    public static ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel, ConversionService conversionService, WorkflowService workflowService) {
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowService.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),

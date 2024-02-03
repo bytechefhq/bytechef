@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.web.rest;
+package com.bytechef.platform.connection.web.rest.util;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -27,25 +26,18 @@ import org.springframework.http.ResponseEntity;
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractConnectionApiController {
+public class ConnectionApiControllerUtils {
 
-    private final ConnectionFacade connectionFacade;
-    private final ConversionService conversionService;
-
-    @SuppressFBWarnings("EI")
-    public AbstractConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        this.connectionFacade = connectionFacade;
-        this.conversionService = conversionService;
-    }
-
-    protected ResponseEntity<Void> deleteConnection(Long id) {
+    public static ResponseEntity<Void> deleteConnection(Long id, ConnectionFacade connectionFacade) {
         connectionFacade.delete(id);
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    protected ResponseEntity<ConnectionModel> getConnection(Long id) {
+    public static ResponseEntity<ConnectionModel> getConnection(
+        Long id, ConnectionFacade connectionFacade, ConversionService conversionService) {
+
         return ResponseEntity.ok(
             Validate.notNull(
                 conversionService.convert(
@@ -54,7 +46,10 @@ public abstract class AbstractConnectionApiController {
                 .parameters(null));
     }
 
-    protected ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
+    public static ResponseEntity<ConnectionModel> updateConnection(
+        Long id, ConnectionModel connectionModel, ConnectionFacade connectionFacade,
+        ConversionService conversionService) {
+
         return ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),

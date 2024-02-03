@@ -19,11 +19,13 @@ package com.bytechef.automation.connection.web.rest;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.AbstractConnectionApiController;
+import com.bytechef.platform.connection.web.rest.util.ConnectionApiControllerUtils;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,15 +37,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.automation.connection.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class ConnectionApiController extends AbstractConnectionApiController implements ConnectionApi {
+public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        super(connectionFacade, conversionService);
-
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
@@ -59,12 +59,17 @@ public class ConnectionApiController extends AbstractConnectionApiController imp
 
     @Override
     public ResponseEntity<Void> deleteConnection(Long id) {
-        return super.deleteConnection(id);
+        return ConnectionApiControllerUtils.deleteConnection(id, connectionFacade);
     }
 
     @Override
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
-        return super.getConnection(id);
+        return ResponseEntity.ok(
+            Validate.notNull(
+                    conversionService.convert(
+                        connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class),
+                    "connection")
+                .parameters(null));
     }
 
     @Override
@@ -81,6 +86,9 @@ public class ConnectionApiController extends AbstractConnectionApiController imp
 
     @Override
     public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
-        return super.updateConnection(id, connectionModel);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
+                ConnectionModel.class));
     }
 }
