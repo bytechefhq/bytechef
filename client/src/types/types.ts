@@ -6,7 +6,7 @@ import {
 } from '@/middleware/platform/configuration';
 
 export type DataPillType = {
-    componentAlias?: string;
+    componentName?: string;
     componentDefinition?: ComponentDefinitionModel | string;
     componentIcon?: string;
     id: string;

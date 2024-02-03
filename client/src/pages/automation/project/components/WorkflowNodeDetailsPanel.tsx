@@ -231,19 +231,19 @@ const WorkflowNodeDetailsPanel = ({
 
         const existingProperties = getExistingProperties(componentProperty.properties);
 
-        const componentAlias = previousComponentNames[index];
+        const componentName = previousComponentNames[index];
 
         const formattedProperties: DataPillType[] = existingProperties.map((property) => {
             if (property.properties) {
                 return getSubProperties(
-                    componentAlias,
+                    componentName,
                     componentProperty.componentDefinition!,
                     property.properties,
                     property.name
                 );
             } else if (property.items) {
                 return getSubProperties(
-                    componentAlias,
+                    componentName,
                     componentProperty.componentDefinition!,
                     property.items,
                     property.name
@@ -251,7 +251,7 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             return {
-                componentAlias,
+                componentName,
                 componentDefinition: JSON.stringify(componentProperty.componentDefinition),
                 id: property.name,
                 value: property.label || property.name,

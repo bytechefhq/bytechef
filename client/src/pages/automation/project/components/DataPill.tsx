@@ -6,7 +6,7 @@ import {twMerge} from 'tailwind-merge';
 
 const DataPill = ({
     arrayIndex,
-    componentAlias,
+    workflowNodeName,
     componentIcon,
     parentProperty,
     path,
@@ -15,7 +15,7 @@ const DataPill = ({
 }: {
     arrayIndex?: number;
     componentIcon?: string;
-    componentAlias: string;
+    workflowNodeName: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyType;
     property?: PropertyType;
@@ -33,7 +33,7 @@ const DataPill = ({
     }
 
     const addDataPillToInput = (
-        componentAlias: string,
+        workflowNodeName: string,
         propertyName?: string,
         parentPropertyName?: string,
         path?: string,
@@ -41,13 +41,13 @@ const DataPill = ({
     ) => {
         const dataPillName = parentPropertyName
             ? `${parentPropertyName}/${propertyName || `[${arrayIndex || 0}]`}`
-            : `${propertyName || componentAlias}`;
+            : `${propertyName || workflowNodeName}`;
 
         mentionInput.insertItem(
             {
                 componentIcon: componentIcon,
-                id: propertyName || componentAlias,
-                value: propertyName ? `${componentAlias}/${path || dataPillName}` : componentAlias,
+                id: propertyName || workflowNodeName,
+                value: propertyName ? `${workflowNodeName}/${path || dataPillName}` : workflowNodeName,
             },
             true,
             {blotName: 'property-mention'}
@@ -61,13 +61,13 @@ const DataPill = ({
         return (
             <div
                 className="inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
-                onClick={() => addDataPillToInput(componentAlias)}
+                onClick={() => addDataPillToInput(workflowNodeName)}
             >
                 <span className="mr-2" title={property?.type}>
                     {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                 </span>
 
-                <span>{componentAlias}</span>
+                <span>{workflowNodeName}</span>
             </div>
         );
     }
@@ -82,18 +82,18 @@ const DataPill = ({
         >
             <div
                 className="mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
-                data-name={property?.name || componentAlias}
+                data-name={property?.name || workflowNodeName}
                 draggable
                 onClick={() =>
-                    addDataPillToInput(componentAlias, property?.name, parentProperty?.name, path, arrayIndex)
+                    addDataPillToInput(workflowNodeName, property?.name, parentProperty?.name, path, arrayIndex)
                 }
-                onDragStart={(event) => event.dataTransfer.setData('name', property?.name || componentAlias)}
+                onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
             >
                 <span className="mr-2" title={property?.type}>
                     {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                 </span>
 
-                {property?.name ? property?.name : `[${arrayIndex || 0}]` || componentAlias}
+                {property?.name ? property?.name : `[${arrayIndex || 0}]` || workflowNodeName}
             </div>
 
             {!!subProperties?.length && (
