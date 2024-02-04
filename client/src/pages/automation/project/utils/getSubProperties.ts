@@ -2,7 +2,7 @@ import {ComponentDefinitionBasicModel} from '@/middleware/platform/workflow/exec
 import {PropertyType} from '@/types/projectTypes';
 
 export default function getSubProperties(
-    componentAlias: string,
+    path: string,
     componentDefinition: ComponentDefinitionBasicModel,
     properties: Array<PropertyType>,
     propertyName?: string
@@ -12,18 +12,16 @@ export default function getSubProperties(
         const subPropertyLabel = subProperty.label || subProperty.name;
 
         if (subProperty.properties?.length) {
-            return getSubProperties(componentAlias, componentDefinition, subProperty.properties, propertyName);
+            return getSubProperties(path, componentDefinition, subProperty.properties, propertyName);
         } else if (subProperty.items?.length) {
-            return getSubProperties(componentAlias, componentDefinition, subProperty.items, propertyName);
+            return getSubProperties(path, componentDefinition, subProperty.items, propertyName);
         }
 
         return {
-            componentAlias,
             componentDefinition: JSON.stringify(componentDefinition),
             id: subProperty.name,
-            value: propertyName
-                ? `${componentAlias}/${propertyName}/${subPropertyLabel}`
-                : `${componentAlias}/${subPropertyLabel}`,
+            path,
+            value: propertyName ? `${path}/${propertyName}/${subPropertyLabel}` : `${path}/${subPropertyLabel}`,
         };
     });
 }
