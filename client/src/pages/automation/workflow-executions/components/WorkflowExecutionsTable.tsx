@@ -1,4 +1,5 @@
 import {Badge} from '@/components/ui/badge';
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {JobBasicModel, WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 import {twMerge} from 'tailwind-merge';
@@ -83,35 +84,32 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
 
     return (
         <div className="w-full px-4 2xl:mx-auto 2xl:w-4/5">
-            <table className="w-full divide-y divide-gray-300 bg-white text-sm">
-                <thead>
+            <Table>
+                <TableHeader>
                     {headerGroups.map((headerGroup) => (
-                        <tr key={headerGroup.id}>
+                        <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
-                                <th
-                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                                    key={header.id}
-                                >
+                                <TableHead key={header.id}>
                                     {!header.isPlaceholder &&
                                         flexRender(header.column.columnDef.header, header.getContext())}
-                                </th>
+                                </TableHead>
                             ))}
-                        </tr>
+                        </TableRow>
                     ))}
-                </thead>
+                </TableHeader>
 
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <TableBody>
                     {rows.map((row) => (
-                        <tr className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
+                        <TableRow className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
                             {row.getVisibleCells().map((cell) => (
-                                <td className="whitespace-nowrap px-3 py-4 text-sm" key={cell.id}>
+                                <TableCell className="px-3 py-4" key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
+                                </TableCell>
                             ))}
-                        </tr>
+                        </TableRow>
                     ))}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
         </div>
     );
 };

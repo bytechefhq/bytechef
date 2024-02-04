@@ -5,8 +5,9 @@ import 'quill-mention';
 import {ChangeEvent, KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
-import './mentionsInput.css';
+import './propMentionsInput.css';
 
+import {Label} from '@/components/ui/label';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -16,12 +17,12 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 
-import MentionBlot from './MentionBlot';
+import PropMentionBlot from './PropMentionBlot';
 
 const isAlphaNumericalKeyCode = (event: KeyboardEvent) =>
     (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90);
 
-Quill.register('formats/property-mention', MentionBlot);
+Quill.register('formats/property-mention', PropMentionBlot);
 
 const MentionInputListItem = (item: DataPillType) => {
     const div = document.createElement('div');
@@ -57,7 +58,7 @@ type MentionsInputProps = {
     workflow?: WorkflowModel;
 };
 
-const MentionsInput = forwardRef(
+const PropMentionsInput = forwardRef(
     (
         {
             controlType,
@@ -66,7 +67,6 @@ const MentionsInput = forwardRef(
             dataPills,
             defaultValue,
             description,
-            fieldsetClassName,
             label,
             leadingIcon,
             name,
@@ -203,12 +203,12 @@ const MentionsInput = forwardRef(
         }, [ref]);
 
         return (
-            <fieldset className={twMerge('w-full', fieldsetClassName)}>
+            <fieldset className="w-full space-y-2">
                 {label && (
                     <div className="flex items-center">
-                        <label
+                        <Label
                             className={twMerge(
-                                'block text-sm font-medium capitalize text-gray-700',
+                                'block text-sm font-medium capitalize text-muted-foreground',
                                 description && 'mr-1'
                             )}
                             htmlFor={elementId}
@@ -216,7 +216,7 @@ const MentionsInput = forwardRef(
                             {label}
 
                             {required && <span className="leading-3 text-red-500">*</span>}
-                        </label>
+                        </Label>
 
                         {description && (
                             <Tooltip>
@@ -233,14 +233,13 @@ const MentionsInput = forwardRef(
                 <div
                     className={twMerge(
                         'flex items-center',
-                        isFocused && 'ring ring-blue-500 shadow-lg shadow-blue-200',
-                        label && 'mt-1',
-                        leadingIcon && 'relative rounded-md border border-gray-300'
+                        isFocused && 'ring-2 ring-blue-500 shadow-lg',
+                        leadingIcon && 'relative rounded-md border'
                     )}
                     title={controlType}
                 >
                     {leadingIcon && (
-                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-3">
+                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r bg-gray-100 px-3">
                             {leadingIcon}
                         </span>
                     )}
@@ -329,6 +328,6 @@ const MentionsInput = forwardRef(
     }
 );
 
-MentionsInput.displayName = 'MentionsInput';
+PropMentionsInput.displayName = 'PropMentionsInput';
 
-export default memo(MentionsInput);
+export default memo(PropMentionsInput);

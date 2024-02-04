@@ -16,6 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
@@ -81,63 +82,48 @@ const WorkflowInputsSheetTable = ({
     return (
         <>
             {workflow.inputs && workflow.inputs.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-300">
-                    <thead>
-                        <tr>
-                            <th
-                                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-                                scope="col"
-                            >
-                                Name
-                            </th>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead>
 
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
-                                Label
-                            </th>
+                            <TableHead>Label</TableHead>
 
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
-                                Type
-                            </th>
+                            <TableHead>Type</TableHead>
 
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
-                                Required
-                            </th>
+                            <TableHead>Required</TableHead>
 
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
-                                Test Value
-                            </th>
+                            <TableHead>Test Value</TableHead>
 
-                            <th className="relative py-3.5 pl-3 pr-4 sm:pr-0" scope="col">
+                            <TableHead>
                                 <span className="sr-only">Edit</span>
-                            </th>
-                        </tr>
-                    </thead>
+                            </TableHead>
+                        </TableRow>
+                    </TableHeader>
 
-                    <tbody className="divide-y divide-gray-200">
+                    <TableBody>
                         {workflow.inputs &&
                             workflow.inputs.map((input, index) => (
-                                <tr key={input.name}>
-                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                                        {input.name}
-                                    </td>
+                                <TableRow key={input.name}>
+                                    <TableCell className="px-3 py-4">{input.name}</TableCell>
 
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.label}</td>
+                                    <TableCell className="px-3 py-4">{input.label}</TableCell>
 
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.type}</td>
+                                    <TableCell className="px-3 py-4">{input.type}</TableCell>
 
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    <TableCell className="px-3 py-4">
                                         {input.required === true ? 'true' : 'false'}
-                                    </td>
+                                    </TableCell>
 
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    <TableCell className="px-3 py-4">
                                         {workflowTestConfiguration?.inputs
                                             ? workflowTestConfiguration?.inputs[
                                                   workflow.inputs![index]?.name
                                               ]?.toString()
                                             : undefined}
-                                    </td>
+                                    </TableCell>
 
-                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                    <TableCell className="px-3 py-4">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
@@ -166,11 +152,11 @@ const WorkflowInputsSheetTable = ({
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ))}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             ) : (
                 <div className="flex h-full flex-col justify-center">
                     <div className="flex flex-col items-center self-center align-middle">

@@ -1,3 +1,7 @@
+import PropInput from '@/components/Properties/components/PropInput/PropInput';
+import PropMentionsInput from '@/components/Properties/components/PropMentionsInput/PropMentionsInput';
+import PropSelect, {ISelectOption} from '@/components/Properties/components/PropSelect';
+import PropTextArea from '@/components/Properties/components/PropTextArea';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
@@ -11,8 +15,6 @@ import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/typ
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
-import Select, {ISelectOption} from 'components/Select/Select';
-import TextArea from 'components/TextArea/TextArea';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
@@ -20,8 +22,6 @@ import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 
-import Input from '../Input/Input';
-import MentionsInput from '../MentionsInput/MentionsInput';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -352,7 +352,7 @@ const Property = ({
                 )}
 
                 {showMentionInput && !!dataPills?.length && (
-                    <MentionsInput
+                    <PropMentionsInput
                         controlType={controlType}
                         currentComponent={currentComponent}
                         currentComponentData={currentComponentData}
@@ -423,11 +423,10 @@ const Property = ({
                         )}
 
                         {register && isValidControlType && (
-                            <Input
+                            <PropInput
                                 defaultValue={defaultValue}
                                 description={description}
                                 error={hasError}
-                                fieldsetClassName="flex-1 mb-0"
                                 key={name}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -442,11 +441,10 @@ const Property = ({
                         )}
 
                         {!register && isValidControlType && (
-                            <Input
+                            <PropInput
                                 description={description}
                                 error={hasError}
                                 errorMessage={errorMessage}
-                                fieldsetClassName="flex-1 mb-0"
                                 key={name}
                                 label={label || name}
                                 leadingIcon={typeIcon}
@@ -469,14 +467,13 @@ const Property = ({
                         )}
 
                         {controlType === 'SELECT' && (
-                            <Select
+                            <PropSelect
                                 defaultValue={taskPropertyValue || defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 onValueChange={(value) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<ISelectOption>) || undefined || []}
-                                triggerClassName="w-full border border-gray-300"
                             />
                         )}
 
@@ -507,9 +504,8 @@ const Property = ({
                         )}
 
                         {controlType === 'TEXT_AREA' && (
-                            <TextArea
+                            <PropTextArea
                                 description={description}
-                                fieldsetClassName="w-full"
                                 key={name}
                                 label={label}
                                 name={name!}
@@ -518,7 +514,7 @@ const Property = ({
                         )}
 
                         {register && type === 'BOOLEAN' && (
-                            <Select
+                            <PropSelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
@@ -527,7 +523,6 @@ const Property = ({
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
-                                triggerClassName="w-full border border-gray-300"
                                 {...register(`${path}.${name}`, {
                                     required: required!,
                                 })}
@@ -535,17 +530,15 @@ const Property = ({
                         )}
 
                         {!register && type === 'BOOLEAN' && (
-                            <Select
+                            <PropSelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
-                                fieldsetClassName="mt-2"
                                 label={label}
                                 leadingIcon={typeIcon}
                                 options={[
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
-                                triggerClassName="w-full border border-gray-300"
                             />
                         )}
 

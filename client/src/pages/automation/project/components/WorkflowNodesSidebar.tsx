@@ -1,4 +1,4 @@
-import Input from '@/components/Input/Input';
+import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {useEffect, useState} from 'react';
 
