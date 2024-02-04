@@ -22,6 +22,11 @@ import {
     WorkflowNodeTestOutputModelToJSON,
 } from '../models/index';
 
+export interface DeleteWorkflowNodeTestOutputRequest {
+    workflowId: string;
+    workflowNodeName: string;
+}
+
 export interface SaveWorkflowNodeTestOutputRequest {
     workflowId: string;
     workflowNodeName: string;
@@ -37,6 +42,41 @@ export interface UploadWorkflowNodeSampleOutputRequest {
  * 
  */
 export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
+
+    /**
+     * Delete existing workflow node test output.
+     * Delete existing workflow node test output
+     */
+    async deleteWorkflowNodeTestOutputRaw(requestParameters: DeleteWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling deleteWorkflowNodeTestOutput.');
+        }
+
+        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
+            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling deleteWorkflowNodeTestOutput.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflow-node-test-outputs/{workflowId}/{workflowNodeName}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete existing workflow node test output.
+     * Delete existing workflow node test output
+     */
+    async deleteWorkflowNodeTestOutput(requestParameters: DeleteWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteWorkflowNodeTestOutputRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Create a new or update existing workflow node test output.
