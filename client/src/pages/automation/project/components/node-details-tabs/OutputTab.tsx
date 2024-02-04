@@ -2,6 +2,7 @@
 
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import useCopyToClipboard from '@/hooks/useCopyToClipboard';
 import {PropertyModel} from '@/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
@@ -12,6 +13,7 @@ import getNestedObject from '@/pages/automation/project/utils/getNestedObject';
 import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
 import {PropertyType} from '@/types/projectTypes';
 import {useQueryClient} from '@tanstack/react-query';
+import {ClipboardIcon} from 'lucide-react';
 import {useState} from 'react';
 import {NodeProps} from 'reactflow';
 import {TYPE_ICONS} from 'shared/typeIcons';
@@ -36,38 +38,71 @@ const AnimateSpin = ({className}: {className?: string}) => (
     </svg>
 );
 
-const PropertyField = ({data, label = '[index]'}: {data: PropertyType; label: string}) => (
-    <div className="inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
-        <span title={data.type}>{TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}</span>
+const PropertyField = ({
+    label = '[index]',
+    parentPath,
+    property,
+    sampleOutput,
+    workflowNodeName,
+}: {
+    label: string;
+    property: PropertyType;
+    parentPath?: string;
+    sampleOutput: object;
+    workflowNodeName: string;
+}) => {
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
 
-        <span className="pl-2">{label}</span>
-    </div>
-);
+    const selector = `${parentPath ? parentPath + '.' : ''}${property.name}`.replace('/', '.');
+
+    const value = property.name && getNestedObject(sampleOutput, selector);
+
+    return (
+        <div>
+            <div className="group relative inline-flex items-center rounded-md p-1 pr-5 text-sm hover:bg-gray-100">
+                <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
+
+                <span className="px-2">{label}</span>
+
+                {value && typeof value !== 'object' && (
+                    <div className="flex-1 text-xs text-muted-foreground">{value}</div>
+                )}
+
+                <div className="absolute right-0.5">
+                    <ClipboardIcon
+                        aria-hidden="true"
+                        className="invisible size-4 cursor-pointer bg-background text-gray-400 group-hover:visible"
+                        onClick={() => copyToClipboard(`$\{${workflowNodeName}.${selector}}`)}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const SchemaProperties = ({
-    path,
+    parentPath,
     properties,
     sampleOutput,
+    workflowNodeName,
 }: {
+    parentPath?: string;
     properties: Array<PropertyType>;
-    path?: string;
     sampleOutput: object;
+    workflowNodeName: string;
 }) => (
     <ul className="ml-2 h-full">
         {properties.map((property, index) => {
-            const value =
-                property.name &&
-                getNestedObject(sampleOutput, `${path ? path + '.' : ''}${property.name}`.replace('/', '.'));
-
             return (
                 <li className="flex flex-col" key={`${property.name}_${index}`}>
-                    <div className="flex items-center space-x-3">
-                        <PropertyField data={property} label={property.name!} />
-
-                        {value && typeof value !== 'object' && (
-                            <div className="flex-1 text-xs text-muted-foreground">{value}</div>
-                        )}
-                    </div>
+                    <PropertyField
+                        label={property.name!}
+                        parentPath={parentPath}
+                        property={property}
+                        sampleOutput={sampleOutput}
+                        workflowNodeName={workflowNodeName}
+                    />
 
                     {property.properties && !!property.properties.length && (
                         <div
@@ -75,9 +110,10 @@ const SchemaProperties = ({
                             key={property.name}
                         >
                             <SchemaProperties
-                                path={`${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
+                                parentPath={`${parentPath ? parentPath + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
                                 properties={property.properties}
                                 sampleOutput={sampleOutput}
+                                workflowNodeName={workflowNodeName}
                             />
                         </div>
                     )}
@@ -88,9 +124,10 @@ const SchemaProperties = ({
                             key={property.name}
                         >
                             <SchemaProperties
-                                path={`${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
+                                parentPath={`${parentPath ? parentPath + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
                                 properties={property.items}
                                 sampleOutput={sampleOutput}
+                                workflowNodeName={workflowNodeName}
                             />
                         </div>
                     )}
@@ -114,6 +151,9 @@ const OutputTab = ({
     sampleOutput: object;
 }) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
+
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
 
     const queryClient = useQueryClient();
 
@@ -205,12 +245,24 @@ const OutputTab = ({
                     </div>
 
                     <div className="mt-2 flex items-center">
-                        <div className="flex items-center">
+                        <div className="group relative flex items-center rounded-md p-1 pr-5 hover:bg-gray-100">
                             <span title={outputSchema.type}>
                                 {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
                             </span>
 
-                            <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
+                            <span className="ml-2 pr-2 text-sm text-gray-800">{currentNode.name}</span>
+
+                            {sampleOutput && typeof sampleOutput !== 'object' && (
+                                <div className="flex-1 text-xs text-muted-foreground">{String(sampleOutput)}</div>
+                            )}
+
+                            <div className="absolute right-0.5">
+                                <ClipboardIcon
+                                    aria-hidden="true"
+                                    className="invisible size-4 cursor-pointer bg-background text-gray-400 group-hover:visible"
+                                    onClick={() => copyToClipboard(`$\{${currentNode.name}}`)}
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -218,11 +270,8 @@ const OutputTab = ({
                         <SchemaProperties
                             properties={(outputSchema as PropertyType).properties!}
                             sampleOutput={sampleOutput}
+                            workflowNodeName={currentNode.name}
                         />
-                    )}
-
-                    {!(outputSchema as PropertyType).properties && !!(outputSchema as PropertyType).controlType && (
-                        <PropertyField data={outputSchema} label={(outputSchema as PropertyType).controlType!} />
                     )}
                 </>
             ) : (
