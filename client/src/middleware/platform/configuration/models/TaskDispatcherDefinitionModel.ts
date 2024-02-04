@@ -55,7 +55,13 @@ export interface TaskDispatcherDefinitionModel {
      * @type {boolean}
      * @memberof TaskDispatcherDefinitionModel
      */
-    outputDefined?: boolean;
+    outputDefined: boolean;
+    /**
+     * Does task dispatcher define dynamic output schema.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinitionModel
+     */
+    outputFunctionDefined: boolean;
     /**
      * The list of task dispatcher properties.
      * @type {Array<PropertyModel>}
@@ -100,6 +106,8 @@ export interface TaskDispatcherDefinitionModel {
 export function instanceOfTaskDispatcherDefinitionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "outputDefined" in value;
+    isInstance = isInstance && "outputFunctionDefined" in value;
     isInstance = isInstance && "version" in value;
 
     return isInstance;
@@ -118,7 +126,8 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
         'description': !exists(json, 'description') ? undefined : json['description'],
         'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'name': json['name'],
-        'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
+        'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
         'taskProperties': !exists(json, 'taskProperties') ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
@@ -141,6 +150,7 @@ export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefini
         'icon': value.icon,
         'name': value.name,
         'outputDefined': value.outputDefined,
+        'outputFunctionDefined': value.outputFunctionDefined,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
         'taskProperties': value.taskProperties === undefined ? undefined : ((value.taskProperties as Array<any>).map(PropertyModelToJSON)),

@@ -73,7 +73,13 @@ export interface ActionDefinitionModel {
      * @type {boolean}
      * @memberof ActionDefinitionModel
      */
-    outputDefined?: boolean;
+    outputDefined: boolean;
+    /**
+     * Does action define dynamic output schema.
+     * @type {boolean}
+     * @memberof ActionDefinitionModel
+     */
+    outputFunctionDefined: boolean;
     /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
@@ -94,6 +100,8 @@ export interface ActionDefinitionModel {
 export function instanceOfActionDefinitionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "outputDefined" in value;
+    isInstance = isInstance && "outputFunctionDefined" in value;
 
     return isInstance;
 }
@@ -114,7 +122,8 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'nodeDescriptionDefined': !exists(json, 'nodeDescriptionDefined') ? undefined : json['nodeDescriptionDefined'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
+        'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': !exists(json, 'title') ? undefined : json['title'],
     };
@@ -136,6 +145,7 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputDefined': value.outputDefined,
+        'outputFunctionDefined': value.outputFunctionDefined,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'title': value.title,
     };

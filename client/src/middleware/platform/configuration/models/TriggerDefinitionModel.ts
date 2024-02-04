@@ -79,7 +79,13 @@ export interface TriggerDefinitionModel {
      * @type {boolean}
      * @memberof TriggerDefinitionModel
      */
-    outputDefined?: boolean;
+    outputDefined: boolean;
+    /**
+     * Does trigger define dynamic output schema.
+     * @type {boolean}
+     * @memberof TriggerDefinitionModel
+     */
+    outputFunctionDefined: boolean;
     /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
@@ -106,6 +112,8 @@ export interface TriggerDefinitionModel {
 export function instanceOfTriggerDefinitionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "outputDefined" in value;
+    isInstance = isInstance && "outputFunctionDefined" in value;
     isInstance = isInstance && "type" in value;
 
     return isInstance;
@@ -127,7 +135,8 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
         'nodeDescriptionDefined': !exists(json, 'nodeDescriptionDefined') ? undefined : json['nodeDescriptionDefined'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
+        'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': !exists(json, 'title') ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
@@ -150,6 +159,7 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputDefined': value.outputDefined,
+        'outputFunctionDefined': value.outputFunctionDefined,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'title': value.title,
         'type': TriggerTypeModelToJSON(value.type),
