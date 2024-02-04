@@ -447,6 +447,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeTestOutput"
+    delete:
+      description: "Delete existing workflow node test output."
+      summary: "Delete existing workflow node test output"
+      tags:
+        - "workflow-node-test-output"
+      operationId: "deleteWorkflowNodeTestOutput"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow node for which to create test output objects."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
   /workflow-node-test-outputs/{workflowId}/{workflowNodeName}/sample-output:
     put:
       description: "Upload a sample output to create a new or update existing workflow node test output."
