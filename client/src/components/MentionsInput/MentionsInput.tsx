@@ -147,16 +147,16 @@ const MentionsInput = forwardRef(
                     const formattedData = dataPills.map((dataPill) => {
                         if (!dataPill.componentDefinition) {
                             return {
-                                componentName: dataPill.componentName,
                                 componentIcon: '📄',
+                                componentName: dataPill.componentName,
                                 id: dataPill.id,
                                 value: dataPill.value,
                             };
                         }
 
                         return {
-                            componentName: dataPill.componentName,
                             componentIcon: JSON.parse(dataPill.componentDefinition as string).icon,
+                            componentName: dataPill.componentName,
                             id: dataPill.id,
                             value: dataPill.value,
                         };
