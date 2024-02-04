@@ -1811,6 +1811,8 @@ components:
           type: "object"
         taskDispatcherDefinition:
           $ref: '#/components/schemas/TaskDispatcherDefinition'
+        triggerDefinition:
+          $ref: '#/components/schemas/TriggerDefinition'
         workflowNodeName:
           description: The workflow node name
           type: "string"
