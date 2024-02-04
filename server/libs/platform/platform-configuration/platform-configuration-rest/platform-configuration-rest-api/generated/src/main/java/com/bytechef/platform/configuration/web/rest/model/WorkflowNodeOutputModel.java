@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherDefinitionModel;
+import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow step output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:20:43.879610+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:40:35.730095+01:00[Europe/Zagreb]")
 public class WorkflowNodeOutputModel {
 
   private ActionDefinitionModel actionDefinition;
@@ -34,6 +35,8 @@ public class WorkflowNodeOutputModel {
   private Object sampleOutput;
 
   private TaskDispatcherDefinitionModel taskDispatcherDefinition;
+
+  private TriggerDefinitionModel triggerDefinition;
 
   private String workflowNodeName;
 
@@ -129,6 +132,26 @@ public class WorkflowNodeOutputModel {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
   }
 
+  public WorkflowNodeOutputModel triggerDefinition(TriggerDefinitionModel triggerDefinition) {
+    this.triggerDefinition = triggerDefinition;
+    return this;
+  }
+
+  /**
+   * Get triggerDefinition
+   * @return triggerDefinition
+  */
+  @Valid 
+  @Schema(name = "triggerDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggerDefinition")
+  public TriggerDefinitionModel getTriggerDefinition() {
+    return triggerDefinition;
+  }
+
+  public void setTriggerDefinition(TriggerDefinitionModel triggerDefinition) {
+    this.triggerDefinition = triggerDefinition;
+  }
+
   public WorkflowNodeOutputModel workflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
@@ -162,12 +185,13 @@ public class WorkflowNodeOutputModel {
         Objects.equals(this.outputSchema, workflowNodeOutput.outputSchema) &&
         Objects.equals(this.sampleOutput, workflowNodeOutput.sampleOutput) &&
         Objects.equals(this.taskDispatcherDefinition, workflowNodeOutput.taskDispatcherDefinition) &&
+        Objects.equals(this.triggerDefinition, workflowNodeOutput.triggerDefinition) &&
         Objects.equals(this.workflowNodeName, workflowNodeOutput.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionDefinition, outputSchema, sampleOutput, taskDispatcherDefinition, workflowNodeName);
+    return Objects.hash(actionDefinition, outputSchema, sampleOutput, taskDispatcherDefinition, triggerDefinition, workflowNodeName);
   }
 
   @Override
@@ -178,6 +202,7 @@ public class WorkflowNodeOutputModel {
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
     sb.append("    taskDispatcherDefinition: ").append(toIndentedString(taskDispatcherDefinition)).append("\n");
+    sb.append("    triggerDefinition: ").append(toIndentedString(triggerDefinition)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();

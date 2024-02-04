@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:20:43.879610+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:40:35.730095+01:00[Europe/Zagreb]")
 public class JobModel {
 
   private String createdBy;
