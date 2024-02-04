@@ -4,7 +4,7 @@ module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
     darkMode: 'class',
     important: true,
-    plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms'), require('tailwindcss-animate')],
+    plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')],
     theme: {
         container: {
             center: true,

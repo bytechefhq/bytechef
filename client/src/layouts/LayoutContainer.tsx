@@ -1,6 +1,6 @@
-import {Dialog, Transition} from '@headlessui/react';
+import {Dialog, DialogContent} from '@/components/ui/dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
+import {PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type SidebarContentLayoutProps = {
@@ -52,67 +52,29 @@ const LayoutContainer = ({
 
     return (
         <>
-            <Transition.Root as={Fragment} show={sidebarOpen}>
-                <Dialog as="div" className="relative z-40 md:hidden" onClose={setSidebarOpen}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="transition-opacity ease-linear duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="transition-opacity ease-linear duration-300"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="fixed inset-0 bg-gray-600" />
-                    </Transition.Child>
+            <Dialog open={sidebarOpen}>
+                <DialogContent className="h-full sm:max-w-[425px]">
+                    <div className="relative">
+                        <div className="absolute right-0 p-1">
+                            <button
+                                className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                                onClick={() => setSidebarOpen(false)}
+                                type="button"
+                            >
+                                <Cross2Icon aria-hidden="true" className="size-4" />
 
-                    <div className="fixed inset-0 z-40 flex">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="transition ease-in-out duration-300 transform"
-                            enterFrom="-translate-x-full"
-                            enterTo="translate-x-0"
-                            leave="transition ease-in-out duration-300 transform"
-                            leaveFrom="translate-x-0"
-                            leaveTo="-translate-x-full"
-                        >
-                            <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white pb-4 pt-5">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-in-out duration-300"
-                                    enterFrom="opacity-0"
-                                    enterTo="opacity-100"
-                                    leave="ease-in-out duration-300"
-                                    leaveFrom="opacity-100"
-                                    leaveTo="opacity-0"
-                                >
-                                    <div className="absolute right-0 top-0 -mr-14 p-1">
-                                        <button
-                                            className="flex size-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
-                                            onClick={() => setSidebarOpen(false)}
-                                            type="button"
-                                        >
-                                            <Cross2Icon aria-hidden="true" className="size-4 text-white" />
+                                <span className="sr-only">Close sidebar</span>
+                            </button>
+                        </div>
 
-                                            <span className="sr-only">Close sidebar</span>
-                                        </button>
-                                    </div>
-                                </Transition.Child>
-
-                                <div className="mt-5 h-0 flex-1 overflow-y-auto">
-                                    <nav className="flex h-full flex-col">
-                                        <div className="space-y-1">{leftSidebarBody}</div>
-                                    </nav>
-                                </div>
-                            </Dialog.Panel>
-                        </Transition.Child>
-
-                        <div aria-hidden="true" className="w-14 shrink-0">
-                            {/* Dummy element to force sidebar to shrink to fit close icon */}
+                        <div className="absolute inset-0 mt-5 overflow-auto">
+                            <nav className="flex h-full flex-col">
+                                <div className="space-y-1">{leftSidebarBody}</div>
+                            </nav>
                         </div>
                     </div>
-                </Dialog>
-            </Transition.Root>
+                </DialogContent>
+            </Dialog>
 
             {leftSidebarOpen && (
                 <aside
