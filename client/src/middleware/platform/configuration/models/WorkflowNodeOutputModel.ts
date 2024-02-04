@@ -31,6 +31,12 @@ import {
     TaskDispatcherDefinitionModelFromJSONTyped,
     TaskDispatcherDefinitionModelToJSON,
 } from './TaskDispatcherDefinitionModel';
+import type { TriggerDefinitionModel } from './TriggerDefinitionModel';
+import {
+    TriggerDefinitionModelFromJSON,
+    TriggerDefinitionModelFromJSONTyped,
+    TriggerDefinitionModelToJSON,
+} from './TriggerDefinitionModel';
 
 /**
  * The workflow step output
@@ -62,6 +68,12 @@ export interface WorkflowNodeOutputModel {
      * @memberof WorkflowNodeOutputModel
      */
     taskDispatcherDefinition?: TaskDispatcherDefinitionModel;
+    /**
+     * 
+     * @type {TriggerDefinitionModel}
+     * @memberof WorkflowNodeOutputModel
+     */
+    triggerDefinition?: TriggerDefinitionModel;
     /**
      * The workflow node name
      * @type {string}
@@ -95,6 +107,7 @@ export function WorkflowNodeOutputModelFromJSONTyped(json: any, ignoreDiscrimina
         'outputSchema': PropertyModelFromJSON(json['outputSchema']),
         'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
         'taskDispatcherDefinition': !exists(json, 'taskDispatcherDefinition') ? undefined : TaskDispatcherDefinitionModelFromJSON(json['taskDispatcherDefinition']),
+        'triggerDefinition': !exists(json, 'triggerDefinition') ? undefined : TriggerDefinitionModelFromJSON(json['triggerDefinition']),
         'workflowNodeName': json['workflowNodeName'],
     };
 }
@@ -112,6 +125,7 @@ export function WorkflowNodeOutputModelToJSON(value?: WorkflowNodeOutputModel | 
         'outputSchema': PropertyModelToJSON(value.outputSchema),
         'sampleOutput': value.sampleOutput,
         'taskDispatcherDefinition': TaskDispatcherDefinitionModelToJSON(value.taskDispatcherDefinition),
+        'triggerDefinition': TriggerDefinitionModelToJSON(value.triggerDefinition),
         'workflowNodeName': value.workflowNodeName,
     };
 }
