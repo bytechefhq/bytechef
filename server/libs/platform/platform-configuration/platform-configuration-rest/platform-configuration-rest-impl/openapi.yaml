@@ -819,6 +819,8 @@ components:
       type: "object"
       required:
       - "name"
+      - "outputDefined"
+      - "outputFunctionDefined"
       properties:
         componentName:
           description: "The component name."
@@ -839,6 +841,9 @@ components:
           type: "string"
         outputDefined:
           description: "Does action define output schema."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does action define dynamic output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -1468,6 +1473,8 @@ components:
       type: "object"
       required:
       - "name"
+      - "outputDefined"
+      - "outputFunctionDefined"
       - "version"
       properties:
         description:
@@ -1481,6 +1488,9 @@ components:
           type: "string"
         outputDefined:
           description: "Does task dispatcher define output schema."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does task dispatcher define dynamic output schema."
           type: "boolean"
         properties:
           description: "The list of task dispatcher properties."
@@ -1572,6 +1582,8 @@ components:
       type: "object"
       required:
       - "name"
+      - "outputDefined"
+      - "outputFunctionDefined"
       - "type"
       properties:
         componentName:
@@ -1593,6 +1605,9 @@ components:
           type: "string"
         outputDefined:
           description: "Does trigger define output schema."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does trigger define dynamic output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
