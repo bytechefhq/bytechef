@@ -80,8 +80,10 @@ const DataPillPanelBodyItem = ({
                                             workflowNodeName={componentAction.workflowNodeName}
                                         />
 
-                                        {value && typeof value !== 'object' && (
-                                            <div className="flex-1 text-xs text-muted-foreground">{value}</div>
+                                        {(value || value === 0 || value === false) && typeof value !== 'object' && (
+                                            <div className="flex-1 text-xs text-muted-foreground">
+                                                {value === true ? 'true' : value === false ? false : value}
+                                            </div>
                                         )}
                                     </div>
                                 );
