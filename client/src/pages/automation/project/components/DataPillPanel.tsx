@@ -27,7 +27,8 @@ const DataPillPanel = ({
         .filter(
             (workflowStepOutput) =>
                 workflowStepOutput.workflowNodeName !== currentNode.name &&
-                workflowStepOutput.actionDefinition!.outputDefined
+                (workflowStepOutput.actionDefinition!.outputDefined ||
+                    workflowStepOutput.actionDefinition!.outputFunctionDefined)
         )
         .map((workflowStepOutput) => {
             return {

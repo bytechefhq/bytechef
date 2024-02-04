@@ -204,7 +204,8 @@ const WorkflowNodeDetailsPanel = ({
             id: workflowId,
             workflowNodeName: currentNode.name,
         },
-        !!currentActionDefinition?.outputDefined && activeTab === 'output'
+        (!!currentActionDefinition?.outputDefined || !!currentActionDefinition?.outputFunctionDefined) &&
+            activeTab === 'output'
     );
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
@@ -273,7 +274,7 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (name === 'output') {
-            return currentActionDefinition?.outputDefined;
+            return currentActionDefinition?.outputDefined || !!currentActionDefinition?.outputFunctionDefined;
         }
 
         if (name === 'properties') {
@@ -366,6 +367,7 @@ const WorkflowNodeDetailsPanel = ({
         activeTab,
         componentDefinitionNames.length,
         currentActionDefinition?.outputDefined,
+        currentActionDefinition?.outputFunctionDefined,
         currentActionFetched,
         currentActionProperties?.length,
         currentComponent?.name,
@@ -485,6 +487,7 @@ const WorkflowNodeDetailsPanel = ({
                                         {activeTab === 'output' && workflowNodeOutput && (
                                             <OutputTab
                                                 currentNode={currentNode}
+                                                outputDefined={currentActionDefinition?.outputDefined ?? false}
                                                 outputSchema={workflowNodeOutput.outputSchema}
                                                 workflowId={workflowId}
                                             />

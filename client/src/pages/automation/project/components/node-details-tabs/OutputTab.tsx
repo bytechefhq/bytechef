@@ -4,6 +4,7 @@ import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {PropertyModel} from '@/middleware/platform/configuration';
 import {
+    useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
     useUploadSampleOutputRequestMutation,
 } from '@/mutations/platform/workflowNodeTestOutputs.mutations';
@@ -72,16 +73,26 @@ const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
 
 const OutputTab = ({
     currentNode,
+    outputDefined = false,
     outputSchema,
     workflowId,
 }: {
     currentNode: NodeProps['data'];
+    outputDefined: boolean;
     outputSchema: PropertyModel;
     workflowId: string;
 }) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
 
     const queryClient = useQueryClient();
+
+    const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
+            });
+        },
+    });
 
     const saveWorkflowNodeTestOutputMutation = useSaveWorkflowNodeTestOutputMutation({
         onSuccess: () => {
@@ -98,6 +109,13 @@ const OutputTab = ({
             });
         },
     });
+
+    const handlePredefinedOutputSchemaClick = () => {
+        deleteWorkflowNodeTestOutputMutation.mutate({
+            workflowId,
+            workflowNodeName: currentNode.name,
+        });
+    };
 
     const handleTestComponentClick = () => {
         saveWorkflowNodeTestOutputMutation.mutate({
@@ -121,6 +139,41 @@ const OutputTab = ({
         <div className="h-full p-4">
             {outputSchema ? (
                 <>
+                    <div className="flex items-center justify-between">
+                        <div className="text-sm font-semibold">Output Schema</div>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
+                                    {(saveWorkflowNodeTestOutputMutation.isPending ||
+                                        uploadSampleOutputRequestMutation.isPending) && (
+                                        <>
+                                            <AnimateSpin />
+                                            Testing...
+                                        </>
+                                    )}
+
+                                    {!saveWorkflowNodeTestOutputMutation.isPending &&
+                                        !uploadSampleOutputRequestMutation.isPending && <>Regenerate</>}
+                                </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end" className="w-60 cursor-pointer">
+                                {outputDefined && (
+                                    <DropdownMenuItem onClick={handlePredefinedOutputSchemaClick}>
+                                        Use Predefined Output Schema
+                                    </DropdownMenuItem>
+                                )}
+
+                                <DropdownMenuItem onClick={handleTestComponentClick}>Test Component</DropdownMenuItem>
+
+                                <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
+                                    Upload Sample Output
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
                     <div className="mt-2 flex items-center">
                         <div className="flex items-center">
                             <span title={outputSchema.type}>
@@ -128,35 +181,6 @@ const OutputTab = ({
                             </span>
 
                             <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
-                        </div>
-
-                        <div className="absolute right-4">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
-                                        {(saveWorkflowNodeTestOutputMutation.isPending ||
-                                            uploadSampleOutputRequestMutation.isPending) && (
-                                            <>
-                                                <AnimateSpin />
-                                                Testing...
-                                            </>
-                                        )}
-
-                                        {!saveWorkflowNodeTestOutputMutation.isPending &&
-                                            !uploadSampleOutputRequestMutation.isPending && <>Regenerate</>}
-                                    </Button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent align="end" className="w-56 cursor-pointer">
-                                    <DropdownMenuItem onClick={handleTestComponentClick}>
-                                        Test Component
-                                    </DropdownMenuItem>
-
-                                    <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
-                                        Upload Sample Output
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </div>
                     </div>
 
