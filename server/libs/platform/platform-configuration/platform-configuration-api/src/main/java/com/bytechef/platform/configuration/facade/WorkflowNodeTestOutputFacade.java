@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic

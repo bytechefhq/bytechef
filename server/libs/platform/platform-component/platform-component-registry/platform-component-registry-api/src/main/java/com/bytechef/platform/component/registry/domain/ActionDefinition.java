@@ -50,13 +50,9 @@ public class ActionDefinition extends ActionDefinitionBasic {
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
             null);
-        this.outputDefined =
-            OptionalUtils.mapOrElse(actionDefinition.getOutput(), output -> true, false) ||
-                OptionalUtils.mapOrElse(
-                    actionDefinition.getOutputFunction(), outputFunction -> true,
-                    actionDefinition.isDefaultOutputFunction());
+        this.outputDefined = OptionalUtils.mapOrElse(actionDefinition.getOutput(), output -> true, false);
         this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputFunction(), outputFunction -> true, false);
+            actionDefinition.getOutputFunction(), outputFunction -> true, actionDefinition.isDefaultOutputFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
     }

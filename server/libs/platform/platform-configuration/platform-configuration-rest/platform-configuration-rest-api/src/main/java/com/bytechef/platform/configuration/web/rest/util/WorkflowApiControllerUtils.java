@@ -26,11 +26,13 @@ import org.springframework.http.ResponseEntity;
  */
 public class WorkflowApiControllerUtils {
 
-    public static ResponseEntity<WorkflowModel> getWorkflow(String id, ConversionService conversionService, WorkflowService workflowService) {
+    public static ResponseEntity<WorkflowModel>
+        getWorkflow(String id, ConversionService conversionService, WorkflowService workflowService) {
         return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class));
     }
 
-    public static ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel, ConversionService conversionService, WorkflowService workflowService) {
+    public static ResponseEntity<WorkflowModel> updateWorkflow(
+        String id, WorkflowModel workflowModel, ConversionService conversionService, WorkflowService workflowService) {
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowService.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),

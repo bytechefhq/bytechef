@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.domain.ObjectProperty;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import java.time.LocalDateTime;

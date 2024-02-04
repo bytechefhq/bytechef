@@ -19,12 +19,11 @@ package com.bytechef.automation.connection.web.rest;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.util.ConnectionApiControllerUtils;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
+import com.bytechef.platform.connection.web.rest.util.ConnectionApiControllerUtils;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -66,9 +65,9 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
         return ResponseEntity.ok(
             Validate.notNull(
-                    conversionService.convert(
-                        connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class),
-                    "connection")
+                conversionService.convert(
+                    connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class),
+                "connection")
                 .parameters(null));
     }
 

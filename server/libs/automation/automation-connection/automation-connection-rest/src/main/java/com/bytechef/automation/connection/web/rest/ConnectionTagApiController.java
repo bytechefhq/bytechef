@@ -18,9 +18,9 @@ package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.web.rest.util.ConnectionTagApiControllerUtils;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.connection.web.rest.util.ConnectionTagApiControllerUtils;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
