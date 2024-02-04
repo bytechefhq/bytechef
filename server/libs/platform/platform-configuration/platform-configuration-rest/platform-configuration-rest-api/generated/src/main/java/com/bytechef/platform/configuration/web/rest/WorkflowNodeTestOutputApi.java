@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T09:53:12.508680+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:20:43.879610+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output API")
 public interface WorkflowNodeTestOutputApi {
@@ -40,6 +40,37 @@ public interface WorkflowNodeTestOutputApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    /**
+     * DELETE /workflow-node-test-outputs/{workflowId}/{workflowNodeName} : Delete existing workflow node test output
+     * Delete existing workflow node test output.
+     *
+     * @param workflowId The id of a workflow. (required)
+     * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "deleteWorkflowNodeTestOutput",
+        summary = "Delete existing workflow node test output",
+        description = "Delete existing workflow node test output.",
+        tags = { "workflow-node-test-output" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName}"
+    )
+    
+    default ResponseEntity<Void> deleteWorkflowNodeTestOutput(
+        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     /**
      * PUT /workflow-node-test-outputs/{workflowId}/{workflowNodeName} : Create a new or update existing workflow node test output
