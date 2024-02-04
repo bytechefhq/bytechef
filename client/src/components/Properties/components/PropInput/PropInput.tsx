@@ -1,3 +1,4 @@
+import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, DetailedHTMLProps, InputHTMLAttributes, ReactNode, forwardRef} from 'react';
@@ -5,11 +6,9 @@ import {twMerge} from 'tailwind-merge';
 
 type InputProps = {
     description?: string;
-    fieldsetClassName?: string;
     error?: boolean;
     errorMessage?: string;
     label?: string;
-    labelClassName?: string;
     leadingIcon?: ReactNode;
     name: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -18,7 +17,7 @@ type InputProps = {
     value?: string;
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
+const PropInput = forwardRef<HTMLInputElement, InputProps>(
     (
         {
             className,
@@ -26,10 +25,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled,
             error,
             errorMessage,
-            fieldsetClassName,
             id,
             label,
-            labelClassName,
             leadingIcon,
             name,
             onChange,
@@ -42,21 +39,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         },
         ref
     ) => (
-        <fieldset className={twMerge(type !== 'hidden' && 'mb-3', fieldsetClassName)}>
+        <fieldset className="w-full space-y-2">
             {label && type !== 'hidden' && (
                 <div className="flex items-center">
-                    <label
+                    <Label
                         className={twMerge(
-                            'block text-sm font-medium capitalize text-gray-700',
-                            description && 'mr-1',
-                            labelClassName
+                            'block text-sm font-medium capitalize text-muted-foreground',
+                            description && 'mr-1'
                         )}
                         htmlFor={name}
                     >
                         {label}
 
                         {required && <span className="leading-3 text-red-500">*</span>}
-                    </label>
+                    </Label>
 
                     {description && (
                         <Tooltip>
@@ -126,6 +122,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     )
 );
 
-Input.displayName = 'Input';
+PropInput.displayName = 'PropInput';
 
-export default Input;
+export default PropInput;

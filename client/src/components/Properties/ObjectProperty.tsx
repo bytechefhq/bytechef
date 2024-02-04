@@ -1,10 +1,10 @@
+import PropInput from '@/components/Properties/components/PropInput/PropInput';
+import PropSelect from '@/components/Properties/components/PropSelect';
 import {Button} from '@/components/ui/button';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
-import {PlusIcon} from '@radix-ui/react-icons';
-import ContextualDialog from 'components/ContextualDialog/ContextualDialog';
-import Input from 'components/Input/Input';
-import Select from 'components/Select/Select';
-import {useState} from 'react';
+import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
+import {PopoverClose} from '@radix-ui/react-popover';
 import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
@@ -25,8 +25,6 @@ const ObjectProperty = ({
     dataPills,
     property,
 }: ObjectPropertyProps) => {
-    const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] = useState(false);
-
     const {additionalProperties, label, multipleValues, name, properties} = property;
 
     if (!properties?.length && !additionalProperties?.length) {
@@ -61,32 +59,36 @@ const ObjectProperty = ({
             </ul>
 
             {!!additionalProperties?.length && multipleValues && (
-                <div className={twMerge(!!properties?.length && 'mt-2', 'relative w-full self-start')}>
-                    <Button
-                        className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                        onClick={() => setAdditionalPropertiesDialogOpen(true)}
-                        size="sm"
-                        variant="ghost"
-                    >
-                        <PlusIcon className="size-4" /> Add property
-                    </Button>
-
-                    {additionalPropertiesDialogOpen && (
-                        <div className="absolute z-50 w-3/4 rounded-md bg-gray-100 shadow-md">
-                            <ContextualDialog
-                                handleCancelClick={() => setAdditionalPropertiesDialogOpen(false)}
-                                handleSaveClick={() => console.log('save')}
-                                saveButtonLabel="Add"
-                                title="Add property"
+                <div className={twMerge(!!properties?.length && 'mt-2')}>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                                size="sm"
+                                variant="ghost"
                             >
-                                <Input
+                                <PlusIcon className="size-4" /> Add property
+                            </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent className="min-w-[400px]">
+                            <header className="flex items-center justify-between py-2">
+                                <span className="font-medium">Add property</span>
+
+                                <PopoverClose asChild>
+                                    <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                                </PopoverClose>
+                            </header>
+
+                            <main className="space-y-2">
+                                <PropInput
                                     label="Name"
                                     name="additionalPropertyName"
                                     placeholder="Name for the additional property"
                                 />
 
                                 {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
-                                    <Select
+                                    <PropSelect
                                         label="Type"
                                         options={(additionalProperties as Array<PropertyType>).map(
                                             (additionalProperty) => ({
@@ -94,7 +96,6 @@ const ObjectProperty = ({
                                                 value: additionalProperty.type!,
                                             })
                                         )}
-                                        triggerClassName="w-full"
                                     />
                                 ) : (
                                     <div className="flex w-full flex-col">
@@ -105,9 +106,15 @@ const ObjectProperty = ({
                                         </span>
                                     </div>
                                 )}
-                            </ContextualDialog>
-                        </div>
-                    )}
+                            </main>
+
+                            <footer className="flex items-center justify-end space-x-2 py-2">
+                                <Button onClick={() => console.log('save')} size="sm">
+                                    Add
+                                </Button>
+                            </footer>
+                        </PopoverContent>
+                    </Popover>
                 </div>
             )}
         </div>

@@ -1,13 +1,13 @@
 import '@testing-library/jest-dom';
 import {describe, expect, it} from 'vitest';
 
-import {render, screen, userEvent} from '../../utils/test-utils';
-import Input from './Input';
+import {render, screen, userEvent} from '../../../../utils/test-utils';
+import PropInput from './PropInput';
 
-describe('Input', async () => {
+describe('PropInput', async () => {
     it('should render the input', () => {
         render(
-            <Input
+            <PropInput
                 aria-label="Email Address"
                 error={undefined}
                 label="Email Address"
@@ -25,7 +25,7 @@ describe('Input', async () => {
     });
     it('should change input value', async () => {
         render(
-            <Input aria-label="Email Address" label="Email Address" name="email" placeholder="Email" type="email" />
+            <PropInput aria-label="Email Address" label="Email Address" name="email" placeholder="Email" type="email" />
         );
 
         screen.logTestingPlaygroundURL();
@@ -42,7 +42,7 @@ describe('Input', async () => {
     });
     it('should render the input with error', () => {
         render(
-            <Input
+            <PropInput
                 aria-label="Email Address"
                 error
                 label="Email Address"
@@ -60,7 +60,7 @@ describe('Input', async () => {
     });
     it('should render the asterisk if input is required', () => {
         render(
-            <Input
+            <PropInput
                 aria-label="Email Address"
                 error={undefined}
                 label="Email Address"

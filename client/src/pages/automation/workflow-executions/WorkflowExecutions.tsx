@@ -2,7 +2,7 @@ import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import DatePicker from '@/components/DatePicker';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import Pagination from '@/components/Pagination/Pagination';
+import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
@@ -256,7 +256,7 @@ export const WorkflowExecutions = () => {
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
                     <PageFooter position="main">
-                        <Pagination
+                        <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber ? filterPageNumber : 0}
                             pageSize={workflowExecutionPage.size!}
@@ -352,6 +352,7 @@ export const WorkflowExecutions = () => {
                     </div>
                 </>
             }
+            leftSidebarWidth="72"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (

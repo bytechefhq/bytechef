@@ -1,4 +1,4 @@
-import Input from '@/components/Input/Input';
+import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';

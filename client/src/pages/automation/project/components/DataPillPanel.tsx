@@ -1,9 +1,9 @@
+import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
 import DataPillPanelBody, {ComponentActionData} from '@/pages/automation/project/components/DataPillPanelBody';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import Input from 'components/Input/Input';
 import {useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
@@ -85,13 +85,14 @@ const DataPillPanel = ({
                         </Dialog.Title>
 
                         <div className="flex w-full grow flex-col">
-                            <Input
-                                fieldsetClassName="p-4 border-b border-gray-100 mb-0"
-                                name="dataPillFilter"
-                                onChange={(event) => setDataPillFilterQuery(event.target.value)}
-                                placeholder="Filter Data Pills..."
-                                value={dataPillFilterQuery}
-                            />
+                            <div className="mb-0 border-b border-gray-100 p-4">
+                                <Input
+                                    name="dataPillFilter"
+                                    onChange={(event) => setDataPillFilterQuery(event.target.value)}
+                                    placeholder="Filter Data Pills..."
+                                    value={dataPillFilterQuery}
+                                />
+                            </div>
 
                             {componentActionData && (
                                 <DataPillPanelBody

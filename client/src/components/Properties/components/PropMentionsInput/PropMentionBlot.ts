@@ -2,7 +2,7 @@ import {Quill} from 'react-quill';
 
 const Embed = Quill.import('blots/embed');
 
-export default class MentionBlot extends Embed {
+export default class PropMentionBlot extends Embed {
     static blotName = 'property-mention';
     static tagName = 'div';
     static className = 'property-mention';
@@ -18,7 +18,7 @@ export default class MentionBlot extends Embed {
         node.appendChild(iconNode);
         node.appendChild(contentNode);
 
-        return MentionBlot.setDataValues(node, data);
+        return PropMentionBlot.setDataValues(node, data);
     }
 
     static setDataValues(element: HTMLElement, data: {[key: string]: string}) {
