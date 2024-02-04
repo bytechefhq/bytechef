@@ -1,10 +1,25 @@
 import {
+    DeleteWorkflowNodeTestOutputRequest,
     SaveWorkflowNodeTestOutputRequest,
     UploadWorkflowNodeSampleOutputRequest,
     WorkflowNodeTestOutputApi,
     WorkflowNodeTestOutputModel,
 } from '@/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
+
+type DeleteWorkflowNodeTestOutputProps = {
+    onSuccess?: (result: void, variables: DeleteWorkflowNodeTestOutputRequest) => void;
+    onError?: (error: Error, variables: DeleteWorkflowNodeTestOutputRequest) => void;
+};
+
+export const useDeleteWorkflowNodeTestOutputMutation = (mutationProps?: DeleteWorkflowNodeTestOutputProps) =>
+    useMutation({
+        mutationFn: (request: DeleteWorkflowNodeTestOutputRequest) => {
+            return new WorkflowNodeTestOutputApi().deleteWorkflowNodeTestOutput(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
 
 type SaveWorkflowNodeTestOutputProps = {
     onSuccess?: (result: WorkflowNodeTestOutputModel, variables: SaveWorkflowNodeTestOutputRequest) => void;
