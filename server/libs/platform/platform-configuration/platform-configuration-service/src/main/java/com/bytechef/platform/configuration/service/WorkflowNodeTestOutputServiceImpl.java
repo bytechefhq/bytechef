@@ -44,6 +44,13 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
+    public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
+        workflowNodeTestOutputRepository
+            .findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName)
+            .ifPresent(workflowNodeTestOutputRepository::delete);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
         return workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);

@@ -53,13 +53,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
             null);
-        this.outputDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutput(), output -> true, false) ||
-            OptionalUtils.mapOrElse(
-                triggerDefinition.getOutputFunction(), outputFunction -> true,
-                triggerDefinition.isDefaultOutputFunction());
+        this.outputDefined = OptionalUtils.mapOrElse(triggerDefinition.getOutput(), output -> true, false);
         this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputFunction(), outputFunction -> true, false);
+            triggerDefinition.getOutputFunction(), outputFunction -> true, triggerDefinition.isDefaultOutputFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);

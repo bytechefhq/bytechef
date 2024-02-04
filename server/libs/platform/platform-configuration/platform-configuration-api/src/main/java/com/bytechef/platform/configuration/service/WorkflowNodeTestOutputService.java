@@ -26,6 +26,8 @@ import java.util.Optional;
  */
 public interface WorkflowNodeTestOutputService {
 
+    void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
+
     Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName);
 
     WorkflowNodeTestOutput save(

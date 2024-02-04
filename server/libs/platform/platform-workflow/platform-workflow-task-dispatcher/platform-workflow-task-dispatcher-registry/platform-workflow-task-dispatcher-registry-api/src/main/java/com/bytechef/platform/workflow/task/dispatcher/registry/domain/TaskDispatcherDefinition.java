@@ -63,10 +63,7 @@ public class TaskDispatcherDefinition {
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
         this.output = getOutput(taskDispatcherDefinition);
-        this.outputDefined = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutput(), outputSchema -> true, false) ||
-            OptionalUtils.mapOrElse(
-                taskDispatcherDefinition.getOutputFunction(), outputSchemaDataSource -> true, false);
+        this.outputDefined = OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutput(), outputSchema -> true, false);
         this.outputFunctionDefined = OptionalUtils.mapOrElse(
             taskDispatcherDefinition.getOutputFunction(), outputFunction -> true, false);
         this.properties = CollectionUtils.map(
