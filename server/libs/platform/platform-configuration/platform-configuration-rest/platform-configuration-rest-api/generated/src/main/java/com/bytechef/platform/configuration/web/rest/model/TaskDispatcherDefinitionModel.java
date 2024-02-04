@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-02T18:49:47.325391+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T09:53:12.508680+01:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   private String description;
@@ -36,6 +36,8 @@ public class TaskDispatcherDefinitionModel {
   private String name;
 
   private Boolean outputDefined;
+
+  private Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -58,8 +60,10 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionModel(String name, Integer version) {
+  public TaskDispatcherDefinitionModel(String name, Boolean outputDefined, Boolean outputFunctionDefined, Integer version) {
     this.name = name;
+    this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
     this.version = version;
   }
 
@@ -132,8 +136,8 @@ public class TaskDispatcherDefinitionModel {
    * Does task dispatcher define output schema.
    * @return outputDefined
   */
-  
-  @Schema(name = "outputDefined", description = "Does task dispatcher define output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does task dispatcher define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -141,6 +145,26 @@ public class TaskDispatcherDefinitionModel {
 
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
+  }
+
+  public TaskDispatcherDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher define dynamic output schema.
+   * @return outputFunctionDefined
+  */
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does task dispatcher define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
   }
 
   public TaskDispatcherDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -292,6 +316,7 @@ public class TaskDispatcherDefinitionModel {
         Objects.equals(this.icon, taskDispatcherDefinition.icon) &&
         Objects.equals(this.name, taskDispatcherDefinition.name) &&
         Objects.equals(this.outputDefined, taskDispatcherDefinition.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, taskDispatcherDefinition.outputFunctionDefined) &&
         Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
         Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
         Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties) &&
@@ -302,7 +327,7 @@ public class TaskDispatcherDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, outputDefined, properties, resources, taskProperties, title, variablePropertiesDefined, version);
+    return Objects.hash(description, icon, name, outputDefined, outputFunctionDefined, properties, resources, taskProperties, title, variablePropertiesDefined, version);
   }
 
   @Override
@@ -313,6 +338,7 @@ public class TaskDispatcherDefinitionModel {
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    taskProperties: ").append(toIndentedString(taskProperties)).append("\n");

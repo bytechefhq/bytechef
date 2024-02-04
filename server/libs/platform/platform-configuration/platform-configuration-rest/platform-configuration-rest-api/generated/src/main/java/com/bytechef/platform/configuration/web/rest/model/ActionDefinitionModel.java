@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-02T18:49:47.325391+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T09:53:12.508680+01:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -43,6 +43,8 @@ public class ActionDefinitionModel {
 
   private Boolean outputDefined;
 
+  private Boolean outputFunctionDefined;
+
   @Valid
   private List<@Valid PropertyModel> properties;
 
@@ -55,8 +57,10 @@ public class ActionDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ActionDefinitionModel(String name) {
+  public ActionDefinitionModel(String name, Boolean outputDefined, Boolean outputFunctionDefined) {
     this.name = name;
+    this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
   }
 
   public ActionDefinitionModel componentName(String componentName) {
@@ -188,8 +192,8 @@ public class ActionDefinitionModel {
    * Does action define output schema.
    * @return outputDefined
   */
-  
-  @Schema(name = "outputDefined", description = "Does action define output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does action define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -197,6 +201,26 @@ public class ActionDefinitionModel {
 
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
+  }
+
+  public ActionDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does action define dynamic output schema.
+   * @return outputFunctionDefined
+  */
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does action define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
   }
 
   public ActionDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -263,13 +287,14 @@ public class ActionDefinitionModel {
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputDefined, actionDefinition.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, actionDefinition.outputFunctionDefined) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
         Objects.equals(this.title, actionDefinition.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, nodeDescriptionDefined, help, name, outputDefined, properties, title);
+    return Objects.hash(componentName, componentVersion, description, nodeDescriptionDefined, help, name, outputDefined, outputFunctionDefined, properties, title);
   }
 
   @Override
@@ -283,6 +308,7 @@ public class ActionDefinitionModel {
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");

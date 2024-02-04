@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-02T18:49:47.325391+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T09:53:12.508680+01:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String componentName;
@@ -45,6 +45,8 @@ public class TriggerDefinitionModel {
 
   private Boolean outputDefined;
 
+  private Boolean outputFunctionDefined;
+
   @Valid
   private List<@Valid PropertyModel> properties;
 
@@ -59,8 +61,10 @@ public class TriggerDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerDefinitionModel(String name, TriggerTypeModel type) {
+  public TriggerDefinitionModel(String name, Boolean outputDefined, Boolean outputFunctionDefined, TriggerTypeModel type) {
     this.name = name;
+    this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
     this.type = type;
   }
 
@@ -193,8 +197,8 @@ public class TriggerDefinitionModel {
    * Does trigger define output schema.
    * @return outputDefined
   */
-  
-  @Schema(name = "outputDefined", description = "Does trigger define output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does trigger define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputDefined")
   public Boolean getOutputDefined() {
     return outputDefined;
@@ -202,6 +206,26 @@ public class TriggerDefinitionModel {
 
   public void setOutputDefined(Boolean outputDefined) {
     this.outputDefined = outputDefined;
+  }
+
+  public TriggerDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does trigger define dynamic output schema.
+   * @return outputFunctionDefined
+  */
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does trigger define dynamic output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
   }
 
   public TriggerDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -288,6 +312,7 @@ public class TriggerDefinitionModel {
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputDefined, triggerDefinition.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, triggerDefinition.outputFunctionDefined) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
         Objects.equals(this.title, triggerDefinition.title) &&
         Objects.equals(this.type, triggerDefinition.type);
@@ -295,7 +320,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, nodeDescriptionDefined, help, name, outputDefined, properties, title, type);
+    return Objects.hash(componentName, componentVersion, description, nodeDescriptionDefined, help, name, outputDefined, outputFunctionDefined, properties, title, type);
   }
 
   @Override
@@ -309,6 +334,7 @@ public class TriggerDefinitionModel {
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
