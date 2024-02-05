@@ -251,8 +251,8 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             return {
-                componentName,
                 componentDefinition: JSON.stringify(componentProperty.componentDefinition),
+                componentName,
                 id: property.name,
                 value: property.label || property.name,
             };
