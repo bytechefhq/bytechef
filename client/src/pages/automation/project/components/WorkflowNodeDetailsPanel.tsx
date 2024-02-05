@@ -236,15 +236,15 @@ const WorkflowNodeDetailsPanel = ({
         const formattedProperties: DataPillType[] = existingProperties.map((property) => {
             if (property.properties) {
                 return getSubProperties(
-                    componentName,
                     componentProperty.componentDefinition!,
+                    componentName,
                     property.properties,
                     property.name
                 );
             } else if (property.items) {
                 return getSubProperties(
-                    componentName,
                     componentProperty.componentDefinition!,
+                    componentName,
                     property.items,
                     property.name
                 );
