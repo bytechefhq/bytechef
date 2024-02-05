@@ -2,8 +2,8 @@ import {ComponentDefinitionBasicModel} from '@/middleware/platform/workflow/exec
 import {PropertyType} from '@/types/projectTypes';
 
 export default function getSubProperties(
-    path: string,
     componentDefinition: ComponentDefinitionBasicModel,
+    path: string,
     properties: Array<PropertyType>,
     propertyName?: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,9 +12,9 @@ export default function getSubProperties(
         const subPropertyLabel = subProperty.label || subProperty.name;
 
         if (subProperty.properties?.length) {
-            return getSubProperties(path, componentDefinition, subProperty.properties, propertyName);
+            return getSubProperties(componentDefinition, path, subProperty.properties, propertyName);
         } else if (subProperty.items?.length) {
-            return getSubProperties(path, componentDefinition, subProperty.items, propertyName);
+            return getSubProperties(componentDefinition, path, subProperty.items, propertyName);
         }
 
         return {
