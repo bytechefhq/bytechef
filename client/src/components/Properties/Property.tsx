@@ -158,7 +158,6 @@ const Property = ({
 
         isNumericalInput ? setNumericValue(taskPropertyValue || '') : setInputValue(taskPropertyValue || '');
     }, [isNumericalInput, taskPropertyValue]);
-    console.log('taskPropertyValue: ', taskPropertyValue);
 
     const otherComponentData = componentData.filter((component) => {
         if (component.componentName !== currentComponent?.name) {

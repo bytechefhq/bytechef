@@ -27,7 +27,6 @@ export default async function saveWorkflowDefinition(
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
     index?: number
 ) {
-    console.log('saving nodeData: ', nodeData);
     const {actionName, componentName, label, name, parameters} = nodeData;
 
     const queryClient = new QueryClient();
@@ -40,9 +39,6 @@ export default async function saveWorkflowDefinition(
     if (!newNodeComponentDefinition) {
         return;
     }
-
-    // console.log('actionName: ', actionName);
-    // console.log('newNodeComponentDefinition: ', newNodeComponentDefinition);
 
     const newTask: WorkflowTaskModel = {
         label,
@@ -69,9 +65,6 @@ export default async function saveWorkflowDefinition(
             return;
         }
 
-        // console.log('existingWorkflowTask: ', existingWorkflowTask);
-        // console.log('newTask: ', newTask);
-
         tasks = [...(workflowDefinition.tasks || [])];
 
         const combinedParameters = {
@@ -84,8 +77,6 @@ export default async function saveWorkflowDefinition(
             ...newTask,
             parameters: combinedParameters,
         };
-
-        console.log('combinedTask: ', combinedTask);
 
         tasks[existingTaskIndex] = combinedTask;
 
