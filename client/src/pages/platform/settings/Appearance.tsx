@@ -1,6 +1,6 @@
-import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
+import {useTheme} from '@/providers/theme-provider';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React from 'react';
 import {useForm} from 'react-hook-form';
@@ -14,24 +14,19 @@ const appearanceFormSchema = z.object({
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 
-const defaultValues: Partial<AppearanceFormValues> = {
-    theme: localStorage.getItem('theme') as 'light' | 'dark' | 'system',
-};
-
 export default function Appearance() {
+    const {setTheme, theme} = useTheme();
+
     const form = useForm<AppearanceFormValues>({
-        defaultValues,
+        defaultValues: {
+            theme,
+        },
         resolver: zodResolver(appearanceFormSchema),
     });
 
-    function onSubmit(data: AppearanceFormValues) {
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        (window as any).__setPreferredTheme(data.theme);
-    }
-
     return (
         <Form {...form}>
-            <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-8">
                 <FormField
                     control={form.control}
                     name="theme"
@@ -46,7 +41,11 @@ export default function Appearance() {
                             <RadioGroup
                                 className="grid max-w-xl grid-cols-3 gap-8 pt-2"
                                 defaultValue={field.value}
-                                onValueChange={(e: 'light' | 'dark' | 'system') => field.onChange(e)}
+                                onValueChange={(e: 'light' | 'dark' | 'system') => {
+                                    field.onChange(e);
+
+                                    setTheme(e);
+                                }}
                             >
                                 <FormItem>
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
@@ -147,8 +146,6 @@ export default function Appearance() {
                         </FormItem>
                     )}
                 />
-
-                <Button type="submit">Update preferences</Button>
             </form>
         </Form>
     );
