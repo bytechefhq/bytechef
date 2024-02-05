@@ -472,7 +472,7 @@ const Property = ({
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                onValueChange={(value) => handleSelectChange(value, name)}
+                                onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<ISelectOption>) || undefined || []}
                             />
                         )}
