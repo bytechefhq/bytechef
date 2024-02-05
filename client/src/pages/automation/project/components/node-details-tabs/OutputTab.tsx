@@ -59,8 +59,6 @@ const SchemaProperties = ({
                 property.name &&
                 getNestedObject(sampleOutput, `${path ? path + '.' : ''}${property.name}`.replace('/', '.'));
 
-            const finalPath = `${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`;
-
             return (
                 <li className="flex flex-col" key={`${property.name}_${index}`}>
                     <div className="flex items-center space-x-3">
@@ -77,7 +75,7 @@ const SchemaProperties = ({
                             key={property.name}
                         >
                             <SchemaProperties
-                                path={finalPath}
+                                path={`${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
                                 properties={property.properties}
                                 sampleOutput={sampleOutput}
                             />
@@ -90,7 +88,7 @@ const SchemaProperties = ({
                             key={property.name}
                         >
                             <SchemaProperties
-                                path={finalPath}
+                                path={`${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
                                 properties={property.items}
                                 sampleOutput={sampleOutput}
                             />
