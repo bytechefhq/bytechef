@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/automation/project/components/DataPill';
+import getNestedObject from '@/pages/automation/project/utils/getNestedObject';
 import {PropertyType} from '@/types/projectTypes';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
@@ -11,9 +12,11 @@ import {ComponentActionData} from './DataPillPanelBody';
 const DataPillPanelBodyItem = ({
     componentAction,
     filteredProperties,
+    sampleOutput,
 }: {
     componentAction: ComponentActionData;
     filteredProperties: Array<PropertyType>;
+    sampleOutput: object;
 }) => {
     const {icon, title} = componentAction.componentDefinition;
 
@@ -22,7 +25,7 @@ const DataPillPanelBodyItem = ({
     const currentComponentAction = componentActions.find(
         (action) => action.workflowNodeName === componentAction.workflowNodeName
     );
-    console.log(componentAction?.properties?.[0]);
+
     return (
         <>
             <AccordionTrigger
@@ -60,18 +63,29 @@ const DataPillPanelBodyItem = ({
                             componentIcon={componentAction.componentDefinition.icon}
                             property={componentAction?.outputSchema}
                             root={true}
+                            sampleOutput={sampleOutput}
                             workflowNodeName={componentAction.workflowNodeName}
                         />
 
                         <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
-                            {filteredProperties?.map((property) => (
-                                <DataPill
-                                    componentAlias={componentAction.workflowNodeName}
-                                    componentIcon={componentAction.componentDefinition.icon}
-                                    key={property.name}
-                                    property={property}
-                                />
-                            ))}
+                            {filteredProperties?.map((property) => {
+                                const value = getNestedObject(sampleOutput, property.name!.replaceAll('/', '.'));
+
+                                return (
+                                    <div className="flex items-center space-x-3" key={property.name}>
+                                        <DataPill
+                                            componentIcon={componentAction.componentDefinition.icon}
+                                            property={property}
+                                            sampleOutput={sampleOutput}
+                                            workflowNodeName={componentAction.workflowNodeName}
+                                        />
+
+                                        {value && typeof value !== 'object' && (
+                                            <div className="flex-1 text-xs text-muted-foreground">{value}</div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </ul>
                     </>
                 ) : (

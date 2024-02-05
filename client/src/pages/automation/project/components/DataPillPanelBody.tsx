@@ -46,6 +46,7 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
                             <DataPillPanelBodyItem
                                 componentAction={componentAction}
                                 filteredProperties={filteredProperties}
+                                sampleOutput={componentActionData[index]?.sampleOutput}
                             />
                         </AccordionItem>
                     );
