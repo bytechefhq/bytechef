@@ -77,7 +77,7 @@ public class DemoProjectConfiguration {
                                 .toList())
                         .build());
 
-                for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.yaml")) {
+                for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.json")) {
                     Workflow workflow = workflowService.create(
                         resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
                         Type.AUTOMATION.getId());
