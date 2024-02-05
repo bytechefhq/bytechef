@@ -8,6 +8,7 @@ import {
     useSaveWorkflowNodeTestOutputMutation,
     useUploadSampleOutputRequestMutation,
 } from '@/mutations/platform/workflowNodeTestOutputs.mutations';
+import getNestedObject from '@/pages/automation/project/utils/getNestedObject';
 import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
 import {PropertyType} from '@/types/projectTypes';
 import {useQueryClient} from '@tanstack/react-query';
@@ -35,7 +36,7 @@ const AnimateSpin = ({className}: {className?: string}) => (
     </svg>
 );
 
-const PropertyField = ({data, label = 'item'}: {data: PropertyType; label: string}) => (
+const PropertyField = ({data, label = '[index]'}: {data: PropertyType; label: string}) => (
     <div className="inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
         <span title={data.type}>{TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}</span>
 
@@ -43,31 +44,59 @@ const PropertyField = ({data, label = 'item'}: {data: PropertyType; label: strin
     </div>
 );
 
-const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
+const SchemaProperties = ({
+    path,
+    properties,
+    sampleOutput,
+}: {
+    properties: Array<PropertyType>;
+    path?: string;
+    sampleOutput: object;
+}) => (
     <ul className="ml-2 h-full">
-        {properties.map((property, index) => (
-            <li className="flex flex-col" key={`${property.name}_${index}`}>
-                <PropertyField data={property} label={property.name!} />
+        {properties.map((property, index) => {
+            const value =
+                property.name &&
+                getNestedObject(sampleOutput, `${path ? path + '.' : ''}${property.name}`.replace('/', '.'));
 
-                {property.properties && !!property.properties.length && (
-                    <div
-                        className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
-                        key={property.name}
-                    >
-                        <SchemaProperties properties={property.properties} />
-                    </div>
-                )}
+            return (
+                <li className="flex flex-col" key={`${property.name}_${index}`}>
+                    <div className="flex items-center space-x-3">
+                        <PropertyField data={property} label={property.name!} />
 
-                {property.items && !!property.items.length && (
-                    <div
-                        className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
-                        key={property.name}
-                    >
-                        <SchemaProperties properties={property.items} />
+                        {value && typeof value !== 'object' && (
+                            <div className="flex-1 text-xs text-muted-foreground">{value}</div>
+                        )}
                     </div>
-                )}
-            </li>
-        ))}
+
+                    {property.properties && !!property.properties.length && (
+                        <div
+                            className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
+                            key={property.name}
+                        >
+                            <SchemaProperties
+                                path={`${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
+                                properties={property.properties}
+                                sampleOutput={sampleOutput}
+                            />
+                        </div>
+                    )}
+
+                    {property.items && !!property.items.length && (
+                        <div
+                            className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
+                            key={property.name}
+                        >
+                            <SchemaProperties
+                                path={`${path ? path + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
+                                properties={property.items}
+                                sampleOutput={sampleOutput}
+                            />
+                        </div>
+                    )}
+                </li>
+            );
+        })}
     </ul>
 );
 
@@ -75,12 +104,14 @@ const OutputTab = ({
     currentNode,
     outputDefined = false,
     outputSchema,
+    sampleOutput,
     workflowId,
 }: {
     currentNode: NodeProps['data'];
     outputDefined: boolean;
     outputSchema: PropertyModel;
     workflowId: string;
+    sampleOutput: object;
 }) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
 
@@ -125,7 +156,6 @@ const OutputTab = ({
     };
 
     const handleSampleDataDialogUpload = (value: string) => {
-        console.log(JSON.parse(value));
         uploadSampleOutputRequestMutation.mutate({
             body: JSON.parse(value),
             workflowId,
@@ -185,7 +215,10 @@ const OutputTab = ({
                     </div>
 
                     {(outputSchema as PropertyType)?.properties && (
-                        <SchemaProperties properties={(outputSchema as PropertyType).properties!} />
+                        <SchemaProperties
+                            properties={(outputSchema as PropertyType).properties!}
+                            sampleOutput={sampleOutput}
+                        />
                     )}
 
                     {!(outputSchema as PropertyType).properties && !!(outputSchema as PropertyType).controlType && (
