@@ -1,5 +1,5 @@
-import PropInput from '@/components/Properties/components/PropInput/PropInput';
-import PropSelect from '@/components/Properties/components/PropSelect';
+import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
+import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
@@ -81,14 +81,14 @@ const ObjectProperty = ({
                             </header>
 
                             <main className="space-y-2">
-                                <PropInput
+                                <PropertyInput
                                     label="Name"
                                     name="additionalPropertyName"
                                     placeholder="Name for the additional property"
                                 />
 
                                 {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
-                                    <PropSelect
+                                    <PropertySelect
                                         label="Type"
                                         options={(additionalProperties as Array<PropertyType>).map(
                                             (additionalProperty) => ({

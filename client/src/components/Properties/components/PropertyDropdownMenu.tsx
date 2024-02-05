@@ -19,13 +19,13 @@ export interface IDropdownMenuItem {
     shortcut?: string;
 }
 
-type DropdownMenuProps = {
+type PropertyDropdownMenuProps = {
     menuItems: IDropdownMenuItem[];
     trigger?: ReactNode;
     id?: number;
 };
 
-const PropDropdownMenu = ({id = 0, menuItems, trigger}: DropdownMenuProps) => (
+const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenuProps) => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
             {trigger ? (
@@ -73,4 +73,4 @@ const PropDropdownMenu = ({id = 0, menuItems, trigger}: DropdownMenuProps) => (
     </DropdownMenu>
 );
 
-export default PropDropdownMenu;
+export default PropertyDropdownMenu;

@@ -1,4 +1,4 @@
-import PropDropdownMenu from '@/components/Properties/components/PropDropdownMenu';
+import PropertyDropdownMenu from '@/components/Properties/components/PropertyDropdownMenu';
 import {Button} from '@/components/ui/button';
 import {DataPillType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
@@ -42,7 +42,7 @@ const ArrayProperty = ({dataPills, property}: {dataPills?: Array<DataPillType>; 
             {multipleValues && (
                 <div className="relative ml-2 w-full self-start border-l pl-2 pt-2">
                     {newPropertyTypeOptions?.length && newPropertyTypeOptions?.length > 1 ? (
-                        <PropDropdownMenu
+                        <PropertyDropdownMenu
                             menuItems={newPropertyTypeOptions}
                             trigger={
                                 <Button

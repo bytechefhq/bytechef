@@ -1,7 +1,7 @@
-import PropInput from '@/components/Properties/components/PropInput/PropInput';
-import PropMentionsInput from '@/components/Properties/components/PropMentionsInput/PropMentionsInput';
-import PropSelect, {ISelectOption} from '@/components/Properties/components/PropSelect';
-import PropTextArea from '@/components/Properties/components/PropTextArea';
+import PropertyMentionsInput from '@/components/Properties/components/PropMentionsInput/PropertyMentionsInput';
+import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
+import PropertySelect, {ISelectOption} from '@/components/Properties/components/PropertySelect';
+import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
@@ -352,7 +352,7 @@ const Property = ({
                 )}
 
                 {showMentionInput && !!dataPills?.length && (
-                    <PropMentionsInput
+                    <PropertyMentionsInput
                         controlType={controlType}
                         currentComponent={currentComponent}
                         currentComponentData={currentComponentData}
@@ -423,7 +423,7 @@ const Property = ({
                         )}
 
                         {register && isValidControlType && (
-                            <PropInput
+                            <PropertyInput
                                 defaultValue={defaultValue}
                                 description={description}
                                 error={hasError}
@@ -441,7 +441,7 @@ const Property = ({
                         )}
 
                         {!register && isValidControlType && (
-                            <PropInput
+                            <PropertyInput
                                 description={description}
                                 error={hasError}
                                 errorMessage={errorMessage}
@@ -467,7 +467,7 @@ const Property = ({
                         )}
 
                         {controlType === 'SELECT' && (
-                            <PropSelect
+                            <PropertySelect
                                 defaultValue={taskPropertyValue || defaultValue?.toString()}
                                 description={description}
                                 label={label}
@@ -504,7 +504,7 @@ const Property = ({
                         )}
 
                         {controlType === 'TEXT_AREA' && (
-                            <PropTextArea
+                            <PropertyTextArea
                                 description={description}
                                 key={name}
                                 label={label}
@@ -514,7 +514,7 @@ const Property = ({
                         )}
 
                         {register && type === 'BOOLEAN' && (
-                            <PropSelect
+                            <PropertySelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
@@ -530,7 +530,7 @@ const Property = ({
                         )}
 
                         {!register && type === 'BOOLEAN' && (
-                            <PropSelect
+                            <PropertySelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}

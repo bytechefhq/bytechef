@@ -5,7 +5,7 @@ import 'quill-mention';
 import {ChangeEvent, KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
-import './propMentionsInput.css';
+import './propertyMentionsInput.css';
 
 import {Label} from '@/components/ui/label';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
@@ -17,12 +17,12 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 
-import PropMentionBlot from './PropMentionBlot';
+import PropertyMentionsInputBlot from './PropertyMentionsInputBlot';
 
 const isAlphaNumericalKeyCode = (event: KeyboardEvent) =>
     (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90);
 
-Quill.register('formats/property-mention', PropMentionBlot);
+Quill.register('formats/property-mention', PropertyMentionsInputBlot);
 
 const MentionInputListItem = (item: DataPillType) => {
     const div = document.createElement('div');
@@ -38,7 +38,7 @@ const MentionInputListItem = (item: DataPillType) => {
     return div;
 };
 
-type MentionsInputProps = {
+type PropertyMentionsInputProps = {
     controlType?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
@@ -58,7 +58,7 @@ type MentionsInputProps = {
     workflow?: WorkflowModel;
 };
 
-const PropMentionsInput = forwardRef(
+const PropertyMentionsInput = forwardRef(
     (
         {
             controlType,
@@ -77,7 +77,7 @@ const PropMentionsInput = forwardRef(
             singleMention,
             updateWorkflowMutation,
             workflow,
-        }: MentionsInputProps,
+        }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>
     ) => {
         const [value, setValue] = useState(defaultValue || '');
@@ -328,6 +328,6 @@ const PropMentionsInput = forwardRef(
     }
 );
 
-PropMentionsInput.displayName = 'PropMentionsInput';
+PropertyMentionsInput.displayName = 'PropertyMentionsInput';
 
-export default memo(PropMentionsInput);
+export default memo(PropertyMentionsInput);

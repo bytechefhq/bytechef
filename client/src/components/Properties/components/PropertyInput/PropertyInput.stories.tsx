@@ -1,6 +1,6 @@
 import {ComponentMeta, ComponentStory} from '@storybook/react';
 
-import PropInput from './PropInput';
+import PropertyInput from './PropertyInput';
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
@@ -8,12 +8,12 @@ export default {
     argTypes: {
         type: {defaultValue: 'text'},
     },
-    component: PropInput,
+    component: PropertyInput,
     title: 'Input',
-} as ComponentMeta<typeof PropInput>;
+} as ComponentMeta<typeof PropertyInput>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof PropInput> = (args) => <PropInput {...args} />;
+const Template: ComponentStory<typeof PropertyInput> = (args) => <PropertyInput {...args} />;
 
 export const Normal = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args

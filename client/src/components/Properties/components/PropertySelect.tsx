@@ -12,7 +12,7 @@ export interface ISelectOption {
     value: string;
 }
 
-type SelectProps = {
+type PropertySelectProps = {
     options: ISelectOption[];
     defaultValue?: string;
     description?: string;
@@ -25,7 +25,7 @@ type SelectProps = {
     value?: string;
 };
 
-const PropSelect = ({
+const PropertySelect = ({
     defaultValue,
     description,
     label,
@@ -36,7 +36,7 @@ const PropSelect = ({
     placeholder = 'Select...',
     required,
     value,
-}: SelectProps) => (
+}: PropertySelectProps) => (
     <fieldset className="w-full space-y-2">
         {label && (
             <div className="flex items-center">
@@ -137,4 +137,4 @@ const PropSelect = ({
     </fieldset>
 );
 
-export default PropSelect;
+export default PropertySelect;

@@ -64,7 +64,7 @@ const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: Com
                             {item?.label}
                         </span>
                     ) : (
-                        'PropSelect...'
+                        'PropertySelect...'
                     )}
 
                     <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />

@@ -4,7 +4,7 @@ import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-
 import {ChangeEvent, DetailedHTMLProps, InputHTMLAttributes, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-type InputProps = {
+type PropertyInputProps = {
     description?: string;
     error?: boolean;
     errorMessage?: string;
@@ -17,7 +17,7 @@ type InputProps = {
     value?: string;
 } & DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
-const PropInput = forwardRef<HTMLInputElement, InputProps>(
+const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
     (
         {
             className,
@@ -122,6 +122,6 @@ const PropInput = forwardRef<HTMLInputElement, InputProps>(
     )
 );
 
-PropInput.displayName = 'PropInput';
+PropertyInput.displayName = 'PropertyInput';
 
-export default PropInput;
+export default PropertyInput;

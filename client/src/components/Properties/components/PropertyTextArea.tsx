@@ -5,7 +5,7 @@ import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-
 import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-type TextAreaProps = {
+type PropertyTextAreaProps = {
     description?: string;
     error?: string | undefined;
     label?: string;
@@ -13,7 +13,7 @@ type TextAreaProps = {
     name: string;
 } & TextareaProps;
 
-const PropTextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
     ({description, error, label, labelClassName, name, required, ...props}, ref) => (
         <fieldset className="mb-3 w-full">
             {label && (
@@ -62,6 +62,6 @@ const PropTextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     )
 );
 
-PropTextArea.displayName = 'PropTextArea';
+PropertyTextArea.displayName = 'PropertyTextArea';
 
-export default PropTextArea;
+export default PropertyTextArea;
