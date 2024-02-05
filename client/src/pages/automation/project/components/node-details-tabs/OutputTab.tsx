@@ -66,9 +66,9 @@ const PropertyField = ({
                 <span className="px-2">{label}</span>
 
                 {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                    <div className="flex-1 text-xs text-muted-foreground">
+                    <span className="flex-1 text-xs text-muted-foreground">
                         {value === true ? 'true' : value === false ? false : value}
-                    </div>
+                    </span>
                 )}
 
                 <div className="absolute right-0.5">

@@ -18,17 +18,27 @@ const getNestedObject = (jsonObj: any, selector: string) => {
             index = 0;
         }
 
-        return obj
-            ? index > -1
-                ? finalKey
-                    ? Array.isArray(obj)
-                        ? obj[index][finalKey]
-                        : obj[finalKey][index]
-                    : obj[index]
-                : finalKey
-                  ? obj[finalKey]
-                  : undefined
-            : undefined;
+        if (obj) {
+            if (index > -1) {
+                if (finalKey) {
+                    if (Array.isArray(obj)) {
+                        return obj[index][finalKey];
+                    } else {
+                        return obj[finalKey][index];
+                    }
+                } else {
+                    return obj[index];
+                }
+            } else {
+                if (finalKey) {
+                    return obj[finalKey];
+                } else {
+                    return undefined;
+                }
+            }
+        } else {
+            return undefined;
+        }
     }, jsonObj);
 };
 
