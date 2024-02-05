@@ -43,11 +43,13 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
                             key={`accordion-item-${componentAction.workflowNodeName}`}
                             value={componentAction.workflowNodeName}
                         >
-                            <DataPillPanelBodyItem
-                                componentAction={componentAction}
-                                filteredProperties={filteredProperties}
-                                sampleOutput={componentActionData[index]?.sampleOutput}
-                            />
+                            {componentActionData[index] && (
+                                <DataPillPanelBodyItem
+                                    componentAction={componentAction}
+                                    filteredProperties={filteredProperties}
+                                    sampleOutput={componentActionData[index].sampleOutput}
+                                />
+                            )}
                         </AccordionItem>
                     );
                 })}

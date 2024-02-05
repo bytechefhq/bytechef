@@ -96,6 +96,8 @@ const SchemaProperties = ({
 }) => (
     <ul className="ml-2 h-full">
         {properties.map((property, index) => {
+            const path = `${parentPath ? parentPath + (property.name ? '.' : '') : ''}${property.name || '[index]'}`;
+
             return (
                 <li className="flex flex-col" key={`${property.name}_${index}`}>
                     <PropertyField
@@ -112,7 +114,7 @@ const SchemaProperties = ({
                             key={property.name}
                         >
                             <SchemaProperties
-                                parentPath={`${parentPath ? parentPath + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
+                                parentPath={path}
                                 properties={property.properties}
                                 sampleOutput={sampleOutput}
                                 workflowNodeName={workflowNodeName}
@@ -126,7 +128,7 @@ const SchemaProperties = ({
                             key={property.name}
                         >
                             <SchemaProperties
-                                parentPath={`${parentPath ? parentPath + (property.name ? '.' : '') : ''}${property.name || '[index]'}`}
+                                parentPath={path}
                                 properties={property.items}
                                 sampleOutput={sampleOutput}
                                 workflowNodeName={workflowNodeName}
