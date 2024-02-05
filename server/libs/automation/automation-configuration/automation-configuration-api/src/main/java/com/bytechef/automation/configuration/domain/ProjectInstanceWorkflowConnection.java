@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;

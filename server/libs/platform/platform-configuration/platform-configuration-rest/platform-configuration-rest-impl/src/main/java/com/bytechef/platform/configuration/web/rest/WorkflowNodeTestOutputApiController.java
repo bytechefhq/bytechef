@@ -20,6 +20,7 @@ import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
+    @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputApiController(
         ConversionService conversionService, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
