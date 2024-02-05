@@ -57,10 +57,10 @@ const DataPillPanelBodyItem = ({
                 {filteredProperties.length ? (
                     <>
                         <DataPill
-                            workflowNodeName={componentAction.workflowNodeName}
                             componentIcon={componentAction.componentDefinition.icon}
                             property={componentAction?.outputSchema}
                             root={true}
+                            workflowNodeName={componentAction.workflowNodeName}
                         />
 
                         <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">

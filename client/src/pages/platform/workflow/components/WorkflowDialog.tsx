@@ -78,7 +78,7 @@ const WorkflowDialog = ({
                         null,
                         SPACE
                     ),
-                    version: workflow.version
+                    version: workflow.version,
                 },
             });
         } else {

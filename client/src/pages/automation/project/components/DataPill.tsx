@@ -6,12 +6,12 @@ import {twMerge} from 'tailwind-merge';
 
 const DataPill = ({
     arrayIndex,
-    workflowNodeName,
     componentIcon,
     parentProperty,
     path,
     property,
     root = false,
+    workflowNodeName,
 }: {
     arrayIndex?: number;
     componentIcon?: string;
