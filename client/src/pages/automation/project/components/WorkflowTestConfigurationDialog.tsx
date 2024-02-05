@@ -104,6 +104,11 @@ const WorkflowTestConfigurationDialog = ({
     });
 
     function saveWorkflowTestConfiguration(workflowTestConfigurationModel: WorkflowTestConfigurationModel) {
+        workflowTestConfigurationModel = {
+            ...workflowTestConfigurationModel,
+            connections: workflowTestConfigurationModel.connections?.filter((connection) => connection.connectionId),
+        };
+
         saveWorkflowTestConfigurationMutation.mutate({
             workflowId: workflow.id!,
             workflowTestConfigurationModel,
