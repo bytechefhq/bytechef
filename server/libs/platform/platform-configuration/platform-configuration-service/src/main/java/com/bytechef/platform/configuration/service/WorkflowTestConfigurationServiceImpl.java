@@ -67,20 +67,16 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     public WorkflowTestConfiguration saveWorkflowTestConfiguration(
         WorkflowTestConfiguration workflowTestConfiguration) {
 
-        WorkflowTestConfiguration currentWorkflowTestConfiguration;
+        return workflowTestConfigurationRepository.save(
+            workflowTestConfigurationRepository
+                .findByWorkflowId(Validate.notNull(workflowTestConfiguration.getWorkflowId(), "workflowId("))
+                .map(curWorkflowTestConfiguration -> {
+                    curWorkflowTestConfiguration.setConnections(workflowTestConfiguration.getConnections());
+                    curWorkflowTestConfiguration.setInputs(workflowTestConfiguration.getInputs());
 
-        if (workflowTestConfiguration.getWorkflowId() == null) {
-            currentWorkflowTestConfiguration = workflowTestConfiguration;
-        } else {
-            currentWorkflowTestConfiguration = OptionalUtils.get(
-                workflowTestConfigurationRepository.findByWorkflowId(
-                    Validate.notNull(workflowTestConfiguration.getWorkflowId(), "workflowId(")));
-
-            currentWorkflowTestConfiguration.setConnections(workflowTestConfiguration.getConnections());
-            currentWorkflowTestConfiguration.setInputs(workflowTestConfiguration.getInputs());
-        }
-
-        return workflowTestConfigurationRepository.save(currentWorkflowTestConfiguration);
+                    return curWorkflowTestConfiguration;
+                })
+                .orElse(workflowTestConfiguration));
     }
 
     @Override
