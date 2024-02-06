@@ -16,7 +16,6 @@
 
 package com.bytechef.file.storage.base64.service;
 
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,7 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class Base64StorageServiceTest {
+public class NoopStorageServiceTest {
 
     private static final String DATA = "data";
     private static final String STRING = "test string";
@@ -38,7 +37,7 @@ public class Base64StorageServiceTest {
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.getFileStream(
-            DATA, new FileEntry("file.text", "base64://" + EncodingUtils.encodeBase64ToString(STRING)));
+            DATA, new FileEntry("file.text", "noop://" + STRING));
 
         Assertions.assertThat(
             new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
@@ -49,7 +48,7 @@ public class Base64StorageServiceTest {
     public void testRead() {
         Assertions.assertThat(
             base64StorageService.readFileToString(
-                DATA, new FileEntry("file.text", "base64://" + EncodingUtils.encodeBase64ToString(STRING))))
+                DATA, new FileEntry("file.text", "noop://" + STRING)))
             .isEqualTo(STRING);
     }
 
@@ -59,6 +58,6 @@ public class Base64StorageServiceTest {
             DATA, "fileEntry", new ByteArrayInputStream(STRING.getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertThat(fileEntry.getUrl())
-            .isEqualTo("base64://" + EncodingUtils.encodeBase64ToString(STRING));
+            .isEqualTo("noop://" + STRING);
     }
 }
