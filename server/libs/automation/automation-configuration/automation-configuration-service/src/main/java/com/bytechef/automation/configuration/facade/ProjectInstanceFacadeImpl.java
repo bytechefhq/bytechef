@@ -126,8 +126,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows, ProjectInstance projectInstance) {
 
         projectInstanceWorkflows = projectInstanceWorkflowService.create(
-            projectInstanceWorkflows.stream()
-                .peek(projectInstanceWorkflow -> projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId()))
+            projectInstanceWorkflows
+                .stream()
+                .peek(projectInstanceWorkflow -> {
+                    Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+                    validate(projectInstanceWorkflow.getInputs(), workflow);
+
+                    projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId());
+                })
                 .toList());
 
         return projectInstanceWorkflows;
@@ -265,9 +272,19 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService.update(
-            CollectionUtils.map(
-                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceDTO
+            .projectInstanceWorkflows()
+            .stream()
+            .map(ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow)
+            .peek(projectInstanceWorkflow -> {
+                Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+                validate(projectInstanceWorkflow.getInputs(), workflow);
+            })
+            .toList();
+
+        projectInstanceWorkflows = projectInstanceWorkflowService.update(projectInstanceWorkflows);
+
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
 
         return new ProjectInstanceDTO(
@@ -284,6 +301,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public ProjectInstanceWorkflow updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+        validate(projectInstanceWorkflow.getInputs(), workflow);
+
         return projectInstanceWorkflowService.update(projectInstanceWorkflow);
     }
 
@@ -368,7 +389,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {
         return projectService.getProjects(
-            projectInstances.stream()
+            projectInstances
+                .stream()
                 .map(ProjectInstance::getProjectId)
                 .filter(Objects::nonNull)
                 .toList());
@@ -376,7 +398,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private List<Tag> getTags(List<ProjectInstance> projectInstances) {
         return tagService.getTags(
-            projectInstances.stream()
+            projectInstances
+                .stream()
                 .flatMap(projectInstance -> CollectionUtils.stream(projectInstance.getTagIds()))
                 .filter(Objects::nonNull)
                 .toList());
@@ -395,6 +418,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
                 Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
+                Validate.notEmpty((String) inputs.get(input.name()), "Missing required param: " + input.name());
             }
         }
     }
