@@ -242,7 +242,7 @@ const OutputTab = ({
                                 <DropdownMenuItem onClick={handleTestComponentClick}>Test Component</DropdownMenuItem>
 
                                 <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
-                                    Upload Sample Output
+                                    Upload Sample Output Data
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -313,7 +313,7 @@ const OutputTab = ({
                                     </>
                                 )}
 
-                                {!uploadSampleOutputRequestMutation.isPending && <>Upload Sample Output</>}
+                                {!uploadSampleOutputRequestMutation.isPending && <>Upload Sample Output Data</>}
                             </Button>
                         </div>
                     </div>

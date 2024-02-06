@@ -41,7 +41,7 @@ const OutputTabSampleDataDialog = ({
             <DialogContent className="max-w-[800px]">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
-                        <DialogTitle>Upload Sample Output</DialogTitle>
+                        <DialogTitle>Upload Sample Output Data</DialogTitle>
 
                         <DialogClose asChild>
                             <Button size="icon" variant="ghost">
