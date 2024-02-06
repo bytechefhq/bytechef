@@ -17,6 +17,7 @@
 package com.bytechef.platform.file.storage.config;
 
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.file.storage.base64.service.NoopFileStorageService;
 import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -62,6 +63,7 @@ public class TriggerFileStorageConfiguration {
         return switch (workflowOutputStorageProvider) {
             case "base64" -> new Base64FileStorageService();
             case "filesystem" -> new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
+            case "noop" -> new NoopFileStorageService();
             default -> throw new IllegalArgumentException(
                 "Output storage %s does not exist".formatted(workflowOutputStorageProvider));
         };

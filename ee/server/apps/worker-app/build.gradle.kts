@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-noop-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
