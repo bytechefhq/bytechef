@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.mail.util.GoogleMailUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,25 +34,25 @@ import org.mockito.MockedStatic;
  */
 public abstract class AbstractGoogleMailActionTest {
 
-    protected MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic;
+    protected MockedStatic<GoogleServices> googleServicesMockedStatic;
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Gmail mockedGmail = mock(Gmail.class);
     protected Parameters mockedParameters = mock(Parameters.class);
 
     @BeforeEach
     public void beforeEach() {
-        googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class);
+        googleServicesMockedStatic = mockStatic(GoogleServices.class);
 
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("accessToken");
 
-        googleMailUtilsMockedStatic
-            .when(() -> GoogleMailUtils.getMail(mockedParameters))
+        googleServicesMockedStatic
+            .when(() -> GoogleServices.getMail(mockedParameters))
             .thenReturn(mockedGmail);
     }
 
     @AfterEach
     public void afterEach() {
-        googleMailUtilsMockedStatic.close();
+        googleServicesMockedStatic.close();
     }
 }

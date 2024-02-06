@@ -181,10 +181,6 @@ class GoogleCalendarCreateEventActionTest extends AbstractGoogleCalendarActionTe
 
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
-                .thenReturn(mockedCalendar);
-
-            googleCalendarUtilsMockedStatic
                 .when(() -> GoogleCalendarUtils.createEventDateTime(any()))
                 .thenReturn(eventDateTime);
 

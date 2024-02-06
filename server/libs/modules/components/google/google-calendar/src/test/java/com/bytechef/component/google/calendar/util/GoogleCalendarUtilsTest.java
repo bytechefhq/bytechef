@@ -16,7 +16,6 @@
 
 package com.bytechef.component.google.calendar.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OUT_OF_OFFICE;
@@ -32,7 +31,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -90,16 +88,6 @@ class GoogleCalendarUtilsTest {
         assertEquals(new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(eventDateTimeCustom.dateTime())),
             eventDateTime.getDateTime());
         assertEquals("timeZone", eventDateTime.getTimeZone());
-    }
-
-    @Test
-    void testGetCalendar() {
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
-        Calendar calendar = GoogleCalendarUtils.getCalendar(mockedParameters);
-
-        assertEquals("Google Calendar Component", calendar.getApplicationName());
     }
 
     @Test
