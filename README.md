@@ -70,7 +70,7 @@ ByteChef can help you as:
 
 [//]: # (For general help using ByteChef, please refer to the official [documentation]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;. For additional help, you can use one of these channels to ask a question:)
 
-[//]: # (- [Discord]&#40;https://https://discord.gg/JcNSqJ7vK8; - Discussions with the community and the team.)
+[//]: # (- [Discord]&#40;https://discord.gg/JcNSqJ7vK8; - Discussions with the community and the team.)
 [//]: # (- [GitHub]&#40;https://github.com/bytechefhq/bytechef/issues&#41; - For bug reports and feature requests.)
 [//]: # (- [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; - Ask for help and propose new ideas.)
 [//]: # (- [Twitter]&#40;https://twitter.com/bytechefhq&#41; - Get the product updates easily.)
