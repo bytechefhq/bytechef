@@ -202,23 +202,26 @@ public class GoogleCalendarConstants {
             bool(ANYONE_CAN_ADD_SELF),
             array(ATTACHMENTS)
                 .items(
-                    string(FILE_ID),
-                    string(FILE_URL),
-                    string(ICON_LINK),
-                    string(MIME_TYPE),
-                    string(TITLE)),
+                    object()
+                        .properties(string(FILE_ID),
+                            string(FILE_URL),
+                            string(ICON_LINK),
+                            string(MIME_TYPE),
+                            string(TITLE))),
             array(ATTENDEES)
                 .items(
-                    integer(ADDITIONAL_GUESTS),
-                    string(COMMENT),
-                    string(DISPLAY_NAME),
-                    string(EMAIL),
-                    string(ID),
-                    bool(OPTIONAL),
-                    bool(ORGANIZER),
-                    bool(RESOURCE),
-                    string(RESPONSE_STATUS),
-                    bool(SELF)),
+                    object()
+                        .properties(
+                            integer(ADDITIONAL_GUESTS),
+                            string(COMMENT),
+                            string(DISPLAY_NAME),
+                            string(EMAIL),
+                            string(ID),
+                            bool(OPTIONAL),
+                            bool(ORGANIZER),
+                            bool(RESOURCE),
+                            string(RESPONSE_STATUS),
+                            bool(SELF))),
             bool(ATTENDEES_OMMITTED),
             string(COLOR_ID),
             object(CONFERENCE_DATA)
@@ -242,18 +245,26 @@ public class GoogleCalendarConstants {
                                     string(STATUS_CODE))),
                     array(ENTRY_POINTS)
                         .items(
-                            string(ACCESS_CODE),
-                            array(ENTRY_POINT_FEATURES),
-                            string(ENTRY_POINT_TYPE),
-                            string(LABEL),
-                            string(MEETING_CODE),
-                            string(PASSCODE),
-                            string(PASSWORD),
-                            string(PIN),
-                            string(REGION_CODE),
-                            string(URI)),
+                            object()
+                                .properties(
+                                    string(ACCESS_CODE),
+                                    array(ENTRY_POINT_FEATURES)
+                                        .items(string()),
+                                    string(ENTRY_POINT_TYPE),
+                                    string(LABEL),
+                                    string(MEETING_CODE),
+                                    string(PASSCODE),
+                                    string(PASSWORD),
+                                    string(PIN),
+                                    string(REGION_CODE),
+                                    string(URI))),
                     string(NOTES),
-                    object(PARAMETERS),
+                    object(PARAMETERS)
+                        .properties(
+                            object("addOnParameters")
+                                .properties(
+                                    object(PARAMETERS)
+                                        .additionalProperties(string()))),
                     string(SIGNATURE)),
             dateTime(CREATED),
             object(CREATOR)
@@ -273,8 +284,10 @@ public class GoogleCalendarConstants {
             string(EVENT_TYPE),
             object(EXTENDED_PROPERTIES)
                 .properties(
-                    object(PRIVATE),
-                    object(SHARED)),
+                    object(PRIVATE)
+                        .additionalProperties(string()),
+                    object(SHARED)
+                        .additionalProperties(string())),
             object(FOCUS_TIME_PROPERTIES)
                 .properties(
                     string(AUTO_DECLINE_MODE),
@@ -286,7 +299,8 @@ public class GoogleCalendarConstants {
                     integer(HEIGHT),
                     string(ICON_LINK),
                     string(LINK),
-                    object(PREFERENCES),
+                    object(PREFERENCES)
+                        .additionalProperties(string()),
                     string(TITLE),
                     string(TYPE),
                     string(WIDTH)),
@@ -316,14 +330,17 @@ public class GoogleCalendarConstants {
                     string(AUTO_DECLINE_MODE),
                     string(DECLINE_MESSAGE)),
             bool(PRIVATE_COPY),
-            array(RECURRENCE),
+            array(RECURRENCE)
+                .items(string()),
             string(RECURRING_EVENT_ID),
             object(REMINDERS)
                 .properties(
                     array(OVERRIDES)
                         .items(
-                            string(METHOD),
-                            integer(MINUTES)),
+                            object()
+                                .properties(
+                                    string(METHOD),
+                                    integer(MINUTES))),
                     bool(USE_DEFAULT)),
             integer(SEQUENCE),
             object(SOURCE)
