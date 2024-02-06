@@ -38,7 +38,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.constant.GoogleDriveConstants;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
@@ -124,7 +124,7 @@ public final class GoogleDriveReadFileAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
-        Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
+        Drive drive = GoogleServices.getDrive(connectionParameters);
 
         return drive
             .files()
@@ -140,7 +140,7 @@ public final class GoogleDriveReadFileAction {
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
-        Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
+        Drive drive = GoogleServices.getDrive(connectionParameters);
 
         return drive
             .files()

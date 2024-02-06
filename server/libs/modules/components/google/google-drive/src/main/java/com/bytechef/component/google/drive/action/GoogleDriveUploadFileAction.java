@@ -36,7 +36,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -76,7 +76,7 @@ public final class GoogleDriveUploadFileAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
-        Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
+        Drive drive = GoogleServices.getDrive(connectionParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         File file = new File().setName(fileEntry.getName());

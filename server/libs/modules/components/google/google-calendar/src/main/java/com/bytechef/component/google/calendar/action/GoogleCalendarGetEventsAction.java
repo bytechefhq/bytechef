@@ -66,6 +66,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Events;
@@ -221,7 +222,7 @@ public class GoogleCalendarGetEventsAction {
     public static Events perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        Calendar service = GoogleCalendarUtils.getCalendar(connectionParameters);
+        Calendar service = GoogleServices.getCalendar(connectionParameters);
 
         return service.events()
             .list("primary")

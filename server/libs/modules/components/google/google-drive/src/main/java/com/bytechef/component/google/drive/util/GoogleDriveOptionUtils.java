@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,7 @@ public class GoogleDriveOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
-        Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
+        Drive drive = GoogleServices.getDrive(connectionParameters);
 
         List<com.google.api.services.drive.model.Drive> drives = drive
             .drives()

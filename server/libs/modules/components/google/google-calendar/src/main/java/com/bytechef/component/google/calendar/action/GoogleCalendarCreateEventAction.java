@@ -122,6 +122,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.ConferenceData;
 import com.google.api.services.calendar.model.Event;
@@ -606,7 +607,7 @@ public class GoogleCalendarCreateEventAction {
             .setWorkingLocationProperties(
                 inputParameters.get(WORKING_LOCATION_PROPERTIES, EventWorkingLocationProperties.class));
 
-        Calendar calendar = GoogleCalendarUtils.getCalendar(connectionParameters);
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         return calendar.events()
             .insert("primary", event)

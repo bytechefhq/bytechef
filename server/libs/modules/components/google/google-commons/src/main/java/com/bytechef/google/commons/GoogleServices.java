@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.drive.util;
+package com.bytechef.google.commons;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 
@@ -26,13 +26,28 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.Preconditions;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.gmail.Gmail;
 
 /**
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
+ * @author Monika Domiter
  */
-public class GoogleDriveUtils {
+public class GoogleServices {
+
+    private GoogleServices() {
+    }
+
+    public static Calendar getCalendar(Parameters connectionParameters) {
+        return new Calendar.Builder(
+            new NetHttpTransport(),
+            GsonFactory.getDefaultInstance(),
+            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+                .setApplicationName("Google Calendar Component")
+                .build();
+    }
 
     public static Drive getDrive(Parameters connectionParameters) {
         return new Drive.Builder(
@@ -40,6 +55,15 @@ public class GoogleDriveUtils {
             GsonFactory.getDefaultInstance(),
             new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
                 .setApplicationName("Google Drive Component")
+                .build();
+    }
+
+    public static Gmail getMail(Parameters connectionParameters) {
+        return new Gmail.Builder(
+            new NetHttpTransport(),
+            GsonFactory.getDefaultInstance(),
+            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+                .setApplicationName("Google Mail Component")
                 .build();
     }
 

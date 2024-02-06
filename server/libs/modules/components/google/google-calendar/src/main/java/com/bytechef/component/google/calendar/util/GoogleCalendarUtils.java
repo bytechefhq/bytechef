@@ -16,7 +16,6 @@
 
 package com.bytechef.component.google.calendar.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -46,14 +45,8 @@ import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.google.api.client.http.HttpExecuteInterceptor;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.Preconditions;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.ColorDefinition;
 import com.google.api.services.calendar.model.Colors;
@@ -175,37 +168,11 @@ public class GoogleCalendarUtils {
         return java.sql.Timestamp.valueOf(dateToConvert);
     }
 
-    public static Calendar getCalendar(Parameters connectionParameters) {
-        return new Calendar.Builder(
-            new NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
-                .setApplicationName("Google Calendar Component")
-                .build();
-    }
-
-    private record OAuthAuthentication(String token) implements HttpRequestInitializer, HttpExecuteInterceptor {
-
-        private OAuthAuthentication {
-            Preconditions.checkNotNull(token);
-        }
-
-        public void initialize(HttpRequest request) {
-            request.setInterceptor(this);
-        }
-
-        public void intercept(HttpRequest request) {
-            HttpHeaders httpHeaders = request.getHeaders();
-
-            httpHeaders.set("Authorization", "Bearer " + token);
-        }
-    }
-
     public static List<Option<String>> getColorOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
-        Calendar service = getCalendar(connectionParameters);
+        Calendar service = GoogleServices.getCalendar(connectionParameters);
 
         Colors colors = service.colors()
             .get()
