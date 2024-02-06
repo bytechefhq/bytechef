@@ -32,10 +32,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
  */
 public class MicrosoftOutlook365Constants {
 
-    private MicrosoftOutlook365Constants() {
-    }
-
     public static final String MICROSOFT_OUTLOOK_365 = "microsoftOutlook365";
+
     public static final String ADDRESS = "address";
     public static final String BCC_RECIPIENTS = "bccRecipients";
     public static final String BODY = "body";
@@ -75,6 +73,7 @@ public class MicrosoftOutlook365Constants {
     public static final String SENT_DATE_TIME = "sentDateTime";
     public static final String START_DATE_TIME = "startDateTime";
     public static final String SUBJECT = "subject";
+    public static final String TENANT_ID = "tenantId";
     public static final String TIME_ZONE = "timeZone";
     public static final String TO_RECIPIENTS = "toRecipients";
     public static final String UNIQUE_BODY = "uniqueBody";
@@ -215,4 +214,7 @@ public class MicrosoftOutlook365Constants {
                             string(CONTENT),
                             string(CONTENT_TYPE)),
                     string(WEB_LINK)));
+
+    private MicrosoftOutlook365Constants() {
+    }
 }

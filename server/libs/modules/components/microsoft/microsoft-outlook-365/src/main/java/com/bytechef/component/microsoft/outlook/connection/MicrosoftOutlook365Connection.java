@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.ModifiableConnectio
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TENANT_ID;
 
 import java.util.List;
 
@@ -36,15 +37,18 @@ public class MicrosoftOutlook365Connection {
             AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
-                    // TODO
                     string(CLIENT_ID)
                         .label("Client Id")
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
+                        .required(true),
+                    string(TENANT_ID)
+                        .label("Tenant Id")
+                        .defaultValue("common")
                         .required(true))
                 .authorizationUrl(
-                    (connection, context) -> "https://login.microsoftonline.com/common/oauth2/v2.0/authorize")
-                .scopes((connection, context) -> List.of("https://graph.microsoft.com/.default"))
-                .tokenUrl((connection, context) -> "https://login.microsoftonline.com/common/v2.0/oauth2/token"));
+                    (parameters, context) -> "https://login.microsoftonline.com/" + parameters.getString(TENANT_ID) +
+                        "/oauth2/v2.0/authorize")
+                .scopes((connection, context) -> List.of("https://graph.microsoft.com/.default")));
 }
