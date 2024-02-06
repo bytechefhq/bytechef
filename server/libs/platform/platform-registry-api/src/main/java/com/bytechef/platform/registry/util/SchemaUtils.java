@@ -138,8 +138,8 @@ public class SchemaUtils {
             case BaseDateTimeProperty ignored -> LocalDateTime.now();
             case BaseFileEntryProperty<?> ignored ->
                 Map.of(
-                    "extension", "sampleExtension", "mimeType", "sampleMimeType", "name", "sampleName", "url",
-                    "file:///tmp/fileName.txt");
+                    "extension", "txt", "mimeType", "text/plain", "name", "sampleName", "url",
+                    "file:///tmp/sampleFileName.txt");
             case BaseIntegerProperty ignored -> 57;
             case BaseNullProperty ignored -> null;
             case BaseNumberProperty ignored -> 23.34;
