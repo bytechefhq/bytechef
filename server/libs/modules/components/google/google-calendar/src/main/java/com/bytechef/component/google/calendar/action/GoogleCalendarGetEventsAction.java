@@ -208,8 +208,10 @@ public class GoogleCalendarGetEventsAction {
                     string(ACCESS_ROLE),
                     array(DEFAULT_REMINDERS)
                         .items(
-                            string(METHOD),
-                            integer(MINUTES)),
+                            object()
+                                .properties(
+                                    string(METHOD),
+                                    integer(MINUTES))),
                     string(NEXT_PAGE_TOKEN),
                     string(NEXT_SYNC_TOKEN),
                     array(EVENT)
