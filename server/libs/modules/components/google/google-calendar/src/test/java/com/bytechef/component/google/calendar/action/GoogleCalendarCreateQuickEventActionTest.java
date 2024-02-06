@@ -21,16 +21,13 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
@@ -62,18 +59,13 @@ class GoogleCalendarCreateQuickEventActionTest extends AbstractGoogleCalendarAct
         when(mockedQuickAdd.execute())
             .thenReturn(mockedEvent);
 
-        try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
-            googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
-                .thenReturn(mockedCalendar);
+        Event event = GoogleCalendarCreateQuickEventAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-            Event event = GoogleCalendarCreateQuickEventAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+        assertEquals(mockedEvent, event);
+        assertEquals("primary", calendarIdArgumentCaptor.getValue());
+        assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
+        assertEquals("text", eventTextArgumentCaptor.getValue());
 
-            assertEquals(mockedEvent, event);
-            assertEquals("primary", calendarIdArgumentCaptor.getValue());
-            assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
-            assertEquals("text", eventTextArgumentCaptor.getValue());
-        }
     }
 }

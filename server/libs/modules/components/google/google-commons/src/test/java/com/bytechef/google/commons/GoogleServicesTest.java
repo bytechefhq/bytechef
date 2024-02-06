@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.drive.util;
+package com.bytechef.google.commons;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,20 +22,42 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.gmail.Gmail;
 import org.junit.jupiter.api.Test;
 
-public class GoogleDriveUtilsTest {
+public class GoogleServicesTest {
+
+    private Parameters mockedParameters = mock(Parameters.class);
 
     @Test
-    void testGetDrive() {
-        Parameters mockedParameters = mock(Parameters.class);
-
+    void testGetCalendar() {
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("accessToken");
 
-        Drive drive = GoogleDriveUtils.getDrive(mockedParameters);
+        Calendar calendar = GoogleServices.getCalendar(mockedParameters);
+
+        assertEquals("Google Calendar Component", calendar.getApplicationName());
+    }
+
+    @Test
+    void testGetDrive() {
+        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
+            .thenReturn("accessToken");
+
+        Drive drive = GoogleServices.getDrive(mockedParameters);
 
         assertEquals("Google Drive Component", drive.getApplicationName());
+    }
+
+    @Test
+    void getMail() {
+        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
+            .thenReturn("accessToken");
+
+        Gmail gmail = GoogleServices.getMail(mockedParameters);
+
+        assertEquals("Google Mail Component", gmail.getApplicationName());
     }
 }

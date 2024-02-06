@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,7 @@ import org.mockito.MockedStatic;
  */
 public abstract class AbstractGoogleDriveActionTest {
 
-    protected MockedStatic<GoogleDriveUtils> mockedGoogleDriveUtils;
+    protected MockedStatic<GoogleServices> mockedGoogleServices;
     protected Drive mockedDrive = mock(Drive.class);
     protected Drive.Files mockedFiles = mock(Drive.Files.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
@@ -44,12 +44,12 @@ public abstract class AbstractGoogleDriveActionTest {
 
     @BeforeEach
     public void beforeEach() {
-        mockedGoogleDriveUtils = mockStatic(GoogleDriveUtils.class);
+        mockedGoogleServices = mockStatic(GoogleServices.class);
 
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("accessToken");
 
-        mockedGoogleDriveUtils.when(() -> GoogleDriveUtils.getDrive(mockedParameters))
+        mockedGoogleServices.when(() -> GoogleServices.getDrive(mockedParameters))
             .thenReturn(mockedDrive);
 
         when(mockedDrive.files())
@@ -61,6 +61,6 @@ public abstract class AbstractGoogleDriveActionTest {
         verify(mockedDrive, times(1))
             .files();
 
-        mockedGoogleDriveUtils.close();
+        mockedGoogleServices.close();
     }
 }

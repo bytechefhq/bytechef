@@ -16,33 +16,12 @@
 
 package com.bytechef.component.google.mail.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Parameters;
-import com.google.api.services.gmail.Gmail;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Monika Domiter
  */
 class GoogleMailUtilsTest {
-
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-
-    @Test
-    void getMail() {
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
-        Gmail gmail = GoogleMailUtils.getMail(mockedParameters);
-
-        assertEquals("Google Mail Component", gmail.getApplicationName());
-    }
 
     @Test
     void testGetMessageIdOptions() {

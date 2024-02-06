@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.DriveList;
 import java.io.IOException;
@@ -41,10 +42,10 @@ import org.mockito.MockedStatic;
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
  */
-public class GoogleDriveOptionUtilsTest {
+class GoogleDriveOptionUtilsTest {
 
     @Test
-    public void testGetDriveOptions() throws IOException {
+    void testGetDriveOptions() throws IOException {
         Drive mockedDrive = mock(Drive.class);
         Drive.Drives mockedDrives = mock(Drive.Drives.class);
         Drive.Drives.List mockedList = mock(Drive.Drives.List.class);
@@ -55,9 +56,9 @@ public class GoogleDriveOptionUtilsTest {
             mock(com.google.api.services.drive.model.Drive.class),
             mock(com.google.api.services.drive.model.Drive.class));
 
-        try (MockedStatic<GoogleDriveUtils> mockedGoogleDriveUtils = mockStatic(GoogleDriveUtils.class)) {
-            mockedGoogleDriveUtils
-                .when(() -> GoogleDriveUtils.getDrive(any()))
+        try (MockedStatic<GoogleServices> mockedGoogleServices = mockStatic(GoogleServices.class)) {
+            mockedGoogleServices
+                .when(() -> GoogleServices.getDrive(any()))
                 .thenReturn(mockedDrive);
             when(mockedDrive.drives())
                 .thenReturn(mockedDrives);

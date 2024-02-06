@@ -18,12 +18,16 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
@@ -32,11 +36,22 @@ public abstract class AbstractGoogleCalendarActionTest {
 
     protected Calendar mockedCalendar = mock(Calendar.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
+    protected MockedStatic<GoogleServices> mockedGoogleServices;
     protected Parameters mockedParameters = mock(Parameters.class);
 
     @BeforeEach
     public void beforeEach() {
+        mockedGoogleServices = mockStatic(GoogleServices.class);
+
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("accessToken");
+
+        mockedGoogleServices.when(() -> GoogleServices.getCalendar(mockedParameters))
+            .thenReturn(mockedCalendar);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        mockedGoogleServices.close();
     }
 }
