@@ -182,6 +182,53 @@ const PropertyMentionsInput = forwardRef(
 
         const taskPropertyValue = name ? currentWorkflowTask?.parameters?.[name] : '';
 
+const handleOnChange = (value: string) => {
+            if (onChange) {
+                onChange({
+                    target: {name, value},
+                } as ChangeEvent<HTMLInputElement>);
+            }
+
+            setValue(value);
+
+            setMentionOccurences(value.match(/property-mention/g)?.length || 0);
+        };
+
+        const handleOnFocus = () => {
+            // @ts-expect-error Quill false positive
+            if (ref?.current) {
+                // @ts-expect-error Quill false positive
+                setFocusedInput(ref.current!);
+
+                setDataPillPanelOpen(true);
+            }
+        };
+
+        const handleOnKeyDown = (event: KeyboardEvent<Element>) => {
+            if (mentionOccurences && isAlphaNumericalKeyCode(event)) {
+                // @ts-expect-error Quill false positive
+                const editor = ref.current.getEditor();
+
+                const selection = editor.getSelection();
+
+                const [leaf] = editor.getLeaf(selection?.index || 0);
+
+                if (leaf) {
+                    const length = editor.getLength();
+
+                    editor.deleteText(0, length);
+
+                    editor.insertText(0, '');
+
+                    editor.setSelection(length);
+                }
+            }
+
+            if (singleMention && mentionOccurences) {
+                event.preventDefault();
+            }
+        };
+
         useEffect(() => {
             if (taskPropertyValue === undefined) {
                 return;
@@ -252,71 +299,10 @@ const PropertyMentionsInput = forwardRef(
                         key={elementId}
                         // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                         modules={useMemo(() => modules, [])}
-                        onBlur={() => {
-                            if (!currentComponentData || !workflow || !updateWorkflowMutation) {
-                                return;
-                            }
-
-                            const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
-
-                            saveWorkflowDefinition(
-                                {
-                                    actionName,
-                                    componentName,
-                                    name: workflowNodeName,
-                                    parameters: {
-                                        ...parameters,
-                                        [name as string]: value,
-                                    },
-                                },
-                                workflow,
-                                updateWorkflowMutation
-                            );
-                        }}
-                        onChange={(value) => {
-                            if (onChange) {
-                                onChange({
-                                    target: {name, value},
-                                } as ChangeEvent<HTMLInputElement>);
-                            }
-
-                            setValue(value);
-
-                            setMentionOccurences(value.match(/property-mention/g)?.length || 0);
-                        }}
-                        onFocus={() => {
-                            // @ts-expect-error Quill false positive
-                            if (ref?.current) {
-                                // @ts-expect-error Quill false positive
-                                setFocusedInput(ref.current!);
-
-                                setDataPillPanelOpen(true);
-                            }
-                        }}
-                        onKeyDown={(event) => {
-                            if (mentionOccurences && isAlphaNumericalKeyCode(event)) {
-                                // @ts-expect-error Quill false positive
-                                const editor = ref.current.getEditor();
-
-                                const selection = editor.getSelection();
-
-                                const [leaf] = editor.getLeaf(selection?.index || 0);
-
-                                if (leaf) {
-                                    const length = editor.getLength();
-
-                                    editor.deleteText(0, length);
-
-                                    editor.insertText(0, '');
-
-                                    editor.setSelection(length);
-                                }
-                            }
-
-                            if (singleMention && mentionOccurences) {
-                                event.preventDefault();
-                            }
-                        }}
+                        onBlur={handleOnBlur}
+                        onChange={handleOnChange}
+                        onFocus={handleOnFocus}
+                        onKeyDown={handleOnKeyDown}
                         onKeyPress={onKeyPress}
                         placeholder={placeholder}
                         ref={ref}
