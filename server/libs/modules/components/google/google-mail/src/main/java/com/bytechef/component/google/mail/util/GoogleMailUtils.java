@@ -16,19 +16,12 @@
 
 package com.bytechef.component.google.mail.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.google.api.client.http.HttpExecuteInterceptor;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.Preconditions;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
@@ -41,38 +34,14 @@ import java.util.List;
  */
 public class GoogleMailUtils {
 
-    public static Gmail getMail(Parameters connectionParameters) {
-        return new Gmail.Builder(
-            new NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
-                .setApplicationName("Google Mail Component")
-                .build();
-    }
-
-    private record OAuthAuthentication(String token)
-        implements HttpRequestInitializer, HttpExecuteInterceptor {
-
-        private OAuthAuthentication(String token) {
-            this.token = Preconditions.checkNotNull(token);
-        }
-
-        public void initialize(HttpRequest request) {
-            request.setInterceptor(this);
-        }
-
-        public void intercept(HttpRequest request) {
-            HttpHeaders httpHeaders = request.getHeaders();
-
-            httpHeaders.set("Authorization", "Bearer " + token);
-        }
+    private GoogleMailUtils() {
     }
 
     public static List<Option<String>> getMessageIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
-        Gmail service = GoogleMailUtils.getMail(connectionParameters);
+        Gmail service = GoogleServices.getMail(connectionParameters);
 
         ListMessagesResponse listMessagesResponse = service.users()
             .messages()

@@ -33,7 +33,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SN
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.mail.util.GoogleMailUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class GoogleMailGetThreadAction {
     public static Thread perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        Gmail service = GoogleMailUtils.getMail(connectionParameters);
+        Gmail service = GoogleServices.getMail(connectionParameters);
 
         return service.users()
             .threads()

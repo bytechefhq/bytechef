@@ -38,7 +38,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.google.mail.util.GoogleMailUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import jakarta.activation.DataHandler;
@@ -124,7 +124,7 @@ public class GoogleMailSendEmailAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException, MessagingException {
 
-        Gmail service = GoogleMailUtils.getMail(connectionParameters);
+        Gmail service = GoogleServices.getMail(connectionParameters);
 
         Properties properties = new Properties();
 

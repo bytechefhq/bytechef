@@ -34,7 +34,7 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -72,7 +72,7 @@ public final class GoogleDriveCreateNewFolderAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
-        Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
+        Drive drive = GoogleServices.getDrive(connectionParameters);
 
         File folderFile = new File().setName(inputParameters.getRequiredString(FOLDER_NAME));
 

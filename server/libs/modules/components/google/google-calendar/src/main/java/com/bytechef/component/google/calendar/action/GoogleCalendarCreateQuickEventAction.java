@@ -27,7 +27,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class GoogleCalendarCreateQuickEventAction {
     public static Event perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        Calendar calendar = GoogleCalendarUtils.getCalendar(connectionParameters);
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         return calendar.events()
             .quickAdd("primary", inputParameters.getRequiredString(TEXT))
