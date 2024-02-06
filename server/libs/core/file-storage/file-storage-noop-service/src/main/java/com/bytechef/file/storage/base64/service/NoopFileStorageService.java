@@ -71,7 +71,7 @@ public class NoopFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
-        return new FileEntry(fileName, NOOP + new String(data));
+        return new FileEntry(fileName, NOOP + new String(data, StandardCharsets.UTF_8));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class NoopFileStorageService implements FileStorageService {
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream) {
         try {
-            return new FileEntry(fileName, NOOP + new String(toByteArray(inputStream)));
+            return new FileEntry(fileName, NOOP + new String(toByteArray(inputStream), StandardCharsets.UTF_8));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);
         }
