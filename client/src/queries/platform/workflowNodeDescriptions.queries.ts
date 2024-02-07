@@ -7,17 +7,17 @@ import {
 } from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
-export const WorkflowNodeDescriptions = {
+export const WorkflowNodeDescriptionKeys = {
     workflowNodeDescription: (request: GetWorkflowNodeOutputRequest) => [
-        ...WorkflowNodeDescriptions.outputSchemas,
+        ...WorkflowNodeDescriptionKeys.workflowNodeDescriptions,
         request,
     ],
-    outputSchemas: ['workflowNodeDescriptions'] as const,
+    workflowNodeDescriptions: ['workflowNodeDescriptions'] as const,
 };
 
 export const useGetWorkflowNodeDescriptionQuery = (request: GetWorkflowNodeDescriptionRequest, enabled?: boolean) =>
     useQuery<GetWorkflowNodeDescription200ResponseModel, Error>({
-        queryKey: WorkflowNodeDescriptions.workflowNodeDescription(request),
+        queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription(request),
         queryFn: () => new WorkflowNodeApi().getWorkflowNodeDescription(request),
         enabled: enabled === undefined ? true : enabled,
     });
