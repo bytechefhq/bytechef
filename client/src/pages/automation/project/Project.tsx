@@ -185,6 +185,7 @@ const Project = () => {
     const runDisabled =
         (workflow?.inputs ?? []).filter((input) => input.required && !workflowTestConfigurationInputs[input.name])
             .length > 0 ||
+        (workflow?.tasks ?? []).length === 0 ||
         (workflow?.tasks ?? [])
             .flatMap((task) => (task.connections ? task.connections : []))
             .filter(
