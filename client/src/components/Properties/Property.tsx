@@ -1,5 +1,6 @@
 import PropertyMentionsInput from '@/components/Properties/components/PropMentionsInput/PropertyMentionsInput';
 import PropertyComboBox from '@/components/Properties/components/PropertyComboBox';
+import PropertyDynamicProperties from '@/components/Properties/components/PropertyDynamicProperties';
 import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
@@ -559,7 +560,12 @@ const Property = ({
 
                         {type === 'NULL' && <span>NULL</span>}
 
-                        {type === 'DYNAMIC_PROPERTIES' && <span>Dynamic properties</span>}
+                        {type === 'DYNAMIC_PROPERTIES' && (
+                            <PropertyDynamicProperties
+                                name={name}
+                                propertiesDataSource={property.propertiesDataSource}
+                            />
+                        )}
                     </>
                 )}
             </div>
