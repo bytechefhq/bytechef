@@ -41,7 +41,7 @@ const Properties = ({
     workflow,
 }: PropertiesProps) => (
     <ul className={twMerge('space-y-4', customClassName)}>
-        {properties.map((property, index) => (
+        {properties.map((property) => (
             <Property
                 actionName={actionName}
                 currentComponent={currentComponent}
