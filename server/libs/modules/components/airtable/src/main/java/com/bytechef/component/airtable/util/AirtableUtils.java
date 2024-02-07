@@ -33,7 +33,8 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +48,10 @@ public class AirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
-    public static OptionsDataSource.ActionOptionsFunction<String> getBaseIdOptions() {
+    @SuppressWarnings("unchecked")
+    public static ActionOptionsFunction<String> getBaseIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
-            Map<String, List<Map<?, ?>>> response = context
+            Map<String, ?> body = context
                 .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
                 .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
@@ -57,9 +59,13 @@ public class AirtableUtils {
 
             context
                 .logger(
-                    logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + response));
+                    logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
 
-            return getOptions(response, "bases");
+            if (body.containsKey("error")) {
+                throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+            }
+
+            return getOptions((Map<String, List<Map<?, ?>>>) body, "bases");
         };
     }
 
@@ -136,19 +142,24 @@ public class AirtableUtils {
         };
     }
 
-    public static OptionsDataSource.ActionOptionsFunction<String> getTableIdOptions() {
+    @SuppressWarnings("unchecked")
+    public static ActionOptionsFunction<String> getTableIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
 
-            Map<String, List<Map<?, ?>>> response = context.http(http -> http.get(url)
+            Map<String, ?> body = context.http(http -> http.get(url)
                 .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
                 .getBody(new Context.TypeReference<>() {}));
 
-            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
+            if (body.containsKey("error")) {
+                throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+            }
 
-            return getOptions(response, "tables");
+            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, body)));
+
+            return getOptions((Map<String, List<Map<?, ?>>>) body, "tables");
         };
     }
 
