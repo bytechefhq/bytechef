@@ -67,7 +67,7 @@ const WorkflowCodeEditorSheet = ({
     };
 
     return (
-        <Sheet modal={true} onOpenChange={onClose} open={true}>
+        <Sheet modal={false} onOpenChange={onClose} open={true}>
             <SheetContent
                 className="flex w-11/12 flex-col gap-2 p-4 sm:max-w-[800px]"
                 onFocusOutside={(event) => event.preventDefault()}
