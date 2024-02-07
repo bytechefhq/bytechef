@@ -198,7 +198,7 @@ const OutputTab = ({
             {outputSchema ? (
                 <>
                     <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold">Output schema</div>
+                        <div className="text-sm font-semibold">Output Schema</div>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -219,14 +219,14 @@ const OutputTab = ({
                             <DropdownMenuContent align="end" className="w-60 cursor-pointer">
                                 {outputDefined && (
                                     <DropdownMenuItem onClick={handlePredefinedOutputSchemaClick}>
-                                        Use predefined output schema
+                                        Use Predefined Output Schema
                                     </DropdownMenuItem>
                                 )}
 
-                                <DropdownMenuItem onClick={handleTestComponentClick}>Test component</DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleTestComponentClick}>Test Component</DropdownMenuItem>
 
                                 <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
-                                    Upload sample output data
+                                    Upload Sample Output Data
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -297,7 +297,7 @@ const OutputTab = ({
                                     </>
                                 )}
 
-                                {!uploadSampleOutputRequestMutation.isPending && <>Upload sample output data</>}
+                                {!uploadSampleOutputRequestMutation.isPending && <>Upload Sample Output Data</>}
                             </Button>
                         </div>
                     </div>
