@@ -17,6 +17,7 @@ import {twMerge} from 'tailwind-merge';
 import type {OptionModel, OptionsDataSourceModel} from '@/middleware/platform/configuration';
 
 type ComboBoxItemType = {
+    description?: string;
     icon?: string;
     label: string | ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -73,21 +74,7 @@ const PropertyComboBox = ({
         }));
     }
 
-    const items = options.map(
-        ({description, label, value}) =>
-            ({
-                label: description ? (
-                    <div className="flex flex-col gap-1">
-                        <div>{label}</div>
-
-                        <div className="text-xs text-muted-foreground">{description}</div>
-                    </div>
-                ) : (
-                    label
-                ),
-                value,
-            }) as ComboBoxItemType
-    );
+    const items = options as Array<ComboBoxItemType>;
 
     const item = items?.find((item) => item.value === value);
 
@@ -188,7 +175,17 @@ const PropertyComboBox = ({
                                             <InlineSVG className="mr-2 size-6 flex-none" src={comboBoxItem.icon} />
                                         )}
 
-                                        {comboBoxItem.label}
+                                        {comboBoxItem.description ? (
+                                            <div className="flex flex-col gap-1">
+                                                <div>{comboBoxItem.label}</div>
+
+                                                <div className="text-xs text-muted-foreground">
+                                                    {comboBoxItem.description}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            comboBoxItem.label
+                                        )}
 
                                         <CheckIcon
                                             className={cn(
