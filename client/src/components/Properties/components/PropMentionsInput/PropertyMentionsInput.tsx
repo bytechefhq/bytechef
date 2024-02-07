@@ -39,6 +39,7 @@ const MentionInputListItem = (item: DataPillType) => {
 };
 
 type PropertyMentionsInputProps = {
+    arrayName?: string;
     controlType?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
@@ -61,6 +62,7 @@ type PropertyMentionsInputProps = {
 const PropertyMentionsInput = forwardRef(
     (
         {
+            arrayName,
             controlType,
             currentComponent,
             currentComponentData,
@@ -182,7 +184,59 @@ const PropertyMentionsInput = forwardRef(
 
         const taskPropertyValue = name ? currentWorkflowTask?.parameters?.[name] : '';
 
-const handleOnChange = (value: string) => {
+        const handleOnBlur = () => {
+            if (!currentComponentData || !workflow || !updateWorkflowMutation) {
+                return;
+            }
+
+            const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+
+            if (arrayName && parameters) {
+                const combinedArray = Object.entries(parameters)
+                    .filter(([key]) => key.startsWith(`${arrayName}_`))
+                    .sort((a, b) => {
+                        const aIndex = parseInt(a[0].split('_')[1], 10);
+                        const bIndex = parseInt(b[0].split('_')[1], 10);
+
+                        return aIndex - bIndex;
+                    })
+                    .map(([, value]) => value as string);
+
+                const combinedString = combinedArray.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
+
+                saveWorkflowDefinition(
+                    {
+                        actionName,
+                        componentName,
+                        name: workflowNodeName,
+                        parameters: {
+                            ...parameters,
+                            [arrayName]: combinedString,
+                        },
+                    },
+                    workflow,
+                    updateWorkflowMutation
+                );
+
+                return;
+            }
+
+            saveWorkflowDefinition(
+                {
+                    actionName,
+                    componentName,
+                    name: workflowNodeName,
+                    parameters: {
+                        ...parameters,
+                        [name as string]: value,
+                    },
+                },
+                workflow,
+                updateWorkflowMutation
+            );
+        };
+
+        const handleOnChange = (value: string) => {
             if (onChange) {
                 onChange({
                     target: {name, value},
@@ -248,6 +302,12 @@ const handleOnChange = (value: string) => {
 
             delete keyboard.bindings[9];
         }, [ref]);
+
+        useEffect(() => {
+            if (defaultValue && !value) {
+                setValue(defaultValue);
+            }
+        }, [defaultValue, value]);
 
         return (
             <fieldset className="w-full space-y-2">

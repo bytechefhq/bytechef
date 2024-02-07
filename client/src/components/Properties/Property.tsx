@@ -40,6 +40,7 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
 
 interface PropertyProps {
     actionName?: string;
+    arrayName?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     customClassName?: string;
@@ -56,6 +57,7 @@ interface PropertyProps {
 
 const Property = ({
     actionName,
+    arrayName,
     currentComponent,
     currentComponentData,
     customClassName,
@@ -352,15 +354,16 @@ const Property = ({
 
                 {showMentionInput && !!dataPills?.length && (
                     <PropertyMentionsInput
+                        arrayName={arrayName}
                         controlType={controlType}
                         currentComponent={currentComponent}
                         currentComponentData={currentComponentData}
                         dataPills={dataPills}
                         defaultValue={defaultValue}
                         description={description}
-                        label={label || name}
+                        label={label || (arrayName ? undefined : name)}
                         leadingIcon={typeIcon}
-                        name={name}
+                        name={name || `${arrayName}_0`}
                         onChange={handlePropertyChange}
                         onKeyPress={(event: KeyboardEvent) => {
                             if (isNumericalInput) {
@@ -398,7 +401,13 @@ const Property = ({
                         )}
 
                         {(type === 'ARRAY' || controlType === 'MULTI_SELECT') && (
-                            <ArrayProperty dataPills={dataPills} property={property} />
+                            <ArrayProperty
+                                currentComponentData={currentComponentData}
+                                dataPills={dataPills}
+                                property={property}
+                                updateWorkflowMutation={updateWorkflowMutation}
+                                workflow={workflow}
+                            />
                         )}
 
                         {type === 'OBJECT' && (
