@@ -14,7 +14,6 @@ export interface ISelectOption {
 
 type PropertySelectProps = {
     options: ISelectOption[];
-    defaultValue?: string;
     description?: string;
     label?: string;
     leadingIcon?: ReactNode;
@@ -26,7 +25,6 @@ type PropertySelectProps = {
 };
 
 const PropertySelect = ({
-    defaultValue,
     description,
     label,
     leadingIcon,
@@ -64,10 +62,8 @@ const PropertySelect = ({
             </div>
         )}
 
-        {/*TODO replace with shadcn.ComboBox for filtering and description in option items*/}
-
         {options.length ? (
-            <Select defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value}>
+            <Select name={name} onValueChange={onValueChange} value={value}>
                 <SelectTrigger aria-label="Select" className={twMerge(leadingIcon && 'relative')}>
                     <>
                         {leadingIcon ? (
@@ -98,7 +94,7 @@ const PropertySelect = ({
                                 <Item
                                     className={twMerge(
                                         'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                                        option.value === (value || defaultValue) && 'px-2'
+                                        option.value === value && 'px-2'
                                     )}
                                     key={option.value}
                                     value={option.value}
