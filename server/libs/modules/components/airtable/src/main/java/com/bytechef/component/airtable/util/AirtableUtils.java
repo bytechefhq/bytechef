@@ -32,7 +32,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property;
@@ -69,19 +68,24 @@ public class AirtableUtils {
         };
     }
 
-    public static PropertiesDataSource.ActionPropertiesFunction getFieldsProperties() {
+    public static ActionPropertiesFunction getFieldsProperties() {
         return (inputParameters, connection, context) -> {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
 
-            Map<String, List<AirtableTable>> tablesMap = context.json(json -> json.read(
-                (String) context.http(http -> http.get(url)
-                    .configuration(Http.responseType(ResponseType.JSON))
-                    .execute()
-                    .getBody(new Context.TypeReference<String>() {})),
-                new Context.TypeReference<>() {}));
+            Http.Response response = context.http(http -> http.get(url)
+                .configuration(Http.responseType(ResponseType.JSON))
+                .execute());
+
+            Map<?, ?> body = response.getBody(Map.class);
+
+            if (body.containsKey("error")) {
+                throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+            }
+
+            Map<String, List<AirtableTable>> tablesMap = response.getBody(new Context.TypeReference<>() {});
 
             context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, tablesMap)));
 
