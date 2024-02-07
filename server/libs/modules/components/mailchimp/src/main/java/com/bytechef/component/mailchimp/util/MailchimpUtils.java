@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class MailchimpUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static OptionsDataSource.ActionOptionsFunction getListIdOptions() {
+    public static ActionOptionsFunction<String> getListIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
 
@@ -67,10 +67,10 @@ public class MailchimpUtils {
 
             context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 
-            List<Option<?>> options = new ArrayList<>();
+            List<Option<String>> options = new ArrayList<>();
 
             for (Map<?, ?> list : (List<Map<?, ?>>) response.get("lists")) {
-                options.add(option((String) list.get("name"), list.get("id")));
+                options.add(option((String) list.get("name"), (String) list.get("id")));
             }
 
             return options;
