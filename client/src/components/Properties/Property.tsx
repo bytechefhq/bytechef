@@ -1,10 +1,12 @@
 import PropertyMentionsInput from '@/components/Properties/components/PropMentionsInput/PropertyMentionsInput';
+import PropertyComboBox from '@/components/Properties/components/PropertyComboBox';
 import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
-import PropertySelect, {ISelectOption} from '@/components/Properties/components/PropertySelect';
+import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
+import {OptionModel} from '@/middleware/platform/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -106,28 +108,13 @@ const Property = ({
         type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
     }
 
-    useEffect(() => {
-        if (formState && name) {
-            setHasError(
-                formState.touchedFields[path] &&
-                    formState.touchedFields[path]![name] &&
-                    formState.errors[path] &&
-                    (formState.errors[path] as never)[name]
-            );
-        }
-    }, [formState, name, path]);
-
     const formattedOptions = options
-        ?.map(({description, label, value}) => {
-            if (value === '') {
+        ?.map((option) => {
+            if (option.value === '') {
                 return null;
             }
 
-            return {
-                description,
-                label,
-                value,
-            } as ISelectOption;
+            return option;
         })
         .filter((option) => option !== null);
 
@@ -151,15 +138,7 @@ const Property = ({
 
     const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
 
-    const taskPropertyValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
-
-    useEffect(() => {
-        if (taskPropertyValue === undefined) {
-            return;
-        }
-
-        isNumericalInput ? setNumericValue(taskPropertyValue || '') : setInputValue(taskPropertyValue || '');
-    }, [isNumericalInput, taskPropertyValue]);
+    const taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
 
     const otherComponentData = componentData.filter((component) => {
         if (component.componentName !== currentComponent?.name) {
@@ -316,6 +295,25 @@ const Property = ({
             setInputValue(event.target.value);
         }
     };
+
+    useEffect(() => {
+        if (formState && name) {
+            setHasError(
+                formState.touchedFields[path] &&
+                    formState.touchedFields[path]![name] &&
+                    formState.errors[path] &&
+                    (formState.errors[path] as never)[name]
+            );
+        }
+    }, [formState, name, path]);
+
+    useEffect(() => {
+        if (taskParameterValue === undefined) {
+            return;
+        }
+
+        isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
+    }, [isNumericalInput, taskParameterValue]);
 
     if (type === 'OBJECT' && !properties?.length && !items?.length) {
         return <></>;
@@ -475,13 +473,15 @@ const Property = ({
                         )}
 
                         {controlType === 'SELECT' && (
-                            <PropertySelect
-                                defaultValue={taskPropertyValue || defaultValue?.toString()}
+                            <PropertyComboBox
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
-                                options={(formattedOptions as Array<ISelectOption>) || undefined || []}
+                                options={(formattedOptions as Array<OptionModel>) || undefined || []}
+                                optionsDataSource={property.optionsDataSource}
+                                value={taskParameterValue || defaultValue?.toString()}
                             />
                         )}
 
@@ -523,7 +523,6 @@ const Property = ({
 
                         {register && type === 'BOOLEAN' && (
                             <PropertySelect
-                                defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -534,19 +533,21 @@ const Property = ({
                                 {...register(`${path}.${name}`, {
                                     required: required!,
                                 })}
+                                value={taskParameterValue || defaultValue?.toString()}
                             />
                         )}
 
                         {!register && type === 'BOOLEAN' && (
                             <PropertySelect
-                                defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                name={name}
                                 options={[
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
+                                value={taskParameterValue || defaultValue?.toString()}
                             />
                         )}
 
