@@ -151,7 +151,6 @@ const WorkflowEditor = ({
             if (componentDefinition) {
                 return {
                     data: {
-                        ...componentDefinition,
                         ...workflowNode,
                         actionName,
                         componentName: componentDefinition.name,
