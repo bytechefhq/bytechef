@@ -17,10 +17,11 @@ interface WorkflowExecutionDetailsSheetProps {
     onClose: () => void;
     onRunClick: () => void;
     projectId: number;
+    runDisabled: boolean;
+    testConfigurationDisabled: boolean;
     workflow: WorkflowModel;
     workflowIsRunning: boolean;
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
-    runDisabled: boolean;
 }
 
 const WorkflowCodeEditorSheet = ({
@@ -28,6 +29,7 @@ const WorkflowCodeEditorSheet = ({
     onRunClick,
     projectId,
     runDisabled,
+    testConfigurationDisabled,
     workflow,
     workflowIsRunning,
     workflowTestConfiguration,
@@ -81,6 +83,7 @@ const WorkflowCodeEditorSheet = ({
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
+                                                disabled={testConfigurationDisabled}
                                                 onClick={() => setShowWorkflowTestConfigurationDialog(true)}
                                                 variant="ghost"
                                             >

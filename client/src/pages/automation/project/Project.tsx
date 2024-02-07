@@ -195,6 +195,10 @@ const Project = () => {
                     ]
             ).length > 0;
 
+    const testConfigurationDisabled =
+        (workflow?.inputs ?? []).length === 0 &&
+        (workflow?.tasks ?? []).flatMap((task) => (task.connections ? task.connections : [])).length === 0;
+
     const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -733,6 +737,7 @@ const Project = () => {
                             onRunClick={handleRunClick}
                             projectId={+projectId!}
                             runDisabled={runDisabled}
+                            testConfigurationDisabled={testConfigurationDisabled}
                             workflow={workflow}
                             workflowIsRunning={workflowIsRunning}
                             workflowTestConfiguration={workflowTestConfiguration}
