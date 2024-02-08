@@ -93,7 +93,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center">
                                 {componentDefinition?.icon && (
-                                    <InlineSVG className="mr-1 size-6 flex-none" src={componentDefinition.icon} />
+                                    <InlineSVG className="mr-2 size-6 flex-none" src={componentDefinition.icon} />
                                 )}
 
                                 {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
