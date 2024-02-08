@@ -429,7 +429,7 @@ const Property = ({
                             />
                         )}
 
-                        {register && isValidControlType && (
+                        {register && (isValidControlType || isNumericalInput) && (
                             <PropertyInput
                                 defaultValue={defaultValue}
                                 description={description}
@@ -447,7 +447,7 @@ const Property = ({
                             />
                         )}
 
-                        {!register && isValidControlType && (
+                        {!register && (isValidControlType || isNumericalInput) && (
                             <PropertyInput
                                 description={description}
                                 error={hasError}
