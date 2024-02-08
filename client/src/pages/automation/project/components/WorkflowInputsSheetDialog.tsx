@@ -148,9 +148,7 @@ const WorkflowInputsSheetDialog = ({
                                 <DialogTitle>{`${inputIndex === -1 ? 'Edit' : 'Create'} Input`}</DialogTitle>
 
                                 <DialogClose asChild>
-                                    <Button size="icon" variant="ghost">
-                                        <Cross2Icon className="size-4 opacity-70" />
-                                    </Button>
+                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                                 </DialogClose>
                             </div>
 
@@ -264,9 +262,7 @@ const WorkflowInputsSheetDialog = ({
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
+                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                             </DialogClose>
 
                             <Button type="submit">Save</Button>

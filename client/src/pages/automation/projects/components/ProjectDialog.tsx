@@ -136,9 +136,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                             <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
 
                             <DialogClose asChild>
-                                <Button size="icon" variant="ghost">
-                                    <Cross2Icon className="size-4 opacity-70" />
-                                </Button>
+                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                             </DialogClose>
                         </div>
 
@@ -178,7 +176,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                 <FormLabel>Description</FormLabel>
 
                                 <FormControl>
-                                    <Textarea placeholder="Cute description of your project" {...field} />
+                                    <Textarea placeholder="Cute description of your project" rows={5} {...field} />
                                 </FormControl>
 
                                 <FormMessage />

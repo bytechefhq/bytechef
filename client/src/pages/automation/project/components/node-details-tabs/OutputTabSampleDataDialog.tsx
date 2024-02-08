@@ -44,9 +44,7 @@ const OutputTabSampleDataDialog = ({
                         <DialogTitle>Upload Sample Output Data</DialogTitle>
 
                         <DialogClose asChild>
-                            <Button size="icon" variant="ghost">
-                                <Cross2Icon className="size-4 opacity-70" />
-                            </Button>
+                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                         </DialogClose>
                     </div>
 
