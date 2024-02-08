@@ -16,6 +16,7 @@ export type ComboBoxItemType = {
 };
 
 export type ComboBoxProps = {
+    disabled?: boolean;
     items: ComboBoxItemType[];
     maxHeight?: boolean;
     name?: string;
@@ -25,7 +26,7 @@ export type ComboBoxProps = {
     value?: any;
 };
 
-const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: ComboBoxProps) => {
+const ComboBox = ({disabled, items, maxHeight = false, name, onBlur, onChange, value}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
 
     const commandItems = items.map((comboBoxItem) => (
@@ -53,6 +54,7 @@ const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: Com
                 <Button
                     aria-expanded={open}
                     className="w-full justify-between"
+                    disabled={disabled}
                     name={name}
                     role="combobox"
                     variant="outline"
