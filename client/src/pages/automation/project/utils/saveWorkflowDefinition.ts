@@ -87,7 +87,7 @@ export default async function saveWorkflowDefinition(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         delete tasks[existingTaskIndex].connections;
-    } else if (index) {
+    } else if (index !== undefined && index > -1) {
         tasks = [...(workflowDefinition.tasks || [])];
 
         tasks.splice(index, 0, newTask);
