@@ -18,6 +18,7 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ANYONE_CAN_ADD_SELF;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.COLOR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CONFERENCE_DATA;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CONFERENCE_DATA_VERSION;
@@ -101,6 +102,8 @@ class GoogleCalendarCreateEventActionTest extends AbstractGoogleCalendarActionTe
     @Test
     void testPerform() throws IOException {
 
+        when(mockedParameters.getRequiredString(CALENDAR_ID))
+            .thenReturn("calendarId");
         when(mockedParameters.getInteger(CONFERENCE_DATA_VERSION))
             .thenReturn(1);
         when(mockedParameters.getInteger(MAX_ATTENDEES))
@@ -187,7 +190,7 @@ class GoogleCalendarCreateEventActionTest extends AbstractGoogleCalendarActionTe
             Event event = GoogleCalendarCreateEventAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedEvent, event);
-            assertEquals("primary", calendarIdArgumentCaptor.getValue());
+            assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
             assertEquals(1, conferenceDataVersionArgumentCaptor.getValue());
             assertEquals(2, maxAttendesArgumentCaptor.getValue());
             assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());

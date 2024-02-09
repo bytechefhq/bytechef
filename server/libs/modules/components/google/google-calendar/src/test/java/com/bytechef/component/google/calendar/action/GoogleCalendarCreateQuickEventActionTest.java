@@ -17,6 +17,7 @@
 package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ANYONE_CAN_ADD_SELF;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,6 +44,9 @@ class GoogleCalendarCreateQuickEventActionTest extends AbstractGoogleCalendarAct
 
     @Test
     void testPerform() throws IOException {
+
+        when(mockedParameters.getRequiredString(CALENDAR_ID))
+            .thenReturn("calendarId");
         when(mockedParameters.getBoolean(ANYONE_CAN_ADD_SELF))
             .thenReturn(true);
         when(mockedParameters.getRequiredString(TEXT))
@@ -63,7 +67,7 @@ class GoogleCalendarCreateQuickEventActionTest extends AbstractGoogleCalendarAct
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedEvent, event);
-        assertEquals("primary", calendarIdArgumentCaptor.getValue());
+        assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
         assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
         assertEquals("text", eventTextArgumentCaptor.getValue());
 
