@@ -25,8 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
-import static com.bytechef.component.resend.constant.ResendConstants.EMAIL;
-import static com.bytechef.component.resend.constant.ResendConstants.EMAIL_ADDRESS;
+import static com.bytechef.component.resend.constant.ResendConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.resend.constant.ResendConstants.FROM;
 import static com.bytechef.component.resend.constant.ResendConstants.HEADERS;
 import static com.bytechef.component.resend.constant.ResendConstants.HTML;
@@ -72,10 +71,7 @@ public final class ResendSendEmailAction {
             array(TO)
                 .label("To")
                 .description("Recipients email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .maxItems(50)
                 .required(true),
             string(SUBJECT)
@@ -85,26 +81,17 @@ public final class ResendSendEmailAction {
             array(BCC)
                 .label("Bcc")
                 .description("Bcc recipients email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(false),
             array(CC)
                 .label("Cc")
                 .description("Cc recipients email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(false),
             array(REPLY_TO)
                 .label("Reply to")
                 .description("Reply-to email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(false),
             string(HTML)
                 .label("HTML")
@@ -131,16 +118,18 @@ public final class ResendSendEmailAction {
                 .required(false),
             array(TAGS)
                 .items(
-                    string(NAME)
-                        .label("Name")
-                        .description("The name of the email tag.")
-                        .maxLength(256)
-                        .required(true),
-                    string(VALUE)
-                        .label("Value")
-                        .description("The value of the email tag.")
-                        .maxLength(256)
-                        .required(true))
+                    object()
+                        .properties(
+                            string(NAME)
+                                .label("Name")
+                                .description("The name of the email tag.")
+                                .maxLength(256)
+                                .required(true),
+                            string(VALUE)
+                                .label("Value")
+                                .description("The value of the email tag.")
+                                .maxLength(256)
+                                .required(true)))
                 .required(false))
         .outputSchema(
             object()
