@@ -17,7 +17,6 @@
 package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALWAYS_INCLUDE_EMAIL;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ICAL_UID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_ATTENDEES;
@@ -59,15 +58,13 @@ import org.mockito.MockedStatic;
 class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest {
 
     private final ArgumentCaptor<Boolean> alwaysIncludeEmailArgumentCapture = ArgumentCaptor.forClass(Boolean.class);
-    private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
     @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> eventTypesArgumentCaptor = ArgumentCaptor.forClass(List.class);
     private final ArgumentCaptor<String> iCalUIDArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> maxAttendesArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<Integer> maxResultsArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final Events mockedEvent = mock(Events.class);
-    private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
+    private final Events mockedEvents = mock(Events.class);
+    private final Calendar.Events mockedCalendarEvents = mock(Calendar.Events.class);
     private final Calendar.Events.List mockedList = mock(Calendar.Events.List.class);
     private final ArgumentCaptor<String> orderByArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> pageTokenArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -96,8 +93,6 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
         LocalDateTime localDateTime = LocalDateTime.of(2015, Month.AUGUST, 15, 10, 10, 10);
         Date date = GoogleCalendarUtils.convertToDateViaSqlTimestamp(localDateTime);
 
-        when(mockedParameters.getRequiredString(CALENDAR_ID))
-            .thenReturn("calendarId");
         when(mockedParameters.getBoolean(ALWAYS_INCLUDE_EMAIL))
             .thenReturn(true);
         when(mockedParameters.getList(EVENT_TYPE, String.class, List.of()))
@@ -134,8 +129,8 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
             .thenReturn(localDateTime);
 
         when(mockedCalendar.events())
-            .thenReturn(mockedEvents);
-        when(mockedEvents.list(calendarIdArgumentCaptor.capture()))
+            .thenReturn(mockedCalendarEvents);
+        when(mockedCalendarEvents.list(calendarIdArgumentCaptor.capture()))
             .thenReturn(mockedList);
         when(mockedList.setAlwaysIncludeEmail(alwaysIncludeEmailArgumentCapture.capture()))
             .thenReturn(mockedList);
@@ -171,7 +166,8 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
             .thenReturn(mockedList);
         when(mockedList.setUpdatedMin(updateMinArgumentCaptor.capture()))
             .thenReturn(mockedList);
-        when(mockedList.execute()).thenReturn(mockedEvent);
+        when(mockedList.execute())
+            .thenReturn(mockedEvents);
 
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
             mockStatic(GoogleCalendarUtils.class)) {
@@ -181,9 +177,7 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
 
             Events result = GoogleCalendarGetEventsAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(mockedEvent, result);
-
-            assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
+            assertEquals(mockedEvents, result);
             assertEquals(true, alwaysIncludeEmailArgumentCapture.getValue());
             assertEquals("iCalUID", iCalUIDArgumentCaptor.getValue());
             assertEquals(5, maxAttendesArgumentCaptor.getValue());
