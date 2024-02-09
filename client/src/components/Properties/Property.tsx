@@ -129,7 +129,7 @@ const Property = ({
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    const showMentionInput = mentionInput && !!dataPills?.length;
+    const showMentionInput = controlType === 'FILE_ENTRY' || (mentionInput && !!dataPills?.length);
 
     let showInputTypeSwitchButton = type !== 'STRING' && !!dataPills?.length && !!name;
 
@@ -334,10 +334,6 @@ const Property = ({
         return <></>;
     }
 
-    if (type === 'FILE_ENTRY' && !dataPills?.length) {
-        return <></>;
-    }
-
     if (displayCondition && !meetsDisplayCondition) {
         return <></>;
     }
@@ -369,7 +365,7 @@ const Property = ({
                     </Button>
                 )}
 
-                {showMentionInput && !!dataPills?.length && (
+                {showMentionInput && (controlType === 'FILE_ENTRY' || !!dataPills?.length) && (
                     <PropertyMentionsInput
                         arrayName={arrayName}
                         controlType={controlType}
@@ -437,7 +433,7 @@ const Property = ({
                             />
                         )}
 
-                        {type === 'FILE_ENTRY' && !!dataPills?.length && (
+                        {type === 'FILE_ENTRY' && (
                             <ObjectProperty
                                 actionName={actionName}
                                 currentComponent={currentComponent}
