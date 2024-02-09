@@ -75,7 +75,9 @@ const Property = ({
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const [mentionInput, setMentionInput] = useState(property.controlType === 'SELECT' ? false : true);
+    const [mentionInput, setMentionInput] = useState(
+        property.controlType === 'SELECT' || property.controlType === 'CHECKBOX' ? false : true
+    );
     const [numericValue, setNumericValue] = useState('');
     const [meetsDisplayCondition, setMeetsDisplayCondition] = useState(false);
 
