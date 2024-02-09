@@ -17,6 +17,7 @@
 package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALWAYS_INCLUDE_EMAIL;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ICAL_UID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_ATTENDEES;
@@ -95,6 +96,8 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
         LocalDateTime localDateTime = LocalDateTime.of(2015, Month.AUGUST, 15, 10, 10, 10);
         Date date = GoogleCalendarUtils.convertToDateViaSqlTimestamp(localDateTime);
 
+        when(mockedParameters.getRequiredString(CALENDAR_ID))
+            .thenReturn("calendarId");
         when(mockedParameters.getBoolean(ALWAYS_INCLUDE_EMAIL))
             .thenReturn(true);
         when(mockedParameters.getList(EVENT_TYPE, String.class, List.of()))
@@ -180,6 +183,7 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
 
             assertEquals(mockedEvent, result);
 
+            assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
             assertEquals(true, alwaysIncludeEmailArgumentCapture.getValue());
             assertEquals("iCalUID", iCalUIDArgumentCaptor.getValue());
             assertEquals(5, maxAttendesArgumentCaptor.getValue());

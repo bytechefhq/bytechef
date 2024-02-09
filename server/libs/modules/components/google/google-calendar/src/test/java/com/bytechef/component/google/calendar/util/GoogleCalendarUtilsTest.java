@@ -24,26 +24,46 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.ColorDefinition;
+import com.google.api.services.calendar.model.Colors;
 import com.google.api.services.calendar.model.EventDateTime;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
  */
 class GoogleCalendarUtilsTest {
-    private final Parameters mockedParameters = mock(Parameters.class);
+
+    private final Calendar mockedCalendar = mock(Calendar.class);
+    private final Calendar.CalendarList mockedCalendarList = mock(Calendar.CalendarList.class);
+
+    private final Calendar.Colors mockedCalendarColors = mock(Calendar.Colors.class);
+    private final Colors mockedColors = mock(Colors.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Calendar.Colors.Get mockedGet = mock(Calendar.Colors.Get.class);
+    private final Calendar.CalendarList.List mockedList = mock(Calendar.CalendarList.List.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<String> minAccessRoleArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testConvertToDateViaSqlDate() {
@@ -91,8 +111,70 @@ class GoogleCalendarUtilsTest {
     }
 
     @Test
-    void testGetColorOptions() {
-        // TODO
+    void testGetCalendarIdOptions() throws IOException {
+        List<CalendarListEntry> calendarListEntries =
+            List.of(new CalendarListEntry().setSummary("summary")
+                .setId("id"));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(mockedParameters))
+                .thenReturn(mockedCalendar);
+
+            when(mockedCalendar.calendarList())
+                .thenReturn(mockedCalendarList);
+            when(mockedCalendarList.list())
+                .thenReturn(mockedList);
+            when(mockedList.setMinAccessRole(minAccessRoleArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.execute())
+                .thenReturn(new CalendarList().setItems(calendarListEntries));
+
+            List<Option<String>> result =
+                GoogleCalendarUtils.getCalendarIdOptions(mockedParameters, mockedParameters, anyString(),
+                    mockedContext);
+
+            assertEquals("writer", minAccessRoleArgumentCaptor.getValue());
+
+            assertEquals(1, result.size());
+
+            Option<String> option = result.getFirst();
+
+            assertEquals("summary", option.getLabel());
+            assertEquals("id", option.getValue());
+        }
+    }
+
+    @Test
+    void testGetColorOptions() throws IOException {
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(mockedParameters))
+                .thenReturn(mockedCalendar);
+
+            when(mockedCalendar.colors())
+                .thenReturn(mockedCalendarColors);
+            when(mockedCalendarColors.get())
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(
+                    new Colors().setEvent(
+                        Map.of("1", new ColorDefinition().setForeground("f")
+                            .setBackground("b"))));
+
+            List<Option<String>> result =
+                GoogleCalendarUtils.getColorOptions(mockedParameters, mockedParameters, anyString(), mockedContext);
+
+            assertEquals(1, result.size());
+
+            Option<String> firstOption = result.getFirst();
+
+            assertEquals("1", firstOption.getLabel());
+            assertEquals("1", firstOption.getValue());
+            assertEquals("Background: b, Foreground: f", firstOption.getDescription()
+                .get());
+        }
     }
 
     @Test
