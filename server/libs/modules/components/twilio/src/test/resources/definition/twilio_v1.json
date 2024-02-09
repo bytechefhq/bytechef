@@ -545,7 +545,7 @@
       "hidden": null,
       "metadata": { },
       "required": true,
-      "name": "source",
+      "name": "sourceProperty",
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
@@ -589,7 +589,7 @@
       "hidden": null,
       "metadata": { },
       "required": false,
-      "name": "content",
+      "name": "contentProperty",
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
@@ -1282,15 +1282,15 @@
       "type": "BASIC_AUTH",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "componentName": "twilio",
     "componentDescription": "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and video capabilities into their applications.",

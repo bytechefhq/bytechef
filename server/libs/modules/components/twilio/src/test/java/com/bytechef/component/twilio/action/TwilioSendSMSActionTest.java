@@ -57,7 +57,6 @@ import com.twilio.type.PhoneNumber;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
@@ -65,7 +64,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
@@ -176,12 +174,12 @@ class TwilioSendSMSActionTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testPerformFirstCaseForZoneIdNull() throws URISyntaxException {
-        List<URI> uriList = List.of(new URI("fd"));
+    void testPerformFirstCaseForZoneIdNull() {
+        List<String> uriList = List.of("uri");
 
         when(mockedParameters.getString(MESSAGING_SERVICE_SID))
             .thenReturn("messaging_service_sid");
-        when(mockedParameters.getList(MEDIA_URL, URI.class))
+        when(mockedParameters.getList(MEDIA_URL, String.class, List.of()))
             .thenReturn(uriList);
 
         try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
@@ -203,14 +201,14 @@ class TwilioSendSMSActionTest {
             assertEquals("+15592585054", toPhoneNumber.getEndpoint());
 
             assertEquals("messaging_service_sid", messagingServidSIDStringArgumentCaptor.getValue());
-            assertEquals(uriList, listArgumentCaptor.getValue());
+            assertEquals(List.of(URI.create("uri")), listArgumentCaptor.getValue());
 
             testMessageCreatorFields();
         }
     }
 
     @Test
-    void testPerformFirstCaseForZoneIdNotNull() throws URISyntaxException {
+    void testPerformFirstCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
             .thenReturn("Asia/Tokyo");
         when(mockedParameters.getLocalDateTime(DATE_TIME))
@@ -221,17 +219,16 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     @SuppressWarnings("unchecked")
     void testPerformSecondCaseForZoneIdNull() {
-        List<URI> uriList = List.of();
+        List<String> uriList = List.of("uri");
 
         when(mockedParameters.getString(ACCOUNT_SID))
             .thenReturn("account_sid");
         when(mockedParameters.getString(MESSAGING_SERVICE_SID))
             .thenReturn("messaging_service_sid");
-        when(mockedParameters.getList(MEDIA_URL, URI.class))
+        when(mockedParameters.getList(MEDIA_URL, String.class, List.of()))
             .thenReturn(uriList);
 
         try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
@@ -255,13 +252,12 @@ class TwilioSendSMSActionTest {
             assertEquals("+15592585054", toPhoneNumber.getEndpoint());
 
             assertEquals("messaging_service_sid", messagingServidSIDStringArgumentCaptor.getValue());
-            assertEquals(uriList, listArgumentCaptor.getValue());
+            assertEquals(List.of(URI.create("uri")), listArgumentCaptor.getValue());
 
             testMessageCreatorFields();
         }
     }
 
-    @Disabled
     @Test
     void testPerformSecondCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
@@ -274,7 +270,6 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     void testPerformThirdCaseForZoneIdNull() {
         when(mockedParameters.getString(MESSAGING_SERVICE_SID))
@@ -305,7 +300,6 @@ class TwilioSendSMSActionTest {
         }
     }
 
-    @Disabled
     @Test
     void testPerformThirdCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
@@ -318,7 +312,6 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     void testPerformFourthCaseForZoneIdNull() {
         when(mockedParameters.getString(ACCOUNT_SID))
@@ -353,7 +346,6 @@ class TwilioSendSMSActionTest {
         }
     }
 
-    @Disabled
     @Test
     void testPerformFourthCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
@@ -366,15 +358,14 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     @SuppressWarnings("unchecked")
     void testPerformFifthCaseForZoneIdNull() {
-        List<URI> uriList = List.of();
+        List<String> uriList = List.of("uri");
 
         when(mockedParameters.getString(FROM))
             .thenReturn("+15592582024");
-        when(mockedParameters.getList(MEDIA_URL, URI.class))
+        when(mockedParameters.getList(MEDIA_URL, String.class, List.of()))
             .thenReturn(uriList);
 
         try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
@@ -397,14 +388,13 @@ class TwilioSendSMSActionTest {
 
             assertEquals("+15592582024", fromPhoneNumber.getEndpoint());
 
-            assertEquals(uriList, listArgumentCaptor.getValue());
+            assertEquals(List.of(URI.create("uri")), listArgumentCaptor.getValue());
 
             testMessageCreatorFields();
         }
 
     }
 
-    @Disabled
     @Test
     void testPerformFifthCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
@@ -417,17 +407,16 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     @SuppressWarnings("unchecked")
     void testPerformSixthCaseForZoneIdNull() {
-        List<URI> uriList = List.of();
+        List<String> uriList = List.of("uri");
 
         when(mockedParameters.getString(ACCOUNT_SID))
             .thenReturn("account_sid");
         when(mockedParameters.getString(FROM))
             .thenReturn("+15592582024");
-        when(mockedParameters.getList(MEDIA_URL, URI.class))
+        when(mockedParameters.getList(MEDIA_URL, String.class, List.of()))
             .thenReturn(uriList);
 
         try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
@@ -451,14 +440,13 @@ class TwilioSendSMSActionTest {
 
             assertEquals("+15592582024", fromPhoneNumber.getEndpoint());
 
-            assertEquals(uriList, listArgumentCaptor.getValue());
+            assertEquals(List.of(URI.create("uri")), listArgumentCaptor.getValue());
 
             testMessageCreatorFields();
 
         }
     }
 
-    @Disabled
     @Test
     void testPerformSixthCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
@@ -471,7 +459,6 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     void testPerformSeventhCaseForZoneIdNull() {
         when(mockedParameters.getString(FROM))
@@ -505,7 +492,6 @@ class TwilioSendSMSActionTest {
         }
     }
 
-    @Disabled
     @Test
     void testPerformSeventhCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
@@ -518,7 +504,6 @@ class TwilioSendSMSActionTest {
         testMessageCreatorSendAtField();
     }
 
-    @Disabled
     @Test
     void testPerformEighthCaseForZoneIdNull() {
         when(mockedParameters.getString(ACCOUNT_SID))
@@ -556,7 +541,6 @@ class TwilioSendSMSActionTest {
         }
     }
 
-    @Disabled
     @Test
     void testPerformEighthCaseForZoneIdNotNull() {
         when(mockedParameters.getString(ZONE_ID))
