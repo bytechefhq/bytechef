@@ -18,6 +18,8 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_QUICK_EVENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
@@ -41,6 +43,7 @@ public class GoogleCalendarCreateQuickEventAction {
         .title("Create Quick Event")
         .description("Add Quick Calendar Event")
         .properties(
+            CALENDAR_ID_PROPERTY,
             string(TEXT)
                 .label("Text")
                 .description("The text describing the event to be created.")
@@ -58,7 +61,7 @@ public class GoogleCalendarCreateQuickEventAction {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         return calendar.events()
-            .quickAdd("primary", inputParameters.getRequiredString(TEXT))
+            .quickAdd(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(TEXT))
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
             .execute();
     }

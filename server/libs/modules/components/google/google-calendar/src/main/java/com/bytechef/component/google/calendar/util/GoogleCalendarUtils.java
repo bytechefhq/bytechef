@@ -48,6 +48,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.ColorDefinition;
 import com.google.api.services.calendar.model.Colors;
 import com.google.api.services.calendar.model.EventDateTime;
@@ -168,6 +169,28 @@ public class GoogleCalendarUtils {
         return java.sql.Timestamp.valueOf(dateToConvert);
     }
 
+    public static List<Option<String>> getCalendarIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws IOException {
+
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        List<CalendarListEntry> calendarListEntries = calendar.calendarList()
+            .list()
+            .setMinAccessRole("writer")
+            .execute()
+            .getItems();
+
+        for (CalendarListEntry calendarListEntry : calendarListEntries) {
+            options.add(
+                option(calendarListEntry.getSummary(), calendarListEntry.getId()));
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getColorOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
@@ -187,7 +210,7 @@ public class GoogleCalendarUtils {
             options.add(
                 option(
                     color.getKey(), color.getKey(),
-                    "Background: " + colorDefinition.getBackground() + "Foreground: " +
+                    "Background: " + colorDefinition.getBackground() + ", Foreground: " +
                         colorDefinition.getForeground()));
         }
 

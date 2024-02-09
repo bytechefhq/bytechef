@@ -25,8 +25,13 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableDateProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableDateTimeProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 
 /**
  * @author Monika Domiter
@@ -47,6 +52,7 @@ public class GoogleCalendarConstants {
     public static final String ATTENDEES_OMMITTED = "attendeesOmitted";
     public static final String AUTO_DECLINE_MODE = "autoDeclineMode";
     public static final String BUILDING_ID = "buildingId";
+    public static final String CALENDAR_ID = "calendarId";
     public static final String CHAT_STATUS = "chatStatus";
     public static final String COLOR_ID = "colorId";
     public static final String COMMENT = "comment";
@@ -176,6 +182,11 @@ public class GoogleCalendarConstants {
     public static final String WORKING_LOCATION = "workingLocation";
     public static final String WORKING_LOCATION_PROPERTIES = "workingLocationProperties";
 
+    public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
+        .label("Calendar identifier")
+        .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
+        .required(true);
+
     public static final ModifiableObjectProperty CONFERENCE_SOLUTION_KEY_PROPERTY =
         object(CONFERENCE_SOLUTION_KEY)
             .label("Key")
@@ -185,12 +196,12 @@ public class GoogleCalendarConstants {
                     .required(false))
             .required(false);
 
-    public static final ComponentDSL.ModifiableDateProperty DATE_PROPERTY = date(DATE)
+    public static final ModifiableDateProperty DATE_PROPERTY = date(DATE)
         .label("Date")
         .description("The date, in the format \"yyyy-mm-dd\", if this is an all-day event.")
         .required(false);
 
-    public static final ComponentDSL.ModifiableDateTimeProperty DATE_TIME_PROPERTY = dateTime(DATE_TIME)
+    public static final ModifiableDateTimeProperty DATE_TIME_PROPERTY = dateTime(DATE_TIME)
         .label("Datetime")
         .description(
             "The time, as a combined date-time value (formatted according to RFC3339). A time " +
@@ -261,7 +272,7 @@ public class GoogleCalendarConstants {
                     string(NOTES),
                     object(PARAMETERS)
                         .properties(
-                            object("addOnParameters")
+                            object(ADD_ON_PARAMETERS)
                                 .properties(
                                     object(PARAMETERS)
                                         .additionalProperties(string()))),
@@ -372,7 +383,7 @@ public class GoogleCalendarConstants {
                             string(LABEL)),
                     string(TYPE)));
 
-    public static final ComponentDSL.ModifiableIntegerProperty MAX_ATTENDEES_PROPERTY =
+    public static final ModifiableIntegerProperty MAX_ATTENDEES_PROPERTY =
         integer(MAX_ATTENDEES)
             .label("Max attendees")
             .description(
@@ -380,7 +391,7 @@ public class GoogleCalendarConstants {
                     "specified number of attendees, only the participant is returned.")
             .required(false);
 
-    public static final ComponentDSL.ModifiableStringProperty SEND_UPDATES_PROPERTY =
+    public static final ModifiableStringProperty SEND_UPDATES_PROPERTY =
         string(SEND_UPDATES)
             .label("Send updates")
             .description(
@@ -393,7 +404,7 @@ public class GoogleCalendarConstants {
                 option("None", "none", "No notifications are sent."))
             .required(false);
 
-    public static final ComponentDSL.ModifiableStringProperty TIME_ZONE_PROPERTY = string(TIME_ZONE)
+    public static final ModifiableStringProperty TIME_ZONE_PROPERTY = string(TIME_ZONE)
         .label("Time zone")
         .description(
             "The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. " +
