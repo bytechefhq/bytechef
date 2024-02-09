@@ -26,6 +26,8 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ACCESS_ROLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALWAYS_INCLUDE_EMAIL;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DEFAULT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DEFAULT_REMINDERS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
@@ -63,7 +65,7 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.google.commons.GoogleServices;
@@ -82,6 +84,7 @@ public class GoogleCalendarGetEventsAction {
         .title("Get events")
         .description("Returns events on the specified calendar. ")
         .properties(
+            CALENDAR_ID_PROPERTY,
             array(EVENT_TYPE)
                 .label("Event type")
                 .description("Event types to return.")
@@ -112,7 +115,7 @@ public class GoogleCalendarGetEventsAction {
             string(ORDER_BY)
                 .label("Order by")
                 .description("The order of the events returned in the result.")
-                .options((OptionsDataSource.ActionOptionsFunction) GoogleCalendarUtils::getOrderByOptions)
+                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getOrderByOptions)
                 .required(false),
             string(PAGE_TOKEN)
                 .label("Page token")
@@ -227,7 +230,7 @@ public class GoogleCalendarGetEventsAction {
         Calendar service = GoogleServices.getCalendar(connectionParameters);
 
         return service.events()
-            .list("primary")
+            .list(inputParameters.getRequiredString(CALENDAR_ID))
             .setAlwaysIncludeEmail(inputParameters.getBoolean(ALWAYS_INCLUDE_EMAIL))
             .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
             .setICalUID(inputParameters.getString(ICAL_UID))

@@ -31,6 +31,8 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ANYONE_CAN_ADD_SELF;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTACHMENTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.COLOR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.COMMENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CONFERENCE_DATA;
@@ -145,6 +147,7 @@ public class GoogleCalendarCreateEventAction {
         .title("Create event")
         .description("Creates an event")
         .properties(
+            CALENDAR_ID_PROPERTY,
             integer(CONFERENCE_DATA_VERSION)
                 .label("Conference date version")
                 .description("")
@@ -248,7 +251,7 @@ public class GoogleCalendarCreateEventAction {
                 .description(
                     "The color of the event. This is an ID referring to an entry in the event section of the " +
                         "colors definition")
-                .options((ActionOptionsFunction) GoogleCalendarUtils::getColorOptions)
+                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getColorOptions)
                 .required(false),
             object(CONFERENCE_DATA)
                 .label("Conference data")
@@ -464,27 +467,29 @@ public class GoogleCalendarCreateEventAction {
                     array(OVERRIDES)
                         .label("Overrides")
                         .description(
-                            "If the event doesn't use the default reminders, this lists the reminders specific " +
-                                "to the event, or, if not set, indicates that no reminders are set for this event.")
+                            "If the event doesn't use the default reminders, this lists the reminders specific to " +
+                                "the event, or, if not set, indicates that no reminders are set for this event.")
                         .items(
-                            string(METHOD)
-                                .label("Method")
-                                .description("The method used by this reminder.")
-                                .options(
-                                    option("Email", "email", "Reminders are sent via email."),
-                                    option("Popup", "popup", "Reminders are sent via a UI popup."))
-                                .required(true),
-                            integer(MINUTES)
-                                .label("Minutes")
-                                .description(
-                                    "Number of minutes before the start of the event when the reminder should " +
-                                        "trigger.")
-                                .minValue(0)
-                                .maxValue(40320)
-                                .required(true))
+                            object()
+                                .properties(
+                                    string(METHOD)
+                                        .label("Method")
+                                        .description("The method used by this reminder.")
+                                        .options(
+                                            option("Email", "email", "Reminders are sent via email."),
+                                            option("Popup", "popup", "Reminders are sent via a UI popup."))
+                                        .required(true),
+                                    integer(MINUTES)
+                                        .label("Minutes")
+                                        .description(
+                                            "Number of minutes before the start of the event when the reminder " +
+                                                "should trigger.")
+                                        .minValue(0)
+                                        .maxValue(40320)
+                                        .required(true)))
                         .required(false),
                     bool(USE_DEFAULT)
-                        .label("Reminders - use default")
+                        .label("Use default")
                         .description("Whether the default reminders of the calendar apply to the event.")
                         .required(false))
                 .required(false),
@@ -523,9 +528,11 @@ public class GoogleCalendarCreateEventAction {
                 .description("Whether the event blocks time on the calendar.")
                 .options(
                     option("opaque", "opaque",
-                        "The event does block time on the calendar. This is equivalent to setting Show me as to Busy in the Calendar UI."),
+                        "The event does block time on the calendar. This is equivalent to setting Show me as to Busy " +
+                            "in the Calendar UI."),
                     option("transparent", "transparent",
-                        "The event does not block time on the calendar. This is equivalent to setting Show me as to Available in the Calendar UI."))
+                        "The event does not block time on the calendar. This is equivalent to setting Show me as to " +
+                            "Available in the Calendar UI."))
                 .required(false),
             string(VISIBILITY)
                 .label("Visibility")
@@ -610,7 +617,7 @@ public class GoogleCalendarCreateEventAction {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
         return calendar.events()
-            .insert("primary", event)
+            .insert(inputParameters.getRequiredString(CALENDAR_ID), event)
             .setConferenceDataVersion(inputParameters.getInteger(CONFERENCE_DATA_VERSION))
             .setMaxAttendees(inputParameters.getInteger(MAX_ATTENDEES))
             .setSendUpdates(inputParameters.getString(SEND_UPDATES))
