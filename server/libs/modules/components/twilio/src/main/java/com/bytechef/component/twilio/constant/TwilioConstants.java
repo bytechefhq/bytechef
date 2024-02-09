@@ -32,6 +32,7 @@ public class TwilioConstants {
     public static final String ATTEMPT = "attempt";
     public static final String BODY = "body";
     public static final String CONTENT = "content";
+    public static final String CONTENT_PROPERTY = "contentProperty";
     public static final String CONTENT_RETENTION = "contentRetention";
     public static final String CONTENT_SID = "contentSid";
     public static final String CONTENT_VARIABLES = "contentVariables";
@@ -49,6 +50,7 @@ public class TwilioConstants {
     public static final String SEND_AS_MMS = "sendAsMms";
     public static final String SHORTEN_URLS = "shortenUrls";
     public static final String SOURCE = "source";
+    public static final String SOURCE_PROPERTY = "sourceProperty";
     public static final String STATUS_CALLBACK = "statusCallback";
     public static final String SMART_ENCODED = "smartEncoded";
     public static final String TO = "to";

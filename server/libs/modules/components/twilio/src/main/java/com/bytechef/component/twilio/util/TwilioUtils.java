@@ -27,7 +27,8 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGING_S
 import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -49,7 +50,7 @@ public class TwilioUtils {
         String content = inputParameters.getString(CONTENT);
 
         if (content.equals(BODY)) {
-            ComponentDSL.ModifiableStringProperty body = string(BODY)
+            ModifiableStringProperty body = string(BODY)
                 .label("Body")
                 .description(
                     "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If " +
@@ -61,7 +62,7 @@ public class TwilioUtils {
 
             return List.of(body);
         } else {
-            ComponentDSL.ModifiableArrayProperty arrayProperty = array(MEDIA_URL)
+            ModifiableArrayProperty arrayProperty = array(MEDIA_URL)
                 .label("Media URL")
                 .description(
                     "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are " +
@@ -70,6 +71,7 @@ public class TwilioUtils {
                         "other types of accepted media. To send more than one image in the message, provide multiple " +
                         "media_url parameters in the POST request. You can include up to ten media_url parameters " +
                         "per message. International and carrier limits apply.")
+                .items(string().controlType(Property.ControlType.URL))
                 .required(true);
 
             return List.of(arrayProperty);
@@ -80,7 +82,7 @@ public class TwilioUtils {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String source = inputParameters.getString(SOURCE);
 
-        ComponentDSL.ModifiableStringProperty stringProperty;
+        ModifiableStringProperty stringProperty;
 
         if (source.equals(FROM)) {
             stringProperty = string(FROM)

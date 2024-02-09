@@ -34,6 +34,7 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.APPLICATION
 import static com.bytechef.component.twilio.constant.TwilioConstants.ATTEMPT;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
+import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_PROPERTY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_RETENTION;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_VARIABLES;
@@ -53,6 +54,7 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.SEND_SMS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SHORTEN_URLS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SMART_ENCODED;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
+import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE_PROPERTY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.STATUS_CALLBACK;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.VALIDITY_PERIOD;
@@ -196,7 +198,7 @@ public class TwilioSendSMSAction {
                         .required(true),
                     string(ZONE_ID)
                         .label("Zone ID")
-                        .options((ActionOptionsFunction) TwilioUtils::getZoneIdOptions)
+                        .options((ActionOptionsFunction<String>) TwilioUtils::getZoneIdOptions)
                         .required(true))
                 .required(false),
             bool(SEND_AS_MMS)
@@ -227,7 +229,7 @@ public class TwilioSendSMSAction {
                     option("From", FROM),
                     option("Messaging Service SID", MESSAGING_SERVICE_SID))
                 .required(true),
-            dynamicProperties(SOURCE)
+            dynamicProperties(SOURCE_PROPERTY)
                 .loadPropertiesDependsOn(SOURCE)
                 .properties(TwilioUtils::getSourceProperties)
                 .required(true),
@@ -237,7 +239,7 @@ public class TwilioSendSMSAction {
                     option("Body", BODY),
                     option("Media URL", MEDIA_URL))
                 .required(true),
-            dynamicProperties(CONTENT)
+            dynamicProperties(CONTENT_PROPERTY)
                 .loadPropertiesDependsOn(CONTENT)
                 .properties(TwilioUtils::getContentProperties)
                 .required(false),
@@ -292,7 +294,6 @@ public class TwilioSendSMSAction {
         .perform(TwilioSendSMSAction::perform);
 
     private TwilioSendSMSAction() {
-
     }
 
     protected static Message perform(
@@ -307,7 +308,12 @@ public class TwilioSendSMSAction {
         String from = inputParameters.getString(FROM);
         String body = inputParameters.getString(BODY);
         String pathAccountSid = inputParameters.getString(ACCOUNT_SID);
-        List<URI> mediaURL = inputParameters.getList(MEDIA_URL, URI.class);
+
+        List<URI> mediaURL = inputParameters.getList(MEDIA_URL, String.class, List.of())
+            .stream()
+            .map(URI::create)
+            .toList();
+
         String messagingServiceSID = inputParameters.getString(MESSAGING_SERVICE_SID);
 
         // first case: to, messagingServiceSid, mediaUrl
