@@ -43,7 +43,7 @@ type PropertyMentionsInputProps = {
     controlType?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
-    dataPills: Array<DataPillType>;
+    dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
     fieldsetClassName?: string;

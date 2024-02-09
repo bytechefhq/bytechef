@@ -26,7 +26,7 @@ const ObjectProperty = ({
     dataPills,
     property,
 }: ObjectPropertyProps) => {
-    const {additionalProperties, label, multipleValues, name, properties} = property;
+    const {additionalProperties, controlType, label, multipleValues, name, properties} = property;
 
     if (!properties?.length && !additionalProperties?.length) {
         return <></>;
@@ -54,7 +54,7 @@ const ObjectProperty = ({
                             customClassName={twMerge('last-of-type:pb-0', label && 'mb-0 pl-2')}
                             dataPills={dataPills}
                             key={`${property.name}_${subProperty.name}_${index}`}
-                            mention={!!dataPills?.length}
+                            mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
                             property={subProperty}
                         />
                     );
