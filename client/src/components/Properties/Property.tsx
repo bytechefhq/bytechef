@@ -481,7 +481,7 @@ const Property = ({
                                 onBlur={handleInputBlur}
                                 onChange={handleInputChange}
                                 placeholder={
-                                    isNumericalInput && minValue && maxValue ? `${minValue} - ${maxValue}` : ''
+                                    isNumericalInput && minValue && maxValue ? `From ${minValue} to ${maxValue}` : ''
                                 }
                                 ref={inputRef}
                                 required={required}
