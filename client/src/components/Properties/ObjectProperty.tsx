@@ -9,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
+import getRandomId from '@/utils/getRandomId';
 
 interface ObjectPropertyProps {
     actionName?: string;
@@ -31,8 +32,10 @@ const ObjectProperty = ({
         return <></>;
     }
 
+    const uniquePropertyKey = `${name}-${getRandomId()}`;
+
     return (
-        <div key={name}>
+        <div key={uniquePropertyKey}>
             <ul className={twMerge('space-y-4', label && 'ml-2 border-l')}>
                 {(properties as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
