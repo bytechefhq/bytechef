@@ -16,6 +16,11 @@
 
 package com.bytechef.component.resend.constant;
 
+import static com.bytechef.component.definition.ComponentDSL.string;
+
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.Property;
+
 /**
  * @author Monika Domiter
  */
@@ -42,4 +47,8 @@ public final class ResendConstants {
     public static final String TEXT = "text";
     public static final String TO = "to";
     public static final String VALUE = "value";
+
+    public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
+        .label(EMAIL_ADDRESS)
+        .controlType(Property.ControlType.EMAIL);
 }
