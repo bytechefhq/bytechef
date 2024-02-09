@@ -74,7 +74,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 
-    public static ApplyFunction getDefaultApply(AuthorizationType type) {
+    private static ApplyFunction getDefaultApply(AuthorizationType type) {
         return switch (type) {
             case API_KEY -> (Parameters connectionParameters, Context context) -> {
                 String addTo = MapUtils.getString(
@@ -131,7 +131,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         };
     }
 
-    public static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
+    private static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
         ClientIdFunction clientIdFunction, Authorization.ClientSecretFunction clientSecretFunction,
         TokenUrlFunction tokenUrlFunction) {
 
@@ -176,29 +176,29 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         };
     }
 
-    public static String getDefaultAuthorizationUrl(Parameters connectionParameters) {
+    private static String getDefaultAuthorizationUrl(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.AUTHORIZATION_URL);
     }
 
-    public static String getDefaultBaseUri(Parameters connectionParameters) {
+    private static String getDefaultBaseUri(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters,
             com.bytechef.component.definition.ConnectionDefinition.BASE_URI);
     }
 
-    public static String getDefaultClientId(Parameters connectionParameters) {
+    private static String getDefaultClientId(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.CLIENT_ID);
     }
 
-    public static String getDefaultClientSecret(Parameters connectionParameters) {
+    private static String getDefaultClientSecret(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
     }
 
-    public static PkceFunction getDefaultPkce() {
+    private static PkceFunction getDefaultPkce() {
         return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
             challengeMethod);
     }
 
-    public static String getDefaultRefreshUrl(
+    private static String getDefaultRefreshUrl(
         Parameters connectionParameters, TokenUrlFunction tokenUrlFunction, Context context) {
 
         String refreshUrl = MapUtils.getString(connectionParameters, Authorization.REFRESH_URL);
@@ -231,7 +231,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
     }
 
-    public static String getDefaultTokenUrl(Parameters connectionParameters) {
+    private static String getDefaultTokenUrl(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.TOKEN_URL);
     }
 
