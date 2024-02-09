@@ -18,7 +18,6 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ANYONE_CAN_ADD_SELF;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.COLOR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CONFERENCE_DATA;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CONFERENCE_DATA_VERSION;
@@ -75,11 +74,9 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarCreateEventActionTest extends AbstractGoogleCalendarActionTest {
 
-    private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> conferenceDataVersionArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private final ArgumentCaptor<Integer> maxAttendesArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final Event mockedEvent = mock(Event.class);
     private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
     private final Calendar.Events.Insert mockedInsert = mock(Calendar.Events.Insert.class);
     private final ArgumentCaptor<String> sendUpdatesArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -102,8 +99,7 @@ class GoogleCalendarCreateEventActionTest extends AbstractGoogleCalendarActionTe
     @Test
     void testPerform() throws IOException {
 
-        when(mockedParameters.getRequiredString(CALENDAR_ID))
-            .thenReturn("calendarId");
+
         when(mockedParameters.getInteger(CONFERENCE_DATA_VERSION))
             .thenReturn(1);
         when(mockedParameters.getInteger(MAX_ATTENDEES))
@@ -190,7 +186,6 @@ class GoogleCalendarCreateEventActionTest extends AbstractGoogleCalendarActionTe
             Event event = GoogleCalendarCreateEventAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedEvent, event);
-            assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
             assertEquals(1, conferenceDataVersionArgumentCaptor.getValue());
             assertEquals(2, maxAttendesArgumentCaptor.getValue());
             assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
