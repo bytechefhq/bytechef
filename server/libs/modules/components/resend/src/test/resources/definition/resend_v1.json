@@ -70,8 +70,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Email subject.",
@@ -129,8 +129,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Cc recipients email addresses.",
@@ -169,8 +169,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Reply-to email addresses.",
@@ -209,8 +209,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The HTML version of the message.",
@@ -305,8 +305,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A list of attachments to send with the email.",
@@ -418,8 +418,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -436,49 +436,69 @@
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
-        "description": "The name of the email tag.",
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
-        "required": true,
-        "name": "name",
-        "type": "STRING",
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Name",
+        "label": null,
         "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": 256,
-        "minLength": null,
+        "additionalProperties": null,
+        "multipleValues": null,
         "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": "The value of the email tag.",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "value",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Value",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": 256,
-        "minLength": null,
-        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": "The name of the email tag.",
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": true,
+          "name": "name",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": "Name",
+          "placeholder": null,
+          "controlType": "TEXT",
+          "maxLength": 256,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": "The value of the email tag.",
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": true,
+          "name": "value",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": "Value",
+          "placeholder": null,
+          "controlType": "TEXT",
+          "maxLength": 256,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        } ],
+        "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Send Email",
     "output": {
@@ -519,8 +539,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
@@ -556,11 +576,11 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "apply": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
-      "clientSecret": null,
-      "apply": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
