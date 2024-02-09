@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.resend;
+package com.bytechef.component.resend.util;
 
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.resend.util.ResendUtils;
 import com.resend.services.emails.model.Attachment;
 import java.util.List;
 import org.junit.jupiter.api.Test;
