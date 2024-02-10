@@ -102,6 +102,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 return true;
             }
 
+            if (include == null && actionDefinitions == null && connectionDefinitions == null &&
+                triggerDefinitions == null) {
+
+                return true;
+            }
+
             return false;
         };
     }

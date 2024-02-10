@@ -72,7 +72,7 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Job> fetchLastWorkflowJob(String workflowId) {
-        return jobRepository.findTop1ByWorkflowIdOrderById(workflowId);
+        return jobRepository.findTop1ByWorkflowIdOrderByIdDesc(workflowId);
     }
 
     @Override

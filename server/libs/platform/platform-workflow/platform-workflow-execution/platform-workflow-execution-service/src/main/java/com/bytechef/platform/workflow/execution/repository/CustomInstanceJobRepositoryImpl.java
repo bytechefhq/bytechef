@@ -107,7 +107,6 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
             query += "AND instance_id = ? ";
 
             arguments.add(instanceId);
-            arguments.add(type);
         }
 
         if (!CollectionUtils.isEmpty(workflowIds)) {

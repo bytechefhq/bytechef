@@ -52,7 +52,7 @@ public interface JdbcJobRepository
     Optional<Job> findLastJob();
 
     @Override
-    Optional<Job> findTop1ByWorkflowIdOrderById(String workflowId);
+    Optional<Job> findTop1ByWorkflowIdOrderByIdDesc(String workflowId);
 
     @Override
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")

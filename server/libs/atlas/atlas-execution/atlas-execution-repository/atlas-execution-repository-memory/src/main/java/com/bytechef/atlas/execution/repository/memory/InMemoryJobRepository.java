@@ -91,7 +91,7 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public Optional<Job> findTop1ByWorkflowIdOrderById(String workflowId) {
+    public Optional<Job> findTop1ByWorkflowIdOrderByIdDesc(String workflowId) {
         throw new UnsupportedOperationException();
     }
 

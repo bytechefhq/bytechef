@@ -49,7 +49,7 @@ public interface JobRepository {
 
     Optional<Job> findLastJob();
 
-    Optional<Job> findTop1ByWorkflowIdOrderById(String workflowId);
+    Optional<Job> findTop1ByWorkflowIdOrderByIdDesc(String workflowId);
 
     Job save(Job job);
 }
