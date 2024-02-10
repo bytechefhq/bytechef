@@ -858,6 +858,9 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        enabled:
+          description: "If a workflow is enabled or not in the project instance."
+          type: "boolean"
         id:
           description: "The id of a project instance."
           type: "integer"
@@ -894,9 +897,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ProjectInstanceWorkflow"
-        enabled:
-          description: "If a workflow is enabled or not in the project instance."
-          type: "boolean"
         tags:
           type: "array"
           items:
@@ -1003,6 +1003,9 @@ components:
           description: "The id of a project instance."
           type: "integer"
           format: "int64"
+        staticWebhookUrl:
+          description: "The url of a static url used to trigger a workflow."
+          type: "string"
         workflowId:
           description: "The id of a workflow."
           type: "string"
