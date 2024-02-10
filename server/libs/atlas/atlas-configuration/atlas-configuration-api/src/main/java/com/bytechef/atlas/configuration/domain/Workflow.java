@@ -329,7 +329,7 @@ public final class Workflow implements Persistable<String>, Serializable {
             }
         }
 
-        throw new IllegalArgumentException("Workflow task %s does not exist".formatted(workflowNodeName));
+        throw new IllegalArgumentException("Workflow task name=%s does not exist".formatted(workflowNodeName));
     }
 
     /** Returns the steps that make up the workflow. */
