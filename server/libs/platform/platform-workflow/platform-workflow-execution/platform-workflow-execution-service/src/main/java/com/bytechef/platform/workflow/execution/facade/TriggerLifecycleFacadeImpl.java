@@ -22,7 +22,6 @@ import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -56,17 +55,12 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, Type type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId) {
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTriggerType);
-
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
-
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            type.getId(), instanceId, workflowId, workflowTriggerName);
+            triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+            triggerWorkflowNodeType.componentOperationName());
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
             triggerStateService.fetchValue(workflowExecutionId), null);
@@ -74,15 +68,15 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 triggerDefinitionFacade.executeDynamicWebhookDisable(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                    triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+                    triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
                     output.parameters(), connectionId);
 
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), triggerParameters,
+                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+                triggerWorkflowNodeType.componentOperationName(), triggerParameters,
                 workflowExecutionId.toString(), connectionId);
             case POLLING -> triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
             default -> {
@@ -92,30 +86,25 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "Trigger type='{}', name='{}', workflowExecutionId={} disabled",
-                workflowTriggerType, workflowTriggerName, workflowExecutionId);
+                triggerWorkflowNodeType, workflowExecutionId.getTriggerName(), workflowExecutionId);
         }
     }
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, Type type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTriggerType);
-
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
-
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            type.getId(), instanceId, workflowId, workflowTriggerName);
+            triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+            triggerWorkflowNodeType.componentOperationName());
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 DynamicWebhookEnableOutput output =
                     triggerDefinitionFacade.executeDynamicWebhookEnable(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                        workflowNodeType.componentOperationName(), triggerParameters,
+                        triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+                        triggerWorkflowNodeType.componentOperationName(), triggerParameters,
                         workflowExecutionId.toString(), connectionId, webhookUrl);
 
                 if (output != null) {
@@ -123,14 +112,14 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
-                            output.webhookExpirationDate(), workflowNodeType.componentName(),
-                            workflowNodeType.componentVersion(), workflowExecutionId);
+                            output.webhookExpirationDate(), triggerWorkflowNodeType.componentName(),
+                            triggerWorkflowNodeType.componentVersion(), workflowExecutionId);
                     }
                 }
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerEnable(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+                triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
                 connectionId);
             case POLLING -> triggerScheduler.schedulePollingTrigger(workflowExecutionId);
             default -> {
@@ -140,7 +129,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "Trigger type='{}', name='{}', workflowExecutionId={} enabled",
-                workflowTriggerType, workflowTriggerName, workflowExecutionId);
+                triggerWorkflowNodeType, workflowExecutionId.getTriggerName(), workflowExecutionId);
         }
     }
 }

@@ -7,7 +7,8 @@
 
 package com.bytechef.platform.workflow.execution.remote.web.rest.facade;
 
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -38,9 +39,8 @@ public class RemoteTriggerLifecycleFacadeController {
         value = "/execute-trigger-disable")
     public void executeTriggerDisable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerDisable(
-            triggerRequest.workflowId, triggerRequest.type, triggerRequest.instanceId,
-            triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
-            triggerRequest.connectionId);
+            triggerRequest.workflowId, triggerRequest.workflowExecutionId, triggerRequest.triggerWorkflowNodeType,
+            triggerRequest.triggerParameters, triggerRequest.connectionId);
     }
 
     @RequestMapping(
@@ -48,14 +48,13 @@ public class RemoteTriggerLifecycleFacadeController {
         value = "/execute-trigger-enable")
     public void executeTriggerEnable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerEnable(
-            triggerRequest.workflowId, triggerRequest.type, triggerRequest.instanceId,
-            triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
-            triggerRequest.connectionId, triggerRequest.webhookUrl);
+            triggerRequest.workflowId, triggerRequest.workflowExecutionId, triggerRequest.triggerWorkflowNodeType,
+            triggerRequest.triggerParameters, triggerRequest.connectionId, triggerRequest.webhookUrl);
     }
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String workflowId, long instanceId, Type type, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

@@ -16,7 +16,8 @@
 
 package com.bytechef.platform.workflow.execution.facade;
 
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.util.Map;
 
 /**
@@ -25,10 +26,10 @@ import java.util.Map;
 public interface TriggerLifecycleFacade {
 
     void executeTriggerDisable(
-        String workflowId, Type type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId);
 
     void executeTriggerEnable(
-        String workflowId, Type type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl);
 }

@@ -8,7 +8,8 @@
 package com.bytechef.platform.workflow.execution.remote.client.facade;
 
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -34,26 +35,24 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, Type type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
             new TriggerRequest(
-                workflowId, instanceId, type, workflowTriggerName, workflowTriggerType, triggerParameters,
-                connectionId, null));
+                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, null));
     }
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, Type type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable",
             new TriggerRequest(
-                workflowId, instanceId, type, workflowTriggerName, workflowTriggerType, triggerParameters,
-                connectionId, webhookUrl));
+                workflowId, workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId, webhookUrl));
     }
 
     private void post(String path, TriggerRequest workflowExecutionId) {
@@ -67,7 +66,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        String workflowId, long instanceId, Type type, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType triggerWorkflowNodeType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

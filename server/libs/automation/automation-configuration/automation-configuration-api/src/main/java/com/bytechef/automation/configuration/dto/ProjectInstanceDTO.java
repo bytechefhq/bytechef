@@ -34,8 +34,8 @@ public record ProjectInstanceDTO(
     Long projectId, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, List<Tag> tags, int version) {
 
     public ProjectInstanceDTO(
-        LocalDateTime lastExecutionDate, ProjectInstance projectInstance,
-        List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, Project project, List<Tag> tags) {
+        ProjectInstance projectInstance, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, Project project,
+        LocalDateTime lastExecutionDate, List<Tag> tags) {
 
         this(
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
@@ -84,71 +84,85 @@ public record ProjectInstanceDTO(
 
         public Builder createdBy(String createdBy) {
             this.createdBy = createdBy;
+
             return this;
         }
 
         public Builder createdDate(LocalDateTime createdDate) {
             this.createdDate = createdDate;
+
             return this;
         }
 
         public Builder description(String description) {
             this.description = description;
+
             return this;
         }
 
         public Builder enabled(boolean enabled) {
             this.enabled = enabled;
+
             return this;
         }
 
         public Builder id(Long id) {
             this.id = id;
+
             return this;
         }
 
         public Builder name(String name) {
             this.name = name;
+
             return this;
         }
 
         public Builder lastExecutionDate(LocalDateTime lastExecutionDate) {
             this.lastExecutionDate = lastExecutionDate;
+
             return this;
         }
 
         public Builder lastModifiedBy(String lastModifiedBy) {
             this.lastModifiedBy = lastModifiedBy;
+
             return this;
         }
 
         public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
+
             return this;
         }
 
         public Builder project(Project project) {
             this.project = project;
+
             return this;
         }
 
         public Builder projectId(Long projectId) {
             this.projectId = projectId;
+
             return this;
         }
 
         public Builder projectInstanceWorkflows(List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows) {
             this.projectInstanceWorkflows = projectInstanceWorkflows;
+
             return this;
         }
 
         public Builder tags(List<Tag> tags) {
             this.tags = tags;
+
             return this;
         }
 
         public Builder version(int version) {
             this.version = version;
+
             return this;
         }
 
