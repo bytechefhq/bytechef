@@ -91,14 +91,14 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                 <div className="group flex items-center rounded-md bg-white p-2 py-3 hover:bg-gray-50">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
-                            <div className="relative flex items-center">
+                            <div className="relative flex items-center gap-2">
                                 {componentDefinition?.icon && (
-                                    <InlineSVG className="mr-2 size-6 flex-none" src={componentDefinition.icon} />
+                                    <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
                                 )}
 
                                 {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
 
-                                <span className="mr-2 text-base font-semibold">{connection.name}</span>
+                                <span className="text-base font-semibold">{connection.name}</span>
                             </div>
                         </div>
 

@@ -103,17 +103,17 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
             <div className="flex w-full items-center justify-between rounded-md px-2 py-5 hover:bg-gray-50">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
-                        <div className="flex w-full items-center">
+                        <div className="flex w-full items-center gap-2">
                             {projectInstance.description ? (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <span className="mr-2 text-base font-semibold">{projectInstance.name}</span>
+                                        <span className="text-base font-semibold">{projectInstance.name}</span>
                                     </TooltipTrigger>
 
                                     <TooltipContent>{projectInstance.description}</TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <span className="mr-2 text-base font-semibold">{projectInstance.name}</span>
+                                <span className="text-base font-semibold">{projectInstance.name}</span>
                             )}
 
                             <span className="text-xs uppercase text-gray-700">{project?.name}</span>

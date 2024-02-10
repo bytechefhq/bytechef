@@ -1,3 +1,4 @@
+import {Skeleton} from '@/components/ui/skeleton';
 import {ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItem';
@@ -16,11 +17,15 @@ const ProjectInstanceWorkflowList = ({
     projectInstanceEnabled: boolean;
     projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
 }) => {
-    const {data: workflows} = useGetProjectWorkflowsQuery(projectId);
+    const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+        triggerDefinitions: true,
+    });
 
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
+    const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
+        useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
+    const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectWorkflowsQuery(projectId);
 
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
@@ -30,7 +35,27 @@ const ProjectInstanceWorkflowList = ({
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
 
-    return (
+    return isComponentDefinitionsLoading || isTaskDispatcherDefinitionsLoading || isProjectWorkflowsLoading ? (
+        <div className="space-y-3 py-2">
+            <Skeleton className="h-5 w-40" />
+
+            {[1, 2].map((value) => (
+                <div className="flex items-center space-x-4" key={value}>
+                    <Skeleton className="h-4 w-80" />
+
+                    <div className="flex w-60 items-center space-x-1">
+                        <Skeleton className="h-6 w-7 rounded-full" />
+
+                        <Skeleton className="size-7 rounded-full" />
+
+                        <Skeleton className="size-7 rounded-full" />
+                    </div>
+
+                    <Skeleton className="h-4 flex-1" />
+                </div>
+            ))}
+        </div>
+    ) : (
         <div className="border-b border-b-gray-100 pl-4">
             <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-gray-400">Workflows</h3>
 
