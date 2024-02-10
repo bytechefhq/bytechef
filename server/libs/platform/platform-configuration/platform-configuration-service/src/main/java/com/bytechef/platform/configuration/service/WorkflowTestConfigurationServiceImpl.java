@@ -55,12 +55,43 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
+    public Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName) {
+        return fetchWorkflowTestConfiguration(workflowId)
+            .map(WorkflowTestConfiguration::getConnections)
+            .orElse(List.of())
+            .stream()
+            .filter(curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName))
+            .findFirst()
+            .map(WorkflowTestConfigurationConnection::getConnectionId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String workflowNodeName) {
 
         return workflowTestConfigurationConnectionRepository.findByWorkflowIdAndWorkflowNodeName(
             workflowId, workflowNodeName);
+    }
+
+    @Override
+    public List<Long> getWorkflowTestConfigurationConnectionIds(String workflowId, List<String> workflowTaskNames) {
+        if (workflowTaskNames.isEmpty()) {
+            return List.of();
+        }
+
+        return workflowTestConfigurationConnectionRepository
+            .findByWorkflowIdAndWorkflowNodeNames(workflowId, workflowTaskNames)
+            .stream()
+            .map(WorkflowTestConfigurationConnection::getConnectionId)
+            .toList();
+    }
+
+    @Override
+    public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId) {
+        return fetchWorkflowTestConfiguration(workflowId)
+            .map(WorkflowTestConfiguration::getInputs)
+            .orElse(Map.of());
     }
 
     @Override
@@ -106,24 +137,6 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
         workflowTestConfiguration.setInputs(inputs);
 
         workflowTestConfigurationRepository.save(workflowTestConfiguration);
-    }
-
-    @Override
-    public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId) {
-        return fetchWorkflowTestConfiguration(workflowId)
-            .map(WorkflowTestConfiguration::getInputs)
-            .orElse(Map.of());
-    }
-
-    @Override
-    public Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName) {
-        return fetchWorkflowTestConfiguration(workflowId)
-            .map(WorkflowTestConfiguration::getConnections)
-            .orElse(List.of())
-            .stream()
-            .filter(curConnection -> Objects.equals(curConnection.getWorkflowNodeName(), workflowNodeName))
-            .findFirst()
-            .map(WorkflowTestConfigurationConnection::getConnectionId);
     }
 
     private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId) {

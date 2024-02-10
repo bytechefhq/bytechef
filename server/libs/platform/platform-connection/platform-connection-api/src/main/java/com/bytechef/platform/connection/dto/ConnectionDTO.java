@@ -41,12 +41,6 @@ public record ConnectionDTO(
             connection.getParameters(), tags, connection.getVersion());
     }
 
-    public ConnectionDTO(
-        boolean active, String componentName, long id, String name, Map<String, Object> parameters, int version) {
-
-        this(active, null, componentName, 0, null, null, null, id, null, null, name, parameters, null, version);
-    }
-
     public Connection toConnection() {
         Connection connection = new Connection();
 

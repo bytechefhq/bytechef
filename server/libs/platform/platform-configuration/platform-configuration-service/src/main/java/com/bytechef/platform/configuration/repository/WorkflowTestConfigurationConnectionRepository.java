@@ -37,4 +37,13 @@ public interface WorkflowTestConfigurationConnectionRepository
         """)
     List<WorkflowTestConfigurationConnection> findByWorkflowIdAndWorkflowNodeName(
         @Param("workflowId") String workflowId, @Param("workflowNodeName") String workflowNodeName);
+
+    @Query("""
+            SELECT workflow_test_configuration_connection.* FROM workflow_test_configuration_connection
+            JOIN workflow_test_configuration ON workflow_test_configuration_connection.workflow_test_configuration_id = workflow_test_configuration.id
+            WHERE workflow_test_configuration.workflow_id = :workflowId
+            AND workflow_test_configuration_connection.workflow_node_name IN (:workflowNodeNames)
+        """)
+    List<WorkflowTestConfigurationConnection> findByWorkflowIdAndWorkflowNodeNames(
+        @Param("workflowId") String workflowId, @Param("workflowNodeNames") List<String> workflowTaskNames);
 }

@@ -29,17 +29,19 @@ public interface WorkflowTestConfigurationService {
 
     Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId);
 
+    Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName);
+
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String workflowNodeName);
 
     WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
+    List<Long> getWorkflowTestConfigurationConnectionIds(String workflowId, List<String> workflowTaskNames);
+
+    Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId);
+
     void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String key, long connectionId);
 
     void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
-
-    Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId);
-
-    Optional<Long> fetchWorkflowTestConfigurationConnectionId(String workflowId, String workflowNodeName);
 }
