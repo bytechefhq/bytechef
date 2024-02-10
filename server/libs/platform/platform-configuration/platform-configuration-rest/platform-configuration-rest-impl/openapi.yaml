@@ -1239,7 +1239,7 @@ components:
       description: "A number property type."
       type: "object"
       allOf:
-      - $ref: "#/components/schemas/Property"
+      - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
           defaultValue:
