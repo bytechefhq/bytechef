@@ -117,7 +117,7 @@ bytechef:
     #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   public-url: http://127.0.0.1:5173
-  webhook-url: http://127.0.0.1:7888
+  webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.
@@ -156,7 +156,3 @@ bytechef:
             - projects
       jdbc:
         enabled: true
-    sync:
-      output-storage:
-        # Output storage provider for async workflow output data (base64 | filesystem) default: base64
-        provider: base64

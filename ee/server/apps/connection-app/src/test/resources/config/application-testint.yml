@@ -9,26 +9,5 @@ openapi:
       platform: /api/platform
 
 bytechef:
-  #  discovery-service:
-  #    provider: redis
-  #  data:
-#     storage:
-  #    provider: db
   encryption:
     provider: filesystem
-  #  file:
-#    storage:
-#      provider: base64
-  #  message:
-#       broker:
-  #      provider: jms
-#  workflow:
-    #    output-storage:
-    #      provider: base64
-#    repository:
-#      jdbc:
-#        enabled: true
-#    sync:
-#      output-storage:
-#        provider: base64
-

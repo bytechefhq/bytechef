@@ -147,7 +147,7 @@ bytechef:
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   public-url: http://127.0.0.1:5173
-  webhook-url: http://127.0.0.1:9555
+  webhook-url: http://127.0.0.1:9555/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.
