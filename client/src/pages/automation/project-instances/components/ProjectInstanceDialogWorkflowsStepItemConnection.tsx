@@ -14,11 +14,13 @@ import * as Portal from '@radix-ui/react-portal';
 import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Control} from 'react-hook-form';
+import InlineSVG from 'react-inlinesvg';
 
 export interface ProjectInstanceDialogWorkflowsStepItemConnectionProps {
     control: Control<ProjectInstanceModel>;
     workflowConnection: WorkflowConnectionModel;
     workflowConnectionIndex: number;
+    workflowConnectionsCount: number;
     workflowIndex: number;
 }
 
@@ -26,6 +28,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
     control,
     workflowConnection,
     workflowConnectionIndex,
+    workflowConnectionsCount,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
@@ -34,6 +37,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
         componentName: workflowConnection.componentName,
         componentVersion: workflowConnection.componentVersion,
     });
+
     const {data: connections} = useGetConnectionsQuery(
         {
             componentName: workflowConnection.componentName,
@@ -49,10 +53,16 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                 name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
                 render={({field}) => (
                     <FormItem>
-                        <FormLabel>
-                            {`${componentDefinition?.title} `}
+                        <FormLabel className="flex items-center gap-1">
+                            {componentDefinition?.icon && (
+                                <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
+                            )}
 
-                            <span className="text-xs text-gray-500">({workflowConnection.key})</span>
+                            <span>{`${componentDefinition?.title} `}</span>
+
+                            {workflowConnectionsCount > 1 && (
+                                <span className="text-xs text-gray-500">({workflowConnection.key})</span>
+                            )}
                         </FormLabel>
 
                         <Select

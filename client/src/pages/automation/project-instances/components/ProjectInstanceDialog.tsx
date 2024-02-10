@@ -102,6 +102,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
                     formState={formState}
                     getValues={getValues}
                     register={register}
+                    setValue={setValue}
                 />
             ),
             name: 'Workflows',
@@ -120,20 +121,33 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
     }
 
     function saveProjectInstance() {
-        const formData = getValues();
+        let projectInstanceFormData = getValues();
 
-        if (!formData) {
+        if (!projectInstanceFormData) {
             return;
         }
+
+        projectInstanceFormData = {
+            ...projectInstanceFormData,
+            projectInstanceWorkflows: projectInstanceFormData.projectInstanceWorkflows?.map(
+                (projectInstanceWorkflow) => {
+                    return {
+                        ...projectInstanceWorkflow,
+                        connections: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.connections : [],
+                        inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
+                    };
+                }
+            ),
+        };
 
         if (projectInstance?.id) {
             updateProjectInstanceMutation.mutate({
                 ...projectInstance,
-                ...formData,
-                projectId: formData?.project?.id || 0,
+                ...projectInstanceFormData,
+                projectId: projectInstanceFormData?.project?.id || 0,
             } as ProjectInstanceModel);
         } else {
-            createProjectInstanceMutation.mutate(formData);
+            createProjectInstanceMutation.mutate(projectInstanceFormData);
         }
     }
 

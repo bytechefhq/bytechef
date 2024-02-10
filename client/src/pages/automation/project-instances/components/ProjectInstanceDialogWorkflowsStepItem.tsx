@@ -4,7 +4,7 @@ import {ProjectInstanceModel, WorkflowConnectionModel, WorkflowModel} from '@/mi
 import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConfiguration';
 import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnection';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {Control, UseFormRegister} from 'react-hook-form';
+import {Control, UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -14,6 +14,7 @@ export interface ProjectInstanceDialogWorkflowListItemProps {
     formState: FormState<ProjectInstanceModel>;
     label: string;
     register: UseFormRegister<ProjectInstanceModel>;
+    setValue: UseFormSetValue<ProjectInstanceModel>;
     switchHidden?: boolean;
     workflow: WorkflowModel;
     workflowIndex: number;
@@ -24,11 +25,12 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
     formState,
     label,
     register,
+    setValue,
     switchHidden = false,
     workflow,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
-    const [setWorkflowEnabled, workflowEnabledMap] = useWorkflowsEnabledStore(
+    const [setWorkflowEnabled, workflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
@@ -60,36 +62,31 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                     <span className="font-semibold">{label}</span>
 
                     <Switch
-                        checked={workflowEnabledMap.get(workflow.id!)}
+                        checked={workflowEnabled.get(workflow.id!)}
                         className={twMerge(
                             'cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
-                            workflowEnabledMap.get(workflow.id!) && 'bg-blue-600'
+                            workflowEnabled.get(workflow.id!) && 'bg-blue-600'
                         )}
                         onClick={() => {
-                            setWorkflowEnabled(workflow.id!, !workflowEnabledMap.get(workflow.id!));
+                            setValue(
+                                `projectInstanceWorkflows.${workflowIndex!}.enabled`,
+                                !workflowEnabled.get(workflow.id!)
+                            );
+                            setWorkflowEnabled(workflow.id!, !workflowEnabled.get(workflow.id!));
                         }}
                     >
                         <span
                             aria-hidden="true"
                             className={twMerge(
                                 'pointer-events-none inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                workflowEnabledMap.get(workflow.id!) ? 'translate-x-5' : 'translate-x-0'
+                                workflowEnabled.get(workflow.id!) ? 'translate-x-5' : 'translate-x-0'
                             )}
                         />
                     </Switch>
                 </div>
             )}
 
-            {workflowEnabledMap.get(workflow.id!) && register && (
-                <input
-                    type="hidden"
-                    {...register(`projectInstanceWorkflows.${workflowIndex!}.enabled`, {
-                        value: workflowEnabledMap.get(workflow.id!),
-                    })}
-                />
-            )}
-
-            {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
+            {(workflowEnabled.get(workflow.id!) || switchHidden) && (
                 <div className="mt-2">
                     <Tabs aria-label="Tabs" defaultValue="configuration">
                         <TabsList className="grid w-full grid-cols-2">
@@ -109,12 +106,13 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
 
                         <TabsContent className="grid gap-4" value="connections">
                             {workflowConnections.length ? (
-                                workflowConnections.map((workflowConnection, workflowConnectionConnectionIndex) => (
+                                workflowConnections.map((workflowConnection, workflowConnectionIndex) => (
                                     <ProjectInstanceDialogWorkflowsStepItemConnection
                                         control={control}
-                                        key={workflowConnection.key}
+                                        key={workflowConnectionIndex + '_' + workflowConnection.key}
                                         workflowConnection={workflowConnection}
-                                        workflowConnectionIndex={workflowConnectionConnectionIndex}
+                                        workflowConnectionIndex={workflowConnectionIndex}
+                                        workflowConnectionsCount={workflowConnections.length}
                                         workflowIndex={workflowIndex}
                                     />
                                 ))
