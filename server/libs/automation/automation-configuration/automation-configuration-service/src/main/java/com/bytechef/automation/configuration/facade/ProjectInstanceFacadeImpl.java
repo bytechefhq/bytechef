@@ -51,13 +51,14 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Transactional
 @Service
+@Transactional
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private final InstanceJobFacade instanceJobFacade;
@@ -141,6 +142,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NEVER)
     public long createProjectInstanceWorkflowJob(Long id, String workflowId) {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
