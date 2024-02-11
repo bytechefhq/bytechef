@@ -25,6 +25,6 @@ public class WebhookConstants {
     public static final String CSRF_TOKEN = "csrfToken";
     public static final String HEADERS = "headers";
     public static final String METHOD = "method";
-    public static final String PARAMETERS = "query";
+    public static final String PARAMETERS = "parameters";
     public static final String WEBHOOK = "webhook";
 }
