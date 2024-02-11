@@ -68,6 +68,11 @@ public class RemoteProjectInstanceServiceClient implements ProjectInstanceServic
     }
 
     @Override
+    public List<ProjectInstance> getProjectInstances(long projectId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ProjectInstance> getProjectInstances(Long projectId, Long tagId) {
         throw new UnsupportedOperationException();
     }

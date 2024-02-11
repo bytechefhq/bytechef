@@ -28,6 +28,8 @@ public interface ProjectInstanceWorkflowService {
 
     List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
+    ProjectInstanceWorkflow create(ProjectInstanceWorkflow projectInstanceWorkflow);
+
     void delete(Long id);
 
     Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(

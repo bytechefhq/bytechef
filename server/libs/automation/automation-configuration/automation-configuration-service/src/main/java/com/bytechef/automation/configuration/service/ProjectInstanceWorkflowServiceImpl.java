@@ -54,6 +54,11 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    public ProjectInstanceWorkflow create(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        return projectInstanceWorkflowRepository.save(projectInstanceWorkflow);
+    }
+
+    @Override
     public void delete(Long id) {
         projectInstanceWorkflowRepository.deleteById(id);
     }

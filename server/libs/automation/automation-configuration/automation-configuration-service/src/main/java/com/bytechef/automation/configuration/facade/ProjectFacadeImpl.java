@@ -21,8 +21,11 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectInstance;
+import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
+import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
@@ -64,17 +67,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final CategoryService categoryService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
+    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         CategoryService categoryService, ProjectInstanceService projectInstanceService, ProjectService projectService,
-        TagService tagService, WorkflowService workflowService) {
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, TagService tagService,
+        WorkflowService workflowService) {
 
         this.categoryService = categoryService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
+        this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
         this.workflowService = workflowService;
     }
@@ -85,6 +91,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
             definition, Format.JSON, SourceType.JDBC, Type.AUTOMATION.getId());
 
         projectService.addWorkflow(id, workflow.getId());
+
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
+
+        for (ProjectInstance projectInstance : projectInstances) {
+            ProjectInstanceWorkflow projectInstanceWorkflow = new ProjectInstanceWorkflow();
+
+            projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId());
+            projectInstanceWorkflow.setWorkflowId(workflow.getId());
+
+            projectInstanceWorkflowService.create(projectInstanceWorkflow);
+        }
 
         return workflow;
     }
@@ -135,6 +152,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     public void deleteWorkflow(long id, @NonNull String workflowId) {
         projectService.removeWorkflow(id, workflowId);
+
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
+
+        for (ProjectInstance projectInstance : projectInstances) {
+            List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+                .getProjectInstanceWorkflows(Validate.notNull(projectInstance.getId(), "id"));
+
+            if (CollectionUtils.anyMatch(
+                projectInstanceWorkflows,
+                projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
+
+                throw new IllegalStateException("Workflow id=%s is in use".formatted(workflowId));
+            }
+        }
 
         workflowService.delete(workflowId);
     }

@@ -36,6 +36,8 @@ public interface ProjectInstanceService {
 
     List<ProjectInstance> getProjectInstances();
 
+    List<ProjectInstance> getProjectInstances(long projectId);
+
     List<ProjectInstance> getProjectInstances(Long projectId, Long tagId);
 
     ProjectInstance update(long id, List<Long> tagIds);

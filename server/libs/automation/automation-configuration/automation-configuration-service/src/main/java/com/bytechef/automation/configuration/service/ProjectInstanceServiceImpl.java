@@ -84,6 +84,12 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ProjectInstance> getProjectInstances(long projectId) {
+        return getProjectInstances(projectId, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances(Long projectId, Long tagId) {
         Iterable<ProjectInstance> projectInstanceIterable;
 
