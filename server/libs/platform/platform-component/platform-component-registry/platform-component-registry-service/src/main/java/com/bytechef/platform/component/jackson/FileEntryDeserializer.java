@@ -30,7 +30,7 @@ import org.springframework.boot.jackson.JsonComponent;
  * @author Ivica Cardic
  */
 @JsonComponent
-public class ActionContextFileEntryDeserializer extends JsonDeserializer<FileEntry> {
+public class FileEntryDeserializer extends JsonDeserializer<FileEntry> {
 
     @Override
     public FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
