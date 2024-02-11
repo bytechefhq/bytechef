@@ -120,9 +120,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         projectInstance = projectInstanceService.create(projectInstance);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
-            CollectionUtils.map(
-                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow),
-            projectInstance);
+            projectInstance, CollectionUtils.map(
+                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
 
         return new ProjectInstanceDTO(
             projectInstance, CollectionUtils.map(
@@ -136,12 +135,16 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows, ProjectInstance projectInstance) {
+        ProjectInstance projectInstance, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
 
         projectInstanceWorkflows = projectInstanceWorkflowService.create(
             projectInstanceWorkflows
                 .stream()
-                .peek(projectInstanceWorkflow -> setProjectInstanceId(projectInstance, projectInstanceWorkflow))
+                .peek(projectInstanceWorkflow -> {
+                    validateInputs(projectInstanceWorkflow);
+
+                    projectInstanceWorkflow.setProjectInstanceId(Validate.notNull(projectInstance.getId(), "id"));
+                })
                 .toList());
 
         return projectInstanceWorkflows;
@@ -164,16 +167,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(id);
 
+        if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
+            throw new IllegalStateException(
+                "ProjectInstance id=%s has executed workflows.".formatted(id));
+        }
+
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             if (projectInstanceWorkflow.isEnabled()) {
                 throw new IllegalStateException(
-                    "The ProjectInstanceWorkflow instance id=%s must be disabled.".formatted(
-                        projectInstanceWorkflow.getId()));
-            }
-
-            if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
-                throw new IllegalStateException(
-                    "The ProjectInstance id=%s has executed workflows.".formatted(id));
+                    "ProjectInstanceWorkflow id=%s must be disabled.".formatted(projectInstanceWorkflow.getId()));
             }
 
             projectInstanceWorkflowService.delete(projectInstanceWorkflow.getId());
@@ -462,13 +464,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             jobService.fetchLastWorkflowJob(workflowId),
             Job::getEndDate,
             null);
-    }
-
-    private void
-        setProjectInstanceId(ProjectInstance projectInstance, ProjectInstanceWorkflow projectInstanceWorkflow) {
-        validateInputs(projectInstanceWorkflow);
-
-        projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId());
     }
 
     private void validateInputs(ProjectInstanceWorkflow projectInstanceWorkflow) {

@@ -50,6 +50,6 @@ public class WorkflowReader {
         }
 
         throw new IllegalArgumentException(
-            "WorkflowMapper does not exist for format type " + workflowResource.getWorkflowFormat());
+            "WorkflowMapper does not exist for format type=" + workflowResource.getWorkflowFormat());
     }
 }

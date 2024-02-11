@@ -88,7 +88,7 @@ public class FileStorageDownloadAction {
             }
         }
 
-        throw new IllegalStateException("Server returned: %s".formatted(connection.getResponseCode()));
+        throw new IllegalStateException("Server returned responseCode=%s".formatted(connection.getResponseCode()));
     }
 
     private static long copy(final InputStream inputStream, final OutputStream outputStream) throws IOException {

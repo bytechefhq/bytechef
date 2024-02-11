@@ -15,8 +15,6 @@ plugins {
     pmd
 }
 
-
-val check by tasks.existing
 configurations.implementation {
     exclude(group = "org.slf4j", module = "slf4j-simple")
 }
@@ -196,7 +194,7 @@ spotless {
 
 val spotlessCheck by tasks.existing
 
-check {
+val check by tasks.existing {
     dependsOn(spotlessCheck)
 }
 

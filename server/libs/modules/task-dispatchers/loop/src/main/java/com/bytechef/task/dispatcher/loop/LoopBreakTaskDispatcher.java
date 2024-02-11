@@ -61,8 +61,9 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
-        if (taskExecution.getType()
-            .equals(LOOP + "/v1")) {
+        String type = taskExecution.getType();
+
+        if (type.equals(LOOP + "/v1")) {
             return taskExecution;
         } else {
             if (taskExecution.getParentId() == null) {

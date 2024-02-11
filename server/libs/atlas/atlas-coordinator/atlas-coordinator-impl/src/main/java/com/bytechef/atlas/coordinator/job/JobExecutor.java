@@ -67,11 +67,11 @@ public class JobExecutor {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         if (job.getStatus() != Job.Status.STARTED) {
-            throw new IllegalStateException("should not be here");
+            throw new IllegalStateException("Should not be here");
         } else if (hasMoreTasks(job, workflow)) {
             executeNextTask(job, workflow);
         } else {
-            throw new IllegalStateException("no tasks to execute!");
+            throw new IllegalStateException("No tasks to execute!");
         }
     }
 
