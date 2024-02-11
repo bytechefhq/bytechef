@@ -30,8 +30,10 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -50,23 +52,50 @@ public class WebhookUtils {
         Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
         WebhookMethod method, TriggerContext context) {
 
+        Map<String, ?> headerMap = headers.toMap();
+        Map<String, ?> parameterMap = parameters.toMap();
+
         if (body == null) {
             return Map.of(
                 METHOD, method,
-                HEADERS, headers,
-                PARAMETERS, parameters);
+                HEADERS, headerMap
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)),
+                PARAMETERS, parameterMap
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)));
         } else {
             return Map.of(
                 BODY, body.getContent(),
                 METHOD, method,
-                HEADERS, headers,
-                PARAMETERS, parameters);
+                HEADERS, headerMap
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)),
+                PARAMETERS, parameterMap
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)));
         }
     }
 
     public static WebhookValidateFunction getWebhookValidateFunction() {
         return (inputParameters, headers, parameters, body, method, triggerContext) -> Objects.equals(
             getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN));
+    }
+
+    private static Object checkList(Map.Entry<String, ?> entry) {
+        Object value = entry.getValue();
+
+        if (value instanceof List<?> list) {
+            if (list.size() == 1) {
+                value = list.getFirst();
+            }
+        }
+
+        return value;
     }
 
     private static String getCsrfToken(HttpHeaders headers) {
