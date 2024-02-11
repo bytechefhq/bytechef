@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
+import useCopyToClipboard from '@/hooks/useCopyToClipboard';
 import {ProjectInstanceApi, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
@@ -9,7 +10,7 @@ import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instan
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon, PlayIcon} from 'lucide-react';
+import {CalendarIcon, ClipboardIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -42,6 +43,8 @@ const ProjectInstanceWorkflowListItem = ({
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
     const {toast} = useToast();
 
     const workflowHasManualTrigger = !workflow.triggers || workflow.triggers?.length === 0;
@@ -160,6 +163,23 @@ const ProjectInstanceWorkflowListItem = ({
                                     </TooltipTrigger>
 
                                     <TooltipContent>Run workflow manually</TooltipContent>
+                                </Tooltip>
+                            </Button>
+                        )}
+
+                        {projectInstanceWorkflow.staticWebhookUrl && (
+                            <Button
+                                disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
+                                onClick={() => copyToClipboard(projectInstanceWorkflow.staticWebhookUrl!)}
+                                size="icon"
+                                variant="ghost"
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <ClipboardIcon className="h-5" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
                                 </Tooltip>
                             </Button>
                         )}
