@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.trigger;
 
-import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
@@ -67,12 +67,12 @@ public record WebhookRequest(
 
         @Override
         public <T> T getContent(Class<T> valueType) {
-            return JsonUtils.convertValue(content, valueType);
+            return ConvertUtils.convertValue(content, valueType);
         }
 
         @Override
         public <T> T getContent(TypeReference<T> valueTypeRef) {
-            return JsonUtils.convertValue(content, valueTypeRef.getType());
+            return ConvertUtils.convertValue(content, valueTypeRef.getType());
         }
 
         @Override

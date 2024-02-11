@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.registry.util;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseFileEntry;
@@ -89,7 +90,7 @@ public class SchemaUtils {
         } else if (value instanceof LocalTime) {
             outputProperty = propertyFactory.create(name, BaseTimeProperty.class);
         } else {
-            if (JsonUtils.canConvert(value, Map.class)) {
+            if (ConvertUtils.canConvert(value, Map.class)) {
                 outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
             } else {
                 outputProperty = propertyFactory.create(name, com.bytechef.definition.BaseProperty.class);

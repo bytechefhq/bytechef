@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactory;
@@ -91,7 +91,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
         if (value instanceof Map<?, ?>) {
             map = (Map<?, ?>) value;
         } else {
-            map = JsonUtils.convertValue(value, Map.class);
+            map = ConvertUtils.convertValue(value, Map.class);
         }
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
