@@ -17,6 +17,9 @@ plugins {
 
 
 val check by tasks.existing
+configurations.implementation {
+    exclude(group = "org.slf4j", module = "slf4j-simple")
+}
 
 //https://melix.github.io/blog/2021/03/version-catalogs-faq.html#_can_i_use_the_version_catalog_in_buildsrc
 val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
