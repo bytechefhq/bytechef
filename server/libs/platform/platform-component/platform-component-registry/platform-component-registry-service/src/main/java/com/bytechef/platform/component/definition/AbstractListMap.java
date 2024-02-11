@@ -16,24 +16,24 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.commons.util.MapUtils;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-public class AbstractListMap {
+/**
+ * @author Ivica Cardic
+ */
+public class AbstractListMap extends HashMap<String, List<String>> {
 
-    private final Map<String, List<String>> parameters;
-
-    public AbstractListMap(Map<String, String[]> parameters) {
-        this.parameters = MapUtils.toMap(parameters, Map.Entry::getKey, entry -> Arrays.asList(entry.getValue()));
+    public AbstractListMap(Map<String, List<String>> parameters) {
+        super(parameters);
     }
 
     public List<String> allValues(String name) {
-        return parameters.values()
+        return values()
             .stream()
             .flatMap(List::stream)
             .toList();
@@ -42,11 +42,11 @@ public class AbstractListMap {
     public Optional<String> firstValue(String name) {
         Optional<String> optional = Optional.empty();
 
-        if (parameters.containsKey(name)) {
-            List<String> values = parameters.get(name);
+        if (containsKey(name)) {
+            List<String> values = get(name);
 
             if (values != null && !values.isEmpty()) {
-                optional = Optional.of(values.get(0));
+                optional = Optional.of(values.getFirst());
             }
         }
 
@@ -60,6 +60,6 @@ public class AbstractListMap {
     }
 
     public Map<String, List<String>> toMap() {
-        return Collections.unmodifiableMap(parameters);
+        return Collections.unmodifiableMap(this);
     }
 }

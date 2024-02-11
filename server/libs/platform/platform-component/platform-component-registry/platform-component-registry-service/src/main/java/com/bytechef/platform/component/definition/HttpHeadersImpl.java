@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerDefinition;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public class HttpHeadersImpl extends AbstractListMap implements TriggerDefinition.HttpHeaders {
 
-    public HttpHeadersImpl(Map<String, String[]> headers) {
+    public HttpHeadersImpl(Map<String, List<String>> headers) {
         super(headers);
     }
 }

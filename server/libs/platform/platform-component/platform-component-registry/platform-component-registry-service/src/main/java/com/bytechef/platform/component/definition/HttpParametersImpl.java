@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerDefinition;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public class HttpParametersImpl extends AbstractListMap implements TriggerDefinition.HttpParameters {
 
-    public HttpParametersImpl(Map<String, String[]> parameters) {
+    public HttpParametersImpl(Map<String, List<String>> parameters) {
         super(parameters);
     }
 }

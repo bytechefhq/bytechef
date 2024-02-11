@@ -22,6 +22,7 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +30,8 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record WebhookRequest(
-    Map<String, String[]> headers, Map<String, String[]> parameters, WebhookBodyImpl body, WebhookMethod method) {
+    Map<String, List<String>> headers, Map<String, List<String>> parameters, WebhookBodyImpl body,
+    WebhookMethod method) {
 
     public static final String WEBHOOK_REQUEST = "webhookRequest";
 

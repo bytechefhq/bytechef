@@ -44,10 +44,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -114,8 +116,8 @@ public class WebhookController {
 
         WebhookBodyImpl body = null;
         String mediaType = httpServletRequest.getContentType();
-        Map<String, String[]> headers = getHeaderMap(httpServletRequest);
-        Map<String, String[]> parameters = httpServletRequest.getParameterMap();
+        Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
+        Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
         ResponseEntity<?> responseEntity;
 
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
@@ -238,13 +240,13 @@ public class WebhookController {
         return "file." + subtype.toLowerCase();
     }
 
-    private static Map<String, String[]> getHeaderMap(HttpServletRequest httpServletRequest) {
-        Map<String, String[]> headerMap = new HashMap<>();
+    private static Map<String, List<String>> getHeaderMap(HttpServletRequest httpServletRequest) {
+        Map<String, List<String>> headerMap = new HashMap<>();
         Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
 
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
-            headerMap.put(headerName, toArray(httpServletRequest.getHeaders(headerName)));
+            headerMap.put(headerName, toList(httpServletRequest.getHeaders(headerName)));
         }
 
         return headerMap;
@@ -263,28 +265,25 @@ public class WebhookController {
         return uriComponentsBuilder.build();
     }
 
-    private static String[] toArray(Enumeration<String> enumeration) {
+    private static List<String> toList(Enumeration<String> enumeration) {
         List<String> list = new ArrayList<>();
 
         while (enumeration.hasMoreElements()) {
             list.add(enumeration.nextElement());
         }
 
-        return list.toArray(new String[0]);
+        return list;
     }
 
-    private static Map<String, String[]> toMap(MultiValueMap<String, String> multiValueMap) {
-        Map<String, String[]> resultMap = new HashMap<>();
+    private Map<String, List<String>> toMap(Map<String, String[]> map) {
+        return map
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, entry -> Arrays.asList(entry.getValue())));
+    }
 
-        for (Map.Entry<String, List<String>> entry : multiValueMap.entrySet()) {
-            String key = entry.getKey();
-            List<String> values = entry.getValue();
-
-            String[] arrayOfValues = new String[values.size()];
-
-            resultMap.put(key, values.toArray(arrayOfValues));
-        }
-
-        return resultMap;
+    private static Map<String, List<String>> toMap(MultiValueMap<String, String> multiValueMap) {
+        return new HashMap<>(multiValueMap);
     }
 }
