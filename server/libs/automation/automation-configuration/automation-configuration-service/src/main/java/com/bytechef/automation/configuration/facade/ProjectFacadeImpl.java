@@ -209,7 +209,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<Project> projects = projectService.getProjects();
 
         return categoryService.getCategories(
-            projects.stream()
+            projects
+                .stream()
                 .map(Project::getCategoryId)
                 .filter(Objects::nonNull)
                 .toList());
@@ -232,7 +233,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 project,
                 CollectionUtils.findFirstOrElse(
                     categoryService.getCategories(
-                        projects.stream()
+                        projects
+                            .stream()
                             .map(Project::getCategoryId)
                             .filter(Objects::nonNull)
                             .toList()),
@@ -240,7 +242,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     null),
                 CollectionUtils.filter(
                     tagService.getTags(
-                        projects.stream()
+                        projects
+                            .stream()
                             .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
                             .filter(Objects::nonNull)
                             .toList()),
@@ -257,7 +260,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<Tag> getProjectTags() {
         List<Project> projects = projectService.getProjects();
 
-        List<Long> tagIds = projects.stream()
+        List<Long> tagIds = projects
+            .stream()
             .map(Project::getTagIds)
             .flatMap(Collection::stream)
             .toList();
