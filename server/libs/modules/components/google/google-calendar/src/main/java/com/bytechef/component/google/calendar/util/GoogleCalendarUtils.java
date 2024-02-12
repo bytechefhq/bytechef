@@ -177,7 +177,8 @@ public class GoogleCalendarUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<CalendarListEntry> calendarListEntries = calendar.calendarList()
+        List<CalendarListEntry> calendarListEntries = calendar
+            .calendarList()
             .list()
             .setMinAccessRole("writer")
             .execute()
