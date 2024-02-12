@@ -186,7 +186,29 @@
       "exampleValue": null,
       "label": "Logit bias",
       "placeholder": null,
-      "additionalProperties": null,
+      "additionalProperties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "NUMBER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "maxNumberPrecision": null,
+        "maxValue": null,
+        "minNumberPrecision": null,
+        "minValue": null,
+        "numberPrecision": null,
+        "options": null,
+        "controlType": "NUMBER",
+        "optionsDataSource": null
+      } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
@@ -300,16 +322,36 @@
       "metadata": { },
       "required": false,
       "name": "stop",
-      "type": "OBJECT",
+      "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Stop",
       "placeholder": null,
-      "additionalProperties": null,
+      "items": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "maxItems": null,
+      "minItems": null,
       "multipleValues": null,
       "options": null,
-      "properties": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -560,8 +602,8 @@
       "optionsDataSource": null
     } ],
     "title": "Ask ChatGPT",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -786,7 +828,27 @@
             "exampleValue": null,
             "label": "Parameters",
             "placeholder": null,
-            "additionalProperties": null,
+            "additionalProperties": [ {
+              "advancedOption": null,
+              "description": null,
+              "displayCondition": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "metadata": { },
+              "required": null,
+              "name": null,
+              "type": "OBJECT",
+              "defaultValue": null,
+              "exampleValue": null,
+              "label": null,
+              "placeholder": null,
+              "additionalProperties": null,
+              "multipleValues": null,
+              "options": null,
+              "properties": null,
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
+            } ],
             "multipleValues": null,
             "options": null,
             "properties": null,
@@ -807,7 +869,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "A list of file IDs attached to this assistant. ",
+      "description": "A list of file IDs attached to this assistant.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -819,7 +881,26 @@
       "exampleValue": null,
       "label": "File ids",
       "placeholder": null,
-      "items": null,
+      "items": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
@@ -867,7 +948,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create assistant",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1222,7 +1302,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -1411,7 +1492,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create image",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1552,7 +1632,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -1727,7 +1808,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create speech",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1823,7 +1903,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -2345,7 +2426,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create transcriptions",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2744,7 +2824,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -2962,7 +3043,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create translation",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3361,7 +3441,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -3648,7 +3729,29 @@
       "exampleValue": null,
       "label": "Logit bias",
       "placeholder": null,
-      "additionalProperties": null,
+      "additionalProperties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "NUMBER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "maxNumberPrecision": null,
+        "maxValue": null,
+        "minNumberPrecision": null,
+        "minValue": null,
+        "numberPrecision": null,
+        "options": null,
+        "controlType": "NUMBER",
+        "optionsDataSource": null
+      } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
@@ -3762,16 +3865,36 @@
       "metadata": { },
       "required": false,
       "name": "stop",
-      "type": "OBJECT",
+      "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Stop",
       "placeholder": null,
-      "additionalProperties": null,
+      "items": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "maxItems": null,
+      "minItems": null,
       "multipleValues": null,
       "options": null,
-      "properties": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -4022,8 +4145,8 @@
       "optionsDataSource": null
     } ],
     "title": "Vision Prompt",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -4056,15 +4179,15 @@
       "type": "BEARER_TOKEN",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "componentName": "openai",
     "componentDescription": "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",
