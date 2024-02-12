@@ -70,7 +70,7 @@ public abstract class AbstractChatCompletionAction {
     public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
         .label("Logit bias")
         .description("Modify the likelihood of specified tokens appearing in the completion.")
-        .defaultValue(null)
+        .additionalProperties(number())
         .required(false);
 
     public static final ComponentDSL.ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
@@ -110,10 +110,10 @@ public abstract class AbstractChatCompletionAction {
                 "monitor changes in the backend.")
         .required(false);
 
-    public static final ModifiableObjectProperty STOP_PROPERTY = object(STOP)
+    public static final ComponentDSL.ModifiableArrayProperty STOP_PROPERTY = array(STOP)
         .label("Stop")
         .description("Up to 4 sequences where the API will stop generating further tokens.")
-        .defaultValue(null)
+        .items(string())
         .required(false);
 
     public static final ComponentDSL.ModifiableBooleanProperty STREAM_PROPERTY = bool(STREAM)

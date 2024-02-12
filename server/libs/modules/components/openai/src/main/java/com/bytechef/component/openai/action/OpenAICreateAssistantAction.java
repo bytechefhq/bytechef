@@ -103,14 +103,14 @@ public class OpenAICreateAssistantAction {
                                     .label("Parameters")
                                     .description(
                                         "The parameters the functions accepts, described as a JSON Schema object.")
+                                    .additionalProperties(object())
                                     .required(true))
-                            .required(false))
-
-                )
+                            .required(false)))
                 .required(false),
             array(FILE_IDS)
                 .label("File ids")
-                .description("A list of file IDs attached to this assistant. ")
+                .description("A list of file IDs attached to this assistant.")
+                .items(string())
                 .required(false),
             object(METADATA)
                 .label("Metadata")
@@ -144,9 +144,7 @@ public class OpenAICreateAssistantAction {
                     array("fileIds")
                         .items(
                             string("fileId")),
-                    object("metadata"))
-
-        )
+                    object("metadata")))
         .perform(OpenAICreateAssistantAction::perform);
 
     private OpenAICreateAssistantAction() {
