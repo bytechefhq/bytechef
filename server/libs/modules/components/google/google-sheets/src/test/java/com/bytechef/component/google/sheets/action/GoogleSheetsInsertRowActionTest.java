@@ -75,8 +75,8 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
                 .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
                 .thenReturn(mockedMap);
 
-            Map<String, Object> result =
-                GoogleSheetsInsertRowAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Map<String, Object> result = GoogleSheetsInsertRowAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedMap, result);
 
@@ -87,8 +87,10 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();
 
             assertEquals("ROWS", valueRange.getMajorDimension());
-            assertEquals(values, valueRange.getValues()
-                .getFirst());
+
+            List<List<Object>> valueRangeValues = valueRange.getValues();
+
+            assertEquals(values, valueRangeValues.getFirst());
         }
     }
 }

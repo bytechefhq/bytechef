@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 public class GoogleServicesTest {
 
-    private Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
 
     @Test
     void testGetCalendar() {

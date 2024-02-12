@@ -33,9 +33,6 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
  */
 public class GoogleSheetsConstants {
 
-    private GoogleSheetsConstants() {
-    }
-
     public static final String CLEAR_SHEET = "clearSheet";
     public static final String DELETE_ROW = "deleteRow";
     public static final String FIND_ROW_BY_NUM = "findRowByNum";
@@ -81,4 +78,7 @@ public class GoogleSheetsConstants {
         .loadPropertiesDependsOn(IS_THE_FIRST_ROW_HEADER)
         .properties(GoogleSheetsUtils::createArrayPropertyForRow)
         .required(true);
+
+    private GoogleSheetsConstants() {
+    }
 }

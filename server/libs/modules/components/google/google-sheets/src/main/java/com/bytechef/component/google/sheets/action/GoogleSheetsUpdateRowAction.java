@@ -88,7 +88,8 @@ public class GoogleSheetsUpdateRowAction {
 
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
 
-        sheets.spreadsheets()
+        sheets
+            .spreadsheets()
             .values()
             .update(
                 spreadsheetId, range, valueRange)
@@ -97,5 +98,4 @@ public class GoogleSheetsUpdateRowAction {
 
         return getMapOfValuesForRow(inputParameters, sheets, values);
     }
-
 }

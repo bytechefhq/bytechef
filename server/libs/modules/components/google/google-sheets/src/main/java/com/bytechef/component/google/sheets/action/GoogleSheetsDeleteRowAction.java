@@ -79,7 +79,8 @@ public class GoogleSheetsDeleteRowAction {
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
             .setRequests(List.of(request));
 
-        sheets.spreadsheets()
+        sheets
+            .spreadsheets()
             .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
             .execute();
 

@@ -65,17 +65,20 @@ public class GoogleSheetsClearSheetAction {
 
         UpdateCellsRequest updateCellsRequest = new UpdateCellsRequest()
             .setFields("userEnteredValue")
-            .setRange(new GridRange()
-                .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
-                .setStartRowIndex(startRowIndex));
+            .setRange(
+                new GridRange()
+                    .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
+                    .setStartRowIndex(startRowIndex));
 
         Request request = new Request().setUpdateCells(updateCellsRequest);
 
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
             .setRequests(List.of(request));
 
-        sheets.spreadsheets()
-            .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID),
+        sheets
+            .spreadsheets()
+            .batchUpdate(
+                inputParameters.getRequiredString(SPREADSHEET_ID),
                 batchUpdateSpreadsheetRequest)
             .execute();
 

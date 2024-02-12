@@ -91,7 +91,8 @@ public class GoogleSheetsInsertRowAction {
 
         String range = createRange(inputParameters.getRequiredInteger(SHEET_ID), null);
 
-        sheets.spreadsheets()
+        sheets
+            .spreadsheets()
             .values()
             .append(spreadsheetId, range, valueRange)
             .setValueInputOption(inputParameters.getRequiredString(VALUE_INPUT_OPTION))

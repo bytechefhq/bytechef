@@ -40,6 +40,7 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
 
+    @SuppressWarnings("unchecked")
     private final Map<String, Object> mockedMap = mock(Map.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Values.Update mockedUpdate = mock(Sheets.Spreadsheets.Values.Update.class);
@@ -70,8 +71,8 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
             when(mockedSpreadsheets.values())
                 .thenReturn(mockedValues);
             when(
-                mockedValues.update(spreadsheetIdArgumentCaptor.capture(), anyString(),
-                    valueRangeArgumentCaptor.capture()))
+                mockedValues.update(
+                    spreadsheetIdArgumentCaptor.capture(), anyString(), valueRangeArgumentCaptor.capture()))
                         .thenReturn(mockedUpdate);
             when(mockedUpdate.setValueInputOption(valueInputOptionArgumentCaptor.capture()))
                 .thenReturn(mockedUpdate);
@@ -87,8 +88,10 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();
 
             assertEquals("ROWS", valueRange.getMajorDimension());
-            assertEquals(values, valueRange.getValues()
-                .getFirst());
+
+            List<List<Object>> valueRangeValues = valueRange.getValues();
+
+            assertEquals(values, valueRangeValues.getFirst());
         }
     }
 }

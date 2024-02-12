@@ -64,8 +64,8 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
                     .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, row))
                     .thenReturn(mockedMap);
 
-                Map<String, Object> result =
-                    GoogleSheetsFindRowByNumAction.perform(mockedParameters, mockedParameters, mockedContext);
+                Map<String, Object> result = GoogleSheetsFindRowByNumAction.perform(
+                    mockedParameters, mockedParameters, mockedContext);
 
                 assertEquals(mockedMap, result);
                 assertEquals(2, rowNumberArgumentCaptor.getValue());

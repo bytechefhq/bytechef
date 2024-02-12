@@ -79,16 +79,15 @@ public class GoogleSheetsUtils {
 
         if (isFirstRowHeader) {
             List<Object> firstRow = GoogleSheetsRowUtils.getRow(
-                GoogleServices.getSheets(connectionParameters),
-                inputParameters.getRequiredString(SPREADSHEET_ID),
-                inputParameters.getRequiredInteger(SHEET_ID),
-                1);
+                GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
+                inputParameters.getRequiredInteger(SHEET_ID), 1);
 
             List<ModifiableStringProperty> list = new ArrayList<>();
 
             for (Object value : firstRow) {
                 list.add(string(value.toString()));
             }
+
             updatedRow.items(list);
         } else {
             updatedRow.items(bool(), number(), string());
@@ -99,25 +98,26 @@ public class GoogleSheetsUtils {
 
     public static Map<String, Object> getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row)
         throws IOException {
+
         Map<String, Object> valuesMap;
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
             List<Object> firstRow = GoogleSheetsRowUtils.getRow(
-                sheets,
-                inputParameters.getRequiredString(SPREADSHEET_ID),
-                inputParameters.getRequiredInteger(SHEET_ID),
+                sheets, inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredInteger(SHEET_ID),
                 1);
 
-            valuesMap = IntStream.range(0, row.size())
+            valuesMap = IntStream
+                .range(0, row.size())
                 .boxed()
-                .collect(Collectors.toMap(i -> firstRow.get(i)
-                    .toString(), row::get, (a, b) -> b, LinkedHashMap::new));
+                .collect(
+                    Collectors.toMap(i -> String.valueOf(firstRow.get(i)), row::get, (a, b) -> b, LinkedHashMap::new));
         } else {
-            valuesMap = IntStream.range(0, row.size())
+            valuesMap = IntStream
+                .range(0, row.size())
                 .boxed()
-                .collect(Collectors.toMap(i -> columnToLabel(i + 1), row::get, (a, b) -> b,
-                    LinkedHashMap::new));
+                .collect(Collectors.toMap(i -> columnToLabel(i + 1), row::get, (a, b) -> b, LinkedHashMap::new));
         }
+
         return valuesMap;
     }
 
@@ -126,10 +126,10 @@ public class GoogleSheetsUtils {
         throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
-
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        List<Sheet> sheetsList = sheets.spreadsheets()
+        List<Sheet> sheetsList = sheets
+            .spreadsheets()
             .get(inputParameters.getRequiredString(SPREADSHEET_ID))
             .execute()
             .getSheets();
@@ -139,12 +139,7 @@ public class GoogleSheetsUtils {
 
             sheetIdMap.put(sheetProperties.getSheetId(), sheetProperties.getTitle());
 
-            options.add(
-                option(sheetProperties
-                    .getTitle(),
-                    sheetProperties
-                        .getSheetId()
-                        .toString()));
+            options.add(option(sheetProperties.getTitle(), String.valueOf(sheetProperties.getSheetId())));
         }
 
         return options;
@@ -156,7 +151,8 @@ public class GoogleSheetsUtils {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        List<File> files = drive.files()
+        List<File> files = drive
+            .files()
             .list()
             .setQ("mimeType='application/vnd.google-apps.spreadsheet'")
             .setIncludeItemsFromAllDrives(inputParameters.getBoolean(INCLUDE_ITEMS_FROM_ALL_DRIVES))
@@ -167,8 +163,7 @@ public class GoogleSheetsUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (File file : files) {
-            options.add(
-                option(file.getName(), file.getId()));
+            options.add(option(file.getName(), file.getId()));
         }
 
         return options;

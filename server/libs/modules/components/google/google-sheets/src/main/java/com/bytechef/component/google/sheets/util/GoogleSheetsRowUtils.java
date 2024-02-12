@@ -31,7 +31,8 @@ public class GoogleSheetsRowUtils {
     public static List<Object> getRow(Sheets sheets, String spreadSheetId, Integer sheetId, Integer rowNumber)
         throws IOException {
 
-        return sheets.spreadsheets()
+        return sheets
+            .spreadsheets()
             .values()
             .batchGet(spreadSheetId)
             .setRanges(List.of(GoogleSheetsUtils.createRange(sheetId, rowNumber)))

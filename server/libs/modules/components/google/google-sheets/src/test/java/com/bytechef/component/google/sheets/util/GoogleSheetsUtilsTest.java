@@ -95,7 +95,6 @@ class GoogleSheetsUtilsTest {
 
     @Test
     void testCreateArrayPropertyForRowWhereFirstRowIsHeader() throws IOException {
-
         when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
             .thenReturn(true);
         when(mockedParameters.getRequiredString(SPREADSHEET_ID))
@@ -107,11 +106,15 @@ class GoogleSheetsUtilsTest {
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getSheets(mockedParameters))
                 .thenReturn(mockedSheets);
-            try (MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic = mockStatic(GoogleSheetsRowUtils.class)) {
-                googleSheetsRowUtilsMockedStatic
-                    .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), anyString(), anyInt(), anyInt())).thenReturn(List.of("header1", "header2", "header3"));
+            try (MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic = mockStatic(
+                GoogleSheetsRowUtils.class)) {
 
-                List<Property.ArrayProperty> result = GoogleSheetsUtils.createArrayPropertyForRow(mockedParameters, mockedParameters, mockedContext);
+                googleSheetsRowUtilsMockedStatic
+                    .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), anyString(), anyInt(), anyInt()))
+                    .thenReturn(List.of("header1", "header2", "header3"));
+
+                List<Property.ArrayProperty> result = GoogleSheetsUtils.createArrayPropertyForRow(
+                    mockedParameters, mockedParameters, mockedContext);
 
                 assertEquals(1, result.size());
                 assertEquals(3, result.getFirst().getItems().get().size());
@@ -123,6 +126,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testGetMapOfValuesForRowWhereFirstRowHeaders() throws IOException {
         List<Object> mockedRow = mock(List.class);
         List<Object> mockedFirstRow = mock(List.class);
@@ -134,19 +138,19 @@ class GoogleSheetsUtilsTest {
         when(mockedParameters.getRequiredInteger(SHEET_ID))
             .thenReturn(123);
 
-        try (MockedStatic<GoogleSheetsRowUtils> sheetsRowUtilsMockedStatic =
-            mockStatic(GoogleSheetsRowUtils.class)) {
+        try (MockedStatic<GoogleSheetsRowUtils> sheetsRowUtilsMockedStatic = mockStatic(GoogleSheetsRowUtils.class)) {
             sheetsRowUtilsMockedStatic
-                .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), spreadsheetIdArgumentCaptor.capture(),
-                    sheetIdArgumentCaptor.capture(), rowNumberArgumentCaptor.capture()))
+                .when(() -> GoogleSheetsRowUtils.getRow(
+                    any(Sheets.class), spreadsheetIdArgumentCaptor.capture(), sheetIdArgumentCaptor.capture(),
+                    rowNumberArgumentCaptor.capture()))
                 .thenReturn(mockedFirstRow);
 
             when(mockedFirstRow.get(anyInt())).thenReturn("header1", "header2", "header3");
             when(mockedRow.size()).thenReturn(3);
             when(mockedRow.get(anyInt())).thenReturn("value1", "value2", "value3");
 
-            Map<String, Object> result =
-                GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, mockedRow);
+            Map<String, Object> result = GoogleSheetsUtils.getMapOfValuesForRow(
+                mockedParameters, mockedSheets, mockedRow);
 
             Map<String, Object> expected = new LinkedHashMap<>();
 
@@ -162,17 +166,16 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testGetMapOfValuesForRowWhereFirstRowNotHeaders() throws IOException {
         List<Object> mockedRow = mock(List.class);
 
         when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
             .thenReturn(false);
-
         when(mockedRow.size()).thenReturn(3);
         when(mockedRow.get(anyInt())).thenReturn("value1", "value2", "value3");
 
-        Map<String, Object> result =
-            GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, mockedRow);
+        Map<String, Object> result = GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, mockedRow);
 
         Map<String, Object> expected = new LinkedHashMap<>();
 
@@ -200,29 +203,34 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(mockedSpreadsheet);
             when(mockedSpreadsheet.getSheets())
                 .thenReturn(sheetsList);
-            List<Option<String>> sheetIdOptions =
-                GoogleSheetsUtils.getSheetIdOptions(mockedParameters, mockedParameters, anyString(), mockedContext);
+
+            List<Option<String>> sheetIdOptions = GoogleSheetsUtils.getSheetIdOptions(
+                mockedParameters, mockedParameters, anyString(), mockedContext);
 
             assertNotNull(sheetIdOptions);
             assertEquals(2, sheetIdOptions.size());
-            assertEquals("Sheet 1", sheetIdOptions.getFirst()
-                .getLabel());
-            assertEquals("1234567890", sheetIdOptions.getFirst()
-                .getValue());
-            assertEquals("Sheet 2", sheetIdOptions.get(1)
-                .getLabel());
-            assertEquals("98765432", sheetIdOptions.get(1)
-                .getValue());
+
+            Option<String> sheetIdOptionsFirst = sheetIdOptions.getFirst();
+
+            assertEquals("Sheet 1", sheetIdOptionsFirst.getLabel());
+            assertEquals("1234567890", sheetIdOptionsFirst.getValue());
+
+            Option<String> option = sheetIdOptions.get(1);
+
+            assertEquals("Sheet 2", option.getLabel());
+            assertEquals("98765432", option.getValue());
         }
     }
 
     @Test
     void testGetSpreadsheetIdOptions() throws IOException {
         File file1 = new File();
+
         file1.setName("Spreadsheet 1");
         file1.setId("1234567890");
 
         File file2 = new File();
+
         file2.setName("Spreadsheet 2");
         file2.setId("0987654321");
 
@@ -248,21 +256,21 @@ class GoogleSheetsUtilsTest {
             when(mockedList.execute())
                 .thenReturn(new FileList().setFiles(files));
 
-            List<Option<String>> spreadsheetIdOptions =
-                GoogleSheetsUtils.getSpreadsheetIdOptions(mockedParameters, mockedParameters, anyString(),
-                    mockedContext);
+            List<Option<String>> spreadsheetIdOptions = GoogleSheetsUtils.getSpreadsheetIdOptions(
+                mockedParameters, mockedParameters, anyString(), mockedContext);
 
             assertNotNull(spreadsheetIdOptions);
             assertEquals(2, spreadsheetIdOptions.size());
 
-            assertEquals("Spreadsheet 1", spreadsheetIdOptions.getFirst()
-                .getLabel());
-            assertEquals("1234567890", spreadsheetIdOptions.getFirst()
-                .getValue());
-            assertEquals("Spreadsheet 2", spreadsheetIdOptions.get(1)
-                .getLabel());
-            assertEquals("0987654321", spreadsheetIdOptions.get(1)
-                .getValue());
+            Option<String> spreadsheetIdOptionsFirst = spreadsheetIdOptions.getFirst();
+
+            assertEquals("Spreadsheet 1", spreadsheetIdOptionsFirst.getLabel());
+            assertEquals("1234567890", spreadsheetIdOptionsFirst.getValue());
+
+            Option<String> option = spreadsheetIdOptions.get(1);
+
+            assertEquals("Spreadsheet 2", option.getLabel());
+            assertEquals("0987654321", option.getValue());
             assertEquals("mimeType='application/vnd.google-apps.spreadsheet'", qArgumentCaptor.getValue());
             assertEquals(true, includeItemsFromAllDrivesArgumentCaptor.getValue());
             assertEquals(true, supportsAllDrivesArgumentCaptor.getValue());
@@ -283,6 +291,7 @@ class GoogleSheetsUtilsTest {
 
         sheetProperties1.setTitle(title);
         sheetProperties1.setSheetId(sheetId);
+
         sheet.setProperties(sheetProperties1);
 
         return sheet;

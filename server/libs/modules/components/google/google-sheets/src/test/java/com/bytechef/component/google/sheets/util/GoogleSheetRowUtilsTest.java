@@ -54,7 +54,6 @@ class GoogleSheetRowUtilsTest {
         String range = "range";
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.createRange(sheetId, rowNumber))
                 .thenReturn(range);
@@ -77,6 +76,7 @@ class GoogleSheetRowUtilsTest {
                 .thenReturn(new BatchGetValuesResponse().setValueRanges(List.of(mockedValueRange)));
 
             List<String> values = List.of("value1", "value2", "value3");
+
             when(mockedValueRange.getValues())
                 .thenReturn(List.of(List.of(values)));
 
