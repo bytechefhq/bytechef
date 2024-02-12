@@ -10,7 +10,7 @@ import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instan
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon, ClipboardIcon, PlayIcon} from 'lucide-react';
+import {ClipboardIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';

@@ -31,7 +31,6 @@ import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.q
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -166,16 +165,9 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
                                 {projectInstance.lastExecutionDate ? (
-                                    <>
-                                        <CalendarIcon
-                                            aria-hidden="true"
-                                            className="mr-0.5 size-3.5 shrink-0 text-gray-400"
-                                        />
-
-                                        <span>
-                                            {`Executed at ${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    </>
+                                    <span>
+                                        {`Executed at ${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
+                                    </span>
                                 ) : (
                                     '-'
                                 )}

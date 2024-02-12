@@ -29,7 +29,6 @@ import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -165,16 +164,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             <TooltipTrigger>
                                 <div className="flex items-center text-sm text-gray-500 sm:mt-0">
                                     {project.status === ProjectModelStatusEnum.Published ? (
-                                        <>
-                                            <CalendarIcon
-                                                aria-hidden="true"
-                                                className="mr-0.5 size-3.5 shrink-0 text-gray-400"
-                                            />
-
-                                            <span>
-                                                {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
-                                            </span>
-                                        </>
+                                        <span>
+                                            {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
+                                        </span>
                                     ) : (
                                         '-'
                                     )}

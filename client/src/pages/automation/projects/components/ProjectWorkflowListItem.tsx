@@ -28,7 +28,6 @@ import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog'
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -119,8 +118,6 @@ const ProjectWorkflowListItem = ({
             <div className="flex justify-end gap-x-4">
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                        <CalendarIcon aria-hidden="true" className="mr-0.5 size-3.5 shrink-0 text-gray-400" />
-
                         <span>
                             {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
                         </span>

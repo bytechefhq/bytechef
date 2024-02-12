@@ -30,7 +30,6 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from '@/queries/automation/co
 import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -136,11 +135,6 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                             {connection.createdDate && (
                                 <Tooltip>
                                     <TooltipTrigger className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                        <CalendarIcon
-                                            aria-hidden="true"
-                                            className="mr-0.5 size-3.5 shrink-0 text-gray-400"
-                                        />
-
                                         <span>
                                             {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
                                         </span>
