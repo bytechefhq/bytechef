@@ -58,7 +58,7 @@ const WorkflowNodesSidebar = ({
 
     return (
         <div>
-            <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
+            <header className="border-b border-gray-200 p-3 text-center text-gray-600">
                 <Input
                     name="workflowNodeFilter"
                     onChange={(event) => setFilter(event.target.value)}
