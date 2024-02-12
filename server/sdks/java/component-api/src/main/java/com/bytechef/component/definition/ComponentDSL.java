@@ -650,7 +650,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            if ((options == null || options.isEmpty()) && optionsFunction == null) {
+            if (options == null && optionsFunction == null) {
                 return ControlType.ARRAY_BUILDER;
             } else {
                 return ControlType.MULTI_SELECT;
@@ -999,7 +999,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            return ControlType.CHECKBOX;
+            return ControlType.SELECT;
         }
 
         @Override
@@ -1697,7 +1697,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            if ((options == null || options.isEmpty()) && optionsFunction == null) {
+            if (options == null && optionsFunction == null) {
                 return ControlType.INTEGER;
             } else {
                 return ControlType.SELECT;
@@ -1939,7 +1939,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            if ((options == null || options.isEmpty()) && optionsFunction == null) {
+            if (options == null && optionsFunction == null) {
                 return ControlType.DATE;
             } else {
                 return ControlType.SELECT;
@@ -2036,7 +2036,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            if ((options == null || options.isEmpty()) && optionsFunction == null) {
+            if (options == null && optionsFunction == null) {
                 return ControlType.DATE_TIME;
             } else {
                 return ControlType.SELECT;
@@ -2227,7 +2227,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            if ((options == null || options.isEmpty()) && optionsFunction == null) {
+            if (options == null && optionsFunction == null) {
                 return ControlType.NUMBER;
             } else {
                 return ControlType.SELECT;
@@ -2408,7 +2408,7 @@ public final class ComponentDSL {
 
         @Override
         public ControlType getControlType() {
-            if ((options == null || options.isEmpty()) && optionsFunction == null) {
+            if (options == null && optionsFunction == null) {
                 return ControlType.OBJECT_BUILDER;
             } else {
                 return ControlType.SELECT;
@@ -2764,7 +2764,7 @@ public final class ComponentDSL {
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
-                if ((options == null || options.isEmpty()) && optionsFunction == null) {
+                if (options == null && optionsFunction == null) {
                     return ControlType.TEXT;
                 } else {
                     return ControlType.SELECT;

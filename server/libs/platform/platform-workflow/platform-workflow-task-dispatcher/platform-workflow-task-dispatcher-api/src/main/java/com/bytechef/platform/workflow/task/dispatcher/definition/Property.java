@@ -35,7 +35,6 @@ public interface Property extends BaseProperty {
      *
      */
     enum ControlType {
-        CHECKBOX,
         DATE,
         DATE_TIME,
         EMAIL,

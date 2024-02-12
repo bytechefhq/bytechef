@@ -402,7 +402,7 @@ public final class TaskDispatcherDSL {
 
         @Override
         public ControlType getControlType() {
-            return ControlType.CHECKBOX;
+            return ControlType.SELECT;
         }
 
         @Override

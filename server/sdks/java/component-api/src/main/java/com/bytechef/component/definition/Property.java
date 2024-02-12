@@ -36,7 +36,6 @@ public interface Property extends BaseProperty {
      */
     enum ControlType {
         ARRAY_BUILDER,
-        CHECKBOX,
         CODE_EDITOR,
         DATE,
         DATE_TIME,
