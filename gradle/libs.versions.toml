@@ -13,9 +13,9 @@ org-mapstruct-extensions-spring = "1.1.1"
 org-springdoc = "2.3.0"
 org-springframework-cloud-dependencies = "2023.0.0"
 pmd = "6.55.0"
-spotbugs = "4.8.2"
-spotless-plugin-gradle = "6.23.3"
-spotbugs-gradle-plugin = "6.0.2"
+spotbugs = "4.8.3"
+spotless-plugin-gradle = "6.25.0"
+spotbugs-gradle-plugin = "6.0.7"
 spring-boot = "3.2.2"
 
 [libraries]
