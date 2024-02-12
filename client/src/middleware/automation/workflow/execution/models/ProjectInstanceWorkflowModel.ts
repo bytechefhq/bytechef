@@ -87,6 +87,12 @@ export interface ProjectInstanceWorkflowModel {
      */
     projectInstanceId?: number;
     /**
+     * The url of a static url used to trigger a workflow.
+     * @type {string}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    staticWebhookUrl?: string;
+    /**
      * The id of a workflow.
      * @type {string}
      * @memberof ProjectInstanceWorkflowModel
@@ -129,6 +135,7 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'projectInstanceId': !exists(json, 'projectInstanceId') ? undefined : json['projectInstanceId'],
+        'staticWebhookUrl': !exists(json, 'staticWebhookUrl') ? undefined : json['staticWebhookUrl'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
         'version': !exists(json, '__version') ? undefined : json['__version'],
     };
@@ -148,6 +155,7 @@ export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkfl
         'enabled': value.enabled,
         'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
         'projectInstanceId': value.projectInstanceId,
+        'staticWebhookUrl': value.staticWebhookUrl,
         'workflowId': value.workflowId,
         '__version': value.version,
     };
