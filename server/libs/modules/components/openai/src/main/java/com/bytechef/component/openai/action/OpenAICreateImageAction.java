@@ -114,9 +114,7 @@ public class OpenAICreateImageAction {
                                     string("url")
                                         .controlType(Property.ControlType.URL),
                                     string("b64Json"),
-                                    string("revisedPrompt"))))
-
-        )
+                                    string("revisedPrompt")))))
         .perform(OpenAICreateImageAction::perform);
 
     private OpenAICreateImageAction() {
