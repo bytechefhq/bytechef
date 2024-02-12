@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/automation/project/components/DataPill';
 import getNestedObject from '@/pages/automation/project/utils/getNestedObject';
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';

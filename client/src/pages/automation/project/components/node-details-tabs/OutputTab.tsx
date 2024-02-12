@@ -13,7 +13,7 @@ import {
 } from '@/mutations/platform/workflowNodeTestOutputs.mutations';
 import getNestedObject from '@/pages/automation/project/utils/getNestedObject';
 import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ClipboardIcon} from 'lucide-react';
 import {useState} from 'react';

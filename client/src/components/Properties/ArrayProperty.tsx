@@ -2,11 +2,10 @@ import PropertyDropdownMenu from '@/components/Properties/components/PropertyDro
 import {Button} from '@/components/ui/button';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {PropertyModel} from '@/middleware/platform/configuration';
-import {ComponentDataType, DataPillType} from '@/types/types';
+import {ComponentDataType, DataPillType, PropertyType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
-import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
 

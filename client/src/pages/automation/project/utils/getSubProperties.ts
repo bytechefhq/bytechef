@@ -1,5 +1,5 @@
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/workflow/execution';
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 
 export default function getSubProperties(
     componentDefinition: ComponentDefinitionBasicModel,

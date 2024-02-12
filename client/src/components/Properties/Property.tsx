@@ -13,8 +13,7 @@ import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowD
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
-import {PropertyType} from '@/types/projectTypes';
-import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';

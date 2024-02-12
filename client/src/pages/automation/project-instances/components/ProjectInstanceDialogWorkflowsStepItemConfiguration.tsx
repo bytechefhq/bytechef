@@ -1,6 +1,6 @@
 import Properties from '@/components/Properties/Properties';
 import {ProjectInstanceModel, WorkflowModel} from '@/middleware/automation/configuration';
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 import {UseFormRegister} from 'react-hook-form';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState} from 'react-hook-form/dist/types/form';

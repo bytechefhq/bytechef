@@ -5,8 +5,7 @@ import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middlewa
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {PropertyType} from '@/types/projectTypes';
-import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
