@@ -140,9 +140,9 @@ const WorkflowEditor = ({
     const defaultNodesWithWorkflowNodes = useMemo(() => {
         const workflowTasks = workflow?.tasks?.filter((task) => task.name);
 
-        const workflowNodes = workflowTasks?.map((workflowNode, index) => {
-            const componentName = workflowNode.type?.split('/')[0];
-            const actionName = workflowNode.type?.split('/')[2];
+        const workflowNodes = workflowTasks?.map((workflowTask, index) => {
+            const componentName = workflowTask.type?.split('/')[0];
+            const actionName = workflowTask.type?.split('/')[2];
 
             const componentDefinition = componentDefinitions.find(
                 (componentDefinition) => componentDefinition.name === componentName
@@ -151,7 +151,7 @@ const WorkflowEditor = ({
             if (componentDefinition) {
                 return {
                     data: {
-                        ...workflowNode,
+                        ...workflowTask,
                         actionName,
                         componentName: componentDefinition.name,
                         icon: (
@@ -163,10 +163,10 @@ const WorkflowEditor = ({
                         ),
                         id: componentDefinition.name,
                         label: componentDefinition.title,
-                        name: workflowNode.name,
+                        name: workflowTask.name,
                         type: 'workflow',
                     },
-                    id: workflowNode.name,
+                    id: workflowTask.name,
                     position: {x: 0, y: 150 * (index + 1)},
                     type: 'workflow',
                 };
