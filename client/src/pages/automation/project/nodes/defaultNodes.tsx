@@ -5,11 +5,12 @@ const defaultNodes: Node[] = [
     {
         data: {
             icon: <PlayIcon className="size-9 text-gray-700" />,
+            id: 'manual',
             label: 'Manual Trigger',
             name: 'manual',
             type: 'trigger',
         },
-        id: '1',
+        id: 'manual',
         position: {x: 0, y: 0},
         type: 'workflow',
     },
