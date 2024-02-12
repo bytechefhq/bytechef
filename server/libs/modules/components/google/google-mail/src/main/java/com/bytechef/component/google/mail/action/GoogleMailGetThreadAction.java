@@ -33,7 +33,9 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SN
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Thread;
@@ -51,6 +53,7 @@ public class GoogleMailGetThreadAction {
             string(ID)
                 .label("Thread ID")
                 .description("The ID of the thread to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getThreadIdOptions)
                 .required(true),
             FORMAT_PROPERTY,
             METADATA_HEADERS_PROPERTY)
