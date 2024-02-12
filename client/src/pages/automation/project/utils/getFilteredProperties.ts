@@ -1,4 +1,4 @@
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 
 export default function getFilteredProperties({
     filterQuery,

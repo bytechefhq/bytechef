@@ -29,7 +29,7 @@ import {
 } from '@/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';

@@ -4,7 +4,7 @@ import {
     type PropertyModel,
 } from '@/middleware/platform/configuration';
 import getFilteredProperties from '@/pages/automation/project/utils/getFilteredProperties';
-import {PropertyType} from '@/types/projectTypes';
+import {PropertyType} from '@/types/types';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
 import DataPillPanelBodyItem from './DataPillPanelBodyItem';

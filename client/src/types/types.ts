@@ -1,8 +1,24 @@
 import {
+    ArrayPropertyModel,
+    BooleanPropertyModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
     ConnectionDefinitionBasicModel,
+    ControlTypeModel,
+    DatePropertyModel,
+    DateTimePropertyModel,
+    DynamicPropertiesPropertyModel,
+    FileEntryPropertyModel,
+    IntegerPropertyModel,
+    NullPropertyModel,
+    NumberPropertyModel,
+    ObjectPropertyModel,
+    PropertyModel,
+    StringPropertyModel,
     TaskDispatcherDefinitionModel,
+    TaskPropertyModel,
+    TimePropertyModel,
+    ValuePropertyModel,
 } from '@/middleware/platform/configuration';
 
 export type DataPillType = {
@@ -89,3 +105,23 @@ export interface WorkflowTrigger {
     timeout?: string;
     type: string;
 }
+
+type PropertyTypeAll = ArrayPropertyModel &
+    BooleanPropertyModel &
+    DatePropertyModel &
+    DateTimePropertyModel &
+    DynamicPropertiesPropertyModel &
+    FileEntryPropertyModel &
+    IntegerPropertyModel &
+    NumberPropertyModel &
+    NullPropertyModel &
+    ObjectPropertyModel &
+    PropertyModel &
+    StringPropertyModel &
+    TaskPropertyModel &
+    TimePropertyModel &
+    ValuePropertyModel;
+
+export type PropertyType = Omit<PropertyTypeAll, 'controlType'> & {
+    controlType?: ControlTypeModel;
+};

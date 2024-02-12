@@ -2,12 +2,11 @@ import PropertyInput from '@/components/Properties/components/PropertyInput/Prop
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {twMerge} from 'tailwind-merge';
-import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
 

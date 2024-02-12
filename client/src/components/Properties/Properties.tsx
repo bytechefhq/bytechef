@@ -1,11 +1,10 @@
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
-import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
 
