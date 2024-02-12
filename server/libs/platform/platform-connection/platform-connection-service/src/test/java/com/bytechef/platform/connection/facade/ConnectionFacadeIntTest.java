@@ -22,6 +22,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -269,5 +270,8 @@ public class ConnectionFacadeIntTest {
 
         @MockBean
         WorkflowConnectionFacade workflowConnectionFacade;
+
+        @MockBean
+        WorkflowTestConfigurationService workflowTestConfigurationService;
     }
 }

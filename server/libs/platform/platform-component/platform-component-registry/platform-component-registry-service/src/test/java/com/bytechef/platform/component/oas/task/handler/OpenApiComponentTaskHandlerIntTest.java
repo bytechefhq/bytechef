@@ -57,6 +57,7 @@ import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.constant.MetadataConstants;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
@@ -863,18 +864,21 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @Bean
+        EncryptionKey encryptionKey() {
+            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+        }
+
+        @Bean
         FileStorageService fileStorageService() {
             return FILE_STORAGE_SERVICE;
         }
 
+        @MockBean
+        WorkflowTestConfigurationService workflowTestConfigurationService;
+
         @Bean
         TaskFileStorage workflowFileStorage() {
             return new TaskFileStorageImpl(new Base64FileStorageService());
-        }
-
-        @Bean
-        EncryptionKey encryptionKey() {
-            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.platform.connection.repository")

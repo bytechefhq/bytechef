@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.config;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
@@ -67,6 +68,9 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private JobService jobService;
+
+    @MockBean
+    private TriggerDefinitionService triggerDefinitionService;
 
     @MockBean
     private TriggerLifecycleFacade triggerLifecycleFacade;
