@@ -1098,7 +1098,6 @@ components:
       type: "string"
       enum:
       - "ARRAY_BUILDER"
-      - "CHECKBOX"
       - "CODE_EDITOR"
       - "DATE"
       - "DATE_TIME"
