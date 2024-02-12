@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:57.811691+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-12T06:58:07.708582+01:00[Europe/Zagreb]")
 public class ProjectInstanceModel {
 
   private String description;
@@ -38,6 +38,8 @@ public class ProjectInstanceModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  private Boolean enabled;
 
   private Long id;
 
@@ -57,8 +59,6 @@ public class ProjectInstanceModel {
 
   @Valid
   private List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows;
-
-  private Boolean enabled;
 
   @Valid
   private List<@Valid TagModel> tags;
@@ -134,6 +134,26 @@ public class ProjectInstanceModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public ProjectInstanceModel enabled(Boolean enabled) {
+    this.enabled = enabled;
+    return this;
+  }
+
+  /**
+   * If a workflow is enabled or not in the project instance.
+   * @return enabled
+  */
+  
+  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
   public ProjectInstanceModel id(Long id) {
@@ -304,26 +324,6 @@ public class ProjectInstanceModel {
     this.projectInstanceWorkflows = projectInstanceWorkflows;
   }
 
-  public ProjectInstanceModel enabled(Boolean enabled) {
-    this.enabled = enabled;
-    return this;
-  }
-
-  /**
-   * If a workflow is enabled or not in the project instance.
-   * @return enabled
-  */
-  
-  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("enabled")
-  public Boolean getEnabled() {
-    return enabled;
-  }
-
-  public void setEnabled(Boolean enabled) {
-    this.enabled = enabled;
-  }
-
   public ProjectInstanceModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
@@ -384,6 +384,7 @@ public class ProjectInstanceModel {
     return Objects.equals(this.description, projectInstance.description) &&
         Objects.equals(this.createdBy, projectInstance.createdBy) &&
         Objects.equals(this.createdDate, projectInstance.createdDate) &&
+        Objects.equals(this.enabled, projectInstance.enabled) &&
         Objects.equals(this.id, projectInstance.id) &&
         Objects.equals(this.lastExecutionDate, projectInstance.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, projectInstance.lastModifiedBy) &&
@@ -392,14 +393,13 @@ public class ProjectInstanceModel {
         Objects.equals(this.project, projectInstance.project) &&
         Objects.equals(this.projectId, projectInstance.projectId) &&
         Objects.equals(this.projectInstanceWorkflows, projectInstance.projectInstanceWorkflows) &&
-        Objects.equals(this.enabled, projectInstance.enabled) &&
         Objects.equals(this.tags, projectInstance.tags) &&
         Objects.equals(this.version, projectInstance.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, enabled, tags, version);
+    return Objects.hash(description, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, tags, version);
   }
 
   @Override
@@ -409,6 +409,7 @@ public class ProjectInstanceModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
@@ -417,7 +418,6 @@ public class ProjectInstanceModel {
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    projectInstanceWorkflows: ").append(toIndentedString(projectInstanceWorkflows)).append("\n");
-    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");

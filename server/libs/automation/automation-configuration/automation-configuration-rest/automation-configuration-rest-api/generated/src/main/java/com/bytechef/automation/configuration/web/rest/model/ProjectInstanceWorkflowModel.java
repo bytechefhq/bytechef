@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:57.811691+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-12T06:58:07.708582+01:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   private String createdBy;
@@ -56,6 +56,8 @@ public class ProjectInstanceWorkflowModel {
   private LocalDateTime lastModifiedDate;
 
   private Long projectInstanceId;
+
+  private String staticWebhookUrl;
 
   private String workflowId;
 
@@ -277,6 +279,26 @@ public class ProjectInstanceWorkflowModel {
     this.projectInstanceId = projectInstanceId;
   }
 
+  public ProjectInstanceWorkflowModel staticWebhookUrl(String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+    return this;
+  }
+
+  /**
+   * The url of a static url used to trigger a workflow.
+   * @return staticWebhookUrl
+  */
+  
+  @Schema(name = "staticWebhookUrl", description = "The url of a static url used to trigger a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("staticWebhookUrl")
+  public String getStaticWebhookUrl() {
+    return staticWebhookUrl;
+  }
+
+  public void setStaticWebhookUrl(String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+  }
+
   public ProjectInstanceWorkflowModel workflowId(String workflowId) {
     this.workflowId = workflowId;
     return this;
@@ -336,13 +358,14 @@ public class ProjectInstanceWorkflowModel {
         Objects.equals(this.lastModifiedBy, projectInstanceWorkflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectInstanceWorkflow.lastModifiedDate) &&
         Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
+        Objects.equals(this.staticWebhookUrl, projectInstanceWorkflow.staticWebhookUrl) &&
         Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
         Objects.equals(this.version, projectInstanceWorkflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstanceId, workflowId, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstanceId, staticWebhookUrl, workflowId, version);
   }
 
   @Override
@@ -359,6 +382,7 @@ public class ProjectInstanceWorkflowModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
+    sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");

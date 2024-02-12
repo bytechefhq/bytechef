@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * A type of the control to show in UI.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:40:35.730095+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-12T06:58:11.835046+01:00[Europe/Zagreb]")
 public enum ControlTypeModel {
   
   ARRAY_BUILDER("ARRAY_BUILDER"),

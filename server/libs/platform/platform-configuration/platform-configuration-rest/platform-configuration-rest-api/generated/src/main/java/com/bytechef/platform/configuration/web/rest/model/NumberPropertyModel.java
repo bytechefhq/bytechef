@@ -2,10 +2,11 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.ControlTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionsDataSourceModel;
-import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyTypeModel;
+import com.bytechef.platform.configuration.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -32,8 +33,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-04T12:40:35.730095+01:00[Europe/Zagreb]")
-public class NumberPropertyModel extends PropertyModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-12T06:58:11.835046+01:00[Europe/Zagreb]")
+public class NumberPropertyModel extends ValuePropertyModel {
 
   private Double defaultValue;
 
@@ -53,6 +54,17 @@ public class NumberPropertyModel extends PropertyModel {
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public NumberPropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public NumberPropertyModel(ControlTypeModel controlType) {
+    super(controlType);
+  }
 
   public NumberPropertyModel defaultValue(Double defaultValue) {
     this.defaultValue = defaultValue;
@@ -242,6 +254,21 @@ public class NumberPropertyModel extends PropertyModel {
     this.optionsDataSource = optionsDataSource;
   }
 
+
+  public NumberPropertyModel controlType(ControlTypeModel controlType) {
+    super.controlType(controlType);
+    return this;
+  }
+
+  public NumberPropertyModel label(String label) {
+    super.label(label);
+    return this;
+  }
+
+  public NumberPropertyModel placeholder(String placeholder) {
+    super.placeholder(placeholder);
+    return this;
+  }
 
   public NumberPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
