@@ -108,8 +108,10 @@ public class GoogleMailConstants {
                     string(FILENAME),
                     array(HEADERS)
                         .items(
-                            string(NAME),
-                            string(VALUE)),
+                            object()
+                                .properties(
+                                    string(NAME),
+                                    string(VALUE))),
                     object(BODY)
                         .properties(
                             string(ATTACHMENT_ID),
