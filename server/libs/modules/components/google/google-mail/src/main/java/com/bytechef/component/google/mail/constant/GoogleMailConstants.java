@@ -40,6 +40,7 @@ public class GoogleMailConstants {
     public static final String ATTACHMENT_ID = "attachmentId";
     public static final String BCC = "bcc";
     public static final String BODY = "body";
+    public static final String CATEGORY = "category";
     public static final String CC = "cc";
     public static final String DATA = "data";
     public static final String EMAIL = "email";
@@ -55,6 +56,7 @@ public class GoogleMailConstants {
     public static final String ID = "id";
     public static final String INCLUDE_SPAM_TRASH = "includeSpamTrash";
     public static final String INTERNAL_DATE = "internalDate";
+    public static final String LABEL = "label";
     public static final String LABEL_IDS = "labelIds";
     public static final String MAX_RESULTS = "maxResults";
     public static final String MESSAGES = "messages";
@@ -66,7 +68,6 @@ public class GoogleMailConstants {
     public static final String PARTS = "parts";
     public static final String PART_ID = "partId";
     public static final String PAYLOAD = "payload";
-    public static final String Q = "q";
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
