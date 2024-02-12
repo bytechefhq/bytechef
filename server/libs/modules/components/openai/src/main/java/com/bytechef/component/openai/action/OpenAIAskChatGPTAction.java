@@ -110,10 +110,9 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
 
         OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN), Duration.ZERO);
 
-        ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
+        ChatCompletionRequest chatCompletionRequest = createChatCompletionRequest(inputParameters);
 
         if (inputParameters.getRequiredBoolean(STREAM)) {
-            setChatCompletionRequestValues(inputParameters, chatCompletionRequest);
             chatCompletionRequest.setStream(true);
 
             Flowable<ChatCompletionChunk> chatCompletionChunkFlowable =
@@ -121,16 +120,14 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
 
             return chatCompletionChunkFlowable.toList();
         } else {
-            setChatCompletionRequestValues(inputParameters, chatCompletionRequest);
             chatCompletionRequest.setStream(false);
 
             return openAiService.createChatCompletion(chatCompletionRequest);
         }
     }
 
-    private static void setChatCompletionRequestValues(
-        Parameters inputParameters, ChatCompletionRequest chatCompletionRequest) {
-
+    private static ChatCompletionRequest createChatCompletionRequest(Parameters inputParameters) {
+        ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
         chatCompletionRequest.setMessages(inputParameters.getList(MESSAGES, new TypeReference<>() {}));
         chatCompletionRequest.setModel(inputParameters.getRequiredString(MODEL));
         chatCompletionRequest.setFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY));
@@ -142,5 +139,7 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
         chatCompletionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
         chatCompletionRequest.setTopP(inputParameters.getDouble(TOP_P));
         chatCompletionRequest.setUser(inputParameters.getString(USER));
+
+        return chatCompletionRequest;
     }
 }
