@@ -146,6 +146,10 @@ const PropertyMentionsInput = forwardRef(
                 renderItem: (item: DataPillType) => MentionInputListItem(item),
                 showDenotationChar: false,
                 source: (searchTerm: string, renderList: (arg1: Array<object>, arg2: string) => void) => {
+                    if (!dataPills) {
+                        return;
+                    }
+
                     const formattedData = dataPills.map((dataPill) => {
                         if (!dataPill.componentDefinition) {
                             return {
