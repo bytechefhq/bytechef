@@ -152,7 +152,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.",
@@ -178,7 +178,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "A language hint for OCR processing during image import (ISO 639-1 code).",
@@ -223,7 +223,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether to use the uploaded content as indexable text.",
@@ -249,7 +249,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
@@ -397,7 +397,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether the requesting application supports both My Drives and shared drives.",
@@ -423,7 +423,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
@@ -507,7 +507,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -569,7 +569,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -633,7 +633,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -659,7 +659,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -723,7 +723,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1234,7 +1234,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1416,7 +1416,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1502,7 +1502,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1684,7 +1684,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1748,7 +1748,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         } ],
         "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER"
@@ -1836,7 +1836,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.",
@@ -1862,7 +1862,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "A language hint for OCR processing during image import (ISO 639-1 code).",
@@ -1907,7 +1907,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether to use the uploaded content as indexable text.",
@@ -1933,7 +1933,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",
@@ -2153,7 +2153,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.",
@@ -2179,7 +2179,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "A language hint for OCR processing during image import (ISO 639-1 code).",
@@ -2224,7 +2224,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Whether to use the uploaded content as indexable text.",
@@ -2250,7 +2250,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Specifies which additional view's permissions to include in the response. Only 'published' is supported.",

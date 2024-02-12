@@ -360,7 +360,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "The sender ID which can be alphanumeric or numeric (e.g., CompanyName). Make sure you don't exceed character limit.",
@@ -405,7 +405,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1024,7 +1024,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Enable tracking of short URL clicks within a message: which URL was clicked, how many times, and by whom.",
@@ -1050,7 +1050,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "The URL of your callback server on to which the Click report will be sent.",
@@ -1095,7 +1095,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Select a predefined custom domain to use when generating a short URL.",
@@ -1239,7 +1239,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "title": "Send SMS",
     "output": {
@@ -1630,7 +1630,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
@@ -1714,7 +1714,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Enable tracking of short URL clicks within a message: which URL was clicked, how many times, and by whom.",
@@ -1740,7 +1740,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "The URL of your callback server on to which the Click report will be sent.",
@@ -1785,7 +1785,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Select a predefined custom domain to use when generating a short URL.",

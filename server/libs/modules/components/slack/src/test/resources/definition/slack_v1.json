@@ -109,7 +109,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Emoji to use as the icon for this message. Overrides icon_url.",
@@ -173,7 +173,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "JSON object with event_type and event_payload fields, presented as a URL-encoded string. Metadata you post to Slack is accessible to any app or user who is a member of that workspace.",
@@ -218,7 +218,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Change how messages are treated. See below.",
@@ -263,7 +263,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Provide another message's ts value to make this message a reply. Avoid using a reply's ts value; use its parent instead.",
@@ -308,7 +308,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Pass false to disable unfurling of media content.",
@@ -334,7 +334,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Set your bot's user name.",
@@ -400,7 +400,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -943,7 +943,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Emoji to use as the icon for this message. Overrides icon_url.",
@@ -1007,7 +1007,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "JSON object with event_type and event_payload fields, presented as a URL-encoded string. Metadata you post to Slack is accessible to any app or user who is a member of that workspace.",
@@ -1052,7 +1052,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Change how messages are treated. See below.",
@@ -1097,7 +1097,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Provide another message's ts value to make this message a reply. Avoid using a reply's ts value; use its parent instead.",
@@ -1142,7 +1142,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Pass false to disable unfurling of media content.",
@@ -1168,7 +1168,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Set your bot's user name.",
@@ -1234,7 +1234,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,

@@ -1299,7 +1299,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "title": "Search Email",
     "output": {

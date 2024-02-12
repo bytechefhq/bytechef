@@ -149,7 +149,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "When reading from file the empty cells will be filled with an empty string.",
@@ -175,7 +175,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "The amount of child elements to return in a page.",
@@ -239,7 +239,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "title": "Read from file",
     "perform": { },
@@ -311,7 +311,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,

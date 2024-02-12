@@ -57,7 +57,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The format in which the data gets returned from the URL.",
@@ -219,7 +219,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow non-GET HTTP 3xx redirects.",
@@ -245,7 +245,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow GET HTTP 3xx redirects.",
@@ -271,7 +271,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Succeeds also when the status code is not 2xx.",
@@ -297,7 +297,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "HTTP proxy to use.",
@@ -398,7 +398,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The format in which the data gets returned from the URL.",
@@ -595,7 +595,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1142,7 +1142,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow non-GET HTTP 3xx redirects.",
@@ -1168,7 +1168,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow GET HTTP 3xx redirects.",
@@ -1194,7 +1194,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Succeeds also when the status code is not 2xx.",
@@ -1220,7 +1220,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "HTTP proxy to use.",
@@ -1321,7 +1321,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The format in which the data gets returned from the URL.",
@@ -1518,7 +1518,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2065,7 +2065,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow non-GET HTTP 3xx redirects.",
@@ -2091,7 +2091,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow GET HTTP 3xx redirects.",
@@ -2117,7 +2117,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Succeeds also when the status code is not 2xx.",
@@ -2143,7 +2143,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "HTTP proxy to use.",
@@ -2244,7 +2244,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The format in which the data gets returned from the URL.",
@@ -2441,7 +2441,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2988,7 +2988,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow non-GET HTTP 3xx redirects.",
@@ -3014,7 +3014,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow GET HTTP 3xx redirects.",
@@ -3040,7 +3040,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Succeeds also when the status code is not 2xx.",
@@ -3066,7 +3066,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "HTTP proxy to use.",
@@ -3167,7 +3167,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The format in which the data gets returned from the URL.",
@@ -3329,7 +3329,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow non-GET HTTP 3xx redirects.",
@@ -3355,7 +3355,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow GET HTTP 3xx redirects.",
@@ -3381,7 +3381,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Succeeds also when the status code is not 2xx.",
@@ -3407,7 +3407,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "HTTP proxy to use.",
@@ -3508,7 +3508,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The format in which the data gets returned from the URL.",
@@ -3670,7 +3670,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow non-GET HTTP 3xx redirects.",
@@ -3696,7 +3696,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Follow GET HTTP 3xx redirects.",
@@ -3722,7 +3722,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "Succeeds also when the status code is not 2xx.",
@@ -3748,7 +3748,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "HTTP proxy to use.",

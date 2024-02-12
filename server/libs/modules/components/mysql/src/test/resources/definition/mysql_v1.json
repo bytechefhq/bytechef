@@ -71,7 +71,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,
@@ -306,7 +306,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -655,7 +655,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -964,7 +964,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1235,7 +1235,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1434,7 +1434,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,

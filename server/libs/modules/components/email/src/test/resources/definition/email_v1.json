@@ -474,7 +474,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "version": 1,
     "authorizationRequired": false,

@@ -30,7 +30,7 @@
       "label": "False",
       "value": true
     } ],
-    "controlType": "CHECKBOX"
+    "controlType": "SELECT"
   }, {
     "advancedOption": null,
     "displayCondition": "rawExpression === true",
@@ -87,7 +87,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "displayCondition": null,
@@ -141,7 +141,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       } ],
       "controlType": "SELECT"
     }, {

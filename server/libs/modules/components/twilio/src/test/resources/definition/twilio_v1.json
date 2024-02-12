@@ -136,7 +136,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Total number of attempts made (including this request) to send the message regardless of the provider used.",
@@ -200,7 +200,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Determines if the message content can be stored or redacted based on privacy settings.",
@@ -284,7 +284,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Rich actions for non-SMS/MMS channels. Used for sending location in WhatsApp messages.",
@@ -350,7 +350,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "For Messaging Services only: Include this parameter with a value of fixed in conjuction with the send_time parameter in order to schedule a Message.",
@@ -459,7 +459,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "For Content Editor/API only: Key-value pairs of Template variables and their substitution values. content_sid parameter must also be provided. If values are not defined in the content_variables parameter, the Template's default placeholder values are used.",

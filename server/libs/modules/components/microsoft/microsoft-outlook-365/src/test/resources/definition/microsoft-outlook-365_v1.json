@@ -676,7 +676,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -838,7 +838,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -864,7 +864,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -890,7 +890,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -916,7 +916,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2112,7 +2112,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "The importance of the message.",
@@ -2299,7 +2299,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet.",
@@ -2325,7 +2325,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Indicates whether the message has been read.",
@@ -2351,7 +2351,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Indicates whether a read receipt is requested for the message.",
@@ -2377,7 +2377,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "The unique identifier for the message's parent mailFolder.",
@@ -2939,7 +2939,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "title": "Send Email",
     "output": null,

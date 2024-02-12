@@ -336,7 +336,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -2728,7 +2728,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             } ],
             "controlType": "OBJECT_BUILDER",
             "optionsDataSource": null
@@ -3345,7 +3345,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             } ],
             "controlType": "OBJECT_BUILDER",
             "optionsDataSource": null
@@ -3798,7 +3798,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",

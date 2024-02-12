@@ -159,7 +159,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": true,
       "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",

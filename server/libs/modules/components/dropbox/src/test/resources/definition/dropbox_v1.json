@@ -381,7 +381,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": null,
@@ -407,7 +407,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             } ],
             "controlType": "OBJECT_BUILDER",
             "optionsDataSource": null
@@ -1154,7 +1154,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1398,7 +1398,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1460,7 +1460,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1801,7 +1801,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         } ],
         "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null
@@ -2145,7 +2145,7 @@
                   "label": "False",
                   "value": true
                 } ],
-                "controlType": "CHECKBOX"
+                "controlType": "SELECT"
               } ],
               "maxItems": null,
               "minItems": null,
@@ -2188,7 +2188,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2573,7 +2573,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2817,7 +2817,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2879,7 +2879,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,

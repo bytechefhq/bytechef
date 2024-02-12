@@ -69,7 +69,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": null,
@@ -303,7 +303,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": "Subscriber location information.",
@@ -443,7 +443,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           } ],
           "optionsDataSource": null,
           "controlType": "OBJECT_BUILDER"
@@ -817,7 +817,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.",
@@ -1201,7 +1201,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "The list member's email client.",
@@ -1474,7 +1474,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             } ],
             "optionsDataSource": null,
             "controlType": "OBJECT_BUILDER"

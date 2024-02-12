@@ -2785,7 +2785,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
@@ -2945,7 +2945,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         } ],
         "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null
@@ -3188,7 +3188,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         } ],
         "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null

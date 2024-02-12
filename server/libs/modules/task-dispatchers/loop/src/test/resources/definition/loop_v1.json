@@ -50,7 +50,7 @@
       "label": "False",
       "value": true
     } ],
-    "controlType": "CHECKBOX"
+    "controlType": "SELECT"
   } ],
   "resources": null,
   "taskProperties": [ {

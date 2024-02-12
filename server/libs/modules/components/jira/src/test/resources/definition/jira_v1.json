@@ -45,7 +45,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Details of an issue update request.",
@@ -108,7 +108,7 @@
           "label": "False",
           "value": true
         } ],
-        "controlType": "CHECKBOX"
+        "controlType": "SELECT"
       }, {
         "advancedOption": null,
         "description": null,
@@ -318,7 +318,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -566,7 +566,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -871,7 +871,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1147,7 +1147,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "Whether the issue transition is global, that is, the transition is applied to issues regardless of their status.",
@@ -1173,7 +1173,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "Whether this is the initial issue transition for the workflow.",
@@ -1199,7 +1199,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "Whether the transition is available to be performed.",
@@ -1225,7 +1225,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "Whether the issue has to meet criteria before the issue transition is applied.",
@@ -1251,7 +1251,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": "Details of the fields associated with the issue transition screen. Use this information to populate `fields` and `update` in a transition request.",
@@ -1308,7 +1308,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "The schema of a field.",
@@ -1546,7 +1546,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "The list of operations that can be performed on the field.",
@@ -1741,7 +1741,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         } ],
         "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER"
@@ -1886,7 +1886,7 @@
             "label": "False",
             "value": true
           } ],
-          "controlType": "CHECKBOX"
+          "controlType": "SELECT"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2229,7 +2229,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2556,7 +2556,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -2883,7 +2883,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -3636,7 +3636,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "Use [expand](#expansion) to include additional information about the issues in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `renderedFields` Returns field values rendered in HTML format.\n *  `names` Returns the display name of each field.\n *  `schema` Returns the schema describing a field type.\n *  `transitions` Returns all possible transitions for the issue.\n *  `editmeta` Returns information about how each field can be edited.\n *  `changelog` Returns a list of recent updates to an issue, sorted by date, starting from the most recent.\n *  `versionedRepresentations` Returns a JSON array for each version of a field's value, with the highest number representing the most recent version. Note: When included in the request, the `fields` parameter is ignored.",
@@ -3727,7 +3727,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "title": "Get issue",
     "perform": null,
@@ -4195,7 +4195,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": null,
@@ -4443,7 +4443,7 @@
                   "label": "False",
                   "value": true
                 } ],
-                "controlType": "CHECKBOX"
+                "controlType": "SELECT"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -4748,7 +4748,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": null,
@@ -5024,7 +5024,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "Whether the issue transition is global, that is, the transition is applied to issues regardless of their status.",
@@ -5050,7 +5050,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "Whether this is the initial issue transition for the workflow.",
@@ -5076,7 +5076,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "Whether the transition is available to be performed.",
@@ -5102,7 +5102,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "Whether the issue has to meet criteria before the issue transition is applied.",
@@ -5128,7 +5128,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "Details of the fields associated with the issue transition screen. Use this information to populate `fields` and `update` in a transition request.",
@@ -5185,7 +5185,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "The schema of a field.",
@@ -5423,7 +5423,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "The list of operations that can be performed on the field.",
@@ -5618,7 +5618,7 @@
                 "label": "False",
                 "value": true
               } ],
-              "controlType": "CHECKBOX"
+              "controlType": "SELECT"
             } ],
             "optionsDataSource": null,
             "controlType": "OBJECT_BUILDER"
@@ -5689,7 +5689,7 @@
               "label": "False",
               "value": true
             } ],
-            "controlType": "CHECKBOX"
+            "controlType": "SELECT"
           }, {
             "advancedOption": null,
             "description": null,
@@ -6340,7 +6340,7 @@
                   "label": "False",
                   "value": true
                 } ],
-                "controlType": "CHECKBOX"
+                "controlType": "SELECT"
               }, {
                 "advancedOption": null,
                 "description": "The schema of a field.",
@@ -6578,7 +6578,7 @@
                   "label": "False",
                   "value": true
                 } ],
-                "controlType": "CHECKBOX"
+                "controlType": "SELECT"
               }, {
                 "advancedOption": null,
                 "description": "The list of operations that can be performed on the field.",
@@ -7108,7 +7108,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.",
@@ -7401,7 +7401,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": null,
@@ -7744,7 +7744,7 @@
                       "label": "False",
                       "value": true
                     } ],
-                    "controlType": "CHECKBOX"
+                    "controlType": "SELECT"
                   }, {
                     "advancedOption": null,
                     "description": null,
@@ -8071,7 +8071,7 @@
                       "label": "False",
                       "value": true
                     } ],
-                    "controlType": "CHECKBOX"
+                    "controlType": "SELECT"
                   }, {
                     "advancedOption": null,
                     "description": null,
@@ -8398,7 +8398,7 @@
                       "label": "False",
                       "value": true
                     } ],
-                    "controlType": "CHECKBOX"
+                    "controlType": "SELECT"
                   }, {
                     "advancedOption": null,
                     "description": null,
@@ -9420,7 +9420,7 @@
         "label": "False",
         "value": true
       } ],
-      "controlType": "CHECKBOX"
+      "controlType": "SELECT"
     } ],
     "title": "Search for issues using JQL (GET)",
     "perform": null,
@@ -9995,7 +9995,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": null,
@@ -10243,7 +10243,7 @@
                       "label": "False",
                       "value": true
                     } ],
-                    "controlType": "CHECKBOX"
+                    "controlType": "SELECT"
                   }, {
                     "advancedOption": null,
                     "description": null,
@@ -10548,7 +10548,7 @@
                         "label": "False",
                         "value": true
                       } ],
-                      "controlType": "CHECKBOX"
+                      "controlType": "SELECT"
                     }, {
                       "advancedOption": null,
                       "description": null,
@@ -10824,7 +10824,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "Whether the issue transition is global, that is, the transition is applied to issues regardless of their status.",
@@ -10850,7 +10850,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "Whether this is the initial issue transition for the workflow.",
@@ -10876,7 +10876,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "Whether the transition is available to be performed.",
@@ -10902,7 +10902,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "Whether the issue has to meet criteria before the issue transition is applied.",
@@ -10928,7 +10928,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 }, {
                   "advancedOption": null,
                   "description": "Details of the fields associated with the issue transition screen. Use this information to populate `fields` and `update` in a transition request.",
@@ -10985,7 +10985,7 @@
                         "label": "False",
                         "value": true
                       } ],
-                      "controlType": "CHECKBOX"
+                      "controlType": "SELECT"
                     }, {
                       "advancedOption": null,
                       "description": "The schema of a field.",
@@ -11223,7 +11223,7 @@
                         "label": "False",
                         "value": true
                       } ],
-                      "controlType": "CHECKBOX"
+                      "controlType": "SELECT"
                     }, {
                       "advancedOption": null,
                       "description": "The list of operations that can be performed on the field.",
@@ -11418,7 +11418,7 @@
                     "label": "False",
                     "value": true
                   } ],
-                  "controlType": "CHECKBOX"
+                  "controlType": "SELECT"
                 } ],
                 "optionsDataSource": null,
                 "controlType": "OBJECT_BUILDER"
@@ -11489,7 +11489,7 @@
                   "label": "False",
                   "value": true
                 } ],
-                "controlType": "CHECKBOX"
+                "controlType": "SELECT"
               }, {
                 "advancedOption": null,
                 "description": null,
@@ -12140,7 +12140,7 @@
                       "label": "False",
                       "value": true
                     } ],
-                    "controlType": "CHECKBOX"
+                    "controlType": "SELECT"
                   }, {
                     "advancedOption": null,
                     "description": "The schema of a field.",
@@ -12378,7 +12378,7 @@
                       "label": "False",
                       "value": true
                     } ],
-                    "controlType": "CHECKBOX"
+                    "controlType": "SELECT"
                   }, {
                     "advancedOption": null,
                     "description": "The list of operations that can be performed on the field.",
@@ -12908,7 +12908,7 @@
                         "label": "False",
                         "value": true
                       } ],
-                      "controlType": "CHECKBOX"
+                      "controlType": "SELECT"
                     }, {
                       "advancedOption": null,
                       "description": "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.",
@@ -13201,7 +13201,7 @@
                         "label": "False",
                         "value": true
                       } ],
-                      "controlType": "CHECKBOX"
+                      "controlType": "SELECT"
                     }, {
                       "advancedOption": null,
                       "description": null,
@@ -13544,7 +13544,7 @@
                           "label": "False",
                           "value": true
                         } ],
-                        "controlType": "CHECKBOX"
+                        "controlType": "SELECT"
                       }, {
                         "advancedOption": null,
                         "description": null,
@@ -13871,7 +13871,7 @@
                           "label": "False",
                           "value": true
                         } ],
-                        "controlType": "CHECKBOX"
+                        "controlType": "SELECT"
                       }, {
                         "advancedOption": null,
                         "description": null,
@@ -14198,7 +14198,7 @@
                           "label": "False",
                           "value": true
                         } ],
-                        "controlType": "CHECKBOX"
+                        "controlType": "SELECT"
                       }, {
                         "advancedOption": null,
                         "description": null,
