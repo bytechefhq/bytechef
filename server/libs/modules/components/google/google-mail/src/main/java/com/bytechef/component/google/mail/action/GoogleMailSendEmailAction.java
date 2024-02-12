@@ -24,8 +24,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.AT
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_ADDRESS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
@@ -37,7 +36,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -73,10 +71,7 @@ public class GoogleMailSendEmailAction {
             array(TO)
                 .label("To")
                 .description("Recipients email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(true),
             string(SUBJECT)
                 .label("Subject")
@@ -85,26 +80,17 @@ public class GoogleMailSendEmailAction {
             array(BCC)
                 .label("Bcc")
                 .description("Bcc recipients email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(false),
             array(CC)
                 .label("Cc")
                 .description("Cc recipients email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(false),
             array(REPLY_TO)
                 .label("Reply to")
                 .description("Reply-to email addresses.")
-                .items(
-                    string(EMAIL)
-                        .label(EMAIL_ADDRESS)
-                        .controlType(Property.ControlType.EMAIL))
+                .items(EMAIL_PROPERTY)
                 .required(false),
             string(BODY)
                 .label("Body")

@@ -23,8 +23,10 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.Property;
 
 /**
  * @author Monika Domiter
@@ -78,19 +80,22 @@ public class GoogleMailConstants {
     public static final String TO = "to";
     public static final String VALUE = "value";
 
-    public static final ComponentDSL.ModifiableStringProperty FORMAT_PROPERTY =
-        string(FORMAT)
-            .label("Format")
-            .description("The format to return the message in.")
-            .options(
-                option("Minimal", "minimal",
-                    "Returns only email message ID and labels; does not return the email headers, body, or payload."),
-                option("Full", "full",
-                    "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
-                option("Raw", "raw",
-                    "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
-                option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
-            .required(false);
+    public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
+        .label(EMAIL_ADDRESS)
+        .controlType(Property.ControlType.EMAIL);
+
+    public static final ModifiableStringProperty FORMAT_PROPERTY = string(FORMAT)
+        .label("Format")
+        .description("The format to return the message in.")
+        .options(
+            option("Minimal", "minimal",
+                "Returns only email message ID and labels; does not return the email headers, body, or payload."),
+            option("Full", "full",
+                "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
+            option("Raw", "raw",
+                "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
+            option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
+        .required(false);
 
     public static final ModifiableObjectProperty MESSAGE_PROPERTY = object()
         .properties(
@@ -121,4 +126,10 @@ public class GoogleMailConstants {
                         .items()),
             integer(SIZE_ESTIMATE),
             string(RAW));
+
+    public static final ModifiableArrayProperty METADATA_HEADERS_PROPERTY = array(METADATA_HEADERS)
+        .label("Metadata headers")
+        .description("When given and format is METADATA, only include headers specified.")
+        .items(string())
+        .required(false);
 }

@@ -17,7 +17,6 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
@@ -25,6 +24,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GE
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -47,15 +47,12 @@ public class GoogleMailGetMailAction {
         .description("Get an email from your Gmail account via Id")
         .properties(
             string(ID)
-                .label("ID")
+                .label("Message ID")
                 .description("The ID of the message to retrieve.")
                 .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true),
             FORMAT_PROPERTY,
-            array(METADATA_HEADERS)
-                .label("Metadata headers")
-                .description("When given and format is METADATA, only include headers specified.")
-                .required(false))
+            METADATA_HEADERS_PROPERTY)
         .outputSchema(MESSAGE_PROPERTY)
         .perform(GoogleMailGetMailAction::perform);
 

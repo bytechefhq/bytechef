@@ -28,6 +28,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
 
 import com.bytechef.component.definition.ActionContext;
@@ -48,14 +49,11 @@ public class GoogleMailGetThreadAction {
         .description("Gets the specified thread.")
         .properties(
             string(ID)
-                .label("ID")
+                .label("Thread ID")
                 .description("The ID of the thread to retrieve.")
                 .required(true),
             FORMAT_PROPERTY,
-            array(METADATA_HEADERS)
-                .label("Metadata headers")
-                .description("When given and format is METADATA, only include headers specified.")
-                .required(false))
+            METADATA_HEADERS_PROPERTY)
         .outputSchema(
             object()
                 .properties(
