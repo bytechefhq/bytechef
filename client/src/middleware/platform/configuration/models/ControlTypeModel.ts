@@ -19,7 +19,6 @@
  */
 export const ControlTypeModel = {
     ArrayBuilder: 'ARRAY_BUILDER',
-    Checkbox: 'CHECKBOX',
     CodeEditor: 'CODE_EDITOR',
     Date: 'DATE',
     DateTime: 'DATE_TIME',
