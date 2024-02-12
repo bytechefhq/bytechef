@@ -7,6 +7,7 @@ springBoot {
 
 dependencies {
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
+    implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -78,6 +79,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:csv-file"))
     implementation(project(":server:libs:modules:components:data-mapper"))
     implementation(project(":server:libs:modules:components:data-storage"))
+    implementation(project(":server:libs:modules:components:data-stream"))
     implementation(project(":server:libs:modules:components:delay"))
     implementation(project(":server:libs:modules:components:dropbox"))
     implementation(project(":server:libs:modules:components:file-storage"))

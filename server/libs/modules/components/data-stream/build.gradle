@@ -1,0 +1,6 @@
+dependencies {
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.batch:spring-batch-core")
+
+    testImplementation("org.springframework.batch:spring-batch-test")
+}
