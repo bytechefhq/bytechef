@@ -8,7 +8,7 @@ interface EmptyListProps {
 }
 
 const EmptyList = ({button, icon, message, title}: EmptyListProps) => (
-    <div className="w-full place-self-center px-2 2xl:mx-auto 2xl:w-4/5">
+    <div className="w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
         <div className="text-center">
             <span className="mx-auto inline-block">{icon}</span>
 

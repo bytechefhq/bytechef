@@ -9,9 +9,6 @@ module.exports = {
         container: {
             center: true,
             padding: '2rem',
-            screens: {
-                '2xl': '1400px',
-            },
         },
         extend: {
             animation: {
@@ -89,6 +86,9 @@ module.exports = {
             minWidth: {
                 'combo-box-popper-anchor-width': 'var(--radix-popper-anchor-width)',
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
+            },
+            screens: {
+                '3xl': '1792px',
             },
             width: {
                 'workflow-nodes-popover-menu-width': '500px',
