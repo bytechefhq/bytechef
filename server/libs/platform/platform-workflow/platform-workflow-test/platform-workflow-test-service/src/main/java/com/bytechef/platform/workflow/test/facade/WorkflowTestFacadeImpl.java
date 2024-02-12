@@ -119,7 +119,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                 });
 
             if (sampleOutput == null) {
-                throw new IllegalStateException("\"sampleOutput\" value is not defined");
+                throw new IllegalArgumentException("\"sampleOutput\" value is not defined");
             }
 
             TriggerExecution triggerExecution = TriggerExecution.builder()

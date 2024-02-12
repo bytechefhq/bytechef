@@ -76,7 +76,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
                 case 3 -> Status.COMPLETED;
                 case 4 -> Status.STOPPED;
                 case 5 -> Status.FAILED;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+                default -> throw new IllegalArgumentException("Unexpected value: %s".formatted(id));
             };
         }
     }

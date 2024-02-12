@@ -756,7 +756,7 @@ public class OpenApiComponentGenerator {
                     } else if (Objects.equals(scheme, "bearer")) {
                         codeBlocks.add(getAuthorizationBearerCodeBlock());
                     } else {
-                        throw new IllegalStateException("Security scheme %s not supported".formatted(scheme));
+                        throw new IllegalArgumentException("Security scheme=%s not supported".formatted(scheme));
                     }
                 } else if (securityScheme.getType() == SecurityScheme.Type.OAUTH2) {
                     OAuthFlows flows = securityScheme.getFlows();
@@ -785,8 +785,8 @@ public class OpenApiComponentGenerator {
                         codeBlocks.add(getAuthorizationOAuth2PasswordCodeBlock(oAuthFlow));
                     }
                 } else {
-                    throw new IllegalStateException(
-                        "Security scheme type %s not supported: ".formatted(securityScheme.getType()));
+                    throw new IllegalArgumentException(
+                        "Security scheme type=%s not supported".formatted(securityScheme.getType()));
                 }
             }
         }
@@ -1562,7 +1562,7 @@ public class OpenApiComponentGenerator {
             }
 
             if (codeBlock.isEmpty()) {
-                throw new IllegalStateException("Schema is not supported: %s".formatted(schema));
+                throw new IllegalArgumentException("Schema is not supported: %s".formatted(schema));
             } else {
                 codeBlocks.add(codeBlock);
             }

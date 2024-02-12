@@ -54,8 +54,8 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                         Authorization.CLIENT_ID, oAuth2App.clientId(),
                         Authorization.CLIENT_SECRET, oAuth2App.clientSecret()));
             } else {
-                throw new IllegalStateException(
-                    "Component definition %s does not exist".formatted(componentName));
+                throw new IllegalArgumentException(
+                    "Component definition with componentName=%s does not exist".formatted(componentName));
             }
         }
 

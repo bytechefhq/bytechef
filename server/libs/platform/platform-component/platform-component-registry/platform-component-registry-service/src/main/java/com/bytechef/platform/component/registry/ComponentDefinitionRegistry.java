@@ -43,7 +43,9 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@SuppressFBWarnings("EI")
+@SuppressFBWarnings({
+    "CT", "EI"
+})
 public class ComponentDefinitionRegistry {
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
@@ -251,7 +253,7 @@ public class ComponentDefinitionRegistry {
                     OptionalUtils.mapOrElse(triggerDefinition.getOutput(), Output::getOutputSchema, null));
 
                 if (triggerDefinition.getType() == null) {
-                    throw new IllegalStateException(
+                    throw new IllegalArgumentException(
                         "Trigger type for trigger=%s is not defined".formatted(triggerDefinition.getName()));
                 }
             }

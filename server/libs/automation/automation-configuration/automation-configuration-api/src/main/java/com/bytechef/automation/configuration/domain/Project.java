@@ -62,7 +62,7 @@ public final class Project implements Persistable<Long> {
             return switch (id) {
                 case 0 -> Status.UNPUBLISHED;
                 case 1 -> Status.PUBLISHED;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+                default -> throw new IllegalArgumentException("Unexpected value=%s".formatted(id));
             };
         }
     }

@@ -75,7 +75,7 @@ public interface ActionContext extends Context {
                     case 2 -> Data.Scope.WORKFLOW;
                     case 3 -> Data.Scope.INSTANCE;
                     case 4 -> Data.Scope.ACCOUNT;
-                    default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+                    default -> throw new IllegalArgumentException("Unexpected value: %s".formatted(id));
                 };
             }
 

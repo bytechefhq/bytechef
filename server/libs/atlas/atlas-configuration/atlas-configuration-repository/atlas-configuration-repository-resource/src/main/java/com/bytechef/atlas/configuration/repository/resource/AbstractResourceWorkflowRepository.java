@@ -92,7 +92,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             resourceURI = resource.getURI();
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
 
         String uri = resourceURI.toString();

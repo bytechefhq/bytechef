@@ -109,7 +109,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
                     eventPublisher.publishEvent(new TaskExecutionCompleteEvent(completionTaskExecution));
                 }
-                default -> throw new IllegalStateException("Unknown status: %s".formatted(status));
+                default -> throw new IllegalArgumentException("Unknown status=%s".formatted(status));
             }
         }
     }

@@ -163,7 +163,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 projectInstanceWorkflows,
                 projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
 
-                throw new IllegalStateException("Workflow id=%s is in use".formatted(workflowId));
+                throw new IllegalArgumentException("Workflow id=%s is in use".formatted(workflowId));
             }
         }
 

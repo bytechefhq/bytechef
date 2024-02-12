@@ -108,7 +108,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
 
         if (!projectService.isProjectEnabled(projectId)) {
-            throw new IllegalStateException("Project id=%s is not published".formatted(projectId));
+            throw new IllegalArgumentException("Project id=%s is not published".formatted(projectId));
         }
 
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
@@ -168,13 +168,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             .getProjectInstanceWorkflows(id);
 
         if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                 "ProjectInstance id=%s has executed workflows.".formatted(id));
         }
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             if (projectInstanceWorkflow.isEnabled()) {
-                throw new IllegalStateException(
+                throw new IllegalArgumentException(
                     "ProjectInstanceWorkflow id=%s must be disabled.".formatted(projectInstanceWorkflow.getId()));
             }
 

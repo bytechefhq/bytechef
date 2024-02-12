@@ -45,7 +45,7 @@ public class CounterServiceImpl implements CounterService {
         Long value = counterRepository.findValueByIdForUpdate(id);
 
         if (value == null) {
-            throw new IllegalStateException("Unable to locate counter with id: %s".formatted(id));
+            throw new IllegalArgumentException("Unable to locate counter with id=%s".formatted(id));
         }
 
         value = value - 1;

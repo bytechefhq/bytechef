@@ -84,7 +84,7 @@ public final class Workflow implements Persistable<String>, Serializable {
             return switch (id) {
                 case 1 -> Format.JSON;
                 case 2 -> Format.YAML;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+                default -> throw new IllegalArgumentException("Unexpected id=%s".formatted(id));
             };
         }
     }
@@ -361,7 +361,7 @@ public final class Workflow implements Persistable<String>, Serializable {
         try {
             readWorkflowMap(definition, id, format);
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            throw new RuntimeException(e);
         }
 
         this.definition = definition;

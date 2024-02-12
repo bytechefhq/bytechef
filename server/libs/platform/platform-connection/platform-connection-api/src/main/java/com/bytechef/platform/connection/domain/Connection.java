@@ -62,7 +62,7 @@ public final class Connection implements Persistable<Long> {
             return switch (id) {
                 case 0 -> CredentialStatus.INVALID;
                 case 1 -> CredentialStatus.VALID;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+                default -> throw new IllegalArgumentException("Unexpected value=%s".formatted(id));
             };
         }
     }

@@ -29,7 +29,7 @@ public class PropertyUtils {
             String name = property.getName();
 
             if (name == null || name.isEmpty()) {
-                throw new IllegalStateException("Defined properties cannot have empty names");
+                throw new IllegalArgumentException("Defined properties cannot have empty names");
             }
         }
     }
@@ -46,7 +46,7 @@ public class PropertyUtils {
         }
 
         if (!name.isEmpty()) {
-            throw new IllegalStateException("Defined property %s must have empty name".formatted(name));
+            throw new IllegalArgumentException("Defined property=%s must have empty name".formatted(name));
         }
     }
 }
