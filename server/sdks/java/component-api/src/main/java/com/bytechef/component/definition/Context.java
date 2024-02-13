@@ -322,6 +322,19 @@ public interface Context {
         }
 
         /**
+         *
+         * @param disableAuthorization
+         * @return
+         */
+        static ConfigurationBuilder disableAuthorization(boolean disableAuthorization) {
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.disableAuthorization = disableAuthorization;
+
+            return configurationBuilder;
+        }
+
+        /**
         *
         */
         class Body {
@@ -480,6 +493,7 @@ public interface Context {
             private String proxy;
             private ResponseType responseType;
             private Duration timeout;
+            private boolean disableAuthorization;
 
             public Configuration() {
             }
@@ -537,6 +551,13 @@ public interface Context {
                 return timeout;
             }
 
+            /**
+             * @return
+             */
+            public boolean isDisableAuthorization() {
+                return disableAuthorization;
+            }
+
             public static final class ConfigurationBuilder {
 
                 private boolean allowUnauthorizedCerts;
@@ -546,6 +567,7 @@ public interface Context {
                 private String proxy;
                 private ResponseType responseType;
                 private Duration timeout = Duration.ofMillis(1000);
+                private boolean disableAuthorization;
 
                 private ConfigurationBuilder() {
                 }
@@ -585,6 +607,11 @@ public interface Context {
                     return this;
                 }
 
+                public ConfigurationBuilder disableAuthorization(boolean disableAuthorization) {
+                    this.disableAuthorization = disableAuthorization;
+                    return this;
+                }
+
                 public Configuration build() {
                     Configuration configuration = new Configuration();
 
@@ -595,11 +622,11 @@ public interface Context {
                     configuration.followAllRedirects = this.followAllRedirects;
                     configuration.allowUnauthorizedCerts = this.allowUnauthorizedCerts;
                     configuration.filename = this.filename;
+                    configuration.disableAuthorization = this.disableAuthorization;
 
                     return configuration;
                 }
             }
-
         }
 
         /**

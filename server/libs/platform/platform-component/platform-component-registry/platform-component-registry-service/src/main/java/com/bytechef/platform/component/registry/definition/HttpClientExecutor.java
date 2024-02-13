@@ -166,7 +166,9 @@ public class HttpClientExecutor {
             }
         }
 
-        applyAuthorization(headers, queryParameters, componentName, connection, context);
+        if (!configuration.isDisableAuthorization()) {
+            applyAuthorization(headers, queryParameters, componentName, connection, context);
+        }
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(HttpClient.Redirect.NORMAL);
