@@ -45,14 +45,14 @@ function renderApp() {
     const queryClient = new QueryClient();
 
     root.render(
-        <React.StrictMode>
-            <ThemeProvider defaultTheme="light">
-                <QueryClientProvider client={queryClient}>
-                    <RouterProvider router={router} />
+        // <React.StrictMode>
+        <ThemeProvider defaultTheme="light">
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router} />
 
-                    <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-                </QueryClientProvider>
-            </ThemeProvider>
-        </React.StrictMode>
+                <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+            </QueryClientProvider>
+        </ThemeProvider>
+        // </React.StrictMode>
     );
 }

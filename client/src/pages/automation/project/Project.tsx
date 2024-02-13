@@ -110,6 +110,8 @@ const Project = () => {
     const {setComponentDefinitions, setProjectId, setTaskDispatcherDefinitions, setWorkflow, workflow} =
         useWorkflowDataStore();
 
+    const {componentNames, nodeNames} = workflow;
+
     const {toast} = useToast();
 
     const {projectId, workflowId} = useParams();
@@ -207,7 +209,8 @@ const Project = () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(parseInt(projectId!)),
             });
-            setWorkflow(workflow);
+
+            setWorkflow({...workflow, componentNames, nodeNames});
         },
     });
 
@@ -330,7 +333,7 @@ const Project = () => {
         const newWorkflow = projectWorkflows.find((workflow: WorkflowModel) => workflow.id === id);
 
         if (newWorkflow) {
-            setWorkflow(newWorkflow);
+            setWorkflow({...newWorkflow, componentNames, nodeNames});
         }
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
@@ -375,7 +378,7 @@ const Project = () => {
             const workflow = projectWorkflows.find((workflow) => workflow.id === workflowId);
 
             if (workflow) {
-                setWorkflow(workflow);
+                setWorkflow({...workflow, componentNames, nodeNames});
             }
         }
 
