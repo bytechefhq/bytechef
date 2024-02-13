@@ -319,9 +319,9 @@ const Property = ({
 
     useEffect(() => {
         if (displayCondition) {
-            const [key, value] = displayCondition.replace(/\s/g, '').split('===');
+            const [key, operator, value] = displayCondition.split(' ');
 
-            const matchesCondition = currentWorkflowTask?.parameters?.[key]?.toString() === value;
+            const matchesCondition = eval(`${currentWorkflowTask?.parameters?.[key]?.toString()} ${operator} ${value}`);
 
             setMeetsDisplayCondition(matchesCondition);
         }
