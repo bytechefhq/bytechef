@@ -2,7 +2,6 @@ name: Documentation Improvement
 description: Suggest improvements to our documentation
 title: "[Docs]: "
 labels: [documentation]
-assignees:
 body:
   - type: markdown
     attributes:

@@ -2,7 +2,6 @@ name: Feature request
 description: Suggest an idea to improve ByteChef
 title: "[Feature]: "
 labels: [enhancement]
-assignees:
 body:
   - type: markdown
     attributes:

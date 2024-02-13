@@ -2,7 +2,6 @@ name: New component request
 description: Suggest a new component to improve ByteChef
 title: "[Feature]: "
 labels: [enhancement]
-assignees:
 body:
   - type: markdown
     attributes:
