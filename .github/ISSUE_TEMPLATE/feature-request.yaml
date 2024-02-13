@@ -1,6 +1,6 @@
 name: Feature request
 description: Suggest an idea to improve ByteChef
-title: "[Feature]: "
+title: "[feature]: "
 labels: [enhancement]
 body:
   - type: markdown

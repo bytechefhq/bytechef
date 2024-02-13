@@ -1,6 +1,6 @@
 name: 🐞 Bug report
 description: Create a bug report to help us improve ByteChef
-title: "[Bug]: "
+title: "[bug]: "
 labels: [bug]
 body:
   - type: markdown
