@@ -4,7 +4,7 @@
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+  "description": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
   "icon": "path:assets/schedule.svg",
   "tags": null,
   "metadata": null,
@@ -15,7 +15,7 @@
   "triggers": [ {
     "batch": null,
     "componentName": "schedule",
-    "componentDescription": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+    "componentDescription": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
     "componentTitle": "Schedule",
     "componentVersion": 1,
     "defaultOutputFunction": true,
@@ -740,7 +740,7 @@
   }, {
     "batch": null,
     "componentName": "schedule",
-    "componentDescription": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+    "componentDescription": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
     "componentTitle": "Schedule",
     "componentVersion": 1,
     "defaultOutputFunction": true,
@@ -1134,7 +1134,7 @@
   }, {
     "batch": null,
     "componentName": "schedule",
-    "componentDescription": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+    "componentDescription": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
     "componentTitle": "Schedule",
     "componentVersion": 1,
     "defaultOutputFunction": true,
@@ -1493,7 +1493,7 @@
   }, {
     "batch": null,
     "componentName": "schedule",
-    "componentDescription": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+    "componentDescription": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
     "componentTitle": "Schedule",
     "componentVersion": 1,
     "defaultOutputFunction": true,
@@ -1661,7 +1661,7 @@
   }, {
     "batch": null,
     "componentName": "schedule",
-    "componentDescription": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+    "componentDescription": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
     "componentTitle": "Schedule",
     "componentVersion": 1,
     "defaultOutputFunction": true,

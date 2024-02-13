@@ -41,7 +41,7 @@ public class ScheduleComponentDefinitionFactory implements ComponentDefinitionFa
         this.componentDefinition = component(SCHEDULE)
             .title("Schedule")
             .description(
-                "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.")
+                "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.")
             .icon("path:assets/schedule.svg")
             .triggers(
                 new ScheduleEveryDayTrigger(triggerScheduler).triggerDefinition,
