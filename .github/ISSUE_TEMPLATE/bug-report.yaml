@@ -43,7 +43,7 @@ body:
     validations:
       required: true
   - type: input
-    id: version
+    id: os
     attributes:
       label: OS
       description: "The OS version your ByteChef instance is running on"
@@ -51,7 +51,7 @@ body:
     validations:
       required: true
   - type: input
-    id: version
+    id: browser
     attributes:
       label: Browser
       description: "The browser information if the problem is UI related"
