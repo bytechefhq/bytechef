@@ -29,7 +29,7 @@ public class PropertiesDataSource {
 
     private final List<String> loadPropertiesDependsOn;
 
-    public PropertiesDataSource(com.bytechef.component.definition.PropertiesDataSource propertiesDataSource) {
+    public PropertiesDataSource(com.bytechef.component.definition.PropertiesDataSource<?> propertiesDataSource) {
         this.loadPropertiesDependsOn = Validate.notNull(
             propertiesDataSource.getLoadPropertiesDependsOn(), "loadPropertiesDependsOn");
     }

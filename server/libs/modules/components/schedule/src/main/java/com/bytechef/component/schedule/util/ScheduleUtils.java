@@ -33,7 +33,6 @@ public class ScheduleUtils {
 
     public static List<Option<String>> getTimeZoneOptions() {
         List<Option<String>> options = new ArrayList<>();
-
         LocalDateTime now = LocalDateTime.now();
         Set<String> zoneIds = ZoneId.getAvailableZoneIds();
 

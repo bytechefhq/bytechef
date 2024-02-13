@@ -17,7 +17,6 @@
 package com.bytechef.component.twilio.util;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
@@ -27,12 +26,16 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGING_S
 import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -113,12 +116,27 @@ public class TwilioUtils {
     public static List<Option<String>> getZoneIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
-
         List<Option<String>> options = new ArrayList<>();
-        for (String zoneId : availableZoneIds) {
-            options.add(option(zoneId, zoneId));
+        LocalDateTime now = LocalDateTime.now();
+        Set<String> zoneIds = ZoneId.getAvailableZoneIds();
+
+        for (String zoneId : zoneIds) {
+            if ((zoneId.startsWith("Etc/GMT+") || zoneId.startsWith("Etc/GMT-")) && !zoneId.equals("Etc/GMT-0")) {
+                ZonedDateTime zonedDateTime = now.atZone(ZoneId.of(zoneId));
+
+                ZoneOffset zoneOffset = zonedDateTime.getOffset();
+
+                String zoneOffsetId = zoneOffset.getId();
+
+                options.add(ComponentDSL.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
+            }
         }
+
+        options.sort((o1, o2) -> {
+            String name = o1.getLabel();
+
+            return name.compareTo(o2.getLabel());
+        });
 
         return options;
     }

@@ -119,9 +119,7 @@ public class ComponentDefinitionRegistry {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
-        return CollectionUtils.getFirst(
-            OptionalUtils.get(actionDefinition.getProperties()),
-            property -> Objects.equals(propertyName, property.getName()));
+        return getProperty(propertyName, OptionalUtils.get(actionDefinition.getProperties()));
     }
 
     public Authorization getAuthorization(String componentName, String authorizationName) {
@@ -209,12 +207,7 @@ public class ComponentDefinitionRegistry {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return triggerDefinition.getProperties()
-            .orElseThrow(IllegalStateException::new)
-            .stream()
-            .filter(property -> Objects.equals(propertyName, property.getName()))
-            .findFirst()
-            .orElseThrow(IllegalStateException::new);
+        return getProperty(propertyName, OptionalUtils.get(triggerDefinition.getProperties()));
     }
 
     private List<ConnectionDefinition> applyAllowedConnectionDefinitionsFunction(
@@ -230,6 +223,23 @@ public class ComponentDefinitionRegistry {
         String o1Name = o1.getName();
 
         return o1Name.compareTo(o2.getName());
+    }
+
+    private static Property getProperty(String propertyName, List<? extends Property> properties) {
+        String[] subProperties = propertyName.split("\\.");
+
+        if (subProperties.length == 1) {
+            return CollectionUtils.getFirst(properties, property -> Objects.equals(propertyName, property.getName()));
+        } else {
+            // TODO add recursion to fetch any level
+
+            Property.ObjectProperty objectProperty = (Property.ObjectProperty) CollectionUtils.getFirst(
+                properties, property -> Objects.equals(property.getName(), subProperties[0]));
+
+            return CollectionUtils.getFirst(
+                OptionalUtils.get(objectProperty.getProperties()),
+                property -> Objects.equals(property.getName(), subProperties[1]));
+        }
     }
 
     private void validate(List<ComponentDefinition> componentDefinitions) {

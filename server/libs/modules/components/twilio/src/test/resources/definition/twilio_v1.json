@@ -21,7 +21,7 @@
       "hidden": null,
       "metadata": { },
       "required": false,
-      "name": "accountSID",
+      "name": "accountSid",
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
