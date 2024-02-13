@@ -15,7 +15,9 @@ export default function useHandleDrop(): [
     (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
     (targetEdge: Edge, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
 ] {
-    const {componentNames, projectId, setComponentNames, workflow} = useWorkflowDataStore();
+    const {projectId, setWorkflow, workflow} = useWorkflowDataStore();
+
+    const {componentNames} = workflow;
 
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -67,7 +69,10 @@ export default function useHandleDrop(): [
 
             tempComponentNames.splice(nodeIndex - 1, 0, newWorkflowNode.data.componentName);
 
-            setComponentNames(tempComponentNames);
+            setWorkflow({
+                ...workflow,
+                componentNames: tempComponentNames,
+            });
 
             return [...nodes, newPlaceholderNode];
         });
@@ -144,7 +149,10 @@ export default function useHandleDrop(): [
 
             tempComponentNames.splice(nextNodeIndex - 1, 0, draggedNode.data.componentName);
 
-            setComponentNames(tempComponentNames);
+            setWorkflow({
+                ...workflow,
+                componentNames: tempComponentNames,
+            });
 
             return nodes;
         });

@@ -55,8 +55,9 @@ const WorkflowNodesPopoverMenuList = memo(
             Array<ComponentDefinitionBasicModel>
         >([]);
 
-        const {componentDefinitions, componentNames, setComponentNames, taskDispatcherDefinitions, workflow} =
-            useWorkflowDataStore();
+        const {componentDefinitions, setWorkflow, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
+
+        const {componentNames} = workflow;
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -119,7 +120,10 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.componentName);
 
-                    setComponentNames(tempComponentNames);
+                    setWorkflow({
+                        ...workflow,
+                        componentNames: tempComponentNames,
+                    });
 
                     const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
 
@@ -174,7 +178,10 @@ const WorkflowNodesPopoverMenuList = memo(
                             if (node.id === placeholderId) {
                                 const formattedNodeName = getFormattedName(clickedItem.name!, nodes);
 
-                                setComponentNames([...componentNames, clickedItem.name]);
+                                setWorkflow({
+                                    ...workflow,
+                                    componentNames: [...componentNames, clickedItem.name],
+                                });
 
                                 return {
                                     ...node,

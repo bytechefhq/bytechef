@@ -68,17 +68,8 @@ const WorkflowNodeDetailsPanel = ({
         componentName: currentNode.componentName || currentNode.id,
     });
 
-    const {
-        componentActions,
-        componentData,
-        componentNames,
-        dataPills,
-        nodeNames,
-        setComponentActions,
-        setComponentData,
-        setDataPills,
-        workflow,
-    } = useWorkflowDataStore();
+    const {componentActions, componentData, dataPills, setComponentActions, setComponentData, setDataPills, workflow} =
+        useWorkflowDataStore();
 
     let currentComponent: CurrentComponentType | undefined;
 
@@ -171,11 +162,13 @@ const WorkflowNodeDetailsPanel = ({
         !!currentComponent?.actions && !!getActionName()
     );
 
+    const {componentNames, nodeNames} = workflow;
+
     const currentActionProperties = currentActionDefinition?.properties;
 
-    const currentNodeIndex = nodeNames.indexOf(currentNode.name);
+    const currentNodeIndex = nodeNames?.indexOf(currentNode.name);
 
-    const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
+    const previousComponentNames = componentNames.length > 1 ? componentNames?.slice(0, currentNodeIndex) : [];
 
     const actionDefinitions = workflowStepOutputs
         .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)

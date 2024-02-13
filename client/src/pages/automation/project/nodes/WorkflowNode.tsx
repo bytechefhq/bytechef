@@ -24,7 +24,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const [hoveredNode, setHoveredNode] = useState<string | undefined>();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {componentNames, projectId, setComponentNames, setWorkflow, workflow} = useWorkflowDataStore();
+    const {projectId, setWorkflow, workflow} = useWorkflowDataStore();
+
+    const {componentNames} = workflow;
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -96,8 +98,6 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             });
         }
 
-        setComponentNames(componentNames.filter((componentName) => componentName !== data.name));
-
         if (!workflow?.definition) {
             return;
         }
@@ -108,6 +108,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
         setWorkflow({
             ...workflow,
+            componentNames: componentNames.filter((componentName) => componentName !== data.name),
             tasks: updatedTasks,
         });
 

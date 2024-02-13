@@ -47,21 +47,15 @@ const WorkflowEditor = ({
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {
-        componentActions,
-        componentNames,
-        nodeNames,
-        setComponentActions,
-        setComponentNames,
-        setNodeNames,
-        workflow,
-    } = useWorkflowDataStore();
+    const {componentActions, setComponentActions, setWorkflow, workflow} = useWorkflowDataStore();
+
+    const {componentNames, nodeNames} = workflow;
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] = useHandleDrop();
 
-    const previousComponentNames: Array<string> | undefined = usePrevious(componentNames);
+    const previousComponentNames: Array<string> | undefined = usePrevious(componentNames || []);
 
     const nodeTypes = useMemo(
         () => ({
@@ -81,11 +75,13 @@ const WorkflowEditor = ({
 
     const width = useStore((store) => store.width);
 
+    const lastComponentName = componentNames?.[componentNames?.length - 1];
+
     const {data: workflowComponent} = useGetComponentDefinitionQuery(
         {
-            componentName: latestComponentName || componentNames[componentNames.length - 1],
+            componentName: latestComponentName || lastComponentName!,
         },
-        !!componentNames.length
+        !!componentNames?.length
     );
 
     const onDrop: DragEventHandler = (event) => {
@@ -125,7 +121,7 @@ const WorkflowEditor = ({
     };
 
     const workflowComponentWithAlias = useMemo(() => {
-        if (!workflowComponent) {
+        if (!workflowComponent || !nodeNames?.length) {
             return undefined;
         }
 
@@ -259,11 +255,13 @@ const WorkflowEditor = ({
                     return node?.data.name;
                 }
             });
-
-            setNodeNames(workflowNodeNames.filter((nodeName) => !!nodeName));
+            setWorkflow({
+                ...workflow,
+                nodeNames: workflowNodeNames.filter((nodeName) => !!nodeName),
+            });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setNodeNames, workflowNodes?.length]);
+    }, [setWorkflow, workflowNodes?.length]);
 
     useEffect(() => {
         if (componentNames && previousComponentNames?.length) {
@@ -282,14 +280,16 @@ const WorkflowEditor = ({
     useEffect(() => {
         if (defaultNodesWithWorkflowNodes) {
             const workflowNodes = defaultNodesWithWorkflowNodes.filter((node) => node?.data.componentName);
-
-            setNodeNames(workflowNodes.map((node) => node?.data.name));
-
-            setComponentNames(workflowNodes.map((node) => node?.data.componentName));
+            setWorkflow({
+                ...workflow,
+                componentNames: workflowNodes.map((node) => node?.data.componentName),
+                nodeNames: workflowNodes.map((node) => node?.data.name),
+            });
 
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
-    }, [defaultNodesWithWorkflowNodes, workflowId, setComponentNames, setNodeNames]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [defaultNodesWithWorkflowNodes, workflowId, setWorkflow]);
 
     useEffect(() => {
         if (defaultEdgesWithWorkflowEdges) {
