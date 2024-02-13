@@ -55,7 +55,10 @@ const ObjectProperty = ({
                             dataPills={dataPills}
                             key={`${property.name}_${subProperty.name}_${index}`}
                             mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
-                            property={subProperty}
+                            property={{
+                                ...subProperty,
+                                name: property.name + '.' + subProperty.name,
+                            }}
                         />
                     );
                 })}
