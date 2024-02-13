@@ -484,7 +484,7 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'SELECT' && (
+                        {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 description={description}
                                 label={label}
@@ -493,6 +493,21 @@ const Property = ({
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={property.optionsDataSource}
+                                value={taskParameterValue || defaultValue?.toString()}
+                            />
+                        )}
+
+                        {controlType === 'SELECT' && type === 'BOOLEAN' && (
+                            <PropertySelect
+                                description={description}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                name={name}
+                                onValueChange={(value: string) => handleSelectChange(value, name)}
+                                options={[
+                                    {label: 'True', value: 'true'},
+                                    {label: 'False', value: 'false'},
+                                ]}
                                 value={taskParameterValue || defaultValue?.toString()}
                             />
                         )}
@@ -531,42 +546,6 @@ const Property = ({
                                 name={name!}
                                 required={required}
                             />
-                        )}
-
-                        {register && type === 'BOOLEAN' && (
-                            <PropertySelect
-                                description={description}
-                                label={label}
-                                leadingIcon={typeIcon}
-                                options={[
-                                    {label: 'True', value: 'true'},
-                                    {label: 'False', value: 'false'},
-                                ]}
-                                {...register(`${path}.${name}`, {
-                                    required: required!,
-                                })}
-                                value={taskParameterValue || defaultValue?.toString()}
-                            />
-                        )}
-
-                        {!register && type === 'BOOLEAN' && (
-                            <PropertySelect
-                                description={description}
-                                label={label}
-                                leadingIcon={typeIcon}
-                                name={name}
-                                options={[
-                                    {label: 'True', value: 'true'},
-                                    {label: 'False', value: 'false'},
-                                ]}
-                                value={taskParameterValue || defaultValue?.toString()}
-                            />
-                        )}
-
-                        {!controlType && type === 'ANY' && (
-                            <span>
-                                {controlType} - {type}
-                            </span>
                         )}
 
                         {type === 'NULL' && <span>NULL</span>}
