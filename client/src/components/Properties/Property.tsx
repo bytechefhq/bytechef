@@ -76,7 +76,6 @@ const Property = ({
     const [inputValue, setInputValue] = useState('');
     const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState('');
-    const [meetsDisplayCondition, setMeetsDisplayCondition] = useState(false);
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +91,6 @@ const Property = ({
     const {
         controlType,
         description,
-        displayCondition,
         hidden,
         items,
         label,
@@ -317,21 +315,7 @@ const Property = ({
         isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
     }, [isNumericalInput, taskParameterValue]);
 
-    useEffect(() => {
-        if (displayCondition) {
-            const [key, operator, value] = displayCondition.split(' ');
-
-            const matchesCondition = eval(`${currentWorkflowTask?.parameters?.[key]?.toString()} ${operator} ${value}`);
-
-            setMeetsDisplayCondition(matchesCondition);
-        }
-    }, [currentWorkflowTask?.parameters, displayCondition]);
-
     if (type === 'OBJECT' && !properties?.length && !items?.length) {
-        return <></>;
-    }
-
-    if (displayCondition && !meetsDisplayCondition) {
         return <></>;
     }
 
