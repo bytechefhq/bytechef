@@ -85,7 +85,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             'block w-full rounded-md border p-2 focus:outline-none focus:ring-1 sm:text-sm',
                             error
                                 ? 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500'
-                                : 'border-gray-300 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500',
+                                : 'border-gray-300 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:ring-blue-500',
                             disabled && 'cursor-not-allowed bg-gray-100 text-gray-500',
                             leadingIcon && 'border-0 pl-12 leading-relaxed',
                             trailing &&
