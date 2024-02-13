@@ -354,6 +354,10 @@ const WorkflowNodeDetailsPanel = ({
         if (activeTab === 'properties' && currentActionFetched && !currentActionProperties) {
             setActiveTab('description');
         }
+
+        if (activeTab === 'output' && !workflowNodeOutput) {
+            setActiveTab('description');
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         activeTab,
