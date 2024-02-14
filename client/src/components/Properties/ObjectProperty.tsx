@@ -3,7 +3,6 @@ import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
-import getRandomId from '@/utils/getRandomId';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {twMerge} from 'tailwind-merge';
@@ -31,10 +30,8 @@ const ObjectProperty = ({
         return <></>;
     }
 
-    const uniquePropertyKey = `${name}-${getRandomId()}`;
-
     return (
-        <div key={uniquePropertyKey}>
+        <div key={name}>
             <ul className={twMerge('space-y-4', label && 'ml-2 border-l')}>
                 {(properties as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
@@ -56,7 +53,7 @@ const ObjectProperty = ({
                             mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
                             property={{
                                 ...subProperty,
-                                name: property.name + '.' + subProperty.name,
+                                name: `${property.name}.${subProperty.name}`,
                             }}
                         />
                     );
