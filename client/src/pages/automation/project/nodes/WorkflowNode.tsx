@@ -188,9 +188,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
                 <span className="font-semibold">{data.title || data.label}</span>
 
-                {data.actionName && <pre className="pb-1 text-sm">{data.actionName}</pre>}
+                {data.actionName && <pre className="text-sm">{data.actionName}</pre>}
 
-                <span className="text-xs text-gray-500">{data.name}</span>
+                <span className="text-sm text-gray-500">{data.name}</span>
             </div>
 
             <Handle
