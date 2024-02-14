@@ -1,25 +1,23 @@
 /* eslint-disable sort-keys */
-import {
-    GetWorkflowNodeDynamicPropertiesRequest,
-    type PropertyModel,
-    WorkflowNodeApi,
-} from '@/middleware/platform/configuration';
+import {EvaluateWorkflowNodeDisplayConditionRequest, WorkflowNodeApi} from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
-export const WorkflowNodeDynamicPropertyKeys = {
-    propertyWorkflowNodeDynamicProperties: (request: GetWorkflowNodeDynamicPropertiesRequest) => [
-        ...WorkflowNodeDynamicPropertyKeys.workflowNodeOptions,
-        request,
+export const WorkflowNodeDisplayConditionKeys = {
+    propertyWorkflowNodeDisplayConditions: (request: EvaluateWorkflowNodeDisplayConditionRequest) => [
+        ...WorkflowNodeDisplayConditionKeys.workflowNodeDisplayConditions,
+        request.id,
+        request.workflowNodeName,
+        request.evaluateWorkflowNodeDisplayConditionRequestModel?.displayCondition,
     ],
-    workflowNodeOptions: ['workflowNodeOptions'] as const,
+    workflowNodeDisplayConditions: ['workflowNodeDisplayConditions'] as const,
 };
 
-export const useGetWorkflowNodeDynamicPropertiesQuery = (
-    request: GetWorkflowNodeDynamicPropertiesRequest,
+export const useEvaluateWorkflowNodeDisplayConditionQuery = (
+    request: EvaluateWorkflowNodeDisplayConditionRequest,
     enabled?: boolean
 ) =>
-    useQuery<Array<PropertyModel>, Error>({
-        queryKey: WorkflowNodeDynamicPropertyKeys.propertyWorkflowNodeDynamicProperties(request),
-        queryFn: () => new WorkflowNodeApi().getWorkflowNodeDynamicProperties(request),
+    useQuery<boolean, Error>({
+        queryKey: WorkflowNodeDisplayConditionKeys.propertyWorkflowNodeDisplayConditions(request),
+        queryFn: () => new WorkflowNodeApi().evaluateWorkflowNodeDisplayCondition(request),
         enabled: enabled === undefined ? true : enabled,
     });
