@@ -38,14 +38,14 @@ const Properties = ({
     updateWorkflowMutation,
 }: PropertiesProps) => (
     <ul className={twMerge('space-y-4', customClassName)}>
-        {properties.map((property) => (
+        {properties.map((property, index) => (
             <Property
                 actionName={actionName}
                 currentComponent={currentComponent}
                 currentComponentData={currentComponentData}
                 dataPills={dataPills}
                 formState={formState}
-                key={property.name}
+                key={property.name + '_' + index}
                 mention={mention}
                 path={path}
                 property={property}

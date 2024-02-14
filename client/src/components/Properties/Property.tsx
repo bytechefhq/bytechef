@@ -13,6 +13,7 @@ import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowD
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
+import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
@@ -54,7 +55,6 @@ interface PropertyProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
-    workflow?: WorkflowModel;
 }
 
 const Property = ({
@@ -69,7 +69,6 @@ const Property = ({
     property,
     register,
     updateWorkflowMutation,
-    workflow,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -80,7 +79,7 @@ const Property = ({
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentData, setComponentData, workflow} = useWorkflowDataStore();
 
@@ -89,10 +88,10 @@ const Property = ({
     let defaultValue: string | undefined = property.defaultValue;
 
     const {
+        additionalProperties,
         controlType,
         description,
         hidden,
-        items,
         label,
         maxLength,
         maxValue,
@@ -153,6 +152,17 @@ const Property = ({
     if (actionName && name && currentComponentData?.parameters?.[name]) {
         defaultValue = currentComponentData?.parameters?.[name];
     }
+
+    const {data: displayCondition, isLoading: isDisplayConditionLoading} = useEvaluateWorkflowNodeDisplayConditionQuery(
+        {
+            evaluateWorkflowNodeDisplayConditionRequestModel: {
+                displayCondition: property.displayCondition!,
+            },
+            id: workflow.id!,
+            workflowNodeName: currentNode.name!,
+        },
+        !!property.displayCondition
+    );
 
     const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (currentComponentData) {
@@ -315,7 +325,11 @@ const Property = ({
         isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
     }, [isNumericalInput, taskParameterValue]);
 
-    if (type === 'OBJECT' && !properties?.length && !items?.length) {
+    if (type === 'OBJECT' && !properties?.length && !additionalProperties?.length) {
+        return <></>;
+    }
+
+    if (displayCondition === false || (property.displayCondition && isDisplayConditionLoading)) {
         return <></>;
     }
 

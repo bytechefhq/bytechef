@@ -4,6 +4,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -88,6 +89,14 @@ const WorkflowNodeDetailsPanel = ({
             if (projectId) {
                 queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(parseInt(projectId))});
             }
+
+            queryClient.invalidateQueries({
+                queryKey: [
+                    ...WorkflowNodeDisplayConditionKeys.workflowNodeDisplayConditions,
+                    workflow.id!,
+                    currentNode.name,
+                ],
+            });
         },
     });
 
