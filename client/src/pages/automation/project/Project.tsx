@@ -670,7 +670,6 @@ const Project = () => {
                             projectId={+projectId!}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             updateWorkflowMutation={updateWorkflowMutation}
-                            workflowId={workflow.id}
                         />
                     )}
                 </PageLoader>

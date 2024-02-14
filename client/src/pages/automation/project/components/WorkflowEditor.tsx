@@ -29,7 +29,6 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 export type WorkflowEditorProps = {
     componentDefinitions: ComponentDefinitionBasicModel[];
     projectId: number;
-    workflowId: string;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 };
@@ -38,7 +37,6 @@ const WorkflowEditor = ({
     componentDefinitions,
     taskDispatcherDefinitions,
     updateWorkflowMutation,
-    workflowId,
 }: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
     const [latestComponentName, setLatestComponentName] = useState('');
@@ -289,13 +287,13 @@ const WorkflowEditor = ({
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultNodesWithWorkflowNodes, workflowId, setWorkflow]);
+    }, [defaultNodesWithWorkflowNodes, setWorkflow]);
 
     useEffect(() => {
         if (defaultEdgesWithWorkflowEdges) {
             setEdges(defaultEdgesWithWorkflowEdges);
         }
-    }, [defaultEdgesWithWorkflowEdges, workflowId]);
+    }, [defaultEdgesWithWorkflowEdges]);
 
     useEffect(() => {
         if (workflowComponentWithAlias?.actions) {

@@ -22,7 +22,6 @@ interface PropertiesProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
-    workflow?: any;
 }
 
 const Properties = ({
@@ -37,7 +36,6 @@ const Properties = ({
     properties,
     register,
     updateWorkflowMutation,
-    workflow,
 }: PropertiesProps) => (
     <ul className={twMerge('space-y-4', customClassName)}>
         {properties.map((property) => (
@@ -53,7 +51,6 @@ const Properties = ({
                 property={property}
                 register={register}
                 updateWorkflowMutation={updateWorkflowMutation}
-                workflow={workflow}
             />
         ))}
     </ul>
