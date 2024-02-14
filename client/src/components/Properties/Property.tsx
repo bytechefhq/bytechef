@@ -6,8 +6,8 @@ import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {OptionModel} from '@/middleware/platform/configuration';
+import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
+import {OptionModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -82,7 +82,7 @@ const Property = ({
 
     const {setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentData, setComponentData} = useWorkflowDataStore();
+    const {componentData, setComponentData, workflow} = useWorkflowDataStore();
 
     let {name} = property;
 
@@ -400,7 +400,6 @@ const Property = ({
                                 dataPills={dataPills}
                                 property={property}
                                 updateWorkflowMutation={updateWorkflowMutation}
-                                workflow={workflow}
                             />
                         )}
 

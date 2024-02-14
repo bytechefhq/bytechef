@@ -19,14 +19,13 @@ const ProjectWorkflow = ({
     projectId,
     taskDispatcherDefinitions,
     updateWorkflowMutation,
-    workflowId,
 }: WorkflowEditorProps) => {
     const {componentActions, setComponentData, workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {data: workflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
         {
-            id: workflowId,
+            id: workflow.id!,
             lastWorkflowNodeName: currentNode.name,
         },
         !!componentActions?.length
@@ -71,13 +70,11 @@ const ProjectWorkflow = ({
                 projectId={+projectId!}
                 taskDispatcherDefinitions={taskDispatcherDefinitions}
                 updateWorkflowMutation={updateWorkflowMutation}
-                workflowId={workflowId}
             />
 
             {currentNode.name && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
-                    workflowId={workflowId}
                     workflowStepOutputs={workflowNodeOutputs ?? []}
                 />
             )}

@@ -1,7 +1,7 @@
 import PropertyDropdownMenu from '@/components/Properties/components/PropertyDropdownMenu';
 import {Button} from '@/components/ui/button';
-import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {PropertyModel} from '@/middleware/platform/configuration';
+import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
+import {PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {ComponentDataType, DataPillType, PropertyType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -14,16 +14,9 @@ type ArrayPropertyProps = {
     dataPills?: Array<DataPillType>;
     property: PropertyType;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
-    workflow?: WorkflowModel;
 };
 
-const ArrayProperty = ({
-    currentComponentData,
-    dataPills,
-    property,
-    updateWorkflowMutation,
-    workflow,
-}: ArrayPropertyProps) => {
+const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflowMutation}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState(property.items);
 
     const {items, multipleValues, name} = property;
@@ -114,7 +107,6 @@ const ArrayProperty = ({
                     mention={!!dataPills?.length}
                     property={item}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={workflow}
                 />
             ))}
 

@@ -49,11 +49,9 @@ const TABS = [
 
 const WorkflowNodeDetailsPanel = ({
     previousComponentDefinitions,
-    workflowId,
     workflowStepOutputs,
 }: {
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflowId: string;
     workflowStepOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
@@ -195,7 +193,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: workflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
-            id: workflowId,
+            id: workflow.id!,
             workflowNodeName: currentNode.name,
         },
         hasOutputData && activeTab === 'output'
@@ -465,7 +463,6 @@ const WorkflowNodeDetailsPanel = ({
                                                     mention={!!dataPills?.length}
                                                     properties={currentActionProperties}
                                                     updateWorkflowMutation={updateWorkflowMutation}
-                                                    workflow={workflow}
                                                 />
                                             ) : (
                                                 <div className="flex h-full items-center justify-center text-xl">
@@ -479,7 +476,7 @@ const WorkflowNodeDetailsPanel = ({
                                                 outputDefined={currentActionDefinition?.outputDefined ?? false}
                                                 outputSchema={workflowNodeOutput.outputSchema}
                                                 sampleOutput={workflowNodeOutput.sampleOutput!}
-                                                workflowId={workflowId}
+                                                workflowId={workflow.id!}
                                             />
                                         )}
                                     </div>
