@@ -62,12 +62,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -297,12 +295,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -646,12 +642,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -955,12 +949,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1226,12 +1218,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1425,12 +1415,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],

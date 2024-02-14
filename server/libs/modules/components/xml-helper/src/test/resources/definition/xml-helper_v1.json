@@ -34,6 +34,7 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from XML string",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -57,8 +58,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "xmlHelper",
@@ -91,12 +91,10 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Object",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Array",
         "value": 2
       } ],
@@ -105,7 +103,7 @@
     }, {
       "advancedOption": null,
       "description": "The object to convert to XML string.",
-      "displayCondition": "type === 1",
+      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -125,7 +123,7 @@
     }, {
       "advancedOption": null,
       "description": "The array to convert to XML string.",
-      "displayCondition": "type === 2",
+      "displayCondition": "type == 2",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -145,6 +143,7 @@
       "optionsDataSource": null
     } ],
     "title": "Convert to XML string",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -167,8 +166,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": null,

@@ -48,12 +48,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -77,22 +75,18 @@
       "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
-        "displayCondition": null,
         "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
-        "displayCondition": null,
         "label": "File",
         "value": "BINARY"
       } ],
@@ -100,7 +94,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the file if the response is returned as a file object.",
-      "displayCondition": "responseType === 'BINARY'",
+      "displayCondition": "responseType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -153,8 +147,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -192,8 +186,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -210,12 +204,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -236,12 +228,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -262,12 +252,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -288,12 +276,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -334,12 +320,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "GET",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -389,12 +375,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -418,22 +402,18 @@
       "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
-        "displayCondition": null,
         "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
-        "displayCondition": null,
         "label": "File",
         "value": "BINARY"
       } ],
@@ -441,7 +421,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the file if the response is returned as a file object.",
-      "displayCondition": "responseType === 'BINARY'",
+      "displayCondition": "responseType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -494,8 +474,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -533,12 +513,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
-      "displayCondition": "bodyContentType === 'JSON'",
+      "displayCondition": "bodyContentType == 'JSON'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -568,8 +548,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -586,12 +566,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -611,8 +589,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -628,8 +606,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -647,8 +625,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -684,8 +662,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -704,8 +682,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -740,18 +718,18 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
-      "displayCondition": "bodyContentType === 'XML'",
+      "displayCondition": "bodyContentType == 'XML'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -766,12 +744,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
-      "displayCondition": "bodyContentType === 'FORM_DATA'",
+      "displayCondition": "bodyContentType == 'FORM_DATA'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -897,12 +875,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
-      "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
+      "displayCondition": "bodyContentType == 'FORM_URL_ENCODED'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -936,12 +914,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
-      "displayCondition": "bodyContentType === 'RAW'",
+      "displayCondition": "bodyContentType == 'RAW'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -960,7 +938,7 @@
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
-      "displayCondition": "bodyContentType === 'BINARY'",
+      "displayCondition": "bodyContentType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1068,32 +1046,26 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "None",
         "value": ""
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Form-Data",
         "value": "FORM_DATA"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Form-Urlencoded",
         "value": "FORM_URL_ENCODED"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Raw",
         "value": "RAW"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Binary",
         "value": "BINARY"
       } ],
@@ -1133,12 +1105,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1159,12 +1129,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1185,12 +1153,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1211,12 +1177,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1257,12 +1221,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "POST",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -1312,12 +1276,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1341,22 +1303,18 @@
       "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
-        "displayCondition": null,
         "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
-        "displayCondition": null,
         "label": "File",
         "value": "BINARY"
       } ],
@@ -1364,7 +1322,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the file if the response is returned as a file object.",
-      "displayCondition": "responseType === 'BINARY'",
+      "displayCondition": "responseType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1417,8 +1375,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -1456,12 +1414,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
-      "displayCondition": "bodyContentType === 'JSON'",
+      "displayCondition": "bodyContentType == 'JSON'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1491,8 +1449,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1509,12 +1467,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1534,8 +1490,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1551,8 +1507,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1570,8 +1526,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1607,8 +1563,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1627,8 +1583,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1663,18 +1619,18 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
-      "displayCondition": "bodyContentType === 'XML'",
+      "displayCondition": "bodyContentType == 'XML'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1689,12 +1645,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
-      "displayCondition": "bodyContentType === 'FORM_DATA'",
+      "displayCondition": "bodyContentType == 'FORM_DATA'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1820,12 +1776,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
-      "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
+      "displayCondition": "bodyContentType == 'FORM_URL_ENCODED'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1859,12 +1815,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
-      "displayCondition": "bodyContentType === 'RAW'",
+      "displayCondition": "bodyContentType == 'RAW'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1883,7 +1839,7 @@
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
-      "displayCondition": "bodyContentType === 'BINARY'",
+      "displayCondition": "bodyContentType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1991,32 +1947,26 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "None",
         "value": ""
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Form-Data",
         "value": "FORM_DATA"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Form-Urlencoded",
         "value": "FORM_URL_ENCODED"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Raw",
         "value": "RAW"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Binary",
         "value": "BINARY"
       } ],
@@ -2056,12 +2006,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2082,12 +2030,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2108,12 +2054,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2134,12 +2078,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2180,12 +2122,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "PUT",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2235,12 +2177,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2264,22 +2204,18 @@
       "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
-        "displayCondition": null,
         "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
-        "displayCondition": null,
         "label": "File",
         "value": "BINARY"
       } ],
@@ -2287,7 +2223,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the file if the response is returned as a file object.",
-      "displayCondition": "responseType === 'BINARY'",
+      "displayCondition": "responseType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2340,8 +2276,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -2379,12 +2315,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
-      "displayCondition": "bodyContentType === 'JSON'",
+      "displayCondition": "bodyContentType == 'JSON'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2414,8 +2350,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2432,12 +2368,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2457,8 +2391,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2474,8 +2408,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2493,8 +2427,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2530,8 +2464,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2550,8 +2484,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2586,18 +2520,18 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
-      "displayCondition": "bodyContentType === 'XML'",
+      "displayCondition": "bodyContentType == 'XML'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2612,12 +2546,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
-      "displayCondition": "bodyContentType === 'FORM_DATA'",
+      "displayCondition": "bodyContentType == 'FORM_DATA'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2743,12 +2677,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
-      "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
+      "displayCondition": "bodyContentType == 'FORM_URL_ENCODED'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2782,12 +2716,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
-      "displayCondition": "bodyContentType === 'RAW'",
+      "displayCondition": "bodyContentType == 'RAW'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2806,7 +2740,7 @@
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
-      "displayCondition": "bodyContentType === 'BINARY'",
+      "displayCondition": "bodyContentType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -2914,32 +2848,26 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "None",
         "value": ""
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Form-Data",
         "value": "FORM_DATA"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Form-Urlencoded",
         "value": "FORM_URL_ENCODED"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Raw",
         "value": "RAW"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Binary",
         "value": "BINARY"
       } ],
@@ -2979,12 +2907,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3005,12 +2931,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3031,12 +2955,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3057,12 +2979,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3103,12 +3023,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "PATCH",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3158,12 +3078,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3187,22 +3105,18 @@
       "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
-        "displayCondition": null,
         "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
-        "displayCondition": null,
         "label": "File",
         "value": "BINARY"
       } ],
@@ -3210,7 +3124,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the file if the response is returned as a file object.",
-      "displayCondition": "responseType === 'BINARY'",
+      "displayCondition": "responseType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -3263,8 +3177,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3302,8 +3216,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -3320,12 +3234,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3346,12 +3258,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3372,12 +3282,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3398,12 +3306,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3444,12 +3350,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "DELETE",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3499,12 +3405,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3528,22 +3432,18 @@
       "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
-        "displayCondition": null,
         "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
-        "displayCondition": null,
         "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
-        "displayCondition": null,
         "label": "File",
         "value": "BINARY"
       } ],
@@ -3551,7 +3451,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the file if the response is returned as a file object.",
-      "displayCondition": "responseType === 'BINARY'",
+      "displayCondition": "responseType == 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -3604,8 +3504,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3643,8 +3543,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -3661,12 +3561,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3687,12 +3585,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3713,12 +3609,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3739,12 +3633,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -3785,12 +3677,12 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "HEAD",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": {
@@ -3855,12 +3747,10 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Header",
           "value": "HEADER"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "QueryParams",
           "value": "QUERY_PARAMETERS"
         } ],
@@ -3870,8 +3760,7 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3879,7 +3768,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3908,8 +3798,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3917,7 +3806,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3965,8 +3855,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3974,7 +3863,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4022,8 +3912,7 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4031,7 +3920,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4155,8 +4045,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4164,7 +4053,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4269,8 +4159,7 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4278,7 +4167,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4383,8 +4273,7 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4392,7 +4281,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationCallback": null
+      "authorizationUrl": null,
+      "clientSecret": null
     } ],
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",

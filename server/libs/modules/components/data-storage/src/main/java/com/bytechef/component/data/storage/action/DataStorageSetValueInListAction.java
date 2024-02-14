@@ -64,52 +64,52 @@ public class DataStorageSetValueInListAction {
             array(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             bool(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 2")
+                .displayCondition("type == 2")
                 .required(true),
             date(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 3")
+                .displayCondition("type == 3")
                 .required(true),
             dateTime(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 4")
+                .displayCondition("type == 4")
                 .required(true),
             integer(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
-                .displayCondition("type === 5")
+                .displayCondition("type == 5")
                 .required(true),
             nullable(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
-                .displayCondition("type === 6")
+                .displayCondition("type == 6")
                 .required(true),
             number(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 7")
+                .displayCondition("type == 7")
                 .required(true),
             object(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 8")
+                .displayCondition("type == 8")
                 .required(true),
             string(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 9")
+                .displayCondition("type == 9")
                 .required(true),
             time(DataStorageConstants.VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type === 10")
+                .displayCondition("type == 10")
                 .required(true))
         .perform(DataStorageSetValueInListAction::perform);
 

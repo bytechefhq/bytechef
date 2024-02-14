@@ -86,7 +86,7 @@ public class OpenAICreateAssistantAction {
                             .required(true),
                         object(FUNCTION)
                             .label("Function")
-                            .displayCondition("%s === '%s'".formatted(TYPE, FUNCTION))
+                            .displayCondition("%s == '%s'".formatted(TYPE, FUNCTION))
                             .properties(
                                 string(DESCRIPTION)
                                     .label("Description")

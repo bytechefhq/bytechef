@@ -54,22 +54,18 @@
       "minLength": null,
       "options": [ {
         "description": "Returns only email message ID and labels; does not return the email headers, body, or payload.",
-        "displayCondition": null,
         "label": "Minimal",
         "value": "minimal"
       }, {
         "description": "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
-        "displayCondition": null,
         "label": "Full",
         "value": "full"
       }, {
         "description": "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
-        "displayCondition": null,
         "label": "Raw",
         "value": "raw"
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
-        "displayCondition": null,
         "label": "Metadata",
         "value": "metadata"
       } ],
@@ -116,6 +112,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get Mail",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -569,8 +566,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleMail",
@@ -626,22 +622,18 @@
       "minLength": null,
       "options": [ {
         "description": "Returns only email message ID and labels; does not return the email headers, body, or payload.",
-        "displayCondition": null,
         "label": "Minimal",
         "value": "minimal"
       }, {
         "description": "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
-        "displayCondition": null,
         "label": "Full",
         "value": "full"
       }, {
         "description": "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
-        "displayCondition": null,
         "label": "Raw",
         "value": "raw"
       }, {
         "description": "Returns only email message ID, labels, and email headers.",
-        "displayCondition": null,
         "label": "Metadata",
         "value": "metadata"
       } ],
@@ -688,6 +680,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get Thread",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1239,8 +1232,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleMail",
@@ -1372,37 +1364,30 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Primary",
         "value": "primary"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Social",
         "value": "social"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Promotions",
         "value": "promotions"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Updates",
         "value": "updates"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Forums",
         "value": "forums"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Reservations",
         "value": "reservations"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Purchases",
         "value": "purchases"
       } ],
@@ -1485,18 +1470,17 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Search Email",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2032,8 +2016,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleMail",
@@ -2380,6 +2363,7 @@
       "optionsDataSource": null
     } ],
     "title": "Send Email",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2833,8 +2817,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": {
@@ -2886,15 +2869,15 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "googleMail",
     "componentDescription": "Google Mail, commonly known as Gmail, is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.",

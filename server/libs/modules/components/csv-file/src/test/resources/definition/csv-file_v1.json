@@ -140,12 +140,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -166,12 +164,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -230,20 +226,18 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "csvFile",
@@ -302,12 +296,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -404,7 +396,6 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -500,7 +491,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

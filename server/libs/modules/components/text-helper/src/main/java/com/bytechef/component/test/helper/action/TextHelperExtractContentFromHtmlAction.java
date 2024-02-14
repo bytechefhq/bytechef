@@ -69,7 +69,7 @@ public class TextHelperExtractContentFromHtmlAction {
                 .label("Attribute")
                 .description("The name of the attribute to return the value of")
                 .required(true)
-                .displayCondition("%s === 'attribute'".formatted(RETURN_VALUE)),
+                .displayCondition("%s == 'attribute'".formatted(RETURN_VALUE)),
             bool(RETURN_ARRAY)
                 .label("Return Array")
                 .description(

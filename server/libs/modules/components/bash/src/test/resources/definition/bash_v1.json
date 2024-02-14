@@ -34,6 +34,7 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -56,8 +57,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": "Sample result"
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": null,

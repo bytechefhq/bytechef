@@ -109,8 +109,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource). Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource).",
@@ -127,12 +127,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -154,8 +152,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The maximum length in seconds that the Message can remain in Twilio's outgoing message queue. If a queued Message exceeds the validity_period, the Message is not sent. A validity_period greater than 5 is recommended.",
@@ -173,8 +171,8 @@
       "maxValue": 14400,
       "minValue": 1,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Reserved",
@@ -191,12 +189,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -220,12 +216,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Retain",
         "value": "retain"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Discard",
         "value": "discard"
       } ],
@@ -249,12 +243,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Retain",
         "value": "retain"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Obfuscate",
         "value": "obfuscate"
       } ],
@@ -275,12 +267,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -323,8 +313,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "For Messaging Services with Link Shortening configured only: A Boolean indicating whether or not Twilio should shorten links in the body of the Message.",
@@ -341,12 +331,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -370,7 +358,6 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "fixed",
         "value": "fixed"
       } ],
@@ -407,8 +394,8 @@
         "label": "Date time",
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -432,8 +419,8 @@
           "options": { }
         }
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "If set to true, Twilio delivers the message as a single MMS message, regardless of the presence of media.",
@@ -450,12 +437,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -498,12 +483,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "enable",
         "value": "enable"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "disable",
         "value": "disable"
       } ],
@@ -527,12 +510,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "From",
         "value": "from"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Messaging Service SID",
         "value": "messagingServiceSid"
       } ],
@@ -571,12 +552,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Body",
         "value": "body"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Media URL",
         "value": "mediaUrl"
       } ],
@@ -729,8 +708,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -782,8 +761,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "controlType": "DATE_TIME",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE_TIME"
           }, {
             "advancedOption": null,
             "description": null,
@@ -804,8 +783,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -990,8 +969,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "controlType": "DATE_TIME",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE_TIME"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1012,8 +991,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1046,8 +1025,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "controlType": "DATE_TIME",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE_TIME"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1068,8 +1047,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1087,8 +1066,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1142,8 +1121,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1161,11 +1140,11 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1222,11 +1201,11 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
@@ -1281,16 +1260,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "componentName": "twilio",
     "componentDescription": "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and video capabilities into their applications.",

@@ -69,12 +69,12 @@ public class JsonFileWriteAction {
             object(SOURCE)
                 .label("Source")
                 .description("The object to write to the file.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             array(SOURCE)
                 .label("Source")
                 .description("The array to write to the file.")
-                .displayCondition("type === 2")
+                .displayCondition("type == 2")
                 .required(true),
             string(FILENAME)
                 .label("Filename")

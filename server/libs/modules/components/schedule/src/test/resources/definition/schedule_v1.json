@@ -42,8 +42,8 @@
       "maxValue": 23,
       "minValue": 0,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -61,8 +61,8 @@
       "maxValue": 59,
       "minValue": 0,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -96,12 +96,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -122,12 +120,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -148,12 +144,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -174,12 +168,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -200,12 +192,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -226,12 +216,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -252,19 +240,17 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
         "controlType": "SELECT"
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -284,137 +270,110 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+00:00",
         "value": "Etc/GMT+0"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+01:00",
         "value": "Etc/GMT-1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+02:00",
         "value": "Etc/GMT-2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+03:00",
         "value": "Etc/GMT-3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+04:00",
         "value": "Etc/GMT-4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+05:00",
         "value": "Etc/GMT-5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+06:00",
         "value": "Etc/GMT-6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+07:00",
         "value": "Etc/GMT-7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+08:00",
         "value": "Etc/GMT-8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+09:00",
         "value": "Etc/GMT-9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+10:00",
         "value": "Etc/GMT-10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+11:00",
         "value": "Etc/GMT-11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+12:00",
         "value": "Etc/GMT-12"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+13:00",
         "value": "Etc/GMT-13"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+14:00",
         "value": "Etc/GMT-14"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-01:00",
         "value": "Etc/GMT+1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-02:00",
         "value": "Etc/GMT+2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-03:00",
         "value": "Etc/GMT+3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-04:00",
         "value": "Etc/GMT+4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-05:00",
         "value": "Etc/GMT+5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-06:00",
         "value": "Etc/GMT+6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-07:00",
         "value": "Etc/GMT+7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-08:00",
         "value": "Etc/GMT+8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-09:00",
         "value": "Etc/GMT+9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-10:00",
         "value": "Etc/GMT+10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-11:00",
         "value": "Etc/GMT+11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-12:00",
         "value": "Etc/GMT+12"
       } ],
@@ -430,9 +389,8 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -487,8 +445,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -506,8 +464,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -541,12 +499,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -567,12 +523,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -593,12 +547,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -619,12 +571,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -645,12 +595,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -671,12 +619,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -697,19 +643,17 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
             "controlType": "SELECT"
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -730,13 +674,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null
   }, {
     "batch": null,
     "componentName": "schedule",
@@ -767,8 +712,8 @@
       "maxValue": 23,
       "minValue": 0,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -786,8 +731,8 @@
       "maxValue": 59,
       "minValue": 0,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -806,42 +751,35 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Monday",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Tuesday",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Wednesday",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Thursday",
         "value": 4
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Friday",
         "value": 5
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Saturday",
         "value": 6
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Sunday",
         "value": 7
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -861,137 +799,110 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+00:00",
         "value": "Etc/GMT+0"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+01:00",
         "value": "Etc/GMT-1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+02:00",
         "value": "Etc/GMT-2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+03:00",
         "value": "Etc/GMT-3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+04:00",
         "value": "Etc/GMT-4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+05:00",
         "value": "Etc/GMT-5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+06:00",
         "value": "Etc/GMT-6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+07:00",
         "value": "Etc/GMT-7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+08:00",
         "value": "Etc/GMT-8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+09:00",
         "value": "Etc/GMT-9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+10:00",
         "value": "Etc/GMT-10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+11:00",
         "value": "Etc/GMT-11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+12:00",
         "value": "Etc/GMT-12"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+13:00",
         "value": "Etc/GMT-13"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+14:00",
         "value": "Etc/GMT-14"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-01:00",
         "value": "Etc/GMT+1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-02:00",
         "value": "Etc/GMT+2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-03:00",
         "value": "Etc/GMT+3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-04:00",
         "value": "Etc/GMT+4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-05:00",
         "value": "Etc/GMT+5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-06:00",
         "value": "Etc/GMT+6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-07:00",
         "value": "Etc/GMT+7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-08:00",
         "value": "Etc/GMT+8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-09:00",
         "value": "Etc/GMT+9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-10:00",
         "value": "Etc/GMT+10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-11:00",
         "value": "Etc/GMT+11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-12:00",
         "value": "Etc/GMT+12"
       } ],
@@ -1007,9 +918,8 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1064,8 +974,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1083,8 +993,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1102,8 +1012,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1124,13 +1034,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null
   }, {
     "batch": null,
     "componentName": "schedule",
@@ -1161,8 +1072,8 @@
       "maxValue": 23,
       "minValue": 0,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
@@ -1180,8 +1091,8 @@
       "maxValue": 59,
       "minValue": 0,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The day of the month  at which a workflow will be triggered.",
@@ -1199,8 +1110,8 @@
       "maxValue": 31,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
@@ -1220,137 +1131,110 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+00:00",
         "value": "Etc/GMT+0"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+01:00",
         "value": "Etc/GMT-1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+02:00",
         "value": "Etc/GMT-2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+03:00",
         "value": "Etc/GMT-3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+04:00",
         "value": "Etc/GMT-4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+05:00",
         "value": "Etc/GMT-5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+06:00",
         "value": "Etc/GMT-6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+07:00",
         "value": "Etc/GMT-7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+08:00",
         "value": "Etc/GMT-8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+09:00",
         "value": "Etc/GMT-9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+10:00",
         "value": "Etc/GMT-10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+11:00",
         "value": "Etc/GMT-11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+12:00",
         "value": "Etc/GMT-12"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+13:00",
         "value": "Etc/GMT-13"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+14:00",
         "value": "Etc/GMT-14"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-01:00",
         "value": "Etc/GMT+1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-02:00",
         "value": "Etc/GMT+2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-03:00",
         "value": "Etc/GMT+3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-04:00",
         "value": "Etc/GMT+4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-05:00",
         "value": "Etc/GMT+5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-06:00",
         "value": "Etc/GMT+6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-07:00",
         "value": "Etc/GMT+7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-08:00",
         "value": "Etc/GMT+8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-09:00",
         "value": "Etc/GMT+9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-10:00",
         "value": "Etc/GMT+10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-11:00",
         "value": "Etc/GMT+11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-12:00",
         "value": "Etc/GMT+12"
       } ],
@@ -1366,9 +1250,8 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1423,8 +1306,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1442,8 +1325,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1461,8 +1344,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1483,13 +1366,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null
   }, {
     "batch": null,
     "componentName": "schedule",
@@ -1520,8 +1404,8 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
@@ -1540,27 +1424,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Minute",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Hour",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Day",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Month",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     } ],
     "staticWebhookRequest": null,
     "title": "Interval",
@@ -1572,9 +1452,8 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1629,8 +1508,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1648,16 +1527,17 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null
   }, {
     "batch": null,
     "componentName": "schedule",
@@ -1709,137 +1589,110 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+00:00",
         "value": "Etc/GMT+0"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+01:00",
         "value": "Etc/GMT-1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+02:00",
         "value": "Etc/GMT-2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+03:00",
         "value": "Etc/GMT-3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+04:00",
         "value": "Etc/GMT-4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+05:00",
         "value": "Etc/GMT-5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+06:00",
         "value": "Etc/GMT-6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+07:00",
         "value": "Etc/GMT-7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+08:00",
         "value": "Etc/GMT-8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+09:00",
         "value": "Etc/GMT-9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+10:00",
         "value": "Etc/GMT-10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+11:00",
         "value": "Etc/GMT-11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+12:00",
         "value": "Etc/GMT-12"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+13:00",
         "value": "Etc/GMT-13"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT+14:00",
         "value": "Etc/GMT-14"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-01:00",
         "value": "Etc/GMT+1"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-02:00",
         "value": "Etc/GMT+2"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-03:00",
         "value": "Etc/GMT+3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-04:00",
         "value": "Etc/GMT+4"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-05:00",
         "value": "Etc/GMT+5"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-06:00",
         "value": "Etc/GMT+6"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-07:00",
         "value": "Etc/GMT+7"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-08:00",
         "value": "Etc/GMT+8"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-09:00",
         "value": "Etc/GMT+9"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-10:00",
         "value": "Etc/GMT+10"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-11:00",
         "value": "Etc/GMT+11"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "GMT-12:00",
         "value": "Etc/GMT+12"
       } ],
@@ -1855,9 +1708,8 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": { },
-    "listenerEnable": { },
-    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1934,13 +1786,14 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "poll": null
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null
   } ],
   "allowedConnections": null
 }

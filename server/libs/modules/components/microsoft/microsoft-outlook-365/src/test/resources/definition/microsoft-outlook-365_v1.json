@@ -34,6 +34,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get Mail",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -667,12 +668,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -829,12 +828,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -855,12 +852,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -881,12 +876,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -907,12 +900,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1389,8 +1380,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "microsoftOutlook365",
@@ -1407,6 +1397,7 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Search Email",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1430,8 +1421,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "microsoftOutlook365",
@@ -1617,12 +1607,10 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "Text",
             "value": "TEXT"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Html",
             "value": "HTML"
           } ],
@@ -1915,17 +1903,14 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "Not flagged",
             "value": "NOT_FLAGGED"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Complete",
             "value": "COMPLETE"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Flagged",
             "value": "FLAGGED"
           } ],
@@ -2103,12 +2088,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2132,17 +2115,14 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Low",
           "value": "LOW"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Normal",
           "value": "NORMAL"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "High",
           "value": "HIGH"
         } ],
@@ -2166,12 +2146,10 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Focused",
           "value": "FOCUSED"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Other",
           "value": "OTHER"
         } ],
@@ -2290,12 +2268,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2316,12 +2292,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2342,12 +2316,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2368,12 +2340,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2879,12 +2849,10 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "Text",
             "value": "TEXT"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Html",
             "value": "HTML"
           } ],
@@ -2930,20 +2898,18 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Send Email",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": {
@@ -3013,6 +2979,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3021,8 +2988,7 @@
       "scopes": { },
       "tokenUrl": null,
       "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     } ],
     "componentName": "microsoftOutlook365",
     "componentDescription": "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, calendar, contacts, and tasks to streamline communication and organization.",

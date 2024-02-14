@@ -32,12 +32,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "JSON Line",
         "value": "JSONL"
       } ],
@@ -150,12 +148,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -163,7 +159,7 @@
     }, {
       "advancedOption": true,
       "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
-      "displayCondition": "isArray === true",
+      "displayCondition": "isArray == true",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -182,7 +178,7 @@
     }, {
       "advancedOption": true,
       "description": "The amount of child elements to return in a page.",
-      "displayCondition": "isArray === true",
+      "displayCondition": "isArray == true",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -196,12 +192,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
-      "displayCondition": "isArray === true",
+      "displayCondition": "isArray == true",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -215,12 +211,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "jsonFile",
@@ -254,12 +250,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "JSON Line",
         "value": "JSONL"
       } ],
@@ -282,21 +276,19 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Object",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
-      "displayCondition": "type === 1",
+      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -311,12 +303,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The array to write to the file.",
-      "displayCondition": "type === 2",
+      "displayCondition": "type == 2",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -332,8 +324,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
@@ -355,6 +347,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -450,8 +443,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": null,

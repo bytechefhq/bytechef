@@ -54,17 +54,14 @@
       "minLength": null,
       "options": [ {
         "description": "A JSON-based array of structured attachments, presented as a URL-encoded string.",
-        "displayCondition": null,
         "label": "Attachments",
         "value": "attachments"
       }, {
         "description": "A JSON-based array of structured blocks, presented as a URL-encoded string.",
-        "displayCondition": null,
         "label": "Blocks",
         "value": "blocks"
       }, {
         "description": "How this field works and whether it is required depends on other fields you use in your API call.",
-        "displayCondition": null,
         "label": "Text",
         "value": "text"
       } ],
@@ -100,12 +97,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -164,12 +159,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -209,12 +202,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -254,12 +245,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -299,12 +288,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -325,12 +312,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -391,12 +376,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -477,8 +460,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -536,8 +519,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -593,11 +576,11 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -825,11 +808,11 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     }
@@ -888,17 +871,14 @@
       "minLength": null,
       "options": [ {
         "description": "A JSON-based array of structured attachments, presented as a URL-encoded string.",
-        "displayCondition": null,
         "label": "Attachments",
         "value": "attachments"
       }, {
         "description": "A JSON-based array of structured blocks, presented as a URL-encoded string.",
-        "displayCondition": null,
         "label": "Blocks",
         "value": "blocks"
       }, {
         "description": "How this field works and whether it is required depends on other fields you use in your API call.",
-        "displayCondition": null,
         "label": "Text",
         "value": "text"
       } ],
@@ -934,12 +914,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -998,12 +976,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1043,12 +1019,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1088,12 +1062,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1133,12 +1105,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1159,12 +1129,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1225,12 +1193,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1311,8 +1277,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1370,8 +1336,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1427,11 +1393,11 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1659,11 +1625,11 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     }
@@ -1717,8 +1683,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
       "apply": null,
       "pkce": null,
       "refresh": null,
@@ -1726,6 +1690,8 @@
       "scopes": { },
       "tokenUrl": { },
       "clientId": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
       "authorizationCallback": null
     } ],
     "componentName": "slack",

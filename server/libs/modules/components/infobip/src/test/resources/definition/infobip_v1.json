@@ -115,37 +115,30 @@
             "minLength": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "Monday",
               "value": "MONDAY"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Tuesday",
               "value": "TUESDAY"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Wednesday",
               "value": "WEDNESDAY"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Thursday",
               "value": "THURSDAY"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Friday",
               "value": "FRIDAY"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Saturday",
               "value": "SATURDAY"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Sunday",
               "value": "SUNDAY"
             } ],
@@ -155,8 +148,8 @@
           "minItems": 1,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The exact time of day to start sending messages. Time is expressed in the UTC time zone. If set, use it together with the to property with minimum 1 hour difference.",
@@ -191,8 +184,8 @@
             "maxValue": 23,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Minute when the time window opens.",
@@ -210,11 +203,11 @@
             "maxValue": 59,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The exact time of day to end sending messages. Time is expressed in the UTC time zone. If set, use it together with the from property with minimum 1 hour difference.",
@@ -249,8 +242,8 @@
             "maxValue": 23,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Minute when the time window closes.",
@@ -268,14 +261,14 @@
             "maxValue": 59,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "An array of destination objects for where messages are being sent. A valid destination is required.",
@@ -333,8 +326,8 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Allows for sending a flash SMS to automatically appear on recipient devices without interaction. Set to true to enable flash SMS, or leave the default value, false to send a standard SMS.",
@@ -351,12 +344,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -396,12 +387,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -442,29 +431,25 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "Turkish",
             "value": "TR"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Spanish",
             "value": "ES"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Portuguese",
             "value": "PT"
           }, {
             "description": "Platform select the character set based on message content.",
-            "displayCondition": null,
             "label": "Autodetect",
             "value": "AUTODETECT"
           } ],
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Preferred delivery report content type.",
@@ -484,12 +469,10 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "application/json",
           "value": "application/json"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "application/xml",
           "value": "application/xml"
         } ],
@@ -586,8 +569,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "IYS regulations specific parameters required for sending promotional SMS to phone numbers registered in Turkey.",
@@ -622,8 +605,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Recipient Type",
@@ -643,19 +626,17 @@
             "minLength": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "Tacir",
               "value": "TACIR"
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "Bireysel",
               "value": "BIREYSEL"
             } ],
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "Use case dependent parameters for sending SMS to phone numbers registered in South Korea.",
@@ -690,14 +671,14 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Date and time when the message is to be sent. Used for scheduled SMS. It can only be scheduled for no later than 180 days in advance.",
@@ -730,8 +711,8 @@
           "label": "Date time",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -752,8 +733,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Content of the message being sent.",
@@ -792,52 +773,42 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Turkish",
           "value": "TURKISH"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Greek",
           "value": "GREEK"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Cyrillic",
           "value": "CYRILLIC"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Serbian cyrillic",
           "value": "SERBIAN_CYRILLIC"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Bulgarian cyrillic",
           "value": "BULGARIAN_CYRILLIC"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Central european",
           "value": "CENTRAL_EUROPEAN"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Baltic",
           "value": "BALTIC"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Portuguese",
           "value": "PORTUGUESE"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Colombian",
           "value": "COLOMBIAN"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Non unicode",
           "value": "NON_UNICODE"
         } ],
@@ -862,8 +833,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Required for entity use in a send request for outbound traffic. Returned in notification events.",
@@ -907,8 +878,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Limits the send speed when sending messages in bulk to deliver messages over a longer period of time. You may wish to use this to allow your systems or agents to handle large amounts of incoming traffic, e.g., if you are expecting recipients to follow through with a call-to-action option from a message you sent. Not setting a send speed limit can overwhelm your resources with incoming traffic.",
@@ -943,8 +914,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The time unit to define when setting a messaging speed limit.",
@@ -964,24 +935,21 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Minute",
           "value": "MINUTE"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Hour",
           "value": "HOUR"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Day",
           "value": "DAY"
         } ],
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Sets up URL shortening and tracking feature. Not compatible with old tracking feature.",
@@ -1015,12 +983,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1041,12 +1007,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1086,12 +1050,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1116,8 +1078,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Sets up tracking parameters to track conversion metrics and type.",
@@ -1212,8 +1174,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Set to true to return smsCount in the response. smsCount is the total count of SMS submitted in the request. SMS messages have a character limit and messages longer than that limit will be split into multiple SMS and reflected in the total count of SMS submitted.",
@@ -1230,12 +1192,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1365,8 +1325,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1384,8 +1344,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -1444,8 +1404,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1482,18 +1442,18 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
@@ -1621,19 +1581,17 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
         "controlType": "SELECT"
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Custom client data that will be included in a Delivery Report.",
@@ -1705,12 +1663,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1731,12 +1687,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1776,12 +1730,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -1806,8 +1758,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Required for entity use in a send request for outbound traffic. Returned in notification events.",
@@ -1902,8 +1854,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1957,8 +1909,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1995,8 +1947,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -2055,11 +2007,11 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
@@ -2095,16 +2047,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "infobip",
     "componentDescription": "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",

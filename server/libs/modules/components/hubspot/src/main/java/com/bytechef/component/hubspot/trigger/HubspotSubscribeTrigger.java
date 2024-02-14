@@ -106,7 +106,7 @@ public class HubspotSubscribeTrigger {
             string(PROPERTY_NAME)
                 .label("Property Name")
                 .description("The name of property to listen for change events.")
-                .displayCondition("eventType.includes('.propertyChange')")
+                .displayCondition("eventType.contains('.propertyChange')")
                 .required(true))
         .outputSchema(
             array().items(

@@ -54,12 +54,12 @@ public class XmlFileWriteAction {
             object(XmlFileConstants.SOURCE)
                 .label("Source")
                 .description("The object to write to the file.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             array(XmlFileConstants.SOURCE)
                 .label("Source")
                 .description("The aray to write to the file.")
-                .displayCondition("type === 2")
+                .displayCondition("type == 2")
                 .required(true),
             string(XmlFileConstants.FILENAME)
                 .label("Filename")

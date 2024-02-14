@@ -143,12 +143,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -169,12 +167,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -214,12 +210,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -240,12 +234,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -290,6 +282,7 @@
       "optionsDataSource": null
     } ],
     "title": "Upload file",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -334,8 +327,7 @@
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleDrive",
@@ -388,12 +380,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -414,12 +404,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -464,6 +452,7 @@
       "optionsDataSource": null
     } ],
     "title": "Read file",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -498,12 +487,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -560,12 +547,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -624,12 +609,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -650,12 +633,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -714,12 +695,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1225,12 +1204,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1407,12 +1384,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1493,12 +1468,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1675,12 +1648,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1739,12 +1710,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1754,8 +1723,7 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleDrive",
@@ -1827,12 +1795,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1853,12 +1819,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1898,12 +1862,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1924,12 +1886,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1974,6 +1934,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2018,8 +1979,7 @@
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleDrive",
@@ -2091,17 +2051,14 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Text",
         "value": "plain/text"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "CSV",
         "value": "text/csv"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "XML",
         "value": "text/xml"
       } ],
@@ -2144,12 +2101,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2170,12 +2125,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2215,12 +2168,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2241,12 +2192,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -2291,6 +2240,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create new text file",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2335,8 +2285,7 @@
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": {
@@ -2389,13 +2338,13 @@
       "acquire": null,
       "authorizationUrl": { },
       "clientSecret": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
       "authorizationCallback": null
     } ],
     "componentName": "googleDrive",

@@ -49,12 +49,12 @@ public class DataMapperMapObjectsToListAction {
             object(INPUT)
                 .label("Input")
                 .description("The object containing one or more properties.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             array(INPUT)
                 .label("Input")
                 .description("The array containing one or more properties.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             string(FIELD_KEY)
                 .label("Field key")

@@ -129,7 +129,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create customer",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -675,7 +674,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "quickbooks",
@@ -769,17 +769,14 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Inventory",
         "value": "inventory"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Service",
         "value": "service"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Non-inventory",
         "value": "nonInventory"
       } ],
@@ -847,7 +844,6 @@
       }
     } ],
     "title": "Create item",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -950,7 +946,8 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "quickbooks",
@@ -989,7 +986,6 @@
       }
     } ],
     "title": "Download customer pdf",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1085,7 +1081,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -1136,7 +1133,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "apply": null,
@@ -1145,7 +1141,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "componentName": "quickbooks",
     "componentDescription": "QuickBooks is an accounting software package developed and marketed by Intuit. It is geared mainly toward small and medium-sized businesses and offers on-premises accounting applications as well as cloud-based versions that accept business payments, manage and pay bills, and payroll functions.",

@@ -46,12 +46,12 @@ public class XmlHelperStringifyAction {
             object(XmlHelperConstants.SOURCE)
                 .label("Source")
                 .description("The object to convert to XML string.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             array(XmlHelperConstants.SOURCE)
                 .label("Source")
                 .description("The array to convert to XML string.")
-                .displayCondition("type === 2")
+                .displayCondition("type == 2")
                 .required(true))
         .outputSchema(string())
         .perform(XmlHelperStringifyAction::perform);

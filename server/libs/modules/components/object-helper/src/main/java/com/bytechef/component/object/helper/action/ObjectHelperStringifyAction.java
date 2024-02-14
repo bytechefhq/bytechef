@@ -47,12 +47,12 @@ public class ObjectHelperStringifyAction {
             object(SOURCE)
                 .label("Source")
                 .description("The data to convert to JSON string.")
-                .displayCondition("type === 1")
+                .displayCondition("type == 1")
                 .required(true),
             array(SOURCE)
                 .label("Source")
                 .description("The data to convert to JSON string.")
-                .displayCondition("type === 2")
+                .displayCondition("type == 2")
                 .required(true))
         .output()
         .perform(ObjectHelperStringifyAction::perform);

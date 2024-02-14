@@ -60,17 +60,17 @@ public class XmlFileReadAction {
                 .label("Path")
                 .description(
                     "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                .displayCondition("%s === true".formatted(IS_ARRAY))
+                .displayCondition("%s == true".formatted(IS_ARRAY))
                 .advancedOption(true),
             integer(PAGE_SIZE)
                 .label("Page Size")
                 .description("The amount of child elements to return in a page.")
-                .displayCondition("%s === true".formatted(IS_ARRAY))
+                .displayCondition("%s == true".formatted(IS_ARRAY))
                 .advancedOption(true),
             integer(PAGE_NUMBER)
                 .label("Page Number")
                 .description("The page number to get.")
-                .displayCondition("%s === true".formatted(IS_ARRAY))
+                .displayCondition("%s == true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .output()
         .perform(XmlFileReadAction::perform);

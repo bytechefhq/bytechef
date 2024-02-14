@@ -70,17 +70,14 @@
       "minLength": null,
       "options": [ {
         "description": "Get the attribute value like 'class' from an element.",
-        "displayCondition": null,
         "label": "Attribute",
         "value": "attribute"
       }, {
         "description": "Get the HTML content that the element contains.",
-        "displayCondition": null,
         "label": "HTML",
         "value": "html"
       }, {
         "description": "Get the text content of the element.",
-        "displayCondition": null,
         "label": "Text",
         "value": "text"
       } ],
@@ -88,7 +85,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of the attribute to return the value of",
-      "displayCondition": "returnValue === 'attribute'",
+      "displayCondition": "returnValue == 'attribute'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -120,20 +117,18 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Extract Content from HTML",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": null,

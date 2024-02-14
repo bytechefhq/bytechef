@@ -82,22 +82,18 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "system",
             "value": "system"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "user",
             "value": "user"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "assistant",
             "value": "assistant"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "tool",
             "value": "tool"
           } ],
@@ -369,12 +365,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -602,8 +596,8 @@
       "optionsDataSource": null
     } ],
     "title": "Ask ChatGPT",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "componentName": "openai",
@@ -744,17 +738,14 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "Code interpreter",
             "value": "code_interpreter"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Retrieval",
             "value": "retrieval"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "Function",
             "value": "function"
           } ],
@@ -762,7 +753,7 @@
         }, {
           "advancedOption": null,
           "description": null,
-          "displayCondition": "type === 'function'",
+          "displayCondition": "type == 'function'",
           "expressionEnabled": null,
           "hidden": null,
           "metadata": { },
@@ -948,6 +939,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create assistant",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1302,8 +1294,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -1352,12 +1343,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "dall-e-3",
         "value": "dall-e-3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "dall-e-2",
         "value": "dall-e-2"
       } ],
@@ -1381,12 +1370,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "standard",
         "value": "standard"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "hd",
         "value": "hd"
       } ],
@@ -1410,12 +1397,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "url",
         "value": "url"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "b64_json",
         "value": "b64_json"
       } ],
@@ -1445,7 +1430,7 @@
     }, {
       "advancedOption": null,
       "description": "The style of the generated images.",
-      "displayCondition": "model === 'dall-e-3'",
+      "displayCondition": "model == 'dall-e-3'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1461,12 +1446,10 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "vivid",
         "value": "vivid"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "natural",
         "value": "natural"
       } ],
@@ -1492,6 +1475,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create image",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1632,8 +1616,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -1667,12 +1650,10 @@
       "minLength": null,
       "options": [ {
         "description": "Model optimized for speed.",
-        "displayCondition": null,
         "label": "tts-1",
         "value": "tts-1"
       }, {
         "description": "Model optimized for quality.",
-        "displayCondition": null,
         "label": "tts-1-hd",
         "value": "tts-1-hd"
       } ],
@@ -1715,32 +1696,26 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "alloy",
         "value": "alloy"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "echo",
         "value": "echo"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "fable",
         "value": "fable"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "onyx",
         "value": "onyx"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "nova",
         "value": "nova"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "schimmer",
         "value": "schimmer"
       } ],
@@ -1764,22 +1739,18 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "mp3",
         "value": "mp3"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "opus",
         "value": "opus"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "aac",
         "value": "aac"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "flac",
         "value": "flac"
       } ],
@@ -1808,6 +1779,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create speech",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1903,8 +1875,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -2030,7 +2001,6 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
@@ -2054,287 +2024,230 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Afrikaans",
         "value": "af"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Arabic",
         "value": "ar"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Armenian",
         "value": "hy"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Azerbaijani",
         "value": "az"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Belarusian",
         "value": "be"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Bosnian",
         "value": "bs"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Bulgarian",
         "value": "bg"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Catalan",
         "value": "ca"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Chinese (Simplified)",
         "value": "zh"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Croatian",
         "value": "hr"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Czech",
         "value": "cs"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Danish",
         "value": "da"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Dutch",
         "value": "nl"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Greek",
         "value": "el"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Estonian",
         "value": "et"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "English",
         "value": "en"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Finnish",
         "value": "fi"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "French",
         "value": "fr"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Galician",
         "value": "gl"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "German",
         "value": "de"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Hebrew",
         "value": "he"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Hindi",
         "value": "hi"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Hungarian",
         "value": "hu"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Icelandic",
         "value": "is"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Indonesian",
         "value": "id"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Italian",
         "value": "it"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Japanese",
         "value": "ja"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Kazakh",
         "value": "kk"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Kannada",
         "value": "kn"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Korean",
         "value": "ko"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Lithuanian",
         "value": "lt"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Latvian",
         "value": "lv"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Maori",
         "value": "ma"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Macedonian",
         "value": "mk"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Marathi",
         "value": "mr"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Malay",
         "value": "ms"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Nepali",
         "value": "ne"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Norwegian",
         "value": "no"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Persian",
         "value": "fa"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Polish",
         "value": "pl"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Portuguese",
         "value": "pt"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Romanian",
         "value": "ro"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Russian",
         "value": "ru"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Slovak",
         "value": "sk"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Slovenian",
         "value": "sl"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Serbian",
         "value": "sr"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Spanish",
         "value": "es"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Swedish",
         "value": "sv"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Swahili",
         "value": "sw"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Tamil",
         "value": "ta"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Tagalog",
         "value": "tl"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Thai",
         "value": "th"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Turkish",
         "value": "tr"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Ukrainian",
         "value": "uk"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Urdu",
         "value": "ur"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Vietnamese",
         "value": "vi"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Welsh",
         "value": "cy"
       } ],
@@ -2377,27 +2290,22 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "json",
         "value": "json"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "text",
         "value": "text"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "srt",
         "value": "srt"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "verbose_json",
         "value": "verbose_json"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "vtt",
         "value": "vtt"
       } ],
@@ -2426,6 +2334,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create transcriptions",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2799,12 +2708,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -2824,8 +2731,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -2951,7 +2857,6 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
@@ -2994,27 +2899,22 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "json",
         "value": "json"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "text",
         "value": "text"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "srt",
         "value": "srt"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "verbose_json",
         "value": "verbose_json"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "vtt",
         "value": "vtt"
       } ],
@@ -3043,6 +2943,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create translation",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3416,12 +3317,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -3441,8 +3340,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "openai",
@@ -3625,22 +3523,18 @@
           "minLength": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "system",
             "value": "system"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "user",
             "value": "user"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "assistant",
             "value": "assistant"
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "tool",
             "value": "tool"
           } ],
@@ -3912,12 +3806,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -4145,8 +4037,8 @@
       "optionsDataSource": null
     } ],
     "title": "Vision Prompt",
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "category": null,
   "connection": {
@@ -4178,16 +4070,16 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "apply": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null
     } ],
     "componentName": "openai",
     "componentDescription": "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",

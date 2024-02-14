@@ -310,17 +310,14 @@
                 "minLength": null,
                 "options": [ {
                   "description": null,
-                  "displayCondition": null,
                   "label": "HUBSPOT_DEFINED",
                   "value": "HUBSPOT_DEFINED"
                 }, {
                   "description": null,
-                  "displayCondition": null,
                   "label": "USER_DEFINED",
                   "value": "USER_DEFINED"
                 }, {
                   "description": null,
-                  "displayCondition": null,
                   "label": "INTEGRATOR_DEFINED",
                   "value": "INTEGRATOR_DEFINED"
                 } ],
@@ -539,12 +536,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -959,12 +954,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -1042,6 +1035,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -1050,8 +1044,7 @@
       "scopes": { },
       "tokenUrl": { },
       "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     } ],
     "componentName": "hubspot",
     "componentDescription": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
@@ -1123,207 +1116,166 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "contact.creation",
         "value": "Contact Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "contact.deletion",
         "value": "Contact Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "contact.merge",
         "value": "Contact Merge"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "contact.associationChange",
         "value": "Contact Association Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "contact.restore",
         "value": "Contact Restore"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "contact.privacyDeletion",
         "value": "Contact  Privacy Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "contact.propertyChange",
         "value": "Contact Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "company.creation",
         "value": "Contact Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "company.deletion",
         "value": "Company Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "company.propertyChange",
         "value": "Company Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "company.associationChange",
         "value": "Company Association Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "company.restore",
         "value": "Company Restore"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "company.merge",
         "value": "Company Merge"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "deal.creation",
         "value": "Deal Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "deal.deletion",
         "value": "Deal Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "deal.associationChange",
         "value": "Deal Association Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "deal.restore",
         "value": "Deal Restore"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "deal.merge",
         "value": "Deal Merge"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "deal.propertyChange",
         "value": "Deal Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "ticket.creation",
         "value": "Ticket Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "ticket.deletion",
         "value": "Ticket Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "ticket.propertyChange",
         "value": "Ticket Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "ticket.associationChange",
         "value": "Ticket Association Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "ticket.restore",
         "value": "Ticket Restore"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "ticket.merge",
         "value": "Ticket Merge"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "product.creation",
         "value": "Product Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "product.deletion",
         "value": "Product Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "product.restore",
         "value": "Product Restore"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "product.merge",
         "value": "Product Merge"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "product.propertyChange",
         "value": "Product Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "line_item.creation",
         "value": "Line Item Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "line_item.deletion",
         "value": "Line Item Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "line_item.associationChange",
         "value": "Line Item Association Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "line_item.restore",
         "value": "Line Item Restore"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "line_item.merge",
         "value": "Line Item Merge"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "line_item.propertyChange",
         "value": "Line Item Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "conversation.creation",
         "value": "Conversation Creation"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "conversation.deletion",
         "value": "Conversation Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "conversation.privacyDeletion",
         "value": "Conversation Privacy Deletion"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "conversation.propertyChange",
         "value": "Conversation Property Change"
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "conversation.newMessage",
         "value": "Conversation New Message"
       } ],
@@ -1331,7 +1283,7 @@
     }, {
       "advancedOption": null,
       "description": "The name of property to listen for change events.",
-      "displayCondition": "eventType.includes('.propertyChange')",
+      "displayCondition": "eventType.contains('.propertyChange')",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1354,6 +1306,10 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
     "deduplicate": null,
     "poll": null,
     "output": {
@@ -1670,11 +1626,7 @@
     },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { }
+    "webhookValidate": null
   } ],
   "allowedConnections": null
 }

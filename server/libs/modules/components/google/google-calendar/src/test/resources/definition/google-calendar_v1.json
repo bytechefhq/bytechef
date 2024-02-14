@@ -53,12 +53,10 @@
       "minValue": null,
       "options": [ {
         "description": "Version 0 assumes no conference data support and ignores conference data in the event's body. ",
-        "displayCondition": null,
         "label": "0",
         "value": 0
       }, {
         "description": "Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. ",
-        "displayCondition": null,
         "label": "1",
         "value": 1
       } ],
@@ -102,17 +100,14 @@
       "minLength": null,
       "options": [ {
         "description": "Notifications are sent to all guests.",
-        "displayCondition": null,
         "label": "All",
         "value": "all"
       }, {
         "description": "Notifications are sent to non-Google Calendar guests only.",
-        "displayCondition": null,
         "label": "External only",
         "value": "externalOnly"
       }, {
         "description": "No notifications are sent.",
-        "displayCondition": null,
         "label": "None",
         "value": "none"
       } ],
@@ -133,12 +128,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -305,12 +298,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -551,12 +542,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -577,12 +566,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -606,22 +593,18 @@
           "minLength": null,
           "options": [ {
             "description": "The attendee has not responded to the invitation (recommended for new events).",
-            "displayCondition": null,
             "label": "Needs action",
             "value": "needsAction"
           }, {
             "description": "The attendee has declined the invitation.",
-            "displayCondition": null,
             "label": "Declined",
             "value": "declined"
           }, {
             "description": "The attendee has tentatively accepted the invitation.",
-            "displayCondition": null,
             "label": "Tentative",
             "value": "tentative"
           }, {
             "description": "The attendee has accepted the invitation.",
-            "displayCondition": null,
             "label": "Accepted",
             "value": "accepted"
           } ],
@@ -1318,22 +1301,18 @@
       "minLength": null,
       "options": [ {
         "description": "A regular event or not further specified.",
-        "displayCondition": null,
         "label": "Default",
         "value": "default"
       }, {
         "description": "An out-of-office event.",
-        "displayCondition": null,
         "label": "Out of office",
         "value": "outOfOffice"
       }, {
         "description": "A focus-time event.",
-        "displayCondition": null,
         "label": "Focus time",
         "value": "focusTime"
       }, {
         "description": "A working location event.",
-        "displayCondition": null,
         "label": "Working location",
         "value": "workingLocation"
       } ],
@@ -1487,12 +1466,10 @@
         "minLength": null,
         "options": [ {
           "description": "The gadget displays next to the event's title in the calendar view.",
-          "displayCondition": null,
           "label": "Icon",
           "value": "icon"
         }, {
           "description": "The gadget displays when the event is clicked.",
-          "displayCondition": null,
           "label": "Chip",
           "value": "chip"
         } ],
@@ -1669,12 +1646,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1695,12 +1670,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1721,12 +1694,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1949,12 +1920,10 @@
             "minLength": null,
             "options": [ {
               "description": "Reminders are sent via email.",
-              "displayCondition": null,
               "label": "Email",
               "value": "email"
             }, {
               "description": "Reminders are sent via a UI popup.",
-              "displayCondition": null,
               "label": "Popup",
               "value": "popup"
             } ],
@@ -2004,12 +1973,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -2113,17 +2080,14 @@
       "minLength": null,
       "options": [ {
         "description": "The event is confirmed.",
-        "displayCondition": null,
         "label": "Confirmed",
         "value": "confirmed"
       }, {
         "description": "The event is tentatively confirmed",
-        "displayCondition": null,
         "label": "Tentative",
         "value": "tentative"
       }, {
         "description": "The event is cancelled (deleted).",
-        "displayCondition": null,
         "label": "Cancelled",
         "value": "cancelled"
       } ],
@@ -2166,12 +2130,10 @@
       "minLength": null,
       "options": [ {
         "description": "The event does block time on the calendar. This is equivalent to setting Show me as to Busy in the Calendar UI.",
-        "displayCondition": null,
         "label": "opaque",
         "value": "opaque"
       }, {
         "description": "The event does not block time on the calendar. This is equivalent to setting Show me as to Available in the Calendar UI.",
-        "displayCondition": null,
         "label": "transparent",
         "value": "transparent"
       } ],
@@ -2195,28 +2157,25 @@
       "minLength": null,
       "options": [ {
         "description": "Uses the default visibility for events on the calendar.",
-        "displayCondition": null,
         "label": "default",
         "value": "default"
       }, {
         "description": "The event is public and event details are visible to all readers of the calendar.",
-        "displayCondition": null,
         "label": "public",
         "value": "public"
       }, {
         "description": "The event is private and only event attendees may view event details.",
-        "displayCondition": null,
         "label": "private",
         "value": "private"
       }, {
         "description": "The event is private. This value is provided for compatibility reasons.",
-        "displayCondition": null,
         "label": "confidential",
         "value": "confidential"
       } ],
       "optionsDataSource": null
     } ],
     "title": "Create event",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2251,12 +2210,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -2539,12 +2496,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -2565,12 +2520,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -2591,12 +2544,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -2636,12 +2587,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -2672,12 +2621,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -3430,12 +3377,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -3551,12 +3496,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -3982,12 +3925,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -4008,12 +3949,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -4034,12 +3973,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -4174,12 +4111,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -4274,12 +4209,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -4434,12 +4367,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -4615,12 +4546,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -5089,8 +5018,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleCalendar",
@@ -5165,23 +5093,21 @@
       "minLength": null,
       "options": [ {
         "description": "Notifications are sent to all guests.",
-        "displayCondition": null,
         "label": "All",
         "value": "all"
       }, {
         "description": "Notifications are sent to non-Google Calendar guests only.",
-        "displayCondition": null,
         "label": "External only",
         "value": "externalOnly"
       }, {
         "description": "No notifications are sent.",
-        "displayCondition": null,
         "label": "None",
         "value": "none"
       } ],
       "optionsDataSource": null
     } ],
     "title": "Create Quick Event",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -5216,12 +5142,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -5504,12 +5428,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -5530,12 +5452,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -5556,12 +5476,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -5601,12 +5519,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -5637,12 +5553,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -6395,12 +6309,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -6516,12 +6428,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -6947,12 +6857,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -6973,12 +6881,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -6999,12 +6905,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -7139,12 +7043,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -7239,12 +7141,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -7399,12 +7299,10 @@
           "placeholder": null,
           "options": [ {
             "description": null,
-            "displayCondition": null,
             "label": "True",
             "value": true
           }, {
             "description": null,
-            "displayCondition": null,
             "label": "False",
             "value": true
           } ],
@@ -7580,12 +7478,10 @@
             "placeholder": null,
             "options": [ {
               "description": null,
-              "displayCondition": null,
               "label": "True",
               "value": true
             }, {
               "description": null,
-              "displayCondition": null,
               "label": "False",
               "value": true
             } ],
@@ -8054,8 +7950,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "componentName": "googleCalendar",
@@ -8125,17 +8020,14 @@
         "minLength": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Default",
           "value": "default"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Out of office",
           "value": "outOfOffice"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Focus time",
           "value": "focusTime"
         } ],
@@ -8360,12 +8252,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -8386,12 +8276,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -8412,12 +8300,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -8513,6 +8399,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get events",
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -8826,12 +8713,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -9114,12 +8999,10 @@
                   "placeholder": null,
                   "options": [ {
                     "description": null,
-                    "displayCondition": null,
                     "label": "True",
                     "value": true
                   }, {
                     "description": null,
-                    "displayCondition": null,
                     "label": "False",
                     "value": true
                   } ],
@@ -9140,12 +9023,10 @@
                   "placeholder": null,
                   "options": [ {
                     "description": null,
-                    "displayCondition": null,
                     "label": "True",
                     "value": true
                   }, {
                     "description": null,
-                    "displayCondition": null,
                     "label": "False",
                     "value": true
                   } ],
@@ -9166,12 +9047,10 @@
                   "placeholder": null,
                   "options": [ {
                     "description": null,
-                    "displayCondition": null,
                     "label": "True",
                     "value": true
                   }, {
                     "description": null,
-                    "displayCondition": null,
                     "label": "False",
                     "value": true
                   } ],
@@ -9211,12 +9090,10 @@
                   "placeholder": null,
                   "options": [ {
                     "description": null,
-                    "displayCondition": null,
                     "label": "True",
                     "value": true
                   }, {
                     "description": null,
-                    "displayCondition": null,
                     "label": "False",
                     "value": true
                   } ],
@@ -9247,12 +9124,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -10005,12 +9880,10 @@
                 "placeholder": null,
                 "options": [ {
                   "description": null,
-                  "displayCondition": null,
                   "label": "True",
                   "value": true
                 }, {
                   "description": null,
-                  "displayCondition": null,
                   "label": "False",
                   "value": true
                 } ],
@@ -10126,12 +9999,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -10557,12 +10428,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -10583,12 +10452,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -10609,12 +10476,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -10749,12 +10614,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -10849,12 +10712,10 @@
                 "placeholder": null,
                 "options": [ {
                   "description": null,
-                  "displayCondition": null,
                   "label": "True",
                   "value": true
                 }, {
                   "description": null,
-                  "displayCondition": null,
                   "label": "False",
                   "value": true
                 } ],
@@ -11009,12 +10870,10 @@
               "placeholder": null,
               "options": [ {
                 "description": null,
-                "displayCondition": null,
                 "label": "True",
                 "value": true
               }, {
                 "description": null,
-                "displayCondition": null,
                 "label": "False",
                 "value": true
               } ],
@@ -11190,12 +11049,10 @@
                 "placeholder": null,
                 "options": [ {
                   "description": null,
-                  "displayCondition": null,
                   "label": "True",
                   "value": true
                 }, {
                   "description": null,
-                  "displayCondition": null,
                   "label": "False",
                   "value": true
                 } ],
@@ -11674,8 +11531,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": {
@@ -11727,15 +11583,15 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "googleCalendar",
     "componentDescription": "Google Calendar is a web-based application that allows users to schedule and organize events, appointments, and reminders, synchronizing across multiple devices.",

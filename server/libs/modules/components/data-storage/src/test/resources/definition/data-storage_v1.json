@@ -31,27 +31,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.",
@@ -89,61 +85,51 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Array",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Boolean",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date Time",
         "value": 4
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Integer",
         "value": 5
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Nullable",
         "value": 6
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Number",
         "value": 7
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Object",
         "value": 8
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "String",
         "value": 9
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 1",
+      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -159,12 +145,12 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 2",
+      "displayCondition": "type == 2",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -177,12 +163,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -190,7 +174,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 3",
+      "displayCondition": "type == 3",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -202,12 +186,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 4",
+      "displayCondition": "type == 4",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -219,12 +203,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 5",
+      "displayCondition": "type == 5",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -238,12 +222,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 6",
+      "displayCondition": "type == 6",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -258,7 +242,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 7",
+      "displayCondition": "type == 7",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -275,12 +259,12 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 8",
+      "displayCondition": "type == 8",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -295,12 +279,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 9",
+      "displayCondition": "type == 9",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -319,7 +303,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
-      "displayCondition": "type === 10",
+      "displayCondition": "type == 10",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -331,8 +315,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
       "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
@@ -349,12 +333,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -375,20 +357,18 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Append Value to List",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -440,27 +420,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value that can be added to the existing numeric value, which may have a negative value.",
@@ -478,12 +454,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Atomic Increment",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -535,27 +511,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
@@ -573,12 +545,12 @@
       "maxValue": 300,
       "minValue": 1,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Await Get Value",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -630,31 +602,27 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     } ],
     "title": "Delete Value",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -706,27 +674,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.",
@@ -744,12 +708,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Delete Value from List",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -782,31 +746,27 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     } ],
     "title": "Get All Entries(Keys and Values)",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -858,27 +818,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -897,61 +853,51 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Array",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Boolean",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date Time",
         "value": 4
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Integer",
         "value": 5
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Nullable",
         "value": 6
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Number",
         "value": 7
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Object",
         "value": 8
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "String",
         "value": 9
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 1",
+      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -967,12 +913,12 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 2",
+      "displayCondition": "type == 2",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -985,12 +931,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -998,7 +942,7 @@
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 3",
+      "displayCondition": "type == 3",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1010,12 +954,12 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 4",
+      "displayCondition": "type == 4",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1027,12 +971,12 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 5",
+      "displayCondition": "type == 5",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1046,12 +990,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 6",
+      "displayCondition": "type == 6",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1066,7 +1010,7 @@
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 7",
+      "displayCondition": "type == 7",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1083,12 +1027,12 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 8",
+      "displayCondition": "type == 8",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1103,12 +1047,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 9",
+      "displayCondition": "type == 9",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1127,7 +1071,7 @@
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
-      "displayCondition": "type === 10",
+      "displayCondition": "type == 10",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1139,12 +1083,12 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Get Value",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1196,27 +1140,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1235,61 +1175,51 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Array",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Boolean",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date Time",
         "value": 4
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Integer",
         "value": 5
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Nullable",
         "value": 6
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Number",
         "value": 7
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Object",
         "value": 8
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "String",
         "value": 9
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 1",
+      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1305,12 +1235,12 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 2",
+      "displayCondition": "type == 2",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1323,12 +1253,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1336,7 +1264,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 3",
+      "displayCondition": "type == 3",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1348,12 +1276,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 4",
+      "displayCondition": "type == 4",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1365,12 +1293,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 5",
+      "displayCondition": "type == 5",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1384,12 +1312,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 6",
+      "displayCondition": "type == 6",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1404,7 +1332,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 7",
+      "displayCondition": "type == 7",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1421,12 +1349,12 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 8",
+      "displayCondition": "type == 8",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1441,12 +1369,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 9",
+      "displayCondition": "type == 9",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1465,7 +1393,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 10",
+      "displayCondition": "type == 10",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1477,12 +1405,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set Value",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1534,27 +1462,23 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Current Execution",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow Instance",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Workflow",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The index in a list to set a value under. The previous value will be overridden.",
@@ -1572,8 +1496,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1592,61 +1516,51 @@
       "minValue": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "Array",
         "value": 1
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Boolean",
         "value": 2
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date",
         "value": 3
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Date Time",
         "value": 4
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Integer",
         "value": 5
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Nullable",
         "value": 6
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Number",
         "value": 7
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Object",
         "value": 8
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "String",
         "value": 9
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 1",
+      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1662,12 +1576,12 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 2",
+      "displayCondition": "type == 2",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1680,12 +1594,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
@@ -1693,7 +1605,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 3",
+      "displayCondition": "type == 3",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1705,12 +1617,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 4",
+      "displayCondition": "type == 4",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1722,12 +1634,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 5",
+      "displayCondition": "type == 5",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1741,12 +1653,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
-      "displayCondition": "type === 6",
+      "displayCondition": "type == 6",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1761,7 +1673,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 7",
+      "displayCondition": "type == 7",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1778,12 +1690,12 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 8",
+      "displayCondition": "type == 8",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1798,12 +1710,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 9",
+      "displayCondition": "type == 9",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1822,7 +1734,7 @@
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
-      "displayCondition": "type === 10",
+      "displayCondition": "type == 10",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -1834,12 +1746,12 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set Value in List",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

@@ -95,7 +95,7 @@ public class OpenAICreateImageAction {
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))
-                .displayCondition("%s === '%s'".formatted(MODEL, DALL_E_3))
+                .displayCondition("%s == '%s'".formatted(MODEL, DALL_E_3))
                 .required(false),
             string(USER)
                 .label("User")

@@ -397,6 +397,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -405,8 +406,7 @@
       "scopes": null,
       "tokenUrl": null,
       "authorizationUrl": null,
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     } ],
     "componentName": "email",
     "componentDescription": "The Email connector sends emails using an SMTP email server.",
@@ -465,12 +465,10 @@
       "placeholder": null,
       "options": [ {
         "description": null,
-        "displayCondition": null,
         "label": "True",
         "value": true
       }, {
         "description": null,
-        "displayCondition": null,
         "label": "False",
         "value": true
       } ],
