@@ -44,7 +44,7 @@ const PropertyField = ({
 
     return (
         <div>
-            <div className="group relative inline-flex items-center rounded-md p-1 pr-5 text-sm hover:bg-gray-100">
+            <div className="group inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
                 <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
 
                 <span className="px-2">{label}</span>
@@ -55,13 +55,11 @@ const PropertyField = ({
                     </span>
                 )}
 
-                <div className="absolute right-0.5">
-                    <ClipboardIcon
-                        aria-hidden="true"
-                        className="invisible size-4 cursor-pointer bg-background text-gray-400 group-hover:visible"
-                        onClick={() => copyToClipboard(`$\{${workflowNodeName}.${selector}}`)}
-                    />
-                </div>
+                <ClipboardIcon
+                    aria-hidden="true"
+                    className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
+                    onClick={() => copyToClipboard(`$\{${workflowNodeName}.${selector}}`)}
+                />
             </div>
         </div>
     );
@@ -233,24 +231,22 @@ const OutputTab = ({
                     </div>
 
                     <div className="mt-2 flex items-center">
-                        <div className="group relative flex items-center rounded-md p-1 pr-5 hover:bg-gray-100">
+                        <div className="group flex items-center rounded-md p-1 hover:bg-gray-100">
                             <span title={outputSchema.type}>
                                 {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
                             </span>
 
-                            <span className="ml-2 pr-2 text-sm text-gray-800">{currentNode.name}</span>
+                            <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
 
                             {sampleOutput && typeof sampleOutput !== 'object' && (
                                 <div className="flex-1 text-xs text-muted-foreground">{String(sampleOutput)}</div>
                             )}
 
-                            <div className="absolute right-0.5">
-                                <ClipboardIcon
-                                    aria-hidden="true"
-                                    className="invisible size-4 cursor-pointer bg-background text-gray-400 group-hover:visible"
-                                    onClick={() => copyToClipboard(`$\{${currentNode.name}}`)}
-                                />
-                            </div>
+                            <ClipboardIcon
+                                aria-hidden="true"
+                                className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
+                                onClick={() => copyToClipboard(`$\{${currentNode.name}}`)}
+                            />
                         </div>
                     </div>
 
