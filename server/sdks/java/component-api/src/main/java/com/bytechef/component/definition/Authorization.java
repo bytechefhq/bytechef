@@ -189,7 +189,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(Parameters connectionParameters, Context context) throws Exception;
+        Map<String, ?> apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
