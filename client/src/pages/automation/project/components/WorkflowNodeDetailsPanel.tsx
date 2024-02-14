@@ -191,13 +191,14 @@ const WorkflowNodeDetailsPanel = ({
         };
     });
 
+    const hasOutputData = currentActionDefinition?.outputDefined || currentActionDefinition?.outputFunctionDefined;
+
     const {data: workflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
             id: workflowId,
             workflowNodeName: currentNode.name,
         },
-        (!!currentActionDefinition?.outputDefined || !!currentActionDefinition?.outputFunctionDefined) &&
-            activeTab === 'output'
+        hasOutputData && activeTab === 'output'
     );
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
@@ -258,7 +259,7 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (name === 'output') {
-            return currentActionDefinition?.outputDefined || !!currentActionDefinition?.outputFunctionDefined;
+            return hasOutputData;
         }
 
         if (name === 'properties') {
@@ -347,7 +348,7 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
-        if (activeTab === 'output' && !workflowNodeOutput) {
+        if (activeTab === 'output' && !hasOutputData) {
             setActiveTab('description');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
