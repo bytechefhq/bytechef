@@ -11,7 +11,6 @@ import {
     useSaveWorkflowNodeTestOutputMutation,
     useUploadSampleOutputRequestMutation,
 } from '@/mutations/platform/workflowNodeTestOutputs.mutations';
-import getNestedObject from '@/pages/automation/project/utils/getNestedObject';
 import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
 import {PropertyType} from '@/types/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -20,108 +19,8 @@ import {useState} from 'react';
 import {NodeProps} from 'reactflow';
 import {TYPE_ICONS} from 'shared/typeIcons';
 
+import SchemaProperties from '../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
-
-const PropertyField = ({
-    label = '[index]',
-    parentPath,
-    property,
-    sampleOutput,
-    workflowNodeName,
-}: {
-    label: string;
-    property: PropertyType;
-    parentPath?: string;
-    sampleOutput: object;
-    workflowNodeName: string;
-}) => {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [_, copyToClipboard] = useCopyToClipboard();
-
-    const selector = `${parentPath ? parentPath + '.' : ''}${property.name}`.replace('/', '.');
-
-    const value = property.name && getNestedObject(sampleOutput, selector);
-
-    return (
-        <div>
-            <div className="group inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
-                <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
-
-                <span className="px-2">{label}</span>
-
-                {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                    <span className="flex-1 text-xs text-muted-foreground">
-                        {value === true ? 'true' : value === false ? false : value}
-                    </span>
-                )}
-
-                <ClipboardIcon
-                    aria-hidden="true"
-                    className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
-                    onClick={() => copyToClipboard(`$\{${workflowNodeName}.${selector}}`)}
-                />
-            </div>
-        </div>
-    );
-};
-
-const SchemaProperties = ({
-    parentPath,
-    properties,
-    sampleOutput,
-    workflowNodeName,
-}: {
-    parentPath?: string;
-    properties: Array<PropertyType>;
-    sampleOutput: object;
-    workflowNodeName: string;
-}) => (
-    <ul className="ml-2 h-full">
-        {properties.map((property, index) => {
-            const path = `${parentPath ? parentPath + (property.name ? '.' : '') : ''}${property.name || '[index]'}`;
-
-            return (
-                <li className="flex flex-col" key={`${property.name}_${index}`}>
-                    <PropertyField
-                        label={property.name!}
-                        parentPath={parentPath}
-                        property={property}
-                        sampleOutput={sampleOutput}
-                        workflowNodeName={workflowNodeName}
-                    />
-
-                    {property.properties && !!property.properties.length && (
-                        <div
-                            className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
-                            key={property.name}
-                        >
-                            <SchemaProperties
-                                parentPath={path}
-                                properties={property.properties}
-                                sampleOutput={sampleOutput}
-                                workflowNodeName={workflowNodeName}
-                            />
-                        </div>
-                    )}
-
-                    {property.items && !!property.items.length && (
-                        <div
-                            className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
-                            key={property.name}
-                        >
-                            <SchemaProperties
-                                parentPath={path}
-                                properties={property.items}
-                                sampleOutput={sampleOutput}
-                                workflowNodeName={workflowNodeName}
-                            />
-                        </div>
-                    )}
-                </li>
-            );
-        })}
-    </ul>
-);
 
 const OutputTab = ({
     currentNode,
