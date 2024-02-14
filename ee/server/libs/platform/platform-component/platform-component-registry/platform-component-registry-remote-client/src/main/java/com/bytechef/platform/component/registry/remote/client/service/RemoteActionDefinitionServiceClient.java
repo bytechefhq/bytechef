@@ -53,8 +53,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

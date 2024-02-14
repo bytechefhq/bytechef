@@ -114,8 +114,8 @@ public class Evaluator {
 
     private static Object evaluate(Object value, Map<String, ?> context) {
         if (value instanceof String) {
-            Expression expression =
-                EXPRESSION_PARSER.parseExpression((String) value, new TemplateParserContext(PREFIX, SUFFIX));
+            Expression expression = EXPRESSION_PARSER.parseExpression(
+                (String) value, new TemplateParserContext(PREFIX, SUFFIX));
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
                 return evaluate((CompositeStringExpression) expression, context);
