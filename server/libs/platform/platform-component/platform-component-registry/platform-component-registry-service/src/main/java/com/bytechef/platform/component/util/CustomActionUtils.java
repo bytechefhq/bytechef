@@ -125,7 +125,7 @@ public class CustomActionUtils {
                 object(BODY_CONTENT)
                     .label("Body Content - JSON")
                     .description("Body Parameters to send.")
-                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.JSON.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.JSON.name()))
                     .additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
                         time())
@@ -133,7 +133,7 @@ public class CustomActionUtils {
                 object(BODY_CONTENT)
                     .label("Body Content - XML")
                     .description("XML content to send.")
-                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.XML.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.XML.name()))
                     .additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
                         time())
@@ -141,25 +141,25 @@ public class CustomActionUtils {
                 object(BODY_CONTENT)
                     .label("Body Content - Form Data")
                     .description("Body parameters to send.")
-                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.FORM_DATA.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.FORM_DATA.name()))
                     .placeholder("Add Parameter")
                     .additionalProperties(string(), fileEntry()),
                 object(BODY_CONTENT)
                     .label("Body Content - Form URL-Encoded")
                     .description("Body parameters to send.")
                     .displayCondition(
-                        "%s === '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.FORM_URL_ENCODED.name()))
+                        "%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.FORM_URL_ENCODED.name()))
                     .placeholder("Add Parameter")
                     .additionalProperties(string()),
                 string(BODY_CONTENT)
                     .label("Body Content - Raw")
                     .description("The raw text to send.")
-                    .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.RAW.name())),
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.RAW.name())),
 
                 string(BODY_CONTENT_MIME_TYPE)
                     .label("Content Type")
                     .description("Mime-Type to use when sending raw body content.")
-                    .displayCondition("'%s' === '%s'".formatted(Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
+                    .displayCondition("'%s' == '%s'".formatted(Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
                     .placeholder("text/plain"))
             .output()

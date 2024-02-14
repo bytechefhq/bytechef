@@ -19,9 +19,11 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDescriptionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowNodeDisplayConditionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOptionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.configuration.web.rest.model.EvaluateWorkflowNodeDisplayConditionRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeDescription200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
@@ -41,21 +43,34 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowNodeApiController implements WorkflowNodeApi {
 
     private final ConversionService conversionService;
+    private final WorkflowNodeDisplayConditionFacade workflowNodeDisplayConditionFacade;
     private final WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade;
     private final WorkflowNodeDynamicPropertiesFacade workflowNodeDynamicPropertiesFacade;
     private final WorkflowNodeOptionFacade workflowNodeOptionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
     public WorkflowNodeApiController(
-        ConversionService conversionService, WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade,
+        ConversionService conversionService, WorkflowNodeDisplayConditionFacade workflowNodeDisplayConditionFacade,
+        WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade,
         WorkflowNodeDynamicPropertiesFacade workflowNodeDynamicPropertiesFacade,
         WorkflowNodeOptionFacade workflowNodeOptionFacade, WorkflowNodeOutputFacade workflowNodeOutputFacade) {
 
         this.conversionService = conversionService;
+        this.workflowNodeDisplayConditionFacade = workflowNodeDisplayConditionFacade;
         this.workflowNodeDescriptionFacade = workflowNodeDescriptionFacade;
         this.workflowNodeDynamicPropertiesFacade = workflowNodeDynamicPropertiesFacade;
         this.workflowNodeOptionFacade = workflowNodeOptionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
+    }
+
+    @Override
+    public ResponseEntity<Boolean> evaluateWorkflowNodeDisplayCondition(
+        String id, String workflowNodeName,
+        EvaluateWorkflowNodeDisplayConditionRequestModel evaluateWorkflowNodeDisplayConditionRequestModel) {
+
+        return ResponseEntity.ok(
+            workflowNodeDisplayConditionFacade.evaluateWorkflowNodeDisplayCondition(id, workflowNodeName,
+                evaluateWorkflowNodeDisplayConditionRequestModel.getDisplayCondition()));
     }
 
     @Override

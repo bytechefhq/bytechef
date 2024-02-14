@@ -32,7 +32,9 @@ import com.bytechef.component.definition.Authorization.AuthorizationCallbackResp
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.component.definition.Authorization.ClientIdFunction;
+import com.bytechef.component.definition.Authorization.ClientSecretFunction;
 import com.bytechef.component.definition.Authorization.PkceFunction;
+import com.bytechef.component.definition.Authorization.RefreshUrlFunction;
 import com.bytechef.component.definition.Authorization.ScopesFunction;
 import com.bytechef.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -58,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -72,167 +75,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     @SuppressFBWarnings("EI2")
     public ConnectionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
-    }
-
-    private static ApplyFunction getDefaultApply(AuthorizationType type) {
-        return switch (type) {
-            case API_KEY -> (Parameters connectionParameters, Context context) -> {
-                String addTo = MapUtils.getString(
-                    connectionParameters, Authorization.ADD_TO, ApiTokenLocation.HEADER.name());
-
-                if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
-                    return ApplyResponse.ofHeaders(
-                        Map.of(
-                            MapUtils.getString(
-                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
-                            List.of(
-                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
-                } else {
-                    return ApplyResponse.ofQueryParameters(
-                        Map.of(
-                            MapUtils.getString(
-                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
-                            List.of(
-                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
-                }
-            };
-            case BASIC_AUTH, DIGEST_AUTH -> (Parameters connectionParameters, Context context) -> {
-                String valueToEncode =
-                    MapUtils.getString(connectionParameters, Authorization.USERNAME) +
-                        ":" +
-                        MapUtils.getString(connectionParameters, Authorization.PASSWORD);
-
-                return ApplyResponse.ofHeaders(
-                    Map.of(
-                        "Authorization",
-                        List.of(
-                            "Basic " +
-                                EncodingUtils.encodeBase64ToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
-            };
-            case BEARER_TOKEN -> (Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
-                Map.of(
-                    Authorization.AUTHORIZATION,
-                    List.of(
-                        Authorization.BEARER + " " +
-                            MapUtils.getString(connectionParameters, Authorization.TOKEN))));
-            case CUSTOM -> (Parameters connectionParameters, Context context) -> null;
-            case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
-                OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
-                    Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
-                        Map.of(
-                            Authorization.AUTHORIZATION,
-                            List.of(
-                                MapUtils.getString(
-                                    connectionParameters, Authorization.HEADER_PREFIX,
-                                    Authorization.BEARER) +
-                                    " " +
-                                    MapUtils.getString(
-                                        connectionParameters, Authorization.ACCESS_TOKEN))));
-        };
-    }
-
-    private static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
-        ClientIdFunction clientIdFunction, Authorization.ClientSecretFunction clientSecretFunction,
-        TokenUrlFunction tokenUrlFunction) {
-
-        return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
-            FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
-
-            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
-            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
-            builder.query("code", code);
-            builder.query("grant_type", "authorization_code");
-            builder.query("redirect_uri", redirectUri);
-
-            if (codeVerifier != null) {
-                builder.query("code_verifier", codeVerifier);
-            }
-
-            try (HttpClient httpClient = Methanol.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .build()) {
-
-                HttpResponse<String> httpResponse = httpClient.send(
-                    HttpRequest.newBuilder()
-                        .POST(builder.build())
-                        .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
-                        .build(),
-                    HttpResponse.BodyHandlers.ofString());
-
-                if (httpResponse.statusCode() != 200) {
-                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
-                }
-
-                if (httpResponse.body() == null) {
-                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
-                }
-
-                Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
-
-                return new AuthorizationCallbackResponse(
-                    (String) body.get(Authorization.ACCESS_TOKEN),
-                    (String) body.get(Authorization.REFRESH_TOKEN));
-            }
-        };
-    }
-
-    private static String getDefaultAuthorizationUrl(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.AUTHORIZATION_URL);
-    }
-
-    private static String getDefaultBaseUri(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters,
-            com.bytechef.component.definition.ConnectionDefinition.BASE_URI);
-    }
-
-    private static String getDefaultClientId(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.CLIENT_ID);
-    }
-
-    private static String getDefaultClientSecret(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
-    }
-
-    private static PkceFunction getDefaultPkce() {
-        return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
-            challengeMethod);
-    }
-
-    private static String getDefaultRefreshUrl(
-        Parameters connectionParameters, TokenUrlFunction tokenUrlFunction, Context context) {
-
-        String refreshUrl = MapUtils.getString(connectionParameters, Authorization.REFRESH_URL);
-
-        if (refreshUrl == null) {
-            try {
-                refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
-            } catch (Exception e) {
-                throw new ComponentExecutionException(e, ConnectionDefinition.class, 101);
-            }
-        }
-
-        return refreshUrl;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<String> getDefaultScopes(Parameters connectionParameters) {
-        Object scopes = MapUtils.get(connectionParameters, Authorization.SCOPES);
-
-        if (scopes == null) {
-            return Collections.emptyList();
-        } else if (scopes instanceof List<?>) {
-            return (List<String>) scopes;
-        } else {
-            return Arrays.stream(((String) scopes).split(","))
-                .filter(Objects::nonNull)
-                .filter(scope -> !scope.isBlank())
-                .map(String::trim)
-                .toList();
-        }
-    }
-
-    private static String getDefaultTokenUrl(Parameters connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.TOKEN_URL);
     }
 
     @Override
@@ -397,5 +239,185 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .stream()
             .map(ConnectionDefinition::new)
             .toList();
+    }
+
+    private static ApplyFunction getDefaultApply(AuthorizationType type) {
+        return switch (type) {
+            case API_KEY -> (Parameters connectionParameters, Context context) -> {
+                String addTo = MapUtils.getString(
+                    connectionParameters, Authorization.ADD_TO, ApiTokenLocation.HEADER.name());
+
+                if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
+                    return ApplyResponse.ofHeaders(
+                        Map.of(
+                            MapUtils.getString(
+                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
+                            List.of(
+                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
+                } else {
+                    return ApplyResponse.ofQueryParameters(
+                        Map.of(
+                            MapUtils.getString(
+                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
+                            List.of(
+                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
+                }
+            };
+            case BASIC_AUTH, DIGEST_AUTH -> (Parameters connectionParameters, Context context) -> {
+                String valueToEncode =
+                    MapUtils.getString(connectionParameters, Authorization.USERNAME) +
+                        ":" +
+                        MapUtils.getString(connectionParameters, Authorization.PASSWORD);
+
+                return ApplyResponse.ofHeaders(
+                    Map.of(
+                        "Authorization",
+                        List.of(
+                            "Basic " +
+                                EncodingUtils.encodeBase64ToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
+            };
+            case BEARER_TOKEN -> (Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
+                Map.of(
+                    Authorization.AUTHORIZATION,
+                    List.of(
+                        Authorization.BEARER + " " +
+                            MapUtils.getString(connectionParameters, Authorization.TOKEN))));
+            case CUSTOM -> (Parameters connectionParameters, Context context) -> null;
+            case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
+                OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
+                    Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(
+                        Map.of(
+                            Authorization.AUTHORIZATION,
+                            List.of(
+                                MapUtils.getString(
+                                    connectionParameters, Authorization.HEADER_PREFIX,
+                                    Authorization.BEARER) +
+                                    " " +
+                                    MapUtils.getString(
+                                        connectionParameters, Authorization.ACCESS_TOKEN))));
+        };
+    }
+
+    private static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
+        ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
+        TokenUrlFunction tokenUrlFunction) {
+
+        return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
+            FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
+
+            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
+            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+            builder.query("code", code);
+            builder.query("grant_type", "authorization_code");
+            builder.query("redirect_uri", redirectUri);
+
+            if (codeVerifier != null) {
+                builder.query("code_verifier", codeVerifier);
+            }
+
+            try (HttpClient httpClient = Methanol.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build()) {
+
+                HttpResponse<String> httpResponse = httpClient.send(
+                    HttpRequest.newBuilder()
+                        .POST(builder.build())
+                        .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
+                        .build(),
+                    HttpResponse.BodyHandlers.ofString());
+
+                if (httpResponse.statusCode() != 200) {
+                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
+                }
+
+                if (httpResponse.body() == null) {
+                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
+                }
+
+                Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
+
+                return new AuthorizationCallbackResponse(
+                    (String) body.get(Authorization.ACCESS_TOKEN),
+                    (String) body.get(Authorization.REFRESH_TOKEN),
+                    body
+                        .entrySet()
+                        .stream()
+                        .filter(entry -> !Objects.equals(Authorization.ACCESS_TOKEN, entry.getKey()) &&
+                            !Objects.equals(Authorization.REFRESH_TOKEN, entry.getKey()))
+                        .collect(
+                            Collectors.toMap(
+                                entry -> (String) entry.getKey(),
+                                entry -> (Object) entry.getValue())));
+            }
+        };
+    }
+
+    private static String getDefaultAuthorizationUrl(Parameters connectionParameters) {
+        return MapUtils.getString(connectionParameters, Authorization.AUTHORIZATION_URL);
+    }
+
+    private static String getDefaultBaseUri(Parameters connectionParameters) {
+        return MapUtils.getString(connectionParameters,
+            com.bytechef.component.definition.ConnectionDefinition.BASE_URI);
+    }
+
+    private static String getDefaultClientId(Parameters connectionParameters) {
+        return MapUtils.getString(connectionParameters, Authorization.CLIENT_ID);
+    }
+
+    private static String getDefaultClientSecret(Parameters connectionParameters) {
+        return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
+    }
+
+    private static PkceFunction getDefaultPkce() {
+        return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
+            challengeMethod);
+    }
+
+    private static String getDefaultRefreshUrl(
+        Parameters connectionParameters, RefreshUrlFunction refreshUrlFunction, TokenUrlFunction tokenUrlFunction,
+        Context context) {
+
+        String refreshUrl = MapUtils.getString(connectionParameters, Authorization.REFRESH_URL);
+
+        if (refreshUrl == null) {
+            if (refreshUrlFunction == null) {
+
+                try {
+                    refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
+                } catch (Exception e) {
+                    throw new ComponentExecutionException(e, ConnectionDefinition.class, 101);
+                }
+            } else {
+                try {
+                    refreshUrl = refreshUrlFunction.apply(connectionParameters, context);
+                } catch (Exception e) {
+                    throw new ComponentExecutionException(e, ConnectionDefinition.class, 101);
+                }
+            }
+        }
+
+        return refreshUrl;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> getDefaultScopes(Parameters connectionParameters) {
+        Object scopes = MapUtils.get(connectionParameters, Authorization.SCOPES);
+
+        if (scopes == null) {
+            return Collections.emptyList();
+        } else if (scopes instanceof List<?>) {
+            return (List<String>) scopes;
+        } else {
+            return Arrays.stream(((String) scopes).split(","))
+                .filter(Objects::nonNull)
+                .filter(scope -> !scope.isBlank())
+                .map(String::trim)
+                .toList();
+        }
+    }
+
+    private static String getDefaultTokenUrl(Parameters connectionParameters) {
+        return MapUtils.getString(connectionParameters, Authorization.TOKEN_URL);
     }
 }
