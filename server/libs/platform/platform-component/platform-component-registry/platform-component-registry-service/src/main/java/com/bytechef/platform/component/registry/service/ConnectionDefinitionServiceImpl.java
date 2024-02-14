@@ -46,6 +46,7 @@ import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.exception.ComponentExecutionException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -334,20 +334,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
                 }
 
-                Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
-
-                return new AuthorizationCallbackResponse(
-                    (String) body.get(Authorization.ACCESS_TOKEN),
-                    (String) body.get(Authorization.REFRESH_TOKEN),
-                    body
-                        .entrySet()
-                        .stream()
-                        .filter(entry -> !Objects.equals(Authorization.ACCESS_TOKEN, entry.getKey()) &&
-                            !Objects.equals(Authorization.REFRESH_TOKEN, entry.getKey()))
-                        .collect(
-                            Collectors.toMap(
-                                entry -> (String) entry.getKey(),
-                                entry -> (Object) entry.getValue())));
+                return new AuthorizationCallbackResponse(JsonUtils.read(httpResponse.body(), new TypeReference<>() {}));
             }
         };
     }

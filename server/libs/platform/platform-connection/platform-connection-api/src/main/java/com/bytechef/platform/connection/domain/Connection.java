@@ -242,7 +242,7 @@ public final class Connection implements Persistable<Long> {
         return id == null;
     }
 
-    public void putAllParameters(Map<String, Object> parameters) {
+    public void putAllParameters(Map<String, ?> parameters) {
         this.parameters.putAll(parameters);
     }
 

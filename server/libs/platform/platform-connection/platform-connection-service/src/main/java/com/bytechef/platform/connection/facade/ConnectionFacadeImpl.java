@@ -112,7 +112,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                             connection.getAuthorizationName()),
                         oAuth2Service.getRedirectUri());
 
-                connection.putAllParameters(authorizationCallbackResponse.toMap());
+                connection.putAllParameters(authorizationCallbackResponse.result());
             }
         }
 

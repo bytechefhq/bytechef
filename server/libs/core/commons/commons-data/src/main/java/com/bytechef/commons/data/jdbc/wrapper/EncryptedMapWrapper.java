@@ -69,7 +69,7 @@ public class EncryptedMapWrapper {
         return Objects.hash(map);
     }
 
-    public void putAll(Map<String, Object> map) {
+    public void putAll(Map<String, ?> map) {
         this.map.putAll(map);
     }
 

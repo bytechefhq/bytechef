@@ -32,6 +32,7 @@ public interface Authorization {
     String API_TOKEN = "api_token";
     String AUTHORIZATION = "Authorization";
     String AUTHORIZATION_URL = "authorizationUrl";
+    String EXPIRES_IN = "expires_in";
     String BEARER = "Bearer";
     String CLIENT_ID = "clientId";
     String CLIENT_SECRET = "clientSecret";
@@ -381,24 +382,29 @@ public interface Authorization {
     }
 
     /**
-     *
-     * @param accessToken
-     * @param refreshToken
-     * @param additionalParameters
+     * @param result
      */
     @SuppressFBWarnings("EI")
-    record AuthorizationCallbackResponse(
-        String accessToken, String refreshToken, Map<String, Object> additionalParameters) {
+    record AuthorizationCallbackResponse(Map<String, ?> result) {
 
-        public AuthorizationCallbackResponse(String accessToken, String refreshToken) {
-            this(accessToken, refreshToken, Map.of());
+        public AuthorizationCallbackResponse(
+            String accessToken, String refreshToken, Long expiresIn, Map<String, Object> additionalParameters) {
+
+            this(toMap(accessToken, refreshToken, expiresIn, additionalParameters));
         }
 
-        public Map<String, Object> toMap() {
+        public AuthorizationCallbackResponse(String accessToken, String refreshToken, Long expiresIn) {
+            this(accessToken, refreshToken, expiresIn, Map.of());
+        }
+
+        private static Map<String, Object> toMap(
+            String accessToken, String refreshToken, Long expiresIn, Map<String, Object> additionalParameters) {
+
             Map<String, Object> map = new HashMap<>();
 
             map.put(ACCESS_TOKEN, accessToken);
             map.put(REFRESH_TOKEN, refreshToken);
+            map.put(EXPIRES_IN, expiresIn);
 
             map.putAll(additionalParameters);
 
