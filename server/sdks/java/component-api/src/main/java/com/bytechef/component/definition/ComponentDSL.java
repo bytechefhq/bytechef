@@ -2441,7 +2441,6 @@ public final class ComponentDSL {
     public static final class ModifiableOption<T> implements Option<T> {
 
         private String description;
-        private String displayCondition;
         private final String label;
         private final T value;
 
@@ -2462,12 +2461,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableOption<?> displayCondition(String displayCondition) {
-            this.displayCondition = displayCondition;
-
-            return this;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -2478,24 +2471,18 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(description, that.description)
-                && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
+            return Objects.equals(description, that.description) && Objects.equals(label, that.label)
                 && Objects.equals(value, that.value);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(description, displayCondition, label, value);
+            return Objects.hash(description, label, value);
         }
 
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
-        }
-
-        @Override
-        public String getDisplayCondition() {
-            return displayCondition;
         }
 
         @Override

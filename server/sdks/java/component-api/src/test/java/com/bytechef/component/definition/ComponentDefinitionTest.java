@@ -84,7 +84,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"displayCondition":null,"label":"True","value":true},{"description":null,"displayCondition":null,"label":"False","value":true}],"controlType":"SELECT"}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"label":"True","value":true},{"description":null,"label":"False","value":true}],"controlType":"SELECT"}
                 """,
             property);
     }
@@ -164,7 +164,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","maxNumberPrecision":null,"minNumberPrecision":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"displayCondition":null,"label":"option1","value":1.0},{"description":null,"displayCondition":null,"label":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","maxNumberPrecision":null,"minNumberPrecision":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"label":"option1","value":1.0},{"description":null,"label":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
                  """,
             property);
     }
@@ -207,7 +207,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"description":null,"displayCondition":null,"label":"label","value":1}
+                {"description":null,"label":"label","value":1}
                 """,
             option);
 
@@ -215,7 +215,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"description":null,"displayCondition":null,"label":"label","value":"value"}
+                {"description":null,"label":"label","value":"value"}
                 """,
             option);
 
@@ -223,7 +223,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"description":"description","displayCondition":null,"label":"label","value":1}
+                {"description":"description","label":"label","value":1}
                 """,
             option);
 
@@ -231,7 +231,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"description":"description","displayCondition":null,"label":"label","value":"value"}
+                {"description":"description","label":"label","value":"value"}
                 """,
             option);
     }

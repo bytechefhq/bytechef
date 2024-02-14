@@ -921,7 +921,6 @@ public final class TaskDispatcherDSL {
     public static final class ModifiableOption<T> implements Option<T> {
 
         private String description;
-        private String displayCondition;
         private final String label;
         private final T value;
 
@@ -942,20 +941,9 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public ModifiableOption<?> displayCondition(String displayCondition) {
-            this.displayCondition = displayCondition;
-
-            return this;
-        }
-
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
-        }
-
-        @Override
-        public String getDisplayCondition() {
-            return displayCondition;
         }
 
         @Override

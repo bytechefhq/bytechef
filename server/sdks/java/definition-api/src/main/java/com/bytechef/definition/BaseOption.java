@@ -33,12 +33,6 @@ public interface BaseOption<T> {
      *
      * @return
      */
-    String getDisplayCondition();
-
-    /**
-     *
-     * @return
-     */
     String getLabel();
 
     /**

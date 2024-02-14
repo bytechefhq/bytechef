@@ -28,7 +28,6 @@ import org.springframework.lang.Nullable;
 public abstract class BaseOption {
 
     protected String description;
-    protected String displayCondition;
     protected String label;
     protected Object value;
 
@@ -37,7 +36,6 @@ public abstract class BaseOption {
 
     protected BaseOption(com.bytechef.definition.BaseOption<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);
-        this.displayCondition = option.getDisplayCondition();
         this.label = option.getLabel();
         this.value = option.getValue();
     }
@@ -45,10 +43,6 @@ public abstract class BaseOption {
     @Nullable
     public String getDescription() {
         return description;
-    }
-
-    public String getDisplayCondition() {
-        return displayCondition;
     }
 
     public String getLabel() {
@@ -69,21 +63,19 @@ public abstract class BaseOption {
             return false;
         }
 
-        return Objects.equals(description, option.description)
-            && Objects.equals(displayCondition, option.displayCondition) && Objects.equals(label, option.label)
+        return Objects.equals(description, option.description) && Objects.equals(label, option.label)
             && Objects.equals(value, option.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, displayCondition, label, value);
+        return Objects.hash(description, label, value);
     }
 
     @Override
     public String toString() {
         return "OptionDTO{" +
             "description='" + description + '\'' +
-            ", displayCondition='" + displayCondition + '\'' +
             ", label='" + label + '\'' +
             ", value=" + value +
             '}';
