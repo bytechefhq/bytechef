@@ -733,6 +733,43 @@ paths:
                 properties:
                   description:
                     type: string
+  /workflows/{id}/{workflowNodeName}/display-condition:
+    post:
+      description: "Evaluate display condition for an action or trigger property."
+      summary: "Evaluate display condition for an action or trigger property"
+      tags:
+        - "workflow-node"
+      operationId: "evaluateWorkflowNodeDisplayCondition"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - displayCondition
+              properties:
+                displayCondition:
+                  type: "string"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "boolean"
   /workflows/{id}/{workflowNodeName}/properties/{propertyName}/dynamic-properties:
     get:
       description: "Get dynamic properties for an action or trigger property shown in the editor."
@@ -1337,9 +1374,6 @@ components:
       properties:
         description:
           description: "Description of the option."
-          type: "string"
-        displayCondition:
-          description: "Defines rules when a property should be shown or hidden."
           type: "string"
         label:
           description: "The label of an option."
