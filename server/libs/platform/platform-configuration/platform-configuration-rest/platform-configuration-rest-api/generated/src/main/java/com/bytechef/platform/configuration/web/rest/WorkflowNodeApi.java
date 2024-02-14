@@ -5,6 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.platform.configuration.web.rest.model.EvaluateWorkflowNodeDisplayConditionRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeDescription200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-12T12:34:57.367110+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-node", description = "The Platform Workflow Node API")
 public interface WorkflowNodeApi {
@@ -43,6 +44,43 @@ public interface WorkflowNodeApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    /**
+     * POST /workflows/{id}/{workflowNodeName}/display-condition : Evaluate display condition for an action or trigger property
+     * Evaluate display condition for an action or trigger property.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @param evaluateWorkflowNodeDisplayConditionRequestModel  (optional)
+     * @return The list of options. (status code 200)
+     */
+    @Operation(
+        operationId = "evaluateWorkflowNodeDisplayCondition",
+        summary = "Evaluate display condition for an action or trigger property",
+        description = "Evaluate display condition for an action or trigger property.",
+        tags = { "workflow-node" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of options.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/workflows/{id}/{workflowNodeName}/display-condition",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<Boolean> evaluateWorkflowNodeDisplayCondition(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "EvaluateWorkflowNodeDisplayConditionRequestModel", description = "") @Valid @RequestBody(required = false) EvaluateWorkflowNodeDisplayConditionRequestModel evaluateWorkflowNodeDisplayConditionRequestModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     /**
      * GET /workflows/{id}/{workflowNodeName}/description : Get an action description shown in the editor
@@ -168,7 +206,7 @@ public interface WorkflowNodeApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"description\" : \"description\", \"label\" : \"label\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"description\" : \"description\", \"label\" : \"label\", \"value\" : \"\" } ]";
+                    String exampleString = "[ { \"description\" : \"description\", \"label\" : \"label\", \"value\" : \"\" }, { \"description\" : \"description\", \"label\" : \"label\", \"value\" : \"\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -24,12 +24,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-12T12:34:57.367110+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
 public class OptionModel {
 
   private String description;
-
-  private String displayCondition;
 
   private String label;
 
@@ -53,26 +51,6 @@ public class OptionModel {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public OptionModel displayCondition(String displayCondition) {
-    this.displayCondition = displayCondition;
-    return this;
-  }
-
-  /**
-   * Defines rules when a property should be shown or hidden.
-   * @return displayCondition
-  */
-  
-  @Schema(name = "displayCondition", description = "Defines rules when a property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("displayCondition")
-  public String getDisplayCondition() {
-    return displayCondition;
-  }
-
-  public void setDisplayCondition(String displayCondition) {
-    this.displayCondition = displayCondition;
   }
 
   public OptionModel label(String label) {
@@ -125,7 +103,6 @@ public class OptionModel {
     }
     OptionModel option = (OptionModel) o;
     return Objects.equals(this.description, option.description) &&
-        Objects.equals(this.displayCondition, option.displayCondition) &&
         Objects.equals(this.label, option.label) &&
         equalsNullable(this.value, option.value);
   }
@@ -136,7 +113,7 @@ public class OptionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, displayCondition, label, hashCodeNullable(value));
+    return Objects.hash(description, label, hashCodeNullable(value));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -151,7 +128,6 @@ public class OptionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class OptionModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");

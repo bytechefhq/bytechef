@@ -24,6 +24,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ControlTypeMode
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/EvaluateWorkflowNodeDisplayConditionRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/FileEntryPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
