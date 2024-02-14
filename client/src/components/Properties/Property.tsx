@@ -73,9 +73,9 @@ const Property = ({
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
-    const [numericValue, setNumericValue] = useState('');
+    const [numericValue, setNumericValue] = useState(property.defaultValue || '');
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -120,7 +120,7 @@ const Property = ({
 
     const isValidControlType = controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
 
-    const isNumericalInput = controlType !== 'SELECT' && (type === 'INTEGER' || type === 'NUMBER');
+    const isNumericalInput = controlType === 'INTEGER' || controlType === 'NUMBER';
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
@@ -282,7 +282,7 @@ const Property = ({
 
             const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
 
-            if (!onlyNumericValue) {
+            if (onlyNumericValue === undefined) {
                 return;
             }
 
@@ -464,7 +464,7 @@ const Property = ({
                                 required={required}
                                 title={type}
                                 type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                value={(isNumericalInput ? numericValue || defaultValue : defaultValue) || inputValue}
+                                value={isNumericalInput ? numericValue : inputValue}
                             />
                         )}
 
