@@ -21,19 +21,17 @@
     "placeholder": null,
     "options": [ {
       "description": null,
-      "displayCondition": null,
       "label": "True",
       "value": true
     }, {
       "description": null,
-      "displayCondition": null,
       "label": "False",
       "value": true
     } ],
     "controlType": "SELECT"
   }, {
     "advancedOption": null,
-    "displayCondition": "rawExpression === true",
+    "displayCondition": "rawExpression == true",
     "expressionEnabled": null,
     "hidden": null,
     "metadata": { },
@@ -78,12 +76,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -104,12 +100,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Equals",
           "value": "EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Not Equals",
           "value": "NOT_EQUALS"
         } ],
@@ -132,12 +126,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "True",
           "value": true
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "False",
           "value": true
         } ],
@@ -193,12 +185,10 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "After",
           "value": "AFTER"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Before",
           "value": "BEFORE"
         } ],
@@ -277,37 +267,30 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Less",
           "value": "LESS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Less or Equals",
           "value": "LESS_EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Equals",
           "value": "EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Not Equals",
           "value": "NOT_EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Greater",
           "value": "GREATER"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Greater or Equals",
           "value": "GREATER_EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Empty",
           "value": "EMPTY"
         } ],
@@ -316,7 +299,7 @@
         "minLength": null
       }, {
         "advancedOption": null,
-        "displayCondition": "operation !== 'EMPTY'",
+        "displayCondition": "operation != 'EMPTY'",
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
@@ -388,42 +371,34 @@
         "placeholder": null,
         "options": [ {
           "description": null,
-          "displayCondition": null,
           "label": "Equals",
           "value": "EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Not Equals",
           "value": "NOT_EQUALS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Contains",
           "value": "CONTAINS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Not Contains",
           "value": "NOT_CONTAINS"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Starts With",
           "value": "STARTS_WITH"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Ends With",
           "value": "ENDS_WITH"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Regex",
           "value": "REGEX"
         }, {
           "description": null,
-          "displayCondition": null,
           "label": "Empty",
           "value": "EMPTY"
         } ],
@@ -432,7 +407,7 @@
         "minLength": null
       }, {
         "advancedOption": null,
-        "displayCondition": "!['EMPTY','REGEX'].includes('operation')",
+        "displayCondition": "!{'EMPTY','REGEX'}.contains('operation')",
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
@@ -450,7 +425,7 @@
         "minLength": null
       }, {
         "advancedOption": null,
-        "displayCondition": "operation === 'REGEX'",
+        "displayCondition": "operation == 'REGEX'",
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
@@ -476,7 +451,7 @@
     "controlType": "MULTI_SELECT"
   }, {
     "advancedOption": null,
-    "displayCondition": "rawExpression === false",
+    "displayCondition": "rawExpression == false",
     "expressionEnabled": null,
     "hidden": null,
     "metadata": { },
@@ -490,12 +465,10 @@
     "placeholder": null,
     "options": [ {
       "description": "Only if all conditions are met, the workflow goes into \"true\" branch.",
-      "displayCondition": null,
       "label": "All",
       "value": "ALL"
     }, {
       "description": "If any condition is met, the workflow goes into \"true\" branch.",
-      "displayCondition": null,
       "label": "Any",
       "value": "ANY"
     } ],

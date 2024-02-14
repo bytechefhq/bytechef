@@ -65,7 +65,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                 .label("Conditions")
                 .placeholder("Add Condition")
                 .description("The type of values to compare.")
-                .displayCondition("%s === true".formatted(RAW_EXPRESSION))
+                .displayCondition("%s == true".formatted(RAW_EXPRESSION))
                 .items(
                     object(BOOLEAN)
                         .label("Boolean")
@@ -139,7 +139,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                 .description(
                                     "The number value to compare with the first one.")
                                 .defaultValue(0)
-                                .displayCondition("%s !== '%s'".formatted(OPERATION, Operation.EMPTY.name()))),
+                                .displayCondition("%s != '%s'".formatted(OPERATION, Operation.EMPTY.name()))),
                     object(STRING)
                         .label("String")
                         .properties(
@@ -169,7 +169,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                 .description(
                                     "The string value to compare with the first one.")
                                 .defaultValue("")
-                                .displayCondition("!['%s','%s'].includes('%s')".formatted(
+                                .displayCondition("!{'%s','%s'}.contains('%s')".formatted(
                                     Operation.EMPTY.name(),
                                     Operation.REGEX.name(),
                                     OPERATION)),
@@ -179,7 +179,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                     "The regex value to compare with the first one.")
                                 .placeholder("/text/i")
                                 .defaultValue("")
-                                .displayCondition("%s === '%s'".formatted(OPERATION, Operation.REGEX.name())))),
+                                .displayCondition("%s == '%s'".formatted(OPERATION, Operation.REGEX.name())))),
             string(COMBINE_OPERATION)
                 .label("Combine")
                 .description(
@@ -187,7 +187,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                         If multiple conditions are set, this setting decides if it is true as soon as ANY condition
                          matches or only if ALL are met.
                         """)
-                .displayCondition("%s === false".formatted(RAW_EXPRESSION))
+                .displayCondition("%s == false".formatted(RAW_EXPRESSION))
                 .options(
                     option(
                         "All",
