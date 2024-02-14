@@ -45,7 +45,7 @@ const DataPill = ({
 
         mentionInput.insertItem(
             {
-                componentIcon: componentIcon,
+                componentIcon,
                 id: propertyName || workflowNodeName,
                 value: propertyName ? `${workflowNodeName}/${path || dataPillName}` : workflowNodeName,
             },

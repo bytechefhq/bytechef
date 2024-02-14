@@ -151,20 +151,13 @@ const PropertyMentionsInput = forwardRef(
                     }
 
                     const formattedData = dataPills.map((dataPill) => {
-                        if (!dataPill.componentDefinition) {
-                            return {
-                                componentIcon: '📄',
-                                componentName: dataPill.componentName,
-                                id: dataPill.id,
-                                value: dataPill.value,
-                            };
-                        }
+                        const {componentIcon, componentName, id, value} = dataPill;
 
                         return {
-                            componentIcon: JSON.parse(dataPill.componentDefinition as string).icon,
-                            componentName: dataPill.componentName,
-                            id: dataPill.id,
-                            value: dataPill.value,
+                            componentIcon: componentIcon || '📄',
+                            componentName,
+                            id,
+                            value,
                         };
                     });
 

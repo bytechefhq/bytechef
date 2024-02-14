@@ -168,7 +168,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const currentNodeIndex = nodeNames?.indexOf(currentNode.name);
 
-    const previousComponentNames = componentNames.length > 1 ? componentNames?.slice(0, currentNodeIndex) : [];
+    const previousNodeNames = nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : [];
 
     const actionDefinitions = workflowStepOutputs
         .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
@@ -222,32 +222,24 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
+        const {componentDefinition} = componentProperty;
+
         const existingProperties = getExistingProperties(componentProperty.properties);
 
-        const componentName = previousComponentNames[index];
+        const nodeName = previousNodeNames[index];
 
         const formattedProperties: DataPillType[] = existingProperties.map((property) => {
             if (property.properties) {
-                return getSubProperties(
-                    componentProperty.componentDefinition!,
-                    componentName,
-                    property.properties,
-                    property.name
-                );
+                return getSubProperties(componentDefinition.icon!, nodeName, property.properties, property.name);
             } else if (property.items) {
-                return getSubProperties(
-                    componentProperty.componentDefinition!,
-                    componentName,
-                    property.items,
-                    property.name
-                );
+                return getSubProperties(componentDefinition.icon!, nodeName, property.items, property.name);
             }
 
             return {
-                componentDefinition: JSON.stringify(componentProperty.componentDefinition),
-                componentName,
+                componentIcon: componentDefinition.icon,
                 id: property.name,
-                value: property.label || property.name,
+                nodeName,
+                value: `${nodeName}/${property.name}`,
             };
         });
 
