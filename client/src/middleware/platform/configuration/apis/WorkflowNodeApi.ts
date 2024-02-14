@@ -15,12 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  EvaluateWorkflowNodeDisplayConditionRequestModel,
   GetWorkflowNodeDescription200ResponseModel,
   OptionModel,
   PropertyModel,
   WorkflowNodeOutputModel,
 } from '../models/index';
 import {
+    EvaluateWorkflowNodeDisplayConditionRequestModelFromJSON,
+    EvaluateWorkflowNodeDisplayConditionRequestModelToJSON,
     GetWorkflowNodeDescription200ResponseModelFromJSON,
     GetWorkflowNodeDescription200ResponseModelToJSON,
     OptionModelFromJSON,
@@ -30,6 +33,12 @@ import {
     WorkflowNodeOutputModelFromJSON,
     WorkflowNodeOutputModelToJSON,
 } from '../models/index';
+
+export interface EvaluateWorkflowNodeDisplayConditionRequest {
+    id: string;
+    workflowNodeName: string;
+    evaluateWorkflowNodeDisplayConditionRequestModel?: EvaluateWorkflowNodeDisplayConditionRequestModel;
+}
 
 export interface GetWorkflowNodeDescriptionRequest {
     id: string;
@@ -63,6 +72,49 @@ export interface GetWorkflowNodeOutputsRequest {
  * 
  */
 export class WorkflowNodeApi extends runtime.BaseAPI {
+
+    /**
+     * Evaluate display condition for an action or trigger property.
+     * Evaluate display condition for an action or trigger property
+     */
+    async evaluateWorkflowNodeDisplayConditionRaw(requestParameters: EvaluateWorkflowNodeDisplayConditionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling evaluateWorkflowNodeDisplayCondition.');
+        }
+
+        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
+            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling evaluateWorkflowNodeDisplayCondition.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/workflows/{id}/{workflowNodeName}/display-condition`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EvaluateWorkflowNodeDisplayConditionRequestModelToJSON(requestParameters.evaluateWorkflowNodeDisplayConditionRequestModel),
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<boolean>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * Evaluate display condition for an action or trigger property.
+     * Evaluate display condition for an action or trigger property
+     */
+    async evaluateWorkflowNodeDisplayCondition(requestParameters: EvaluateWorkflowNodeDisplayConditionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
+        const response = await this.evaluateWorkflowNodeDisplayConditionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get an action description shown in the editor.

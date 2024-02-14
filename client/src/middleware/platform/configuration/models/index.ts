@@ -14,6 +14,7 @@ export * from './ControlTypeModel';
 export * from './DatePropertyModel';
 export * from './DateTimePropertyModel';
 export * from './DynamicPropertiesPropertyModel';
+export * from './EvaluateWorkflowNodeDisplayConditionRequestModel';
 export * from './ExecutionErrorModel';
 export * from './FileEntryPropertyModel';
 export * from './GetOAuth2AuthorizationParametersRequestModel';

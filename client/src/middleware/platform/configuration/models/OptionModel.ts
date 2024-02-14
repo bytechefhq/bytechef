@@ -26,12 +26,6 @@ export interface OptionModel {
      */
     description?: string;
     /**
-     * Defines rules when a property should be shown or hidden.
-     * @type {string}
-     * @memberof OptionModel
-     */
-    displayCondition?: string;
-    /**
      * The label of an option.
      * @type {string}
      * @memberof OptionModel
@@ -65,7 +59,6 @@ export function OptionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'value': !exists(json, 'value') ? undefined : json['value'],
     };
@@ -81,7 +74,6 @@ export function OptionModelToJSON(value?: OptionModel | null): any {
     return {
         
         'description': value.description,
-        'displayCondition': value.displayCondition,
         'label': value.label,
         'value': value.value,
     };

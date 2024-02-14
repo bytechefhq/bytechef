@@ -23,6 +23,7 @@ models/ControlTypeModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
 models/DynamicPropertiesPropertyModel.ts
+models/EvaluateWorkflowNodeDisplayConditionRequestModel.ts
 models/ExecutionErrorModel.ts
 models/FileEntryPropertyModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
