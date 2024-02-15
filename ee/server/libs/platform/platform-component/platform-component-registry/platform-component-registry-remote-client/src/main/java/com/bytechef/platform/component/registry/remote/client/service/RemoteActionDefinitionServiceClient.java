@@ -51,14 +51,6 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
@@ -80,6 +72,14 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters,
         ComponentConnection connection, @NonNull ActionContext context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

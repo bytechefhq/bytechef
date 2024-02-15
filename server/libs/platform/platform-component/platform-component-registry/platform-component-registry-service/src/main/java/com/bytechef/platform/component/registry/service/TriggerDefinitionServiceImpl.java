@@ -36,7 +36,7 @@ import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerNodeDescriptionFunction;
+import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersImpl;
@@ -142,23 +142,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return dynamicWebhookRefreshFunction.apply(
             new ParametersImpl(outputParameters), context);
-    }
-
-    @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull TriggerContext context) {
-
-        TriggerNodeDescriptionFunction nodeDescriptionFunction =
-            getNodeDescriptionFunction(
-                componentName, componentVersion, triggerName);
-
-        try {
-            return nodeDescriptionFunction
-                .apply(new ParametersImpl(inputParameters), context);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 101);
-        }
     }
 
     @Override
@@ -289,6 +272,23 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return executeWebhookValidate(
             triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull TriggerContext context) {
+
+        TriggerWorkflowNodeDescriptionFunction nodeDescriptionFunction =
+            getworkflowNodeDescriptionFunction(
+                componentName, componentVersion, triggerName);
+
+        try {
+            return nodeDescriptionFunction
+                .apply(new ParametersImpl(inputParameters), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 101);
+        }
     }
 
     @Override
@@ -453,7 +453,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
     }
 
-    private TriggerNodeDescriptionFunction getNodeDescriptionFunction(
+    private TriggerWorkflowNodeDescriptionFunction getworkflowNodeDescriptionFunction(
         String componentName, int componentVersion, String triggerName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -463,7 +463,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.orElse(
-            triggerDefinition.getNodeDescriptionFunction(),
+            triggerDefinition.getWorkflowNodeDescriptionFunction(),
             (inputParameters, context) -> componentDefinition.getTitle() + ": " + triggerDefinition.getTitle());
     }
 

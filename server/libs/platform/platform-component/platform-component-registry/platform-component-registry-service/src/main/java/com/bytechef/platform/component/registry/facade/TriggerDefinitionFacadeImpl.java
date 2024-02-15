@@ -103,16 +103,6 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters) {
-
-        return triggerDefinitionService.executeNodeDescription(
-            componentName, componentVersion, triggerName, inputParameters,
-            contextFactory.createTriggerContext(componentName, triggerName, null));
-    }
-
-    @Override
     public void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
@@ -184,6 +174,16 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeWebhookValidate(
             componentName, componentVersion, triggerName, inputParameters, webhookRequest,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters) {
+
+        return triggerDefinitionService.executeWorkflowNodeDescription(
+            componentName, componentVersion, triggerName, inputParameters,
+            contextFactory.createTriggerContext(componentName, triggerName, null));
     }
 
     private String createWebhookUrl(String workflowExecutionId, String webhookUrl) {

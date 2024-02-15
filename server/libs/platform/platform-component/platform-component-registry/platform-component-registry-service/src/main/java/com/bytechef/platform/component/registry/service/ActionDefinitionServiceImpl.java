@@ -19,8 +19,8 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionNodeDescriptionFunction;
 import com.bytechef.component.definition.ActionOutputFunction;
+import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
@@ -74,21 +74,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .toList();
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 100);
-        }
-    }
-
-    @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
-
-        ActionNodeDescriptionFunction nodeDescriptionFunction = getNodeDescriptionFunction(
-            componentName, componentVersion, actionName);
-
-        try {
-            return nodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 101);
         }
     }
 
@@ -157,6 +142,21 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
+
+        ActionWorkflowNodeDescriptionFunction nodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
+            componentName, componentVersion, actionName);
+
+        try {
+            return nodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 101);
+        }
+    }
+
+    @Override
     public ActionDefinition getActionDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String actionName) {
 
@@ -195,7 +195,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     }
 
-    private ActionNodeDescriptionFunction getNodeDescriptionFunction(
+    private ActionWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
         String componentName, int componentVersion, String actionName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -207,7 +207,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition
-            .getNodeDescriptionFunction()
+            .getWorkflowNodeDescriptionFunction()
             .orElse((inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
                 getActionTitle(actionDefinition));
     }

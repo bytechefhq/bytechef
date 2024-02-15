@@ -70,12 +70,6 @@ public interface ActionDefinition {
     Optional<String> getDescription();
 
     /**
-     *
-     * @return
-     */
-    Optional<ActionNodeDescriptionFunction> getNodeDescriptionFunction();
-
-    /**
      * The code that should be executed when an action runs as a task inside the workflow engine.
      *
      * @return an optional execute function implementation
@@ -123,6 +117,12 @@ public interface ActionDefinition {
      * @return
      */
     Optional<String> getTitle();
+
+    /**
+     *
+     * @return
+     */
+    Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction();
 
     /**
      *

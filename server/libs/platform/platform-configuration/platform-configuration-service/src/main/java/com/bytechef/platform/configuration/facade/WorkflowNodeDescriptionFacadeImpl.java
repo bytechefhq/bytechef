@@ -65,7 +65,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
             .map(workflowTrigger -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                return triggerDefinitionFacade.executeNodeDescription(
+                return triggerDefinitionFacade.executeWorkflowNodeDescription(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                     workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs));
             })
@@ -76,7 +76,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
                     workflowId, workflowTask.getName());
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-                return actionDefinitionFacade.executeNodeDescription(
+                return actionDefinitionFacade.executeWorkflowNodeDescription(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                     workflowNodeType.componentOperationName(),
                     workflowTask.evaluateParameters(

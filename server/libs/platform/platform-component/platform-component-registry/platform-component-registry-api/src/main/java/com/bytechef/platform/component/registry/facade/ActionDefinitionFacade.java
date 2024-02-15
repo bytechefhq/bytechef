@@ -32,10 +32,6 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, ?> inputParameters, Long connectionId);
 
-    String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters);
-
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
@@ -47,4 +43,8 @@ public interface ActionDefinitionFacade {
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
         @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters, Long connectionId);
+
+    String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters);
 }

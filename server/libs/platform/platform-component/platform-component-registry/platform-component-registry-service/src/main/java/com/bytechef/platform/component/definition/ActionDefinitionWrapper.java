@@ -18,8 +18,8 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionNodeDescriptionFunction;
 import com.bytechef.component.definition.ActionOutputFunction;
+import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
@@ -40,7 +40,7 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     protected final int componentVersion;
     protected final Boolean deprecated;
     protected final String description;
-    protected final ActionNodeDescriptionFunction nodeDescriptionFunction;
+    protected final ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
     protected final PerformFunction performFunction;
     protected final Help help;
     protected final Map<String, Object> metadata;
@@ -61,8 +61,6 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.componentVersion = actionDefinition.getComponentVersion();
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
-        this.nodeDescriptionFunction =
-            OptionalUtils.orElse(actionDefinition.getNodeDescriptionFunction(), null);
         this.performFunction = performFunction;
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
@@ -72,6 +70,8 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.outputSchemaDefaultFunction = actionDefinition.isDefaultOutputFunction();
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
+        this.workflowNodeDescriptionFunction =
+            OptionalUtils.orElse(actionDefinition.getWorkflowNodeDescriptionFunction(), null);
     }
 
     @Override
@@ -107,11 +107,6 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     @Override
     public Optional<String> getDescription() {
         return Optional.ofNullable(description);
-    }
-
-    @Override
-    public Optional<ActionNodeDescriptionFunction> getNodeDescriptionFunction() {
-        return Optional.ofNullable(nodeDescriptionFunction);
     }
 
     @Override
@@ -152,6 +147,11 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     @Override
     public Optional<String> getTitle() {
         return Optional.ofNullable(title);
+    }
+
+    @Override
+    public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction() {
+        return Optional.ofNullable(workflowNodeDescriptionFunction);
     }
 
     @Override

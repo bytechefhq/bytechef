@@ -82,14 +82,6 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull TriggerContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
@@ -138,6 +130,14 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, ComponentConnection connection,
         @NonNull TriggerContext context) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, @NonNull TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }

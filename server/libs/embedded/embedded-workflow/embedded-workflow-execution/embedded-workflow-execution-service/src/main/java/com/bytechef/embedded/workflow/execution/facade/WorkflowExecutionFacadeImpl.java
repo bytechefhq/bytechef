@@ -176,14 +176,14 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         return CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> new TaskExecutionDTO(
-                taskExecutionService.getTaskExecution(taskExecution.getId()), getComponentDefinition(taskExecution.getType()),
+                taskExecutionService.getTaskExecution(taskExecution.getId()),
+                getComponentDefinition(taskExecution.getType()),
                 taskFileStorage.readContextValue(
                     contextService.peek(
                         Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                 taskExecution.getOutput() == null
                     ? null
-                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput())
-            ));
+                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput())));
     }
 
     private ComponentDefinition getComponentDefinition(String type) {
