@@ -279,13 +279,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull TriggerContext context) {
 
-        TriggerWorkflowNodeDescriptionFunction nodeDescriptionFunction =
-            getworkflowNodeDescriptionFunction(
-                componentName, componentVersion, triggerName);
+        TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
+            componentName, componentVersion, triggerName);
 
         try {
-            return nodeDescriptionFunction
-                .apply(new ParametersImpl(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 101);
         }
@@ -403,6 +401,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElse(true);
     }
 
+    private static String getComponentTitle(ComponentDefinition componentDefinition) {
+        return componentDefinition
+            .getTitle()
+            .orElse(componentDefinition.getName());
+    }
+
     private OptionsDataSource.TriggerOptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String triggerName, String propertyName) {
 
@@ -453,7 +457,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
     }
 
-    private TriggerWorkflowNodeDescriptionFunction getworkflowNodeDescriptionFunction(
+    private TriggerWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
         String componentName, int componentVersion, String triggerName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -464,7 +468,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return OptionalUtils.orElse(
             triggerDefinition.getWorkflowNodeDescriptionFunction(),
-            (inputParameters, context) -> componentDefinition.getTitle() + ": " + triggerDefinition.getTitle());
+            (inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
+                getTriggerTitle(triggerDefinition));
     }
 
     private ListenerDisableConsumer getListenerDisableConsumer(
@@ -483,5 +488,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerEnable());
+    }
+
+    private static String getTriggerTitle(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
+        return triggerDefinition
+            .getTitle()
+            .orElse(triggerDefinition.getName());
     }
 }

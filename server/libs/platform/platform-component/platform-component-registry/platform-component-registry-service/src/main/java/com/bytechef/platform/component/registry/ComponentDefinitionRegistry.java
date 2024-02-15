@@ -50,7 +50,7 @@ public class ComponentDefinitionRegistry {
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
         .title("Manual")
-        .triggers(trigger("trigger").type(TriggerType.STATIC_WEBHOOK));
+        .triggers(trigger("manual").type(TriggerType.STATIC_WEBHOOK));
 
     private final List<ComponentDefinition> componentDefinitions;
     private final List<ConnectionDefinition> connectionDefinitions;
