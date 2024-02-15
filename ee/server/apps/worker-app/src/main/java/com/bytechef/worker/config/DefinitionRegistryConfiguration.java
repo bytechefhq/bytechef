@@ -57,7 +57,7 @@ public class DefinitionRegistryConfiguration {
         public ApplyResponse executeAuthorizationApply(
             @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
-            if (connectionDefinitionService.connectionExists(componentName)) {
+            if (connectionDefinitionService.containsConnection(componentName)) {
                 return connectionDefinitionService.executeAuthorizationApply(componentName, connection, context);
             } else {
                 return connectionDefinitionFacadeClient.executeAuthorizationApply(componentName, connection);
@@ -77,8 +77,8 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public boolean connectionExists(String componentName) {
-            return connectionDefinitionService.connectionExists(componentName);
+        public boolean containsConnection(String componentName) {
+            return connectionDefinitionService.containsConnection(componentName);
         }
 
         /**
@@ -88,7 +88,7 @@ public class DefinitionRegistryConfiguration {
         public Optional<String> executeBaseUri(
             @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
-            if (connectionDefinitionService.connectionExists(componentName)) {
+            if (connectionDefinitionService.containsConnection(componentName)) {
                 return connectionDefinitionService.executeBaseUri(componentName, connection, context);
             } else {
                 return connectionDefinitionFacadeClient.executeBaseUri(componentName, connection);
