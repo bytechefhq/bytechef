@@ -123,7 +123,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
-        if (connectionDefinitionService.connectionExists(workflowNodeType.componentName())) {
+        if (connectionDefinitionService.containsConnection(workflowNodeType.componentName())) {
             ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
