@@ -66,14 +66,14 @@ public class JobTestExecutor {
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
                 taskExecution -> new TaskExecutionDTO(
-                    getComponentDefinition(taskExecution),
+                    taskExecution, getComponentDefinition(taskExecution),
                     taskFileStorage.readContextValue(
                         contextService.peek(
                             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                     taskExecution.getOutput() == null
                         ? null
-                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()),
-                    taskExecution)));
+                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput())
+                )));
     }
 
     private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {

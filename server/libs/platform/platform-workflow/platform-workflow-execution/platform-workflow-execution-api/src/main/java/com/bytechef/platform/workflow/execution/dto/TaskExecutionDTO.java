@@ -36,7 +36,7 @@ public record TaskExecutionDTO(
     TaskExecution.Status status, int taskNumber, String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(
-        ComponentDefinition component, Map<String, ?> input, Object output, TaskExecution taskExecution) {
+        TaskExecution taskExecution, ComponentDefinition component, Map<String, ?> input, Object output) {
 
         this(
             component, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
