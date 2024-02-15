@@ -179,8 +179,8 @@ public class ComponentDefinition {
             '}';
     }
 
-    private static List<ActionDefinitionBasic>
-        getActions(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
+    private static List<ActionDefinitionBasic> getActions(
+        com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getActions(),
