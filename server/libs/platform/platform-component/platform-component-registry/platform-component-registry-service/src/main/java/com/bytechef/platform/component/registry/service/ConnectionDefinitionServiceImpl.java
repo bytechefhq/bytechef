@@ -236,8 +236,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public List<ConnectionDefinition>
-        getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
+    public List<ConnectionDefinition> getConnectionDefinitions(
+        @NonNull String componentName, @NonNull Integer componentVersion) {
+
         return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
             .stream()
             .map(ConnectionDefinition::new)
