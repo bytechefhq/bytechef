@@ -78,15 +78,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public boolean containsConnection(String componentName) {
-        return componentDefinitionRegistry.getComponentDefinitions()
-            .stream()
-            .map(ComponentDefinition::getConnection)
-            .flatMap(Optional::stream)
-            .anyMatch(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
-    }
-
-    @Override
     public ApplyResponse executeAuthorizationApply(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
@@ -165,11 +156,23 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 connectionDefinition.getBaseUri(),
                 (connectionParameters, context1) -> getDefaultBaseUri(connectionParameters));
 
-        return Optional.ofNullable(
-            baseUriFunction.apply(
-                new ParametersImpl(
-                    connection.parameters()),
-                context));
+        return Optional.ofNullable(baseUriFunction.apply(new ParametersImpl(connection.parameters()), context));
+    }
+
+    @Override
+    public Optional<ConnectionDefinition> fetchConnectionDefinition(
+        @NonNull String componentName, int componentVersion) {
+
+        if (containsConnection(componentName)) {
+            ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+                componentName, componentVersion);
+
+            return componentDefinition
+                .getConnection()
+                .map(ConnectionDefinition::new);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -239,6 +242,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .stream()
             .map(ConnectionDefinition::new)
             .toList();
+    }
+
+    private boolean containsConnection(String componentName) {
+        return componentDefinitionRegistry
+            .getComponentDefinitions()
+            .stream()
+            .map(ComponentDefinition::getConnection)
+            .flatMap(Optional::stream)
+            .anyMatch(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
     }
 
     private static ApplyFunction getDefaultApply(AuthorizationType type) {

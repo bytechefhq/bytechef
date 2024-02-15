@@ -55,12 +55,18 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof ConnectionDefinition that))
+        }
+
+        if (!(o instanceof ConnectionDefinition that)) {
             return false;
-        if (!super.equals(o))
+        }
+
+        if (!super.equals(o)) {
             return false;
+        }
+
         return Objects.equals(authorizations, that.authorizations) && Objects.equals(properties, that.properties);
     }
 

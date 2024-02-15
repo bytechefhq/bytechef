@@ -39,10 +39,10 @@ public interface ConnectionDefinitionService {
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
         @NonNull String redirectUri);
 
-    boolean containsConnection(String componentName);
-
     Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
+
+    Optional<ConnectionDefinition> fetchConnectionDefinition(@NonNull String componentName, int componentVersion);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
@@ -56,4 +56,5 @@ public interface ConnectionDefinitionService {
 
     List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion);
+
 }

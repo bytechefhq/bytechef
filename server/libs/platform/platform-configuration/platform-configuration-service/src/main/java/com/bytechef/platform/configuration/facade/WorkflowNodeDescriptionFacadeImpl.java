@@ -60,27 +60,35 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
         Workflow workflow = workflowService.getWorkflow(workflowId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
 
-        return WorkflowTrigger
-            .fetch(workflow, workflowNodeName)
-            .map(workflowTrigger -> {
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+        String description;
 
-                return triggerDefinitionFacade.executeWorkflowNodeDescription(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs));
-            })
-            .orElseGet(() -> {
-                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+        if (workflowNodeName.equals("manual")) {
+            description = triggerDefinitionFacade.executeWorkflowNodeDescription("manual", 1, "manual", Map.of());
+        } else {
+            description = WorkflowTrigger
+                .fetch(workflow, workflowNodeName)
+                .map(workflowTrigger -> {
+                    WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
-                    workflowId, workflowTask.getName());
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+                    return triggerDefinitionFacade.executeWorkflowNodeDescription(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                        workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs));
+                })
+                .orElseGet(() -> {
+                    WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-                return actionDefinitionFacade.executeWorkflowNodeDescription(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(),
-                    workflowTask.evaluateParameters(
-                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)));
-            });
+                    Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                        workflowId, workflowTask.getName());
+                    WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+                    return actionDefinitionFacade.executeWorkflowNodeDescription(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                        workflowNodeType.componentOperationName(),
+                        workflowTask.evaluateParameters(
+                            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)));
+                });
+        }
+
+        return description;
     }
 }

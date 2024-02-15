@@ -82,6 +82,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .toList();
     }
 
+    @Override
+    public List<String> getWorkflowConnectionKeys(String name, Integer version) {
+        return componentDefinitionRegistry.getComponentDefinitions(name)
+            .stream()
+            .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getWorkflowConnectionKeys()))
+            .toList();
+    }
+
     private static Predicate<ComponentDefinition> filter(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
 
@@ -94,8 +102,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 return true;
             }
 
-            if (connectionDefinitions != null && componentDefinition.getConnection() != null) {
-                return true;
+            if (connectionDefinitions != null) {
+                List<String> workflowConnectionKeys = componentDefinition.getWorkflowConnectionKeys();
+
+                if (!workflowConnectionKeys.isEmpty() || componentDefinition.getAdditionalConnections()) {
+                    return true;
+                }
             }
 
             if (triggerDefinitions != null && !CollectionUtils.isEmpty(componentDefinition.getTriggers())) {

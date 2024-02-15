@@ -40,6 +40,21 @@ public class RemoteConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
+        value = "/fetch-connection-definition/{componentName}/{componentVersion}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<ConnectionDefinition> fetchComponentDefinition(
+        @PathVariable("componentName") String componentName, @PathVariable("componentVersion") int componentVersion) {
+
+        return ResponseEntity.ok(
+            connectionDefinitionService
+                .fetchConnectionDefinition(componentName, componentVersion)
+                .orElse(null));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
         value = "/get-authorization-type/{componentName}/{connectionVersion}/{authorizationName}",
         produces = {
             "application/json"
