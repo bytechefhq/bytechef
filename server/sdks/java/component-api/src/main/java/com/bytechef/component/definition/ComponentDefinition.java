@@ -34,6 +34,18 @@ public interface ComponentDefinition {
     Optional<List<? extends ActionDefinition>> getActions();
 
     /**
+     *
+     * @return
+     */
+    Optional<Boolean> getAdditionalConnections();
+
+    /**
+     *
+     * @return
+     */
+    Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections();
+
+    /**
      * TODO
      *
      * @return
@@ -45,12 +57,6 @@ public interface ComponentDefinition {
      * @return
      */
     Optional<ConnectionDefinition> getConnection();
-
-    /**
-     *
-     * @return
-     */
-    Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections();
 
     /**
      *

@@ -1036,6 +1036,7 @@ public final class ComponentDSL {
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
         private List<? extends ModifiableActionDefinition> actions;
+        private Boolean additionalConnections;
         private String category;
         private ModifiableConnectionDefinition connection;
         private Boolean customAction;
@@ -1050,7 +1051,7 @@ public final class ComponentDSL {
         private int version = VERSION_1;
         private String title;
         private List<? extends ModifiableTriggerDefinition> triggers;
-        private List<String> workflowConnectionKeys = List.of();
+        private List<String> workflowConnectionKeys;
 
         private ModifiableComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -1090,6 +1091,8 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition additionalConnections(boolean additionalConnections) {
+            this.additionalConnections = additionalConnections;
 
             return this;
         }
@@ -1246,6 +1249,11 @@ public final class ComponentDSL {
         }
 
         @Override
+        public Optional<Boolean> getAdditionalConnections() {
+            return Optional.ofNullable(additionalConnections);
+        }
+
+        @Override
         public Optional<String> getCategory() {
             return Optional.ofNullable(category);
         }
@@ -1312,8 +1320,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public List<String> getWorkflowConnectionKeys() {
-            return workflowConnectionKeys;
+        public Optional<List<String>> getWorkflowConnectionKeys() {
+            return Optional.ofNullable(workflowConnectionKeys);
         }
 
         @Override
