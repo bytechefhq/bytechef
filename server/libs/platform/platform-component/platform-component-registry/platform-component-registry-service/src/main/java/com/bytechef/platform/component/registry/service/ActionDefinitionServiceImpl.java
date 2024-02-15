@@ -146,11 +146,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
 
-        ActionWorkflowNodeDescriptionFunction nodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
+        ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
             componentName, componentVersion, actionName);
 
         try {
-            return nodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
+            return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 101);
         }
