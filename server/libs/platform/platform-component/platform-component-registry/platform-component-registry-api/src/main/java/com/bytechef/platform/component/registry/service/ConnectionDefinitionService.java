@@ -39,7 +39,7 @@ public interface ConnectionDefinitionService {
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
         @NonNull String redirectUri);
 
-    boolean connectionExists(String componentName);
+    boolean containsConnection(String componentName);
 
     Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);

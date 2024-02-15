@@ -78,7 +78,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public boolean connectionExists(String componentName) {
+    public boolean containsConnection(String componentName) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .map(ComponentDefinition::getConnection)
