@@ -38,6 +38,7 @@ import java.util.Optional;
 public class ComponentDefinitionWrapper implements ComponentDefinition {
 
     protected final List<? extends ActionDefinition> actions;
+    private final Boolean additionalConnections;
     protected final String category;
     protected final ConnectionDefinition connection;
     protected final Boolean customAction;
@@ -66,6 +67,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         }
 
         this.actions = actionDefinitions;
+        this.additionalConnections = OptionalUtils.orElse(componentDefinition.getAdditionalConnections(), null);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
@@ -81,7 +83,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
         this.triggers = OptionalUtils.orElse(componentDefinition.getTriggers(), null);
         this.version = componentDefinition.getVersion();
-        this.workflowConnectionKeys = componentDefinition.getWorkflowConnectionKeys();
+        this.workflowConnectionKeys = OptionalUtils.orElse(componentDefinition.getWorkflowConnectionKeys(), null);
     }
 
     @Override
@@ -92,6 +94,11 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     @Override
     public Optional<List<? extends ActionDefinition>> getActions() {
         return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
+    }
+
+    @Override
+    public Optional<Boolean> getAdditionalConnections() {
+        return Optional.ofNullable(additionalConnections);
     }
 
     @Override
@@ -161,7 +168,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     }
 
     @Override
-    public List<String> getWorkflowConnectionKeys() {
-        return workflowConnectionKeys;
+    public Optional<List<String>> getWorkflowConnectionKeys() {
+        return Optional.ofNullable(workflowConnectionKeys);
     }
 }

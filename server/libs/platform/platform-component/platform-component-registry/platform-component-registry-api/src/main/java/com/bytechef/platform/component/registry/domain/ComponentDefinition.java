@@ -32,6 +32,7 @@ import org.springframework.lang.Nullable;
 public class ComponentDefinition {
 
     private List<ActionDefinitionBasic> actions;
+    private boolean additionalConnections;
     private String category;
     private ConnectionDefinitionBasic connection;
     private String description;
@@ -57,6 +58,7 @@ public class ComponentDefinition {
 
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
+        this.additionalConnections = OptionalUtils.orElse(componentDefinition.getAdditionalConnections(), false);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection =
             OptionalUtils.mapOrElse(componentDefinition.getConnection(), ConnectionDefinitionBasic::new, null);
@@ -72,11 +74,15 @@ public class ComponentDefinition {
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
         this.version = componentDefinition.getVersion();
-        this.workflowConnectionKeys = componentDefinition.getWorkflowConnectionKeys();
+        this.workflowConnectionKeys = OptionalUtils.orElse(componentDefinition.getWorkflowConnectionKeys(), List.of());
     }
 
     public List<ActionDefinitionBasic> getActions() {
         return actions;
+    }
+
+    public boolean getAdditionalConnections() {
+        return additionalConnections;
     }
 
     public int getActionsCount() {
