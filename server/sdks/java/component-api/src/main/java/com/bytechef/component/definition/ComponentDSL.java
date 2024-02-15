@@ -1050,6 +1050,7 @@ public final class ComponentDSL {
         private int version = VERSION_1;
         private String title;
         private List<? extends ModifiableTriggerDefinition> triggers;
+        private List<String> workflowConnectionKeys = List.of();
 
         private ModifiableComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -1081,6 +1082,18 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition allowedConnections(
+            AllowedConnectionDefinitionsFunction allowedConnectionConnectionDefinitions) {
+
+            this.allowedConnectionDefinitionsFunction = allowedConnectionConnectionDefinitions;
+
+            return this;
+        }
+
+
+            return this;
+        }
+
         public ModifiableComponentDefinition category(String category) {
             this.category = category;
 
@@ -1098,13 +1111,8 @@ public final class ComponentDSL {
             Optional<String> titleOptional = this.getTitle();
 
             this.connection.componentTitle = titleOptional.orElse(null);
-            this.connection.workflowConnectionKeys = List.of(this.getName());
 
-            return this;
-        }
-
-        public ModifiableComponentDefinition connections(AllowedConnectionDefinitionsFunction connectionDefinitions) {
-            this.allowedConnectionDefinitionsFunction = connectionDefinitions;
+            this.workflowConnectionKeys = List.of(name);
 
             return this;
         }
@@ -1201,11 +1209,14 @@ public final class ComponentDSL {
             this.triggers = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));
 
             for (ModifiableTriggerDefinition triggerDefinition : triggers) {
-                triggerDefinition.componentDescription = this.getDescription()
-                    .orElse(null);
+                Optional<String> descriptionOptional = this.getDescription();
+
+                triggerDefinition.componentDescription = descriptionOptional.orElse(null);
                 triggerDefinition.componentName = this.getName();
-                triggerDefinition.componentTitle = this.getTitle()
-                    .orElse(null);
+
+                Optional<String> titleOptional = this.getTitle();
+
+                triggerDefinition.componentTitle = titleOptional.orElse(null);
                 triggerDefinition.componentVersion = this.getVersion();
             }
 
@@ -1214,6 +1225,12 @@ public final class ComponentDSL {
 
         public ModifiableComponentDefinition version(int version) {
             this.version = version;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition workflowConnectionKeys(String... workflowConnectionKeys) {
+            this.workflowConnectionKeys = List.of(workflowConnectionKeys);
 
             return this;
         }
@@ -1295,6 +1312,11 @@ public final class ComponentDSL {
         }
 
         @Override
+        public List<String> getWorkflowConnectionKeys() {
+            return workflowConnectionKeys;
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -1313,13 +1335,15 @@ public final class ComponentDSL {
                 && Objects.equals(allowedConnectionDefinitionsFunction, that.allowedConnectionDefinitionsFunction)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(resources, that.resources) && Objects.equals(title, that.title)
-                && Objects.equals(triggers, that.triggers);
+                && Objects.equals(triggers, that.triggers)
+                && workflowConnectionKeys == that.workflowConnectionKeys;
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(actions, category, connection, customAction, customActionHelp, description, icon, tags,
-                allowedConnectionDefinitionsFunction, metadata, name, resources, version, title, triggers);
+                allowedConnectionDefinitionsFunction, metadata, name, resources, version, title, triggers,
+                workflowConnectionKeys);
         }
     }
 
@@ -1407,19 +1431,19 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return version == that.version && Objects.equals(authorizations, that.authorizations)
+            return Objects.equals(authorizationRequired, that.authorizationRequired)
+                && Objects.equals(authorizations, that.authorizations)
                 && Objects.equals(baseUriFunction, that.baseUriFunction)
                 && Objects.equals(componentName, that.componentName)
                 && Objects.equals(componentDescription, that.componentDescription)
                 && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(properties, that.properties)
-                && Objects.equals(testConsumer, that.testConsumer)
-                && Objects.equals(authorizationRequired, that.authorizationRequired);
+                && Objects.equals(testConsumer, that.testConsumer) && version == that.version;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(authorizations, baseUriFunction, componentName, componentDescription, componentTitle,
-                properties, testConsumer, version, authorizationRequired);
+            return Objects.hash(authorizationRequired, authorizations, baseUriFunction, componentName,
+                componentDescription, componentTitle, properties, testConsumer, version);
         }
 
         @Override
@@ -1475,11 +1499,6 @@ public final class ComponentDSL {
         @Override
         public int getVersion() {
             return version;
-        }
-
-        @Override
-        public List<String> getWorkflowConnectionKeys() {
-            return workflowConnectionKeys;
         }
     }
 

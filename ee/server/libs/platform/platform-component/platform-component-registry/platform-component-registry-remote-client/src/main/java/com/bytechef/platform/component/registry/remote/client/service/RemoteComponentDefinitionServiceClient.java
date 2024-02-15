@@ -53,7 +53,6 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
-
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
@@ -92,6 +91,15 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
                 new ParameterizedTypeReference<>() {})));
 
         return getComponentDefinitions(completableFutures);
+    }
+
+    @Override
+    public List<String> getWorkflowConnectionKeys(String name, Integer version) {
+        return defaultRestClient.get(
+            uriBuilder -> toUri(
+                uriBuilder, name, COMPONENT_DEFINITION_SERVICE + "/get-workflow-connection-keys/{name}/{version}", name,
+                checkVersion(version)),
+            new ParameterizedTypeReference<>() {});
     }
 
     private static int checkVersion(Integer version) {

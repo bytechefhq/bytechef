@@ -77,7 +77,8 @@ public class ComponentDefinitionRegistry {
 
         validate(componentDefinitions);
 
-        this.connectionDefinitions = componentDefinitions.stream()
+        this.connectionDefinitions = componentDefinitions
+            .stream()
             .map(componentDefinition -> OptionalUtils.orElse(componentDefinition.getConnection(), null))
             .filter(Objects::nonNull)
             .distinct()
@@ -89,7 +90,8 @@ public class ComponentDefinitionRegistry {
 
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getActions()
+        return componentDefinition
+            .getActions()
             .orElse(Collections.emptyList())
             .stream()
             .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
@@ -100,7 +102,8 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<ActionDefinition> getActionDefinitions() {
-        return componentDefinitions.stream()
+        return componentDefinitions
+            .stream()
             .flatMap(componentDefinition -> CollectionUtils.stream(
                 OptionalUtils.orElse(componentDefinition.getActions(), List.of())))
             .distinct()
@@ -131,14 +134,16 @@ public class ComponentDefinitionRegistry {
     public ComponentDefinition getComponentDefinition(String name, Integer version) {
         ComponentDefinition componentDefinition;
 
-        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.stream()
+        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions
+            .stream()
             .filter(curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()))
             .toList();
 
         if (version == null) {
             componentDefinition = filteredComponentDefinitions.getLast();
         } else {
-            componentDefinition = filteredComponentDefinitions.stream()
+            componentDefinition = filteredComponentDefinitions
+                .stream()
                 .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
@@ -148,7 +153,8 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<? extends ComponentDefinition> getComponentDefinitions(String name) {
-        return componentDefinitions.stream()
+        return componentDefinitions
+            .stream()
             .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
             .toList();
     }
@@ -169,14 +175,15 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return CollectionUtils.concatDistinct(
-            applyAllowedConnectionDefinitionsFunction(componentDefinition, connectionDefinitions),
+            applyAllowedConnectionDefinitionsFunction(componentDefinition, connectionDefinitions, null),
             List.of(OptionalUtils.get(componentDefinition.getConnection())));
     }
 
     public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getTriggers()
+        return componentDefinition
+            .getTriggers()
             .orElse(Collections.emptyList())
             .stream()
             .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
@@ -188,7 +195,8 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<TriggerDefinition> getTriggerDefinitions() {
-        return componentDefinitions.stream()
+        return componentDefinitions
+            .stream()
             .flatMap(componentDefinition -> CollectionUtils.stream(
                 OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())))
             .distinct()
@@ -211,11 +219,13 @@ public class ComponentDefinitionRegistry {
     }
 
     private List<ConnectionDefinition> applyAllowedConnectionDefinitionsFunction(
-        ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
+        ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions,
+        String workflowConnectionKey) {
 
-        return componentDefinition.getAllowedConnections()
+        return componentDefinition
+            .getAllowedConnections()
             .map(allowedConnectionDefinitionsFunction -> allowedConnectionDefinitionsFunction.apply(
-                componentDefinition, connectionDefinitions))
+                componentDefinition, connectionDefinitions, workflowConnectionKey))
             .orElse(Collections.emptyList());
     }
 

@@ -123,6 +123,12 @@ public interface ComponentDefinition {
 
     /**
      *
+     * @return
+     */
+    Optional<List<String>> getWorkflowConnectionKeys();
+
+    /**
+     *
      */
     @FunctionalInterface
     interface AllowedConnectionDefinitionsFunction {
@@ -134,6 +140,7 @@ public interface ComponentDefinition {
          * @return
          */
         List<ConnectionDefinition> apply(
-            ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions);
+            ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions,
+            String workflowConnectionKey);
     }
 }
