@@ -19,7 +19,7 @@
     @apply leading-6;
     @apply focus:outline-none;
     @apply min-w-[34px];
-    padding: 0.375rem;
+    padding: 0.313rem;
 }
 
 .ql-mention-list-container {
