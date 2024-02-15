@@ -20,15 +20,15 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.definition.WorkflowNodeType;
-import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,40 +37,57 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectionDefinitionService connectionDefinitionService;
 
-    public WorkflowConnectionFacadeImpl(ConnectionDefinitionService connectionDefinitionService) {
+    public WorkflowConnectionFacadeImpl(
+        ComponentDefinitionService componentDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService) {
+
+        this.componentDefinitionService = componentDefinitionService;
         this.connectionDefinitionService = connectionDefinitionService;
     }
 
     @Override
     public List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask) {
         return getWorkflowConnections(
-            workflowTask.getType(), (connectionRequired) -> getWorkflowConnections(
-                workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions(), connectionRequired));
+            workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions());
     }
 
     @Override
     public List<WorkflowConnection> getWorkflowConnections(WorkflowTrigger workflowTrigger) {
         return getWorkflowConnections(
-            workflowTrigger.getType(),
-            (connectionRequired) -> getWorkflowConnections(
-                workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions(),
-                connectionRequired));
+            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions());
     }
 
-    private static List<WorkflowConnection> getWorkflowConnections(
-        String name, WorkflowNodeType workflowNodeType, boolean connectionRequired) {
+    private List<WorkflowConnection> getWorkflowConnections(
+        String name, WorkflowNodeType workflowNodeType) {
 
-        return List.of(
-            new WorkflowConnection(
+        List<WorkflowConnection> workflowConnections = new ArrayList<>();
+
+        List<String> workflowConnectionKeys = componentDefinitionService.getWorkflowConnectionKeys(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+        boolean connectionRequired;
+
+        if (workflowConnectionKeys.isEmpty()) {
+            connectionRequired = false;
+        } else {
+            connectionRequired = isConnectionRequired(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion());
+        }
+
+        for (String workflowConnectionKey : workflowConnectionKeys) {
+            workflowConnections.add(new WorkflowConnection(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(), name,
-                workflowNodeType.componentName(),
-                null, connectionRequired));
+                workflowConnectionKey, null, connectionRequired));
+        }
+
+        return workflowConnections;
     }
 
-    private static List<WorkflowConnection> getWorkflowConnections(
-        String workflowNodeName, String type, Map<String, Object> extensions, boolean connectionRequired) {
+    private List<WorkflowConnection> getWorkflowConnections(
+        String workflowNodeName, String type, Map<String, Object> extensions) {
 
         List<WorkflowConnection> workflowConnections;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
@@ -78,18 +95,26 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         if (MapUtils.containsKey(extensions, WorkflowConnection.CONNECTIONS)) {
             workflowConnections = toList(
                 MapUtils.getMap(extensions, WorkflowConnection.CONNECTIONS, new TypeReference<>() {}, Map.of()),
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(), workflowNodeName,
-                connectionRequired);
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(), workflowNodeName);
         } else {
-            workflowConnections = getWorkflowConnections(workflowNodeName, workflowNodeType, connectionRequired);
+            workflowConnections = getWorkflowConnections(workflowNodeName, workflowNodeType);
         }
 
         return workflowConnections;
     }
 
-    private static List<WorkflowConnection> toList(
+    private boolean isConnectionRequired(String componentName, int componentVersion) {
+        return connectionDefinitionService
+            .fetchConnectionDefinition(componentName, componentVersion)
+            .map(connectionDefinition -> CollectionUtils.anyMatch(
+                connectionDefinition.getProperties(), Property::getRequired) ||
+                connectionDefinition.isAuthorizationRequired())
+            .orElse(false);
+    }
+
+    private List<WorkflowConnection> toList(
         Map<String, Map<String, Object>> connections, String componentName, int componentVersion,
-        String workflowNodeName, boolean connectionRequired) {
+        String workflowNodeName) {
 
         return connections
             .entrySet()
@@ -111,28 +136,8 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
                     MapUtils.getInteger(connectionMap, WorkflowConnection.COMPONENT_VERSION, componentVersion),
                     workflowNodeName, entry.getKey(), MapUtils.getLong(connectionMap, WorkflowConnection.ID),
                     MapUtils.getBoolean(
-                        connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false) || connectionRequired);
+                        connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false));
             })
             .toList();
-    }
-
-    private List<WorkflowConnection> getWorkflowConnections(
-        String type, Function<Boolean, List<WorkflowConnection>> workflowConnectionsFunction) {
-
-        List<WorkflowConnection> workflowConnections = List.of();
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
-
-        if (connectionDefinitionService.containsConnection(workflowNodeType.componentName())) {
-            ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion());
-
-            boolean propertiesRequired = CollectionUtils.anyMatch(
-                connectionDefinition.getProperties(), Property::getRequired);
-
-            workflowConnections = workflowConnectionsFunction.apply(
-                connectionDefinition.isAuthorizationRequired() || propertiesRequired);
-        }
-        return workflowConnections;
     }
 }

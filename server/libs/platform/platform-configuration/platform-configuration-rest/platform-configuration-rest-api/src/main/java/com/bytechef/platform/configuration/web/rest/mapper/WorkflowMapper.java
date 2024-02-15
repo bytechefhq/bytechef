@@ -55,6 +55,7 @@ public abstract class WorkflowMapper {
         @Mapping(target = "triggers", ignore = true)
         public abstract WorkflowModel convert(Workflow workflow);
 
+        // TODO introduce WorkflowDTO, fetch connections only for individual workflow, update logic on UI
         @AfterMapping
         public void afterMapping(Workflow workflow, @MappingTarget WorkflowModel workflowModel) {
             for (WorkflowTaskModel workflowTaskModel : workflowModel.getTasks()) {

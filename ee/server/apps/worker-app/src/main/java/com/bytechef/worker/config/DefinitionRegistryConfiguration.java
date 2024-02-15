@@ -7,9 +7,9 @@
 
 package com.bytechef.worker.config;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
@@ -36,18 +36,20 @@ public class DefinitionRegistryConfiguration {
     @Primary
     ConnectionDefinitionService connectionDefinitionService(
         @Qualifier("connectionDefinitionService") ConnectionDefinitionService connectionDefinitionService,
-        RemoteConnectionDefinitionFacadeClient connectionDefinitionFacadeClient) {
+        RemoteConnectionDefinitionFacadeClient remoteConnectionDefinitionFacadeClient) {
 
-        return new WorkerConnectionDefinitionService(connectionDefinitionService, connectionDefinitionFacadeClient);
+        return new WorkerConnectionDefinitionService(
+            connectionDefinitionService, remoteConnectionDefinitionFacadeClient);
     }
 
     /**
-     * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, HttpClient
-     * or Script) uses a compatible connection from a different component that can be in a different worker instance.
+     * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, DataStream
+     * or Script) uses a compatible connection from a different component that can be in a different worker instance
+     * when .
      */
     private record WorkerConnectionDefinitionService(
         ConnectionDefinitionService connectionDefinitionService,
-        RemoteConnectionDefinitionFacadeClient connectionDefinitionFacadeClient)
+        RemoteConnectionDefinitionFacadeClient remoteConnectionDefinitionFacadeClient)
         implements ConnectionDefinitionService {
 
         /**
@@ -60,7 +62,7 @@ public class DefinitionRegistryConfiguration {
             if (connectionDefinitionService.containsConnection(componentName)) {
                 return connectionDefinitionService.executeAuthorizationApply(componentName, connection, context);
             } else {
-                return connectionDefinitionFacadeClient.executeAuthorizationApply(componentName, connection);
+                return remoteConnectionDefinitionFacadeClient.executeAuthorizationApply(componentName, connection);
             }
         }
 
@@ -91,8 +93,15 @@ public class DefinitionRegistryConfiguration {
             if (connectionDefinitionService.containsConnection(componentName)) {
                 return connectionDefinitionService.executeBaseUri(componentName, connection, context);
             } else {
-                return connectionDefinitionFacadeClient.executeBaseUri(componentName, connection);
+                return remoteConnectionDefinitionFacadeClient.executeBaseUri(componentName, connection);
             }
+        }
+
+        @Override
+        public Optional<ConnectionDefinition> fetchConnectionDefinition(
+            @NonNull String componentName, int componentVersion) {
+
+            return connectionDefinitionService.fetchConnectionDefinition(componentName, componentVersion);
         }
 
         @Override
@@ -103,26 +112,28 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public Authorization.AuthorizationType getAuthorizationType(
+        public AuthorizationType getAuthorizationType(
             @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
-            throw new UnsupportedOperationException();
+            return connectionDefinitionService.getAuthorizationType(
+                componentName, connectionVersion, authorizationName);
         }
 
         @Override
         public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
-            throw new UnsupportedOperationException();
+            return connectionDefinitionService.getConnectionDefinition(componentName, componentVersion);
         }
 
         @Override
         public List<ConnectionDefinition> getConnectionDefinitions() {
-            throw new UnsupportedOperationException();
+            return connectionDefinitionService.getConnectionDefinitions();
         }
 
         @Override
-        public List<ConnectionDefinition>
-            getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
-            throw new UnsupportedOperationException();
+        public List<ConnectionDefinition> getConnectionDefinitions(
+            @NonNull String componentName, @NonNull Integer componentVersion) {
+
+            return connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion);
         }
     }
 }

@@ -52,6 +52,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     protected final int version;
     protected final String title;
     protected final List<? extends TriggerDefinition> triggers;
+    private final List<String> workflowConnectionKeys;
 
     public ComponentDefinitionWrapper(
         ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions) {
@@ -65,7 +66,6 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         }
 
         this.actions = actionDefinitions;
-
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
@@ -73,14 +73,15 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
-        this.allowedConnectionDefinitionsFunction =
-            OptionalUtils.orElse(componentDefinition.getAllowedConnections(), null);
+        this.allowedConnectionDefinitionsFunction = OptionalUtils.orElse(
+            componentDefinition.getAllowedConnections(), null);
         this.metadata = OptionalUtils.orElse(componentDefinition.getMetadata(), null);
         this.name = componentDefinition.getName();
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
-        this.version = componentDefinition.getVersion();
         this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
         this.triggers = OptionalUtils.orElse(componentDefinition.getTriggers(), null);
+        this.version = componentDefinition.getVersion();
+        this.workflowConnectionKeys = componentDefinition.getWorkflowConnectionKeys();
     }
 
     @Override
@@ -157,5 +158,10 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     @Override
     public int getVersion() {
         return version;
+    }
+
+    @Override
+    public List<String> getWorkflowConnectionKeys() {
+        return workflowConnectionKeys;
     }
 }

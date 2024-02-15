@@ -62,14 +62,22 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public boolean containsConnection(String componentName) {
+    public Optional<String> executeBaseUri(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<String> executeBaseUri(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
-        throw new UnsupportedOperationException();
+    public Optional<ConnectionDefinition> fetchConnectionDefinition(
+        @NonNull String componentName, int componentVersion) {
+
+        return Optional.ofNullable(
+            defaultRestClient.get(
+                uriBuilder -> toUri(
+                    uriBuilder, componentName,
+                    CONNECTION_DEFINITION_SERVICE + "/fetch-connection-definition/{componentName}/{componentVersion}",
+                    componentName, componentVersion),
+                ConnectionDefinition.class));
     }
 
     @Override
