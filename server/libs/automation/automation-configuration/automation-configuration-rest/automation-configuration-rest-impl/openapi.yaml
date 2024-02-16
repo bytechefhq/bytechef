@@ -551,7 +551,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
     post:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
@@ -626,11 +626,11 @@ paths:
             type: "string"
       responses:
         "200":
-          description: "The duplicated workflow object."
+          description: "The id of a new duplicated workflow object."
           content:
             application/json:
               schema:
-                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                type: string
   /workflows:
     get:
       description: "Get workflow definitions."
@@ -646,7 +646,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
   /workflows/{id}:
     get:
       description: "Get a workflow by id."
