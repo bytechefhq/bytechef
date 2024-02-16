@@ -161,14 +161,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName) {
 
         return new ActionDefinition(
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName));
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName),
+            componentName, componentVersion);
     }
 
     @Override
     public List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion) {
         return componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
             .stream()
-            .map(ActionDefinition::new)
+            .map(actionDefinition -> new ActionDefinition(actionDefinition, componentName, componentVersion))
             .toList();
     }
 

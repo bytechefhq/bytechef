@@ -39,10 +39,10 @@ public class ActionDefinitionBasic {
     protected ActionDefinitionBasic() {
     }
 
-    public ActionDefinitionBasic(ActionDefinition actionDefinition) {
+    public ActionDefinitionBasic(ActionDefinition actionDefinition, String componentName, int componentVersion) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
-        this.componentName = actionDefinition.getComponentName();
-        this.componentVersion = actionDefinition.getComponentVersion();
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
         this.description = Validate.notNull(getDescription(actionDefinition), "description");
         this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
         this.name = Validate.notNull(actionDefinition.getName(), "name");
