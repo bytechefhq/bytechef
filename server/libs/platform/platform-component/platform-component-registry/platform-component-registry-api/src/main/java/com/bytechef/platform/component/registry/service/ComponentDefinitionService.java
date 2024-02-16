@@ -32,7 +32,4 @@ public interface ComponentDefinitionService {
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include);
 
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
-
-    List<String> getWorkflowConnectionKeys(String name, Integer version);
-
 }

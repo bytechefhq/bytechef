@@ -93,15 +93,6 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         return getComponentDefinitions(completableFutures);
     }
 
-    @Override
-    public List<String> getWorkflowConnectionKeys(String name, Integer version) {
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, name, COMPONENT_DEFINITION_SERVICE + "/get-workflow-connection-keys/{name}/{version}", name,
-                checkVersion(version)),
-            new ParameterizedTypeReference<>() {});
-    }
-
     private static int checkVersion(Integer version) {
         if (version == null) {
             version = 1;

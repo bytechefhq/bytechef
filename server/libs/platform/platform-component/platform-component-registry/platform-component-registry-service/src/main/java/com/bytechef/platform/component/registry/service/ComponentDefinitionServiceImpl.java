@@ -82,14 +82,6 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .toList();
     }
 
-    @Override
-    public List<String> getWorkflowConnectionKeys(String name, Integer version) {
-        return componentDefinitionRegistry.getComponentDefinitions(name)
-            .stream()
-            .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getWorkflowConnectionKeys()))
-            .toList();
-    }
-
     private static Predicate<ComponentDefinition> filter(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
 
