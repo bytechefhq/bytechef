@@ -17,21 +17,11 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel;
-import java.util.List;
-import java.util.Objects;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -40,52 +30,10 @@ import org.springframework.core.convert.converter.Converter;
 public abstract class WorkflowMapper {
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public abstract static class WorkflowToWorkflowModelMapper implements Converter<Workflow, WorkflowModel> {
-
-        @Autowired
-        private WorkflowConnectionMapper workflowConnectionMapper;
-
-        @Autowired
-        private WorkflowTriggerMapper workflowTriggerMapper;
-
-        @Autowired
-        private WorkflowConnectionFacade workflowConnectionFacade;
+    public abstract static class WorkflowToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
 
         @Override
-        @Mapping(target = "triggers", ignore = true)
-        public abstract WorkflowModel convert(Workflow workflow);
-
-        // TODO introduce WorkflowDTO, fetch connections only for individual workflow, update logic on UI
-        @AfterMapping
-        public void afterMapping(Workflow workflow, @MappingTarget WorkflowModel workflowModel) {
-            for (WorkflowTaskModel workflowTaskModel : workflowModel.getTasks()) {
-                workflowTaskModel.connections(
-                    CollectionUtils.map(
-                        workflowConnectionFacade.getWorkflowConnections(
-                            CollectionUtils.getFirst(
-                                workflow.getTasks(),
-                                workflowTask -> Objects.equals(workflowTask.getName(), workflowTaskModel.getName()))),
-                        workflowConnection -> workflowConnectionMapper.convert(workflowConnection)));
-            }
-
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-            List<WorkflowTriggerModel> workflowTriggerModels = CollectionUtils.map(
-                workflowTriggers, workflowTrigger -> workflowTriggerMapper.convert(workflowTrigger));
-
-            for (WorkflowTriggerModel workflowTriggerModel : workflowTriggerModels) {
-                workflowTriggerModel.connections(
-                    CollectionUtils.map(
-                        workflowConnectionFacade.getWorkflowConnections(
-                            CollectionUtils.getFirst(
-                                workflowTriggers,
-                                workflowTrigger -> Objects.equals(
-                                    workflowTrigger.getName(), workflowTriggerModel.getName()))),
-                        workflowConnection -> workflowConnectionMapper.convert(workflowConnection)));
-            }
-
-            workflowModel.triggers(workflowTriggerModels);
-        }
+        public abstract WorkflowModel convert(WorkflowDTO workflow);
     }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)

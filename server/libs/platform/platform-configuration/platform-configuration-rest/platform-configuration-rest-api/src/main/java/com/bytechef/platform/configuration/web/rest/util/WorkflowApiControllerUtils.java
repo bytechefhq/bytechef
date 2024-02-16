@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest.util;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +26,17 @@ import org.springframework.http.ResponseEntity;
  */
 public class WorkflowApiControllerUtils {
 
-    public static ResponseEntity<WorkflowModel>
-        getWorkflow(String id, ConversionService conversionService, WorkflowService workflowService) {
-        return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class));
+    public static ResponseEntity<WorkflowModel> getWorkflow(
+        String id, ConversionService conversionService, WorkflowFacade workflowFacade) {
+
+        return ResponseEntity.ok(conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class));
     }
 
     public static ResponseEntity<WorkflowModel> updateWorkflow(
-        String id, WorkflowModel workflowModel, ConversionService conversionService, WorkflowService workflowService) {
+        String id, WorkflowModel workflowModel, ConversionService conversionService, WorkflowFacade workflowFacade) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowService.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),
+                workflowFacade.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),
                 WorkflowModel.class));
     }
 }
