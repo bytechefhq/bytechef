@@ -380,7 +380,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
         return workflowConnection
-            .getId()
+            .fetchId()
             .orElseGet(() -> getConnectionId(
                 projectInstanceId, workflowId, workflowConnection.getWorkflowNodeName(), workflowConnection.getKey()));
     }
