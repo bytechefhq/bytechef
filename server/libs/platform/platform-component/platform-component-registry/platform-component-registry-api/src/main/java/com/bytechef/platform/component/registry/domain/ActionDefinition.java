@@ -38,8 +38,11 @@ public class ActionDefinition extends ActionDefinitionBasic {
     private ActionDefinition() {
     }
 
-    public ActionDefinition(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        super(actionDefinition);
+    public ActionDefinition(
+        com.bytechef.component.definition.ActionDefinition actionDefinition, String componentName,
+        int componentVersion) {
+
+        super(actionDefinition, componentName, componentVersion);
 
         this.output = OptionalUtils.mapOrElse(
             actionDefinition.getOutput(),

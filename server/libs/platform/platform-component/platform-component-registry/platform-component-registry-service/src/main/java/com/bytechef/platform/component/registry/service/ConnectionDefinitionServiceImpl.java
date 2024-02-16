@@ -169,7 +169,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
             return componentDefinition
                 .getConnection()
-                .map(ConnectionDefinition::new);
+                .map(connectionDefinition -> toConnectionDefinition(connectionDefinition, componentDefinition));
         } else {
             return Optional.empty();
         }
@@ -192,7 +192,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        return new ConnectionDefinition(OptionalUtils.get(componentDefinition.getConnection()));
+        return toConnectionDefinition(OptionalUtils.get(componentDefinition.getConnection()), componentDefinition);
     }
 
     @Override
@@ -200,8 +200,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
-            .map(componentDefinition -> new ConnectionDefinition(
-                OptionalUtils.get(componentDefinition.getConnection())))
+            .map(componentDefinition -> toConnectionDefinition(
+                OptionalUtils.get(componentDefinition.getConnection()), componentDefinition))
             .toList();
     }
 
@@ -239,9 +239,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
         return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
             .stream()
-            .map(ConnectionDefinition::new)
+            .map(connectionDefinition -> toConnectionDefinition(connectionDefinition, componentDefinition))
             .toList();
     }
 
@@ -419,5 +422,17 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     private static String getDefaultTokenUrl(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.TOKEN_URL);
+    }
+
+    private static ConnectionDefinition toConnectionDefinition(
+        com.bytechef.component.definition.ConnectionDefinition connectionDefinition,
+        ComponentDefinition componentDefinition) {
+
+        Optional<String> descriptionOptional = componentDefinition.getDescription();
+        Optional<String> titleOptional = componentDefinition.getTitle();
+
+        return new ConnectionDefinition(
+            connectionDefinition, descriptionOptional.orElse(null), componentDefinition.getName(),
+            titleOptional.orElse(componentDefinition.getName()));
     }
 }

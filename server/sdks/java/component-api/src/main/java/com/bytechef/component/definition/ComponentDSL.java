@@ -1035,10 +1035,10 @@ public final class ComponentDSL {
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<? extends ModifiableActionDefinition> actions;
+        private List<? extends ModifiableActionDefinition> actionDefinitions;
         private Boolean additionalConnections;
         private String category;
-        private ModifiableConnectionDefinition connection;
+        private ModifiableConnectionDefinition connectionDefinition;
         private Boolean customAction;
         private Help customActionHelp;
         private String description;
@@ -1050,7 +1050,7 @@ public final class ComponentDSL {
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<? extends ModifiableTriggerDefinition> triggers;
+        private List<? extends ModifiableTriggerDefinition> triggerDefinitions;
         private List<String> workflowConnectionKeys;
 
         private ModifiableComponentDefinition(String name) {
@@ -1069,16 +1069,7 @@ public final class ComponentDSL {
         }
 
         public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
-            this.actions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
-
-            for (ModifiableActionDefinition actionDefinition : actions) {
-                actionDefinition.componentDescription = this.getDescription()
-                    .orElse(null);
-                actionDefinition.componentName = this.getName();
-                actionDefinition.componentTitle = this.getTitle()
-                    .orElse(null);
-                actionDefinition.componentVersion = this.getVersion();
-            }
+            this.actionDefinitions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
 
             return this;
         }
@@ -1104,18 +1095,7 @@ public final class ComponentDSL {
         }
 
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
-            this.connection = connectionDefinition;
-
-            Optional<String> descriptionOptional = this.getDescription();
-
-            this.connection.componentDescription = descriptionOptional.orElse(null);
-            this.connection.componentName = this.getName();
-
-            Optional<String> titleOptional = this.getTitle();
-
-            this.connection.componentTitle = titleOptional.orElse(null);
-
-            this.workflowConnectionKeys = List.of(name);
+            this.connectionDefinition = connectionDefinition;
 
             return this;
         }
@@ -1209,19 +1189,7 @@ public final class ComponentDSL {
         public <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(
             List<T> triggerDefinitions) {
 
-            this.triggers = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));
-
-            for (ModifiableTriggerDefinition triggerDefinition : triggers) {
-                Optional<String> descriptionOptional = this.getDescription();
-
-                triggerDefinition.componentDescription = descriptionOptional.orElse(null);
-                triggerDefinition.componentName = this.getName();
-
-                Optional<String> titleOptional = this.getTitle();
-
-                triggerDefinition.componentTitle = titleOptional.orElse(null);
-                triggerDefinition.componentVersion = this.getVersion();
-            }
+            this.triggerDefinitions = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));
 
             return this;
         }
@@ -1245,7 +1213,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends ActionDefinition>> getActions() {
-            return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
+            return Optional.ofNullable(actionDefinitions == null ? null : new ArrayList<>(actionDefinitions));
         }
 
         @Override
@@ -1260,7 +1228,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<ConnectionDefinition> getConnection() {
-            return Optional.ofNullable(connection);
+            return Optional.ofNullable(connectionDefinition);
         }
 
         @Override
@@ -1311,7 +1279,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<List<? extends TriggerDefinition>> getTriggers() {
-            return Optional.ofNullable(triggers == null ? null : new ArrayList<>(triggers));
+            return Optional.ofNullable(triggerDefinitions == null ? null : new ArrayList<>(triggerDefinitions));
         }
 
         @Override
@@ -1334,8 +1302,10 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return version == that.version && Objects.equals(actions, that.actions)
-                && Objects.equals(category, that.category) && Objects.equals(connection, that.connection)
+            return Objects.equals(actionDefinitions, that.actionDefinitions)
+                && Objects.equals(additionalConnections, that.additionalConnections)
+                && Objects.equals(category, that.category)
+                && Objects.equals(connectionDefinition, that.connectionDefinition)
                 && Objects.equals(customAction, that.customAction)
                 && Objects.equals(customActionHelp, that.customActionHelp)
                 && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)
@@ -1343,14 +1313,15 @@ public final class ComponentDSL {
                 && Objects.equals(allowedConnectionDefinitionsFunction, that.allowedConnectionDefinitionsFunction)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(resources, that.resources) && Objects.equals(title, that.title)
-                && Objects.equals(triggers, that.triggers)
-                && workflowConnectionKeys == that.workflowConnectionKeys;
+                && Objects.equals(triggerDefinitions, that.triggerDefinitions)
+                && version == that.version && workflowConnectionKeys == that.workflowConnectionKeys;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(actions, category, connection, customAction, customActionHelp, description, icon, tags,
-                allowedConnectionDefinitionsFunction, metadata, name, resources, version, title, triggers,
+            return Objects.hash(actionDefinitions, category, connectionDefinition, customAction, customActionHelp,
+                description, icon, tags,
+                allowedConnectionDefinitionsFunction, metadata, name, resources, version, title, triggerDefinitions,
                 workflowConnectionKeys);
         }
     }

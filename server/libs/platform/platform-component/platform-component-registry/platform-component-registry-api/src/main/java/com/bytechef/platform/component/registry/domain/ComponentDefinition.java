@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.lang.Nullable;
 
 /**
@@ -60,21 +61,27 @@ public class ComponentDefinition {
         this.actions = getActions(componentDefinition);
         this.additionalConnections = OptionalUtils.orElse(componentDefinition.getAdditionalConnections(), false);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
-        this.connection =
-            OptionalUtils.mapOrElse(componentDefinition.getConnection(), ConnectionDefinitionBasic::new, null);
+        this.connection = getConnection(componentDefinition);
+        this.connectionRequired = OptionalUtils.orElseGet(
+            componentDefinition.getConnectionRequired(),
+            () -> componentDefinition.
+                getConnection()
+                .map(connectionDefinition -> CollectionUtils.anyMatch(
+                    OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
+                    property -> OptionalUtils.orElse(property.getRequired(), false)) ||
+                    OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
+                .orElse(false));
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = componentDefinition.getName();
         this.resources = OptionalUtils.mapOrElse(componentDefinition.getResources(), Resources::new, null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), Collections.emptyList());
-        this.triggers = OptionalUtils.mapOrElse(
-            componentDefinition.getTriggers(),
-            triggerDefinitions -> CollectionUtils.map(triggerDefinitions, TriggerDefinitionBasic::new),
-            Collections.emptyList());
+        this.triggers = getTriggers(componentDefinition);
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
         this.version = componentDefinition.getVersion();
-        this.workflowConnectionKeys = OptionalUtils.orElse(componentDefinition.getWorkflowConnectionKeys(), List.of());
+        this.workflowConnectionKeys = OptionalUtils.orElseGet(
+            componentDefinition.getWorkflowConnectionKeys(), () -> List.of(componentDefinition.getName()));
     }
 
     public List<ActionDefinitionBasic> getActions() {
@@ -190,11 +197,37 @@ public class ComponentDefinition {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getActions(),
-            actionDefinitions -> CollectionUtils.map(actionDefinitions, ActionDefinitionBasic::new),
+            actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinitionBasic(
+                actionDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
             Collections.emptyList());
+    }
+
+    private static ConnectionDefinitionBasic getConnection(
+        com.bytechef.component.definition.ComponentDefinition componentDefinition) {
+
+        Optional<String> descriptionOptional = componentDefinition.getDescription();
+        Optional<String> titleOptional = componentDefinition.getTitle();
+
+        return OptionalUtils.mapOrElse(
+            componentDefinition.getConnection(),
+            connectionDefinition -> new ConnectionDefinitionBasic(
+                connectionDefinition, descriptionOptional.orElse(null), componentDefinition.getName(),
+                titleOptional.orElse(componentDefinition.getName())),
+            null);
     }
 
     private static String getTitle(String componentName, String componentTitle) {
         return componentTitle == null ? componentName : componentTitle;
+    }
+
+    private static List<TriggerDefinitionBasic> getTriggers(
+        com.bytechef.component.definition.ComponentDefinition componentDefinition) {
+
+        return OptionalUtils.mapOrElse(
+            componentDefinition.getTriggers(),
+            triggerDefinitions -> CollectionUtils.map(triggerDefinitions,
+                triggerDefinition -> new TriggerDefinitionBasic(
+                    triggerDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
+            Collections.emptyList());
     }
 }
