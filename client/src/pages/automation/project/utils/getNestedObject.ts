@@ -1,45 +1,39 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getNestedObject = (jsonObj: any, selector: string) => {
+const getNestedObject = (jsonObject: any, selector: string) => {
     const selectors = selector.split('.');
 
-    return selectors.reduce((obj, key) => {
+    return selectors.reduce((object, key) => {
+        if (!object) {
+            return undefined;
+        }
+
         let finalKey: string | undefined = key;
         let index = -1;
 
         if (finalKey === '[index]') {
             index = 0;
+
             finalKey = undefined;
         } else if (finalKey.endsWith('[index]')) {
             index = 0;
+
             finalKey = finalKey.substring(0, finalKey.length - '[index]'.length);
         }
 
-        if (Array.isArray(obj)) {
+        if (Array.isArray(object)) {
             index = 0;
         }
 
-        if (obj) {
-            if (index > -1) {
-                if (finalKey) {
-                    if (Array.isArray(obj)) {
-                        return obj[index][finalKey];
-                    } else {
-                        return obj[finalKey][index];
-                    }
-                } else {
-                    return obj[index];
-                }
+        if (index > -1) {
+            if (finalKey) {
+                return Array.isArray(object) ? object[index][finalKey] : object[finalKey][index];
             } else {
-                if (finalKey) {
-                    return obj[finalKey];
-                } else {
-                    return undefined;
-                }
+                return object[index];
             }
         } else {
-            return undefined;
+            return finalKey ? object[finalKey] : undefined;
         }
-    }, jsonObj);
+    }, jsonObject);
 };
 
 export default getNestedObject;
