@@ -160,22 +160,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Optional<ConnectionDefinition> fetchConnectionDefinition(
-        @NonNull String componentName, int componentVersion) {
-
-        if (containsConnection(componentName)) {
-            ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-                componentName, componentVersion);
-
-            return componentDefinition
-                .getConnection()
-                .map(connectionDefinition -> toConnectionDefinition(connectionDefinition, componentDefinition));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    @Override
     public AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 

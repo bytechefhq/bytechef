@@ -75,16 +75,4 @@ public class RemoteComponentDefinitionServiceController {
     public ResponseEntity<List<ComponentDefinition>> getComponentDefinitionVersions(@PathVariable("name") String name) {
         return ResponseEntity.ok(componentDefinitionService.getComponentDefinitionVersions(name));
     }
-
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/get-workflow-connection-keys/{name}/{version}",
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<List<String>> getWorkflowConnectionKeys(
-        @PathVariable("name") String name, @PathVariable("version") int version) {
-
-        return ResponseEntity.ok(componentDefinitionService.getWorkflowConnectionKeys(name, version));
-    }
 }

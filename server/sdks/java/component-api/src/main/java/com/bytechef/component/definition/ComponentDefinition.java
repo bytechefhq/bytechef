@@ -62,6 +62,12 @@ public interface ComponentDefinition {
      *
      * @return
      */
+    Optional<Boolean> getConnectionRequired();
+
+    /**
+     *
+     * @return
+     */
     Optional<Boolean> getCustomAction();
 
     /**
