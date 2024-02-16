@@ -1039,6 +1039,7 @@ public final class ComponentDSL {
         private Boolean additionalConnections;
         private String category;
         private ModifiableConnectionDefinition connectionDefinition;
+        private Boolean connectionRequired;
         private Boolean customAction;
         private Help customActionHelp;
         private String description;
@@ -1100,13 +1101,19 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition connectionRequired(boolean connectionRequired) {
+            this.connectionRequired = connectionRequired;
+
+            return this;
+        }
+
         public ModifiableComponentDefinition customAction(boolean customAction) {
             this.customAction = customAction;
 
             return this;
         }
 
-        public ModifiableComponentDefinition customAction(Help customActionHelp) {
+        public ModifiableComponentDefinition customActionHelp(Help customActionHelp) {
             this.customActionHelp = customActionHelp;
 
             return this;
@@ -1232,6 +1239,11 @@ public final class ComponentDSL {
         }
 
         @Override
+        public Optional<Boolean> getConnectionRequired() {
+            return Optional.ofNullable(connectionRequired);
+        }
+
+        @Override
         public Optional<Boolean> getCustomAction() {
             return Optional.ofNullable(customAction);
         }
@@ -1306,6 +1318,7 @@ public final class ComponentDSL {
                 && Objects.equals(additionalConnections, that.additionalConnections)
                 && Objects.equals(category, that.category)
                 && Objects.equals(connectionDefinition, that.connectionDefinition)
+                && Objects.equals(connectionRequired, that.connectionRequired)
                 && Objects.equals(customAction, that.customAction)
                 && Objects.equals(customActionHelp, that.customActionHelp)
                 && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)

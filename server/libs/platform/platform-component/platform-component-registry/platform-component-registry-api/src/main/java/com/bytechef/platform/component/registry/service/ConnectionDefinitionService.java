@@ -42,8 +42,6 @@ public interface ConnectionDefinitionService {
     Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 
-    Optional<ConnectionDefinition> fetchConnectionDefinition(@NonNull String componentName, int componentVersion);
-
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 

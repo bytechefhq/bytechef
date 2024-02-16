@@ -36,6 +36,7 @@ public class ComponentDefinition {
     private boolean additionalConnections;
     private String category;
     private ConnectionDefinitionBasic connection;
+    private boolean connectionRequired;
     private String description;
     private String icon;
     private String name;
@@ -64,8 +65,7 @@ public class ComponentDefinition {
         this.connection = getConnection(componentDefinition);
         this.connectionRequired = OptionalUtils.orElseGet(
             componentDefinition.getConnectionRequired(),
-            () -> componentDefinition.
-                getConnection()
+            () -> componentDefinition.getConnection()
                 .map(connectionDefinition -> CollectionUtils.anyMatch(
                     OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
                     property -> OptionalUtils.orElse(property.getRequired(), false)) ||
@@ -88,8 +88,12 @@ public class ComponentDefinition {
         return actions;
     }
 
-    public boolean getAdditionalConnections() {
+    public boolean isAdditionalConnections() {
         return additionalConnections;
+    }
+
+    public boolean isConnectionRequired() {
+        return connectionRequired;
     }
 
     public int getActionsCount() {
@@ -159,8 +163,9 @@ public class ComponentDefinition {
             return false;
         }
 
-        return Objects.equals(actions, that.actions) && Objects.equals(category, that.category) &&
-            Objects.equals(connection, that.connection) && Objects.equals(description, that.description) &&
+        return Objects.equals(actions, that.actions) && additionalConnections == that.additionalConnections &&
+            Objects.equals(category, that.category) && Objects.equals(connection, that.connection) &&
+            connectionRequired == that.connectionRequired && Objects.equals(description, that.description) &&
             Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
             Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
             Objects.equals(triggers, that.triggers) && Objects.equals(title, that.title) &&
@@ -170,16 +175,18 @@ public class ComponentDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, category, connection, description, icon, name, resources, tags, triggers, title, version,
-            workflowConnectionKeys);
+            actions, additionalConnections, category, connection, connectionRequired, description, icon, name,
+            resources, tags, triggers, title, version, workflowConnectionKeys);
     }
 
     @Override
     public String toString() {
         return "ComponentDefinition{" +
             "actions=" + actions +
+            ", additionalConnections=" + additionalConnections +
             ", category='" + category + '\'' +
             ", connection=" + connection +
+            ", connectionRequired=" + connectionRequired +
             ", description='" + description + '\'' +
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +
