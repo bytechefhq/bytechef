@@ -41,8 +41,11 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     private TriggerDefinition() {
     }
 
-    public TriggerDefinition(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
-        super(triggerDefinition);
+    public TriggerDefinition(
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition, String componentName,
+        int componentVersion) {
+
+        super(triggerDefinition, componentName, componentVersion);
 
         this.output = OptionalUtils.mapOrElse(
             triggerDefinition.getOutput(),

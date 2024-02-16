@@ -294,14 +294,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
 
         return new TriggerDefinition(
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName));
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName),
+            componentName, componentVersion);
     }
 
     @Override
     public List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion) {
         return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
             .stream()
-            .map(TriggerDefinition::new)
+            .map(triggerDefinition -> new TriggerDefinition(triggerDefinition, componentName, componentVersion))
             .toList();
     }
 

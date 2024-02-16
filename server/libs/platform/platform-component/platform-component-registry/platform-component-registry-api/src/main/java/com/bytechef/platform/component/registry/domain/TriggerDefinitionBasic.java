@@ -41,10 +41,10 @@ public class TriggerDefinitionBasic {
     protected TriggerDefinitionBasic() {
     }
 
-    public TriggerDefinitionBasic(TriggerDefinition triggerDefinition) {
+    public TriggerDefinitionBasic(TriggerDefinition triggerDefinition, String componentName, int componentVersion) {
         this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
-        this.componentName = triggerDefinition.getComponentName();
-        this.componentVersion = triggerDefinition.getComponentVersion();
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
         this.description = Validate.notNull(getDescription(triggerDefinition), "description");
         this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
         this.name = Validate.notNull(triggerDefinition.getName(), "name");

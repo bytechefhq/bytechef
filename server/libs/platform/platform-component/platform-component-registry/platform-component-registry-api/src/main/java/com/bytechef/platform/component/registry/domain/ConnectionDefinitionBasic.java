@@ -37,13 +37,14 @@ public class ConnectionDefinitionBasic {
     protected ConnectionDefinitionBasic() {
     }
 
-    public ConnectionDefinitionBasic(ConnectionDefinition connectionDefinition) {
+    public ConnectionDefinitionBasic(
+        ConnectionDefinition connectionDefinition, String componentDescription, String componentName,
+        String componentTitle) {
+
         this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);
-        this.componentDescription =
-            OptionalUtils.orElse(connectionDefinition.getComponentDescription(), null);
-        this.componentName = connectionDefinition.getComponentName();
-        this.componentTitle = OptionalUtils.orElse(
-            connectionDefinition.getComponentTitle(), connectionDefinition.getComponentName());
+        this.componentDescription = componentDescription;
+        this.componentName = componentName;
+        this.componentTitle = componentTitle;
         this.version = connectionDefinition.getVersion();
     }
 

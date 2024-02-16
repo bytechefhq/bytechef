@@ -35,8 +35,11 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
     private ConnectionDefinition() {
     }
 
-    public ConnectionDefinition(com.bytechef.component.definition.ConnectionDefinition connectionDefinition) {
-        super(connectionDefinition);
+    public ConnectionDefinition(
+        com.bytechef.component.definition.ConnectionDefinition connectionDefinition, String componentDescription,
+        String componentName, String componentTitle) {
+
+        super(connectionDefinition, componentName, componentDescription, componentTitle);
 
         this.authorizations = toAuthorizationDTOs(
             OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList()));
