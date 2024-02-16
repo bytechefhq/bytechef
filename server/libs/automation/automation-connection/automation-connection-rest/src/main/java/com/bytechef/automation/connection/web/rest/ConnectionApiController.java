@@ -62,6 +62,18 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    public ResponseEntity<List<ConnectionModel>> getComponentConnections(
+        String componentName, Integer componentVersion) {
+
+        return ResponseEntity.ok(
+            connectionFacade.getComponentConnections(componentName, componentVersion, Type.AUTOMATION)
+                .stream()
+                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
+                    .parameters(null))
+                .toList());
+    }
+
+    @Override
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
         return ResponseEntity.ok(
             Validate.notNull(
