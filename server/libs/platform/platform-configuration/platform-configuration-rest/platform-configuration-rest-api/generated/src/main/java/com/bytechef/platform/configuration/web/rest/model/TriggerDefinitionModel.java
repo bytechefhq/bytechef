@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String componentName;
@@ -37,7 +37,7 @@ public class TriggerDefinitionModel {
 
   private String description;
 
-  private Boolean nodeDescriptionDefined;
+  private Boolean workflowNodeDescriptionDefined;
 
   private HelpModel help;
 
@@ -128,24 +128,24 @@ public class TriggerDefinitionModel {
     this.description = description;
   }
 
-  public TriggerDefinitionModel nodeDescriptionDefined(Boolean nodeDescriptionDefined) {
-    this.nodeDescriptionDefined = nodeDescriptionDefined;
+  public TriggerDefinitionModel workflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+    this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
     return this;
   }
 
   /**
    * Does trigger define dynamic node description.
-   * @return nodeDescriptionDefined
+   * @return workflowNodeDescriptionDefined
   */
   
-  @Schema(name = "nodeDescriptionDefined", description = "Does trigger define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("nodeDescriptionDefined")
-  public Boolean getNodeDescriptionDefined() {
-    return nodeDescriptionDefined;
+  @Schema(name = "workflowNodeDescriptionDefined", description = "Does trigger define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowNodeDescriptionDefined")
+  public Boolean getWorkflowNodeDescriptionDefined() {
+    return workflowNodeDescriptionDefined;
   }
 
-  public void setNodeDescriptionDefined(Boolean nodeDescriptionDefined) {
-    this.nodeDescriptionDefined = nodeDescriptionDefined;
+  public void setWorkflowNodeDescriptionDefined(Boolean workflowNodeDescriptionDefined) {
+    this.workflowNodeDescriptionDefined = workflowNodeDescriptionDefined;
   }
 
   public TriggerDefinitionModel help(HelpModel help) {
@@ -308,7 +308,7 @@ public class TriggerDefinitionModel {
     return Objects.equals(this.componentName, triggerDefinition.componentName) &&
         Objects.equals(this.componentVersion, triggerDefinition.componentVersion) &&
         Objects.equals(this.description, triggerDefinition.description) &&
-        Objects.equals(this.nodeDescriptionDefined, triggerDefinition.nodeDescriptionDefined) &&
+        Objects.equals(this.workflowNodeDescriptionDefined, triggerDefinition.workflowNodeDescriptionDefined) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputDefined, triggerDefinition.outputDefined) &&
@@ -320,7 +320,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, nodeDescriptionDefined, help, name, outputDefined, outputFunctionDefined, properties, title, type);
+    return Objects.hash(componentName, componentVersion, description, workflowNodeDescriptionDefined, help, name, outputDefined, outputFunctionDefined, properties, title, type);
   }
 
   @Override
@@ -330,7 +330,7 @@ public class TriggerDefinitionModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    nodeDescriptionDefined: ").append(toIndentedString(nodeDescriptionDefined)).append("\n");
+    sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");

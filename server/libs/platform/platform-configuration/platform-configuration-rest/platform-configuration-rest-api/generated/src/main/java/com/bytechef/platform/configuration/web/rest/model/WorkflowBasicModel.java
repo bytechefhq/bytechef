@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -23,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
 public class WorkflowBasicModel {
 
   private String createdBy;
@@ -31,9 +34,13 @@ public class WorkflowBasicModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
+  private Integer connectionsCount;
+
   private String description;
 
   private String id;
+
+  private Integer inputsCount;
 
   private String label;
 
@@ -41,6 +48,14 @@ public class WorkflowBasicModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  private Boolean manualTrigger;
+
+  @Valid
+  private List<String> workflowTaskComponentNames;
+
+  @Valid
+  private List<String> workflowTriggerComponentNames;
 
   private Integer version;
 
@@ -84,6 +99,26 @@ public class WorkflowBasicModel {
     this.createdDate = createdDate;
   }
 
+  public WorkflowBasicModel connectionsCount(Integer connectionsCount) {
+    this.connectionsCount = connectionsCount;
+    return this;
+  }
+
+  /**
+   * The number of workflow connections
+   * @return connectionsCount
+  */
+  
+  @Schema(name = "connectionsCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of workflow connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionsCount")
+  public Integer getConnectionsCount() {
+    return connectionsCount;
+  }
+
+  public void setConnectionsCount(Integer connectionsCount) {
+    this.connectionsCount = connectionsCount;
+  }
+
   public WorkflowBasicModel description(String description) {
     this.description = description;
     return this;
@@ -122,6 +157,26 @@ public class WorkflowBasicModel {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public WorkflowBasicModel inputsCount(Integer inputsCount) {
+    this.inputsCount = inputsCount;
+    return this;
+  }
+
+  /**
+   * The number of workflow inputs
+   * @return inputsCount
+  */
+  
+  @Schema(name = "inputsCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of workflow inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputsCount")
+  public Integer getInputsCount() {
+    return inputsCount;
+  }
+
+  public void setInputsCount(Integer inputsCount) {
+    this.inputsCount = inputsCount;
   }
 
   public WorkflowBasicModel label(String label) {
@@ -184,6 +239,82 @@ public class WorkflowBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public WorkflowBasicModel manualTrigger(Boolean manualTrigger) {
+    this.manualTrigger = manualTrigger;
+    return this;
+  }
+
+  /**
+   * Does this workflow have a manual trigger or not
+   * @return manualTrigger
+  */
+  
+  @Schema(name = "manualTrigger", accessMode = Schema.AccessMode.READ_ONLY, description = "Does this workflow have a manual trigger or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("manualTrigger")
+  public Boolean getManualTrigger() {
+    return manualTrigger;
+  }
+
+  public void setManualTrigger(Boolean manualTrigger) {
+    this.manualTrigger = manualTrigger;
+  }
+
+  public WorkflowBasicModel workflowTaskComponentNames(List<String> workflowTaskComponentNames) {
+    this.workflowTaskComponentNames = workflowTaskComponentNames;
+    return this;
+  }
+
+  public WorkflowBasicModel addWorkflowTaskComponentNamesItem(String workflowTaskComponentNamesItem) {
+    if (this.workflowTaskComponentNames == null) {
+      this.workflowTaskComponentNames = new ArrayList<>();
+    }
+    this.workflowTaskComponentNames.add(workflowTaskComponentNamesItem);
+    return this;
+  }
+
+  /**
+   * Get workflowTaskComponentNames
+   * @return workflowTaskComponentNames
+  */
+  
+  @Schema(name = "workflowTaskComponentNames", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowTaskComponentNames")
+  public List<String> getWorkflowTaskComponentNames() {
+    return workflowTaskComponentNames;
+  }
+
+  public void setWorkflowTaskComponentNames(List<String> workflowTaskComponentNames) {
+    this.workflowTaskComponentNames = workflowTaskComponentNames;
+  }
+
+  public WorkflowBasicModel workflowTriggerComponentNames(List<String> workflowTriggerComponentNames) {
+    this.workflowTriggerComponentNames = workflowTriggerComponentNames;
+    return this;
+  }
+
+  public WorkflowBasicModel addWorkflowTriggerComponentNamesItem(String workflowTriggerComponentNamesItem) {
+    if (this.workflowTriggerComponentNames == null) {
+      this.workflowTriggerComponentNames = new ArrayList<>();
+    }
+    this.workflowTriggerComponentNames.add(workflowTriggerComponentNamesItem);
+    return this;
+  }
+
+  /**
+   * Get workflowTriggerComponentNames
+   * @return workflowTriggerComponentNames
+  */
+  
+  @Schema(name = "workflowTriggerComponentNames", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowTriggerComponentNames")
+  public List<String> getWorkflowTriggerComponentNames() {
+    return workflowTriggerComponentNames;
+  }
+
+  public void setWorkflowTriggerComponentNames(List<String> workflowTriggerComponentNames) {
+    this.workflowTriggerComponentNames = workflowTriggerComponentNames;
+  }
+
   public WorkflowBasicModel version(Integer version) {
     this.version = version;
     return this;
@@ -215,17 +346,22 @@ public class WorkflowBasicModel {
     WorkflowBasicModel workflowBasic = (WorkflowBasicModel) o;
     return Objects.equals(this.createdBy, workflowBasic.createdBy) &&
         Objects.equals(this.createdDate, workflowBasic.createdDate) &&
+        Objects.equals(this.connectionsCount, workflowBasic.connectionsCount) &&
         Objects.equals(this.description, workflowBasic.description) &&
         Objects.equals(this.id, workflowBasic.id) &&
+        Objects.equals(this.inputsCount, workflowBasic.inputsCount) &&
         Objects.equals(this.label, workflowBasic.label) &&
         Objects.equals(this.lastModifiedBy, workflowBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflowBasic.lastModifiedDate) &&
+        Objects.equals(this.manualTrigger, workflowBasic.manualTrigger) &&
+        Objects.equals(this.workflowTaskComponentNames, workflowBasic.workflowTaskComponentNames) &&
+        Objects.equals(this.workflowTriggerComponentNames, workflowBasic.workflowTriggerComponentNames) &&
         Objects.equals(this.version, workflowBasic.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate, version);
+    return Objects.hash(createdBy, createdDate, connectionsCount, description, id, inputsCount, label, lastModifiedBy, lastModifiedDate, manualTrigger, workflowTaskComponentNames, workflowTriggerComponentNames, version);
   }
 
   @Override
@@ -234,11 +370,16 @@ public class WorkflowBasicModel {
     sb.append("class WorkflowBasicModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    connectionsCount: ").append(toIndentedString(connectionsCount)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    inputsCount: ").append(toIndentedString(inputsCount)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    manualTrigger: ").append(toIndentedString(manualTrigger)).append("\n");
+    sb.append("    workflowTaskComponentNames: ").append(toIndentedString(workflowTaskComponentNames)).append("\n");
+    sb.append("    workflowTriggerComponentNames: ").append(toIndentedString(workflowTriggerComponentNames)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

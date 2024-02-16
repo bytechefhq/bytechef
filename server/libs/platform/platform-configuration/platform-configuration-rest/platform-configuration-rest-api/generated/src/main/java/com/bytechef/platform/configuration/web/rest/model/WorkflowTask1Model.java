@@ -26,10 +26,10 @@ import jakarta.annotation.Generated;
  * Represents a definition of a workflow task.
  */
 
-@Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
-@JsonTypeName("WorkflowTask")
+@Schema(name = "WorkflowTask_1", description = "Represents a definition of a workflow task.")
+@JsonTypeName("WorkflowTask_1")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
-public class WorkflowTaskModel {
+public class WorkflowTask1Model {
 
   @Valid
   private List<@Valid WorkflowConnectionModel> connections;
@@ -37,7 +37,7 @@ public class WorkflowTaskModel {
   private DataStreamComponentModel destination;
 
   @Valid
-  private List<@Valid WorkflowTaskModel> finalize;
+  private List<@Valid WorkflowTask1Model> finalize;
 
   private String label;
 
@@ -49,10 +49,10 @@ public class WorkflowTaskModel {
   private Map<String, Object> parameters = new HashMap<>();
 
   @Valid
-  private List<@Valid WorkflowTaskModel> post;
+  private List<@Valid WorkflowTask1Model> post;
 
   @Valid
-  private List<@Valid WorkflowTaskModel> pre;
+  private List<@Valid WorkflowTask1Model> pre;
 
   private DataStreamComponentModel source;
 
@@ -60,24 +60,24 @@ public class WorkflowTaskModel {
 
   private String type;
 
-  public WorkflowTaskModel() {
+  public WorkflowTask1Model() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public WorkflowTaskModel(String name, String type) {
+  public WorkflowTask1Model(String name, String type) {
     this.name = name;
     this.type = type;
   }
 
-  public WorkflowTaskModel connections(List<@Valid WorkflowConnectionModel> connections) {
+  public WorkflowTask1Model connections(List<@Valid WorkflowConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public WorkflowTaskModel addConnectionsItem(WorkflowConnectionModel connectionsItem) {
+  public WorkflowTask1Model addConnectionsItem(WorkflowConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -100,7 +100,7 @@ public class WorkflowTaskModel {
     this.connections = connections;
   }
 
-  public WorkflowTaskModel destination(DataStreamComponentModel destination) {
+  public WorkflowTask1Model destination(DataStreamComponentModel destination) {
     this.destination = destination;
     return this;
   }
@@ -120,12 +120,12 @@ public class WorkflowTaskModel {
     this.destination = destination;
   }
 
-  public WorkflowTaskModel finalize(List<@Valid WorkflowTaskModel> finalize) {
+  public WorkflowTask1Model finalize(List<@Valid WorkflowTask1Model> finalize) {
     this.finalize = finalize;
     return this;
   }
 
-  public WorkflowTaskModel addFinalizeItem(WorkflowTaskModel finalizeItem) {
+  public WorkflowTask1Model addFinalizeItem(WorkflowTask1Model finalizeItem) {
     if (this.finalize == null) {
       this.finalize = new ArrayList<>();
     }
@@ -140,15 +140,15 @@ public class WorkflowTaskModel {
   @Valid 
   @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("finalize")
-  public List<@Valid WorkflowTaskModel> getFinalize() {
+  public List<@Valid WorkflowTask1Model> getFinalize() {
     return finalize;
   }
 
-  public void setFinalize(List<@Valid WorkflowTaskModel> finalize) {
+  public void setFinalize(List<@Valid WorkflowTask1Model> finalize) {
     this.finalize = finalize;
   }
 
-  public WorkflowTaskModel label(String label) {
+  public WorkflowTask1Model label(String label) {
     this.label = label;
     return this;
   }
@@ -168,7 +168,7 @@ public class WorkflowTaskModel {
     this.label = label;
   }
 
-  public WorkflowTaskModel name(String name) {
+  public WorkflowTask1Model name(String name) {
     this.name = name;
     return this;
   }
@@ -188,7 +188,7 @@ public class WorkflowTaskModel {
     this.name = name;
   }
 
-  public WorkflowTaskModel node(String node) {
+  public WorkflowTask1Model node(String node) {
     this.node = node;
     return this;
   }
@@ -208,12 +208,12 @@ public class WorkflowTaskModel {
     this.node = node;
   }
 
-  public WorkflowTaskModel parameters(Map<String, Object> parameters) {
+  public WorkflowTask1Model parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
     return this;
   }
 
-  public WorkflowTaskModel putParametersItem(String key, Object parametersItem) {
+  public WorkflowTask1Model putParametersItem(String key, Object parametersItem) {
     if (this.parameters == null) {
       this.parameters = new HashMap<>();
     }
@@ -236,12 +236,12 @@ public class WorkflowTaskModel {
     this.parameters = parameters;
   }
 
-  public WorkflowTaskModel post(List<@Valid WorkflowTaskModel> post) {
+  public WorkflowTask1Model post(List<@Valid WorkflowTask1Model> post) {
     this.post = post;
     return this;
   }
 
-  public WorkflowTaskModel addPostItem(WorkflowTaskModel postItem) {
+  public WorkflowTask1Model addPostItem(WorkflowTask1Model postItem) {
     if (this.post == null) {
       this.post = new ArrayList<>();
     }
@@ -256,20 +256,20 @@ public class WorkflowTaskModel {
   @Valid 
   @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the successful execution of a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("post")
-  public List<@Valid WorkflowTaskModel> getPost() {
+  public List<@Valid WorkflowTask1Model> getPost() {
     return post;
   }
 
-  public void setPost(List<@Valid WorkflowTaskModel> post) {
+  public void setPost(List<@Valid WorkflowTask1Model> post) {
     this.post = post;
   }
 
-  public WorkflowTaskModel pre(List<@Valid WorkflowTaskModel> pre) {
+  public WorkflowTask1Model pre(List<@Valid WorkflowTask1Model> pre) {
     this.pre = pre;
     return this;
   }
 
-  public WorkflowTaskModel addPreItem(WorkflowTaskModel preItem) {
+  public WorkflowTask1Model addPreItem(WorkflowTask1Model preItem) {
     if (this.pre == null) {
       this.pre = new ArrayList<>();
     }
@@ -284,15 +284,15 @@ public class WorkflowTaskModel {
   @Valid 
   @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("pre")
-  public List<@Valid WorkflowTaskModel> getPre() {
+  public List<@Valid WorkflowTask1Model> getPre() {
     return pre;
   }
 
-  public void setPre(List<@Valid WorkflowTaskModel> pre) {
+  public void setPre(List<@Valid WorkflowTask1Model> pre) {
     this.pre = pre;
   }
 
-  public WorkflowTaskModel source(DataStreamComponentModel source) {
+  public WorkflowTask1Model source(DataStreamComponentModel source) {
     this.source = source;
     return this;
   }
@@ -312,7 +312,7 @@ public class WorkflowTaskModel {
     this.source = source;
   }
 
-  public WorkflowTaskModel timeout(String timeout) {
+  public WorkflowTask1Model timeout(String timeout) {
     this.timeout = timeout;
     return this;
   }
@@ -332,7 +332,7 @@ public class WorkflowTaskModel {
     this.timeout = timeout;
   }
 
-  public WorkflowTaskModel type(String type) {
+  public WorkflowTask1Model type(String type) {
     this.type = type;
     return this;
   }
@@ -360,19 +360,19 @@ public class WorkflowTaskModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowTaskModel workflowTask = (WorkflowTaskModel) o;
-    return Objects.equals(this.connections, workflowTask.connections) &&
-        Objects.equals(this.destination, workflowTask.destination) &&
-        Objects.equals(this.finalize, workflowTask.finalize) &&
-        Objects.equals(this.label, workflowTask.label) &&
-        Objects.equals(this.name, workflowTask.name) &&
-        Objects.equals(this.node, workflowTask.node) &&
-        Objects.equals(this.parameters, workflowTask.parameters) &&
-        Objects.equals(this.post, workflowTask.post) &&
-        Objects.equals(this.pre, workflowTask.pre) &&
-        Objects.equals(this.source, workflowTask.source) &&
-        Objects.equals(this.timeout, workflowTask.timeout) &&
-        Objects.equals(this.type, workflowTask.type);
+    WorkflowTask1Model workflowTask1 = (WorkflowTask1Model) o;
+    return Objects.equals(this.connections, workflowTask1.connections) &&
+        Objects.equals(this.destination, workflowTask1.destination) &&
+        Objects.equals(this.finalize, workflowTask1.finalize) &&
+        Objects.equals(this.label, workflowTask1.label) &&
+        Objects.equals(this.name, workflowTask1.name) &&
+        Objects.equals(this.node, workflowTask1.node) &&
+        Objects.equals(this.parameters, workflowTask1.parameters) &&
+        Objects.equals(this.post, workflowTask1.post) &&
+        Objects.equals(this.pre, workflowTask1.pre) &&
+        Objects.equals(this.source, workflowTask1.source) &&
+        Objects.equals(this.timeout, workflowTask1.timeout) &&
+        Objects.equals(this.type, workflowTask1.type);
   }
 
   @Override
@@ -383,7 +383,7 @@ public class WorkflowTaskModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowTaskModel {\n");
+    sb.append("class WorkflowTask1Model {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    destination: ").append(toIndentedString(destination)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
