@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ExecutionErrorModel;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTask1Model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private ComponentDefinitionBasicModel component;
@@ -124,7 +124,7 @@ public class TaskExecutionModel {
 
   private Long retryDelayMillis;
 
-  private WorkflowTaskModel workflowTask;
+  private WorkflowTask1Model workflowTask;
 
   private String type;
 
@@ -610,7 +610,7 @@ public class TaskExecutionModel {
     this.retryDelayMillis = retryDelayMillis;
   }
 
-  public TaskExecutionModel workflowTask(WorkflowTaskModel workflowTask) {
+  public TaskExecutionModel workflowTask(WorkflowTask1Model workflowTask) {
     this.workflowTask = workflowTask;
     return this;
   }
@@ -622,11 +622,11 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTask")
-  public WorkflowTaskModel getWorkflowTask() {
+  public WorkflowTask1Model getWorkflowTask() {
     return workflowTask;
   }
 
-  public void setWorkflowTask(WorkflowTaskModel workflowTask) {
+  public void setWorkflowTask(WorkflowTask1Model workflowTask) {
     this.workflowTask = workflowTask;
   }
 

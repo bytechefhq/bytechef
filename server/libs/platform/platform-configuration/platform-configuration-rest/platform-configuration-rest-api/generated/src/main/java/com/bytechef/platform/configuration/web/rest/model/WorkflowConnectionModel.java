@@ -20,14 +20,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;
 
   private Integer componentVersion;
-
-  private Long id;
 
   private String key;
 
@@ -56,11 +54,11 @@ public class WorkflowConnectionModel {
   }
 
   /**
-   * Get componentName
+   * The name of the component
    * @return componentName
   */
   @NotNull 
-  @Schema(name = "componentName", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "componentName", description = "The name of the component", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
     return componentName;
@@ -76,11 +74,11 @@ public class WorkflowConnectionModel {
   }
 
   /**
-   * Get componentVersion
+   * The version of the component
    * @return componentVersion
   */
   @NotNull 
-  @Schema(name = "componentVersion", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "componentVersion", description = "The version of the component", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentVersion")
   public Integer getComponentVersion() {
     return componentVersion;
@@ -90,37 +88,17 @@ public class WorkflowConnectionModel {
     this.componentVersion = componentVersion;
   }
 
-  public WorkflowConnectionModel id(Long id) {
-    this.id = id;
-    return this;
-  }
-
-  /**
-   * Get id
-   * @return id
-  */
-  
-  @Schema(name = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("id")
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
   public WorkflowConnectionModel key(String key) {
     this.key = key;
     return this;
   }
 
   /**
-   * Get key
+   * The key of the connection
    * @return key
   */
   @NotNull 
-  @Schema(name = "key", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "key", description = "The key of the connection", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("key")
   public String getKey() {
     return key;
@@ -136,11 +114,11 @@ public class WorkflowConnectionModel {
   }
 
   /**
-   * Get required
+   * If the connection is required, or not
    * @return required
   */
   @NotNull 
-  @Schema(name = "required", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "required", description = "If the connection is required, or not", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("required")
   public Boolean getRequired() {
     return required;
@@ -181,7 +159,6 @@ public class WorkflowConnectionModel {
     WorkflowConnectionModel workflowConnection = (WorkflowConnectionModel) o;
     return Objects.equals(this.componentName, workflowConnection.componentName) &&
         Objects.equals(this.componentVersion, workflowConnection.componentVersion) &&
-        Objects.equals(this.id, workflowConnection.id) &&
         Objects.equals(this.key, workflowConnection.key) &&
         Objects.equals(this.required, workflowConnection.required) &&
         Objects.equals(this.workflowNodeName, workflowConnection.workflowNodeName);
@@ -189,7 +166,7 @@ public class WorkflowConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, id, key, required, workflowNodeName);
+    return Objects.hash(componentName, componentVersion, key, required, workflowNodeName);
   }
 
   @Override
@@ -198,7 +175,6 @@ public class WorkflowConnectionModel {
     sb.append("class WorkflowConnectionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
