@@ -16,16 +16,16 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.util.WorkflowApiControllerUtils;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -42,14 +42,17 @@ public class WorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
+    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
-        ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
+        ConversionService conversionService, ProjectFacade projectFacade, WorkflowFacade workflowFacade,
+        WorkflowService workflowService) {
 
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
+        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
     }
 
@@ -62,37 +65,35 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> duplicateWorkflow(Long id, String workflowId) {
-        return ResponseEntity.ok(
-            conversionService.convert(projectFacade.duplicateWorkflow(id, workflowId), WorkflowModel.class));
+    public ResponseEntity<String> duplicateWorkflow(Long id, String workflowId) {
+        return ResponseEntity.ok(projectFacade.duplicateWorkflow(id, workflowId));
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
+    public ResponseEntity<List<WorkflowBasicModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 projectFacade.getProjectWorkflows(id),
-                workflow -> conversionService.convert(workflow, WorkflowModel.class)));
+                workflow -> conversionService.convert(workflow, WorkflowBasicModel.class)));
     }
 
     @Override
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
-        return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowService);
+        return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowFacade);
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getWorkflows() {
-        List<WorkflowModel> workflowModels = new ArrayList<>();
-
-        for (Workflow workflow : workflowService.getWorkflows(Type.AUTOMATION.getId())) {
-            workflowModels.add(conversionService.convert(workflow, WorkflowModel.class));
-        }
-
-        return ResponseEntity.ok(workflowModels);
+    public ResponseEntity<List<WorkflowBasicModel>> getWorkflows() {
+        return ResponseEntity.ok(
+            workflowService
+                .getWorkflows(Type.AUTOMATION.getId())
+                .stream()
+                .map(workflow -> conversionService.convert(workflow, WorkflowBasicModel.class))
+                .toList());
     }
 
     @Override
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
-        return WorkflowApiControllerUtils.updateWorkflow(id, workflowModel, conversionService, workflowService);
+        return WorkflowApiControllerUtils.updateWorkflow(id, workflowModel, conversionService, workflowFacade);
     }
 }

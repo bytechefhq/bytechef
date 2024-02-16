@@ -38,7 +38,7 @@ public interface ProjectFacade {
 
     ProjectDTO duplicateProject(long id);
 
-    Workflow duplicateWorkflow(long id, @NonNull String workflowId);
+    String duplicateWorkflow(long id, @NonNull String workflowId);
 
     ProjectDTO getProject(long id);
 
