@@ -51,7 +51,7 @@ public class WorkflowConnection {
         return componentName;
     }
 
-    public Optional<Long> getId() {
+    public Optional<Long> fetchId() {
         return Optional.ofNullable(id);
     }
 
