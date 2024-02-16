@@ -868,7 +868,7 @@ components:
         description:
           description: "The description."
           type: "string"
-        nodeDescriptionDefined:
+        workflowNodeDescriptionDefined:
           description: "Does action define dynamic node description."
           type: "boolean"
         help:
@@ -1631,7 +1631,7 @@ components:
         description:
           description: "The description."
           type: "string"
-        nodeDescriptionDefined:
+        workflowNodeDescriptionDefined:
           description: "Does trigger define dynamic node description."
           type: "boolean"
         help:
