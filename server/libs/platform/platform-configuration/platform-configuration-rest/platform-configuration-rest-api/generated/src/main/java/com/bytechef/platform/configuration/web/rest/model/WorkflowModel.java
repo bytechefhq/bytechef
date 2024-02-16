@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-14T16:10:55.682263+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   private String createdBy;
@@ -40,9 +40,16 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
+  private String definition;
+
   private String description;
 
+  private WorkflowFormatModel format;
+
   private String id;
+
+  @Valid
+  private List<@Valid WorkflowInputModel> inputs;
 
   private String label;
 
@@ -50,15 +57,6 @@ public class WorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
-
-  private Integer version;
-
-  private String definition;
-
-  private WorkflowFormatModel format;
-
-  @Valid
-  private List<@Valid WorkflowInputModel> inputs;
 
   @Valid
   private List<@Valid WorkflowOutputModel> outputs;
@@ -112,6 +110,8 @@ public class WorkflowModel {
   @Valid
   private List<@Valid WorkflowTriggerModel> triggers;
 
+  private Integer version;
+
   public WorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
@@ -152,6 +152,26 @@ public class WorkflowModel {
     this.createdDate = createdDate;
   }
 
+  public WorkflowModel definition(String definition) {
+    this.definition = definition;
+    return this;
+  }
+
+  /**
+   * The definition of a workflow.
+   * @return definition
+  */
+  
+  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("definition")
+  public String getDefinition() {
+    return definition;
+  }
+
+  public void setDefinition(String definition) {
+    this.definition = definition;
+  }
+
   public WorkflowModel description(String description) {
     this.description = description;
     return this;
@@ -172,6 +192,26 @@ public class WorkflowModel {
     this.description = description;
   }
 
+  public WorkflowModel format(WorkflowFormatModel format) {
+    this.format = format;
+    return this;
+  }
+
+  /**
+   * Get format
+   * @return format
+  */
+  @Valid 
+  @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("format")
+  public WorkflowFormatModel getFormat() {
+    return format;
+  }
+
+  public void setFormat(WorkflowFormatModel format) {
+    this.format = format;
+  }
+
   public WorkflowModel id(String id) {
     this.id = id;
     return this;
@@ -190,6 +230,34 @@ public class WorkflowModel {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public WorkflowModel inputs(List<@Valid WorkflowInputModel> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public WorkflowModel addInputsItem(WorkflowInputModel inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new ArrayList<>();
+    }
+    this.inputs.add(inputsItem);
+    return this;
+  }
+
+  /**
+   * The workflow's expected list of inputs.
+   * @return inputs
+  */
+  @Valid 
+  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public List<@Valid WorkflowInputModel> getInputs() {
+    return inputs;
+  }
+
+  public void setInputs(List<@Valid WorkflowInputModel> inputs) {
+    this.inputs = inputs;
   }
 
   public WorkflowModel label(String label) {
@@ -250,94 +318,6 @@ public class WorkflowModel {
 
   public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
-  }
-
-  public WorkflowModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * Get version
-   * @return version
-  */
-  
-  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("__version")
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
-  public WorkflowModel definition(String definition) {
-    this.definition = definition;
-    return this;
-  }
-
-  /**
-   * The definition of a workflow.
-   * @return definition
-  */
-  
-  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("definition")
-  public String getDefinition() {
-    return definition;
-  }
-
-  public void setDefinition(String definition) {
-    this.definition = definition;
-  }
-
-  public WorkflowModel format(WorkflowFormatModel format) {
-    this.format = format;
-    return this;
-  }
-
-  /**
-   * Get format
-   * @return format
-  */
-  @Valid 
-  @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("format")
-  public WorkflowFormatModel getFormat() {
-    return format;
-  }
-
-  public void setFormat(WorkflowFormatModel format) {
-    this.format = format;
-  }
-
-  public WorkflowModel inputs(List<@Valid WorkflowInputModel> inputs) {
-    this.inputs = inputs;
-    return this;
-  }
-
-  public WorkflowModel addInputsItem(WorkflowInputModel inputsItem) {
-    if (this.inputs == null) {
-      this.inputs = new ArrayList<>();
-    }
-    this.inputs.add(inputsItem);
-    return this;
-  }
-
-  /**
-   * The workflow's expected list of inputs.
-   * @return inputs
-  */
-  @Valid 
-  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("inputs")
-  public List<@Valid WorkflowInputModel> getInputs() {
-    return inputs;
-  }
-
-  public void setInputs(List<@Valid WorkflowInputModel> inputs) {
-    this.inputs = inputs;
   }
 
   public WorkflowModel outputs(List<@Valid WorkflowOutputModel> outputs) {
@@ -464,6 +444,26 @@ public class WorkflowModel {
     this.triggers = triggers;
   }
 
+  public WorkflowModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -475,25 +475,25 @@ public class WorkflowModel {
     WorkflowModel workflow = (WorkflowModel) o;
     return Objects.equals(this.createdBy, workflow.createdBy) &&
         Objects.equals(this.createdDate, workflow.createdDate) &&
+        Objects.equals(this.definition, workflow.definition) &&
         Objects.equals(this.description, workflow.description) &&
+        Objects.equals(this.format, workflow.format) &&
         Objects.equals(this.id, workflow.id) &&
+        Objects.equals(this.inputs, workflow.inputs) &&
         Objects.equals(this.label, workflow.label) &&
         Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
-        Objects.equals(this.version, workflow.version) &&
-        Objects.equals(this.definition, workflow.definition) &&
-        Objects.equals(this.format, workflow.format) &&
-        Objects.equals(this.inputs, workflow.inputs) &&
         Objects.equals(this.outputs, workflow.outputs) &&
         Objects.equals(this.sourceType, workflow.sourceType) &&
         Objects.equals(this.maxRetries, workflow.maxRetries) &&
         Objects.equals(this.tasks, workflow.tasks) &&
-        Objects.equals(this.triggers, workflow.triggers);
+        Objects.equals(this.triggers, workflow.triggers) &&
+        Objects.equals(this.version, workflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate, version, definition, format, inputs, outputs, sourceType, maxRetries, tasks, triggers);
+    return Objects.hash(createdBy, createdDate, definition, description, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, tasks, triggers, version);
   }
 
   @Override
@@ -502,20 +502,20 @@ public class WorkflowModel {
     sb.append("class WorkflowModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    format: ").append(toIndentedString(format)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
-    sb.append("    format: ").append(toIndentedString(format)).append("\n");
-    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    sourceType: ").append(toIndentedString(sourceType)).append("\n");
     sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
     sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

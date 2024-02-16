@@ -21,6 +21,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefini
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ControlTypeModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/DataStreamComponentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
@@ -68,6 +69,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowModel.j
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowNodeOutputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowNodeTestOutputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowOutputModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTask1Model.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTaskModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTestConfigurationConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTestConfigurationModel.java
