@@ -1,29 +1,35 @@
-import useCopyToClipboard from '@/hooks/useCopyToClipboard';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyType} from '@/types/types';
-import {ClipboardIcon} from 'lucide-react';
+import {ClipboardCheck, ClipboardIcon} from 'lucide-react';
 
 import getNestedObject from '../utils/getNestedObject';
 
-const PropertyField = ({
-    label = '[index]',
-    parentPath,
-    property,
-    sampleOutput,
-    workflowNodeName,
-}: {
+type PropertyFieldProps = {
+    copiedValue: string | null;
+    copyToClipboard: (text: string) => Promise<boolean>;
     label: string;
     property: PropertyType;
     parentPath?: string;
     sampleOutput: object;
+    valueToCopy?: string;
     workflowNodeName: string;
-}) => {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [_, copyToClipboard] = useCopyToClipboard();
+};
 
+const PropertyField = ({
+    copiedValue,
+    copyToClipboard,
+    label = '[index]',
+    parentPath,
+    property,
+    sampleOutput,
+    valueToCopy,
+    workflowNodeName,
+}: PropertyFieldProps) => {
     const selector = `${parentPath ? parentPath + '.' : ''}${property.name}`.replace('/', '.');
 
     const value = property.name && getNestedObject(sampleOutput, selector);
+
+    valueToCopy = valueToCopy || `$\{${workflowNodeName}.${selector}}`;
 
     return (
         <div>
@@ -33,16 +39,18 @@ const PropertyField = ({
                 <span className="px-2">{label}</span>
 
                 {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                    <span className="flex-1 text-xs text-muted-foreground">
-                        {value === true ? 'true' : value === false ? false : value}
-                    </span>
+                    <span className="flex-1 text-xs text-muted-foreground">{value}</span>
                 )}
 
-                <ClipboardIcon
-                    aria-hidden="true"
-                    className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
-                    onClick={() => copyToClipboard(`$\{${workflowNodeName}.${selector}}`)}
-                />
+                {copiedValue === valueToCopy ? (
+                    <ClipboardCheck className="mx-2 size-4 cursor-pointer text-green-600 hover:text-green-500" />
+                ) : (
+                    <ClipboardIcon
+                        aria-hidden="true"
+                        className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
+                        onClick={() => copyToClipboard(valueToCopy!)}
+                    />
+                )}
             </div>
         </div>
     );

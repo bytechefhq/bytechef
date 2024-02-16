@@ -1,7 +1,6 @@
-import LoadingIcon from '@/components/LoadingIcon';
-
 /// <reference types="vite-plugin-svgr/client" />
 
+import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import useCopyToClipboard from '@/hooks/useCopyToClipboard';
@@ -14,31 +13,25 @@ import {
 import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
 import {PropertyType} from '@/types/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {ClipboardIcon} from 'lucide-react';
 import {useState} from 'react';
 import {NodeProps} from 'reactflow';
-import {TYPE_ICONS} from 'shared/typeIcons';
 
+import PropertyField from '../PropertyField';
 import SchemaProperties from '../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
-const OutputTab = ({
-    currentNode,
-    outputDefined = false,
-    outputSchema,
-    sampleOutput,
-    workflowId,
-}: {
+type OutputTabProps = {
     currentNode: NodeProps['data'];
     outputDefined: boolean;
     outputSchema: PropertyModel;
-    workflowId: string;
     sampleOutput: object;
-}) => {
+    workflowId: string;
+};
+
+const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutput, workflowId}: OutputTabProps) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
 
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [_, copyToClipboard] = useCopyToClipboard();
+    const [copiedValue, copyToClipboard] = useCopyToClipboard();
 
     const queryClient = useQueryClient();
 
@@ -129,28 +122,20 @@ const OutputTab = ({
                         </DropdownMenu>
                     </div>
 
-                    <div className="mt-2 flex items-center">
-                        <div className="group flex items-center rounded-md p-1 hover:bg-gray-100">
-                            <span title={outputSchema.type}>
-                                {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
-                            </span>
-
-                            <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
-
-                            {sampleOutput && typeof sampleOutput !== 'object' && (
-                                <div className="flex-1 text-xs text-muted-foreground">{String(sampleOutput)}</div>
-                            )}
-
-                            <ClipboardIcon
-                                aria-hidden="true"
-                                className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
-                                onClick={() => copyToClipboard(`$\{${currentNode.name}}`)}
-                            />
-                        </div>
-                    </div>
+                    <PropertyField
+                        copiedValue={copiedValue}
+                        copyToClipboard={copyToClipboard}
+                        label={currentNode.name}
+                        property={outputSchema}
+                        sampleOutput={sampleOutput}
+                        valueToCopy={`$\{${currentNode.name}}`}
+                        workflowNodeName={currentNode.name}
+                    />
 
                     {(outputSchema as PropertyType)?.properties && (
                         <SchemaProperties
+                            copiedValue={copiedValue}
+                            copyToClipboard={copyToClipboard}
                             properties={(outputSchema as PropertyType).properties!}
                             sampleOutput={sampleOutput}
                             workflowNodeName={currentNode.name}
@@ -171,7 +156,8 @@ const OutputTab = ({
                                 {saveWorkflowNodeTestOutputMutation.isPending && (
                                     <>
                                         <LoadingIcon />
-                                        Testing...
+
+                                        <span>Testing...</span>
                                     </>
                                 )}
 
@@ -188,11 +174,12 @@ const OutputTab = ({
                                 {uploadSampleOutputRequestMutation.isPending && (
                                     <>
                                         <LoadingIcon />
-                                        Uploading...
+
+                                        <span>Uploading...</span>
                                     </>
                                 )}
 
-                                {!uploadSampleOutputRequestMutation.isPending && <>Upload Sample Output Data</>}
+                                {!uploadSampleOutputRequestMutation.isPending && <span>Upload Sample Output Data</span>}
                             </Button>
                         </div>
                     </div>

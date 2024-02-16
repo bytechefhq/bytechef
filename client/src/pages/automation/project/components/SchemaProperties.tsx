@@ -2,17 +2,23 @@ import {PropertyType} from '@/types/types';
 
 import PropertyField from './PropertyField';
 
-const SchemaProperties = ({
-    parentPath,
-    properties,
-    sampleOutput,
-    workflowNodeName,
-}: {
+type SchemaPropertiesProps = {
+    copiedValue: string | null;
+    copyToClipboard: (text: string) => Promise<boolean>;
     parentPath?: string;
     properties: Array<PropertyType>;
     sampleOutput: object;
     workflowNodeName: string;
-}) => (
+};
+
+const SchemaProperties = ({
+    copiedValue,
+    copyToClipboard,
+    parentPath,
+    properties,
+    sampleOutput,
+    workflowNodeName,
+}: SchemaPropertiesProps) => (
     <ul className="ml-2 h-full">
         {properties.map((property, index) => {
             const {items, name, properties} = property;
@@ -22,6 +28,8 @@ const SchemaProperties = ({
             return (
                 <li className="flex flex-col" key={`${name}_${index}`}>
                     <PropertyField
+                        copiedValue={copiedValue}
+                        copyToClipboard={copyToClipboard}
                         label={name!}
                         parentPath={parentPath}
                         property={property}
@@ -32,6 +40,8 @@ const SchemaProperties = ({
                     {properties && !!properties.length && (
                         <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1" key={name}>
                             <SchemaProperties
+                                copiedValue={copiedValue}
+                                copyToClipboard={copyToClipboard}
                                 parentPath={path}
                                 properties={properties}
                                 sampleOutput={sampleOutput}
@@ -43,6 +53,8 @@ const SchemaProperties = ({
                     {items && !!items.length && (
                         <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1" key={name}>
                             <SchemaProperties
+                                copiedValue={copiedValue}
+                                copyToClipboard={copyToClipboard}
                                 parentPath={path}
                                 properties={items}
                                 sampleOutput={sampleOutput}
