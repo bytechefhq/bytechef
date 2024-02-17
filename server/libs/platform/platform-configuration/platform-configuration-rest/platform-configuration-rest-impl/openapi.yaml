@@ -1797,15 +1797,16 @@ components:
         - "workflowNodeName"
       properties:
         componentName:
+          description: "The name of the component"
           type: "string"
         componentVersion:
+          description: "The version of the component"
           type: "integer"
-        id:
-          type: "integer"
-          format: "int64"
         key:
+          description: "The key of the connection"
           type: "string"
         required:
+          description: "If the connection is required, or not"
           type: "boolean"
         workflowNodeName:
           type: "string"
