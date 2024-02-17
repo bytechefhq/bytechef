@@ -59,30 +59,6 @@ public interface TriggerDefinition {
     Optional<Boolean> getBatch();
 
     /**
-     *
-     * @return
-     */
-    Optional<String> getComponentDescription();
-
-    /**
-     *
-     * @return
-     */
-    String getComponentName();
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getComponentTitle();
-
-    /**
-     *
-     * @return
-     */
-    int getComponentVersion();
-
-    /**
      * TODO
      *
      * @return

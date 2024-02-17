@@ -70,7 +70,7 @@ public class WorkflowTestConfigurationFacade {
                 workflowTestConfigurationConnections.removeIf(connection -> !CollectionUtils.anyMatch(
                     taskWorkflowConnections,
                     workflowConnection -> Objects.equals(
-                        workflowConnection.getWorkflowNodeName(), connection.getWorkflowNodeName())));
+                        workflowConnection.workflowNodeName(), connection.getWorkflowNodeName())));
 
                 // TODO
 //                List<WorkflowConnection> triggerWorkflowConnections = CollectionUtils.flatMap(

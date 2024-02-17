@@ -53,7 +53,6 @@ public class ComponentDefinitionRegistry {
         .triggers(trigger("manual").type(TriggerType.STATIC_WEBHOOK));
 
     private final List<ComponentDefinition> componentDefinitions;
-    private final List<ConnectionDefinition> connectionDefinitions;
 
     public ComponentDefinitionRegistry(
         List<ComponentDefinitionFactory> componentDefinitionFactories,
@@ -76,13 +75,6 @@ public class ComponentDefinitionRegistry {
         // Validate
 
         validate(componentDefinitions);
-
-        this.connectionDefinitions = componentDefinitions
-            .stream()
-            .map(componentDefinition -> OptionalUtils.orElse(componentDefinition.getConnection(), null))
-            .filter(Objects::nonNull)
-            .distinct()
-            .toList();
     }
 
     public ActionDefinition getActionDefinition(
@@ -99,16 +91,6 @@ public class ComponentDefinitionRegistry {
             .orElseThrow(
                 () -> new IllegalArgumentException(
                     "The component '%s' does not contain the '%s' action.".formatted(componentName, actionName)));
-    }
-
-    public List<ActionDefinition> getActionDefinitions() {
-        return componentDefinitions
-            .stream()
-            .flatMap(componentDefinition -> CollectionUtils.stream(
-                OptionalUtils.orElse(componentDefinition.getActions(), List.of())))
-            .distinct()
-            .map(actionDefinition -> (ActionDefinition) actionDefinition)
-            .toList();
     }
 
     public List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
@@ -165,18 +147,17 @@ public class ComponentDefinitionRegistry {
 
     public ConnectionDefinition getConnectionDefinition(String componentName) {
         return CollectionUtils.getFirst(
-            connectionDefinitions,
-            connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
+            componentDefinitions,
+            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()),
+            componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
     }
 
-    public List<ConnectionDefinition> getConnectionDefinitions(
-        String componentName, int componentVersion) {
-
+    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return CollectionUtils.concatDistinct(
-            applyAllowedConnectionDefinitionsFunction(componentDefinition, connectionDefinitions, null),
-            List.of(OptionalUtils.get(componentDefinition.getConnection())));
+            applyAllowedConnectionDefinitionsFunction(componentDefinition, componentDefinitions, null),
+            OptionalUtils.mapOrElse(componentDefinition.getConnection(), List::of, List.of()));
     }
 
     public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
@@ -219,13 +200,16 @@ public class ComponentDefinitionRegistry {
     }
 
     private List<ConnectionDefinition> applyAllowedConnectionDefinitionsFunction(
-        ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions,
+        ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
         String workflowConnectionKey) {
 
         return componentDefinition
             .getAllowedConnections()
             .map(allowedConnectionDefinitionsFunction -> allowedConnectionDefinitionsFunction.apply(
-                componentDefinition, connectionDefinitions, workflowConnectionKey))
+                componentDefinition,
+                CollectionUtils.filter(componentDefinitions, curComponentDefinition -> OptionalUtils.isPresent(
+                    curComponentDefinition.getConnection())),
+                workflowConnectionKey))
             .orElse(Collections.emptyList());
     }
 

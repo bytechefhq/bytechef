@@ -34,10 +34,6 @@ import java.util.Optional;
 public class ActionDefinitionWrapper implements ActionDefinition {
 
     protected final Boolean batch;
-    protected final String componentName;
-    protected final String componentDescription;
-    protected final String componentTitle;
-    protected final int componentVersion;
     protected final Boolean deprecated;
     protected final String description;
     protected final ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
@@ -55,10 +51,6 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         ActionDefinition actionDefinition, PerformFunction performFunction) {
 
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), null);
-        this.componentName = actionDefinition.getComponentName();
-        this.componentDescription = OptionalUtils.orElse(actionDefinition.getComponentDescription(), null);
-        this.componentTitle = OptionalUtils.orElse(actionDefinition.getComponentTitle(), null);
-        this.componentVersion = actionDefinition.getComponentVersion();
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
         this.performFunction = performFunction;
@@ -82,26 +74,6 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     @Override
     public Optional<Boolean> getDeprecated() {
         return Optional.ofNullable(deprecated);
-    }
-
-    @Override
-    public Optional<String> getComponentDescription() {
-        return Optional.ofNullable(componentDescription);
-    }
-
-    @Override
-    public String getComponentName() {
-        return componentName;
-    }
-
-    @Override
-    public Optional<String> getComponentTitle() {
-        return Optional.ofNullable(componentTitle);
-    }
-
-    @Override
-    public int getComponentVersion() {
-        return componentVersion;
     }
 
     @Override
