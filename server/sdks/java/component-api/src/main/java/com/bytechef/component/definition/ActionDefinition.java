@@ -43,30 +43,6 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<String> getComponentDescription();
-
-    /**
-     *
-     * @return
-     */
-    String getComponentName();
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getComponentTitle();
-
-    /**
-     *
-     * @return
-     */
-    int getComponentVersion();
-
-    /**
-     *
-     * @return
-     */
     Optional<String> getDescription();
 
     /**

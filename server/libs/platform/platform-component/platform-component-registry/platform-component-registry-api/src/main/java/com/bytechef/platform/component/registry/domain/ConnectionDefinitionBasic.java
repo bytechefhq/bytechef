@@ -38,8 +38,8 @@ public class ConnectionDefinitionBasic {
     }
 
     public ConnectionDefinitionBasic(
-        ConnectionDefinition connectionDefinition, String componentDescription, String componentName,
-        String componentTitle) {
+        ConnectionDefinition connectionDefinition, String componentName, String componentTitle,
+        String componentDescription) {
 
         this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);
         this.componentDescription = componentDescription;

@@ -61,7 +61,7 @@ public class CustomActionUtils {
     private static final String PATH = "path";
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
-        ModifiableActionDefinition customActionDefinition = ComponentDSL.action(CUSTOM, componentDefinition)
+        ModifiableActionDefinition customActionDefinition = ComponentDSL.action(CUSTOM)
             .title("Custom Action")
             .description(
                 "By using custom actions, you can take advantage of the existing connector platform to create new actions.")

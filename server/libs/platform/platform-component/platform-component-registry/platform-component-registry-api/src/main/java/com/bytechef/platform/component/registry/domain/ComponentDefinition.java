@@ -65,7 +65,8 @@ public class ComponentDefinition {
         this.connection = getConnection(componentDefinition);
         this.connectionRequired = OptionalUtils.orElseGet(
             componentDefinition.getConnectionRequired(),
-            () -> componentDefinition.getConnection()
+            () -> componentDefinition
+                .getConnection()
                 .map(connectionDefinition -> CollectionUtils.anyMatch(
                     OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
                     property -> OptionalUtils.orElse(property.getRequired(), false)) ||
@@ -218,8 +219,8 @@ public class ComponentDefinition {
         return OptionalUtils.mapOrElse(
             componentDefinition.getConnection(),
             connectionDefinition -> new ConnectionDefinitionBasic(
-                connectionDefinition, descriptionOptional.orElse(null), componentDefinition.getName(),
-                titleOptional.orElse(componentDefinition.getName())),
+                connectionDefinition, componentDefinition.getName(),
+                titleOptional.orElse(componentDefinition.getName()), descriptionOptional.orElse(null)),
             null);
     }
 

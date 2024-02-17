@@ -49,12 +49,6 @@ public interface ConnectionDefinition {
      */
     Optional<List<? extends Authorization>> getAuthorizations();
 
-    Optional<String> getComponentDescription();
-
-    String getComponentName();
-
-    Optional<String> getComponentTitle();
-
     /**
      *
      * @return

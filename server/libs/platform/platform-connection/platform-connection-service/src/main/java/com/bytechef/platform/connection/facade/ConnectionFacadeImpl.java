@@ -27,7 +27,6 @@ import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
@@ -273,22 +272,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return connectionUsed;
     }
 
-    private boolean isConnectionUsed(
-        String workflowId, WorkflowConnection workflowConnection, long connectionId, Type type) {
-
-        return workflowConnection
-            .fetchId()
-            .map(curConnectionId -> connectionId == curConnectionId)
-            .orElseGet(() -> isConnectionUsed(
-                workflowId, workflowConnection.getWorkflowNodeName(), workflowConnection.getKey(),
-                connectionId, type));
-    }
-
     private boolean isConnectionUsed(String workflowId, WorkflowTask workflowTask, long id, Type type) {
         return workflowConnectionFacade
             .getWorkflowConnections(workflowTask)
             .stream()
-            .map(workflowConnection -> isConnectionUsed(workflowId, workflowConnection, id, type))
+            .map(workflowConnection -> isConnectionUsed(
+                workflowId, workflowConnection.workflowNodeName(), workflowConnection.key(), id, type))
             .findFirst()
             .orElse(false);
     }
@@ -310,8 +299,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private List<ConnectionDTO> getConnections(List<Connection> connections) {
-        List<Tag> tags = tagService
-            .getTags(connections.stream()
+        List<Tag> tags = tagService.getTags(
+            connections
+                .stream()
                 .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
                 .filter(Objects::nonNull)
                 .toList());
