@@ -22,9 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.ConnectionDefinition;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Component;
 
@@ -47,24 +45,16 @@ public class DataStreamComponentDefinitionFactory implements ComponentDefinition
             .connectionRequired(true);
     }
 
-    private static List<ConnectionDefinition> getAllowedConnectionDefinitionsFunction(
+    private static List<ComponentDefinition> getAllowedConnectionDefinitionsFunction(
         ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
         String workflowConnectionKey) {
 
         if ("source".equals(workflowConnectionKey)) {
             // TODO
-            return componentDefinitions
-                .stream()
-                .map(ComponentDefinition::getConnection)
-                .map(Optional::get)
-                .toList();
+            return componentDefinitions;
         } else {
             // TODO
-            return componentDefinitions
-                .stream()
-                .map(ComponentDefinition::getConnection)
-                .map(Optional::get)
-                .toList();
+            return componentDefinitions;
         }
     }
 
