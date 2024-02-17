@@ -223,12 +223,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
-
-        return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
+        return componentDefinitionRegistry
+            .getConnectionDefinitions(componentName, componentVersion)
+            .entrySet()
             .stream()
-            .map(connectionDefinition -> toConnectionDefinition(connectionDefinition, componentDefinition))
+            .map(entry -> toConnectionDefinition(entry.getValue(), entry.getKey()))
             .toList();
     }
 
