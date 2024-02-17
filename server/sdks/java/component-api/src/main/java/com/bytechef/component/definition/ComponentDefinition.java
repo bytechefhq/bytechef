@@ -151,7 +151,7 @@ public interface ComponentDefinition {
          * @param componentDefinitions
          * @return
          */
-        List<ConnectionDefinition> apply(
+        List<ComponentDefinition> apply(
             ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
             String workflowConnectionKey);
     }

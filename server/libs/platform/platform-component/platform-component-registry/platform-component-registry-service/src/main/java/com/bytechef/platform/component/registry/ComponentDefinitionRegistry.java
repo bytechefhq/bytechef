@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.definition.ActionDefinition;
@@ -35,6 +36,7 @@ import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -152,12 +154,27 @@ public class ComponentDefinitionRegistry {
             componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
     }
 
-    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, int componentVersion) {
+    public Map<ComponentDefinition, ConnectionDefinition> getConnectionDefinitions(
+        String componentName, int componentVersion) {
+
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return CollectionUtils.concatDistinct(
-            applyAllowedConnectionDefinitionsFunction(componentDefinition, componentDefinitions, null),
-            OptionalUtils.mapOrElse(componentDefinition.getConnection(), List::of, List.of()));
+        return MapUtils.concat(
+            MapUtils.toMap(
+                applyAllowedConnectionDefinitionsFunction(
+                    componentDefinition,
+                    CollectionUtils.filter(
+                        componentDefinitions,
+                        curComponentDefinition -> OptionalUtils.isPresent(
+                            curComponentDefinition.getConnection())),
+                    null),
+                curComponentDefinition -> curComponentDefinition,
+                curComponentDefinition -> OptionalUtils.get(curComponentDefinition.getConnection())),
+            OptionalUtils.mapOrElse(
+                componentDefinition.getConnection(),
+                connectionDefinition -> Map.of(
+                    componentDefinition, OptionalUtils.get(componentDefinition.getConnection())),
+                Map.of()));
     }
 
     public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
@@ -199,7 +216,7 @@ public class ComponentDefinitionRegistry {
         return getProperty(propertyName, OptionalUtils.get(triggerDefinition.getProperties()));
     }
 
-    private List<ConnectionDefinition> applyAllowedConnectionDefinitionsFunction(
+    private List<ComponentDefinition> applyAllowedConnectionDefinitionsFunction(
         ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
         String workflowConnectionKey) {
 

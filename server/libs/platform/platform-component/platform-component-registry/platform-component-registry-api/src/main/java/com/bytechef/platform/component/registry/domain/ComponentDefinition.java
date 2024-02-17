@@ -82,7 +82,8 @@ public class ComponentDefinition {
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
         this.version = componentDefinition.getVersion();
         this.workflowConnectionKeys = OptionalUtils.orElseGet(
-            componentDefinition.getWorkflowConnectionKeys(), () -> List.of(componentDefinition.getName()));
+            componentDefinition.getWorkflowConnectionKeys(),
+            () -> connection == null ? List.of() : List.of(componentDefinition.getName()));
     }
 
     public List<ActionDefinitionBasic> getActions() {
