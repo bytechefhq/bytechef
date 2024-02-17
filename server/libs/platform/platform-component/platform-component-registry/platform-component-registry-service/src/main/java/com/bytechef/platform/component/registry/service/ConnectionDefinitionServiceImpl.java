@@ -407,7 +407,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Optional<String> titleOptional = componentDefinition.getTitle();
 
         return new ConnectionDefinition(
-            connectionDefinition, descriptionOptional.orElse(null), componentDefinition.getName(),
-            titleOptional.orElse(componentDefinition.getName()));
+            connectionDefinition, componentDefinition.getName(), titleOptional.orElse(componentDefinition.getName()),
+            descriptionOptional.orElse(null));
     }
 }

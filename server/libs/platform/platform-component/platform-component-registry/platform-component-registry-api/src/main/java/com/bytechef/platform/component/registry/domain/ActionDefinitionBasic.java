@@ -39,7 +39,9 @@ public class ActionDefinitionBasic {
     protected ActionDefinitionBasic() {
     }
 
-    public ActionDefinitionBasic(ActionDefinition actionDefinition, String componentName, int componentVersion) {
+    public ActionDefinitionBasic(
+        ActionDefinition actionDefinition, String componentName, int componentVersion) {
+
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
         this.componentName = componentName;
         this.componentVersion = componentVersion;
@@ -73,18 +75,6 @@ public class ActionDefinitionBasic {
         return title;
     }
 
-    private static String getDescription(ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(
-            actionDefinition.getDescription(),
-            OptionalUtils.orElse(actionDefinition.getComponentTitle(), actionDefinition.getComponentName()) +
-                ": " +
-                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
-    }
-
-    private static String getTitle(ActionDefinition actionDefinition) {
-        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -114,5 +104,15 @@ public class ActionDefinitionBasic {
             ", name='" + name + '\'' +
             ", title='" + title + '\'' +
             '}';
+    }
+
+    private static String getDescription(ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(
+            actionDefinition.getDescription(),
+            OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
+    }
+
+    private static String getTitle(ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
     }
 }

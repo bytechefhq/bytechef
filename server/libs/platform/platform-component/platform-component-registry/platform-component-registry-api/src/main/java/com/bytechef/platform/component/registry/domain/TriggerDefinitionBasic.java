@@ -41,7 +41,9 @@ public class TriggerDefinitionBasic {
     protected TriggerDefinitionBasic() {
     }
 
-    public TriggerDefinitionBasic(TriggerDefinition triggerDefinition, String componentName, int componentVersion) {
+    public TriggerDefinitionBasic(
+        TriggerDefinition triggerDefinition, String componentName, int componentVersion) {
+
         this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
         this.componentName = componentName;
         this.componentVersion = componentVersion;
@@ -112,11 +114,7 @@ public class TriggerDefinitionBasic {
     }
 
     private static String getDescription(TriggerDefinition triggerDefinition) {
-        return OptionalUtils.orElse(
-            triggerDefinition.getDescription(),
-            OptionalUtils.orElse(triggerDefinition.getComponentTitle(), triggerDefinition.getComponentName()) +
-                ": " +
-                getTitle(triggerDefinition));
+        return OptionalUtils.orElse(triggerDefinition.getDescription(), getTitle(triggerDefinition));
     }
 
     private static String getTitle(TriggerDefinition triggerDefinition) {

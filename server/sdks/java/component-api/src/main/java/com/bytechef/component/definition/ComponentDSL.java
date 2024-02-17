@@ -48,10 +48,6 @@ public final class ComponentDSL {
         return new ModifiableActionDefinition(name);
     }
 
-    public static ModifiableActionDefinition action(String name, ComponentDefinition componentDefinition) {
-        return new ModifiableActionDefinition(name, componentDefinition);
-    }
-
     public static ModifiableArrayProperty array() {
         return new ModifiableArrayProperty();
     }
@@ -232,10 +228,6 @@ public final class ComponentDSL {
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
-        private String componentName;
-        private String componentDescription;
-        private String componentTitle;
-        private int componentVersion;
         private boolean defaultOutputFunction;
         private Boolean deprecated;
         private String description;
@@ -252,16 +244,6 @@ public final class ComponentDSL {
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
-        }
-
-        private ModifiableActionDefinition(String name, ComponentDefinition componentDefinition) {
-            this.name = Objects.requireNonNull(name);
-            this.componentDescription = componentDefinition.getDescription()
-                .orElse(null);
-            this.componentName = componentDefinition.getName();
-            this.componentTitle = componentDefinition.getTitle()
-                .orElse(null);
-            this.componentVersion = componentDefinition.getVersion();
         }
 
         public ModifiableActionDefinition batch(boolean batch) {
@@ -376,11 +358,7 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return componentVersion == that.componentVersion && Objects.equals(batch, that.batch)
-                && Objects.equals(componentName, that.componentName)
-                && Objects.equals(componentDescription, that.componentDescription)
-                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(deprecated, that.deprecated)
-                && Objects.equals(description, that.description)
+            return Objects.equals(description, that.description)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(outputSchema, that.outputSchema)
@@ -393,8 +371,7 @@ public final class ComponentDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
-                deprecated, description, performFunction, help, metadata, name,
+            return Objects.hash(batch, deprecated, description, performFunction, help, metadata, name,
                 outputSchema, defaultOutputFunction, outputFunction, sampleOutput, properties, title,
                 workflowNodeDescriptionFunction);
         }
@@ -407,26 +384,6 @@ public final class ComponentDSL {
         @Override
         public Optional<Boolean> getDeprecated() {
             return Optional.ofNullable(deprecated);
-        }
-
-        @Override
-        public Optional<String> getComponentDescription() {
-            return Optional.ofNullable(componentDescription);
-        }
-
-        @Override
-        public String getComponentName() {
-            return componentName;
-        }
-
-        @Override
-        public Optional<String> getComponentTitle() {
-            return Optional.ofNullable(componentTitle);
-        }
-
-        @Override
-        public int getComponentVersion() {
-            return componentVersion;
         }
 
         @Override
@@ -1343,9 +1300,6 @@ public final class ComponentDSL {
 
         private List<? extends ModifiableAuthorization> authorizations;
         private BaseUriFunction baseUriFunction;
-        private String componentName;
-        private String componentDescription;
-        private String componentTitle;
         private List<? extends Property> properties;
         private TestConsumer testConsumer;
         private int version = 1;
@@ -1425,17 +1379,14 @@ public final class ComponentDSL {
 
             return Objects.equals(authorizationRequired, that.authorizationRequired)
                 && Objects.equals(authorizations, that.authorizations)
-                && Objects.equals(baseUriFunction, that.baseUriFunction)
-                && Objects.equals(componentName, that.componentName)
-                && Objects.equals(componentDescription, that.componentDescription)
-                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(properties, that.properties)
+                && Objects.equals(baseUriFunction, that.baseUriFunction) && Objects.equals(properties, that.properties)
                 && Objects.equals(testConsumer, that.testConsumer) && version == that.version;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(authorizationRequired, authorizations, baseUriFunction, componentName,
-                componentDescription, componentTitle, properties, testConsumer, version);
+            return Objects.hash(
+                authorizationRequired, authorizations, baseUriFunction, properties, testConsumer, version);
         }
 
         @Override
@@ -1456,21 +1407,6 @@ public final class ComponentDSL {
         @Override
         public Optional<List<? extends Authorization>> getAuthorizations() {
             return Optional.ofNullable(authorizations == null ? null : new ArrayList<>(authorizations));
-        }
-
-        @Override
-        public Optional<String> getComponentDescription() {
-            return Optional.ofNullable(componentDescription);
-        }
-
-        @Override
-        public String getComponentName() {
-            return componentName;
-        }
-
-        @Override
-        public Optional<String> getComponentTitle() {
-            return Optional.ofNullable(componentTitle);
         }
 
         @Override
@@ -2904,10 +2840,6 @@ public final class ComponentDSL {
     public static final class ModifiableTriggerDefinition implements TriggerDefinition {
 
         private Boolean batch;
-        private String componentName;
-        private String componentDescription;
-        private String componentTitle;
-        private int componentVersion;
         private DeduplicateFunction deduplicateFunction;
         private boolean defaultOutputFunction;
         private Boolean deprecated;
@@ -3138,10 +3070,7 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return componentVersion == that.componentVersion && Objects.equals(batch, that.batch)
-                && Objects.equals(componentName, that.componentName)
-                && Objects.equals(componentDescription, that.componentDescription)
-                && Objects.equals(componentTitle, that.componentTitle)
+            return Objects.equals(batch, that.batch)
                 && Objects.equals(deduplicateFunction, that.deduplicateFunction)
                 && Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description)
                 && Objects.equals(dynamicWebhookDisableConsumer, that.dynamicWebhookDisableConsumer)
@@ -3168,8 +3097,7 @@ public final class ComponentDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
-                deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
+            return Objects.hash(batch, deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
                 help, listenerDisableConsumer, listenerEnableConsumer, name, outputSchema, defaultOutputFunction,
                 outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequest, title, type,
@@ -3180,26 +3108,6 @@ public final class ComponentDSL {
         @Override
         public Optional<Boolean> getBatch() {
             return Optional.ofNullable(batch);
-        }
-
-        @Override
-        public Optional<String> getComponentDescription() {
-            return Optional.ofNullable(componentDescription);
-        }
-
-        @Override
-        public String getComponentName() {
-            return componentName;
-        }
-
-        @Override
-        public Optional<String> getComponentTitle() {
-            return Optional.ofNullable(componentTitle);
-        }
-
-        @Override
-        public int getComponentVersion() {
-            return componentVersion;
         }
 
         @Override

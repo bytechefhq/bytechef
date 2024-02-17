@@ -148,11 +148,11 @@ public interface ComponentDefinition {
         /**
          *
          * @param componentDefinition
-         * @param connectionDefinitions
+         * @param componentDefinitions
          * @return
          */
         List<ConnectionDefinition> apply(
-            ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions,
+            ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
             String workflowConnectionKey);
     }
 }

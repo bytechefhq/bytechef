@@ -16,70 +16,17 @@
 
 package com.bytechef.platform.configuration.domain;
 
-import java.util.Optional;
-
 /**
+ * @param workflowNodeName action task/trigger name used in the workflow
+ *
  * @author Ivica Cardic
  */
-public class WorkflowConnection {
+public record WorkflowConnection(
+    String componentName, int componentVersion, String workflowNodeName, String key, boolean required) {
 
     public static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
     public static final String COMPONENT_NAME = "componentName";
     public static final String COMPONENT_VERSION = "componentVersion";
     public static final String ID = "id";
     public static final String CONNECTIONS = "connections";
-
-    private final String componentName;
-    private final int componentVersion;
-    private final Long id;
-    private final String key;
-    private final boolean required;
-    private final String workflowNodeName; // action task/trigger name used in the workflow
-
-    public WorkflowConnection(
-        String componentName, int componentVersion, String workflowNodeName, String key, Long id, boolean required) {
-
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
-        this.id = id;
-        this.key = key;
-        this.required = required;
-        this.workflowNodeName = workflowNodeName;
-    }
-
-    public String getComponentName() {
-        return componentName;
-    }
-
-    public Optional<Long> fetchId() {
-        return Optional.ofNullable(id);
-    }
-
-    public int getComponentVersion() {
-        return componentVersion;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getWorkflowNodeName() {
-        return workflowNodeName;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    @Override
-    public String toString() {
-        return "WorkflowConnection{" +
-            "componentName='" + componentName + '\'' +
-            ", componentVersion=" + componentVersion +
-            ", key='" + key + '\'' +
-            ", workflowNodeName='" + workflowNodeName + '\'' +
-            ", id=" + id +
-            ", required=" + required +
-            '}';
-    }
 }

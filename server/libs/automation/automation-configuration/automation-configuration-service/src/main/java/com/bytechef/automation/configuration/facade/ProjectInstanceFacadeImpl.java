@@ -36,7 +36,6 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.constant.Type;
@@ -378,19 +377,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return CollectionUtils.filter(tags, tag -> containsTag(projectInstance, tag));
     }
 
-    private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
-        return workflowConnection
-            .fetchId()
-            .orElseGet(() -> getConnectionId(
-                projectInstanceId, workflowId, workflowConnection.getWorkflowNodeName(), workflowConnection.getKey()));
-    }
-
     private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowTrigger workflowTrigger) {
         return workflowConnectionFacade
             .getWorkflowConnections(workflowTrigger)
             .stream()
             .findFirst()
-            .map(workflowConnection -> getConnectionId(projectInstanceId, workflowId, workflowConnection))
+            .map(workflowConnection -> getConnectionId(
+                projectInstanceId, workflowId, workflowConnection.workflowNodeName(), workflowConnection.key()))
             .orElse(null);
     }
 

@@ -58,13 +58,15 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
         List<WorkflowConnection> workflowConnections = new ArrayList<>();
 
-        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+        if (workflowNodeType.componentOperationName() != null) {
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
-        for (String workflowConnectionKey : componentDefinition.getWorkflowConnectionKeys()) {
-            workflowConnections.add(new WorkflowConnection(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(), name,
-                workflowConnectionKey, null, componentDefinition.isConnectionRequired()));
+            for (String workflowConnectionKey : componentDefinition.getWorkflowConnectionKeys()) {
+                workflowConnections.add(new WorkflowConnection(
+                    workflowNodeType.componentName(), workflowNodeType.componentVersion(), name,
+                    workflowConnectionKey, componentDefinition.isConnectionRequired()));
+            }
         }
 
         return workflowConnections;
@@ -109,9 +111,8 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
                 return new WorkflowConnection(
                     MapUtils.getString(connectionMap, WorkflowConnection.COMPONENT_NAME, componentName),
                     MapUtils.getInteger(connectionMap, WorkflowConnection.COMPONENT_VERSION, componentVersion),
-                    workflowNodeName, entry.getKey(), MapUtils.getLong(connectionMap, WorkflowConnection.ID),
-                    MapUtils.getBoolean(
-                        connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false));
+                    workflowNodeName, entry.getKey(),
+                    MapUtils.getBoolean(connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false));
             })
             .toList();
     }
