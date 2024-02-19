@@ -33,11 +33,11 @@ import java.util.function.BiFunction;
  */
 public abstract class AbstractComponentHandlerLoader<T extends ComponentHandler> implements ComponentHandlerLoader {
 
-    private final BiFunction<ComponentHandler, ActionDefinition, ActionDefinition> actionDefinitionMapperFunction;
+    private final BiFunction<T, ActionDefinition, ActionDefinition> actionDefinitionMapperFunction;
     private final Class<T> serviceClass;
 
     public AbstractComponentHandlerLoader(
-        BiFunction<ComponentHandler, ActionDefinition, ActionDefinition> actionDefinitionMapperFunction,
+        BiFunction<T, ActionDefinition, ActionDefinition> actionDefinitionMapperFunction,
         Class<T> serviceClass) {
 
         this.actionDefinitionMapperFunction = actionDefinitionMapperFunction;
