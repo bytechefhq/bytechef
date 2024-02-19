@@ -100,7 +100,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
                 Map<String, Object> connectionMap = entry.getValue();
 
                 if ((!connectionMap.containsKey(WorkflowConnection.COMPONENT_NAME) ||
-                        !connectionMap.containsKey(WorkflowConnection.COMPONENT_VERSION))) {
+                    !connectionMap.containsKey(WorkflowConnection.COMPONENT_VERSION))) {
 
                     throw new IllegalStateException(
                         "%s and %s must be set".formatted(
