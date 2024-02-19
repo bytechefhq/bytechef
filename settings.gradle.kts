@@ -117,6 +117,7 @@ include("server:libs:embedded:embedded-swagger")
 
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api")
+include("server:libs:platform:platform-component:platform-component-api")
 include("server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service")
 include("server:libs:platform:platform-component:platform-component-test-int-support")
 include("server:libs:platform:platform-configuration:platform-configuration-api")
