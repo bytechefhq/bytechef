@@ -27,6 +27,12 @@ public interface AdditionalConnectionsComponentDefinition extends ComponentDefin
 
     /**
      *
+     * @return
+     */
+    FilterConnectionDefinitionsFunction getFilterConnectionDefinition();
+
+    /**
+     *
      */
     @FunctionalInterface
     interface FilterConnectionDefinitionsFunction {
