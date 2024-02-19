@@ -27,6 +27,5 @@ public record WorkflowConnection(
     public static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
     public static final String COMPONENT_NAME = "componentName";
     public static final String COMPONENT_VERSION = "componentVersion";
-    public static final String ID = "id";
     public static final String CONNECTIONS = "connections";
 }
