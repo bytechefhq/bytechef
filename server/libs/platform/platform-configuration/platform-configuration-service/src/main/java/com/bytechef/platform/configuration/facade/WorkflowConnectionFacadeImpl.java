@@ -99,8 +99,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
             .map(entry -> {
                 Map<String, Object> connectionMap = entry.getValue();
 
-                if (!connectionMap.containsKey(WorkflowConnection.ID) &&
-                    (!connectionMap.containsKey(WorkflowConnection.COMPONENT_NAME) ||
+                if ((!connectionMap.containsKey(WorkflowConnection.COMPONENT_NAME) ||
                         !connectionMap.containsKey(WorkflowConnection.COMPONENT_VERSION))) {
 
                     throw new IllegalStateException(
