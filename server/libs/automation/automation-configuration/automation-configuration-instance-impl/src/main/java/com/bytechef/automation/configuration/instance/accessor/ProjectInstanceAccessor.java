@@ -16,18 +16,13 @@
 
 package com.bytechef.automation.configuration.instance.accessor;
 
-import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,24 +43,8 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
-
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances();
-
-        for (ProjectInstance projectInstance : projectInstances) {
-            if (projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
-                Validate.notNull(projectInstance.getId(), "id"), workflowId, workflowNodeName,
-                workflowConnectionKey)
-                .map(ProjectInstanceWorkflowConnection::getConnectionId)
-                .map(curConnectionId -> Objects.equals(curConnectionId, connectionId))
-                .orElse(false)) {
-
-                return true;
-            }
-        }
-
-        return false;
+    public boolean isConnectionUsed(long connectionId) {
+        return projectInstanceWorkflowService.isConnectionUsed(connectionId);
     }
 
     @Override

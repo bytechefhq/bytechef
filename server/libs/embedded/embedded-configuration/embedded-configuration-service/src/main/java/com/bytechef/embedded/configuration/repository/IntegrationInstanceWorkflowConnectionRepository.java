@@ -30,6 +30,8 @@ import org.springframework.stereotype.Repository;
 public interface IntegrationInstanceWorkflowConnectionRepository
     extends org.springframework.data.repository.Repository<IntegrationInstanceWorkflowConnection, Long> {
 
+    List<IntegrationInstanceWorkflowConnection> findByConnectionId(long connectionId);
+
     @Query("""
             SELECT integration_instance_workflow_connection.* FROM integration_instance_workflow_connection
             JOIN integration_instance_workflow ON integration_instance_workflow_connection.integration_instance_workflow_id = integration_instance_workflow.id

@@ -19,7 +19,6 @@ package com.bytechef.embedded.configuration.service;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflowConnection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -29,9 +28,6 @@ public interface IntegrationInstanceWorkflowService {
     List<IntegrationInstanceWorkflow> create(List<IntegrationInstanceWorkflow> integrationInstanceWorkflows);
 
     void delete(Long id);
-
-    Optional<IntegrationInstanceWorkflowConnection> fetchIntegrationInstanceWorkflowConnection(
-        long integrationInstanceId, String workflowId, String operationName, String key);
 
     boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceId, String workflowId);
 
@@ -46,6 +42,8 @@ public interface IntegrationInstanceWorkflowService {
     List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(long integrationInstanceId);
 
     List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(List<Long> integrationInstanceIds);
+
+    boolean isConnectionUsed(long connectionId);
 
     IntegrationInstanceWorkflow update(IntegrationInstanceWorkflow integrationInstanceWorkflow);
 

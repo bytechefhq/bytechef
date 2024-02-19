@@ -54,21 +54,20 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     }
 
     @Override
-    public WorkflowTestConfiguration
-        saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<Long> getWorkflowTestConfigurationConnectionIds(String workflowId, List<String> workflowTaskNames) {
+    public boolean isConnectionUsed(long connectionId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
-                .path(
-                    WORKFLOW_SERVICE +
-                        "/get-workflow-test-configuration-connection-ids/{workflowId}/{workflowTaskNames}")
-                .build(workflowId, String.join(",", workflowTaskNames)),
+                .path(WORKFLOW_SERVICE + "/is-connection-used/{connectionId}")
+                .build(connectionId),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public WorkflowTestConfiguration saveWorkflowTestConfiguration(
+        WorkflowTestConfiguration workflowTestConfiguration) {
+
+        throw new UnsupportedOperationException();
     }
 
     @Override

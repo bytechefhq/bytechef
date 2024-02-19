@@ -30,6 +30,8 @@ import org.springframework.stereotype.Repository;
 public interface ProjectInstanceWorkflowConnectionRepository
     extends org.springframework.data.repository.Repository<ProjectInstanceWorkflowConnection, Long> {
 
+    List<ProjectInstanceWorkflowConnection> findByConnectionId(long connectionId);
+
     @Query("""
             SELECT project_instance_workflow_connection.* FROM project_instance_workflow_connection
             JOIN project_instance_workflow ON project_instance_workflow_connection.project_instance_workflow_id = project_instance_workflow.id

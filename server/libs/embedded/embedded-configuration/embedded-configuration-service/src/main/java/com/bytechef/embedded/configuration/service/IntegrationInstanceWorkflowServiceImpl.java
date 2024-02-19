@@ -24,7 +24,6 @@ import com.bytechef.embedded.configuration.repository.IntegrationInstanceWorkflo
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,13 +58,10 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
-    public Optional<IntegrationInstanceWorkflowConnection> fetchIntegrationInstanceWorkflowConnection(
-        long integrationInstanceId, String workflowId, String operationName,
-        String key) {
-
-        return integrationInstanceWorkflowConnectionRepository
-            .findByIntegrationInstanceIdAndWorkflowIdAndOperationNameAndKey(
-                integrationInstanceId, workflowId, operationName, key);
+    public boolean isConnectionUsed(long connectionId) {
+        return !integrationInstanceWorkflowConnectionRepository
+            .findByConnectionId(connectionId)
+            .isEmpty();
     }
 
     @Override

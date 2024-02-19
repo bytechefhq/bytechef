@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -32,9 +31,6 @@ public interface ProjectInstanceWorkflowService {
 
     void delete(Long id);
 
-    Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String workflowNodeName, String key);
-
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
@@ -46,6 +42,8 @@ public interface ProjectInstanceWorkflowService {
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds);
+
+    boolean isConnectionUsed(long connectionId);
 
     boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId);
 

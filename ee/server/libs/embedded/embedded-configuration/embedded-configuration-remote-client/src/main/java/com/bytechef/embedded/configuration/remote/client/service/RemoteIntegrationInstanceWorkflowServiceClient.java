@@ -13,7 +13,6 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflowCon
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -45,20 +44,13 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     }
 
     @Override
-    public Optional<IntegrationInstanceWorkflowConnection> fetchIntegrationInstanceWorkflowConnection(
-        long integrationInstanceId, String workflowId, String operationName,
-        String key) {
-
-        return Optional.ofNullable(
-            loadBalancedRestClient.get(
-                uriBuilder -> uriBuilder
-                    .host(CONFIGURATION_APP)
-                    .path(
-                        INTEGRATION_INSTANCE_WORKFLOW_SERVICE +
-                            "/fetch-integration-instance-workflow-connection/{integrationInstanceId}/{workflowId}/" +
-                            "{workflowConnectionOperationName}/{workflowConnectionKey}")
-                    .build(integrationInstanceId, workflowId, operationName, key),
-                IntegrationInstanceWorkflowConnection.class));
+    public boolean isConnectionUsed(long connectionId) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(CONFIGURATION_APP)
+                .path(INTEGRATION_INSTANCE_WORKFLOW_SERVICE + "/is-connection-used/{connectionId}")
+                .build(connectionId),
+            Boolean.class);
     }
 
     @Override

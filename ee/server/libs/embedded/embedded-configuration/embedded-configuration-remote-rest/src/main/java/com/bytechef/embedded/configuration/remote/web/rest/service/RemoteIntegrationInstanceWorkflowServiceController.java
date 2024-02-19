@@ -40,19 +40,12 @@ public class RemoteIntegrationInstanceWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-integration-instance-workflow-connection/{integrationInstanceId}/{workflowId}/" +
-            "{workflowConnectionOperationName}/{workflowConnectionKey}",
+        value = "/is-connection-used/{connectionId}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<IntegrationInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        @PathVariable long integrationInstanceId, @PathVariable String workflowId,
-        @PathVariable String workflowConnectionOperationName, @PathVariable String workflowConnectionKey) {
-
-        return ResponseEntity.ok(
-            integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflowConnection(
-                integrationInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey)
-                .orElse(null));
+    public ResponseEntity<Boolean> isConnectionUsed(@PathVariable long connectionId) {
+        return ResponseEntity.ok(integrationInstanceWorkflowService.isConnectionUsed(connectionId));
     }
 
     @RequestMapping(

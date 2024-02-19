@@ -24,8 +24,7 @@ import java.util.Map;
  */
 public interface InstanceAccessor {
 
-    boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowNodeName, String workflowConnectionKey);
+    boolean isConnectionUsed(long connectionId);
 
     boolean isWorkflowEnabled(long instanceId, String workflowId);
 

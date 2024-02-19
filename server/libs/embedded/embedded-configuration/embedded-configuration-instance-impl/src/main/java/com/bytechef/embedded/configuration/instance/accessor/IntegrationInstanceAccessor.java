@@ -16,18 +16,13 @@
 
 package com.bytechef.embedded.configuration.instance.accessor;
 
-import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflowConnection;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,24 +44,8 @@ public class IntegrationInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
-
-        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances();
-
-        for (IntegrationInstance integrationInstance : integrationInstances) {
-            if (integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflowConnection(
-                Validate.notNull(integrationInstance.getId(), "id"), workflowId, workflowConnectionOperationName,
-                workflowConnectionKey)
-                .map(IntegrationInstanceWorkflowConnection::getConnectionId)
-                .map(curConnectionId -> Objects.equals(curConnectionId, connectionId))
-                .orElse(false)) {
-
-                return true;
-            }
-        }
-
-        return false;
+    public boolean isConnectionUsed(long connectionId) {
+        return integrationInstanceWorkflowService.isConnectionUsed(connectionId);
     }
 
     @Override
