@@ -17,8 +17,8 @@
 package com.bytechef.platform.component.registry.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
+import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Arrays;
 import java.util.List;

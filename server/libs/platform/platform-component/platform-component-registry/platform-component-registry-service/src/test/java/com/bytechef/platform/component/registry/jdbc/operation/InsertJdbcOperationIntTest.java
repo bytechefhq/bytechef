@@ -22,9 +22,9 @@ import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstan
 import static com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
+import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
-import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;

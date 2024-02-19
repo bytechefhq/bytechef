@@ -39,14 +39,14 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.JdbcComponentDefinition;
 import com.bytechef.component.definition.Property;
-import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
+import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
+import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.registry.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.platform.component.registry.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.registry.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.platform.component.registry.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.platform.component.registry.jdbc.operation.UpdateJdbcOperation;
-import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
 import java.util.List;
 import java.util.Map;
 

@@ -19,8 +19,6 @@ package com.bytechef.platform.component.registry.jdbc.handler.loader;
 import com.bytechef.component.JdbcComponentDefinitionFactory;
 import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.registry.handler.loader.ComponentHandlerLoader;
-import com.bytechef.platform.component.registry.jdbc.handler.JdbcComponentHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -37,8 +35,9 @@ public class JdbcComponentHandlerLoader implements ComponentHandlerLoader {
         for (JdbcComponentDefinitionFactory jdbcComponentDefinitionFactory : ServiceLoader.load(
             JdbcComponentDefinitionFactory.class)) {
 
-            JdbcComponentHandler jdbcComponentHandler = new JdbcComponentHandler(
-                jdbcComponentDefinitionFactory.getJdbcComponentDefinition());
+            com.bytechef.platform.component.registry.jdbc.handler.JdbcComponentHandler jdbcComponentHandler =
+                new com.bytechef.platform.component.registry.jdbc.handler.JdbcComponentHandler(
+                    jdbcComponentDefinitionFactory.getJdbcComponentDefinition());
 
             componentHandlerEntries.add(
                 new ComponentHandlerEntry(

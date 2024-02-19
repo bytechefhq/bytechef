@@ -17,8 +17,8 @@
 package com.bytechef.platform.component.registry.handler.loader;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import java.util.List;
 
 /**

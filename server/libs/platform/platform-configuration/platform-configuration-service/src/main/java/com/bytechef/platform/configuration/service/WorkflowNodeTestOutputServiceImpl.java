@@ -18,11 +18,11 @@ package com.bytechef.platform.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.defiition.PropertyFactory;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
+import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
