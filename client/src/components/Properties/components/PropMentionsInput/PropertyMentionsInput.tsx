@@ -85,7 +85,7 @@ const PropertyMentionsInput = forwardRef(
         const [value, setValue] = useState(defaultValue || '');
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+        const {copiedPropertyData, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -277,6 +277,24 @@ const PropertyMentionsInput = forwardRef(
 
             if (singleMention && mentionOccurences) {
                 event.preventDefault();
+            }
+
+            if (event.key === 'v' && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+
+                if (copiedPropertyData) {
+                    if (currentComponent?.icon) {
+                        copiedPropertyData.componentIcon = currentComponent.icon;
+                    }
+
+                    const mentionInput = focusedInput?.getEditor().getModule('mention');
+
+                    if (!mentionInput) {
+                        return;
+                    }
+
+                    mentionInput.insertItem(copiedPropertyData, true, {blotName: 'property-mention'});
+                }
             }
         };
 
