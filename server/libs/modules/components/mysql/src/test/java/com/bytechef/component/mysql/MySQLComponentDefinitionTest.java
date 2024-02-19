@@ -16,7 +16,7 @@
 
 package com.bytechef.component.mysql;
 
-import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandler;
+import com.bytechef.platform.component.registry.jdbc.handler.JdbcComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 

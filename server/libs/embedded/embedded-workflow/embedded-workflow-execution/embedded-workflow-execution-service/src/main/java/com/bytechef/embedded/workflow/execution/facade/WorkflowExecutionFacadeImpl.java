@@ -32,7 +32,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
-import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.Type;

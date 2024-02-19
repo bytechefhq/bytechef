@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.platform.component.definition.factory.ContextFactory;
+import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;

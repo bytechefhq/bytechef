@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import com.bytechef.platform.component.definition.factory.ContextFactory;
+import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
