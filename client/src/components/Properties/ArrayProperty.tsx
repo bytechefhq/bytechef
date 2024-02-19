@@ -40,6 +40,7 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
         }
 
         const newItem = {
+            controlType: arrayItems[0].controlType,
             name: `${name}_${arrayItems.length}`,
             type: arrayItems[0].type,
         };
@@ -48,11 +49,35 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
     };
 
     useEffect(() => {
-        if (!currentComponentData?.parameters || !Object.keys(currentComponentData?.parameters).length) {
+        if (dataPills?.length || !arrayItems?.length) {
             return;
         }
 
-        const parameterArrayItems = Object.keys(currentComponentData!.parameters!).reduce(
+        const updatedArrayItems = arrayItems.map((item) => {
+            if (!item.name) {
+                return {
+                    ...item,
+                    name: `${name}_0`,
+                };
+            }
+
+            return item;
+        });
+
+        setArrayItems(updatedArrayItems);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [arrayItems?.length, name]);
+
+    useEffect(() => {
+        if (
+            !dataPills?.length ||
+            !currentComponentData?.parameters ||
+            !Object.keys(currentComponentData?.parameters).length
+        ) {
+            return;
+        }
+
+        const parameterArrayItems = Object.keys(currentComponentData.parameters).reduce(
             (parameters: Array<PropertyModel & {defaultValue: string}>, key: string) => {
                 if (arrayItems?.length && key.startsWith(`${name}_`)) {
                     const strippedValue = currentComponentData.parameters?.[key]
@@ -91,9 +116,11 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
             return 0;
         });
 
-        setArrayItems(parameterArrayItems);
+        if (parameterArrayItems.length) {
+            setArrayItems(parameterArrayItems);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [arrayItems?.length, currentComponentData?.parameters, name]);
+    }, [currentComponentData?.parameters, name]);
 
     return (
         <ul className="w-full">
