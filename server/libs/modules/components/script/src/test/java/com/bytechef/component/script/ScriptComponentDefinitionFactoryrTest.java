@@ -22,10 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Matija Petanjek
  */
-public class ScriptComponentHandlerTest {
+public class ScriptComponentDefinitionFactoryrTest {
 
     @Test
     public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/script_v1.json", new ScriptComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/script_v1.json",
+            new ScriptComponentDefinitionFactory().getDefinition());
     }
 }
