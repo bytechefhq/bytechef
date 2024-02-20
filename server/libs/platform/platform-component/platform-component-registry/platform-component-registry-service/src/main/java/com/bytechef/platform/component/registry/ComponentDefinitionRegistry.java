@@ -35,7 +35,6 @@ import com.bytechef.platform.component.definition.ScriptComponentDefinition.Filt
 import com.bytechef.platform.component.registry.factory.ComponentHandlerListFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -165,9 +164,9 @@ public class ComponentDefinitionRegistry {
                 .getFilterConnectionDefinition();
 
             return this.componentDefinitions
-                    .stream()
-                    .filter(curComponentDefinition -> filterConnectionDefinitionPredicate.apply(componentDefinition))
-                    .toList();
+                .stream()
+                .filter(curComponentDefinition -> filterConnectionDefinitionPredicate.apply(componentDefinition))
+                .toList();
         } else {
             return List.of(componentDefinition);
         }

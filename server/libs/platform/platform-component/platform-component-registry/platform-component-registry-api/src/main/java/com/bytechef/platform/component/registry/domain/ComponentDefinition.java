@@ -63,12 +63,12 @@ public class ComponentDefinition {
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = getConnection(componentDefinition);
         this.connectionRequired = componentDefinition
-                .getConnection()
-                .map(connectionDefinition -> CollectionUtils.anyMatch(
-                    OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
-                    property -> OptionalUtils.orElse(property.getRequired(), false)) ||
-                    OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
-                .orElse(false);
+            .getConnection()
+            .map(connectionDefinition -> CollectionUtils.anyMatch(
+                OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
+                property -> OptionalUtils.orElse(property.getRequired(), false)) ||
+                OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
+            .orElse(false);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = componentDefinition.getName();

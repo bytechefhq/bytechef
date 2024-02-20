@@ -46,7 +46,6 @@ public interface ComponentDefinition {
      */
     Optional<ConnectionDefinition> getConnection();
 
-
     /**
      *
      * @return
