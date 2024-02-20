@@ -61,7 +61,7 @@ export interface TriggerDefinitionModel {
      * @type {boolean}
      * @memberof TriggerDefinitionModel
      */
-    nodeDescriptionDefined?: boolean;
+    workflowNodeDescriptionDefined?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -132,7 +132,7 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'nodeDescriptionDefined': !exists(json, 'nodeDescriptionDefined') ? undefined : json['nodeDescriptionDefined'],
+        'workflowNodeDescriptionDefined': !exists(json, 'workflowNodeDescriptionDefined') ? undefined : json['workflowNodeDescriptionDefined'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
@@ -155,7 +155,7 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'description': value.description,
-        'nodeDescriptionDefined': value.nodeDescriptionDefined,
+        'workflowNodeDescriptionDefined': value.workflowNodeDescriptionDefined,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputDefined': value.outputDefined,

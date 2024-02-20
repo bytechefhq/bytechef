@@ -25,12 +25,12 @@ import {
     ExecutionErrorModelFromJSONTyped,
     ExecutionErrorModelToJSON,
 } from './ExecutionErrorModel';
-import type { WorkflowTaskModel } from './WorkflowTaskModel';
+import type { WorkflowTask1Model } from './WorkflowTask1Model';
 import {
-    WorkflowTaskModelFromJSON,
-    WorkflowTaskModelFromJSONTyped,
-    WorkflowTaskModelToJSON,
-} from './WorkflowTaskModel';
+    WorkflowTask1ModelFromJSON,
+    WorkflowTask1ModelFromJSONTyped,
+    WorkflowTask1ModelToJSON,
+} from './WorkflowTask1Model';
 
 /**
  * Adds execution semantics to a task.
@@ -178,10 +178,10 @@ export interface TaskExecutionModel {
     readonly retryDelayMillis?: number;
     /**
      * 
-     * @type {WorkflowTaskModel}
+     * @type {WorkflowTask1Model}
      * @memberof TaskExecutionModel
      */
-    workflowTask?: WorkflowTaskModel;
+    workflowTask?: WorkflowTask1Model;
     /**
      * The type of the task.
      * @type {string}
@@ -250,7 +250,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'status': json['status'],
         'taskNumber': !exists(json, 'taskNumber') ? undefined : json['taskNumber'],
         'retryDelayMillis': !exists(json, 'retryDelayMillis') ? undefined : json['retryDelayMillis'],
-        'workflowTask': !exists(json, 'workflowTask') ? undefined : WorkflowTaskModelFromJSON(json['workflowTask']),
+        'workflowTask': !exists(json, 'workflowTask') ? undefined : WorkflowTask1ModelFromJSON(json['workflowTask']),
         'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
@@ -266,7 +266,7 @@ export function TaskExecutionModelToJSON(value?: TaskExecutionModel | null): any
         
         'component': ComponentDefinitionBasicModelToJSON(value.component),
         'error': ExecutionErrorModelToJSON(value.error),
-        'workflowTask': WorkflowTaskModelToJSON(value.workflowTask),
+        'workflowTask': WorkflowTask1ModelToJSON(value.workflowTask),
     };
 }
 

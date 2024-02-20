@@ -20,31 +20,25 @@ import { exists, mapValues } from '../runtime';
  */
 export interface WorkflowConnectionModel {
     /**
-     * 
+     * The name of the component
      * @type {string}
      * @memberof WorkflowConnectionModel
      */
     componentName: string;
     /**
-     * 
+     * The version of the component
      * @type {number}
      * @memberof WorkflowConnectionModel
      */
     componentVersion: number;
     /**
-     * 
-     * @type {number}
-     * @memberof WorkflowConnectionModel
-     */
-    id?: number;
-    /**
-     * 
+     * The key of the connection
      * @type {string}
      * @memberof WorkflowConnectionModel
      */
     key: string;
     /**
-     * 
+     * If the connection is required, or not
      * @type {boolean}
      * @memberof WorkflowConnectionModel
      */
@@ -83,7 +77,6 @@ export function WorkflowConnectionModelFromJSONTyped(json: any, ignoreDiscrimina
         
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
         'key': json['key'],
         'required': json['required'],
         'workflowNodeName': json['workflowNodeName'],
@@ -101,7 +94,6 @@ export function WorkflowConnectionModelToJSON(value?: WorkflowConnectionModel | 
         
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
-        'id': value.id,
         'key': value.key,
         'required': value.required,
         'workflowNodeName': value.workflowNodeName,

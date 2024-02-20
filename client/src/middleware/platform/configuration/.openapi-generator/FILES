@@ -20,6 +20,7 @@ models/ComponentDefinitionModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
 models/ControlTypeModel.ts
+models/DataStreamComponentModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
 models/DynamicPropertiesPropertyModel.ts
@@ -67,6 +68,7 @@ models/WorkflowModel.ts
 models/WorkflowNodeOutputModel.ts
 models/WorkflowNodeTestOutputModel.ts
 models/WorkflowOutputModel.ts
+models/WorkflowTask1Model.ts
 models/WorkflowTaskModel.ts
 models/WorkflowTestConfigurationConnectionModel.ts
 models/WorkflowTestConfigurationModel.ts

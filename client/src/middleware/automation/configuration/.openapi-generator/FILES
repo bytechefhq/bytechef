@@ -8,6 +8,7 @@ apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/CreateProjectInstanceWorkflowJob200ResponseModel.ts
+models/DataStreamComponentModel.ts
 models/ProjectBasicModel.ts
 models/ProjectInstanceBasicModel.ts
 models/ProjectInstanceModel.ts
