@@ -94,7 +94,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 return true;
             }
 
-            if (connectionDefinitions != null  && componentDefinition.getConnection() != null) {
+            if (connectionDefinitions != null && componentDefinition.getConnection() != null) {
                 return true;
             }
 
