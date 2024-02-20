@@ -63,10 +63,12 @@ public class ScriptComponentDefinitionFactory implements ComponentDefinitionFact
         }
 
         @Override
-        public FilterConnectionDefinitionFunction getFilterConnectionDefinition() {
+        public FilterConnectionDefinitionPredicate getFilterConnectionDefinition() {
             // TODO more granular filtering
 
-            return ComponentDefinition::getConnection;
+            return componentDefinition -> componentDefinition
+                .getConnection()
+                .isPresent();
         }
     }
 }
