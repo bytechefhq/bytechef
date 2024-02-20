@@ -36,7 +36,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.registry.definition.WorkflowNodeType;
@@ -220,7 +220,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             if (Objects.equals(MapUtils.getString(workflowTask, WorkflowConstants.NAME), connectionEntry.getKey())) {
                 workflowOperations.set(
                     i,
-                    MapUtils.concat(workflowTask, Map.of(WorkflowConnection.CONNECTIONS, connectionEntry.getValue())));
+                    MapUtils.concat(workflowTask,
+                        Map.of(WorkflowExtConstants.CONNECTIONS, connectionEntry.getValue())));
             }
         }
     }
