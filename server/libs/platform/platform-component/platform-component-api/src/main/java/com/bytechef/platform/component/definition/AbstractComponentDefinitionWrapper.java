@@ -37,59 +37,40 @@ import java.util.Optional;
 public abstract class AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
     protected final List<? extends ActionDefinition> actions;
-    protected final Boolean additionalConnections;
     protected final String category;
     protected final ConnectionDefinition connection;
-    protected final Boolean connectionRequired;
     protected final Boolean customAction;
     protected final Help customActionHelp;
     protected final String description;
     protected final String icon;
     protected final List<String> tags;
-    protected final AllowedConnectionDefinitionsFunction allowedConnectionDefinitionsFunction;
     protected final Map<String, Object> metadata;
     protected final String name;
     protected final Resources resources;
     protected final int version;
     protected final String title;
     protected final List<? extends TriggerDefinition> triggers;
-    protected final List<String> workflowConnectionKeys;
 
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
         this.actions = OptionalUtils.orElse(componentDefinition.getActions(), List.of());
-        this.additionalConnections = OptionalUtils.orElse(componentDefinition.getAdditionalConnections(), null);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
-        this.connectionRequired = OptionalUtils.orElse(componentDefinition.getConnectionRequired(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
         this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
-        this.allowedConnectionDefinitionsFunction = OptionalUtils.orElse(
-            componentDefinition.getAllowedConnections(), null);
         this.metadata = OptionalUtils.orElse(componentDefinition.getMetadata(), null);
         this.name = componentDefinition.getName();
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
         this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
         this.triggers = OptionalUtils.orElse(componentDefinition.getTriggers(), null);
         this.version = componentDefinition.getVersion();
-        this.workflowConnectionKeys = OptionalUtils.orElse(componentDefinition.getWorkflowConnectionKeys(), null);
-    }
-
-    @Override
-    public Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections() {
-        return Optional.ofNullable(allowedConnectionDefinitionsFunction);
     }
 
     @Override
     public Optional<List<? extends ActionDefinition>> getActions() {
         return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
-    }
-
-    @Override
-    public Optional<Boolean> getAdditionalConnections() {
-        return Optional.ofNullable(additionalConnections);
     }
 
     @Override
@@ -100,11 +81,6 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public Optional<ConnectionDefinition> getConnection() {
         return Optional.ofNullable(connection);
-    }
-
-    @Override
-    public Optional<Boolean> getConnectionRequired() {
-        return Optional.ofNullable(connectionRequired);
     }
 
     @Override
@@ -161,10 +137,5 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public int getVersion() {
         return version;
-    }
-
-    @Override
-    public Optional<List<String>> getWorkflowConnectionKeys() {
-        return Optional.ofNullable(workflowConnectionKeys);
     }
 }

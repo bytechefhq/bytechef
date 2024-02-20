@@ -1002,7 +1002,6 @@ public final class ComponentDSL {
         private String description;
         private String icon;
         private List<String> tags;
-        private AllowedConnectionDefinitionsFunction allowedConnectionDefinitionsFunction;
         private Map<String, Object> metadata;
         private final String name;
         private Resources resources;
@@ -1028,14 +1027,6 @@ public final class ComponentDSL {
 
         public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
             this.actionDefinitions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition allowedConnections(
-            AllowedConnectionDefinitionsFunction allowedConnectionConnectionDefinitions) {
-
-            this.allowedConnectionDefinitionsFunction = allowedConnectionConnectionDefinitions;
 
             return this;
         }
@@ -1171,18 +1162,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections() {
-            return Optional.ofNullable(allowedConnectionDefinitionsFunction);
-        }
-
-        @Override
         public Optional<List<? extends ActionDefinition>> getActions() {
             return Optional.ofNullable(actionDefinitions == null ? null : new ArrayList<>(actionDefinitions));
-        }
-
-        @Override
-        public Optional<Boolean> getAdditionalConnections() {
-            return Optional.ofNullable(additionalConnections);
         }
 
         @Override
@@ -1193,11 +1174,6 @@ public final class ComponentDSL {
         @Override
         public Optional<ConnectionDefinition> getConnection() {
             return Optional.ofNullable(connectionDefinition);
-        }
-
-        @Override
-        public Optional<Boolean> getConnectionRequired() {
-            return Optional.ofNullable(connectionRequired);
         }
 
         @Override
@@ -1257,11 +1233,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<String>> getWorkflowConnectionKeys() {
-            return Optional.ofNullable(workflowConnectionKeys);
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -1280,7 +1251,6 @@ public final class ComponentDSL {
                 && Objects.equals(customActionHelp, that.customActionHelp)
                 && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)
                 && Objects.equals(tags, that.tags)
-                && Objects.equals(allowedConnectionDefinitionsFunction, that.allowedConnectionDefinitionsFunction)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(resources, that.resources) && Objects.equals(title, that.title)
                 && Objects.equals(triggerDefinitions, that.triggerDefinitions)
@@ -1290,8 +1260,7 @@ public final class ComponentDSL {
         @Override
         public int hashCode() {
             return Objects.hash(actionDefinitions, category, connectionDefinition, customAction, customActionHelp,
-                description, icon, tags,
-                allowedConnectionDefinitionsFunction, metadata, name, resources, version, title, triggerDefinitions,
+                description, icon, tags, metadata, name, resources, version, title, triggerDefinitions,
                 workflowConnectionKeys);
         }
     }

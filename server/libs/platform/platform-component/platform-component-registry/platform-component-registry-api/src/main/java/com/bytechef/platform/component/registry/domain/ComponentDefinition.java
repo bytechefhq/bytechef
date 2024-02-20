@@ -19,6 +19,7 @@ package com.bytechef.platform.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +34,6 @@ import org.springframework.lang.Nullable;
 public class ComponentDefinition {
 
     private List<ActionDefinitionBasic> actions;
-    private boolean additionalConnections;
     private String category;
     private ConnectionDefinitionBasic connection;
     private boolean connectionRequired;
@@ -60,18 +60,15 @@ public class ComponentDefinition {
 
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
-        this.additionalConnections = OptionalUtils.orElse(componentDefinition.getAdditionalConnections(), false);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = getConnection(componentDefinition);
-        this.connectionRequired = OptionalUtils.orElseGet(
-            componentDefinition.getConnectionRequired(),
-            () -> componentDefinition
+        this.connectionRequired = componentDefinition
                 .getConnection()
                 .map(connectionDefinition -> CollectionUtils.anyMatch(
                     OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
                     property -> OptionalUtils.orElse(property.getRequired(), false)) ||
                     OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
-                .orElse(false));
+                .orElse(false);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = componentDefinition.getName();
@@ -81,17 +78,16 @@ public class ComponentDefinition {
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
         this.version = componentDefinition.getVersion();
-        this.workflowConnectionKeys = OptionalUtils.orElseGet(
-            componentDefinition.getWorkflowConnectionKeys(),
-            () -> connection == null ? List.of() : List.of(componentDefinition.getName()));
+
+        if (componentDefinition instanceof DataStreamComponentDefinition dataStreamComponentDefinition) {
+            this.workflowConnectionKeys = dataStreamComponentDefinition.getWorkflowConnectionKeys();
+        } else {
+            this.workflowConnectionKeys = connection == null ? List.of() : List.of(componentDefinition.getName());
+        }
     }
 
     public List<ActionDefinitionBasic> getActions() {
         return actions;
-    }
-
-    public boolean isAdditionalConnections() {
-        return additionalConnections;
     }
 
     public boolean isConnectionRequired() {
@@ -165,27 +161,26 @@ public class ComponentDefinition {
             return false;
         }
 
-        return Objects.equals(actions, that.actions) && additionalConnections == that.additionalConnections &&
-            Objects.equals(category, that.category) && Objects.equals(connection, that.connection) &&
-            connectionRequired == that.connectionRequired && Objects.equals(description, that.description) &&
-            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
-            Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
-            Objects.equals(triggers, that.triggers) && Objects.equals(title, that.title) &&
-            version == that.version && Objects.equals(workflowConnectionKeys, that.workflowConnectionKeys);
+        return Objects.equals(actions, that.actions) && Objects.equals(category, that.category) &&
+            Objects.equals(connection, that.connection) && connectionRequired == that.connectionRequired &&
+            Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
+            Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
+            Objects.equals(tags, that.tags) && Objects.equals(triggers, that.triggers) &&
+            Objects.equals(title, that.title) && version == that.version &&
+            Objects.equals(workflowConnectionKeys, that.workflowConnectionKeys);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, additionalConnections, category, connection, connectionRequired, description, icon, name,
-            resources, tags, triggers, title, version, workflowConnectionKeys);
+            actions, category, connection, connectionRequired, description, icon, name, resources, tags, triggers,
+            title, version, workflowConnectionKeys);
     }
 
     @Override
     public String toString() {
         return "ComponentDefinition{" +
             "actions=" + actions +
-            ", additionalConnections=" + additionalConnections +
             ", category='" + category + '\'' +
             ", connection=" + connection +
             ", connectionRequired=" + connectionRequired +
