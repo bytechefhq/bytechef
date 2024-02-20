@@ -34,18 +34,6 @@ public interface ComponentDefinition {
     Optional<List<? extends ActionDefinition>> getActions();
 
     /**
-     *
-     * @return
-     */
-    Optional<Boolean> getAdditionalConnections();
-
-    /**
-     *
-     * @return
-     */
-    Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections();
-
-    /**
      * TODO
      *
      * @return
@@ -58,11 +46,6 @@ public interface ComponentDefinition {
      */
     Optional<ConnectionDefinition> getConnection();
 
-    /**
-     *
-     * @return
-     */
-    Optional<Boolean> getConnectionRequired();
 
     /**
      *
@@ -132,27 +115,4 @@ public interface ComponentDefinition {
      * @return
      */
     int getVersion();
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<String>> getWorkflowConnectionKeys();
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface AllowedConnectionDefinitionsFunction {
-
-        /**
-         *
-         * @param componentDefinition
-         * @param componentDefinitions
-         * @return
-         */
-        List<ComponentDefinition> apply(
-            ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
-            String workflowConnectionKey);
-    }
 }
