@@ -124,7 +124,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public Map<String, Object> getExtensions() {
+    public Map<String, ?> getExtensions() {
         return Collections.unmodifiableMap(extensions);
     }
 

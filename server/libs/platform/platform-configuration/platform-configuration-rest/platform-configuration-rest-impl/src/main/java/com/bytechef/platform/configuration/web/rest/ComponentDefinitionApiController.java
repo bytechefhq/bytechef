@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
@@ -75,6 +76,19 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
         return ResponseEntity.ok(
             componentDefinitionService.getComponentDefinitions(
                 actionDefinitions, connectionDefinitions, triggerDefinitions, include)
+                .stream()
+                .map(componentDefinition -> conversionService.convert(
+                    componentDefinition, ComponentDefinitionBasicModel.class))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<ComponentDefinitionBasicModel>> getDataStreamComponentDefinitions(
+        Integer componentVersion, String componentType) {
+
+        return ResponseEntity.ok(
+            componentDefinitionService
+                .getDataStreamComponentDefinitions(componentVersion, ComponentType.valueOf(componentType))
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))
