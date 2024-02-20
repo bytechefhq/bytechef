@@ -141,8 +141,8 @@ public final class ComponentDSL {
         return new ModifiableObjectProperty(name);
     }
 
-    public static ModifiableOption<Boolean> option(String name, boolean value) {
-        return new ModifiableOption<>(name, value);
+    public static ModifiableOption<Boolean> option(String label, boolean value) {
+        return new ModifiableOption<>(label, value);
     }
 
     public static ModifiableOption<Boolean> option(String label, boolean value, String description) {
