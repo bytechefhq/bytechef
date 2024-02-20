@@ -19,7 +19,6 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.component.definition.ComponentDefinition;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +33,7 @@ public interface DataStreamComponentDefinition extends ComponentDefinition {
      *
      * @return
      */
-    FilterComponentDefinitionBiFunction getFilterComponentDefinition();
+    FilterComponentDefinitionBiPredicate getFilterComponentDefinition();
 
     /**
      * @return
@@ -47,13 +46,13 @@ public interface DataStreamComponentDefinition extends ComponentDefinition {
      *
      */
     @FunctionalInterface
-    interface FilterComponentDefinitionBiFunction {
+    interface FilterComponentDefinitionBiPredicate {
 
         /**
          *
          * @param componentDefinition
          * @return
          */
-        Optional<ComponentDefinition> apply(ComponentDefinition componentDefinition, ComponentType componentType);
+        boolean apply(ComponentDefinition componentDefinition, ComponentType componentType);
     }
 }
