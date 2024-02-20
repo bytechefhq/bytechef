@@ -4,7 +4,7 @@
 </a>
 </p>
 
-ByteChef is an open-source, low-code, extendable API integration & workflow automation platform that allows you to automate work by connecting applications and building workflows across your organization.
+ByteChef is an open-source, low-code, extendable API integration and workflow automation platform. It automates daily rutines that require interaction between independent business applications. ByteChef maintains automation definitions in easy to understand workflow like format.
 
 [//]: # ([Website]&#40;https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Docs]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Blog]&#40;https://blog.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Discord]&#40;https://discord.gg/JcNSqJ7vK8; • [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; • [Twitter]&#40;https://twitter.com/bytechefhq&#41;)
 
