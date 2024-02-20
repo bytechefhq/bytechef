@@ -1,7 +1,7 @@
-import PropertyMentionsInput from '@/components/Properties/components/PropMentionsInput/PropertyMentionsInput';
 import PropertyComboBox from '@/components/Properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/components/Properties/components/PropertyDynamicProperties';
 import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
+import PropertyMentionsInput from '@/components/Properties/components/PropertyMentionsInput/PropertyMentionsInput';
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
 import {Button} from '@/components/ui/button';
@@ -137,7 +137,11 @@ const Property = ({
 
     const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
 
-    const taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+    let taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+
+    if (name && name.endsWith('_0') && defaultValue) {
+        taskParameterValue = defaultValue;
+    }
 
     const otherComponentData = componentData.filter((component) => {
         if (component.componentName !== currentComponent?.name) {
@@ -323,7 +327,7 @@ const Property = ({
         }
 
         isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
-    }, [isNumericalInput, taskParameterValue]);
+    }, [defaultValue, isNumericalInput, taskParameterValue]);
 
     if (type === 'OBJECT' && !properties?.length && !additionalProperties?.length) {
         return <></>;
@@ -424,6 +428,7 @@ const Property = ({
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
                                 property={property}
+                                updateWorkflowMutation={updateWorkflowMutation}
                             />
                         )}
 
@@ -467,7 +472,7 @@ const Property = ({
                                 maxLength={maxLength}
                                 min={minValue}
                                 minLength={minLength}
-                                name={name!}
+                                name={name || `${arrayName}_0`}
                                 onBlur={handleInputBlur}
                                 onChange={handleInputChange}
                                 placeholder={
