@@ -23,19 +23,19 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface AdditionalConnectionsComponentDefinition extends ComponentDefinition {
+public interface ScriptComponentDefinition extends ComponentDefinition {
 
     /**
      *
      * @return
      */
-    FilterConnectionDefinitionsFunction getFilterConnectionDefinition();
+    FilterConnectionDefinitionFunction getFilterConnectionDefinition();
 
     /**
      *
      */
     @FunctionalInterface
-    interface FilterConnectionDefinitionsFunction {
+    interface FilterConnectionDefinitionFunction {
 
         /**
          *

@@ -26,7 +26,7 @@ import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
 import com.bytechef.component.script.action.ScriptRubyAction;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.AdditionalConnectionsComponentDefinition;
+import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,18 +36,18 @@ import org.springframework.stereotype.Component;
 @Component(SCRIPT + "_v1_ComponentDefinitionFactory")
 public class ScriptComponentDefinitionFactory implements ComponentDefinitionFactory {
 
-    private static final AdditionalConnectionsComponentDefinition COMPONENT_DEFINITION =
-        new ScriptComponentDefinition();
+    private static final ScriptComponentDefinition COMPONENT_DEFINITION =
+        new ScriptComponentDefinitionImpl();
 
     @Override
     public ComponentDefinition getDefinition() {
         return COMPONENT_DEFINITION;
     }
 
-    private static class ScriptComponentDefinition extends AbstractComponentDefinitionWrapper
-        implements AdditionalConnectionsComponentDefinition {
+    private static class ScriptComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
+        implements ScriptComponentDefinition {
 
-        public ScriptComponentDefinition() {
+        public ScriptComponentDefinitionImpl() {
             super(
                 component(SCRIPT)
                     .title("Script")
@@ -63,7 +63,7 @@ public class ScriptComponentDefinitionFactory implements ComponentDefinitionFact
         }
 
         @Override
-        public FilterConnectionDefinitionsFunction getFilterConnectionDefinition() {
+        public FilterConnectionDefinitionFunction getFilterConnectionDefinition() {
             // TODO more granular filtering
 
             return ComponentDefinition::getConnection;
