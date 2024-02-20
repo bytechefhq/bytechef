@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.domain;
+package com.bytechef.platform.configuration.constant;
 
 /**
- * @param workflowNodeName action task/trigger name used in the workflow
- *
  * @author Ivica Cardic
  */
-public record WorkflowConnection(
-    String componentName, int componentVersion, String workflowNodeName, String key, boolean required) {
+public class WorkflowExtConstants {
+
+    public static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
+    public static final String COMPONENT_NAME = "componentName";
+    public static final String COMPONENT_VERSION = "componentVersion";
+    public static final String CONNECTIONS = "connections";
+    public static final String DESTINATION = "destination";
+    public static final String SOURCE = "source";
+    public static final String TRIGGERS = "triggers";
 }
