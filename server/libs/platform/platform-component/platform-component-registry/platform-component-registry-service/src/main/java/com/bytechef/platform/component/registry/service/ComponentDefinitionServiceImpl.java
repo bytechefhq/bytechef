@@ -94,12 +94,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 return true;
             }
 
-            if (connectionDefinitions != null) {
-                List<String> workflowConnectionKeys = componentDefinition.getWorkflowConnectionKeys();
-
-                if (!workflowConnectionKeys.isEmpty() || componentDefinition.isAdditionalConnections()) {
-                    return true;
-                }
+            if (connectionDefinitions != null  && componentDefinition.getConnection() != null) {
+                return true;
             }
 
             if (triggerDefinitions != null && !CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
