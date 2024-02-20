@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.registry.definition.WorkflowNodeType;
@@ -78,9 +79,9 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         List<WorkflowConnection> workflowConnections;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
-        if (MapUtils.containsKey(extensions, WorkflowConnection.CONNECTIONS)) {
+        if (MapUtils.containsKey(extensions, WorkflowExtConstants.CONNECTIONS)) {
             workflowConnections = toList(
-                MapUtils.getMap(extensions, WorkflowConnection.CONNECTIONS, new TypeReference<>() {}, Map.of()),
+                MapUtils.getMap(extensions, WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of()),
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(), workflowNodeName);
         } else {
             workflowConnections = getWorkflowConnections(workflowNodeName, workflowNodeType);
@@ -99,19 +100,19 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
             .map(entry -> {
                 Map<String, Object> connectionMap = entry.getValue();
 
-                if ((!connectionMap.containsKey(WorkflowConnection.COMPONENT_NAME) ||
-                    !connectionMap.containsKey(WorkflowConnection.COMPONENT_VERSION))) {
+                if ((!connectionMap.containsKey(WorkflowExtConstants.COMPONENT_NAME) ||
+                    !connectionMap.containsKey(WorkflowExtConstants.COMPONENT_VERSION))) {
 
                     throw new IllegalStateException(
                         "%s and %s must be set".formatted(
-                            WorkflowConnection.COMPONENT_NAME, WorkflowConnection.COMPONENT_VERSION));
+                            WorkflowExtConstants.COMPONENT_NAME, WorkflowExtConstants.COMPONENT_VERSION));
                 }
 
                 return new WorkflowConnection(
-                    MapUtils.getString(connectionMap, WorkflowConnection.COMPONENT_NAME, componentName),
-                    MapUtils.getInteger(connectionMap, WorkflowConnection.COMPONENT_VERSION, componentVersion),
+                    MapUtils.getString(connectionMap, WorkflowExtConstants.COMPONENT_NAME, componentName),
+                    MapUtils.getInteger(connectionMap, WorkflowExtConstants.COMPONENT_VERSION, componentVersion),
                     workflowNodeName, entry.getKey(),
-                    MapUtils.getBoolean(connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false));
+                    MapUtils.getBoolean(connectionMap, WorkflowExtConstants.AUTHORIZATION_REQUIRED, false));
             })
             .toList();
     }

@@ -17,8 +17,7 @@
 package com.bytechef.platform.configuration.workflow.contributor;
 
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
-import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import java.util.List;
 
 /**
@@ -29,7 +28,8 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
     @Override
     public List<String> getReservedWords() {
         return List.of(
-            WorkflowConnection.COMPONENT_NAME, WorkflowConnection.COMPONENT_VERSION, WorkflowConnection.CONNECTIONS,
-            WorkflowTrigger.TRIGGERS);
+            WorkflowExtConstants.AUTHORIZATION_REQUIRED, WorkflowExtConstants.COMPONENT_NAME,
+            WorkflowExtConstants.COMPONENT_VERSION, WorkflowExtConstants.CONNECTIONS, WorkflowExtConstants.DESTINATION,
+            WorkflowExtConstants.SOURCE, WorkflowExtConstants.TRIGGERS);
     }
 }

@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -36,8 +37,6 @@ import org.apache.commons.lang3.Validate;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTrigger implements Serializable, Trigger {
-
-    public static final String TRIGGERS = "triggers";
 
     private final Map<String, Object> extensions = new HashMap<>();
     private Map<String, ?> metadata = new HashMap<>();
@@ -76,12 +75,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
-        return workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, List.of());
+        return workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of());
     }
 
     public static WorkflowTrigger of(String triggerName, Workflow workflow) {
         return CollectionUtils.getFirst(
-            workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, List.of()),
+            workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of()),
             workflowTrigger -> Objects.equals(triggerName, workflowTrigger.name));
     }
 
