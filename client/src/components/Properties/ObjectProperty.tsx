@@ -2,9 +2,12 @@ import PropertyInput from '@/components/Properties/components/PropertyInput/Prop
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
+import {UseMutationResult} from '@tanstack/react-query';
+import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Property from './Property';
@@ -15,6 +18,7 @@ interface ObjectPropertyProps {
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
     property: PropertyType;
+    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
 const ObjectProperty = ({
@@ -23,17 +27,63 @@ const ObjectProperty = ({
     currentComponentData,
     dataPills,
     property,
+    updateWorkflowMutation,
 }: ObjectPropertyProps) => {
-    const {additionalProperties, controlType, label, multipleValues, name, properties} = property;
+    const [subProperties, setSubProperties] = useState(property.properties);
+    const [newPropertyName, setNewPropertyName] = useState('');
+    const [newPropertyType, setNewPropertyType] = useState('');
 
-    if (!properties?.length && !additionalProperties?.length) {
+    const {additionalProperties, controlType, label, multipleValues, name} = property;
+
+    const handleAddItemClick = () => {
+        setSubProperties([
+            ...subProperties!,
+            {
+                controlType: 'TEXT',
+                name: newPropertyName,
+                type: newPropertyType || additionalProperties?.[0].type,
+            },
+        ]);
+
+        setNewPropertyName('');
+    };
+
+    useEffect(() => {
+        if (!currentComponentData?.parameters) {
+            return;
+        }
+
+        const parameterKeys = Object.keys(currentComponentData?.parameters);
+
+        if (!currentComponentData?.parameters || !parameterKeys.length) {
+            return;
+        }
+
+        const parameterSubProperties = parameterKeys
+            .filter((parameterKey) => parameterKey.includes(`${name}.`))
+            .map((parameterKey) => {
+                const parameterName = parameterKey.split(`${name}.`)[1];
+
+                return {
+                    controlType: 'TEXT',
+                    name: parameterName,
+                    type: newPropertyType || additionalProperties?.[0].type,
+                };
+            });
+
+        if (parameterSubProperties?.length) {
+            setSubProperties(parameterSubProperties);
+        }
+    }, [additionalProperties, currentComponentData?.parameters, name, newPropertyType]);
+
+    if (!subProperties?.length && !additionalProperties?.length) {
         return <></>;
     }
 
     return (
-        <div key={name}>
-            <ul className={twMerge('space-y-4', label && 'ml-2 border-l')}>
-                {(properties as Array<PropertyType>)?.map((subProperty, index) => {
+        <>
+            <ul className={twMerge('space-y-4', label && 'ml-2 border-l', subProperties?.length && 'pb-2')} key={name}>
+                {(subProperties as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
                         subProperty.type === 'OBJECT' &&
                         !subProperty.additionalProperties?.length &&
@@ -55,71 +105,81 @@ const ObjectProperty = ({
                                 ...subProperty,
                                 name: `${property.name}.${subProperty.name}`,
                             }}
+                            updateWorkflowMutation={updateWorkflowMutation}
                         />
                     );
                 })}
             </ul>
 
             {!!additionalProperties?.length && multipleValues && (
-                <div className={twMerge(!!properties?.length && 'mt-2')}>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                                size="sm"
-                                variant="ghost"
-                            >
-                                <PlusIcon className="size-4" /> Add property
-                            </Button>
-                        </PopoverTrigger>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                            size="sm"
+                            variant="ghost"
+                        >
+                            <PlusIcon className="size-4" /> Add property
+                        </Button>
+                    </PopoverTrigger>
 
-                        <PopoverContent className="min-w-[400px]">
-                            <header className="flex items-center justify-between py-2">
-                                <span className="font-medium">Add property</span>
+                    <PopoverContent className="min-w-[400px]">
+                        <header className="flex items-center justify-between">
+                            <span className="font-medium">Add property</span>
 
-                                <PopoverClose asChild>
-                                    <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                                </PopoverClose>
-                            </header>
-
-                            <main className="space-y-2">
-                                <PropertyInput
-                                    label="Name"
-                                    name="additionalPropertyName"
-                                    placeholder="Name for the additional property"
+                            <PopoverClose asChild>
+                                <Cross2Icon
+                                    aria-hidden="true"
+                                    className="size-4 cursor-pointer"
+                                    onClick={() => setNewPropertyName('')}
                                 />
+                            </PopoverClose>
+                        </header>
 
-                                {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
-                                    <PropertySelect
-                                        label="Type"
-                                        options={(additionalProperties as Array<PropertyType>).map(
-                                            (additionalProperty) => ({
-                                                label: additionalProperty.type!,
-                                                value: additionalProperty.type!,
-                                            })
-                                        )}
-                                    />
-                                ) : (
-                                    <div className="flex w-full flex-col">
-                                        <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
+                        <main className="my-2 space-y-2">
+                            <PropertyInput
+                                className="mb-2"
+                                label="Name"
+                                name="additionalPropertyName"
+                                onChange={(event) => setNewPropertyName(event.target.value)}
+                                placeholder="Name for the additional property"
+                                value={newPropertyName}
+                            />
 
-                                        <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
-                                            {additionalProperties[0]?.type}
-                                        </span>
-                                    </div>
-                                )}
-                            </main>
+                            {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
+                                <PropertySelect
+                                    label="Type"
+                                    onValueChange={(value) => setNewPropertyType(value)}
+                                    options={(additionalProperties as Array<PropertyType>).map(
+                                        (additionalProperty) => ({
+                                            label: additionalProperty.type!,
+                                            value: additionalProperty.type!,
+                                        })
+                                    )}
+                                    value={newPropertyType}
+                                />
+                            ) : (
+                                <div className="flex w-full flex-col">
+                                    <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
 
-                            <footer className="flex items-center justify-end space-x-2 py-2">
-                                <Button onClick={() => console.log('save')} size="sm">
+                                    <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
+                                        {additionalProperties[0]?.type}
+                                    </span>
+                                </div>
+                            )}
+                        </main>
+
+                        <footer className="flex items-center justify-end space-x-2">
+                            <PopoverClose asChild>
+                                <Button onClick={handleAddItemClick} size="sm">
                                     Add
                                 </Button>
-                            </footer>
-                        </PopoverContent>
-                    </Popover>
-                </div>
+                            </PopoverClose>
+                        </footer>
+                    </PopoverContent>
+                </Popover>
             )}
-        </div>
+        </>
     );
 };
 
