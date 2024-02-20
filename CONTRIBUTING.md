@@ -78,43 +78,39 @@ ByteChef platform consists of three major parts. User interface is implemented w
 - [Docker](https://docs.docker.com/get-docker/)
 ### Run from command line
 1. Open terminal application.
-2. Clone the ByteChef repository to local directory we will call `BYTECHEF_HOME`.
+2. Make sure `java -version` and `JAVA_HOME` references Java JDK 21+
+3. Clone the ByteChef repository to local directory we will call `BYTECHEF_HOME`.
 
     ```bash
     git clone https://github.com/bytechefhq/bytechef.git
     cd bytechef
     ```
-3. Change working directory to the `BYTECHEF_HOME/server` folder.
-4. Start up the docker container with dependent infrastructure
+4. Change working directory to the `BYTECHEF_HOME/server` folder.
+5. Start up the docker container with dependent infrastructure
 
     ```bash
     docker compose -f docker-compose.dev.server.yml up -d
     ```
-5. Compile codebase:
+6. Compile codebase:
 
     ```bash
     ../gradlew clean compileJava
     ```
 
-6. Change working directory to the `BYTECHEF_HOME/server/apps/server-app` folder.
-7. Start the ByteChef server instance by running:
+7. Change working directory to the `BYTECHEF_HOME/server/apps/server-app` folder.
+8. Start the ByteChef server instance by running:
 
     ```bash
     ../../../gradlew bootRun
     ```
-8. Change working directory to the `BYTECHEF_HOME/client` folder.
-
-    ```bash
-    cd client
-    ```
-
-9. Install dependencies.
+9. Change working directory to the `BYTECHEF_HOME/client` folder.
+10. Install dependencies.
 
     ```bash
     npm install
     ```
 
-10. Serve with hot reload.
+11. Serve with hot reload.
 
     ```bash
     npm run dev
