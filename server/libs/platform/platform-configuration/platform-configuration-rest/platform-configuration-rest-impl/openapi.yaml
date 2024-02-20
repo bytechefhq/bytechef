@@ -1017,9 +1017,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
-        additionalConnections:
-          description: "Does component can define additional connections."
-          type: "boolean"
         category:
           description: "The category."
           type: "string"
