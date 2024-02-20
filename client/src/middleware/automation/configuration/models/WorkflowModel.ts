@@ -63,17 +63,35 @@ export interface WorkflowModel {
      */
     readonly createdDate?: Date;
     /**
+     * The definition of a workflow.
+     * @type {string}
+     * @memberof WorkflowModel
+     */
+    definition?: string;
+    /**
      * The description of a workflow.
      * @type {string}
      * @memberof WorkflowModel
      */
     description?: string;
     /**
+     * 
+     * @type {WorkflowFormatModel}
+     * @memberof WorkflowModel
+     */
+    format?: WorkflowFormatModel;
+    /**
      * The id of the workflow.
      * @type {string}
      * @memberof WorkflowModel
      */
     readonly id?: string;
+    /**
+     * The workflow's expected list of inputs.
+     * @type {Array<WorkflowInputModel>}
+     * @memberof WorkflowModel
+     */
+    readonly inputs?: Array<WorkflowInputModel>;
     /**
      * The descriptive name for the workflow
      * @type {string}
@@ -92,30 +110,6 @@ export interface WorkflowModel {
      * @memberof WorkflowModel
      */
     readonly lastModifiedDate?: Date;
-    /**
-     * 
-     * @type {number}
-     * @memberof WorkflowModel
-     */
-    version?: number;
-    /**
-     * The definition of a workflow.
-     * @type {string}
-     * @memberof WorkflowModel
-     */
-    definition?: string;
-    /**
-     * 
-     * @type {WorkflowFormatModel}
-     * @memberof WorkflowModel
-     */
-    format?: WorkflowFormatModel;
-    /**
-     * The workflow's expected list of inputs.
-     * @type {Array<WorkflowInputModel>}
-     * @memberof WorkflowModel
-     */
-    readonly inputs?: Array<WorkflowInputModel>;
     /**
      * The workflow's list of expected outputs.
      * @type {Array<WorkflowOutputModel>}
@@ -146,6 +140,12 @@ export interface WorkflowModel {
      * @memberof WorkflowModel
      */
     readonly triggers?: Array<WorkflowTriggerModel>;
+    /**
+     * 
+     * @type {number}
+     * @memberof WorkflowModel
+     */
+    version?: number;
 }
 
 
@@ -182,20 +182,20 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
+        'definition': !exists(json, 'definition') ? undefined : json['definition'],
         'description': !exists(json, 'description') ? undefined : json['description'],
+        'format': !exists(json, 'format') ? undefined : WorkflowFormatModelFromJSON(json['format']),
         'id': !exists(json, 'id') ? undefined : json['id'],
+        'inputs': !exists(json, 'inputs') ? undefined : ((json['inputs'] as Array<any>).map(WorkflowInputModelFromJSON)),
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'version': !exists(json, '__version') ? undefined : json['__version'],
-        'definition': !exists(json, 'definition') ? undefined : json['definition'],
-        'format': !exists(json, 'format') ? undefined : WorkflowFormatModelFromJSON(json['format']),
-        'inputs': !exists(json, 'inputs') ? undefined : ((json['inputs'] as Array<any>).map(WorkflowInputModelFromJSON)),
         'outputs': !exists(json, 'outputs') ? undefined : ((json['outputs'] as Array<any>).map(WorkflowOutputModelFromJSON)),
         'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
         'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'triggers': !exists(json, 'triggers') ? undefined : ((json['triggers'] as Array<any>).map(WorkflowTriggerModelFromJSON)),
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -208,11 +208,11 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
     }
     return {
         
-        'description': value.description,
-        '__version': value.version,
         'definition': value.definition,
+        'description': value.description,
         'format': WorkflowFormatModelToJSON(value.format),
         'sourceType': value.sourceType,
+        '__version': value.version,
     };
 }
 

@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { DataStreamComponentModel } from './DataStreamComponentModel';
+import {
+    DataStreamComponentModelFromJSON,
+    DataStreamComponentModelFromJSONTyped,
+    DataStreamComponentModelToJSON,
+} from './DataStreamComponentModel';
 import type { WorkflowConnectionModel } from './WorkflowConnectionModel';
 import {
     WorkflowConnectionModelFromJSON,
@@ -32,6 +38,12 @@ export interface WorkflowTaskModel {
      * @memberof WorkflowTaskModel
      */
     readonly connections?: Array<WorkflowConnectionModel>;
+    /**
+     * 
+     * @type {DataStreamComponentModel}
+     * @memberof WorkflowTaskModel
+     */
+    destination?: DataStreamComponentModel;
     /**
      * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
      * @type {Array<WorkflowTaskModel>}
@@ -75,6 +87,12 @@ export interface WorkflowTaskModel {
      */
     pre?: Array<WorkflowTaskModel>;
     /**
+     * 
+     * @type {DataStreamComponentModel}
+     * @memberof WorkflowTaskModel
+     */
+    source?: DataStreamComponentModel;
+    /**
      * The timeout expression which describes when a task should be deemed as timed-out.
      * @type {string}
      * @memberof WorkflowTaskModel
@@ -110,6 +128,7 @@ export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
+        'destination': !exists(json, 'destination') ? undefined : DataStreamComponentModelFromJSON(json['destination']),
         'finalize': !exists(json, 'finalize') ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'label': !exists(json, 'label') ? undefined : json['label'],
         'name': json['name'],
@@ -117,6 +136,7 @@ export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
         'post': !exists(json, 'post') ? undefined : ((json['post'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'pre': !exists(json, 'pre') ? undefined : ((json['pre'] as Array<any>).map(WorkflowTaskModelFromJSON)),
+        'source': !exists(json, 'source') ? undefined : DataStreamComponentModelFromJSON(json['source']),
         'timeout': !exists(json, 'timeout') ? undefined : json['timeout'],
         'type': json['type'],
     };
@@ -131,6 +151,7 @@ export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
     }
     return {
         
+        'destination': DataStreamComponentModelToJSON(value.destination),
         'finalize': value.finalize === undefined ? undefined : ((value.finalize as Array<any>).map(WorkflowTaskModelToJSON)),
         'label': value.label,
         'name': value.name,
@@ -138,6 +159,7 @@ export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
         'parameters': value.parameters,
         'post': value.post === undefined ? undefined : ((value.post as Array<any>).map(WorkflowTaskModelToJSON)),
         'pre': value.pre === undefined ? undefined : ((value.pre as Array<any>).map(WorkflowTaskModelToJSON)),
+        'source': DataStreamComponentModelToJSON(value.source),
         'timeout': value.timeout,
         'type': value.type,
     };

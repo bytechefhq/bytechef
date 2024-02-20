@@ -4,6 +4,7 @@ apis/index.ts
 index.ts
 models/ComponentDefinitionBasicModel.ts
 models/CreateJob200ResponseModel.ts
+models/DataStreamComponentModel.ts
 models/ExecutionErrorModel.ts
 models/JobBasicModel.ts
 models/JobConnectionModel.ts
