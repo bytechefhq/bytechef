@@ -16,13 +16,12 @@
 
 package com.bytechef.component.data.stream;
 
-import static com.bytechef.component.data.stream.constant.DataStreamConstants.DATA_STREAM;
 import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.platform.component.constant.DataStreamConstants.DATA_STREAM;
 
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;
 import com.bytechef.component.definition.ComponentDefinition;
-
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -53,7 +52,6 @@ public class DataStreamComponentDefinitionFactory implements ComponentDefinition
 
     private static class DataStreamComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
         implements DataStreamComponentDefinition {
-
 
         public DataStreamComponentDefinitionImpl(ComponentDefinition componentDefinition) {
             super(componentDefinition);

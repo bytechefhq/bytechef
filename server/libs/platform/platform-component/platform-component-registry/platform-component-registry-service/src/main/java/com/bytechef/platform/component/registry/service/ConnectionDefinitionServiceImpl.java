@@ -40,6 +40,8 @@ import com.bytechef.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ScriptComponentDefinition;
+import com.bytechef.platform.component.definition.ScriptComponentDefinition.FilterConnectionDefinitionPredicate;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -218,11 +220,30 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
-        return componentDefinitionRegistry
-            .getConnectionComponentDefinitions(componentName, componentVersion)
+        return getConnectionComponentDefinitions(componentName, componentVersion)
             .stream()
             .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
             .toList();
+    }
+
+    private List<ComponentDefinition> getConnectionComponentDefinitions(
+        String componentName, int componentVersion) {
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        if (componentDefinition instanceof ScriptComponentDefinition scriptComponentDefinition) {
+            FilterConnectionDefinitionPredicate filterConnectionDefinitionPredicate = scriptComponentDefinition
+                .getFilterConnectionDefinition();
+
+            return componentDefinitionRegistry
+                .getComponentDefinitions()
+                .stream()
+                .filter(curComponentDefinition -> filterConnectionDefinitionPredicate.apply(componentDefinition))
+                .toList();
+        } else {
+            return List.of(componentDefinition);
+        }
     }
 
     private static ApplyFunction getDefaultApply(AuthorizationType type) {

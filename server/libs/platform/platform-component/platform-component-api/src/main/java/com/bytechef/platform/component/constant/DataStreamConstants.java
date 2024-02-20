@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.data.stream.constant;
+package com.bytechef.platform.component.constant;
 
 /**
  * @author Ivica Cardic

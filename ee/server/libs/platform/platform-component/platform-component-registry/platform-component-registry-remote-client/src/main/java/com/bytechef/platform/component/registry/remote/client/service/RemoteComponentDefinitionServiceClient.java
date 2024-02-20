@@ -10,6 +10,7 @@ package com.bytechef.platform.component.registry.remote.client.service;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
@@ -93,6 +94,13 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         return getComponentDefinitions(completableFutures);
     }
 
+    @Override
+    public List<ComponentDefinition> getDataStreamComponentDefinitions(
+        int componentVersion, ComponentType componentType) {
+
+        throw new UnsupportedOperationException();
+    }
+
     private static int checkVersion(Integer version) {
         if (version == null) {
             version = 1;
@@ -104,10 +112,12 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     private static List<ComponentDefinition> getComponentDefinitions(
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures) {
 
-        CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]))
+        CompletableFuture
+            .allOf(completableFutures.toArray(new CompletableFuture[0]))
             .join();
 
-        return completableFutures.stream()
+        return completableFutures
+            .stream()
             .map(CompletableFuture::join)
             .flatMap(CollectionUtils::stream)
             .collect(Collectors.toList());

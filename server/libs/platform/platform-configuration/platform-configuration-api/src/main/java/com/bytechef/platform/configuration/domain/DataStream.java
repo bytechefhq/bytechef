@@ -16,12 +16,18 @@
 
 package com.bytechef.platform.configuration.domain;
 
+import java.util.Map;
+
 /**
  *
  * @author Ivica Cardic
  */
 public record DataStream(ComponentType source, ComponentType destination) {
 
-    record ComponentType(String name, int version) {
+    public static DataStream of(Map<String, ?> extensions) {
+        return null;
+    }
+
+    public record ComponentType(String componentName, int componentVersion, Map<String, ?> parameters) {
     }
 }

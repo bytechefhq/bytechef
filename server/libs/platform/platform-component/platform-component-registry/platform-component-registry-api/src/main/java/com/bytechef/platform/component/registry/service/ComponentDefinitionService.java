@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.registry.service;
 
+import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import java.util.List;
 
@@ -32,4 +33,6 @@ public interface ComponentDefinitionService {
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include);
 
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
+
+    List<ComponentDefinition> getDataStreamComponentDefinitions(int componentVersion, ComponentType componentType);
 }

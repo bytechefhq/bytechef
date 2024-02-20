@@ -17,26 +17,172 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.platform.configuration.domain.DataStream;
+import com.bytechef.platform.configuration.domain.DataStream.ComponentType;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record WorkflowTaskDTO(
-    List<WorkflowConnection> connections, List<WorkflowTask> finalize1, String label, int maxRetries, String name,
-    String node, Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, int taskNumber,
-    String timeout, String type) {
+public final class WorkflowTaskDTO {
 
-    public WorkflowTaskDTO(WorkflowTask workflowTask, List<WorkflowConnection> connections) {
+    private final List<WorkflowConnection> connections;
+    private final ComponentType destination;
+    private final List<WorkflowTask> finalize;
+    private final String label;
+    private final int maxRetries;
+    private final String name;
+    private final String node;
+    private final Map<String, ?> parameters;
+    private final List<WorkflowTask> post;
+    private final List<WorkflowTask> pre;
+    private final ComponentType source;
+    private final int taskNumber;
+    private final String timeout;
+    private final String type;
+
+    /**
+     *
+     */
+    public WorkflowTaskDTO(
+        List<WorkflowConnection> connections, ComponentType destination, List<WorkflowTask> finalize,
+        String label, int maxRetries, String name, String node, Map<String, ?> parameters, List<WorkflowTask> post,
+        List<WorkflowTask> pre, ComponentType source, int taskNumber, String timeout, String type) {
+
+        this.connections = connections;
+        this.destination = destination;
+        this.finalize = finalize;
+        this.label = label;
+        this.maxRetries = maxRetries;
+        this.name = name;
+        this.node = node;
+        this.parameters = parameters;
+        this.post = post;
+        this.pre = pre;
+        this.source = source;
+        this.taskNumber = taskNumber;
+        this.timeout = timeout;
+        this.type = type;
+    }
+
+    public WorkflowTaskDTO(WorkflowTask workflowTask, List<WorkflowConnection> connections, DataStream dataStream) {
         this(
-            connections, workflowTask.getFinalize(), workflowTask.getLabel(), workflowTask.getMaxRetries(),
-            workflowTask.getName(), workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(),
-            workflowTask.getPre(), workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
+            connections, dataStream.destination(), workflowTask.getFinalize(), workflowTask.getLabel(),
+            workflowTask.getMaxRetries(), workflowTask.getName(), workflowTask.getNode(), workflowTask.getParameters(),
+            workflowTask.getPost(), workflowTask.getPre(), dataStream.source(), workflowTask.getTaskNumber(),
+            workflowTask.getTimeout(), workflowTask.getType());
+    }
+
+    public List<WorkflowConnection> getConnections() {
+        return connections;
+    }
+
+    public ComponentType getDestination() {
+        return destination;
     }
 
     public List<WorkflowTask> getFinalize() {
-        return finalize1;
+        return finalize;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public Map<String, ?> getParameters() {
+        return parameters;
+    }
+
+    public List<WorkflowTask> getPost() {
+        return post;
+    }
+
+    public List<WorkflowTask> getPre() {
+        return pre;
+    }
+
+    public ComponentType getSource() {
+        return source;
+    }
+
+    public int getTaskNumber() {
+        return taskNumber;
+    }
+
+    public String getTimeout() {
+        return timeout;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        WorkflowTaskDTO that = (WorkflowTaskDTO) obj;
+
+        return Objects.equals(this.connections, that.connections) &&
+            Objects.equals(this.destination, that.destination) &&
+            Objects.equals(this.finalize, that.finalize) &&
+            Objects.equals(this.label, that.label) &&
+            this.maxRetries == that.maxRetries &&
+            Objects.equals(this.name, that.name) &&
+            Objects.equals(this.node, that.node) &&
+            Objects.equals(this.parameters, that.parameters) &&
+            Objects.equals(this.post, that.post) &&
+            Objects.equals(this.pre, that.pre) &&
+            Objects.equals(this.source, that.source) &&
+            this.taskNumber == that.taskNumber &&
+            Objects.equals(this.timeout, that.timeout) &&
+            Objects.equals(this.type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            connections, destination, finalize, label, maxRetries, name, node, parameters, post, pre, source,
+            taskNumber, timeout, type);
+    }
+
+    @Override
+    public String toString() {
+        return "WorkflowTaskDTO[" +
+            "connections=" + connections + ", " +
+            "destination=" + destination + ", " +
+            "finalize=" + finalize + ", " +
+            "label=" + label + ", " +
+            "maxRetries=" + maxRetries + ", " +
+            "name=" + name + ", " +
+            "node=" + node + ", " +
+            "parameters=" + parameters + ", " +
+            "post=" + post + ", " +
+            "pre=" + pre + ", " +
+            "source=" + source + ", " +
+            "taskNumber=" + taskNumber + ", " +
+            "timeout=" + timeout + ", " +
+            "type=" + type + ']';
     }
 }
