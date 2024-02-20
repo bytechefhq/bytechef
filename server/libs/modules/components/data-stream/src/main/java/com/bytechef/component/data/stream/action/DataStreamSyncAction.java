@@ -17,6 +17,8 @@
 package com.bytechef.component.data.stream.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ComponentDSL;
 
@@ -27,5 +29,13 @@ public class DataStreamSyncAction {
 
     public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("sync")
         .title("Sync Data Stream")
-        .description("Sync large volume of data between source and destination applications.");
+        .description("Sync large volume of data between source and destination applications.")
+        .properties(
+            integer("transformation")
+                .description(
+                    "Choose between transformation: simple - define source and destination fields, script - define custom transformation script")
+                .label("Transformation")
+                .options(
+                    option("Simple", 1),
+                    option("Script", 2)));
 }

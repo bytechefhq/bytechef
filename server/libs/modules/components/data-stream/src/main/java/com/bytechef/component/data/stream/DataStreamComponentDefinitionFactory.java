@@ -22,7 +22,10 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;
 import com.bytechef.component.definition.ComponentDefinition;
-import java.util.List;
+import java.util.Optional;
+
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Component;
 
@@ -32,34 +35,42 @@ import org.springframework.stereotype.Component;
 @Component(DATA_STREAM + "_v1_ComponentDefinitionFactory")
 public class DataStreamComponentDefinitionFactory implements ComponentDefinitionFactory {
 
-    private final ComponentDefinition componentDefinition;
+    private final DataStreamComponentDefinition componentDefinition;
 
     public DataStreamComponentDefinitionFactory(JobLauncher jobLauncher) {
-        this.componentDefinition = component(DATA_STREAM)
-            .title("Data Stream")
-            .description("With the Data Stream, you can transfer large amounts of data efficiently.")
-            .icon("path:assets/data-stream.svg")
-            .actions(DataStreamSyncAction.ACTION_DEFINITION)
-            .workflowConnectionKeys("source", "destination")
-            .allowedConnections(DataStreamComponentDefinitionFactory::getAllowedConnectionDefinitionsFunction)
-            .connectionRequired(true);
-    }
-
-    private static List<ComponentDefinition> getAllowedConnectionDefinitionsFunction(
-        ComponentDefinition componentDefinition, List<ComponentDefinition> componentDefinitions,
-        String workflowConnectionKey) {
-
-        if ("source".equals(workflowConnectionKey)) {
-            // TODO
-            return componentDefinitions;
-        } else {
-            // TODO
-            return componentDefinitions;
-        }
+        this.componentDefinition = new DataStreamComponentDefinitionImpl(
+            component(DATA_STREAM)
+                .title("Data Stream")
+                .description("With the Data Stream, you can transfer large amounts of data efficiently.")
+                .icon("path:assets/data-stream.svg")
+                .actions(DataStreamSyncAction.ACTION_DEFINITION)
+                .workflowConnectionKeys("source", "destination"));
     }
 
     @Override
     public ComponentDefinition getDefinition() {
         return componentDefinition;
+    }
+
+    private static class DataStreamComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
+        implements DataStreamComponentDefinition {
+
+
+        public DataStreamComponentDefinitionImpl(ComponentDefinition componentDefinition) {
+            super(componentDefinition);
+        }
+
+        @Override
+        public FilterComponentDefinitionBiFunction getFilterComponentDefinition() {
+            return (componentDefinition, componentType) -> {
+                if (componentType == ComponentType.SOURCE) {
+                    // TODO
+                    return Optional.of(componentDefinition);
+                } else {
+                    // TODO
+                    return Optional.of(componentDefinition);
+                }
+            };
+        }
     }
 }
