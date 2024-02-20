@@ -1,7 +1,7 @@
 import PropertyDropdownMenu from '@/components/Properties/components/PropertyDropdownMenu';
 import {Button} from '@/components/ui/button';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
-import {PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {ControlTypeModel, PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {ComponentDataType, DataPillType, PropertyType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -16,8 +16,10 @@ type ArrayPropertyProps = {
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 };
 
+type ArrayPropertyType = Array<PropertyModel & {controlType?: ControlTypeModel; defaultValue?: string}>;
+
 const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflowMutation}: ArrayPropertyProps) => {
-    const [arrayItems, setArrayItems] = useState(property.items);
+    const [arrayItems, setArrayItems] = useState<ArrayPropertyType>(property.items || []);
 
     const {items, multipleValues, name} = property;
 
@@ -39,7 +41,7 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
             return;
         }
 
-        const newItem = {
+        const newItem: PropertyType = {
             controlType: arrayItems[0].controlType,
             name: `${name}_${arrayItems.length}`,
             type: arrayItems[0].type,
@@ -48,8 +50,9 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
         setArrayItems([...arrayItems, newItem]);
     };
 
+    // set arrayItems[0].name if it's not set
     useEffect(() => {
-        if (dataPills?.length || !arrayItems?.length) {
+        if (!arrayItems?.length) {
             return;
         }
 
@@ -68,19 +71,16 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [arrayItems?.length, name]);
 
+    // render individual array items with data gathered from parameters
     useEffect(() => {
-        if (
-            !dataPills?.length ||
-            !currentComponentData?.parameters ||
-            !Object.keys(currentComponentData?.parameters).length
-        ) {
+        if (!currentComponentData?.parameters || !Object.keys(currentComponentData?.parameters).length) {
             return;
         }
 
         const parameterArrayItems = Object.keys(currentComponentData.parameters).reduce(
-            (parameters: Array<PropertyModel & {defaultValue: string}>, key: string) => {
+            (parameters: ArrayPropertyType, key: string) => {
                 if (arrayItems?.length && key.startsWith(`${name}_`)) {
-                    const strippedValue = currentComponentData.parameters?.[key]
+                    const strippedValue: string = currentComponentData.parameters?.[key]
                         .replace(/<p>/g, '')
                         .replace(/<\/p>/g, '');
 
