@@ -41,6 +41,10 @@ export interface GetComponentDefinitionsRequest {
     include?: Array<string>;
 }
 
+export interface GetDataStreamComponentDefinitionsRequest {
+    componentType: GetDataStreamComponentDefinitionsComponentTypeEnum;
+}
+
 /**
  * 
  */
@@ -158,4 +162,45 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         return await response.value();
     }
 
+    /**
+     * Get all compatible component definitions for a data stream component type.
+     * Get all compatible component definitions for a data stream component type
+     */
+    async getDataStreamComponentDefinitionsRaw(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
+        if (requestParameters.componentType === null || requestParameters.componentType === undefined) {
+            throw new runtime.RequiredError('componentType','Required parameter requestParameters.componentType was null or undefined when calling getDataStreamComponentDefinitions.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/data-streams/{componentType}/component-definitions`.replace(`{${"componentType"}}`, encodeURIComponent(String(requestParameters.componentType))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicModelFromJSON));
+    }
+
+    /**
+     * Get all compatible component definitions for a data stream component type.
+     * Get all compatible component definitions for a data stream component type
+     */
+    async getDataStreamComponentDefinitions(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
+        const response = await this.getDataStreamComponentDefinitionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
 }
+
+/**
+ * @export
+ */
+export const GetDataStreamComponentDefinitionsComponentTypeEnum = {
+    Source: 'SOURCE',
+    Destination: 'DESTINATION'
+} as const;
+export type GetDataStreamComponentDefinitionsComponentTypeEnum = typeof GetDataStreamComponentDefinitionsComponentTypeEnum[keyof typeof GetDataStreamComponentDefinitionsComponentTypeEnum];

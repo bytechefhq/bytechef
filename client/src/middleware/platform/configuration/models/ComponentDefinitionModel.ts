@@ -51,6 +51,12 @@ export interface ComponentDefinitionModel {
      */
     actions?: Array<ActionDefinitionBasicModel>;
     /**
+     * Does component can define additional connections.
+     * @type {boolean}
+     * @memberof ComponentDefinitionModel
+     */
+    additionalConnections?: boolean;
+    /**
      * The category.
      * @type {string}
      * @memberof ComponentDefinitionModel
@@ -134,6 +140,7 @@ export function ComponentDefinitionModelFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
+        'additionalConnections': !exists(json, 'additionalConnections') ? undefined : json['additionalConnections'],
         'category': !exists(json, 'category') ? undefined : json['category'],
         'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
         'description': !exists(json, 'description') ? undefined : json['description'],
@@ -157,6 +164,7 @@ export function ComponentDefinitionModelToJSON(value?: ComponentDefinitionModel 
     return {
         
         'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionBasicModelToJSON)),
+        'additionalConnections': value.additionalConnections,
         'category': value.category,
         'connection': ConnectionDefinitionBasicModelToJSON(value.connection),
         'description': value.description,

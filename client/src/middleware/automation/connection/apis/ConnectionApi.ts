@@ -30,6 +30,11 @@ export interface DeleteConnectionRequest {
     id: number;
 }
 
+export interface GetComponentConnectionsRequest {
+    componentName: string;
+    componentVersion: number;
+}
+
 export interface GetConnectionRequest {
     id: number;
 }
@@ -114,6 +119,42 @@ export class ConnectionApi extends runtime.BaseAPI {
      */
     async deleteConnection(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteConnectionRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all connections a component can use.
+     * Get all connections a component can use.
+     */
+    async getComponentConnectionsRaw(requestParameters: GetComponentConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentConnections.');
+        }
+
+        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
+            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentConnections.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/components/{componentName}/{componentVersion}/connections`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionModelFromJSON));
+    }
+
+    /**
+     * Get all connections a component can use.
+     * Get all connections a component can use.
+     */
+    async getComponentConnections(requestParameters: GetComponentConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
+        const response = await this.getComponentConnectionsRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

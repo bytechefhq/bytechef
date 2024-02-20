@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './CategoryModel';
 export * from './CreateProjectInstanceWorkflowJob200ResponseModel';
+export * from './DataStreamComponentModel';
 export * from './ProjectBasicModel';
 export * from './ProjectInstanceBasicModel';
 export * from './ProjectInstanceModel';
