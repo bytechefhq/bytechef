@@ -170,13 +170,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ConnectionDefinition getConnectionDefinition(
-        @NonNull String componentName, int componentVersion) {
-
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
-
-        return toConnectionDefinition(OptionalUtils.get(componentDefinition.getConnection()), componentDefinition);
+    public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
+        return toConnectionDefinition(
+            componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion));
     }
 
     @Override
@@ -184,8 +180,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
-            .map(componentDefinition -> toConnectionDefinition(
-                OptionalUtils.get(componentDefinition.getConnection()), componentDefinition))
+            .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
             .toList();
     }
 
@@ -224,10 +219,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
         return componentDefinitionRegistry
-            .getConnectionDefinitions(componentName, componentVersion)
-            .entrySet()
+            .getConnectionComponentDefinitions(componentName, componentVersion)
             .stream()
-            .map(entry -> toConnectionDefinition(entry.getValue(), entry.getKey()))
+            .map(ConnectionDefinitionServiceImpl::toConnectionDefinition)
             .toList();
     }
 
@@ -399,14 +393,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     private static ConnectionDefinition toConnectionDefinition(
-        com.bytechef.component.definition.ConnectionDefinition connectionDefinition,
         ComponentDefinition componentDefinition) {
 
         Optional<String> descriptionOptional = componentDefinition.getDescription();
         Optional<String> titleOptional = componentDefinition.getTitle();
 
         return new ConnectionDefinition(
-            connectionDefinition, componentDefinition.getName(), titleOptional.orElse(componentDefinition.getName()),
-            descriptionOptional.orElse(null));
+            OptionalUtils.get(componentDefinition.getConnection()), componentDefinition.getName(),
+            titleOptional.orElse(componentDefinition.getName()), descriptionOptional.orElse(null));
     }
 }
