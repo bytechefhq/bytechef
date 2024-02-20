@@ -18,8 +18,6 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ComponentDefinition;
 
-import java.util.List;
-
 /**
  * @author Ivica Cardic
  */
@@ -34,13 +32,6 @@ public interface DataStreamComponentDefinition extends ComponentDefinition {
      * @return
      */
     FilterComponentDefinitionBiPredicate getFilterComponentDefinition();
-
-    /**
-     * @return
-     */
-    default List<String> getWorkflowConnectionKeys() {
-        return List.of("source", "destination");
-    }
 
     /**
      *

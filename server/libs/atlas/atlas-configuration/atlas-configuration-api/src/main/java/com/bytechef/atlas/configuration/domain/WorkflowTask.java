@@ -134,7 +134,7 @@ public class WorkflowTask implements Task, Serializable {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
-    public Map<String, Object> getExtensions() {
+    public Map<String, ?> getExtensions() {
         return Collections.unmodifiableMap(extensions);
     }
 
