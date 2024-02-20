@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;
 import com.bytechef.component.definition.ComponentDefinition;
-import java.util.Optional;
 
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
@@ -61,14 +60,14 @@ public class DataStreamComponentDefinitionFactory implements ComponentDefinition
         }
 
         @Override
-        public FilterComponentDefinitionBiFunction getFilterComponentDefinition() {
+        public FilterComponentDefinitionBiPredicate getFilterComponentDefinition() {
             return (componentDefinition, componentType) -> {
                 if (componentType == ComponentType.SOURCE) {
                     // TODO
-                    return Optional.of(componentDefinition);
+                    return true;
                 } else {
                     // TODO
-                    return Optional.of(componentDefinition);
+                    return true;
                 }
             };
         }
