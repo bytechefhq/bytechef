@@ -16,15 +16,13 @@
 
 package com.bytechef.platform.configuration.domain;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import java.util.ArrayList;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @param workflowNodeName action task/trigger name used in the workflow
@@ -34,27 +32,19 @@ import java.util.Objects;
 public record WorkflowConnection(
     String componentName, int componentVersion, String workflowNodeName, String key, boolean required) {
 
-    public static List<WorkflowConnection> of(
-        Map<String, Map<String, Object>> connections, String componentName, int componentVersion,
-        String workflowNodeName) {
+    public static List<WorkflowConnection> of(Map<String, ?> extensions, String workflowNodeName) {
+        Map<String, Map<String, ?>> connections = MapUtils.getMap(
+            extensions, WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
 
         return connections
             .entrySet()
             .stream()
             .map(entry -> {
-                Map<String, Object> connectionMap = entry.getValue();
-
-                if ((!connectionMap.containsKey(WorkflowExtConstants.COMPONENT_NAME) ||
-                    !connectionMap.containsKey(WorkflowExtConstants.COMPONENT_VERSION))) {
-
-                    throw new IllegalStateException(
-                        "%s and %s must be set".formatted(
-                            WorkflowExtConstants.COMPONENT_NAME, WorkflowExtConstants.COMPONENT_VERSION));
-                }
+                Map<String, ?> connectionMap = entry.getValue();
 
                 return new WorkflowConnection(
-                    MapUtils.getString(connectionMap, WorkflowExtConstants.COMPONENT_NAME, componentName),
-                    MapUtils.getInteger(connectionMap, WorkflowExtConstants.COMPONENT_VERSION, componentVersion),
+                    MapUtils.getRequiredString(connectionMap, WorkflowExtConstants.COMPONENT_NAME),
+                    MapUtils.getRequiredInteger(connectionMap, WorkflowExtConstants.COMPONENT_VERSION),
                     workflowNodeName, entry.getKey(),
                     MapUtils.getBoolean(connectionMap, WorkflowExtConstants.AUTHORIZATION_REQUIRED, false));
             })
@@ -65,24 +55,6 @@ public record WorkflowConnection(
         return new WorkflowConnection(
             componentDefinition.getName(), componentDefinition.getVersion(), workflowNodeName,
             componentDefinition.getName(), componentDefinition.isConnectionRequired());
-    }
-
-    public static List<WorkflowConnection> of(
-        String workflowNodeName, DataStream.ComponentType componentType,
-        List<ComponentDefinition> componentDefinitions) {
-
-        List<WorkflowConnection> workflowConnections = new ArrayList<>();
-
-        ComponentDefinition componentDefinition = CollectionUtils.getFirst(
-            componentDefinitions,
-            curComponentDefinition -> Objects.equals(
-                curComponentDefinition.getName(), componentType.componentName()));
-
-        if (componentDefinition.getConnection() != null) {
-            workflowConnections.add(of(workflowNodeName, componentDefinition));
-        }
-
-        return workflowConnections;
     }
 
     public static WorkflowConnection of(

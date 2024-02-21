@@ -17,19 +17,19 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
+import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.DataStream;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,62 +56,59 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
             workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions(), false);
     }
 
-    public List<WorkflowConnection> getWorkflowConnections(
-        String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> extensions, boolean workflowTask) {
-
-        List<WorkflowConnection> workflowConnections = new ArrayList<>();
-
-        if (workflowNodeType.componentOperationName() != null) {
-            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion());
-
-            if (workflowTask && componentDefinition instanceof DataStreamComponentDefinition) {
-                workflowConnections.addAll(
-                    getWorkflowConnections(
-                        DataStream.of(extensions), workflowNodeName,
-                        componentDefinitionService.getComponentDefinitions()));
-            } else {
-                workflowConnections.add(WorkflowConnection.of(workflowNodeName, workflowNodeType, componentDefinition));
-            }
-        }
-
-        return workflowConnections;
-    }
-
     private List<WorkflowConnection> getWorkflowConnections(
         String workflowNodeName, String type, Map<String, ?> extensions, boolean workflowTask) {
 
         List<WorkflowConnection> workflowConnections;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
-        if (MapUtils.containsKey(extensions, WorkflowExtConstants.CONNECTIONS)) {
-            workflowConnections = WorkflowConnection.of(
-                MapUtils.getMap(extensions, WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of()),
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(), workflowNodeName);
+        if (workflowNodeType.componentOperationName() == null) {
+            return Collections.emptyList();
+        }
+
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+        if (workflowTask && componentDefinition instanceof ScriptComponentDefinition) {
+            workflowConnections = WorkflowConnection.of(extensions, workflowNodeName);
+        } else if (workflowTask && componentDefinition instanceof DataStreamComponentDefinition) {
+            workflowConnections = getWorkflowConnections(DataStream.of(extensions), workflowNodeName);
         } else {
-            workflowConnections = getWorkflowConnections(workflowNodeName, workflowNodeType, extensions, workflowTask);
+            workflowConnections = List.of(
+                WorkflowConnection.of(workflowNodeName, workflowNodeType, componentDefinition));
         }
 
         return workflowConnections;
     }
 
-    private List<WorkflowConnection> getWorkflowConnections(
-        DataStream dataStream, String workflowNodeName, List<ComponentDefinition> componentDefinitions) {
-
+    private List<WorkflowConnection> getWorkflowConnections(DataStream dataStream, String workflowNodeName) {
         List<WorkflowConnection> workflowConnections = new ArrayList<>();
 
         if (dataStream != null) {
             if (dataStream.source() != null) {
-                workflowConnections.addAll(
-                    WorkflowConnection.of(workflowNodeName, dataStream.source(), componentDefinitions));
+                fetchWorkflowConnection(workflowNodeName, dataStream.source()).ifPresent(workflowConnections::add);
             }
 
             if (dataStream.destination() != null) {
-                workflowConnections.addAll(
-                    WorkflowConnection.of(workflowNodeName, dataStream.destination(), componentDefinitions));
+                fetchWorkflowConnection(workflowNodeName, dataStream.destination()).ifPresent(workflowConnections::add);
             }
         }
 
         return workflowConnections;
+    }
+
+    Optional<WorkflowConnection> fetchWorkflowConnection(
+        String workflowNodeName, DataStream.ComponentType componentType) {
+
+        Optional<WorkflowConnection> workflowConnectionOptional = Optional.empty();
+
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            componentType.componentName(), componentType.componentVersion());
+
+        if (componentDefinition.getConnection() != null) {
+            workflowConnectionOptional = Optional.of(WorkflowConnection.of(workflowNodeName, componentDefinition));
+        }
+
+        return workflowConnectionOptional;
     }
 }
