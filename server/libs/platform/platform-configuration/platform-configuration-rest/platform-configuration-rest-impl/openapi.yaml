@@ -1107,6 +1107,16 @@ components:
         triggersCount:
           default: "The number of triggers a component has"
           type: "integer"
+    ComponentType:
+      description: "The type of a data stream component."
+      type: "object"
+      properties:
+        componentName:
+          description: "The name of a component."
+          type: "string"
+        componentVersion:
+          description: "The version of a component."
+          type: "integer"
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
@@ -1733,53 +1743,82 @@ components:
     Workflow:
       description: "The blueprint that describe the execution of a job."
       type: "object"
-      allOf:
-        - $ref: "#/components/schemas/WorkflowBasic"
-        - type: "object"
-          properties:
-            definition:
-              description: "The definition of a workflow."
-              type: "string"
-              writeOnly: true
-            format:
-              $ref: "#/components/schemas/WorkflowFormat"
-            inputs:
-              description: "The workflow's expected list of inputs."
-              type: "array"
-              items:
-                $ref: "#/components/schemas/WorkflowInput"
-              readOnly: true
-            outputs:
-              description: "The workflow's list of expected outputs."
-              type: "array"
-              items:
-                $ref: "#/components/schemas/WorkflowOutput"
-              readOnly: true
-            sourceType:
-              description: "The type of the source which stores the workflow definition."
-              type: "string"
-              enum:
-                - "CLASSPATH"
-                - "FILESYSTEM"
-                - "GIT"
-                - "JDBC"
-            maxRetries:
-              description: "The maximum number of times a task may retry."
-              type: "integer"
-              format: "int32"
-              readOnly: true
-            tasks:
-              description: "The steps that make up the workflow."
-              type: "array"
-              items:
-                $ref: "#/components/schemas/WorkflowTask"
-              readOnly: true
-            triggers:
-              description: "The steps that make up the workflow."
-              type: "array"
-              items:
-                $ref: "#/components/schemas/WorkflowTrigger"
-              readOnly: true
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        definition:
+          description: "The definition of a workflow."
+          type: "string"
+          writeOnly: true
+        description:
+          description: "The description of a workflow."
+          type: "string"
+          writeOnly: true
+        format:
+          $ref: "#/components/schemas/WorkflowFormat"
+        id:
+          description: "The id of the workflow."
+          type: "string"
+          readOnly: true
+        inputs:
+          description: "The workflow's expected list of inputs."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowInput"
+          readOnly: true
+        label:
+          description: "The descriptive name for the workflow"
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        outputs:
+          description: "The workflow's list of expected outputs."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowOutput"
+          readOnly: true
+        sourceType:
+          description: "The type of the source which stores the workflow definition."
+          type: "string"
+          enum:
+            - "CLASSPATH"
+            - "FILESYSTEM"
+            - "GIT"
+            - "JDBC"
+        maxRetries:
+          description: "The maximum number of times a task may retry."
+          type: "integer"
+          format: "int32"
+          readOnly: true
+        tasks:
+          description: "The steps that make up the workflow."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+          readOnly: true
+        triggers:
+          description: "The steps that make up the workflow."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTrigger"
+          readOnly: true
+        __version:
+          type: "integer"
     WorkflowBasic:
       description: "The blueprint that describe the execution of a job."
       type: "object"
@@ -1813,6 +1852,16 @@ components:
           description: "The last modified date."
           type: "string"
           format: "date-time"
+          readOnly: true
+        workflowTaskComponentNames:
+          type: "array"
+          items:
+            type: "string"
+          readOnly: true
+        workflowTriggerComponentNames:
+          type: "array"
+          items:
+            type: "string"
           readOnly: true
         __version:
           type: "integer"
@@ -1991,6 +2040,8 @@ components:
           items:
             $ref: "#/components/schemas/WorkflowConnection"
           readOnly: true
+        destination:
+          $ref: '#/components/schemas/ComponentType'
         finalize:
           description: "The (optional) list of tasks that are to be executed after\
             \ execution of a task -- regardless of whether it had failed or not."
@@ -2027,6 +2078,8 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/WorkflowTask"
+        source:
+          $ref: '#/components/schemas/ComponentType'
         timeout:
           description: "The timeout expression which describes when a task should\
             \ be deemed as timed-out."
