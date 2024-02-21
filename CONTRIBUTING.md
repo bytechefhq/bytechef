@@ -119,7 +119,7 @@ ByteChef platform consists of three major parts. User interface is implemented w
 #### Note:
 User interface application connects to the microservices server at the predefined URL http://127.0.0.1:9555. If microservices backend API server is not present, your page will load with errors. The API server starts on default port 9555. To configure the API server in details, please follow [Setup With docker](#setup-with-docker) instructions. The API server status is available at the endpoint: http://localhost:9555/swagger-ui/index.html. Type it in the browser's address bar to get Swagger UI with the list of API endpoints.
 
-If ran for the first time the API server automatically populate database with required data and demo projects. Subsequent runs against existing database would trigger table updates on PostgreSQL. 
+If ran for the first time the API server automatically populate database with required data and demo projects. Subsequent runs against existing database would trigger table updates on PostgreSQL.
 
 ## User Interface Development tasks
 ### Running Source Formatting
