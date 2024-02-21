@@ -40,6 +40,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -92,6 +93,7 @@ public class MapUtils {
         return map.get(key);
     }
 
+    @Nullable
     public static <K, T> T get(Map<K, ?> map, K key, Class<T> returnType) {
         Object value = get(map, key);
 
@@ -112,6 +114,7 @@ public class MapUtils {
         return value;
     }
 
+    @Nullable
     public static <K, T> T get(Map<K, ?> map, K key, TypeReference<T> elementTypeRef) {
         Validate.notNull(map, "'map' must not be null");
 
@@ -136,6 +139,7 @@ public class MapUtils {
         return convert(value, elementTypeRef);
     }
 
+    @Nullable
     public static <K> Object[] getArray(Map<K, ?> map, K key) {
         Object value = get(map, key);
 
@@ -180,6 +184,7 @@ public class MapUtils {
         return list.toArray((Object[]) Array.newInstance(Object.class, 0));
     }
 
+    @Nullable
     @SuppressWarnings("unchecked")
     public static <K, T> T[] getArray(Map<K, ?> map, K key, Class<T> elementType) {
         Object value = get(map, key);
@@ -298,6 +303,7 @@ public class MapUtils {
         return list == null ? defaultValue : list;
     }
 
+    @Nullable
     public static <K, T> List<T> getList(Map<K, ?> map, K key, Class<T> elementType) {
         List<?> list = get(map, key, List.class);
 
@@ -348,6 +354,7 @@ public class MapUtils {
         return list;
     }
 
+    @Nullable
     public static <K, T> List<T> getList(Map<K, ?> map, K key, TypeReference<T> elementTypeRef) {
         List<?> list = getList(map, key);
 
@@ -418,6 +425,7 @@ public class MapUtils {
         return get(map, key, Long.class, defaultValue);
     }
 
+    @Nullable
     public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key) {
         @SuppressWarnings("unchecked")
         Map<K2, ?> value = get(map, key, Map.class);
@@ -429,6 +437,7 @@ public class MapUtils {
         return Collections.unmodifiableMap(toMap(value, entry -> (K2) entry.getKey(), Map.Entry::getValue));
     }
 
+    @Nullable
     public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, TypeReference<V> elementTypeRef) {
         Map<K2, ?> resultMap = getMap(map, key);
 
@@ -450,6 +459,7 @@ public class MapUtils {
         return Collections.unmodifiableMap(toMap(value, entry -> (K2) entry.getKey(), Map.Entry::getValue));
     }
 
+    @Nullable
     public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, Class<V> valueType) {
         @SuppressWarnings("unchecked")
         Map<K2, ?> value = get(map, key, Map.class);
