@@ -27,10 +27,11 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 
 import java.util.List;
 
+/**
+ * @author Monika Domiter
+ * @author Ivica Cardic
+ */
 public class MicrosoftOutlook365Connection {
-
-    private MicrosoftOutlook365Connection() {
-    }
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
@@ -50,5 +51,11 @@ public class MicrosoftOutlook365Connection {
                 .authorizationUrl(
                     (parameters, context) -> "https://login.microsoftonline.com/" + parameters.getString(TENANT_ID) +
                         "/oauth2/v2.0/authorize")
-                .scopes((connection, context) -> List.of("https://graph.microsoft.com/.default")));
+                .tokenUrl(
+                    (parameters, context) -> "https://login.microsoftonline.com/" + parameters.getString(TENANT_ID) +
+                        "/oauth2/v2.0/token")
+                .scopes((connection, context) -> List.of("Mail.Read", "MailboxSettings.Read", "Mail.Send")));
+
+    private MicrosoftOutlook365Connection() {
+    }
 }
