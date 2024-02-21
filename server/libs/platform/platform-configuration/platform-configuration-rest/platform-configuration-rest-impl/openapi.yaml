@@ -297,6 +297,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDefinition"
+  /data-streams/{componentVersion}/{componentType}/component-definitions:
+    get:
+      description: "Get all compatible component definitions for a data stream component type."
+      summary: "Get all compatible component definitions for a data stream component type"
+      tags:
+        - "component-definition"
+      operationId: "getDataStreamComponentDefinitions"
+      parameters:
+        - name: "componentVersion"
+          description: "The version of a data stream component."
+          required: true
+          in: "path"
+          schema:
+            type: "integer"
+        - name: "componentType"
+          description: "The name of a component type."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+            enum:
+              - "SOURCE"
+              - "DESTINATION"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
   /oauth2/authorization-parameters:
     post:
       description: "Retrieves oauth2 authorization parameters."
