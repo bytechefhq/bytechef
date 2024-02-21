@@ -22,6 +22,7 @@ import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.DataStream;
+import com.bytechef.platform.configuration.domain.DataStream.ComponentType;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -97,9 +98,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         return workflowConnections;
     }
 
-    Optional<WorkflowConnection> fetchWorkflowConnection(
-        String workflowNodeName, DataStream.ComponentType componentType) {
-
+    Optional<WorkflowConnection> fetchWorkflowConnection(String workflowNodeName, ComponentType componentType) {
         Optional<WorkflowConnection> workflowConnectionOptional = Optional.empty();
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
