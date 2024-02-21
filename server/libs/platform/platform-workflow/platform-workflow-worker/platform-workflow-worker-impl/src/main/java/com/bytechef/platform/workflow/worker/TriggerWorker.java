@@ -82,13 +82,12 @@ public class TriggerWorker {
 
         Future<?> future = triggerWorkerExecutor.submit(() -> {
             try {
-                eventPublisher.publishEvent(new TriggerStartedApplicationEvent(
-                    Validate.notNull(triggerExecution.getId(), "id")));
+                eventPublisher.publishEvent(
+                    new TriggerStartedApplicationEvent(Validate.notNull(triggerExecution.getId(), "id")));
 
                 TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
-                eventPublisher.publishEvent(
-                    new TriggerExecutionCompleteEvent(completedTriggerExecution));
+                eventPublisher.publishEvent(new TriggerExecutionCompleteEvent(completedTriggerExecution));
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
