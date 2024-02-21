@@ -16,6 +16,10 @@
 
 package com.bytechef.platform.configuration.domain;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
 
 /**
@@ -25,7 +29,28 @@ import java.util.Map;
 public record DataStream(ComponentType source, ComponentType destination) {
 
     public static DataStream of(Map<String, ?> extensions) {
-        return null;
+        DataStream dataStream = null;
+
+        if (extensions.containsKey(WorkflowExtConstants.SOURCE) ||
+            extensions.containsKey(WorkflowExtConstants.DESTINATION)) {
+
+            Map<String, ?> sourceMap = MapUtils.get(extensions, WorkflowExtConstants.SOURCE, new TypeReference<>() {});
+            Map<String, ?> destinationMap = MapUtils.get(
+                extensions, WorkflowExtConstants.DESTINATION, new TypeReference<>() {});
+
+            dataStream = new DataStream(
+                sourceMap == null ? null : toComponentType(sourceMap),
+                destinationMap == null ? null : toComponentType(destinationMap));
+        }
+
+        return dataStream;
+    }
+
+    private static ComponentType toComponentType(Map<String, ?> componentTypeMap) {
+        return new ComponentType(
+            MapUtils.getRequiredString(componentTypeMap, WorkflowExtConstants.COMPONENT_NAME),
+            MapUtils.getRequiredInteger(componentTypeMap, WorkflowExtConstants.COMPONENT_VERSION),
+            MapUtils.getMap(componentTypeMap, WorkflowConstants.PARAMETERS, new TypeReference<>() {}, Map.of()));
     }
 
     public record ComponentType(String componentName, int componentVersion, Map<String, ?> parameters) {
