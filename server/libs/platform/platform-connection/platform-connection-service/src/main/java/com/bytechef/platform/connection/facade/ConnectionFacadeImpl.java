@@ -21,7 +21,6 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
@@ -35,7 +34,6 @@ import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -139,23 +137,6 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 // TODO find a way to delete ll tags not referenced anymore
 //        connection.getTagIds()
 //            .forEach(tagService::delete);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ConnectionDTO> getComponentConnections(String componentName, Integer componentVersion, Type type) {
-        List<Connection> connections = new ArrayList<>();
-
-        List<ConnectionDefinition> connectionDefinitions = connectionDefinitionService.getConnectionDefinitions(
-            componentName, componentVersion);
-
-        for (ConnectionDefinition connectionDefinition : connectionDefinitions) {
-            connections.addAll(
-                connectionService.getConnections(
-                    connectionDefinition.getComponentName(), connectionDefinition.getVersion(), type));
-        }
-
-        return getConnections(connections);
     }
 
     @Override
