@@ -32,7 +32,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;

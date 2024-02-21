@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.factory;
-
-import com.bytechef.component.ComponentHandler;
-import java.util.List;
+package com.bytechef.platform.component.trigger;
 
 /**
  * @author Ivica Cardic
  */
-public interface ComponentHandlerListFactory {
-
-    List<? extends ComponentHandler> getComponentHandlers();
+public record TriggerOutput(Object value, Object state, boolean batch) {
 }

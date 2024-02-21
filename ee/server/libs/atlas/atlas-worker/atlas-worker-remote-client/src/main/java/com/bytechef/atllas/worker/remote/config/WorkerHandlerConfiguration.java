@@ -14,7 +14,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.constant.MetadataConstants;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.annotation.Bean;
