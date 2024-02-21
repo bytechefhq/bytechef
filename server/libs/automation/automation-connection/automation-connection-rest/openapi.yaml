@@ -11,35 +11,6 @@ tags:
 - name: "connection"
   description: "The Automation Connection API"
 paths:
-  /components/{componentName}/{componentVersion}/connections:
-    get:
-      description: "Get all connections a component can use."
-      summary: "Get all connections a component can use."
-      tags:
-        - "connection"
-      operationId: "getComponentConnections"
-      parameters:
-        - name: "componentName"
-          description: "The component name used for filtering connections."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "componentVersion"
-          description: "The component version."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-      responses:
-        "200":
-          description: "A list of connections."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
   /connections:
     get:
       description: "Get all connections."
