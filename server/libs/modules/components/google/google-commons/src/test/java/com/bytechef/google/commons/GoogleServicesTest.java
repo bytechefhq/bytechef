@@ -23,30 +23,39 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.sheets.v4.Sheets;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class GoogleServicesTest {
 
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private static final Parameters mockedParameters = mock(Parameters.class);
+
+    @BeforeAll
+    static void beforeAll() {
+        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
+            .thenReturn("accessToken");
+    }
 
     @Test
     void testGetCalendar() {
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
         Calendar calendar = GoogleServices.getCalendar(mockedParameters);
 
         assertEquals("Google Calendar Component", calendar.getApplicationName());
     }
 
     @Test
-    void testGetDrive() {
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
+    void testGetDocs() {
+        Docs docs = GoogleServices.getDocs(mockedParameters);
 
+        assertEquals("Google Docs Component", docs.getApplicationName());
+    }
+
+    @Test
+    void testGetDrive() {
         Drive drive = GoogleServices.getDrive(mockedParameters);
 
         assertEquals("Google Drive Component", drive.getApplicationName());
@@ -54,9 +63,6 @@ public class GoogleServicesTest {
 
     @Test
     void getMail() {
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
         Gmail gmail = GoogleServices.getMail(mockedParameters);
 
         assertEquals("Google Mail Component", gmail.getApplicationName());
@@ -64,9 +70,6 @@ public class GoogleServicesTest {
 
     @Test
     void getSheets() {
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
         Sheets sheets = GoogleServices.getSheets(mockedParameters);
 
         assertEquals("Google Sheets Component", sheets.getApplicationName());

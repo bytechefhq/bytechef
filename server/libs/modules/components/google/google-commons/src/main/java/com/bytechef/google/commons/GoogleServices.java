@@ -27,6 +27,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.Preconditions;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.sheets.v4.Sheets;
@@ -47,6 +48,15 @@ public class GoogleServices {
             GsonFactory.getDefaultInstance(),
             new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
                 .setApplicationName("Google Calendar Component")
+                .build();
+    }
+
+    public static Docs getDocs(Parameters connectionParameters) {
+        return new Docs.Builder(
+            new NetHttpTransport(),
+            GsonFactory.getDefaultInstance(),
+            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+                .setApplicationName("Google Docs Component")
                 .build();
     }
 
