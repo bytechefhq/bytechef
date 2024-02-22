@@ -106,7 +106,11 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         Job job = jobService.getJob(id);
 
         JobDTO jobDTO = new JobDTO(
-            job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
+            job,
+            job.getOutputs() == null
+                ? null
+                : taskFileStorage.readJobOutputs(job.getOutputs()),
+            getJobTaskExecutions(id));
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
             Validate.notNull(job.getId(), ""), Type.AUTOMATION);
 
