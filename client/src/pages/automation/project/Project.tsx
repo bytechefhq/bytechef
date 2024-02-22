@@ -166,6 +166,8 @@ const Project = () => {
         isLoading: projectWorkflowsLoading,
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
+    const {data: projectWorkflow} = useGetWorkflowQuery(workflowId!);
+
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
 
@@ -249,6 +251,9 @@ const Project = () => {
     });
 
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
+        onError: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
@@ -271,7 +276,11 @@ const Project = () => {
             });
 
             queryClient.invalidateQueries({
-                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration({workflowId: workflow.id!}),
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
             });
 
             setShowEditWorkflowDialog(false);
@@ -328,16 +337,6 @@ const Project = () => {
     };
 
     const handleProjectWorkflowValueChange = (id: string) => {
-        if (!projectWorkflows) {
-            return;
-        }
-
-        const newWorkflow = projectWorkflows.find((workflow: WorkflowModel) => workflow.id === id);
-
-        if (newWorkflow) {
-            setWorkflow({...newWorkflow, componentNames, nodeNames});
-        }
-
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
     };
 
@@ -376,16 +375,12 @@ const Project = () => {
     }, [workflowId]);
 
     useEffect(() => {
-        if (projectWorkflows) {
-            const workflow = projectWorkflows.find((workflow) => workflow.id === workflowId);
-
-            if (workflow) {
-                setWorkflow({...workflow, componentNames, nodeNames});
-            }
+        if (projectWorkflow) {
+            setWorkflow({...projectWorkflow, componentNames, nodeNames});
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectWorkflows, workflowId]);
+    }, [projectWorkflow, workflowId]);
 
     return (
         <>
@@ -435,7 +430,7 @@ const Project = () => {
                                         defaultValue={workflowId}
                                         name="projectWorkflowSelect"
                                         onValueChange={handleProjectWorkflowValueChange}
-                                        value={workflow.id || workflowId}
+                                        value={workflowId}
                                     >
                                         <SelectTrigger className="mr-0.5 border-0 bg-white shadow-none">
                                             <SelectValue placeholder="Select a workflow" />
@@ -728,7 +723,7 @@ const Project = () => {
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={workflow}
+                    workflowId={workflow.id}
                 />
             )}
 

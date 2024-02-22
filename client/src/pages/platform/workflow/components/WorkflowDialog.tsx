@@ -13,6 +13,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/middleware/platform/configuration';
+import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -28,7 +29,7 @@ interface WorkflowDialogProps {
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
-    workflow?: WorkflowModel;
+    workflowId?: string;
 }
 
 const WorkflowDialog = ({
@@ -37,9 +38,11 @@ const WorkflowDialog = ({
     parentId,
     triggerNode,
     updateWorkflowMutation,
-    workflow,
+    workflowId,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
+
+    const {data: workflow} = useGetWorkflowQuery(workflowId ?? '', !!workflowId);
 
     const form = useForm({
         defaultValues: {

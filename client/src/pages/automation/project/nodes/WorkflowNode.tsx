@@ -47,6 +47,10 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId!)});
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
         },
     });
 
