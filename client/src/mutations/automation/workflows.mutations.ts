@@ -22,7 +22,7 @@ export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutation
     });
 
 interface DuplicateWorkflowMutationProps {
-    onSuccess?: (result: WorkflowModel, variables: DuplicateWorkflowRequest) => void;
+    onSuccess?: (result: string, variables: DuplicateWorkflowRequest) => void;
     onError?: (error: Error, variables: DuplicateWorkflowRequest) => void;
 }
 

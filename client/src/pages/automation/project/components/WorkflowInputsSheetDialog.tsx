@@ -16,7 +16,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
@@ -61,7 +61,8 @@ const WorkflowInputsSheetDialog = ({
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projectWorkflows(projectId),
+                queryKey: WorkflowKeys.projectWorkflows(projectId),
+            });
             });
 
             saveWorkflowTestConfigurationInputsMutation.mutate({
@@ -79,9 +80,7 @@ const WorkflowInputsSheetDialog = ({
     const saveWorkflowTestConfigurationInputsMutation = useSaveWorkflowTestConfigurationInputsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration({
-                    workflowId: workflow.id!,
-                }),
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
 
             closeDialog();

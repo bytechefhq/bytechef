@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/queries/platform/workflowNodeDescriptions.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {HoverCard} from '@radix-ui/react-hover-card';
@@ -46,7 +46,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId!)});
+            queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId!)});
         },
     });
 
