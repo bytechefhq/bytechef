@@ -70,10 +70,11 @@ public final class WorkflowTaskDTO {
 
     public WorkflowTaskDTO(WorkflowTask workflowTask, List<WorkflowConnection> connections, DataStream dataStream) {
         this(
-            connections, dataStream.destination(), workflowTask.getFinalize(), workflowTask.getLabel(),
-            workflowTask.getMaxRetries(), workflowTask.getName(), workflowTask.getNode(), workflowTask.getParameters(),
-            workflowTask.getPost(), workflowTask.getPre(), dataStream.source(), workflowTask.getTaskNumber(),
-            workflowTask.getTimeout(), workflowTask.getType());
+            connections, dataStream == null ? null : dataStream.destination(), workflowTask.getFinalize(),
+            workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getName(), workflowTask.getNode(),
+            workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
+            dataStream == null ? null : dataStream.source(), workflowTask.getTaskNumber(), workflowTask.getTimeout(),
+            workflowTask.getType());
     }
 
     public List<WorkflowConnection> getConnections() {
