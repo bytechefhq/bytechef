@@ -91,7 +91,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     public void delete(@NonNull String id) {
         Validate.notNull(id, "'id' must not be null");
 
-        workflowCrudRepositories.stream()
+        workflowCrudRepositories
+            .stream()
             .filter(workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)))
             .findFirst()
             .ifPresent(workflowCrudRepository -> workflowCrudRepository.deleteById(id));
@@ -171,7 +172,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) == null) {
-            workflows = filteredWorkflowRepositories.stream()
+            workflows = filteredWorkflowRepositories
+                .stream()
                 .flatMap(workflowRepository -> workflowRepository.findAll(type)
                     .stream()
                     .filter(Objects::nonNull)
@@ -226,6 +228,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                 if (workflowOptional.isPresent()) {
                     workflow = workflowOptional.get();
+
+                    workflow.setSourceType(workflowRepository.getSourceType());
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -251,7 +255,8 @@ public class WorkflowServiceImpl implements WorkflowService {
             List<Workflow> workflows = (List<Workflow>) Validate.notNull(valueWrapper.get(), "workflows");
 
             if (workflow == null) {
-                CollectionUtils.findFirst(workflows, curWorkflow -> Objects.equals(curWorkflow.getId(), id))
+                CollectionUtils
+                    .findFirst(workflows, curWorkflow -> Objects.equals(curWorkflow.getId(), id))
                     .ifPresent(workflows::remove);
             } else {
                 int index = workflows.indexOf(workflow);
@@ -276,16 +281,17 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         final Workflow workflow = getWorkflow(id);
 
-        workflow.setVersion(version);
-
         return CollectionUtils.getFirst(
             workflowCrudRepositories,
             workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)),
-            workflowCrudRepository -> update(definition, workflowCrudRepository, workflow));
+            workflowCrudRepository -> update(definition, version, workflow, workflowCrudRepository));
     }
 
-    private Workflow update(String definition, WorkflowCrudRepository workflowCrudRepository, Workflow workflow) {
+    private Workflow update(
+        String definition, int version, Workflow workflow, WorkflowCrudRepository workflowCrudRepository) {
+
         workflow.setDefinition(definition);
+        workflow.setVersion(version);
 
         try {
             workflowCrudRepository.save(workflow);
@@ -295,7 +301,15 @@ public class WorkflowServiceImpl implements WorkflowService {
             throw e;
         }
 
-        return updateCache(OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
+        return updateCache(
+            workflowCrudRepository
+                .findById(workflow.getId())
+                .map(curWorkflow -> {
+                    curWorkflow.setSourceType(workflowCrudRepository.getSourceType());
+
+                    return curWorkflow;
+                })
+                .get());
     }
 
     private Workflow updateCache(Workflow workflow) {
