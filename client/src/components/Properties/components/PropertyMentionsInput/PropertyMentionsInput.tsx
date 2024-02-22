@@ -218,6 +218,8 @@ const PropertyMentionsInput = forwardRef(
                 return;
             }
 
+            const strippedValue = value.length ? value?.replace(/<p>|<\/p>/g, '') : '';
+
             saveWorkflowDefinition(
                 {
                     actionName,
@@ -225,7 +227,7 @@ const PropertyMentionsInput = forwardRef(
                     name: workflowNodeName,
                     parameters: {
                         ...parameters,
-                        [name as string]: value,
+                        [name as string]: strippedValue,
                     },
                 },
                 workflow,
