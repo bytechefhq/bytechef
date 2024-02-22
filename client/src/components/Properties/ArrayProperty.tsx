@@ -132,7 +132,7 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
                     dataPills={dataPills}
                     key={item.name || `${name}_0`}
                     mention={!!dataPills?.length}
-                    property={item}
+                    property={item as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
                     updateWorkflowMutation={updateWorkflowMutation}
                 />
             ))}
