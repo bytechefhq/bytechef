@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -33,7 +34,7 @@ public interface ProjectInstanceWorkflowService {
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
-    ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
+    Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
         long projectInstanceOd, String workflowId, String workflowNodeName, String key);
 
     List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(

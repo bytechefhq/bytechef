@@ -24,6 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,13 +65,12 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
     @Override
     @Transactional(readOnly = true)
-    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String workflowNodeName,
-        String key) {
+    public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
+        long projectInstanceId, String workflowId, String workflowNodeName, String key) {
 
-        return OptionalUtils.get(
-            projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
-                projectInstanceId, workflowId, workflowNodeName, key));
+        return projectInstanceWorkflowConnectionRepository
+            .findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
+                projectInstanceId, workflowId, workflowNodeName, key);
     }
 
     @Override
