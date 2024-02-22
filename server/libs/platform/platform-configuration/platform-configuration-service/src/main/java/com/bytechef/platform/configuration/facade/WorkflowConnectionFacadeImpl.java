@@ -60,7 +60,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
     private List<WorkflowConnection> getWorkflowConnections(
         String workflowNodeName, String type, Map<String, ?> extensions, boolean workflowTask) {
 
-        List<WorkflowConnection> workflowConnections;
+        List<WorkflowConnection> workflowConnections = List.of();
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         if (workflowNodeType.componentOperationName() == null) {
@@ -74,7 +74,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
             workflowConnections = WorkflowConnection.of(extensions, workflowNodeName);
         } else if (workflowTask && componentDefinition instanceof DataStreamComponentDefinition) {
             workflowConnections = getWorkflowConnections(DataStream.of(extensions), workflowNodeName);
-        } else {
+        } else if (componentDefinition.getConnection() != null) {
             workflowConnections = List.of(
                 WorkflowConnection.of(workflowNodeName, workflowNodeType, componentDefinition));
         }
