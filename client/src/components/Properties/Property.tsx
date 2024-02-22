@@ -24,6 +24,7 @@ import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
+import {useDebouncedCallback} from 'use-debounce';
 
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
@@ -168,7 +169,7 @@ const Property = ({
         !!property.displayCondition
     );
 
-    const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handlePropertyChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (currentComponentData) {
             const {parameters} = currentComponentData;
 
@@ -183,7 +184,7 @@ const Property = ({
                 },
             ]);
         }
-    };
+    }, 500);
 
     const handleSelectChange = (value: string, name: string | undefined) => {
         if (currentComponentData) {
