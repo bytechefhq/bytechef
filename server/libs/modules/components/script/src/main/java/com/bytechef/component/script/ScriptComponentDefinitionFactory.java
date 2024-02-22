@@ -55,11 +55,11 @@ public class ScriptComponentDefinitionFactory implements ComponentDefinitionFact
                         "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.")
                     .icon("path:assets/script.svg")
                     .actions(
-                        ScriptJavaAction.ACTION_DEFINITION,
                         ScriptJavaScriptAction.ACTION_DEFINITION,
                         ScriptPythonAction.ACTION_DEFINITION,
 //            ScriptRAction.ACTION_DEFINITION,
-                        ScriptRubyAction.ACTION_DEFINITION));
+                        ScriptRubyAction.ACTION_DEFINITION,
+                        ScriptJavaAction.ACTION_DEFINITION));
         }
 
         @Override
