@@ -29,7 +29,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel} from '@/middleware/automation/configuration';
-import {WorkflowModel} from '@/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {
@@ -52,7 +51,8 @@ import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-execu
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
-import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
+import {ProjectKeys, useGetProjectQuery} from '@/queries/automation/projects.queries';
+import {WorkflowKeys, useGetProjectWorkflowsQuery, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
 import {
@@ -207,7 +207,7 @@ const Project = () => {
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projectWorkflows(parseInt(projectId!)),
+                queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
             setWorkflow({...workflow, componentNames, nodeNames});
@@ -267,7 +267,7 @@ const Project = () => {
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: (workflow) => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projectWorkflows(+projectId!),
+                queryKey: WorkflowKeys.projectWorkflows(+projectId!),
             });
 
             queryClient.invalidateQueries({
@@ -321,7 +321,7 @@ const Project = () => {
                     setWorkflowIsRunning(false);
 
                     queryClient.invalidateQueries({
-                        queryKey: ProjectKeys.projectWorkflows(parseInt(projectId!)),
+                        queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId!)),
                     });
                 });
         }

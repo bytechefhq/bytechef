@@ -5,7 +5,7 @@ import {toast} from '@/components/ui/use-toast';
 import {WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
@@ -43,7 +43,8 @@ const WorkflowCodeEditorSheet = ({
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: (workflow: WorkflowModel) => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projectWorkflows(projectId!),
+                queryKey: WorkflowKeys.projectWorkflows(projectId!),
+            });
             });
 
             setDirty(false);

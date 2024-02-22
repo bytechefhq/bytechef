@@ -10,9 +10,9 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowTestConfigurationKeys = {
-    workflowTestConfiguration: (request: GetWorkflowTestConfigurationRequest) => [
+    workflowTestConfiguration: (workflowId: string) => [
         ...WorkflowTestConfigurationKeys.workflowTestConfigurations,
-        request,
+        workflowId,
     ],
     workflowTestConfigurations: ['workflowTestConfigurations'] as const,
     workflowTestConfigurationConnections: (request: GetWorkflowTestConfigurationConnectionsRequest) => [
@@ -31,6 +31,6 @@ export const useGetWorkflowTestConfigurationConnectionsQuery = (
 
 export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkflowTestConfigurationRequest) =>
     useQuery<WorkflowTestConfigurationModel, Error>({
-        queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(requestParameters),
+        queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(requestParameters.workflowId),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfiguration(requestParameters),
     });

@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
-import {ProjectApi, ProjectModel, WorkflowApi, WorkflowModel} from 'middleware/automation/configuration';
+import {ProjectApi, ProjectModel} from 'middleware/automation/configuration';
 
 export const ProjectKeys = {
     filteredProjects: (filters: {categoryId?: number; tagId?: number} | undefined) => [
@@ -8,7 +8,6 @@ export const ProjectKeys = {
         filters,
     ],
     project: (id: number) => [...ProjectKeys.projects, id],
-    projectWorkflows: (projectId: number) => [...ProjectKeys.projects, projectId, 'projectWorkflows'],
     projects: ['projects'] as const,
 };
 
@@ -28,10 +27,4 @@ export const useGetProjectsQuery = (filters?: {
     useQuery<ProjectModel[], Error>({
         queryKey: ProjectKeys.filteredProjects(filters),
         queryFn: () => new ProjectApi().getProjects(filters),
-    });
-
-export const useGetProjectWorkflowsQuery = (id: number) =>
-    useQuery<WorkflowModel[], Error>({
-        queryKey: ProjectKeys.projectWorkflows(id),
-        queryFn: () => new WorkflowApi().getProjectWorkflows({id}),
     });

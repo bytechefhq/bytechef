@@ -10,8 +10,8 @@ export const ProjectInstanceKeys = {
     projectInstances: ['projectInstances'] as const,
 };
 
-export const useGetProjectInstancesQuery = (filters: {projectId?: number; tagId?: number}) =>
+export const useGetProjectInstancesQuery = (request: {projectId?: number; tagId?: number}) =>
     useQuery<ProjectInstanceModel[], Error>({
-        queryKey: ProjectInstanceKeys.filteredProjectInstances(filters),
-        queryFn: () => new ProjectInstanceApi().getProjectInstances(filters),
+        queryKey: ProjectInstanceKeys.filteredProjectInstances(request),
+        queryFn: () => new ProjectInstanceApi().getProjectInstances(request),
     });
