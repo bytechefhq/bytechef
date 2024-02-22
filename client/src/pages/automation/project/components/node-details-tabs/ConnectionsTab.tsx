@@ -1,4 +1,5 @@
 import {Button} from '@/components/ui/button';
+import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
@@ -10,7 +11,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
-import {ComponentDefinitionModel} from 'middleware/platform/configuration';
+import {ComponentDefinitionModel, WorkflowConnectionModel} from 'middleware/platform/configuration';
 import ConnectionDialog from 'pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
@@ -21,14 +22,14 @@ import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
-const ConnectionTab = ({
+const ConnectionsTab = ({
     componentDefinition,
-    workflowConnectionKey,
+    workflowConnections,
     workflowId,
     workflowNodeName,
 }: {
     componentDefinition: ComponentDefinitionModel;
-    workflowConnectionKey: string;
+    workflowConnections: WorkflowConnectionModel[];
     workflowNodeName: string;
     workflowId: string;
 }) => {
@@ -36,13 +37,10 @@ const ConnectionTab = ({
 
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
-    const {data: connections} = useGetConnectionsQuery(
-        {
-            componentName: componentDefinition.name,
-            connectionVersion: componentDefinition.connection?.version,
-        },
-        !!componentDefinition.connection?.componentName
-    );
+    const {data: connections} = useGetConnectionsQuery({
+        componentName: componentDefinition.name,
+        connectionVersion: componentDefinition?.connection?.version,
+    });
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
         workflowId,
@@ -65,7 +63,7 @@ const ConnectionTab = ({
         },
     });
 
-    const handleValueChange = (connectionId: number) => {
+    const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
         saveWorkflowTestConfigurationConnectionMutation.mutate({
             saveWorkflowTestConfigurationConnectionRequestModel: {
                 connectionId,
@@ -77,42 +75,52 @@ const ConnectionTab = ({
     };
 
     return (
-        <div className="h-full flex-[1_1_1px] overflow-auto p-4">
-            {connections?.length ? (
-                <Select
-                    onValueChange={(value) => handleValueChange(+value)}
-                    value={connectionId ? connectionId.toString() : undefined}
-                >
-                    <div className="flex space-x-2">
-                        <SelectTrigger>
-                            <SelectValue placeholder="Choose Connection..." />
-                        </SelectTrigger>
+        <div className="flex h-full flex-col gap-4 overflow-auto p-4">
+            {workflowConnections?.length ? (
+                workflowConnections.map((workflowConnection) => (
+                    <div
+                        className="space-y-2 text-sm font-medium capitalize text-muted-foreground"
+                        key={workflowConnection.key}
+                    >
+                        {workflowConnections.length > 1 && <Label>{workflowConnection.key}</Label>}
 
-                        <Button
-                            className="mt-auto p-2"
-                            onClick={() => setShowEditConnectionDialog(true)}
-                            title="Create a new connection"
-                            variant="outline"
+                        <Select
+                            onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
+                            required={workflowConnection.required}
+                            value={connectionId ? connectionId.toString() : undefined}
                         >
-                            <PlusIcon className="size-5" />
-                        </Button>
+                            <div className="flex space-x-2">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Choose Connection..." />
+                                </SelectTrigger>
+
+                                <Button
+                                    className="mt-auto p-2"
+                                    onClick={() => setShowEditConnectionDialog(true)}
+                                    title="Create a new connection"
+                                    variant="outline"
+                                >
+                                    <PlusIcon className="size-5" />
+                                </Button>
+                            </div>
+
+                            <SelectContent>
+                                {connections &&
+                                    connections.map((connection) => (
+                                        <SelectItem key={connection.id} value={connection.id!.toString()}>
+                                            <div className="flex items-center">
+                                                <span className="mr-1 ">{connection.name}</span>
+
+                                                <span className="text-xs text-gray-500">
+                                                    {connection?.tags?.map((tag) => tag.name).join(', ')}
+                                                </span>
+                                            </div>
+                                        </SelectItem>
+                                    ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-
-                    <SelectContent>
-                        {connections &&
-                            connections.map((connection) => (
-                                <SelectItem key={connection.id} value={connection.id!.toString()}>
-                                    <div className="flex items-center">
-                                        <span className="mr-1 ">{connection.name}</span>
-
-                                        <span className="text-xs text-gray-500">
-                                            {connection?.tags?.map((tag) => tag.name).join(', ')}
-                                        </span>
-                                    </div>
-                                </SelectItem>
-                            ))}
-                    </SelectContent>
-                </Select>
+                ))
             ) : (
                 <EmptyList
                     button={
@@ -140,7 +148,9 @@ const ConnectionTab = ({
                         </button>
                     </div>
 
-                    <p className="text-sm text-gray-800">The selected connection is used for testing purposes only.</p>
+                    <p className="text-sm text-gray-800">
+                        The selected connections are used for testing purposes only.
+                    </p>
                 </div>
             )}
 
@@ -159,4 +169,4 @@ const ConnectionTab = ({
     );
 };
 
-export default ConnectionTab;
+export default ConnectionsTab;

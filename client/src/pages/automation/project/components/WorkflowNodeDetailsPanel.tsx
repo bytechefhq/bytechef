@@ -1,7 +1,11 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
+import {
+    ComponentDefinitionBasicModel,
+    WorkflowConnectionModel,
+    WorkflowNodeOutputModel,
+} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
@@ -25,7 +29,7 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 import getSubProperties from '../utils/getSubProperties';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentActionSelect from './CurrentActionSelect';
-import ConnectionTab from './node-details-tabs/ConnectionTab';
+import ConnectionsTab from './node-details-tabs/ConnectionsTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
 
@@ -35,8 +39,8 @@ const TABS = [
         name: 'description',
     },
     {
-        label: 'Connection',
-        name: 'connection',
+        label: 'Connections',
+        name: 'connections',
     },
     {
         label: 'Properties',
@@ -214,7 +218,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
 
-    const workflowConnectionKey = currentWorkflowTask?.connections?.[0]?.key;
+    const workflowConnections: WorkflowConnectionModel[] = currentWorkflowTask?.connections || [];
 
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
@@ -261,12 +265,8 @@ const WorkflowNodeDetailsPanel = ({
     });
 
     const nodeTabs = TABS.filter(({name}) => {
-        if (name === 'connection') {
-            return (
-                currentComponent?.name &&
-                componentDefinitionNames?.includes(currentComponent.name) &&
-                currentActionProperties?.length
-            );
+        if (name === 'connections') {
+            return currentComponent?.name && componentDefinitionNames?.includes(currentComponent.name);
         }
 
         if (name === 'output') {
@@ -344,7 +344,7 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (
-            activeTab === 'connection' &&
+            activeTab === 'connections' &&
             currentComponent?.name &&
             !componentDefinitionNames?.includes(currentComponent.name)
         ) {
@@ -454,16 +454,14 @@ const WorkflowNodeDetailsPanel = ({
                                             />
                                         )}
 
-                                        {activeTab === 'connection' &&
-                                            workflowConnectionKey &&
-                                            currentComponent.connection && (
-                                                <ConnectionTab
-                                                    componentDefinition={currentComponent}
-                                                    workflowConnectionKey={workflowConnectionKey}
-                                                    workflowId={workflow.id!}
-                                                    workflowNodeName={currentNode.name}
-                                                />
-                                            )}
+                                        {activeTab === 'connections' && workflowConnections.length > 0 && (
+                                            <ConnectionsTab
+                                                componentDefinition={currentComponent}
+                                                workflowConnections={workflowConnections}
+                                                workflowId={workflow.id!}
+                                                workflowNodeName={currentNode.name}
+                                            />
+                                        )}
 
                                         {activeTab === 'properties' &&
                                             (currentActionProperties?.length ? (
