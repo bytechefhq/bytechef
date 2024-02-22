@@ -390,11 +390,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private Long getConnectionId(
         long projectInstanceId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
-        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey);
-
-        return projectInstanceWorkflowConnection.getConnectionId();
+        return projectInstanceWorkflowService
+            .fetchProjectInstanceWorkflowConnection(
+                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey)
+            .map(ProjectInstanceWorkflowConnection::getConnectionId)
+            .orElse(null);
     }
 
     private LocalDateTime getJobEndDate(Long jobId) {

@@ -13,6 +13,7 @@ import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowServ
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -66,18 +67,19 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
-    public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
+    public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
         long projectInstanceOd, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    PROJECT_INSTANCE_WORKFLOW_SERVICE +
-                        "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
-                        "{workflowNodeName}/{workflowConnectionKey}")
-                .build(projectInstanceOd, workflowId, workflowNodeName, workflowConnectionKey),
-            ProjectInstanceWorkflowConnection.class);
+        return Optional.ofNullable(
+            loadBalancedRestClient.get(
+                uriBuilder -> uriBuilder
+                    .host(CONFIGURATION_APP)
+                    .path(
+                        PROJECT_INSTANCE_WORKFLOW_SERVICE +
+                            "/fetch-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
+                            "{workflowNodeName}/{workflowConnectionKey}")
+                    .build(projectInstanceOd, workflowId, workflowNodeName, workflowConnectionKey),
+                ProjectInstanceWorkflowConnection.class));
     }
 
     @Override

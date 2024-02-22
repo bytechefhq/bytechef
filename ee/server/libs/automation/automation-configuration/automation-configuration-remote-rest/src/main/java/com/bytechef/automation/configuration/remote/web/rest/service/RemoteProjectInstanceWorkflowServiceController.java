@@ -73,8 +73,10 @@ public class RemoteProjectInstanceWorkflowServiceController {
         @PathVariable String workflowNodeName, @PathVariable String workflowConnectionKey) {
 
         return ResponseEntity.ok(
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey));
+            projectInstanceWorkflowService
+                .fetchProjectInstanceWorkflowConnection(
+                    projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey)
+                .orElse(null));
     }
 
     @RequestMapping(
