@@ -96,6 +96,7 @@
         "requireindex": "^1.2.0",
         "tailwind-merge": "^2.2.1",
         "tailwindcss-animate": "^1.0.7",
+        "use-debounce": "^10.0.0",
         "vite-plugin-svgr": "^4.2.0",
         "whatwg-fetch": "^3.6.20",
         "zod": "^3.22.4",
