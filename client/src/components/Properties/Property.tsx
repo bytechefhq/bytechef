@@ -360,9 +360,21 @@ const Property = ({
                         variant="ghost"
                     >
                         {mentionInput ? (
-                            <FormInputIcon className="size-5 text-gray-800" />
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <FormInputIcon className="size-5 text-gray-800" />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Switch to constant value</TooltipContent>
+                            </Tooltip>
                         ) : (
-                            <FunctionSquareIcon className="size-5 text-gray-800" />
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <FunctionSquareIcon className="size-5 text-gray-800" />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Switch to dynamic value</TooltipContent>
+                            </Tooltip>
                         )}
                     </Button>
                 )}
