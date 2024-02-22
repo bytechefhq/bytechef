@@ -91,6 +91,10 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+
+            queryClient.invalidateQueries({
                 queryKey: [
                     ...WorkflowNodeDisplayConditionKeys.workflowNodeDisplayConditions,
                     workflow.id!,

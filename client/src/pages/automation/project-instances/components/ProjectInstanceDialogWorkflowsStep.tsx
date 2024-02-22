@@ -1,5 +1,5 @@
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
+import {useGetProjectWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {ProjectInstanceModel} from 'middleware/automation/configuration';
 import {Control, UseFormGetValues, UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
@@ -31,7 +31,7 @@ const ProjectInstanceDialogWorkflowsStep = ({
                     label={workflow.label!}
                     register={register}
                     setValue={setValue}
-                    workflow={workflow}
+                    workflowId={workflow.id!}
                     workflowIndex={workflowIndex}
                 />
             ))}

@@ -94,7 +94,7 @@ const ProjectInstanceEditWorkflowDialog = ({
                         register={register}
                         setValue={setValue}
                         switchHidden={true}
-                        workflow={workflow}
+                        workflowId={workflow.id!}
                         workflowIndex={0}
                     />
 

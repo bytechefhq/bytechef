@@ -1,10 +1,11 @@
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import useCopyToClipboard from '@/hooks/useCopyToClipboard';
-import {ProjectInstanceApi, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
+import {ProjectInstanceApi, ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel, WorkflowBasicModel} from '@/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
@@ -19,7 +20,7 @@ import {twMerge} from 'tailwind-merge';
 const projectInstanceApi = new ProjectInstanceApi();
 
 const ProjectInstanceWorkflowListItem = ({
-    filteredDefinitionNames,
+    filteredComponentNames,
     projectId,
     projectInstanceEnabled,
     projectInstanceId,
@@ -28,12 +29,12 @@ const ProjectInstanceWorkflowListItem = ({
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
-    filteredDefinitionNames?: string[];
+    filteredComponentNames?: string[];
     projectId: number;
     projectInstanceEnabled: boolean;
     projectInstanceId: number;
     projectInstanceWorkflow: ProjectInstanceWorkflowModel;
-    workflow: WorkflowModel;
+    workflow: WorkflowBasicModel;
     workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     };
@@ -46,8 +47,6 @@ const ProjectInstanceWorkflowListItem = ({
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
     const {toast} = useToast();
-
-    const workflowHasManualTrigger = !workflow.triggers || workflow.triggers?.length === 0;
 
     const queryClient = useQueryClient();
 
@@ -106,7 +105,7 @@ const ProjectInstanceWorkflowListItem = ({
                 </div>
 
                 <div className="ml-6 flex">
-                    {filteredDefinitionNames?.map((name) => {
+                    {filteredComponentNames?.map((name) => {
                         const componentDefinition = workflowComponentDefinitions[name];
                         const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
@@ -150,7 +149,7 @@ const ProjectInstanceWorkflowListItem = ({
 
                 {projectInstanceWorkflow && (
                     <div className="w-8">
-                        {workflowHasManualTrigger && (
+                        {workflow.manualTrigger && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
                                 onClick={() => handleWorkflowRun()}
@@ -182,6 +181,27 @@ const ProjectInstanceWorkflowListItem = ({
                                     <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
                                 </Tooltip>
                             </Button>
+                        )}
+
+                        {!workflow.manualTrigger && !projectInstanceWorkflow.staticWebhookUrl && (
+                            <Switch
+                                checked={projectInstanceWorkflow.enabled}
+                                disabled={projectInstanceEnabled}
+                                onCheckedChange={(value) => {
+                                    enableProjectInstanceWorkflowMutation.mutate(
+                                        {
+                                            enable: value,
+                                            id: projectInstanceId,
+                                            workflowId: workflow.id!,
+                                        },
+                                        {
+                                            onSuccess: () => {
+                                                projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
+                                            },
+                                        }
+                                    );
+                                }}
+                            />
                         )}
                     </div>
                 )}
