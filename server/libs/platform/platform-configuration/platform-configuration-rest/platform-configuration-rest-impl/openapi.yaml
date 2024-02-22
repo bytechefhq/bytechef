@@ -1853,6 +1853,10 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        manualTrigger:
+          description: "Does this workflow have a manual trigger or not"
+          type: "boolean"
+          readOnly: true
         workflowTaskComponentNames:
           type: "array"
           items:
