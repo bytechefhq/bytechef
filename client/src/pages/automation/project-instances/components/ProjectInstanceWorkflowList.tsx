@@ -61,24 +61,27 @@ const ProjectInstanceWorkflowList = ({
 
             <ul>
                 {workflows?.map((workflow) => {
-                    const definitionNames = workflow.tasks?.map((task) => task.type.split('/')[0]);
+                    const componentNames = [
+                        ...(workflow.workflowTriggerComponentNames ?? []),
+                        ...(workflow.workflowTaskComponentNames ?? []),
+                    ];
 
-                    definitionNames?.forEach((definitionName) => {
-                        if (!workflowComponentDefinitions[definitionName]) {
-                            workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
-                                (componentDefinition) => componentDefinition.name === definitionName
+                    componentNames?.forEach((componentName) => {
+                        if (!workflowComponentDefinitions[componentName]) {
+                            workflowComponentDefinitions[componentName] = componentDefinitions?.find(
+                                (componentDefinition) => componentDefinition.name === componentName
                             );
                         }
 
-                        if (!workflowTaskDispatcherDefinitions[definitionName]) {
-                            workflowTaskDispatcherDefinitions[definitionName] = taskDispatcherDefinitions?.find(
-                                (taskDispatcherDefinition) => taskDispatcherDefinition.name === definitionName
+                        if (!workflowTaskDispatcherDefinitions[componentName]) {
+                            workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
+                                (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
                             );
                         }
                     });
 
-                    const filteredDefinitionNames = definitionNames?.filter(
-                        (item, index) => definitionNames?.indexOf(item) === index
+                    const filteredComponentNames = componentNames?.filter(
+                        (item, index) => componentNames?.indexOf(item) === index
                     );
 
                     const projectInstanceWorkflow = projectInstanceWorkflows?.find(
@@ -92,7 +95,7 @@ const ProjectInstanceWorkflowList = ({
                         >
                             {projectInstanceWorkflow && (
                                 <ProjectInstanceWorkflowListItem
-                                    filteredDefinitionNames={filteredDefinitionNames}
+                                    filteredComponentNames={filteredComponentNames}
                                     key={workflow.id}
                                     projectId={projectId}
                                     projectInstanceEnabled={projectInstanceEnabled}

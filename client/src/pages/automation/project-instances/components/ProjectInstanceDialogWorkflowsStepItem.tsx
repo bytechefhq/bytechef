@@ -1,9 +1,10 @@
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {ProjectInstanceModel, WorkflowConnectionModel, WorkflowModel} from '@/middleware/automation/configuration';
+import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConfiguration';
 import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnection';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
+import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {Control, UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -16,7 +17,7 @@ export interface ProjectInstanceDialogWorkflowListItemProps {
     register: UseFormRegister<ProjectInstanceModel>;
     setValue: UseFormSetValue<ProjectInstanceModel>;
     switchHidden?: boolean;
-    workflow: WorkflowModel;
+    workflowId: string;
     workflowIndex: number;
 }
 
@@ -27,33 +28,37 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
     register,
     setValue,
     switchHidden = false,
-    workflow,
+    workflowId,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
     const [setWorkflowEnabled, workflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
+    const {data: workflow} = useGetWorkflowQuery(workflowId);
+
     let workflowConnections: WorkflowConnectionModel[] = [];
 
-    workflow.tasks?.forEach((task) => {
-        if (task.connections) {
-            workflowConnections = workflowConnections.concat(task.connections);
-        }
-    });
+    if (workflow) {
+        workflow.tasks?.forEach((task) => {
+            if (task.connections) {
+                workflowConnections = workflowConnections.concat(task.connections);
+            }
+        });
 
-    workflow.triggers?.forEach((trigger) => {
-        if (trigger.connections) {
-            workflowConnections = workflowConnections.concat(trigger.connections);
-        }
-    });
+        workflow.triggers?.forEach((trigger) => {
+            if (trigger.connections) {
+                workflowConnections = workflowConnections.concat(trigger.connections);
+            }
+        });
+    }
 
     return (
         <div>
             {register && (
                 <input
                     type="hidden"
-                    {...register(`projectInstanceWorkflows.${workflowIndex!}.workflowId`, {value: workflow.id})}
+                    {...register(`projectInstanceWorkflows.${workflowIndex!}.workflowId`, {value: workflowId})}
                 />
             )}
 
@@ -62,31 +67,31 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                     <span className="font-semibold">{label}</span>
 
                     <Switch
-                        checked={workflowEnabled.get(workflow.id!)}
+                        checked={workflowEnabled.get(workflowId)}
                         className={twMerge(
                             'cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
-                            workflowEnabled.get(workflow.id!) && 'bg-blue-600'
+                            workflowEnabled.get(workflowId!) && 'bg-blue-600'
                         )}
                         onClick={() => {
                             setValue(
                                 `projectInstanceWorkflows.${workflowIndex!}.enabled`,
-                                !workflowEnabled.get(workflow.id!)
+                                !workflowEnabled.get(workflowId)
                             );
-                            setWorkflowEnabled(workflow.id!, !workflowEnabled.get(workflow.id!));
+                            setWorkflowEnabled(workflowId, !workflowEnabled.get(workflowId));
                         }}
                     >
                         <span
                             aria-hidden="true"
                             className={twMerge(
                                 'pointer-events-none inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                                workflowEnabled.get(workflow.id!) ? 'translate-x-5' : 'translate-x-0'
+                                workflowEnabled.get(workflowId) ? 'translate-x-5' : 'translate-x-0'
                             )}
                         />
                     </Switch>
                 </div>
             )}
 
-            {(workflowEnabled.get(workflow.id!) || switchHidden) && (
+            {(workflowEnabled.get(workflowId) || switchHidden) && (
                 <div className="mt-2">
                     <Tabs aria-label="Tabs" defaultValue="configuration">
                         <TabsList className="grid w-full grid-cols-2">
@@ -95,14 +100,16 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                             <TabsTrigger value="connections">Connections</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="configuration">
-                            <ProjectInstanceDialogWorkflowsStepItemConfiguration
-                                formState={formState}
-                                register={register}
-                                workflow={workflow}
-                                workflowIndex={workflowIndex}
-                            />
-                        </TabsContent>
+                        {workflow && (
+                            <TabsContent value="configuration">
+                                <ProjectInstanceDialogWorkflowsStepItemConfiguration
+                                    formState={formState}
+                                    register={register}
+                                    workflow={workflow}
+                                    workflowIndex={workflowIndex}
+                                />
+                            </TabsContent>
+                        )}
 
                         <TabsContent className="grid gap-4" value="connections">
                             {workflowConnections.length ? (

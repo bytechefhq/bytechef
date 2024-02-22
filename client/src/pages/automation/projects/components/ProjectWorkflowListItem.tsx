@@ -26,6 +26,8 @@ import {
 } from '@/mutations/automation/workflows.mutations';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
+import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -33,13 +35,13 @@ import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 
 const ProjectWorkflowListItem = ({
-    filteredDefinitionNames,
+    filteredComponentNames,
     project,
     workflow,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
-    filteredDefinitionNames?: string[];
+    filteredComponentNames?: string[];
     project: ProjectModel;
     workflow: WorkflowModel;
     workflowComponentDefinitions: {
@@ -65,14 +67,28 @@ const ProjectWorkflowListItem = ({
     });
 
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
+        onError: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(project.id!)});
+        onSuccess: (workflow) => {
+            console.log(workflow);
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.projectWorkflows(project.id!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
 
             setShowEditDialog(false);
         },
@@ -87,9 +103,8 @@ const ProjectWorkflowListItem = ({
                 <div className="w-80 text-sm font-semibold">{workflow.label}</div>
 
                 <div className="flex">
-                    {filteredDefinitionNames?.map((name) => {
+                    {filteredComponentNames?.map((name) => {
                         const componentDefinition = workflowComponentDefinitions[name];
-
                         const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
                         return (
@@ -201,11 +216,11 @@ const ProjectWorkflowListItem = ({
                 </AlertDialogContent>
             </AlertDialog>
 
-            {showEditDialog && (
+            {showEditDialog && selectedWorkflow && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={selectedWorkflow!}
+                    workflowId={selectedWorkflow.id!}
                 />
             )}
         </>

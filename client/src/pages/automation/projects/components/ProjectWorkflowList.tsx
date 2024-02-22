@@ -1,7 +1,7 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/ProjectWorkflowListItem';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
+import {useGetProjectWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
 import {ProjectModel} from 'middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
@@ -53,9 +53,12 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
 
             <ul>
                 {workflows?.map((workflow) => {
-                    const definitionNames = workflow.tasks?.map((task) => task.type.split('/')[0]);
+                    const componentNames = [
+                        ...(workflow.workflowTriggerComponentNames ?? []),
+                        ...(workflow.workflowTaskComponentNames ?? []),
+                    ];
 
-                    definitionNames?.map((definitionName) => {
+                    componentNames?.map((definitionName) => {
                         if (!workflowComponentDefinitions[definitionName]) {
                             workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
                                 (componentDefinition) => componentDefinition.name === definitionName
@@ -69,8 +72,8 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                         }
                     });
 
-                    const filteredDefinitionNames = definitionNames?.filter(
-                        (item, index) => definitionNames?.indexOf(item) === index
+                    const filteredComponentNames = componentNames?.filter(
+                        (item, index) => componentNames?.indexOf(item) === index
                     );
 
                     return (
@@ -79,7 +82,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                             key={workflow.id}
                         >
                             <ProjectWorkflowListItem
-                                filteredDefinitionNames={filteredDefinitionNames}
+                                filteredComponentNames={filteredComponentNames}
                                 key={workflow.id}
                                 project={project}
                                 workflow={workflow}
