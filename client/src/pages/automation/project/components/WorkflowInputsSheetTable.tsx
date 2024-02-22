@@ -20,7 +20,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -47,7 +47,8 @@ const WorkflowInputsSheetTable = ({
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.projectWorkflows(projectId),
+                queryKey: WorkflowKeys.projectWorkflows(projectId),
+            });
             });
         },
     });

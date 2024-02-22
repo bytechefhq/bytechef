@@ -1,5 +1,5 @@
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import getRandomId from '@/utils/getRandomId';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
@@ -29,7 +29,11 @@ export default function useHandleDrop(): [
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId)});
+            queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId)});
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
         },
     });
 

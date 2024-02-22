@@ -3,7 +3,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
@@ -87,7 +87,7 @@ const WorkflowNodeDetailsPanel = ({
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             if (projectId) {
-                queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(parseInt(projectId))});
+                queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId))});
             }
 
             queryClient.invalidateQueries({

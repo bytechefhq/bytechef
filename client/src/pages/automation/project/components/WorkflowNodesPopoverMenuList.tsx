@@ -4,7 +4,7 @@ import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutati
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/automation/project/utils/getFormattedName';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {ClickedItemType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -39,7 +39,7 @@ const WorkflowNodesPopoverMenuList = memo(
 
         const updateWorkflowMutation = useUpdateWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId!)});
+                queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId!)});
             },
         });
 
