@@ -50,6 +50,7 @@ public class ComponentDefinitionRegistry {
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
         .title("Manual")
+        .icon("path:assets/manual.svg")
         .triggers(trigger("manual").type(TriggerType.STATIC_WEBHOOK));
 
     private final List<ComponentDefinition> componentDefinitions;
