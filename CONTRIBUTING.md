@@ -85,11 +85,11 @@ ByteChef platform consists of three major parts. User interface is implemented w
     git clone https://github.com/bytechefhq/bytechef.git
     cd bytechef
     ```
-4. Change working directory to the `BYTECHEF_HOME/server` folder.
+4. **Change working directory to the `BYTECHEF_HOME/server` folder.**
 5. Start up the docker container with dependent infrastructure
 
     ```bash
-    docker compose -f docker-compose.dev.server.yml up -d
+    docker compose -f docker-compose.dev.infra.yml up -d
     ```
 6. Compile codebase:
 
@@ -97,13 +97,13 @@ ByteChef platform consists of three major parts. User interface is implemented w
     ../gradlew clean compileJava
     ```
 
-7. Change working directory to the `BYTECHEF_HOME/server/apps/server-app` folder.
+7. **Change working directory to the `BYTECHEF_HOME/server/apps/server-app` folder.**
 8. Start the ByteChef server instance by running:
 
     ```bash
     ../../../gradlew bootRun
     ```
-9. Change working directory to the `BYTECHEF_HOME/client` folder.
+9. **Change working directory to the `BYTECHEF_HOME/client` folder.**
 10. Install dependencies.
 
     ```bash
