@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel;
 import java.util.List;
@@ -29,13 +30,28 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface WorkflowTaskMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
+public class WorkflowTaskMapper {
 
-    @Named(value = "workflowTaskToWorkflowTaskModelMapper")
-    @Mapping(target = "connections", ignore = true)
-    WorkflowTaskModel convert(WorkflowTask workflowTask);
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public interface WorkflowTaskToWorkflowTaskModelMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
 
-    @IterableMapping(qualifiedByName = "workflowTaskToWorkflowTaskModelMapper")
-    List<WorkflowTaskModel> map(List<WorkflowTask> workflowTasks);
+        @Named(value = "workflowTaskToWorkflowTaskModelMapper")
+        @Mapping(target = "destination", ignore = true)
+        @Mapping(target = "connections", ignore = true)
+        @Mapping(target = "source", ignore = true)
+        WorkflowTaskModel convert(WorkflowTask workflowTask);
+
+        @IterableMapping(qualifiedByName = "workflowTaskToWorkflowTaskModelMapper")
+        List<WorkflowTaskModel> map(List<WorkflowTask> workflowTasks);
+    }
+
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public interface WorkflowTaskDTOToWorkflowTaskModelMapper extends Converter<WorkflowTaskDTO, WorkflowTaskModel> {
+
+        @Named(value = "workflowTaskDTOToWorkflowTaskModelMapper")
+        WorkflowTaskModel convert(WorkflowTaskDTO workflowTask);
+
+        @IterableMapping(qualifiedByName = "workflowTaskDTOToWorkflowTaskModelMapper")
+        List<WorkflowTaskModel> map(List<WorkflowTaskDTO> workflowTaskDTOs);
+    }
 }
