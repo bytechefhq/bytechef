@@ -27,6 +27,7 @@ export default async function saveWorkflowDefinition(
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
     index?: number
 ) {
+    console.log('nodeData: ', nodeData);
     const {actionName, componentName, label, name, parameters} = nodeData;
 
     const queryClient = new QueryClient();

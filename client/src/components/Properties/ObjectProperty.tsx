@@ -3,6 +3,7 @@ import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
+import {PropertyTypeModel} from '@/middleware/platform/configuration';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
@@ -21,6 +22,13 @@ interface ObjectPropertyProps {
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
+type SubPropertyType = {
+    controlType: string;
+    defaultValue: string;
+    name: string;
+    type: string;
+};
+
 const ObjectProperty = ({
     actionName,
     currentComponent,
@@ -29,7 +37,9 @@ const ObjectProperty = ({
     property,
     updateWorkflowMutation,
 }: ObjectPropertyProps) => {
-    const [subProperties, setSubProperties] = useState(property.properties);
+    const [subProperties, setSubProperties] = useState<Array<SubPropertyType>>(
+        (property.properties as Array<SubPropertyType>) || []
+    );
     const [newPropertyName, setNewPropertyName] = useState('');
     const [newPropertyType, setNewPropertyType] = useState('');
 
@@ -37,11 +47,12 @@ const ObjectProperty = ({
 
     const handleAddItemClick = () => {
         setSubProperties([
-            ...subProperties!,
+            ...subProperties,
             {
                 controlType: 'TEXT',
-                name: newPropertyName,
-                type: newPropertyType || additionalProperties?.[0].type,
+                defaultValue: '',
+                name: `${name}.${newPropertyName}`,
+                type: newPropertyType || additionalProperties?.[0].type || 'STRING',
             },
         ]);
 
@@ -49,30 +60,29 @@ const ObjectProperty = ({
     };
 
     useEffect(() => {
-        if (!currentComponentData?.parameters) {
+        if (!name || !currentComponentData?.parameters) {
             return;
         }
 
-        const parameterKeys = Object.keys(currentComponentData?.parameters);
+        const matchingParameters = Object.keys(currentComponentData.parameters).filter((key) => key.startsWith(name));
 
-        if (!currentComponentData?.parameters || !parameterKeys.length) {
+        if (!matchingParameters.length) {
             return;
         }
 
-        const parameterSubProperties = parameterKeys
-            .filter((parameterKey) => parameterKey.includes(`${name}.`))
-            .map((parameterKey) => {
-                const parameterName = parameterKey.split(`${name}.`)[1];
+        const newSubProperties = matchingParameters.map((matchingParameter) => {
+            const value: string = currentComponentData.parameters![matchingParameter];
 
-                return {
-                    controlType: 'TEXT',
-                    name: parameterName,
-                    type: newPropertyType || additionalProperties?.[0].type,
-                };
-            });
+            return {
+                controlType: 'TEXT',
+                defaultValue: value,
+                name: matchingParameter,
+                type: newPropertyType || additionalProperties?.[0].type || ('STRING' as PropertyTypeModel),
+            };
+        });
 
-        if (parameterSubProperties?.length) {
-            setSubProperties(parameterSubProperties);
+        if (newSubProperties.length) {
+            setSubProperties(newSubProperties);
         }
     }, [additionalProperties, currentComponentData?.parameters, name, newPropertyType]);
 
@@ -83,7 +93,7 @@ const ObjectProperty = ({
     return (
         <>
             <ul className={twMerge('space-y-4', label && 'ml-2 border-l', subProperties?.length && 'pb-2')} key={name}>
-                {(subProperties as Array<PropertyType>)?.map((subProperty, index) => {
+                {(subProperties as unknown as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
                         subProperty.type === 'OBJECT' &&
                         !subProperty.additionalProperties?.length &&
@@ -103,7 +113,7 @@ const ObjectProperty = ({
                             mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
                             property={{
                                 ...subProperty,
-                                name: `${property.name}.${subProperty.name}`,
+                                name: subProperty.name,
                             }}
                             updateWorkflowMutation={updateWorkflowMutation}
                         />
