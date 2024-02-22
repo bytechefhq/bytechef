@@ -51,9 +51,9 @@ const WorkflowTestConfigurationDialog = ({
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
     const [workflowConnection, setWorkflowConnection] = useState<WorkflowConnectionModel | undefined>();
 
-    const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
-        .flatMap((task) => (task.connections ? task.connections : []))
-        .filter((workflowConnection) => !workflowConnection.id);
+    const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? []).flatMap((task) =>
+        task.connections ? task.connections : []
+    );
 
     const workflowTestConfigurationConnections = workflowConnections.map((workflowConnection) => {
         const workflowTestConfigurationConfiguration = (workflowTestConfiguration?.connections ?? []).find(
