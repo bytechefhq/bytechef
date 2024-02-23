@@ -20,13 +20,11 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.openai.action.AbstractOpenAIActionTest;
 import java.util.List;
@@ -129,25 +127,5 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         Assertions.assertEquals(false, property.getRequired().get());
         Assertions.assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMaxValue());
         Assertions.assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMinValue());
-    }
-
-    @Test
-    public void testGetOutputSchemaFunctionForStream() {
-        when(mockedParameters.getRequiredBoolean(STREAM))
-            .thenReturn(true);
-
-        Output output = OpenAIUtils.getOutput(mockedParameters, mockedParameters, mockedContext);
-
-        Assertions.assertEquals(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE_FOR_STREAM, output.getOutputSchema());
-    }
-
-    @Test
-    public void testGetOutputSchemaFunction() {
-        when(mockedParameters.getRequiredBoolean(STREAM))
-            .thenReturn(false);
-
-        Output output = OpenAIUtils.getOutput(mockedParameters, mockedParameters, mockedContext);
-
-        Assertions.assertEquals(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE, output.getOutputSchema());
     }
 }

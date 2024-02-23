@@ -95,13 +95,12 @@ public class OpenAIVisionPromptAction extends AbstractChatCompletionAction {
             RESPONSE_FORMAT_PROPERTY,
             SEED_PROPERTY,
             STOP_PROPERTY,
-            STREAM_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOOLS_PROPERTY,
             TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
-        .output(OpenAIUtils::getOutput)
+        .outputSchema(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE)
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIVisionPromptAction() {
