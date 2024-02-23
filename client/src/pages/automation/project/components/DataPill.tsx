@@ -29,7 +29,7 @@ const DataPill = ({
 
     const subProperties = property?.properties || property?.items;
 
-    if (!property?.name && (property?.type === 'OBJECT' || property?.type === 'ARRAY')) {
+    if (!property?.name && (property?.controlType === 'OBJECT_BUILDER' || property?.controlType === 'ARRAY_BUILDER')) {
         property.name = '[index]';
     }
 

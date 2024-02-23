@@ -95,7 +95,7 @@ const ObjectProperty = ({
             <ul className={twMerge('space-y-4', label && 'ml-2 border-l', subProperties?.length && 'pb-2')} key={name}>
                 {(subProperties as unknown as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
-                        subProperty.type === 'OBJECT' &&
+                        subProperty.controlType === 'OBJECT_BUILDER' &&
                         !subProperty.additionalProperties?.length &&
                         !subProperty.properties?.length
                     ) {
