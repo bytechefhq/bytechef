@@ -102,7 +102,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -164,7 +164,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -207,7 +207,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -250,7 +250,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -293,7 +293,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -317,7 +317,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -341,7 +341,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send message",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -381,7 +380,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -815,7 +814,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "slack",
@@ -919,7 +919,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -981,7 +981,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1024,7 +1024,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1067,7 +1067,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1110,7 +1110,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1134,7 +1134,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1158,7 +1158,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send direct message",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1198,7 +1197,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -1632,7 +1631,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -1684,15 +1684,15 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "clientId": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "tokenUrl": { }
     } ],
     "componentName": "slack",
     "componentDescription": "Component description.",

@@ -349,7 +349,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -392,7 +392,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -988,7 +988,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -1012,7 +1012,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -1055,7 +1055,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -1197,7 +1197,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     } ],
@@ -1586,7 +1586,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       } ],
@@ -1668,7 +1668,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -1692,7 +1692,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -1735,7 +1735,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2048,15 +2048,15 @@
       "type": "API_KEY",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "componentName": "infobip",
     "componentDescription": "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",

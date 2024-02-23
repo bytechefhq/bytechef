@@ -53,7 +53,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -209,7 +209,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -233,7 +233,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -257,7 +257,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -281,7 +281,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -324,8 +324,8 @@
       "optionsDataSource": null
     } ],
     "title": "GET",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -380,7 +380,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -571,7 +571,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -1110,7 +1110,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1134,7 +1134,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1158,7 +1158,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1182,7 +1182,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1225,8 +1225,8 @@
       "optionsDataSource": null
     } ],
     "title": "POST",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -1281,7 +1281,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1472,7 +1472,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2011,7 +2011,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2035,7 +2035,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2059,7 +2059,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2083,7 +2083,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2126,8 +2126,8 @@
       "optionsDataSource": null
     } ],
     "title": "PUT",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2182,7 +2182,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2373,7 +2373,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2912,7 +2912,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2936,7 +2936,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2960,7 +2960,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -2984,7 +2984,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3027,8 +3027,8 @@
       "optionsDataSource": null
     } ],
     "title": "PATCH",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3083,7 +3083,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3239,7 +3239,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3263,7 +3263,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3287,7 +3287,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3311,7 +3311,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3354,8 +3354,8 @@
       "optionsDataSource": null
     } ],
     "title": "DELETE",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3410,7 +3410,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3566,7 +3566,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3590,7 +3590,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3614,7 +3614,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3638,7 +3638,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -3681,8 +3681,8 @@
       "optionsDataSource": null
     } ],
     "title": "HEAD",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -3760,16 +3760,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3798,16 +3798,16 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3855,16 +3855,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3912,16 +3912,16 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4045,16 +4045,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4159,16 +4159,16 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4273,16 +4273,16 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     } ],
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
