@@ -211,6 +211,8 @@ const Project = () => {
             });
 
             setWorkflow({...workflow, componentNames, nodeNames});
+
+            navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
         },
     });
 
@@ -498,7 +500,7 @@ const Project = () => {
                                 {!!projectId && (
                                     <WorkflowDialog
                                         createWorkflowMutation={createProjectWorkflowMutation}
-                                        parentId={+projectId}
+                                        parentId={parseInt(projectId)}
                                         triggerNode={
                                             <Button
                                                 className="border-0 bg-white shadow-none"
