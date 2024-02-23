@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
-import CreatableSelect, {ISelectOption} from 'components/CreatableSelect/CreatableSelect';
+import CreatableSelect, {SelectOptionType} from 'components/CreatableSelect/CreatableSelect';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
@@ -88,7 +88,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 <CreatableSelect
                     className="w-40 text-start"
                     name="newTag"
-                    onChange={(selectedOption: OnChangeValue<ISelectOption, false>) => {
+                    onChange={(selectedOption: OnChangeValue<SelectOptionType, false>) => {
                         if (selectedOption) {
                             handleAddTag(selectedOption.tag);
                         }
