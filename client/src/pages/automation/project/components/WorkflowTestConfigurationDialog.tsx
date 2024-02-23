@@ -19,6 +19,7 @@ import {
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
 } from '@/middleware/platform/configuration';
+import {ConnectionModel} from '@/middleware/platform/connection';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useSaveWorkflowTestConfigurationMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
@@ -34,14 +35,113 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import {useState} from 'react';
-import {useForm} from 'react-hook-form';
+import {Dispatch, SetStateAction, useState} from 'react';
+import {UseFormReturn, useForm} from 'react-hook-form';
+import InlineSVG from 'react-inlinesvg';
 
 interface WorkflowTestConfigurationDialogProps {
     onClose: () => void;
     workflow: WorkflowModel;
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }
+
+const WorkflowTestConfigurationFormField = ({
+    connections,
+    form,
+    index,
+    setShowNewConnectionDialog,
+    setWorkflowConnection,
+    workflowConnection,
+}: {
+    connections: ConnectionModel[];
+    form: UseFormReturn<WorkflowTestConfigurationModel>;
+    index: number;
+    workflowConnection: WorkflowConnectionModel;
+    setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
+    setWorkflowConnection: Dispatch<SetStateAction<WorkflowConnectionModel | undefined>>;
+}) => {
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+        componentName: workflowConnection.componentName,
+        componentVersion: workflowConnection.componentVersion,
+    });
+
+    return (
+        <div key={index}>
+            <FormField
+                control={form.control}
+                name={`connections.${index}.connectionId`}
+                render={({field}) => {
+                    return (
+                        <FormItem>
+                            <FormLabel className="flex items-center">
+                                {componentDefinition?.icon && (
+                                    <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
+                                )}
+
+                                <span className="ml-1">{componentDefinition?.title} Connection</span>
+
+                                <span className="ml-0.5 text-xs text-gray-500">
+                                    {`(${workflowConnection.workflowNodeName})`}
+                                </span>
+                            </FormLabel>
+
+                            <Select
+                                onValueChange={field.onChange}
+                                value={field.value ? field.value.toString() : undefined}
+                            >
+                                <FormControl>
+                                    <div className="flex space-x-2">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Choose Connection..." />
+                                        </SelectTrigger>
+
+                                        <Button
+                                            className="mt-auto p-2"
+                                            onClick={() => {
+                                                setWorkflowConnection(workflowConnection);
+                                                setShowNewConnectionDialog(true);
+                                            }}
+                                            title="Create a new connection"
+                                            type="button"
+                                            variant="outline"
+                                        >
+                                            <PlusIcon className="size-5" />
+                                        </Button>
+                                    </div>
+                                </FormControl>
+
+                                <SelectContent>
+                                    {connections &&
+                                        connections
+                                            .filter(
+                                                (connection) =>
+                                                    connection.componentName === workflowConnection.componentName
+                                            )
+                                            .map((connection) => (
+                                                <SelectItem key={connection.id} value={connection.id!.toString()}>
+                                                    <div className="flex items-center">
+                                                        <span className="mr-1 ">{connection.name}</span>
+
+                                                        <span className="text-xs text-gray-500">
+                                                            {connection?.tags?.map((tag) => tag.name).join(', ')}
+                                                        </span>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                </SelectContent>
+                            </Select>
+
+                            <FormMessage />
+                        </FormItem>
+                    );
+                }}
+                rules={{
+                    required: workflowConnection.required,
+                }}
+            />
+        </div>
+    );
+};
 
 const WorkflowTestConfigurationDialog = ({
     onClose,
@@ -173,117 +273,22 @@ const WorkflowTestConfigurationDialog = ({
                                     <div className="space-y-2">
                                         <Label className="text-gray-500">Connections</Label>
 
-                                        {workflowConnections.map((workflowConnection, index) => {
-                                            const operationConnectionCount = workflowConnections.reduce(
-                                                (count, curWorkflowConnection) => {
-                                                    if (
-                                                        curWorkflowConnection.workflowNodeName ===
-                                                        workflowConnection.workflowNodeName
-                                                    ) {
-                                                        return count + 1;
-                                                    }
-
-                                                    return count;
-                                                },
-                                                0
-                                            );
-
-                                            return (
-                                                <div key={index}>
-                                                    <FormField
-                                                        control={form.control}
-                                                        name={`connections.${index}.connectionId`}
-                                                        render={({field}) => {
-                                                            return (
-                                                                <FormItem>
-                                                                    <FormLabel>
-                                                                        {'Connection '}
-
-                                                                        <span className="text-xs text-gray-500">
-                                                                            {`(${workflowConnection.workflowNodeName}${
-                                                                                operationConnectionCount > 1
-                                                                                    ? ' - ' + workflowConnection.key
-                                                                                    : ''
-                                                                            })`}
-                                                                        </span>
-                                                                    </FormLabel>
-
-                                                                    <Select
-                                                                        onValueChange={field.onChange}
-                                                                        value={
-                                                                            field.value
-                                                                                ? field.value.toString()
-                                                                                : undefined
-                                                                        }
-                                                                    >
-                                                                        <FormControl>
-                                                                            <div className="flex space-x-2">
-                                                                                <SelectTrigger>
-                                                                                    <SelectValue placeholder="Choose Connection..." />
-                                                                                </SelectTrigger>
-
-                                                                                <Button
-                                                                                    className="mt-auto p-2"
-                                                                                    onClick={() => {
-                                                                                        setWorkflowConnection(
-                                                                                            workflowConnection
-                                                                                        );
-                                                                                        setShowNewConnectionDialog(
-                                                                                            true
-                                                                                        );
-                                                                                    }}
-                                                                                    title="Create a new connection"
-                                                                                    type="button"
-                                                                                    variant="outline"
-                                                                                >
-                                                                                    <PlusIcon className="size-5" />
-                                                                                </Button>
-                                                                            </div>
-                                                                        </FormControl>
-
-                                                                        <SelectContent>
-                                                                            {connections &&
-                                                                                connections
-                                                                                    .filter(
-                                                                                        (connection) =>
-                                                                                            connection.componentName ===
-                                                                                            workflowConnection.componentName
-                                                                                    )
-                                                                                    .map((connection) => (
-                                                                                        <SelectItem
-                                                                                            key={connection.id}
-                                                                                            value={connection.id!.toString()}
-                                                                                        >
-                                                                                            <div className="flex items-center">
-                                                                                                <span className="mr-1 ">
-                                                                                                    {connection.name}
-                                                                                                </span>
-
-                                                                                                <span className="text-xs text-gray-500">
-                                                                                                    {connection?.tags
-                                                                                                        ?.map(
-                                                                                                            (tag) =>
-                                                                                                                tag.name
-                                                                                                        )
-                                                                                                        .join(', ')}
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        </SelectItem>
-                                                                                    ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            );
-                                                        }}
-                                                        rules={{
-                                                            required: workflowConnection.required,
-                                                        }}
+                                        <div className="space-y-4">
+                                        {workflowConnections.map(
+                                            (workflowConnection, index) =>
+                                                connections && (
+                                                    <WorkflowTestConfigurationFormField
+                                                        connections={connections}
+                                                        form={form}
+                                                        index={index}
+                                                        key={workflowConnection.key}
+                                                        setShowNewConnectionDialog={setShowNewConnectionDialog}
+                                                        setWorkflowConnection={setWorkflowConnection}
+                                                        workflowConnection={workflowConnection}
                                                     />
-                                                </div>
-                                            );
-                                        })}
+                                                )
+                                        )}
+                                        </div>
                                     </div>
                                 )}
                             </div>

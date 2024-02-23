@@ -119,7 +119,6 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                                         key={workflowConnectionIndex + '_' + workflowConnection.key}
                                         workflowConnection={workflowConnection}
                                         workflowConnectionIndex={workflowConnectionIndex}
-                                        workflowConnectionsCount={workflowConnections.length}
                                         workflowIndex={workflowIndex}
                                     />
                                 ))
