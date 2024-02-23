@@ -999,6 +999,8 @@ public final class ComponentDSL {
         private Boolean connectionRequired;
         private Boolean customAction;
         private Help customActionHelp;
+        private DataStreamItemReader dataStreamItemReader;
+        private DataStreamItemWriter dataStreamItemWriter;
         private String description;
         private String icon;
         private List<String> tags;
@@ -1063,6 +1065,18 @@ public final class ComponentDSL {
 
         public ModifiableComponentDefinition customActionHelp(Help customActionHelp) {
             this.customActionHelp = customActionHelp;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition dataStreamItemReader(DataStreamItemReader dataStreamItemReader) {
+            this.dataStreamItemReader = dataStreamItemReader;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition dataStreamItemWriter(DataStreamItemWriter dataStreamItemWriter) {
+            this.dataStreamItemWriter = dataStreamItemWriter;
 
             return this;
         }
@@ -1184,6 +1198,16 @@ public final class ComponentDSL {
         @Override
         public Optional<Help> getCustomActionHelp() {
             return Optional.ofNullable(customActionHelp);
+        }
+
+        @Override
+        public Optional<DataStreamItemReader> getDataStreamItemReader() {
+            return Optional.ofNullable(dataStreamItemReader);
+        }
+
+        @Override
+        public Optional<DataStreamItemWriter> getDataStreamItemWriter() {
+            return Optional.ofNullable(dataStreamItemWriter);
         }
 
         @Override

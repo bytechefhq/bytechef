@@ -23,6 +23,7 @@ import com.bytechef.component.csv.file.action.CsvFileReadAction;
 import com.bytechef.component.csv.file.action.CsvFileWriteAction;
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.DataStreamItemReader;
 import com.google.auto.service.AutoService;
 
 /**
@@ -35,7 +36,8 @@ public class CsvFileComponentHandler implements ComponentHandler {
         .title("CSV File")
         .description("Reads and writes data from a csv file.")
         .icon("path:assets/csv-file.svg")
-        .actions(CsvFileReadAction.ACTION_DEFINITION, CsvFileWriteAction.ACTION_DEFINITION);
+        .actions(CsvFileReadAction.ACTION_DEFINITION, CsvFileWriteAction.ACTION_DEFINITION)
+        .dataStreamItemReader(new DataStreamItemReader() {});
 
     @Override
     public ComponentDefinition getDefinition() {

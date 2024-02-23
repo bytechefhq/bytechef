@@ -26,24 +26,4 @@ public interface DataStreamComponentDefinition extends ComponentDefinition {
     enum ComponentType {
         SOURCE, DESTINATION
     }
-
-    /**
-     *
-     * @return
-     */
-    FilterComponentDefinitionBiPredicate getFilterComponentDefinition();
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface FilterComponentDefinitionBiPredicate {
-
-        /**
-         *
-         * @param componentDefinition
-         * @return
-         */
-        boolean apply(ComponentDefinition componentDefinition, ComponentType componentType);
-    }
 }

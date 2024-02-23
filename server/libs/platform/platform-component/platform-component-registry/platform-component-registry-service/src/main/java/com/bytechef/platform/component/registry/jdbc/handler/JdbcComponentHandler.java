@@ -37,6 +37,7 @@ import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.DataStreamItemWriter;
 import com.bytechef.component.definition.JdbcComponentDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
@@ -287,6 +288,7 @@ public class JdbcComponentHandler implements ComponentHandler {
             .icon(icon)
             .title(title)
             .connection(CONNECTION_DEFINITION)
-            .actions(actionDefinitions);
+            .actions(actionDefinitions)
+            .dataStreamItemWriter(new DataStreamItemWriter() {});
     }
 }
