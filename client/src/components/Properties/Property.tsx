@@ -26,6 +26,7 @@ import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
+import {SelectOptionType} from '../CreatableSelect/CreatableSelect';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -99,6 +100,7 @@ const Property = ({
         minLength,
         minValue,
         options,
+        optionsDataSource,
         properties,
         required,
         type,
@@ -127,10 +129,6 @@ const Property = ({
     const showMentionInput = controlType === 'FILE_ENTRY' || (mentionInput && !!dataPills?.length);
 
     let showInputTypeSwitchButton = type !== 'STRING' && !!dataPills?.length && !!name;
-
-    if (controlType === 'SELECT') {
-        showInputTypeSwitchButton = true;
-    }
 
     if (controlType === 'FILE_ENTRY') {
         showInputTypeSwitchButton = false;
@@ -487,6 +485,31 @@ const Property = ({
                             />
                         )}
 
+                        {!register && (isValidControlType || isNumericalInput) && !!options?.length && (
+                            <PropertySelect
+                                description={description}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                name={name}
+                                onValueChange={(value: string) => handleSelectChange(value, name)}
+                                options={options as Array<SelectOptionType>}
+                                value={taskParameterValue || defaultValue?.toString()}
+                            />
+                        )}
+
+                        {!register && (isValidControlType || isNumericalInput) && !!optionsDataSource && (
+                            <PropertyComboBox
+                                description={description}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                name={name}
+                                onValueChange={(value: string) => handleSelectChange(value, name)}
+                                options={(formattedOptions as Array<OptionModel>) || undefined || []}
+                                optionsDataSource={optionsDataSource}
+                                value={taskParameterValue || defaultValue?.toString()}
+                            />
+                        )}
+
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 description={description}
@@ -495,7 +518,7 @@ const Property = ({
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
-                                optionsDataSource={property.optionsDataSource}
+                                optionsDataSource={optionsDataSource}
                                 value={taskParameterValue || defaultValue?.toString()}
                             />
                         )}
