@@ -5,6 +5,7 @@ import {
     ComponentDefinitionModel,
     GetComponentDefinitionRequest,
     GetComponentDefinitionsRequest,
+    GetDataStreamComponentDefinitionsRequest,
 } from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
@@ -15,6 +16,10 @@ export const ComponentDefinitionKeys = {
     ],
     componentDefinitions: ['componentDefinitions'] as const,
     filteredComponentDefinitions: (request?: GetComponentDefinitionsRequest) => [
+        ...ComponentDefinitionKeys.componentDefinitions,
+        request,
+    ],
+    filteredDataStreamComponentDefinitions: (request?: GetDataStreamComponentDefinitionsRequest) => [
         ...ComponentDefinitionKeys.componentDefinitions,
         request,
     ],
@@ -31,5 +36,15 @@ export const useGetComponentDefinitionsQuery = (request?: GetComponentDefinition
     useQuery<ComponentDefinitionBasicModel[], Error>({
         queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
         queryFn: () => new ComponentDefinitionApi().getComponentDefinitions(request),
+        enabled: enabled === undefined ? true : enabled,
+    });
+
+export const useGetDataStreamComponentDefinitions = (
+    request: GetDataStreamComponentDefinitionsRequest,
+    enabled?: boolean
+) =>
+    useQuery<ComponentDefinitionBasicModel[], Error>({
+        queryKey: ComponentDefinitionKeys.filteredDataStreamComponentDefinitions(request),
+        queryFn: () => new ComponentDefinitionApi().getDataStreamComponentDefinitions(request),
         enabled: enabled === undefined ? true : enabled,
     });

@@ -7,6 +7,8 @@ import {
     WorkflowNodeOutputModel,
 } from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import DestinationTab from '@/pages/automation/project/components/node-details-tabs/DestinationTab';
+import SourceTab from '@/pages/automation/project/components/node-details-tabs/SourceTab';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
@@ -37,6 +39,14 @@ const TABS = [
     {
         label: 'Description',
         name: 'description',
+    },
+    {
+        label: 'Source',
+        name: 'source',
+    },
+    {
+        label: 'Destination',
+        name: 'destination',
     },
     {
         label: 'Connections',
@@ -269,6 +279,10 @@ const WorkflowNodeDetailsPanel = ({
             return currentComponent?.name && componentDefinitionNames?.includes(currentComponent.name);
         }
 
+        if (name === 'source' || name === 'destination') {
+            return currentComponent?.name === 'dataStream';
+        }
+
         if (name === 'output') {
             return hasOutputData;
         }
@@ -348,6 +362,10 @@ const WorkflowNodeDetailsPanel = ({
             currentComponent?.name &&
             !componentDefinitionNames?.includes(currentComponent.name)
         ) {
+            setActiveTab('description');
+        }
+
+        if ((activeTab === 'source' || activeTab === 'destination') && currentComponent?.name !== 'dataStream') {
             setActiveTab('description');
         }
 
@@ -452,6 +470,12 @@ const WorkflowNodeDetailsPanel = ({
                                                 currentComponentData={currentComponentData}
                                                 otherComponentData={otherComponentData}
                                             />
+                                        )}
+
+                                        {activeTab === 'source' && <SourceTab componentDefinition={currentComponent} />}
+
+                                        {activeTab === 'destination' && (
+                                            <DestinationTab componentDefinition={currentComponent} />
                                         )}
 
                                         {activeTab === 'connections' && workflowConnections.length > 0 && (
