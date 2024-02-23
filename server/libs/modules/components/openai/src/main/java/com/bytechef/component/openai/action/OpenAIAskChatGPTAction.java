@@ -34,7 +34,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.ROLE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STOP;
-import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
@@ -44,10 +43,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.util.OpenAIUtils;
-import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
-import io.reactivex.Flowable;
 import java.time.Duration;
 
 /**
@@ -93,13 +90,12 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
             RESPONSE_FORMAT_PROPERTY,
             SEED_PROPERTY,
             STOP_PROPERTY,
-            STREAM_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOOLS_PROPERTY,
             TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
-        .output(OpenAIUtils::getOutput)
+        .outputSchema(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE)
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIAskChatGPTAction() {
@@ -112,18 +108,9 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
 
         ChatCompletionRequest chatCompletionRequest = createChatCompletionRequest(inputParameters);
 
-        if (inputParameters.getRequiredBoolean(STREAM)) {
-            chatCompletionRequest.setStream(true);
+        chatCompletionRequest.setStream(false);
 
-            Flowable<ChatCompletionChunk> chatCompletionChunkFlowable =
-                openAiService.streamChatCompletion(chatCompletionRequest);
-
-            return chatCompletionChunkFlowable.toList();
-        } else {
-            chatCompletionRequest.setStream(false);
-
-            return openAiService.createChatCompletion(chatCompletionRequest);
-        }
+        return openAiService.createChatCompletion(chatCompletionRequest);
     }
 
     private static ChatCompletionRequest createChatCompletionRequest(Parameters inputParameters) {

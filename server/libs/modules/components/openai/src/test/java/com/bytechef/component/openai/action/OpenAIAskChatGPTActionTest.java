@@ -24,7 +24,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STOP;
-import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
@@ -38,12 +37,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.TypeReference;
-import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
-import io.reactivex.Flowable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,9 +91,6 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
     public void testPerformIsNotStream() {
         ChatCompletionResult mockedChatCompletionResult = mock(ChatCompletionResult.class);
 
-        when(mockedParameters.getRequiredBoolean(STREAM))
-            .thenReturn(false);
-
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
             mockConstruction(
                 OpenAiService.class,
@@ -119,35 +113,6 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
             ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
 
             assertEquals(false, chatCompletionRequest.getStream());
-        }
-    }
-
-    @Test
-    public void testPerformIsStream() {
-        Flowable<ChatCompletionChunk> chatCompletionChunkFlowable = mock(Flowable.class);
-
-        when(mockedParameters.getRequiredBoolean(STREAM))
-            .thenReturn(true);
-
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
-            OpenAiService.class,
-            (openAiService, context) -> when(openAiService.streamChatCompletion(any()))
-                .thenReturn(chatCompletionChunkFlowable))) {
-
-            Object result = OpenAIAskChatGPTAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
-
-            assertEquals(1, openAiServices.size());
-            assertEquals(chatCompletionChunkFlowable.toList(), result);
-
-            OpenAiService openAiService = openAiServices.getFirst();
-
-            verify(openAiService, times(1)).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
-
-            ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
-
-            assertEquals(true, chatCompletionRequest.getStream());
         }
     }
 
