@@ -184,7 +184,7 @@ const Property = ({
                 },
             ]);
         }
-    }, 500);
+    }, 200);
 
     const handleSelectChange = (value: string, name: string | undefined) => {
         if (currentComponentData) {
