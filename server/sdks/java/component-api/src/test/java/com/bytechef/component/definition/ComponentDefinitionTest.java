@@ -84,7 +84,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"label":"True","value":true},{"description":null,"label":"False","value":true}],"controlType":"SELECT"}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"label":"True","value":true},{"description":null,"label":"False","value":false}],"controlType":"SELECT"}
                 """,
             property);
     }

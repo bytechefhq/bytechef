@@ -34,7 +34,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get Mail",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -673,7 +672,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -833,7 +832,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -857,7 +856,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -881,7 +880,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -905,7 +904,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -1380,7 +1379,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "microsoftOutlook365",
@@ -1397,7 +1397,6 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Search Email",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1421,7 +1420,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "microsoftOutlook365",
@@ -2093,7 +2093,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2273,7 +2273,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2297,7 +2297,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2321,7 +2321,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2345,7 +2345,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       }, {
@@ -2903,13 +2903,13 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Send Email",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -2979,16 +2979,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": null,
-      "authorizationUrl": { },
-      "clientSecret": null
+      "tokenUrl": null
     } ],
     "componentName": "microsoftOutlook365",
     "componentDescription": "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, calendar, contacts, and tasks to streamline communication and organization.",

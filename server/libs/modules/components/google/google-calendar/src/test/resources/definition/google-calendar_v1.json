@@ -133,7 +133,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -303,7 +303,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -547,7 +547,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -571,7 +571,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -1651,7 +1651,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1675,7 +1675,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1699,7 +1699,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -1978,7 +1978,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "controlType": "SELECT"
       } ],
@@ -2175,7 +2175,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create event",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2215,7 +2214,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -2501,7 +2500,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -2525,7 +2524,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -2549,7 +2548,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -2592,7 +2591,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             } ],
@@ -2626,7 +2625,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -3382,7 +3381,7 @@
             }, {
               "description": null,
               "label": "False",
-              "value": true
+              "value": false
             } ],
             "controlType": "SELECT"
           } ],
@@ -3501,7 +3500,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -3930,7 +3929,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -3954,7 +3953,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -3978,7 +3977,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -4116,7 +4115,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -4214,7 +4213,7 @@
             }, {
               "description": null,
               "label": "False",
-              "value": true
+              "value": false
             } ],
             "controlType": "SELECT"
           } ],
@@ -4372,7 +4371,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -4551,7 +4550,7 @@
             }, {
               "description": null,
               "label": "False",
-              "value": true
+              "value": false
             } ],
             "controlType": "SELECT"
           } ],
@@ -5018,7 +5017,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleCalendar",
@@ -5107,7 +5107,6 @@
       "optionsDataSource": null
     } ],
     "title": "Create Quick Event",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -5147,7 +5146,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -5433,7 +5432,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -5457,7 +5456,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -5481,7 +5480,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -5524,7 +5523,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             } ],
@@ -5558,7 +5557,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -6314,7 +6313,7 @@
             }, {
               "description": null,
               "label": "False",
-              "value": true
+              "value": false
             } ],
             "controlType": "SELECT"
           } ],
@@ -6433,7 +6432,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -6862,7 +6861,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -6886,7 +6885,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -6910,7 +6909,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -7048,7 +7047,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -7146,7 +7145,7 @@
             }, {
               "description": null,
               "label": "False",
-              "value": true
+              "value": false
             } ],
             "controlType": "SELECT"
           } ],
@@ -7304,7 +7303,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -7483,7 +7482,7 @@
             }, {
               "description": null,
               "label": "False",
-              "value": true
+              "value": false
             } ],
             "controlType": "SELECT"
           } ],
@@ -7950,7 +7949,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleCalendar",
@@ -8257,7 +8257,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -8281,7 +8281,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -8305,7 +8305,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -8399,7 +8399,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get events",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -8718,7 +8717,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -9004,7 +9003,7 @@
                   }, {
                     "description": null,
                     "label": "False",
-                    "value": true
+                    "value": false
                   } ],
                   "controlType": "SELECT"
                 }, {
@@ -9028,7 +9027,7 @@
                   }, {
                     "description": null,
                     "label": "False",
-                    "value": true
+                    "value": false
                   } ],
                   "controlType": "SELECT"
                 }, {
@@ -9052,7 +9051,7 @@
                   }, {
                     "description": null,
                     "label": "False",
-                    "value": true
+                    "value": false
                   } ],
                   "controlType": "SELECT"
                 }, {
@@ -9095,7 +9094,7 @@
                   }, {
                     "description": null,
                     "label": "False",
-                    "value": true
+                    "value": false
                   } ],
                   "controlType": "SELECT"
                 } ],
@@ -9129,7 +9128,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -9885,7 +9884,7 @@
                 }, {
                   "description": null,
                   "label": "False",
-                  "value": true
+                  "value": false
                 } ],
                 "controlType": "SELECT"
               } ],
@@ -10004,7 +10003,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -10433,7 +10432,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -10457,7 +10456,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -10481,7 +10480,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -10619,7 +10618,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -10717,7 +10716,7 @@
                 }, {
                   "description": null,
                   "label": "False",
-                  "value": true
+                  "value": false
                 } ],
                 "controlType": "SELECT"
               } ],
@@ -10875,7 +10874,7 @@
               }, {
                 "description": null,
                 "label": "False",
-                "value": true
+                "value": false
               } ],
               "controlType": "SELECT"
             }, {
@@ -11054,7 +11053,7 @@
                 }, {
                   "description": null,
                   "label": "False",
-                  "value": true
+                  "value": false
                 } ],
                 "controlType": "SELECT"
               } ],
@@ -11531,7 +11530,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -11583,15 +11583,15 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "tokenUrl": { }
     } ],
     "componentName": "googleCalendar",
     "componentDescription": "Google Calendar is a web-based application that allows users to schedule and organize events, appointments, and reminders, synchronizing across multiple devices.",

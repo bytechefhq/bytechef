@@ -126,7 +126,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -188,8 +188,8 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "xmlFile",
@@ -293,7 +293,6 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -389,7 +388,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

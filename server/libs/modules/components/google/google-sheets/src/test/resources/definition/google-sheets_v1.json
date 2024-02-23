@@ -56,7 +56,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -102,13 +102,13 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Clear sheet",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleSheets",
@@ -166,7 +166,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -212,8 +212,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete row",
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleSheets",
@@ -271,7 +271,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -317,7 +317,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -341,7 +341,6 @@
       "optionsDataSource": null
     } ],
     "title": "Find row by number",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -378,7 +377,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -430,7 +429,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleSheets",
@@ -488,7 +488,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -561,7 +561,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -581,7 +581,6 @@
       }
     } ],
     "title": "Insert row",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -618,7 +617,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -670,7 +669,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleSheets",
@@ -728,7 +728,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -793,7 +793,7 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     }, {
@@ -813,7 +813,6 @@
       }
     } ],
     "title": "Update row",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -850,7 +849,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "controlType": "SELECT"
         }, {
@@ -902,7 +901,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -953,16 +953,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null
+      "tokenUrl": { }
     } ],
     "componentName": "googleSheets",
     "componentDescription": "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time.",

@@ -112,7 +112,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get Mail",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -566,7 +565,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleMail",
@@ -680,7 +680,6 @@
       "optionsDataSource": null
     } ],
     "title": "Get Thread",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1232,7 +1231,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleMail",
@@ -1475,12 +1475,11 @@
       }, {
         "description": null,
         "label": "False",
-        "value": true
+        "value": false
       } ],
       "controlType": "SELECT"
     } ],
     "title": "Search Email",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2016,7 +2015,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "googleMail",
@@ -2363,7 +2363,6 @@
       "optionsDataSource": null
     } ],
     "title": "Send Email",
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2817,7 +2816,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -2869,15 +2869,15 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "tokenUrl": { }
     } ],
     "componentName": "googleMail",
     "componentDescription": "Google Mail, commonly known as Gmail, is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.",
