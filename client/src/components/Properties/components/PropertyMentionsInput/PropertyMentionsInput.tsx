@@ -331,10 +331,7 @@ const PropertyMentionsInput = forwardRef(
                 {label && (
                     <div className="flex items-center">
                         <Label
-                            className={twMerge(
-                                'block text-sm font-medium capitalize text-muted-foreground',
-                                description && 'mr-1'
-                            )}
+                            className={twMerge('block text-sm font-medium capitalize', description && 'mr-1')}
                             htmlFor={elementId}
                         >
                             {label}

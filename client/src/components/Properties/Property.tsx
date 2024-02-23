@@ -5,6 +5,7 @@ import PropertyMentionsInput from '@/components/Properties/components/PropertyMe
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
 import {Button} from '@/components/ui/button';
+import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {OptionModel, WorkflowModel} from '@/middleware/platform/configuration';
@@ -413,7 +414,7 @@ const Property = ({
                                     {typeIcon}
                                 </span>
 
-                                <span className="text-sm font-medium">{label}</span>
+                                <Label>{label}</Label>
 
                                 {description && (
                                     <Tooltip>
