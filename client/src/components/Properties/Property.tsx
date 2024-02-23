@@ -105,7 +105,7 @@ const Property = ({
     } = property;
 
     if (!name) {
-        type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
+        controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER' ? (name = 'item') : <></>;
     }
 
     const formattedOptions = options
@@ -330,7 +330,7 @@ const Property = ({
         isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
     }, [defaultValue, isNumericalInput, taskParameterValue]);
 
-    if (type === 'OBJECT' && !properties?.length && !additionalProperties?.length) {
+    if (controlType === 'OBJECT_BUILDER' && !properties?.length && !additionalProperties?.length) {
         return <></>;
     }
 
@@ -343,8 +343,8 @@ const Property = ({
             className={twMerge(
                 controlType === 'CODE_EDITOR' && 'h-5/6',
                 hidden && 'mb-0',
-                type === 'OBJECT' && 'flex-col',
-                type === 'ARRAY' && 'flex-col',
+                controlType === 'OBJECT_BUILDER' && 'flex-col',
+                controlType === 'ARRAY_BUILDER' && 'flex-col',
                 customClassName
             )}
         >
@@ -393,7 +393,7 @@ const Property = ({
 
                 {!showMentionInput && (
                     <>
-                        {(type === 'OBJECT' || type === 'ARRAY') && label && (
+                        {(controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER') && label && (
                             <div className="flex items-center py-2">
                                 <span className="pr-2" title={type}>
                                     {typeIcon}
@@ -413,7 +413,7 @@ const Property = ({
                             </div>
                         )}
 
-                        {(type === 'ARRAY' || controlType === 'MULTI_SELECT') && (
+                        {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
                             <ArrayProperty
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
@@ -422,7 +422,7 @@ const Property = ({
                             />
                         )}
 
-                        {type === 'OBJECT' && (
+                        {controlType === 'OBJECT_BUILDER' && (
                             <ObjectProperty
                                 actionName={actionName}
                                 currentComponent={currentComponent}
