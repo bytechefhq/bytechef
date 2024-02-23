@@ -533,6 +533,7 @@ const Project = () => {
                                             <Button
                                                 className="bg-success text-success-foreground hover:bg-success/80"
                                                 disabled={runDisabled}
+                                                size="sm"
                                                 variant="secondary"
                                             >
                                                 <PlayIcon className="h-5" /> Run
@@ -555,6 +556,7 @@ const Project = () => {
                                                 className="bg-success text-success-foreground hover:bg-success/80"
                                                 disabled={runDisabled}
                                                 onClick={handleRunClick}
+                                                size="sm"
                                                 variant="secondary"
                                             >
                                                 <PlayIcon className="h-5" /> Run
@@ -587,6 +589,7 @@ const Project = () => {
                                                     id: +projectId!,
                                                 })
                                             }
+                                            size="sm"
                                         >
                                             <CircleDotDashedIcon className="h-5" /> Publish
                                         </Button>
@@ -600,7 +603,7 @@ const Project = () => {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <span>
-                                            <Button disabled={!!project?.publishedDate}>
+                                            <Button disabled={!!project?.publishedDate} size="sm">
                                                 <CircleDotDashedIcon className="h-5" /> Publish
                                             </Button>
                                         </span>
