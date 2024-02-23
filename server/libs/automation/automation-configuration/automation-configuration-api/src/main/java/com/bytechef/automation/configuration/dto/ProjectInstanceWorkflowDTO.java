@@ -39,7 +39,7 @@ public record ProjectInstanceWorkflowDTO(
         this(
             projectInstanceWorkflow.getConnections(), projectInstanceWorkflow.getCreatedBy(),
             projectInstanceWorkflow.getCreatedDate(), projectInstanceWorkflow.getInputs(),
-            projectInstanceWorkflow.isEnabled(), projectInstanceWorkflow.getProjectInstanceId(),
+            projectInstanceWorkflow.isEnabled(), projectInstanceWorkflow.getId(),
             lastExecutionDate, projectInstanceWorkflow.getLastModifiedBy(),
             projectInstanceWorkflow.getLastModifiedDate(), projectInstanceWorkflow.getProjectInstanceId(),
             staticWebhookUrl, projectInstanceWorkflow.getVersion(), projectInstanceWorkflow.getWorkflowId());
