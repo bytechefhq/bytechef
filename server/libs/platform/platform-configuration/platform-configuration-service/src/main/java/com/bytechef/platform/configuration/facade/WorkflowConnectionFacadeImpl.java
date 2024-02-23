@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -87,25 +89,38 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
         if (dataStream != null) {
             if (dataStream.source() != null) {
-                fetchWorkflowConnection(workflowNodeName, dataStream.source()).ifPresent(workflowConnections::add);
+                OptionalUtils.ifPresent(
+                    fetchWorkflowConnection(
+                        workflowNodeName,
+                        StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.SOURCE.name()),
+                        dataStream.source()),
+                    workflowConnections::add);
             }
 
             if (dataStream.destination() != null) {
-                fetchWorkflowConnection(workflowNodeName, dataStream.destination()).ifPresent(workflowConnections::add);
+                OptionalUtils.ifPresent(
+                    fetchWorkflowConnection(
+                        workflowNodeName,
+                        StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.DESTINATION.name()),
+                        dataStream.destination()),
+                    workflowConnections::add);
             }
         }
 
         return workflowConnections;
     }
 
-    Optional<WorkflowConnection> fetchWorkflowConnection(String workflowNodeName, ComponentType componentType) {
+    Optional<WorkflowConnection> fetchWorkflowConnection(
+        String workflowNodeName, String workflowConnectionKey, ComponentType componentType) {
+
         Optional<WorkflowConnection> workflowConnectionOptional = Optional.empty();
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             componentType.componentName(), componentType.componentVersion());
 
         if (componentDefinition.getConnection() != null) {
-            workflowConnectionOptional = Optional.of(WorkflowConnection.of(workflowNodeName, componentDefinition));
+            workflowConnectionOptional = Optional.of(
+                WorkflowConnection.of(workflowNodeName, workflowConnectionKey, componentDefinition));
         }
 
         return workflowConnectionOptional;

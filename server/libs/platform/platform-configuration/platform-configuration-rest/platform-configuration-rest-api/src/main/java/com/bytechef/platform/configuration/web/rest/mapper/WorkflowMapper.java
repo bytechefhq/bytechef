@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
@@ -56,8 +57,7 @@ public abstract class WorkflowMapper {
 
         @AfterMapping
         public void afterMapping(Workflow workflow, @MappingTarget WorkflowBasicModel workflowBasicModel) {
-            workflowBasicModel.setManualTrigger(WorkflowTrigger.of(workflow)
-                .isEmpty());
+            workflowBasicModel.setManualTrigger(CollectionUtils.isEmpty(WorkflowTrigger.of(workflow)));
             workflowBasicModel.setWorkflowTaskComponentNames(getWorkflowTaskComponentNames(workflow.getTasks()));
 
             List<String> workflowTriggerComponentNames = WorkflowTrigger

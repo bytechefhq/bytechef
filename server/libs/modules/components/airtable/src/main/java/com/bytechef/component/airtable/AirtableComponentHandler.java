@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableDynamicPropertie
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.DataStreamItemReader;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +48,8 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/airtable.svg");
+            .icon("path:assets/airtable.svg")
+            .dataStreamItemReader(new DataStreamItemReader() {});
     }
 
     @Override

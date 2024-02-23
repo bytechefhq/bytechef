@@ -19,15 +19,22 @@ package com.bytechef.component.data.stream.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.platform.component.constant.DataStreamConstants.DATA_STREAM;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.exception.TaskExecutionException;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-public class DataStreamSyncAction {
+@Component(DATA_STREAM + "/v1/sync")
+public class DataStreamSyncAction implements TaskHandler<Void> {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action("sync")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sync")
         .title("Sync Data Stream")
         .description("Sync large volume of data between source and destination applications.")
         .properties(
@@ -38,4 +45,12 @@ public class DataStreamSyncAction {
                 .options(
                     option("Simple", 1),
                     option("Script", 2)));
+
+    public DataStreamSyncAction(JobLauncher jobLauncher) {
+    }
+
+    @Override
+    public Void handle(TaskExecution taskExecution) throws TaskExecutionException {
+        return null;
+    }
 }
