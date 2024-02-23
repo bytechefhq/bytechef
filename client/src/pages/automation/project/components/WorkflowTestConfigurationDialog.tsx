@@ -274,20 +274,20 @@ const WorkflowTestConfigurationDialog = ({
                                         <Label className="text-gray-500">Connections</Label>
 
                                         <div className="space-y-4">
-                                        {workflowConnections.map(
-                                            (workflowConnection, index) =>
-                                                connections && (
-                                                    <WorkflowTestConfigurationFormField
-                                                        connections={connections}
-                                                        form={form}
-                                                        index={index}
-                                                        key={workflowConnection.key}
-                                                        setShowNewConnectionDialog={setShowNewConnectionDialog}
-                                                        setWorkflowConnection={setWorkflowConnection}
-                                                        workflowConnection={workflowConnection}
-                                                    />
-                                                )
-                                        )}
+                                            {workflowConnections.map(
+                                                (workflowConnection, index) =>
+                                                    connections && (
+                                                        <WorkflowTestConfigurationFormField
+                                                            connections={connections}
+                                                            form={form}
+                                                            index={index}
+                                                            key={workflowConnection.key}
+                                                            setShowNewConnectionDialog={setShowNewConnectionDialog}
+                                                            setWorkflowConnection={setWorkflowConnection}
+                                                            workflowConnection={workflowConnection}
+                                                        />
+                                                    )
+                                            )}
                                         </div>
                                     </div>
                                 )}
