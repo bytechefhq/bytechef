@@ -140,7 +140,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstanceWorkflows
                 .stream()
                 .peek(projectInstanceWorkflow -> {
-                    validateInputs(projectInstanceWorkflow);
+                    if (projectInstanceWorkflow.isEnabled()) {
+                        validateInputs(projectInstanceWorkflow);
+                    }
 
                     projectInstanceWorkflow.setProjectInstanceId(Validate.notNull(projectInstance.getId(), "id"));
                 })
