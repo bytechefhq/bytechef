@@ -6,14 +6,14 @@ import {Item, ItemIndicator, ItemText, Value} from '@radix-ui/react-select';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-export interface ISelectOption {
+export type SelectOptionType = {
     description?: string;
     label: string;
     value: string;
-}
+};
 
 type PropertySelectProps = {
-    options: ISelectOption[];
+    options: Array<SelectOptionType>;
     description?: string;
     label?: string;
     leadingIcon?: ReactNode;

@@ -8,7 +8,7 @@ import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import {GroupBase} from 'react-select';
 
-export interface ISelectOption {
+export interface SelectOptionType {
     value: string;
     label: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -23,13 +23,13 @@ type CreatableSelectProps<
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
     fieldsetClassName?: string;
-    defaultValue?: ISelectOption;
+    defaultValue?: SelectOptionType;
     error?: boolean;
     field?: ControllerRenderProps<TFieldValues, TName>;
     isMulti?: boolean;
     label?: string;
     name?: string;
-    options: ISelectOption[];
+    options: SelectOptionType[];
 } & CreatableProps<Option, IsMulti, Group>;
 
 const CreatableSelect = <
