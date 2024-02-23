@@ -60,55 +60,58 @@ const ProjectInstanceWorkflowList = ({
             <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-gray-400">Workflows</h3>
 
             <ul>
-                {workflows?.map((workflow) => {
-                    const componentNames = [
-                        ...(workflow.workflowTriggerComponentNames ?? []),
-                        ...(workflow.workflowTaskComponentNames ?? []),
-                    ];
+                {workflows &&
+                    workflows
+                        .sort((a, b) => a.label!.localeCompare(b.label!))
+                        .map((workflow) => {
+                            const componentNames = [
+                                ...(workflow.workflowTriggerComponentNames ?? []),
+                                ...(workflow.workflowTaskComponentNames ?? []),
+                            ];
 
-                    componentNames?.forEach((componentName) => {
-                        if (!workflowComponentDefinitions[componentName]) {
-                            workflowComponentDefinitions[componentName] = componentDefinitions?.find(
-                                (componentDefinition) => componentDefinition.name === componentName
+                            componentNames?.forEach((componentName) => {
+                                if (!workflowComponentDefinitions[componentName]) {
+                                    workflowComponentDefinitions[componentName] = componentDefinitions?.find(
+                                        (componentDefinition) => componentDefinition.name === componentName
+                                    );
+                                }
+
+                                if (!workflowTaskDispatcherDefinitions[componentName]) {
+                                    workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
+                                        (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
+                                    );
+                                }
+                            });
+
+                            const filteredComponentNames = componentNames?.filter(
+                                (item, index) => componentNames?.indexOf(item) === index
                             );
-                        }
 
-                        if (!workflowTaskDispatcherDefinitions[componentName]) {
-                            workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
-                                (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
+                            const projectInstanceWorkflow = projectInstanceWorkflows?.find(
+                                (projectInstanceWorkflow) => projectInstanceWorkflow.workflowId === workflow?.id
                             );
-                        }
-                    });
 
-                    const filteredComponentNames = componentNames?.filter(
-                        (item, index) => componentNames?.indexOf(item) === index
-                    );
-
-                    const projectInstanceWorkflow = projectInstanceWorkflows?.find(
-                        (projectInstanceWorkflow) => projectInstanceWorkflow.workflowId === workflow?.id
-                    );
-
-                    return (
-                        <li
-                            className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
-                            key={workflow.id}
-                        >
-                            {projectInstanceWorkflow && (
-                                <ProjectInstanceWorkflowListItem
-                                    filteredComponentNames={filteredComponentNames}
+                            return (
+                                <li
+                                    className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                                     key={workflow.id}
-                                    projectId={projectId}
-                                    projectInstanceEnabled={projectInstanceEnabled}
-                                    projectInstanceId={projectInstanceId}
-                                    projectInstanceWorkflow={projectInstanceWorkflow}
-                                    workflow={workflow}
-                                    workflowComponentDefinitions={workflowComponentDefinitions}
-                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                />
-                            )}
-                        </li>
-                    );
-                })}
+                                >
+                                    {projectInstanceWorkflow && (
+                                        <ProjectInstanceWorkflowListItem
+                                            filteredComponentNames={filteredComponentNames}
+                                            key={workflow.id}
+                                            projectId={projectId}
+                                            projectInstanceEnabled={projectInstanceEnabled}
+                                            projectInstanceId={projectInstanceId}
+                                            projectInstanceWorkflow={projectInstanceWorkflow}
+                                            workflow={workflow}
+                                            workflowComponentDefinitions={workflowComponentDefinitions}
+                                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                        />
+                                    )}
+                                </li>
+                            );
+                        })}
             </ul>
         </div>
     );
