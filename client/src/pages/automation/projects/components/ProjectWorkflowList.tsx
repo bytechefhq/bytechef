@@ -52,46 +52,49 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
             </div>
 
             <ul>
-                {workflows?.map((workflow) => {
-                    const componentNames = [
-                        ...(workflow.workflowTriggerComponentNames ?? []),
-                        ...(workflow.workflowTaskComponentNames ?? []),
-                    ];
+                {workflows &&
+                    workflows
+                        .sort((a, b) => a.label!.localeCompare(b.label!))
+                        .map((workflow) => {
+                            const componentNames = [
+                                ...(workflow.workflowTriggerComponentNames ?? []),
+                                ...(workflow.workflowTaskComponentNames ?? []),
+                            ];
 
-                    componentNames?.map((definitionName) => {
-                        if (!workflowComponentDefinitions[definitionName]) {
-                            workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
-                                (componentDefinition) => componentDefinition.name === definitionName
+                            componentNames?.map((definitionName) => {
+                                if (!workflowComponentDefinitions[definitionName]) {
+                                    workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
+                                        (componentDefinition) => componentDefinition.name === definitionName
+                                    );
+                                }
+
+                                if (!workflowTaskDispatcherDefinitions[definitionName]) {
+                                    workflowTaskDispatcherDefinitions[definitionName] = taskDispatcherDefinitions?.find(
+                                        (taskDispatcherDefinition) => taskDispatcherDefinition.name === definitionName
+                                    );
+                                }
+                            });
+
+                            const filteredComponentNames = componentNames?.filter(
+                                (item, index) => componentNames?.indexOf(item) === index
                             );
-                        }
 
-                        if (!workflowTaskDispatcherDefinitions[definitionName]) {
-                            workflowTaskDispatcherDefinitions[definitionName] = taskDispatcherDefinitions?.find(
-                                (taskDispatcherDefinition) => taskDispatcherDefinition.name === definitionName
+                            return (
+                                <li
+                                    className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                                    key={workflow.id}
+                                >
+                                    <ProjectWorkflowListItem
+                                        filteredComponentNames={filteredComponentNames}
+                                        key={workflow.id}
+                                        project={project}
+                                        workflow={workflow}
+                                        workflowComponentDefinitions={workflowComponentDefinitions}
+                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                                    />
+                                </li>
                             );
-                        }
-                    });
-
-                    const filteredComponentNames = componentNames?.filter(
-                        (item, index) => componentNames?.indexOf(item) === index
-                    );
-
-                    return (
-                        <li
-                            className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
-                            key={workflow.id}
-                        >
-                            <ProjectWorkflowListItem
-                                filteredComponentNames={filteredComponentNames}
-                                key={workflow.id}
-                                project={project}
-                                workflow={workflow}
-                                workflowComponentDefinitions={workflowComponentDefinitions}
-                                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                            />
-                        </li>
-                    );
-                })}
+                        })}
             </ul>
         </div>
     );
