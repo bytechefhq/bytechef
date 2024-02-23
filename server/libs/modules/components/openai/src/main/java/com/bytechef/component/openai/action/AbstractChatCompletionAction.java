@@ -17,7 +17,6 @@
 package com.bytechef.component.openai.action;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -35,7 +34,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PE
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.SEED;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STOP;
-import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOL_CHOICE;
@@ -115,14 +113,6 @@ public abstract class AbstractChatCompletionAction {
         .description("Up to 4 sequences where the API will stop generating further tokens.")
         .items(string())
         .required(false);
-
-    public static final ComponentDSL.ModifiableBooleanProperty STREAM_PROPERTY = bool(STREAM)
-        .label("Stream")
-        .description(
-            "If set, partial message deltas will be sent, like in ChatGPT. Tokens will be sent as data-only " +
-                "server-sent events as they become available, with the stream terminated by a data: [DONE] message.")
-        .defaultValue(false)
-        .required(true);
 
     public static final ComponentDSL.ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
         .label("Temperature")

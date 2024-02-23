@@ -53,7 +53,6 @@ public final class OpenAIConstants {
     public static final String SIZE = "size";
     public static final String SPEED = "speed";
     public static final String STOP = "stop";
-    public static final String STREAM = "stream";
     public static final String STYLE = "style";
     public static final String TEMPERATURE = "temperature";
     public static final String TOOLS = "tools";

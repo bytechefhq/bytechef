@@ -26,15 +26,12 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZ
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
-import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
@@ -44,29 +41,6 @@ import java.util.List;
  * @author Monika Domiter
  */
 public class OpenAIUtils {
-
-    public static final ModifiableArrayProperty OUTPUT_SCHEMA_RESPONSE_FOR_STREAM =
-        array("stream")
-            .items(
-                string("id"),
-                string("object"),
-                integer("created"),
-                string("model"),
-                array("choices")
-                    .items(
-                        object()
-                            .properties(
-                                integer("index"),
-                                object("message")
-                                    .properties(
-                                        string("role"),
-                                        string("content"),
-                                        string("name"),
-                                        object("functionCall")
-                                            .properties(
-                                                string("name"),
-                                                object("arguments"))),
-                                string("finishReason"))));
 
     public static final ModifiableValueProperty<?, ?> OUTPUT_SCHEMA_RESPONSE = object()
         .properties(
@@ -142,17 +116,5 @@ public class OpenAIUtils {
         }
 
         return List.of(string, n);
-    }
-
-    public static Output getOutput(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        boolean stream = inputParameters.getRequiredBoolean(STREAM);
-
-        if (stream) {
-            return new Output(OUTPUT_SCHEMA_RESPONSE_FOR_STREAM);
-        } else {
-            return new Output(OUTPUT_SCHEMA_RESPONSE);
-        }
     }
 }
