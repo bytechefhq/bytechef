@@ -43,8 +43,8 @@ const DescriptionTab = ({
     };
 
     return (
-        <div className="h-full flex-[1_1_1px] overflow-auto p-4">
-            <div>
+        <div className="flex h-full flex-col gap-4 overflow-auto p-4">
+            <div className="space-y-2">
                 <Label>Title</Label>
 
                 <Input
@@ -55,7 +55,7 @@ const DescriptionTab = ({
                 />
             </div>
 
-            <div>
+            <div className="space-y-2">
                 <Label>Notes</Label>
 
                 <Textarea
