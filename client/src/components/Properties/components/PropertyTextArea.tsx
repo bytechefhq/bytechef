@@ -9,23 +9,15 @@ interface PropertyTextAreaProps extends TextareaProps {
     description?: string;
     error?: string | undefined;
     label?: string;
-    labelClassName?: string;
     name: string;
 }
 
 const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
-    ({description, error, label, labelClassName, name, required, ...props}, ref) => (
+    ({description, error, label, name, required, ...props}, ref) => (
         <fieldset className="mb-3 w-full">
             {label && (
                 <div className="flex items-center">
-                    <Label
-                        className={twMerge(
-                            'block text-sm font-medium capitalize text-gray-700',
-                            description && 'mr-1',
-                            labelClassName
-                        )}
-                        htmlFor={name}
-                    >
+                    <Label className={twMerge(description && 'mr-1')} htmlFor={name}>
                         {label}
 
                         {required && <span className="leading-3 text-red-500">*</span>}

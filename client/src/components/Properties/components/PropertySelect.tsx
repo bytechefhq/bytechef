@@ -38,13 +38,7 @@ const PropertySelect = ({
     <fieldset className="w-full space-y-2">
         {label && (
             <div className="flex items-center">
-                <Label
-                    className={twMerge(
-                        'block text-sm font-medium capitalize text-muted-foreground',
-                        description && 'mr-1'
-                    )}
-                    htmlFor={name}
-                >
+                <Label className={twMerge(description && 'mr-1')} htmlFor={name}>
                     <span>{label}</span>
 
                     {required && <span className="leading-3 text-red-500">*</span>}
