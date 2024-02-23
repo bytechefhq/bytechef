@@ -20,7 +20,6 @@ export interface ProjectInstanceDialogWorkflowsStepItemConnectionProps {
     control: Control<ProjectInstanceModel>;
     workflowConnection: WorkflowConnectionModel;
     workflowConnectionIndex: number;
-    workflowConnectionsCount: number;
     workflowIndex: number;
 }
 
@@ -28,7 +27,6 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
     control,
     workflowConnection,
     workflowConnectionIndex,
-    workflowConnectionsCount,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
@@ -53,16 +51,16 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                 name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
                 render={({field}) => (
                     <FormItem>
-                        <FormLabel className="flex items-center gap-1">
+                        <FormLabel className="flex items-center">
                             {componentDefinition?.icon && (
                                 <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                             )}
 
-                            <span>{`${componentDefinition?.title} `}</span>
+                            <span className="ml-1">{componentDefinition?.title} Connection</span>
 
-                            {workflowConnectionsCount > 1 && (
-                                <span className="text-xs text-gray-500">({workflowConnection.key})</span>
-                            )}
+                            <span className="ml-0.5 text-xs text-gray-500">
+                                {`(${workflowConnection.workflowNodeName})`}
+                            </span>
                         </FormLabel>
 
                         <Select
