@@ -106,7 +106,7 @@ const LayoutContainer = ({
                             <div className="flex h-full flex-1 flex-col">
                                 {rightSidebarHeader}
 
-                                <div className="overflow-y-auto">{rightSidebarBody}</div>
+                                {rightSidebarBody}
                             </div>
                         </div>
                     </aside>
