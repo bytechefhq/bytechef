@@ -24,7 +24,6 @@ import com.bytechef.component.data.stream.action.DataStreamSyncAction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,21 +32,17 @@ import org.springframework.stereotype.Component;
 @Component(DATA_STREAM + "_v1_ComponentDefinitionFactory")
 public class DataStreamComponentDefinitionFactory implements ComponentDefinitionFactory {
 
-    private final DataStreamComponentDefinition componentDefinition;
-
-    public DataStreamComponentDefinitionFactory(JobLauncher jobLauncher) {
-        this.componentDefinition = new DataStreamComponentDefinitionImpl(
-            component(DATA_STREAM)
-                .title("Data Stream")
-                .description("With the Data Stream, you can transfer large amounts of data efficiently.")
-                .icon("path:assets/data-stream.svg")
-                .actions(DataStreamSyncAction.ACTION_DEFINITION)
-                .workflowConnectionKeys("source", "destination"));
-    }
+    private static final DataStreamComponentDefinition COMPONENT_DEFINITION = new DataStreamComponentDefinitionImpl(
+        component(DATA_STREAM)
+            .title("Data Stream")
+            .description("With the Data Stream, you can transfer large amounts of data efficiently.")
+            .icon("path:assets/data-stream.svg")
+            .actions(DataStreamSyncAction.ACTION_DEFINITION)
+            .workflowConnectionKeys("source", "destination"));
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 
     private static class DataStreamComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
@@ -55,19 +50,6 @@ public class DataStreamComponentDefinitionFactory implements ComponentDefinition
 
         public DataStreamComponentDefinitionImpl(ComponentDefinition componentDefinition) {
             super(componentDefinition);
-        }
-
-        @Override
-        public FilterComponentDefinitionBiPredicate getFilterComponentDefinition() {
-            return (componentDefinition, componentType) -> {
-                if (componentType == ComponentType.SOURCE) {
-                    // TODO
-                    return true;
-                } else {
-                    // TODO
-                    return true;
-                }
-            };
         }
     }
 }

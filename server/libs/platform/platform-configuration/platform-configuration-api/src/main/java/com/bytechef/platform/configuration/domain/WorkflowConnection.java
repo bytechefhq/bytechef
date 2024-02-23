@@ -51,10 +51,12 @@ public record WorkflowConnection(
             .toList();
     }
 
-    public static WorkflowConnection of(String workflowNodeName, ComponentDefinition componentDefinition) {
+    public static WorkflowConnection of(
+        String workflowNodeName, String workflowConnectionKey, ComponentDefinition componentDefinition) {
+
         return new WorkflowConnection(
             componentDefinition.getName(), componentDefinition.getVersion(), workflowNodeName,
-            componentDefinition.getName(), componentDefinition.isConnectionRequired());
+            workflowConnectionKey, componentDefinition.isConnectionRequired());
     }
 
     public static WorkflowConnection of(

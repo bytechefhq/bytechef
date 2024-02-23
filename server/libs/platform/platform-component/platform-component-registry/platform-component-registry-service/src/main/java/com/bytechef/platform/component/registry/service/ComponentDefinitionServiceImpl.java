@@ -17,10 +17,8 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.constant.DataStreamConstants;
-import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
-import com.bytechef.platform.component.definition.DataStreamComponentDefinition.FilterComponentDefinitionBiPredicate;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -90,18 +88,16 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     public List<ComponentDefinition> getDataStreamComponentDefinitions(
         int componentVersion, ComponentType componentType) {
 
-        DataStreamComponentDefinition dataStreamComponentDefinition =
-            (DataStreamComponentDefinition) componentDefinitionRegistry.getComponentDefinition(
-                DataStreamConstants.DATA_STREAM, componentVersion);
-
-        FilterComponentDefinitionBiPredicate filterComponentDefinitionBiPredicate = dataStreamComponentDefinition
-            .getFilterComponentDefinition();
-
         return componentDefinitionRegistry
             .getComponentDefinitions()
             .stream()
-            .filter(componentDefinition -> filterComponentDefinitionBiPredicate.apply(
-                componentDefinition, componentType))
+            .filter(componentDefinition -> {
+                if (componentType == ComponentType.SOURCE) {
+                    return OptionalUtils.isPresent(componentDefinition.getDataStreamItemReader());
+                } else {
+                    return OptionalUtils.isPresent(componentDefinition.getDataStreamItemWriter());
+                }
+            })
             .map(ComponentDefinition::new)
             .toList();
     }

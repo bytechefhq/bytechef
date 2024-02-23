@@ -20,6 +20,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.DataStreamItemWriter;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -41,6 +43,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     protected final ConnectionDefinition connection;
     protected final Boolean customAction;
     protected final Help customActionHelp;
+    protected final DataStreamItemReader dataStreamItemReader;
+    protected final DataStreamItemWriter dataStreamItemWriter;
     protected final String description;
     protected final String icon;
     protected final List<String> tags;
@@ -57,6 +61,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
         this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
+        this.dataStreamItemReader = OptionalUtils.orElse(componentDefinition.getDataStreamItemReader(), null);
+        this.dataStreamItemWriter = OptionalUtils.orElse(componentDefinition.getDataStreamItemWriter(), null);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
@@ -91,6 +97,16 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public Optional<Help> getCustomActionHelp() {
         return Optional.ofNullable(customActionHelp);
+    }
+
+    @Override
+    public Optional<DataStreamItemReader> getDataStreamItemReader() {
+        return Optional.ofNullable(dataStreamItemReader);
+    }
+
+    @Override
+    public Optional<DataStreamItemWriter> getDataStreamItemWriter() {
+        return Optional.ofNullable(dataStreamItemWriter);
     }
 
     @Override
