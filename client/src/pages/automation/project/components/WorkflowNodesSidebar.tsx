@@ -57,7 +57,7 @@ const WorkflowNodesSidebar = ({
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <div>
+        <>
             <header className="border-b border-gray-200 p-3 text-center text-gray-600">
                 <Input
                     name="workflowNodeFilter"
@@ -67,7 +67,7 @@ const WorkflowNodesSidebar = ({
                 />
             </header>
 
-            <main>
+            <main className="overflow-y-auto">
                 <WorkflowNodesTabs
                     actionComponentDefinitions={filteredActionComponentDefinitions}
                     itemsDraggable
@@ -75,7 +75,7 @@ const WorkflowNodesSidebar = ({
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />
             </main>
-        </div>
+        </>
     );
 };
 
