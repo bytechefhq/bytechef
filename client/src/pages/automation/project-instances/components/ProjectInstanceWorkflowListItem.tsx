@@ -168,7 +168,7 @@ const ProjectInstanceWorkflowListItem = ({
 
                         {projectInstanceWorkflow.staticWebhookUrl && (
                             <Button
-                                disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
+                                disabled={!projectInstanceWorkflow.enabled}
                                 onClick={() => copyToClipboard(projectInstanceWorkflow.staticWebhookUrl!)}
                                 size="icon"
                                 variant="ghost"
