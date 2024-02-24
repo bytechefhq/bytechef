@@ -18,7 +18,7 @@ package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
-import com.bytechef.platform.configuration.constant.MetadataConstants;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;

@@ -23,7 +23,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
-import com.bytechef.platform.configuration.constant.MetadataConstants;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
