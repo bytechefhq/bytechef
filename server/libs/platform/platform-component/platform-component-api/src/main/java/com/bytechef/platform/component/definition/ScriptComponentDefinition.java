@@ -25,6 +25,11 @@ public interface ScriptComponentDefinition extends ComponentDefinition {
 
     /**
      *
+     */
+    String SCRIPT = "script";
+
+    /**
+     *
      * @return
      */
     FilterConnectionDefinitionPredicate getFilterConnectionDefinition();

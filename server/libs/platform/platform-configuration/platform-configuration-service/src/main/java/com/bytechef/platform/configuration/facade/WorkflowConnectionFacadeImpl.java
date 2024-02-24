@@ -17,8 +17,8 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.platform.component.constant.ScriptConstants;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
+import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.DataStream;
@@ -72,7 +72,8 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         if (workflowTask
             && StringUtils.startsWith(componentDefinition.getName(), DataStreamComponentDefinition.DATA_STREAM)) {
             workflowConnections = getWorkflowConnections(DataStream.of(extensions), workflowNodeName);
-        } else if (workflowTask && StringUtils.startsWith(componentDefinition.getName(), ScriptConstants.SCRIPT)) {
+        } else if (workflowTask
+            && StringUtils.startsWith(componentDefinition.getName(), ScriptComponentDefinition.SCRIPT)) {
             workflowConnections = WorkflowConnection.of(extensions, workflowNodeName);
         } else if (componentDefinition.getConnection() != null) {
             workflowConnections = List.of(
