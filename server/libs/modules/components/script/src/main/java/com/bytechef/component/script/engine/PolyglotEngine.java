@@ -17,7 +17,7 @@
 package com.bytechef.component.script.engine;
 
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
-import static com.bytechef.platform.component.constant.ScriptConstants.SCRIPT;
+import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.commons.util.MapUtils;
 import java.util.Map;
