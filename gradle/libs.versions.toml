@@ -55,5 +55,5 @@ software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.23.19"
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.4"
-org-openapi-generator = "org.openapi.generator:7.2.0"
+org-openapi-generator = "org.openapi.generator:7.3.0"
 org-sonarqube = "org.sonarqube:4.2.1.3168"
