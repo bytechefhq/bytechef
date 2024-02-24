@@ -992,10 +992,10 @@ public final class ComponentDSL {
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<? extends ModifiableActionDefinition> actionDefinitions;
+        private List<? extends ActionDefinition> actionDefinitions;
         private Boolean additionalConnections;
         private String category;
-        private ModifiableConnectionDefinition connectionDefinition;
+        private ConnectionDefinition connectionDefinition;
         private Boolean connectionRequired;
         private Boolean customAction;
         private Help customActionHelp;
@@ -1009,7 +1009,7 @@ public final class ComponentDSL {
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<? extends ModifiableTriggerDefinition> triggerDefinitions;
+        private List<? extends TriggerDefinition> triggerDefinitions;
         private List<String> workflowConnectionKeys;
 
         private ModifiableComponentDefinition(String name) {
@@ -1017,7 +1017,7 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(
+        public final <A extends ActionDefinition> ModifiableComponentDefinition actions(
             A... actionDefinitions) {
 
             if (actionDefinitions != null) {
@@ -1027,7 +1027,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public <A extends ModifiableActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
+        public <A extends ActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
             this.actionDefinitions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
 
             return this;
@@ -1145,7 +1145,7 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(
+        public final <T extends TriggerDefinition> ModifiableComponentDefinition triggers(
             T... triggerDefinitions) {
 
             if (triggerDefinitions != null) {
@@ -1155,7 +1155,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public <T extends ModifiableTriggerDefinition> ModifiableComponentDefinition triggers(
+        public <T extends TriggerDefinition> ModifiableComponentDefinition triggers(
             List<T> triggerDefinitions) {
 
             this.triggerDefinitions = Collections.unmodifiableList(Objects.requireNonNull(triggerDefinitions));

@@ -122,5 +122,4 @@ public interface ActionDefinition {
         Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
-
 }
