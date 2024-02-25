@@ -17,6 +17,7 @@ interface SidebarContentLayoutProps {
     rightSidebarWidth?: '96' | '460';
     rightToolbarBody?: ReactNode;
     rightToolbarOpen?: boolean;
+    topHeader?: ReactNode;
 }
 
 const leftSidebarWidths = {
@@ -47,11 +48,12 @@ const LayoutContainer = ({
     rightSidebarWidth = '460',
     rightToolbarBody,
     rightToolbarOpen = false,
+    topHeader,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <>
+        <div className={twMerge('size-full', className)}>
             <Dialog open={sidebarOpen}>
                 <DialogContent className="h-full sm:max-w-[425px]">
                     <div className="relative">
@@ -79,7 +81,9 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden md:fixed md:inset-y-0 md:flex md:flex-col border-r',
+                        'hidden md:flex md:flex-col border-r bg-white',
+                        !topHeader && 'md:fixed md:inset-y-0',
+                        topHeader && 'md:absolute md:bottom-0 md:top-14',
                         leftSidebarWidths[leftSidebarWidth][0]
                     )}
                 >
@@ -91,8 +95,10 @@ const LayoutContainer = ({
                 </aside>
             )}
 
+            {topHeader}
+
             <div className={twMerge('flex h-full w-full', leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1])}>
-                <main className={twMerge('flex h-full w-full flex-col', className)}>
+                <main className="flex size-full flex-col">
                     {header}
 
                     <div className="flex flex-1 overflow-y-auto">{children}</div>
@@ -118,7 +124,7 @@ const LayoutContainer = ({
                     </aside>
                 )}
             </div>
-        </>
+        </div>
     );
 };
 

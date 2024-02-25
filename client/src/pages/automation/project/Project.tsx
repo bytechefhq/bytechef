@@ -386,8 +386,52 @@ const Project = () => {
         <>
             <LayoutContainer
                 className="bg-muted dark:bg-background"
-                header={
-                    <header className="my-4 ml-4 flex items-center">
+                leftSidebarBody={
+                    <div className="py-1.5">
+                        {!workflowIsRunning ? (
+                            workflowTestExecution?.job ? (
+                                <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
+                            ) : (
+                                <div className="absolute inset-x-0 bottom-0 top-2/4">
+                                    <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
+                                        <RefreshCwOffIcon className="size-16 text-gray-300" />
+
+                                        <span>Workflow has not yet been executed.</span>
+                                    </div>
+                                </div>
+                            )
+                        ) : (
+                            <div className="absolute inset-x-0 bottom-0 top-2/4">
+                                <div className="flex w-full flex-col items-center">
+                                    <span className="flex animate-spin space-x-2 text-gray-400">
+                                        <RefreshCwIcon className="size-16" />
+                                    </span>
+
+                                    <span className="text-gray-500">Workflow is running...</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                }
+                leftSidebarOpen={leftSidebarOpen}
+                leftSidebarWidth="112"
+                rightSidebarBody={
+                    componentDefinitions &&
+                    taskDispatcherDefinitions && (
+                        <WorkflowNodesSidebar
+                            data={{
+                                componentDefinitions,
+                                taskDispatcherDefinitions,
+                            }}
+                        />
+                    )
+                }
+                rightSidebarOpen={rightSidebarOpen}
+                rightSidebarWidth="96"
+                rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
+                rightToolbarOpen={true}
+                topHeader={
+                    <header className="flex items-center border-b px-3 py-2">
                         <div className="flex">
                             <div className="mr-2 flex items-center">
                                 <h1>{project?.name}</h1>
@@ -525,7 +569,7 @@ const Project = () => {
                             />
                         </div>
 
-                        <div className="mr-4 flex items-center space-x-1">
+                        <div className="flex items-center space-x-1">
                             {!workflowIsRunning && runDisabled && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -615,50 +659,6 @@ const Project = () => {
                         </div>
                     </header>
                 }
-                leftSidebarBody={
-                    <div className="py-1.5">
-                        {!workflowIsRunning ? (
-                            workflowTestExecution?.job ? (
-                                <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
-                            ) : (
-                                <div className="absolute inset-x-0 bottom-0 top-2/4">
-                                    <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
-                                        <RefreshCwOffIcon className="size-16 text-gray-300" />
-
-                                        <span>Workflow has not yet been executed.</span>
-                                    </div>
-                                </div>
-                            )
-                        ) : (
-                            <div className="absolute inset-x-0 bottom-0 top-2/4">
-                                <div className="flex w-full flex-col items-center">
-                                    <span className="flex animate-spin space-x-2 text-gray-400">
-                                        <RefreshCwIcon className="size-16" />
-                                    </span>
-
-                                    <span className="text-gray-500">Workflow is running...</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                }
-                leftSidebarOpen={leftSidebarOpen}
-                leftSidebarWidth="112"
-                rightSidebarBody={
-                    componentDefinitions &&
-                    taskDispatcherDefinitions && (
-                        <WorkflowNodesSidebar
-                            data={{
-                                componentDefinitions,
-                                taskDispatcherDefinitions,
-                            }}
-                        />
-                    )
-                }
-                rightSidebarOpen={rightSidebarOpen}
-                rightSidebarWidth="96"
-                rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarOpen={true}
             >
                 <PageLoader
                     errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
