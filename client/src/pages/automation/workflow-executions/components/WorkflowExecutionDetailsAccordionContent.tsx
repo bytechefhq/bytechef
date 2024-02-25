@@ -1,4 +1,3 @@
-import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import {ExecutionErrorModel} from '@/middleware/automation/workflow/execution';
 import {AccordionContent} from '@radix-ui/react-accordion';
@@ -21,23 +20,21 @@ const WorkflowExecutionDetailsAccordionContent = ({
 }) => {
     return (
         <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
-            <div className="space-y-2 rounded-lg">
-                <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                    <span className="text-sm font-medium uppercase">Input</span>
+            <div className="space-y-2 rounded-md bg-muted p-2">
+                <header className="flex items-center justify-between">
+                    <span className="text-sm font-semibold uppercase">Input</span>
 
                     <div className="flex items-center space-x-1">
                         <span className="text-xs">{startDate?.toLocaleString()}</span>
 
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <ExpandIcon className="h-4" />
-                                </Button>
+                                <ExpandIcon className="h-4 cursor-pointer" />
                             </DialogTrigger>
 
                             <DialogContent className="max-w-[1000px]">
                                 <DialogHeader>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between uppercase">
                                         <DialogTitle>Input</DialogTitle>
 
                                         <DialogClose asChild>
@@ -79,23 +76,21 @@ const WorkflowExecutionDetailsAccordionContent = ({
                 </div>
             </div>
 
-            <div className="space-y-2 rounded-lg">
-                <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                    <span className="text-sm font-medium uppercase">Output</span>
+            <div className="space-y-2 rounded-md bg-muted p-2">
+                <header className="flex items-center justify-between">
+                    <span className="text-sm font-semibold uppercase">Output</span>
 
                     <div className="flex items-center space-x-1">
                         <span className="text-xs">{endDate?.toLocaleString()}</span>
 
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <ExpandIcon className="h-4" />
-                                </Button>
+                                <ExpandIcon className="h-4 cursor-pointer" />
                             </DialogTrigger>
 
                             <DialogContent className="max-w-[1000px]">
                                 <DialogHeader>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between uppercase">
                                         <DialogTitle>Output</DialogTitle>
 
                                         <DialogClose asChild>
@@ -138,23 +133,21 @@ const WorkflowExecutionDetailsAccordionContent = ({
             </div>
 
             {error && (
-                <div className="space-y-2 rounded-lg">
-                    <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                        <span className="text-sm font-medium uppercase text-destructive">Error</span>
+                <div className="space-y-2 rounded-md bg-muted p-2">
+                    <header className="flex items-center justify-between">
+                        <span className="text-sm font-semibold uppercase text-destructive">Error</span>
 
                         <div className="flex space-x-1">
                             <span className="text-xs">{endDate?.toLocaleString()}</span>
 
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button size="icon" variant="ghost">
-                                        <ExpandIcon className="h-4" />
-                                    </Button>
+                                    <ExpandIcon className="h-4 cursor-pointer" />
                                 </DialogTrigger>
 
                                 <DialogContent className="max-w-[1000px]">
                                     <DialogHeader>
-                                        <div className="flex items-center justify-between">
+                                        <div className="flex items-center justify-between uppercase">
                                             <DialogTitle className="text-destructive">Error</DialogTitle>
 
                                             <DialogClose asChild>
@@ -185,8 +178,6 @@ const WorkflowExecutionDetailsAccordionContent = ({
 
                     <div className="overflow-x-auto">
                         <div className="flex flex-col space-y-1">
-                            <div className="text-sm font-semibold">Message</div>
-
                             <div className="text-sm">{error.message}</div>
                         </div>
                     </div>

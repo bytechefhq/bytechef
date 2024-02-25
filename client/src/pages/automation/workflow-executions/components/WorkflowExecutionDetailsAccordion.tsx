@@ -1,8 +1,8 @@
 import {Accordion} from '@/components/ui/accordion';
 import {JobModel, TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
+import WorkflowExecutionDetailsAccordionBadge from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionBadge';
 import WorkflowExecutionDetailsTaskAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTaskAccordionItem';
 import WorkflowExecutionDetailsTriggerAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTriggerAccordionItem';
-import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionDetailsAccordion = ({
@@ -29,25 +29,21 @@ const WorkflowExecutionDetailsAccordion = ({
     return (
         <>
             <div className="px-3 py-4">
-                <div className="mb-3 flex items-center justify-between">
+                <div className="mb-3 flex items-center gap-x-2">
+                    <WorkflowExecutionDetailsAccordionBadge
+                        success={!!(taskExecutionsCompleted && triggerExecutionCompleted)}
+                    />
+
                     <span
                         className={twMerge(
                             (!taskExecutionsCompleted || !triggerExecutionCompleted) && 'text-destructive',
-                            'font-semibold'
+                            'font-semibold uppercase text-sm'
                         )}
                     >
                         {taskExecutionsCompleted && triggerExecutionCompleted
                             ? 'Workflow executed successfully'
                             : 'Workflow failed'}
                     </span>
-
-                    {taskExecutionsCompleted && triggerExecutionCompleted && (
-                        <CheckCircledIcon className="size-5 text-green-500" />
-                    )}
-
-                    {(!taskExecutionsCompleted || !triggerExecutionCompleted) && (
-                        <CrossCircledIcon className="size-5 text-red-500" />
-                    )}
                 </div>
 
                 <div className="flex justify-between text-xs">
