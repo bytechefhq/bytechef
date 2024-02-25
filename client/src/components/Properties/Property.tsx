@@ -1,3 +1,4 @@
+import PropertyCodeEditor from '@/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
 import PropertyComboBox from '@/components/Properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/components/Properties/components/PropertyDynamicProperties';
 import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
@@ -16,7 +17,6 @@ import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType'
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
-import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
@@ -557,29 +557,14 @@ const Property = ({
                         )}
 
                         {controlType === 'CODE_EDITOR' && (
-                            <div className="size-full border-2">
-                                <Editor
-                                    defaultValue="// Add your custom code here..."
-                                    language={actionName}
-                                    options={{
-                                        extraEditorClassName: 'code-editor',
-                                        folding: false,
-                                        glyphMargin: false,
-                                        lineDecorationsWidth: 0,
-                                        lineNumbers: 'off',
-                                        lineNumbersMinChars: 0,
-                                        minimap: {
-                                            enabled: false,
-                                        },
-                                        scrollBeyondLastLine: false,
-                                        scrollbar: {
-                                            horizontalScrollbarSize: 4,
-                                            verticalScrollbarSize: 4,
-                                        },
-                                        tabSize: 2,
-                                    }}
-                                />
-                            </div>
+                            <PropertyCodeEditor
+                                description={description}
+                                key={name}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                name={name!}
+                                required={required}
+                            />
                         )}
 
                         {controlType === 'TEXT_AREA' && (
