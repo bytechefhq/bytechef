@@ -27,7 +27,7 @@ const WorkflowNodesTabs = ({
 }: WorkflowNodesTabsProps) => (
     <div className="mt-2 w-full px-3">
         <Tabs className="w-full" defaultValue={hideActionComponents ? 'triggers' : 'components'}>
-            <TabsList className="flex w-full justify-between">
+            <TabsList className="sticky flex w-full justify-between">
                 {!hideTriggerComponents && (
                     <TabsTrigger className="w-full" value="triggers">
                         Triggers
