@@ -618,7 +618,7 @@ const Project = () => {
                                     size="sm"
                                     variant="destructive"
                                 >
-                                    <SquareIcon className="h-5" /> Running
+                                    <SquareIcon className="h-5" /> Stop
                                 </Button>
                             )}
 
