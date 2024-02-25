@@ -586,6 +586,7 @@ const Property = ({
                                 description={description}
                                 key={name}
                                 label={label}
+                                leadingIcon={typeIcon}
                                 name={name!}
                                 required={required}
                             />
