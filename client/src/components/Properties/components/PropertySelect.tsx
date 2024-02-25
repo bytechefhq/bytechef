@@ -14,6 +14,7 @@ export type SelectOptionType = {
 
 interface PropertySelectProps {
     options: Array<SelectOptionType>;
+    defaultValue?: string;
     description?: string;
     label?: string;
     leadingIcon?: ReactNode;
@@ -25,6 +26,7 @@ interface PropertySelectProps {
 }
 
 const PropertySelect = ({
+    defaultValue,
     description,
     label,
     leadingIcon,
@@ -57,7 +59,7 @@ const PropertySelect = ({
         )}
 
         {options.length ? (
-            <Select name={name} onValueChange={onValueChange} value={value}>
+            <Select defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value}>
                 <SelectTrigger aria-label="Select" className={twMerge(leadingIcon && 'relative')}>
                     <>
                         {leadingIcon ? (
