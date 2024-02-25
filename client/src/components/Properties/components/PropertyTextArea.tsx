@@ -2,18 +2,19 @@ import {Label} from '@/components/ui/label';
 import {Textarea, TextareaProps} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {forwardRef} from 'react';
+import {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyTextAreaProps extends TextareaProps {
     description?: string;
     error?: string | undefined;
     label?: string;
+    leadingIcon?: ReactNode;
     name: string;
 }
 
 const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
-    ({description, error, label, name, required, ...props}, ref) => (
+    ({description, error, label, leadingIcon, name, required, title, ...props}, ref) => (
         <fieldset className="mb-3 w-full">
             {label && (
                 <div className="flex items-center">
@@ -35,14 +36,22 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                 </div>
             )}
 
-            <div className={twMerge([label && 'mt-1'])}>
-                <Textarea id={name} name={name} ref={ref} rows={5} {...props} />
+            <div className={twMerge([label && 'mt-1', leadingIcon && 'relative'])} title={title}>
+                <div className={twMerge(leadingIcon && 'relative rounded-md')}>
+                    {leadingIcon && (
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-300 bg-gray-100 px-3">
+                            {leadingIcon}
+                        </div>
+                    )}
 
-                {error && (
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
-                    </div>
-                )}
+                    <Textarea id={name} name={name} ref={ref} rows={5} {...props} />
+
+                    {error && (
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
+                        </div>
+                    )}
+                </div>
             </div>
 
             {error && (
