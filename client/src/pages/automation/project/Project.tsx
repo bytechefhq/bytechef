@@ -337,6 +337,8 @@ const Project = () => {
     };
 
     const handleProjectWorkflowValueChange = (id: string) => {
+        setWorkflowTestExecution(undefined);
+
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
     };
 
@@ -387,31 +389,27 @@ const Project = () => {
             <LayoutContainer
                 className="bg-muted dark:bg-background"
                 leftSidebarBody={
-                    <div className="py-1.5">
+                    <>
                         {!workflowIsRunning ? (
                             workflowTestExecution?.job ? (
                                 <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
                             ) : (
-                                <div className="absolute inset-x-0 bottom-0 top-2/4">
-                                    <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
-                                        <RefreshCwOffIcon className="size-16 text-gray-300" />
+                                <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
+                                    <RefreshCwOffIcon className="size-5" />
 
-                                        <span>Workflow has not yet been executed.</span>
-                                    </div>
+                                    <span>Workflow has not yet been executed.</span>
                                 </div>
                             )
                         ) : (
-                            <div className="absolute inset-x-0 bottom-0 top-2/4">
-                                <div className="flex w-full flex-col items-center">
-                                    <span className="flex animate-spin space-x-2 text-gray-400">
-                                        <RefreshCwIcon className="size-16" />
-                                    </span>
+                            <div className="flex size-full items-center justify-center gap-x-1 p-3">
+                                <span className="flex animate-spin text-gray-400">
+                                    <RefreshCwIcon className="size-5" />
+                                </span>
 
-                                    <span className="text-gray-500">Workflow is running...</span>
-                                </div>
+                                <span className="text-muted-foreground">Workflow is running...</span>
                             </div>
                         )}
-                    </div>
+                    </>
                 }
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="112"
@@ -575,10 +573,10 @@ const Project = () => {
                                     <TooltipTrigger asChild>
                                         <span tabIndex={0}>
                                             <Button
-                                                className="bg-success text-success-foreground hover:bg-success/80"
+                                                className="font-semibold"
                                                 disabled={runDisabled}
                                                 size="sm"
-                                                variant="secondary"
+                                                variant="success"
                                             >
                                                 <PlayIcon className="h-5" /> Run
                                             </Button>
@@ -597,11 +595,11 @@ const Project = () => {
                                     <TooltipTrigger asChild>
                                         <span tabIndex={0}>
                                             <Button
-                                                className="bg-success text-success-foreground hover:bg-success/80"
+                                                className="font-semibold"
                                                 disabled={runDisabled}
                                                 onClick={handleRunClick}
                                                 size="sm"
-                                                variant="secondary"
+                                                variant="success"
                                             >
                                                 <PlayIcon className="h-5" /> Run
                                             </Button>
@@ -737,12 +735,10 @@ const Project = () => {
                             onClose={() => {
                                 setShowWorkflowCodeEditorSheet(false);
                             }}
-                            onRunClick={handleRunClick}
                             projectId={+projectId!}
                             runDisabled={runDisabled}
                             testConfigurationDisabled={testConfigurationDisabled}
                             workflow={workflow}
-                            workflowIsRunning={workflowIsRunning}
                             workflowTestConfiguration={workflowTestConfiguration}
                         />
                     )}

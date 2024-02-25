@@ -1,4 +1,5 @@
 import {TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
+import WorkflowExecutionDetailsAccordionBadge from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionBadge';
 import WorkflowExecutionDetailsAccordionContent from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionContent';
 import {AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
@@ -15,17 +16,21 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
 
     return (
         <AccordionItem key={id} value={id || ''}>
-            <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
-                <div className="flex items-center text-sm">
-                    {triggerExecution?.component?.icon && (
-                        <InlineSVG className="mr-1 size-6" src={triggerExecution?.component?.icon} />
-                    )}
+            <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white p-3 data-[state=closed]:border-b">
+                <div className="flex items-center space-x-2 text-sm">
+                    <WorkflowExecutionDetailsAccordionBadge success={triggerExecution.status === 'COMPLETED'} />
 
-                    <span>{component?.title}</span>
+                    <div className="flex items-center gap-x-1">
+                        {triggerExecution?.component?.icon && (
+                            <InlineSVG className="size-4" src={triggerExecution?.component?.icon} />
+                        )}
 
-                    <span className="text-xs text-muted-foreground">
-                        ({workflowTrigger?.name || workflowTrigger?.type})
-                    </span>
+                        <span>{component?.title}</span>
+
+                        <span className="text-xs text-muted-foreground">
+                            ({workflowTrigger?.name || workflowTrigger?.type})
+                        </span>
+                    </div>
                 </div>
 
                 <div className="flex items-center">
