@@ -542,6 +542,7 @@ const Property = ({
 
                         {controlType === 'SELECT' && type === 'BOOLEAN' && (
                             <PropertySelect
+                                defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -551,7 +552,7 @@ const Property = ({
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
-                                value={taskParameterValue || defaultValue?.toString()}
+                                value={taskParameterValue}
                             />
                         )}
 
