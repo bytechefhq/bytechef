@@ -57,7 +57,7 @@ const WorkflowNodesSidebar = ({
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <>
+        <div className="flex h-full flex-col bg-white pb-12">
             <header className="border-b border-gray-200 p-3 text-center text-gray-600">
                 <Input
                     name="workflowNodeFilter"
@@ -75,7 +75,7 @@ const WorkflowNodesSidebar = ({
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />
             </main>
-        </>
+        </div>
     );
 };
 
