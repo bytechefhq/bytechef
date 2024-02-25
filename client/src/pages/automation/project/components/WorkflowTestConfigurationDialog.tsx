@@ -156,14 +156,14 @@ const WorkflowTestConfigurationDialog = ({
     );
 
     const workflowTestConfigurationConnections = workflowConnections.map((workflowConnection) => {
-        const workflowTestConfigurationConfiguration = (workflowTestConfiguration?.connections ?? []).find(
+        const workflowTestConfigurationConnection = (workflowTestConfiguration?.connections ?? []).find(
             (curWorkflowTestConfigurationConfiguration) =>
                 curWorkflowTestConfigurationConfiguration.workflowNodeName === workflowConnection.workflowNodeName &&
                 curWorkflowTestConfigurationConfiguration.workflowConnectionKey === workflowConnection.key
         );
 
         return (
-            workflowTestConfigurationConfiguration ??
+            workflowTestConfigurationConnection ??
             ({
                 workflowConnectionKey: workflowConnection.key,
                 workflowNodeName: workflowConnection.workflowNodeName,
