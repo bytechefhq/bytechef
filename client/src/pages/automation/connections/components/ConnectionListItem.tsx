@@ -32,7 +32,6 @@ import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../../components/TagList';
 
@@ -123,12 +122,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            <Badge
-                                className={twMerge(
-                                    connection.active && 'bg-success text-success-foreground hover:bg-success'
-                                )}
-                                variant="secondary"
-                            >
+                            <Badge variant={connection.active ? 'success' : 'secondary'}>
                                 {connection.active ? 'Active' : 'Not Active'}
                             </Badge>
 

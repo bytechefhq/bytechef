@@ -32,7 +32,6 @@ import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../../components/TagList';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
@@ -153,12 +152,7 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Badge
-                            className={twMerge(
-                                projectInstance.enabled && 'bg-success text-success-foreground hover:bg-success'
-                            )}
-                            variant="secondary"
-                        >
+                        <Badge variant={projectInstance.enabled ? 'success' : 'secondary'}>
                             {projectInstance.enabled ? 'Enabled' : 'Disabled'}
                         </Badge>
 

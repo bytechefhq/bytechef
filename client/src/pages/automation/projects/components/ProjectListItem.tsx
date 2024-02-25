@@ -31,7 +31,6 @@ import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../../components/TagList';
 import ProjectDialog from './ProjectDialog';
@@ -148,13 +147,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Badge
-                            className={twMerge(
-                                project.status === ProjectModelStatusEnum.Published &&
-                                    'border-transparent bg-success text-success-foreground hover:bg-success'
-                            )}
-                            variant="secondary"
-                        >
+                        <Badge variant={project.status === ProjectModelStatusEnum.Published ? 'success' : 'secondary'}>
                             {project.status === ProjectModelStatusEnum.Published
                                 ? `Published V${project.projectVersion}`
                                 : 'Not Published'}
