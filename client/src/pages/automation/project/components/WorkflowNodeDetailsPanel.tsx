@@ -31,7 +31,7 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 import getSubProperties from '../utils/getSubProperties';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentActionSelect from './CurrentActionSelect';
-import ConnectionsTab from './node-details-tabs/ConnectionsTab';
+import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
 
@@ -49,8 +49,8 @@ const TABS = [
         name: 'destination',
     },
     {
-        label: 'Connections',
-        name: 'connections',
+        label: 'Connection',
+        name: 'connection',
     },
     {
         label: 'Properties',
@@ -275,7 +275,7 @@ const WorkflowNodeDetailsPanel = ({
     });
 
     const nodeTabs = TABS.filter(({name}) => {
-        if (name === 'connections') {
+        if (name === 'connection') {
             return currentComponent?.name && componentDefinitionNames?.includes(currentComponent.name);
         }
 
@@ -358,7 +358,7 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         if (
-            activeTab === 'connections' &&
+            activeTab === 'connection' &&
             currentComponent?.name &&
             !componentDefinitionNames?.includes(currentComponent.name)
         ) {
@@ -478,8 +478,8 @@ const WorkflowNodeDetailsPanel = ({
                                             <DestinationTab componentDefinition={currentComponent} />
                                         )}
 
-                                        {activeTab === 'connections' && workflowConnections.length > 0 && (
-                                            <ConnectionsTab
+                                        {activeTab === 'connection' && workflowConnections.length > 0 && (
+                                            <ConnectionTab
                                                 componentDefinition={currentComponent}
                                                 workflowConnections={workflowConnections}
                                                 workflowId={workflow.id!}

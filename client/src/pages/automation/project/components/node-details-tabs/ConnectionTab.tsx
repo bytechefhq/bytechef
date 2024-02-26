@@ -22,7 +22,7 @@ import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
-const ConnectionsTab = ({
+const ConnectionTab = ({
     componentDefinition,
     workflowConnections,
     workflowId,
@@ -78,10 +78,13 @@ const ConnectionsTab = ({
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
             {workflowConnections?.length ? (
                 workflowConnections.map((workflowConnection) => (
-                    <div
-                        className="space-y-2 text-sm font-medium capitalize text-muted-foreground"
-                        key={workflowConnection.key}
-                    >
+                    <fieldset className="space-y-2" key={workflowConnection.key}>
+                        <Label>
+                            {`${componentDefinition.title} Connection`}
+
+                            {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                        </Label>
+
                         {workflowConnections.length > 1 && <Label>{workflowConnection.key}</Label>}
 
                         <Select
@@ -119,7 +122,7 @@ const ConnectionsTab = ({
                                     ))}
                             </SelectContent>
                         </Select>
-                    </div>
+                    </fieldset>
                 ))
             ) : (
                 <EmptyList
@@ -169,4 +172,4 @@ const ConnectionsTab = ({
     );
 };
 
-export default ConnectionsTab;
+export default ConnectionTab;
