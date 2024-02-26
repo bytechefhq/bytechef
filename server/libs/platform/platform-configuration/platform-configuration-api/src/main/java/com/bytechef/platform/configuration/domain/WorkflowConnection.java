@@ -32,6 +32,13 @@ import java.util.Map;
 public record WorkflowConnection(
     String componentName, int componentVersion, String workflowNodeName, String key, boolean required) {
 
+    public static int count(Map<String, ?> extensions) {
+        Map<String, Map<String, ?>> connections = MapUtils.getMap(
+            extensions, WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
+
+        return connections.size();
+    }
+
     public static List<WorkflowConnection> of(Map<String, ?> extensions, String workflowNodeName) {
         Map<String, Map<String, ?>> connections = MapUtils.getMap(
             extensions, WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
