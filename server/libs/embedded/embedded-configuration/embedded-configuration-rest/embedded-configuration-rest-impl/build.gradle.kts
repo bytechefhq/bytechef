@@ -20,6 +20,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/../embedded-configuration-rest-api/generated")
     schemaMappings.set(
         mapOf(
+            "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
             "Workflow" to "com.bytechef.platform.configuration.web.rest.model.WorkflowModel",
             "WorkflowBasic" to "com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel",
             "WorkflowConnection" to "com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel",

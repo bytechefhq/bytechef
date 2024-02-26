@@ -95,8 +95,8 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ComponentDefinition> getDataStreamComponentDefinitions(
-        int componentVersion, ComponentType componentType) {
+    public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
+        // TODO
 
         throw new UnsupportedOperationException();
     }

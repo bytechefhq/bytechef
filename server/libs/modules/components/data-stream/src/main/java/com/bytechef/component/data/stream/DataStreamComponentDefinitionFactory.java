@@ -17,7 +17,7 @@
 package com.bytechef.component.data.stream;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.platform.component.constant.DataStreamConstants.DATA_STREAM;
+import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;

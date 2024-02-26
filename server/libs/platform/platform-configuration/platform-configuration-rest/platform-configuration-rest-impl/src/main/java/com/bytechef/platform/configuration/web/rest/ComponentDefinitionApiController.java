@@ -83,12 +83,10 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
     }
 
     @Override
-    public ResponseEntity<List<ComponentDefinitionBasicModel>> getDataStreamComponentDefinitions(
-        Integer componentVersion, String componentType) {
-
+    public ResponseEntity<List<ComponentDefinitionBasicModel>> getDataStreamComponentDefinitions(String componentType) {
         return ResponseEntity.ok(
             componentDefinitionService
-                .getDataStreamComponentDefinitions(componentVersion, ComponentType.valueOf(componentType))
+                .getDataStreamComponentDefinitions(ComponentType.valueOf(componentType))
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

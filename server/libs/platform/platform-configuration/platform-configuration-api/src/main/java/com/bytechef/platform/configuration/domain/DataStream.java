@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Ivica Cardic
  */
-public record DataStream(ComponentType source, ComponentType destination) {
+public record DataStream(DataStreamComponent source, DataStreamComponent destination) {
 
     public static DataStream of(Map<String, ?> extensions) {
         DataStream dataStream = null;
@@ -39,20 +39,20 @@ public record DataStream(ComponentType source, ComponentType destination) {
                 extensions, WorkflowExtConstants.DESTINATION, new TypeReference<>() {});
 
             dataStream = new DataStream(
-                sourceMap == null ? null : toComponentType(sourceMap),
-                destinationMap == null ? null : toComponentType(destinationMap));
+                sourceMap == null ? null : toDataStreamComponent(sourceMap),
+                destinationMap == null ? null : toDataStreamComponent(destinationMap));
         }
 
         return dataStream;
     }
 
-    private static ComponentType toComponentType(Map<String, ?> componentTypeMap) {
-        return new ComponentType(
-            MapUtils.getRequiredString(componentTypeMap, WorkflowExtConstants.COMPONENT_NAME),
-            MapUtils.getRequiredInteger(componentTypeMap, WorkflowExtConstants.COMPONENT_VERSION),
-            MapUtils.getMap(componentTypeMap, WorkflowConstants.PARAMETERS, new TypeReference<>() {}, Map.of()));
+    private static DataStreamComponent toDataStreamComponent(Map<String, ?> map) {
+        return new DataStreamComponent(
+            MapUtils.getRequiredString(map, WorkflowExtConstants.COMPONENT_NAME),
+            MapUtils.getRequiredInteger(map, WorkflowExtConstants.COMPONENT_VERSION),
+            MapUtils.getMap(map, WorkflowConstants.PARAMETERS, new TypeReference<>() {}, Map.of()));
     }
 
-    public record ComponentType(String componentName, int componentVersion, Map<String, ?> parameters) {
+    public record DataStreamComponent(String componentName, int componentVersion, Map<String, ?> parameters) {
     }
 }
