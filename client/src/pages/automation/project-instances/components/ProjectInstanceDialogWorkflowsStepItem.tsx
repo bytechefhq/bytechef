@@ -2,7 +2,7 @@ import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConfiguration';
-import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnection';
+import ProjectInstanceDialogWorkflowsStepItemConnections from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnections';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {Control, UseFormRegister, UseFormSetValue} from 'react-hook-form';
@@ -37,21 +37,15 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
 
     const {data: workflow} = useGetWorkflowQuery(workflowId);
 
-    let workflowConnections: WorkflowConnectionModel[] = [];
-
-    if (workflow) {
-        workflow.tasks?.forEach((task) => {
-            if (task.connections) {
-                workflowConnections = workflowConnections.concat(task.connections);
-            }
-        });
-
-        workflow.triggers?.forEach((trigger) => {
-            if (trigger.connections) {
-                workflowConnections = workflowConnections.concat(trigger.connections);
-            }
-        });
-    }
+    const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+        .flatMap((task) => {
+            return task.connections ?? [];
+        })
+        .concat(
+            (workflow?.triggers ?? []).flatMap((trigger) => {
+                return trigger.connections ?? [];
+            })
+        );
 
     return (
         <div>
@@ -112,19 +106,11 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                         )}
 
                         <TabsContent className="grid gap-4" value="connections">
-                            {workflowConnections.length ? (
-                                workflowConnections.map((workflowConnection, workflowConnectionIndex) => (
-                                    <ProjectInstanceDialogWorkflowsStepItemConnection
-                                        control={control}
-                                        key={workflowConnectionIndex + '_' + workflowConnection.key}
-                                        workflowConnection={workflowConnection}
-                                        workflowConnectionIndex={workflowConnectionIndex}
-                                        workflowIndex={workflowIndex}
-                                    />
-                                ))
-                            ) : (
-                                <p className="text-sm">No defined connections.</p>
-                            )}
+                            <ProjectInstanceDialogWorkflowsStepItemConnections
+                                control={control}
+                                workflowConnections={workflowConnections}
+                                workflowIndex={workflowIndex}
+                            />
                         </TabsContent>
                     </Tabs>
                 </div>
