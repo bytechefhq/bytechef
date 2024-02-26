@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Helper component which contains operations to help you work with text.",
+  "icon": "path:assets/text-helper.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "htmlHelper",
+  "resources": null,
+  "version": 1,
+  "title": "Text Helper",
   "actions": [ {
     "batch": null,
-    "componentName": "htmlHelper",
-    "componentDescription": "Helper component which contains operations to help you work with text.",
-    "componentTitle": "Text Helper",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Extract content from the HTML content.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "extractContentFromHtml",
@@ -127,21 +135,10 @@
       "controlType": "SELECT"
     } ],
     "title": "Extract Content from HTML",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Helper component which contains operations to help you work with text.",
-  "icon": "path:assets/text-helper.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "htmlHelper",
-  "resources": null,
-  "version": 1,
-  "title": "Text Helper",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

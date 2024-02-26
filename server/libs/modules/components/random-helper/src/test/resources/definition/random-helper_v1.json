@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "The Random Helper allows you to generate random values.",
+  "icon": "path:assets/random-helper.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "randomHelper",
+  "resources": null,
+  "version": 1,
+  "title": "Random Helper",
   "actions": [ {
     "batch": null,
-    "componentName": "randomHelper",
-    "componentDescription": "The Random Helper allows you to generate random values.",
-    "componentTitle": "Random Helper",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Generates a random integer value.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "randomInt",
@@ -30,8 +38,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum possible generated value.",
@@ -49,10 +57,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Int",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -71,22 +80,17 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "randomHelper",
-    "componentDescription": "The Random Helper allows you to generate random values.",
-    "componentTitle": "Random Helper",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Generates a random float value.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "randomFloat",
@@ -108,8 +112,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum possible generated value.",
@@ -127,10 +131,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Float",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -152,25 +157,13 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
     "perform": { }
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "The Random Helper allows you to generate random values.",
-  "icon": "path:assets/random-helper.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "randomHelper",
-  "resources": null,
-  "version": 1,
-  "title": "Random Helper",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

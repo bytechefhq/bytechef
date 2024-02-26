@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Allows multiple operations over files on the filesystem.",
+  "icon": "path:assets/filesystem.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "filesystem",
+  "resources": null,
+  "version": 1,
+  "title": "Filesystem",
   "actions": [ {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": null,
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "readFile",
@@ -34,6 +42,7 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -133,14 +142,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": null,
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "writeFile",
@@ -258,6 +262,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -293,11 +298,11 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": {
         "bytes": 1024
@@ -306,20 +311,16 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a temporary directory on the filesystem.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createTempDir",
     "outputFunction": null,
     "properties": null,
     "title": "Create Temp Directory",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -346,14 +347,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getFilePath",
@@ -379,6 +375,7 @@
       "optionsDataSource": null
     } ],
     "title": "File Path",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -405,14 +402,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Lists a content of directory for the given path.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "ls",
@@ -462,6 +454,7 @@
       "controlType": "SELECT"
     } ],
     "title": "List",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -549,32 +542,27 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
     },
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a directory.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mkdir",
@@ -600,6 +588,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -626,14 +615,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "filesystem",
-    "componentDescription": "Allows multiple operations over files on the filesystem.",
-    "componentTitle": "Filesystem",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Removes the content of a directory.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "rm",
@@ -659,6 +643,7 @@
       "optionsDataSource": null
     } ],
     "title": "Remove",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -689,18 +674,6 @@
     },
     "perform": { }
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Allows multiple operations over files on the filesystem.",
-  "icon": "path:assets/filesystem.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "filesystem",
-  "resources": null,
-  "version": 1,
-  "title": "Filesystem",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

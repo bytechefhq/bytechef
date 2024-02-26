@@ -51,7 +51,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"batch":null,"componentName":null,"componentDescription":null,"componentTitle":null,"componentVersion":0,"deprecated":null,"description":"description","nodeDescriptionFunction":null,"help":null,"metadata":null,"name":"name","defaultOutputFunction":false,"outputFunction":null,"properties":null,"title":"title","output":null,"perform":{}}
+                {"batch":null,"defaultOutputFunction":false,"deprecated":null,"description":"description","help":null,"metadata":null,"name":"name","outputFunction":null,"properties":null,"title":"title","workflowNodeDescriptionFunction":null,"output":null,"perform":{}}
                 """,
             action);
     }
@@ -99,7 +99,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"actions":null,"category":null,"connection":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"allowedConnections":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
+                {"category":null,"customAction":null,"customActionHelp":null,"dataStreamItemReader":null,"dataStreamItemWriter":null,"description":"description","icon":"icon","tags":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","actions":null,"triggers":null,"connection":null}
                   """,
             componentDefinition);
     }

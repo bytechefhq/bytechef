@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
+  "icon": "path:assets/data-storage.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "dataStorage",
+  "resources": null,
+  "version": 1,
+  "title": "Data Storage",
   "actions": [ {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "appendValueToList",
@@ -46,8 +54,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.",
@@ -124,8 +132,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -145,8 +153,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -186,8 +194,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -203,8 +211,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -222,8 +230,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -259,8 +267,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -279,8 +287,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -315,8 +323,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
       "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
@@ -367,18 +375,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Append Value to List",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "atomicIncrement",
@@ -435,8 +439,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value that can be added to the existing numeric value, which may have a negative value.",
@@ -454,22 +458,18 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Atomic Increment",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "awaitGetValue",
@@ -526,8 +526,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
@@ -545,22 +545,18 @@
       "maxValue": 300,
       "minValue": 1,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Await Get Value",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "deleteValue",
@@ -617,22 +613,18 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     } ],
     "title": "Delete Value",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delete a value from the given index in a list.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "deleteValueFromlist",
@@ -689,8 +681,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.",
@@ -708,22 +700,18 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Delete Value from List",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getAllEntries",
@@ -761,22 +749,18 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     } ],
     "title": "Get All Entries(Keys and Values)",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getValue",
@@ -833,8 +817,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -892,8 +876,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -913,8 +897,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -954,8 +938,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -971,8 +955,8 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -990,8 +974,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1027,8 +1011,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1047,8 +1031,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1083,22 +1067,18 @@
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Get Value",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "setValue",
@@ -1155,8 +1135,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1214,8 +1194,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1235,8 +1215,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1276,8 +1256,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1293,8 +1273,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1312,8 +1292,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1349,8 +1329,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1369,8 +1349,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1405,22 +1385,18 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set Value",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "dataStorage",
-    "componentDescription": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "componentTitle": "Data Storage",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Set value under a specified index in a list.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "setValueInList",
@@ -1477,8 +1453,8 @@
         "label": "Account",
         "value": 4
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The index in a list to set a value under. The previous value will be overridden.",
@@ -1496,8 +1472,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1555,8 +1531,8 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1576,8 +1552,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1617,8 +1593,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1634,8 +1610,8 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1653,8 +1629,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1690,8 +1666,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1710,8 +1686,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1746,25 +1722,14 @@
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
     "title": "Set Value in List",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-  "icon": "path:assets/data-storage.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "dataStorage",
-  "resources": null,
-  "version": 1,
-  "title": "Data Storage",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

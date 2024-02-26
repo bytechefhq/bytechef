@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
+  "icon": "path:assets/petstore.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "petstore",
+  "resources": null,
+  "version": 1,
+  "title": "Petstore",
   "actions": [ {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Add a new pet to the store",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/pet",
@@ -288,6 +296,8 @@
       "optionsDataSource": null
     } ],
     "title": "Add a new pet to the store",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -559,18 +569,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Update an existing pet by Id",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/pet",
@@ -850,6 +854,8 @@
       "optionsDataSource": null
     } ],
     "title": "Update an existing pet",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1121,18 +1127,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1175,6 +1175,8 @@
       "optionsDataSource": null
     } ],
     "title": "Finds Pets by status",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1467,18 +1469,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1530,6 +1526,8 @@
       "optionsDataSource": null
     } ],
     "title": "Finds Pets by tags",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1822,18 +1820,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "delete a pet",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -1885,18 +1877,14 @@
       "optionsDataSource": null
     } ],
     "title": "Deletes a pet",
-    "output": null,
-    "perform": null
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns a single pet",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1927,6 +1915,8 @@
       "optionsDataSource": null
     } ],
     "title": "Find pet by ID",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2198,18 +2188,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "POST",
@@ -2282,18 +2266,14 @@
       "optionsDataSource": null
     } ],
     "title": "Updates a pet in the store with form data",
-    "output": null,
-    "perform": null
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/pet/{petId}/uploadImage",
@@ -2441,6 +2421,8 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "uploads an image",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2523,18 +2505,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns a map of status codes to quantities",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -2544,6 +2520,8 @@
     "outputFunction": null,
     "properties": [ ],
     "title": "Returns pet inventories by status",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2588,18 +2566,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Place a new order in the store",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/store/order",
@@ -2762,6 +2734,8 @@
       "optionsDataSource": null
     } ],
     "title": "Place an order for a pet",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2916,18 +2890,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -2958,18 +2926,14 @@
       "optionsDataSource": null
     } ],
     "title": "Delete purchase order by ID",
-    "output": null,
-    "perform": null
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -3000,6 +2964,8 @@
       "optionsDataSource": null
     } ],
     "title": "Find purchase order by ID",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3154,18 +3120,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/user",
@@ -3351,6 +3311,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create user",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3528,18 +3490,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates list of users with given input array",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/user/createWithList",
@@ -3746,6 +3702,8 @@
       "optionsDataSource": null
     } ],
     "title": "Creates list of users with given input array",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3944,18 +3902,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -3986,18 +3938,14 @@
       "optionsDataSource": null
     } ],
     "title": "Delete user",
-    "output": null,
-    "perform": null
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -4028,6 +3976,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get user by user name",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -4205,18 +4155,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/user/{username}",
@@ -4423,6 +4367,8 @@
       "optionsDataSource": null
     } ],
     "title": "Update user",
+    "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -4600,10 +4546,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   } ],
-  "category": null,
+  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -4653,15 +4598,15 @@
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": null,
-      "apply": null,
-      "clientId": null
+      "authorizationUrl": { },
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4710,35 +4655,20 @@
       "type": "API_KEY",
       "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "apply": null,
-      "clientId": null
+      "authorizationUrl": null,
+      "clientSecret": null
     } ],
-    "componentName": "petstore",
-    "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "componentTitle": "Petstore",
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "test": null,
-    "baseUri": { }
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-  "icon": "path:assets/petstore.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "petstore",
-  "resources": null,
-  "version": 1,
-  "title": "Petstore",
-  "triggers": [ ],
-  "allowedConnections": null
+    "baseUri": { },
+    "test": null
+  }
 }

@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Component description.",
+  "icon": "path:assets/slack.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "slack",
+  "resources": null,
+  "version": 1,
+  "title": "Slack",
   "actions": [ {
     "batch": null,
-    "componentName": "slack",
-    "componentDescription": "Component description.",
-    "componentTitle": "Slack",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Posts a message to a public channel, private channel, or existing direct message conversation.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sendMessage",
@@ -341,6 +349,7 @@
       "optionsDataSource": null
     } ],
     "title": "Send message",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -818,14 +827,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "slack",
-    "componentDescription": "Component description.",
-    "componentTitle": "Slack",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sendDirectMessage",
@@ -1158,6 +1162,7 @@
       "optionsDataSource": null
     } ],
     "title": "Send direct message",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1634,7 +1639,7 @@
     },
     "perform": { }
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -1684,35 +1689,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "clientId": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
-    "componentName": "slack",
-    "componentDescription": "Component description.",
-    "componentTitle": "Slack",
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Component description.",
-  "icon": "path:assets/slack.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "slack",
-  "resources": null,
-  "version": 1,
-  "title": "Slack",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }

@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
+  "icon": "path:assets/dropbox.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "dropbox",
+  "resources": null,
+  "version": 1,
+  "title": "Dropbox",
   "actions": [ {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be copied.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "copy",
@@ -53,6 +61,8 @@
       "optionsDataSource": null
     } ],
     "title": "Copy",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -184,25 +194,19 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a folder at a given path.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createNewFolder",
@@ -228,6 +232,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -405,8 +411,8 @@
               } ],
               "controlType": "SELECT"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -527,45 +533,39 @@
                     "options": null,
                     "optionsDataSource": null
                   } ],
-                  "controlType": "OBJECT_BUILDER",
-                  "optionsDataSource": null
+                  "optionsDataSource": null,
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "maxItems": null,
                 "minItems": null,
                 "multipleValues": null,
                 "options": null,
-                "controlType": "ARRAY_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "ARRAY_BUILDER"
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new text file.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createNewTextFile",
@@ -591,6 +591,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create new text file",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -683,25 +685,19 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -727,6 +723,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -858,25 +856,19 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get a temporary link to stream content of a file. This link will expire in four hours and afterwards you will get 410 Gone. This URL should not be used to display content directly in the browser. The Content-Type of the link is determined automatically by the file's mime type.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getFileLink",
@@ -902,6 +894,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get file link",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -971,8 +965,8 @@
             "label": "Client modified",
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           }, {
             "advancedOption": null,
             "description": null,
@@ -988,8 +982,8 @@
             "label": "Server modified",
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1026,8 +1020,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "controlType": "INTEGER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1065,8 +1059,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1123,8 +1117,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1223,11 +1217,11 @@
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1348,25 +1342,25 @@
                     "options": null,
                     "optionsDataSource": null
                   } ],
-                  "controlType": "OBJECT_BUILDER",
-                  "optionsDataSource": null
+                  "optionsDataSource": null,
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "maxItems": null,
                 "minItems": null,
                 "multipleValues": null,
                 "options": null,
-                "controlType": "ARRAY_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "ARRAY_BUILDER"
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -1504,14 +1498,14 @@
               "label": "Created",
               "placeholder": null,
               "options": null,
-              "controlType": "DATE",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "DATE"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1532,22 +1526,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Lists content of a folder.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "listAFolder",
@@ -1573,6 +1561,8 @@
       "optionsDataSource": null
     } ],
     "title": "List folder",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1735,18 +1725,18 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1791,22 +1781,16 @@
           } ],
           "controlType": "SELECT"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be moved. Note that we do not currently support case-only renaming.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "move",
@@ -1851,6 +1835,8 @@
       "optionsDataSource": null
     } ],
     "title": "Move",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1982,25 +1968,19 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Searches for files and folders. Can only be used to retrieve a maximum of 10,000 matches. Recent changes may not immediately be reflected in search results due to a short delay in indexing. Duplicate results may be returned across pages. Some results may not be returned.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "search",
@@ -2026,6 +2006,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2137,18 +2119,18 @@
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2193,22 +2175,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Create a new file up to a size of 150MB with the contents provided in the request.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "uploadFile",
@@ -2326,6 +2302,8 @@
       "optionsDataSource": null
     } ],
     "title": "Upload file",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2378,8 +2356,8 @@
           "label": "Client modified",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2395,8 +2373,8 @@
           "label": "Server modified",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2433,8 +2411,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2472,8 +2450,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2530,8 +2508,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2630,11 +2608,11 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2755,25 +2733,25 @@
                   "options": null,
                   "optionsDataSource": null
                 } ],
-                "controlType": "OBJECT_BUILDER",
-                "optionsDataSource": null
+                "optionsDataSource": null,
+                "controlType": "OBJECT_BUILDER"
               } ],
               "maxItems": null,
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "controlType": "ARRAY_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "ARRAY_BUILDER"
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -2911,20 +2889,19 @@
             "label": "Created",
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -2973,36 +2950,21 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
-    "componentName": "dropbox",
-    "componentDescription": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-    "componentTitle": "Dropbox",
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
-  "icon": "path:assets/dropbox.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "dropbox",
-  "resources": null,
-  "version": 1,
-  "title": "Dropbox",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }
