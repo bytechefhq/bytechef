@@ -29,6 +29,15 @@
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/naming-convention": ["error", {
+            "selector": "typeAlias",
+            "format": ["PascalCase"],
+            "suffix": ["Type"]
+        }, {
+            "selector": "interface",
+            "format": ["PascalCase"],
+            "suffix": ["Props", "I"]
+        }],
         "bytechef/empty-line-between-elements": "error",
         "bytechef/group-imports": "error",
         "bytechef/no-conditional-object-keys": "error",
