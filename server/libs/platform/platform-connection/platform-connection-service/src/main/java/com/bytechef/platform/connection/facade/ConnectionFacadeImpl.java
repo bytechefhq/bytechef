@@ -24,6 +24,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
@@ -39,6 +40,7 @@ import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -150,6 +152,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ConnectionDTO> getComponentConnections(String componentName, Integer componentVersion, Type type) {
+        List<Connection> connections = new ArrayList<>();
+
+        List<ConnectionDefinition> connectionDefinitions = connectionDefinitionService.getConnectionDefinitions(
+            componentName, componentVersion);
+
+        for (ConnectionDefinition connectionDefinition : connectionDefinitions) {
+            connections.addAll(
+                connectionService.getConnections(
+                    connectionDefinition.getComponentName(), connectionDefinition.getVersion(), type));
+        }
+
+        return getConnections(connections);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
 
@@ -160,13 +179,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, Type type) {
-        return getConnections(componentName, componentVersion, null, type);
-    }
+    public List<ConnectionDTO> getConnections(
+        String componentName, Integer connectionVersion, Long tagId, Type type) {
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, Type type) {
         List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId, type);
 
         return getConnections(connections);
@@ -177,8 +192,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public List<Tag> getConnectionTags(Type type) {
         List<Connection> connections = connectionService.getConnections(type);
 
-        return tagService
-            .getTags(connections.stream()
+        return tagService.getTags(
+            connections
+                .stream()
                 .map(Connection::getTagIds)
                 .flatMap(Collection::stream)
                 .toList());
@@ -261,7 +277,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         String workflowId, WorkflowConnection workflowConnection, long connectionId, Type type) {
 
         return workflowConnection
-            .getId()
+            .fetchId()
             .map(curConnectionId -> connectionId == curConnectionId)
             .orElseGet(() -> isConnectionUsed(
                 workflowId, workflowConnection.getWorkflowNodeName(), workflowConnection.getKey(),
@@ -303,8 +319,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return CollectionUtils.map(
             connections,
             connection -> new ConnectionDTO(
-                isConnectionUsed(
-                    Validate.notNull(connection.getId(), "id"), Type.valueOf(connection.getType())),
+                isConnectionUsed(Validate.notNull(connection.getId(), "id"), Type.valueOf(connection.getType())),
                 connection, filterTags(tags, connection)));
     }
 }

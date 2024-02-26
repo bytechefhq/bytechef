@@ -33,8 +33,6 @@ public interface ConnectionService {
 
     List<Connection> getConnections(Type type);
 
-    List<Connection> getConnections(List<Long> ids);
-
     List<Connection> getConnections(String componentName, int version, Type type);
 
     List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, Type type);
