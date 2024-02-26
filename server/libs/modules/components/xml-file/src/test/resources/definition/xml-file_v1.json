@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Reads and writes data from a XML file.",
+  "icon": "path:assets/xml-file.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "xmlFile",
+  "resources": null,
+  "version": 1,
+  "title": "XML File",
   "actions": [ {
     "batch": null,
-    "componentName": "xmlFile",
-    "componentDescription": "Reads and writes data from a XML file.",
-    "componentTitle": "XML File",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Reads data from a XML file.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "read",
@@ -165,8 +173,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -184,22 +192,18 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Read from file",
+    "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "xmlFile",
-    "componentDescription": "Reads and writes data from a XML file.",
-    "componentTitle": "XML File",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the data to a XML file.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "write",
@@ -229,8 +233,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -249,8 +253,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The aray to write to the file.",
@@ -270,8 +274,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xml\" will be used.",
@@ -293,6 +297,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -391,18 +396,6 @@
     },
     "perform": { }
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Reads and writes data from a XML file.",
-  "icon": "path:assets/xml-file.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "xmlFile",
-  "resources": null,
-  "version": 1,
-  "title": "XML File",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+  "icon": "path:assets/aws-s3.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "awsS3",
+  "resources": null,
+  "version": 1,
+  "title": "AWS S3",
   "actions": [ {
     "batch": null,
-    "componentName": "awsS3",
-    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "componentTitle": "AWS S3",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the AWS S3 object.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getObject",
@@ -53,6 +61,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get Object",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -148,18 +158,12 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "awsS3",
-    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "componentTitle": "AWS S3",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getUrl",
@@ -185,6 +189,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get URL",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -207,18 +213,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "awsS3",
-    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "componentTitle": "AWS S3",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the list AWS S3 objects.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "listObjects",
@@ -244,6 +244,8 @@
       "optionsDataSource": null
     } ],
     "title": "List Objects",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -334,29 +336,23 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "awsS3",
-    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "componentTitle": "AWS S3",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Get the url of an pre-signed AWS S3 object.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "presignGetObject",
@@ -401,6 +397,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get Pre-signed Object",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -423,18 +421,12 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
-    "componentName": "awsS3",
-    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "componentTitle": "AWS S3",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Store an object to AWS S3.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "putObject",
@@ -599,6 +591,8 @@
       "optionsDataSource": null
     } ],
     "title": "Put Object",
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -621,15 +615,11 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": null,
-    "componentName": "awsS3",
-    "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "componentTitle": "AWS S3",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -827,17 +817,5 @@
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-  "icon": "path:assets/aws-s3.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "awsS3",
-  "resources": null,
-  "version": 1,
-  "title": "AWS S3",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }

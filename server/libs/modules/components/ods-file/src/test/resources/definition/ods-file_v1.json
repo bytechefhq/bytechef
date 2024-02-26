@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Reads and writes data from a ODS file.",
+  "icon": "path:assets/ods-file.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "odsFile",
+  "resources": null,
+  "version": 1,
+  "title": "ODS File",
   "actions": [ {
     "batch": null,
-    "componentName": "odsFile",
-    "componentDescription": "Reads and writes data from a ODS file.",
-    "componentTitle": "ODS File",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Reads data from a ODS file.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "read",
@@ -236,18 +244,14 @@
       "controlType": "SELECT"
     } ],
     "title": "Read from file",
+    "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "odsFile",
-    "componentDescription": "Reads and writes data from a ODS file.",
-    "componentTitle": "ODS File",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Writes the data to a ODS file.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "write",
@@ -483,6 +487,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -581,18 +586,6 @@
     },
     "perform": { }
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Reads and writes data from a ODS file.",
-  "icon": "path:assets/ods-file.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "odsFile",
-  "resources": null,
-  "version": 1,
-  "title": "ODS File",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }
