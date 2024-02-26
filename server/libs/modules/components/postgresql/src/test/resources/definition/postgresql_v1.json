@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": { },
+  "description": "Query, insert and update data from PostgreSQL.",
+  "icon": "path:assets/postgresql.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "postgresql",
+  "resources": null,
+  "version": 1,
+  "title": "PostgreSQL",
   "actions": [ {
     "batch": null,
-    "componentName": "postgresql",
-    "componentDescription": "Query, insert and update data from PostgreSQL.",
-    "componentTitle": "PostgreSQL",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Execute an SQL query.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "query",
@@ -136,18 +144,14 @@
       "optionsDataSource": null
     } ],
     "title": "Query",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "postgresql",
-    "componentDescription": "Query, insert and update data from PostgreSQL.",
-    "componentTitle": "PostgreSQL",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Insert rows in database.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "insert",
@@ -464,18 +468,14 @@
       "optionsDataSource": null
     } ],
     "title": "Insert",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "postgresql",
-    "componentDescription": "Query, insert and update data from PostgreSQL.",
-    "componentTitle": "PostgreSQL",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Update rows in database.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "update",
@@ -811,18 +811,14 @@
       "optionsDataSource": null
     } ],
     "title": "Update",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "postgresql",
-    "componentDescription": "Query, insert and update data from PostgreSQL.",
-    "componentTitle": "PostgreSQL",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delete rows from database.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -1118,18 +1114,14 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
-    "componentName": "postgresql",
-    "componentDescription": "Query, insert and update data from PostgreSQL.",
-    "componentTitle": "PostgreSQL",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -1489,15 +1481,13 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": null,
-    "componentName": "postgresql",
-    "componentDescription": "Query, insert and update data from PostgreSQL.",
-    "componentTitle": "PostgreSQL",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -1598,17 +1588,5 @@
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Query, insert and update data from PostgreSQL.",
-  "icon": "path:assets/postgresql.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "postgresql",
-  "resources": null,
-  "version": 1,
-  "title": "PostgreSQL",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }

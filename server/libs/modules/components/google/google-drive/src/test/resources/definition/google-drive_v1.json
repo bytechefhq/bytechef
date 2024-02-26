@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
+  "icon": "path:assets/google-drive.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "googleDrive",
+  "resources": null,
+  "version": 1,
+  "title": "Google Drive",
   "actions": [ {
     "batch": null,
-    "componentName": "googleDrive",
-    "componentDescription": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
-    "componentTitle": "Google Drive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Uploads a file to google drive.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "uploadFile",
@@ -282,6 +290,7 @@
       "optionsDataSource": null
     } ],
     "title": "Upload file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -330,14 +339,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "googleDrive",
-    "componentDescription": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
-    "componentTitle": "Google Drive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Read a selected file from google drive file.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "readFile",
@@ -452,6 +456,7 @@
       "optionsDataSource": null
     } ],
     "title": "Read file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1726,14 +1731,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "googleDrive",
-    "componentDescription": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
-    "componentTitle": "Google Drive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new folder in google drive.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createNewFolder",
@@ -1934,6 +1934,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1982,14 +1983,9 @@
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "googleDrive",
-    "componentDescription": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
-    "componentTitle": "Google Drive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a new text file in google drive.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createNewTextFile",
@@ -2240,6 +2236,7 @@
       "optionsDataSource": null
     } ],
     "title": "Create new text file",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2287,7 +2284,7 @@
     },
     "perform": { }
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -2336,36 +2333,21 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
       "authorizationCallback": null,
-      "authorizationUrl": { },
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null
     } ],
-    "componentName": "googleDrive",
-    "componentDescription": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
-    "componentTitle": "Google Drive",
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows users to store files in the cloud, synchronize files across devices, and share files.",
-  "icon": "path:assets/google-drive.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "googleDrive",
-  "resources": null,
-  "version": 1,
-  "title": "Google Drive",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }

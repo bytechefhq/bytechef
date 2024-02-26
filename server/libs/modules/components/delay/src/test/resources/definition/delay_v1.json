@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Sets a value which can then be referenced in other tasks.",
+  "icon": "path:assets/delay.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "delay",
+  "resources": null,
+  "version": 1,
+  "title": "Delay",
   "actions": [ {
     "batch": null,
-    "componentName": "delay",
-    "componentDescription": "Sets a value which can then be referenced in other tasks.",
-    "componentTitle": "Delay",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Delay action execution.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sleep",
@@ -34,21 +42,10 @@
       "controlType": "INTEGER"
     } ],
     "title": "Sleep",
-    "perform": { },
-    "output": null
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Sets a value which can then be referenced in other tasks.",
-  "icon": "path:assets/delay.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "delay",
-  "resources": null,
-  "version": 1,
-  "title": "Delay",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

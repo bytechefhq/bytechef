@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Allows you to run arbitrary Bash scripts.",
+  "icon": "path:assets/bash.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "bash",
+  "resources": null,
+  "version": 1,
+  "title": "Bash",
   "actions": [ {
     "batch": null,
-    "componentName": "bash",
-    "componentDescription": "Allows you to run arbitrary Bash scripts.",
-    "componentTitle": "Bash",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Executes the script.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -34,7 +42,7 @@
       "optionsDataSource": null
     } ],
     "title": "Execute",
-    "perform": { },
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -57,20 +65,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": "Sample result"
-    }
+    },
+    "perform": { }
   } ],
-  "category": null,
-  "connection": null,
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Allows you to run arbitrary Bash scripts.",
-  "icon": "path:assets/bash.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "bash",
-  "resources": null,
-  "version": 1,
-  "title": "Bash",
   "triggers": null,
-  "allowedConnections": null
+  "connection": null
 }

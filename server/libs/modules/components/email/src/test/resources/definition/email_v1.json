@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "The Email connector sends emails using an SMTP email server.",
+  "icon": "path:assets/email.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "email",
+  "resources": null,
+  "version": 1,
+  "title": "Email",
   "actions": [ {
     "batch": null,
-    "componentName": "email",
-    "componentDescription": "The Email connector sends emails using an SMTP email server.",
-    "componentTitle": "Email",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Send an email to any address.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "send",
@@ -30,8 +38,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Who to send the email to.",
@@ -70,8 +78,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Who to CC on the email.",
@@ -110,8 +118,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Who to BCC on the email.",
@@ -150,8 +158,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "When someone replies to this email, where should it go to?",
@@ -190,8 +198,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Your email subject.",
@@ -341,14 +349,15 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send",
-    "output": null,
-    "perform": { }
+    "workflowNodeDescriptionFunction": null,
+    "perform": { },
+    "output": null
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -397,20 +406,17 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "tokenUrl": null,
-      "apply": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
-      "scopes": null
+      "scopes": null,
+      "tokenUrl": null
     } ],
-    "componentName": "email",
-    "componentDescription": "The Email connector sends emails using an SMTP email server.",
-    "componentTitle": "Email",
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -447,8 +453,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "If selected the connection will use TLS when connecting to server.",
@@ -478,17 +484,5 @@
     "authorizationRequired": false,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "The Email connector sends emails using an SMTP email server.",
-  "icon": "path:assets/email.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "email",
-  "resources": null,
-  "version": 1,
-  "title": "Email",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }

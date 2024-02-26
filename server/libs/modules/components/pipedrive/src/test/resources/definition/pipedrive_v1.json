@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": true,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
+  "icon": "path:assets/pipedrive.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "pipedrive",
+  "resources": null,
+  "version": 1,
+  "title": "Pipedrive",
   "actions": [ {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns all deals. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-all-deals\" target=\"_blank\" rel=\"noopener noreferrer\">getting all deals</a>.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -226,6 +234,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get all deals",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2754,72 +2763,94 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "8877": {
+              "pic_hash": "",
+              "has_pic": false,
+              "name": "Creator",
+              "email": "john.doe@pipedrive.com",
+              "active_flag": true,
+              "id": 8877
+            }
+          },
+          "person": {
+            "1101": {
+              "phone": [ {
+                "primary": true,
+                "value": 3.421787767E9,
+                "label": "work"
+              } ],
+              "owner_id": 8877,
+              "name": "Person",
+              "email": [ {
+                "primary": true,
+                "value": "person@pipedrive.com",
+                "label": "work"
+              } ],
+              "active_flag": true,
+              "id": 1101
+            }
+          },
+          "organization": {
+            "5": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 2,
+              "name": "Organization",
+              "active_flag": true,
+              "owner_id": 8877,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 5
+            }
+          },
+          "stage": {
+            "2": {
+              "pipeline_id": 1,
+              "add_time": "2015-12-08 13:54:06",
+              "pipeline_deal_probability": true,
+              "name": "Stage Name",
+              "rotten_days": "",
+              "id": 2,
+              "rotten_flag": false,
+              "update_time": "2015-12-08 13:54:06",
+              "company_id": 123,
+              "pipeline_name": "Pipeline",
+              "active_flag": true,
+              "order_nr": 1,
+              "deal_probability": 100
+            }
+          },
+          "pipeline": {
+            "1": {
+              "id": 1,
+              "name": "Pipeline",
+              "add_time": "2015-12-08 10:00:24",
+              "deal_probability": true,
+              "update_time": "2015-12-08 10:00:24",
+              "order_nr": 0,
+              "active": true,
+              "url_title": "Pipeline"
+            }
+          }
+        },
         "data": [ {
-          "lost_time": "2019-11-27 11:40:36",
-          "weighted_value_currency": "EUR",
-          "person_name": "Person",
-          "org_hidden": false,
-          "next_activity_type": "call",
-          "stage_change_time": "2019-11-28 15:41:22",
-          "visible_to": 1.0,
-          "formatted_weighted_value": "€5,000",
-          "add_time": "2019-05-29 04:21:51",
-          "probability": "",
-          "cc_email": "company+deal1@pipedrivemail.com",
-          "org_id": {
-            "active_flag": true,
-            "owner_id": 8877,
-            "cc_email": "org@pipedrivemail.com",
-            "value": 5,
-            "address": "Mustamäe tee 3a, 10615 Tallinn",
-            "people_count": 2,
-            "name": "Organization"
-          },
-          "last_activity_date": "",
-          "pipeline_id": 1,
-          "last_outgoing_mail_time": "2019-05-30 03:45:35",
-          "title": "Deal One",
-          "org_name": "Organization",
-          "last_incoming_mail_time": "2019-05-29 18:21:42",
-          "owner_name": "Creator",
-          "stage_order_nr": 2,
-          "notes_count": 2,
-          "user_id": {
-            "email": "john.doe@pipedrive.com",
-            "pic_hash": "",
-            "active_flag": true,
-            "value": 8877,
-            "id": 8877,
-            "has_pic": false,
-            "name": "Creator"
-          },
-          "id": 1,
-          "status": "open",
-          "first_won_time": "2019-11-27 11:40:36",
-          "won_time": "2019-11-27 11:40:36",
-          "next_activity_time": "11:30:00",
-          "close_time": "",
-          "last_activity_id": "",
-          "next_activity_duration": "00:30:00",
-          "formatted_value": "€5,000",
-          "deleted": false,
           "label": 11,
           "rotten_time": "",
           "next_activity_id": 128,
           "person_id": {
-            "value": 1101,
             "name": "Person",
             "phone": [ {
+              "primary": true,
               "value": 3.7244499911E10,
-              "label": "work",
-              "primary": true
+              "label": "work"
             } ],
             "active_flag": true,
             "email": [ {
+              "primary": true,
               "value": "person@pipedrive.com",
-              "label": "work",
-              "primary": true
-            } ]
+              "label": "work"
+            } ],
+            "value": 1101
           },
           "followers_count": 0,
           "active": true,
@@ -2839,95 +2870,73 @@
           "currency": "EUR",
           "undone_activities_count": 1,
           "creator_user_id": {
+            "has_pic": false,
+            "name": "Creator",
             "email": "john.doe@pipedrive.com",
             "pic_hash": "",
             "active_flag": true,
             "value": 8877,
-            "id": 8877,
-            "has_pic": false,
-            "name": "Creator"
+            "id": 8877
           },
           "done_activities_count": 0,
           "next_activity_note": "Note content",
-          "weighted_value": 5000
+          "weighted_value": 5000,
+          "lost_time": "2019-11-27 11:40:36",
+          "weighted_value_currency": "EUR",
+          "person_name": "Person",
+          "org_hidden": false,
+          "next_activity_type": "call",
+          "stage_change_time": "2019-11-28 15:41:22",
+          "visible_to": 1.0,
+          "formatted_weighted_value": "€5,000",
+          "add_time": "2019-05-29 04:21:51",
+          "probability": "",
+          "cc_email": "company+deal1@pipedrivemail.com",
+          "org_id": {
+            "address": "Mustamäe tee 3a, 10615 Tallinn",
+            "people_count": 2,
+            "name": "Organization",
+            "active_flag": true,
+            "owner_id": 8877,
+            "cc_email": "org@pipedrivemail.com",
+            "value": 5
+          },
+          "last_activity_date": "",
+          "pipeline_id": 1,
+          "last_outgoing_mail_time": "2019-05-30 03:45:35",
+          "title": "Deal One",
+          "org_name": "Organization",
+          "last_incoming_mail_time": "2019-05-29 18:21:42",
+          "owner_name": "Creator",
+          "stage_order_nr": 2,
+          "notes_count": 2,
+          "user_id": {
+            "has_pic": false,
+            "name": "Creator",
+            "email": "john.doe@pipedrive.com",
+            "pic_hash": "",
+            "active_flag": true,
+            "value": 8877,
+            "id": 8877
+          },
+          "id": 1,
+          "status": "open",
+          "first_won_time": "2019-11-27 11:40:36",
+          "won_time": "2019-11-27 11:40:36",
+          "next_activity_time": "11:30:00",
+          "close_time": "",
+          "last_activity_id": "",
+          "next_activity_duration": "00:30:00",
+          "formatted_value": "€5,000",
+          "deleted": false
         } ],
         "success": true,
         "additional_data": {
           "pagination": {
-            "start": 0,
-            "limit": 100,
             "next_start": 1,
-            "more_items_in_collection": false
-          }
-        },
-        "related_objects": {
-          "organization": {
-            "5": {
-              "active_flag": true,
-              "owner_id": 8877,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 5,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 2,
-              "name": "Organization"
-            }
-          },
-          "stage": {
-            "2": {
-              "rotten_flag": false,
-              "update_time": "2015-12-08 13:54:06",
-              "company_id": 123,
-              "pipeline_name": "Pipeline",
-              "active_flag": true,
-              "order_nr": 1,
-              "deal_probability": 100,
-              "pipeline_id": 1,
-              "add_time": "2015-12-08 13:54:06",
-              "pipeline_deal_probability": true,
-              "name": "Stage Name",
-              "rotten_days": "",
-              "id": 2
-            }
-          },
-          "pipeline": {
-            "1": {
-              "deal_probability": true,
-              "update_time": "2015-12-08 10:00:24",
-              "order_nr": 0,
-              "active": true,
-              "url_title": "Pipeline",
-              "id": 1,
-              "name": "Pipeline",
-              "add_time": "2015-12-08 10:00:24"
-            }
-          },
-          "user": {
-            "8877": {
-              "name": "Creator",
-              "email": "john.doe@pipedrive.com",
-              "active_flag": true,
-              "id": 8877,
-              "pic_hash": "",
-              "has_pic": false
-            }
-          },
-          "person": {
-            "1101": {
-              "name": "Person",
-              "email": [ {
-                "value": "person@pipedrive.com",
-                "label": "work",
-                "primary": true
-              } ],
-              "active_flag": true,
-              "id": 1101,
-              "phone": [ {
-                "value": 3.421787767E9,
-                "label": "work",
-                "primary": true
-              } ],
-              "owner_id": 8877
-            }
+            "more_items_in_collection": false,
+            "start": 0,
+            "limit": 100
           }
         }
       }
@@ -2935,14 +2944,9 @@
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Adds a new deal. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the dealFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/creating-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">adding a deal</a>.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/deals",
@@ -3275,6 +3279,7 @@
       "optionsDataSource": null
     } ],
     "title": "Add a deal",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -5680,73 +5685,95 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "8877": {
+              "pic_hash": "",
+              "has_pic": false,
+              "name": "Creator",
+              "email": "john.doe@pipedrive.com",
+              "active_flag": true,
+              "id": 8877
+            }
+          },
+          "person": {
+            "1101": {
+              "phone": [ {
+                "primary": true,
+                "value": 3.421787767E9,
+                "label": "work"
+              } ],
+              "owner_id": 8877,
+              "name": "Person",
+              "email": [ {
+                "primary": true,
+                "value": "person@pipedrive.com",
+                "label": "work"
+              } ],
+              "active_flag": true,
+              "id": 1101
+            }
+          },
+          "organization": {
+            "2": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 2,
+              "name": "Organization",
+              "active_flag": true,
+              "owner_id": 8877,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 2
+            }
+          },
+          "stage": {
+            "2": {
+              "pipeline_id": 1,
+              "add_time": "2015-12-08 13:54:06",
+              "pipeline_deal_probability": true,
+              "name": "Stage Name",
+              "rotten_days": "",
+              "id": 2,
+              "rotten_flag": false,
+              "update_time": "2015-12-08 13:54:06",
+              "company_id": 123,
+              "pipeline_name": "Pipeline",
+              "active_flag": true,
+              "order_nr": 1,
+              "deal_probability": 100
+            }
+          },
+          "pipeline": {
+            "1": {
+              "id": 1,
+              "name": "Pipeline",
+              "add_time": "2015-12-08 10:00:24",
+              "deal_probability": true,
+              "update_time": "2015-12-08 10:00:24",
+              "order_nr": 0,
+              "active": true,
+              "url_title": "Pipeline"
+            }
+          }
+        },
         "success": true,
         "data": {
-          "lost_time": "",
-          "weighted_value_currency": "EUR",
-          "person_name": "Person",
-          "org_hidden": false,
-          "next_activity_type": "call",
-          "stage_change_time": "2019-11-28 15:41:22",
-          "visible_to": 1.0,
-          "formatted_weighted_value": "€5,000",
-          "add_time": "2019-05-29 04:21:51",
-          "probability": "",
-          "cc_email": "company+deal1@pipedrivemail.com",
-          "org_id": {
-            "active_flag": true,
-            "owner_id": 8877,
-            "cc_email": "org@pipedrivemail.com",
-            "value": 5,
-            "address": "",
-            "people_count": 2,
-            "name": "Organization"
-          },
-          "last_activity_date": "",
-          "pipeline_id": 1,
-          "last_outgoing_mail_time": "2019-05-30 03:45:35",
-          "title": "Deal One",
-          "org_name": "Organization",
-          "last_incoming_mail_time": "2019-05-29 18:21:42",
-          "owner_name": "Creator",
-          "stage_order_nr": 2,
-          "notes_count": 2,
-          "user_id": {
-            "email": "john.doe@pipedrive.com",
-            "pic_hash": "",
-            "active_flag": true,
-            "value": 8877,
-            "id": 8877,
-            "has_pic": false,
-            "name": "Creator"
-          },
-          "id": 1,
-          "status": "open",
-          "first_won_time": "2019-11-27 11:40:36",
-          "won_time": "2019-11-27 11:40:36",
-          "next_activity_time": "11:30:00",
-          "close_time": "",
-          "last_activity_id": "",
-          "next_activity_duration": "00:30:00",
-          "formatted_value": "€5,000",
-          "deleted": false,
           "label": 11,
           "rotten_time": "",
           "next_activity_id": 128,
           "person_id": {
-            "value": 1101,
             "name": "Person",
             "phone": [ {
+              "primary": true,
               "value": 3.7244499911E10,
-              "label": "work",
-              "primary": true
+              "label": "work"
             } ],
             "active_flag": true,
             "email": [ {
+              "primary": true,
               "value": "person@pipedrive.com",
-              "label": "work",
-              "primary": true
-            } ]
+              "label": "work"
+            } ],
+            "value": 1101
           },
           "followers_count": 0,
           "active": true,
@@ -5766,101 +5793,74 @@
           "currency": "EUR",
           "undone_activities_count": 1,
           "creator_user_id": {
+            "has_pic": false,
+            "name": "Creator",
             "email": "john.doe@pipedrive.com",
             "pic_hash": "",
             "active_flag": true,
             "value": 8877,
-            "id": 8877,
-            "has_pic": false,
-            "name": "Creator"
+            "id": 8877
           },
           "done_activities_count": 0,
           "next_activity_note": "Note content",
-          "weighted_value": 5000
-        },
-        "related_objects": {
-          "organization": {
-            "2": {
-              "active_flag": true,
-              "owner_id": 8877,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 2,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 2,
-              "name": "Organization"
-            }
+          "weighted_value": 5000,
+          "lost_time": "",
+          "weighted_value_currency": "EUR",
+          "person_name": "Person",
+          "org_hidden": false,
+          "next_activity_type": "call",
+          "stage_change_time": "2019-11-28 15:41:22",
+          "visible_to": 1.0,
+          "formatted_weighted_value": "€5,000",
+          "add_time": "2019-05-29 04:21:51",
+          "probability": "",
+          "cc_email": "company+deal1@pipedrivemail.com",
+          "org_id": {
+            "address": "",
+            "people_count": 2,
+            "name": "Organization",
+            "active_flag": true,
+            "owner_id": 8877,
+            "cc_email": "org@pipedrivemail.com",
+            "value": 5
           },
-          "stage": {
-            "2": {
-              "rotten_flag": false,
-              "update_time": "2015-12-08 13:54:06",
-              "company_id": 123,
-              "pipeline_name": "Pipeline",
-              "active_flag": true,
-              "order_nr": 1,
-              "deal_probability": 100,
-              "pipeline_id": 1,
-              "add_time": "2015-12-08 13:54:06",
-              "pipeline_deal_probability": true,
-              "name": "Stage Name",
-              "rotten_days": "",
-              "id": 2
-            }
+          "last_activity_date": "",
+          "pipeline_id": 1,
+          "last_outgoing_mail_time": "2019-05-30 03:45:35",
+          "title": "Deal One",
+          "org_name": "Organization",
+          "last_incoming_mail_time": "2019-05-29 18:21:42",
+          "owner_name": "Creator",
+          "stage_order_nr": 2,
+          "notes_count": 2,
+          "user_id": {
+            "has_pic": false,
+            "name": "Creator",
+            "email": "john.doe@pipedrive.com",
+            "pic_hash": "",
+            "active_flag": true,
+            "value": 8877,
+            "id": 8877
           },
-          "pipeline": {
-            "1": {
-              "deal_probability": true,
-              "update_time": "2015-12-08 10:00:24",
-              "order_nr": 0,
-              "active": true,
-              "url_title": "Pipeline",
-              "id": 1,
-              "name": "Pipeline",
-              "add_time": "2015-12-08 10:00:24"
-            }
-          },
-          "user": {
-            "8877": {
-              "name": "Creator",
-              "email": "john.doe@pipedrive.com",
-              "active_flag": true,
-              "id": 8877,
-              "pic_hash": "",
-              "has_pic": false
-            }
-          },
-          "person": {
-            "1101": {
-              "name": "Person",
-              "email": [ {
-                "value": "person@pipedrive.com",
-                "label": "work",
-                "primary": true
-              } ],
-              "active_flag": true,
-              "id": 1101,
-              "phone": [ {
-                "value": 3.421787767E9,
-                "label": "work",
-                "primary": true
-              } ],
-              "owner_id": 8877
-            }
-          }
+          "id": 1,
+          "status": "open",
+          "first_won_time": "2019-11-27 11:40:36",
+          "won_time": "2019-11-27 11:40:36",
+          "next_activity_time": "11:30:00",
+          "close_time": "",
+          "last_activity_id": "",
+          "next_activity_duration": "00:30:00",
+          "formatted_value": "€5,000",
+          "deleted": false
         }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Searches all deals by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found deals can be filtered by the person ID and the organization ID.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -6095,6 +6095,7 @@
       "optionsDataSource": null
     } ],
     "title": "Search deals",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -6798,14 +6799,6 @@
         "data": {
           "items": [ {
             "item": {
-              "value": 100,
-              "organization": "",
-              "currency": "USD",
-              "notes": [ ],
-              "custom_fields": [ ],
-              "type": "deal",
-              "title": "Jane Doe deal",
-              "status": "open",
               "person": {
                 "id": 1,
                 "name": "Jane Doe"
@@ -6818,42 +6811,45 @@
               "stage": {
                 "id": 1,
                 "name": "Lead In"
-              }
+              },
+              "value": 100,
+              "organization": "",
+              "currency": "USD",
+              "notes": [ ],
+              "custom_fields": [ ],
+              "type": "deal",
+              "title": "Jane Doe deal",
+              "status": "open"
             },
             "result_score": 1.22
           } ]
         },
         "additional_data": {
-          "type": "object",
           "properties": {
-            "limit": {
-              "type": "integer",
-              "description": "Items shown per page"
-            },
             "more_items_in_collection": {
-              "type": "boolean",
-              "description": "If there are more list items in the collection than displayed or not"
+              "description": "If there are more list items in the collection than displayed or not",
+              "type": "boolean"
             },
             "start": {
-              "type": "integer",
-              "description": "Pagination start"
+              "description": "Pagination start",
+              "type": "integer"
+            },
+            "limit": {
+              "description": "Items shown per page",
+              "type": "integer"
             }
           },
-          "description": "The additional data of the list"
+          "description": "The additional data of the list",
+          "type": "object"
         }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -6884,6 +6880,7 @@
       "optionsDataSource": null
     } ],
     "title": "Delete a deal",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -6972,23 +6969,18 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
           "id": 123
-        },
-        "success": true
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns the details of a specific deal. Note that this also returns some additional fields which are not present when asking for all deals – such as deal age and stay in pipeline stages. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of dealFields. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-details-of-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">getting details of a deal</a>.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -7019,6 +7011,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get details of a deal",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -9911,15 +9904,130 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "8877": {
+              "pic_hash": "",
+              "has_pic": false,
+              "name": "Creator",
+              "email": "john.doe@pipedrive.com",
+              "active_flag": true,
+              "id": 8877
+            }
+          },
+          "person": {
+            "1101": {
+              "phone": [ {
+                "primary": true,
+                "value": 3.421787767E9,
+                "label": "work"
+              } ],
+              "owner_id": 8877,
+              "name": "Person",
+              "email": [ {
+                "primary": true,
+                "value": "person@pipedrive.com",
+                "label": "work"
+              } ],
+              "active_flag": true,
+              "id": 1101
+            }
+          },
+          "organization": {
+            "2": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 2,
+              "name": "Organization",
+              "active_flag": true,
+              "owner_id": 8877,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 2
+            }
+          },
+          "stage": {
+            "2": {
+              "pipeline_id": 1,
+              "add_time": "2015-12-08 13:54:06",
+              "pipeline_deal_probability": true,
+              "name": "Stage Name",
+              "rotten_days": "",
+              "id": 2,
+              "rotten_flag": false,
+              "update_time": "2015-12-08 13:54:06",
+              "company_id": 123,
+              "pipeline_name": "Pipeline",
+              "active_flag": true,
+              "order_nr": 1,
+              "deal_probability": 100
+            }
+          },
+          "pipeline": {
+            "1": {
+              "id": 1,
+              "name": "Pipeline",
+              "add_time": "2015-12-08 10:00:24",
+              "deal_probability": true,
+              "update_time": "2015-12-08 10:00:24",
+              "order_nr": 0,
+              "active": true,
+              "url_title": "Pipeline"
+            }
+          }
+        },
         "data": {
+          "person_name": "Person",
+          "next_activity_subject": "Call",
+          "org_hidden": false,
+          "org_name": "Organization",
+          "next_activity_date": "2019-11-29",
+          "expected_close_date": "2019-06-29",
+          "pipeline_id": 1,
+          "followers_count": 0,
+          "next_activity_type": "call",
+          "weighted_value_currency": "EUR",
+          "person_hidden": false,
+          "active": true,
+          "stay_in_pipeline_stages": {
+            "order_of_stages": [ 1, 2, 3, 4, 5 ],
+            "times_in_stages": {
+              "1": 15721267,
+              "2": 1288449,
+              "3": 4368,
+              "4": 3315,
+              "5": 26460
+            }
+          },
+          "next_activity_note": "Note content",
+          "weighted_value": 5000,
+          "deleted": false,
+          "label": 11,
+          "average_stage_progress": 4.99,
+          "age": {
+            "m": 6,
+            "d": 14,
+            "s": 26,
+            "h": 8,
+            "i": 57,
+            "total_seconds": 17139446,
+            "y": 0
+          },
+          "products_count": 0,
+          "email_messages_count": 4,
+          "visible_to": 1.0,
+          "next_activity": "",
+          "next_activity_time": "11:30:00",
+          "last_activity": "",
+          "stage_id": 2,
+          "won_time": "2019-11-27 11:40:36",
+          "done_activities_count": 0,
           "average_time_to_won": {
+            "m": 0,
             "d": 0,
             "s": 49,
             "h": 0,
             "i": 20,
             "total_seconds": 1249,
-            "y": 0,
-            "m": 0
+            "y": 0
           },
           "status": "open",
           "cc_email": "company+deal1@pipedrivemail.com",
@@ -9941,47 +10049,47 @@
           "files_count": 0,
           "owner_name": "Creator",
           "user_id": {
+            "has_pic": false,
+            "name": "Creator",
             "email": "john.doe@pipedrive.com",
             "pic_hash": "",
             "active_flag": true,
             "value": 8877,
-            "id": 8877,
-            "has_pic": false,
-            "name": "Creator"
+            "id": 8877
           },
           "org_id": {
+            "address": "",
+            "people_count": 2,
+            "name": "Organization",
             "active_flag": true,
             "owner_id": 8877,
             "cc_email": "org@pipedrivemail.com",
-            "value": 5,
-            "address": "",
-            "people_count": 2,
-            "name": "Organization"
+            "value": 5
           },
           "stage_change_time": "2019-11-28 15:41:22",
           "creator_user_id": {
+            "has_pic": false,
+            "name": "Creator",
             "email": "john.doe@pipedrive.com",
             "pic_hash": "",
             "active_flag": true,
             "value": 8877,
-            "id": 8877,
-            "has_pic": false,
-            "name": "Creator"
+            "id": 8877
           },
           "person_id": {
-            "value": 1101,
             "name": "Person",
             "phone": [ {
+              "primary": true,
               "value": 3.7244499911E10,
-              "label": "work",
-              "primary": true
+              "label": "work"
             } ],
             "active_flag": true,
             "email": [ {
+              "primary": true,
               "value": "person@pipedrive.com",
-              "label": "work",
-              "primary": true
-            } ]
+              "label": "work"
+            } ],
+            "value": 1101
           },
           "lost_time": "",
           "participants_count": 1,
@@ -9992,140 +10100,20 @@
           "title": "Deal One",
           "id": 1,
           "first_won_time": "2019-11-27 11:40:36",
-          "last_incoming_mail_time": "2019-05-29 18:21:42",
-          "person_name": "Person",
-          "next_activity_subject": "Call",
-          "org_hidden": false,
-          "org_name": "Organization",
-          "next_activity_date": "2019-11-29",
-          "expected_close_date": "2019-06-29",
-          "pipeline_id": 1,
-          "followers_count": 0,
-          "next_activity_type": "call",
-          "weighted_value_currency": "EUR",
-          "person_hidden": false,
-          "active": true,
-          "stay_in_pipeline_stages": {
-            "times_in_stages": {
-              "3": 4368,
-              "4": 3315,
-              "5": 26460,
-              "1": 15721267,
-              "2": 1288449
-            },
-            "order_of_stages": [ 1, 2, 3, 4, 5 ]
-          },
-          "next_activity_note": "Note content",
-          "weighted_value": 5000,
-          "deleted": false,
-          "label": 11,
-          "average_stage_progress": 4.99,
-          "age": {
-            "d": 14,
-            "s": 26,
-            "h": 8,
-            "i": 57,
-            "total_seconds": 17139446,
-            "y": 0,
-            "m": 6
-          },
-          "products_count": 0,
-          "email_messages_count": 4,
-          "visible_to": 1.0,
-          "next_activity": "",
-          "next_activity_time": "11:30:00",
-          "last_activity": "",
-          "stage_id": 2,
-          "won_time": "2019-11-27 11:40:36",
-          "done_activities_count": 0
+          "last_incoming_mail_time": "2019-05-29 18:21:42"
         },
         "success": true,
         "additional_data": {
           "dropbox_email": "company+deal1@pipedrivemail.com"
-        },
-        "related_objects": {
-          "organization": {
-            "2": {
-              "active_flag": true,
-              "owner_id": 8877,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 2,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 2,
-              "name": "Organization"
-            }
-          },
-          "stage": {
-            "2": {
-              "rotten_flag": false,
-              "update_time": "2015-12-08 13:54:06",
-              "company_id": 123,
-              "pipeline_name": "Pipeline",
-              "active_flag": true,
-              "order_nr": 1,
-              "deal_probability": 100,
-              "pipeline_id": 1,
-              "add_time": "2015-12-08 13:54:06",
-              "pipeline_deal_probability": true,
-              "name": "Stage Name",
-              "rotten_days": "",
-              "id": 2
-            }
-          },
-          "pipeline": {
-            "1": {
-              "deal_probability": true,
-              "update_time": "2015-12-08 10:00:24",
-              "order_nr": 0,
-              "active": true,
-              "url_title": "Pipeline",
-              "id": 1,
-              "name": "Pipeline",
-              "add_time": "2015-12-08 10:00:24"
-            }
-          },
-          "user": {
-            "8877": {
-              "name": "Creator",
-              "email": "john.doe@pipedrive.com",
-              "active_flag": true,
-              "id": 8877,
-              "pic_hash": "",
-              "has_pic": false
-            }
-          },
-          "person": {
-            "1101": {
-              "name": "Person",
-              "email": [ {
-                "value": "person@pipedrive.com",
-                "label": "work",
-                "primary": true
-              } ],
-              "active_flag": true,
-              "id": 1101,
-              "phone": [ {
-                "value": 3.421787767E9,
-                "label": "work",
-                "primary": true
-              } ],
-              "owner_id": 8877
-            }
-          }
         }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest. Pagination can be controlled using `limit` and `start` query parameters. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals.\n",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -10360,6 +10348,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get all leads",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -10938,17 +10927,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": [ {
-          "title": "Jane Doe Lead",
-          "value": {
-            "currency": "USD",
-            "amount": 999
-          },
-          "next_activity_id": 1,
-          "person_id": 1092,
-          "creator_id": 1,
-          "cc_email": "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com",
-          "source_name": "API",
           "id": "adf21080-0e10-11eb-879b-05d71fb426ec",
           "owner_id": 1,
           "expected_close_date": "",
@@ -10958,22 +10938,26 @@
           "visible_to": 3.0,
           "add_time": "2020-10-14T11:30:36",
           "organization_id": "",
-          "is_archived": false
-        } ],
-        "success": true
+          "is_archived": false,
+          "title": "Jane Doe Lead",
+          "value": {
+            "amount": 999,
+            "currency": "USD"
+          },
+          "next_activity_id": 1,
+          "person_id": 1092,
+          "creator_id": 1,
+          "cc_email": "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com",
+          "source_name": "API"
+        } ]
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Creates a lead. A lead always has to be linked to a person or an organization or both. All leads created through the Pipedrive API will have a lead source `API` assigned. Here's the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-a-lead\" target=\"_blank\" rel=\"noopener noreferrer\">adding a lead</a>. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals. See an example given in the <a href=\"https://pipedrive.readme.io/docs/updating-custom-field-value\" target=\"_blank\" rel=\"noopener noreferrer\">updating custom fields' values tutorial</a>.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/leads",
@@ -11260,6 +11244,7 @@
       "optionsDataSource": null
     } ],
     "title": "Add a lead",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -11735,17 +11720,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
-          "title": "Jane Doe Lead",
-          "value": {
-            "currency": "USD",
-            "amount": 999
-          },
-          "next_activity_id": 1,
-          "person_id": 1092,
-          "creator_id": 1,
-          "cc_email": "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com",
-          "source_name": "API",
           "id": "adf21080-0e10-11eb-879b-05d71fb426ec",
           "owner_id": 1,
           "expected_close_date": "",
@@ -11755,22 +11731,26 @@
           "visible_to": 3.0,
           "add_time": "2020-10-14T11:30:36",
           "organization_id": "",
-          "is_archived": false
-        },
-        "success": true
+          "is_archived": false,
+          "title": "Jane Doe Lead",
+          "value": {
+            "amount": 999,
+            "currency": "USD"
+          },
+          "next_activity_id": 1,
+          "person_id": 1092,
+          "creator_id": 1,
+          "cc_email": "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com",
+          "source_name": "API"
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Deletes a specific lead.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -11801,6 +11781,7 @@
       "optionsDataSource": null
     } ],
     "title": "Delete a lead",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -11889,23 +11870,18 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
           "id": "adf21080-0e10-11eb-879b-05d71fb426ec"
-        },
-        "success": true
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns details of a specific lead. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields’ structure from deals.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -11936,6 +11912,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get one lead",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -12411,17 +12388,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
-          "title": "Jane Doe Lead",
-          "value": {
-            "currency": "USD",
-            "amount": 999
-          },
-          "next_activity_id": 1,
-          "person_id": 1092,
-          "creator_id": 1,
-          "cc_email": "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com",
-          "source_name": "API",
           "id": "adf21080-0e10-11eb-879b-05d71fb426ec",
           "owner_id": 1,
           "expected_close_date": "",
@@ -12431,22 +12399,26 @@
           "visible_to": 3.0,
           "add_time": "2020-10-14T11:30:36",
           "organization_id": "",
-          "is_archived": false
-        },
-        "success": true
+          "is_archived": false,
+          "title": "Jane Doe Lead",
+          "value": {
+            "amount": 999,
+            "currency": "USD"
+          },
+          "next_activity_id": 1,
+          "person_id": 1092,
+          "creator_id": 1,
+          "cc_email": "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com",
+          "source_name": "API"
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Searches all leads by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found leads can be filtered by the person ID and the organization ID.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -12648,6 +12620,7 @@
       "optionsDataSource": null
     } ],
     "title": "Search leads",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -13378,17 +13351,6 @@
         "data": {
           "items": [ {
             "item": {
-              "owner": {
-                "id": 1
-              },
-              "title": "John Doe lead",
-              "type": "lead",
-              "notes": [ ],
-              "currency": "USD",
-              "organization": {
-                "id": 1,
-                "name": "John company"
-              },
               "emails": [ "john@doe.com" ],
               "person": {
                 "id": 1,
@@ -13399,42 +13361,48 @@
               "custom_fields": [ ],
               "is_archived": false,
               "visible_to": 3,
-              "phones": [ ]
+              "phones": [ ],
+              "owner": {
+                "id": 1
+              },
+              "title": "John Doe lead",
+              "type": "lead",
+              "notes": [ ],
+              "currency": "USD",
+              "organization": {
+                "id": 1,
+                "name": "John company"
+              }
             },
             "result_score": 0.29
           } ]
         },
         "additional_data": {
-          "type": "object",
           "properties": {
-            "limit": {
-              "type": "integer",
-              "description": "Items shown per page"
-            },
             "more_items_in_collection": {
-              "type": "boolean",
-              "description": "If there are more list items in the collection than displayed or not"
+              "description": "If there are more list items in the collection than displayed or not",
+              "type": "boolean"
             },
             "start": {
-              "type": "integer",
-              "description": "Pagination start"
+              "description": "Pagination start",
+              "type": "integer"
+            },
+            "limit": {
+              "description": "Items shown per page",
+              "type": "integer"
             }
           },
-          "description": "The additional data of the list"
+          "description": "The additional data of the list",
+          "type": "object"
         }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns all organizations.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -13576,6 +13544,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get all organizations",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -15491,7 +15460,85 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "123": {
+              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+              "has_pic": 1,
+              "name": "Jane Doe",
+              "email": "jane@pipedrive.com",
+              "active_flag": true,
+              "id": 123
+            }
+          },
+          "picture": {
+            "1": {
+              "id": 1,
+              "add_time": "2020-09-08 08:17:52",
+              "update_time": "0000-00-00 00:00:00",
+              "active_flag": true,
+              "item_type": "person",
+              "item_id": 25,
+              "added_by_user_id": 967055,
+              "pictures": {
+                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+              }
+            }
+          },
+          "organization": {
+            "1": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 1,
+              "name": "Org Name",
+              "active_flag": true,
+              "owner_id": 123,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 1
+            }
+          }
+        },
         "data": [ {
+          "related_open_deals_count": 2,
+          "last_activity_id": 34,
+          "name": "Bolt",
+          "address_country": "Estonia",
+          "notes_count": 0,
+          "first_char": "b",
+          "address_admin_area_level_1": "Harju maakond",
+          "address_admin_area_level_2": "",
+          "owner_id": {
+            "has_pic": 0,
+            "name": "Will Smith",
+            "email": "will.smith@pipedrive.com",
+            "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+            "active_flag": true,
+            "value": 10,
+            "id": 10
+          },
+          "related_lost_deals_count": 0,
+          "won_deals_count": 0,
+          "address_locality": "Tallinn",
+          "picture_id": {
+            "add_time": "2020-09-08 08:17:52",
+            "value": 101,
+            "update_time": "0000-00-00 00:00:00",
+            "active_flag": true,
+            "item_type": "person",
+            "item_id": 25,
+            "added_by_user_id": 967055,
+            "pictures": {
+              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg",
+              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg"
+            }
+          },
+          "activities_count": 2,
+          "done_activities_count": 1,
+          "next_activity_date": "2019-11-29",
+          "address_formatted_address": "Mustamäe tee 3a, 10616 Tallinn, Estonia",
+          "people_count": 1,
+          "address_street_number": "3a",
+          "email_messages_count": 2,
           "next_activity_id": 128,
           "open_deals_count": 1,
           "related_won_deals_count": 0,
@@ -15517,93 +15564,15 @@
           "add_time": "2020-02-25 10:04:08",
           "related_closed_deals_count": 1,
           "cc_email": "org@pipedrivemail.com",
-          "company_id": 77,
-          "related_open_deals_count": 2,
-          "last_activity_id": 34,
-          "name": "Bolt",
-          "address_country": "Estonia",
-          "notes_count": 0,
-          "first_char": "b",
-          "address_admin_area_level_1": "Harju maakond",
-          "address_admin_area_level_2": "",
-          "owner_id": {
-            "email": "will.smith@pipedrive.com",
-            "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-            "active_flag": true,
-            "value": 10,
-            "id": 10,
-            "has_pic": 0,
-            "name": "Will Smith"
-          },
-          "related_lost_deals_count": 0,
-          "won_deals_count": 0,
-          "address_locality": "Tallinn",
-          "picture_id": {
-            "update_time": "0000-00-00 00:00:00",
-            "active_flag": true,
-            "item_type": "person",
-            "item_id": 25,
-            "added_by_user_id": 967055,
-            "pictures": {
-              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg",
-              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg"
-            },
-            "add_time": "2020-09-08 08:17:52",
-            "value": 101
-          },
-          "activities_count": 2,
-          "done_activities_count": 1,
-          "next_activity_date": "2019-11-29",
-          "address_formatted_address": "Mustamäe tee 3a, 10616 Tallinn, Estonia",
-          "people_count": 1,
-          "address_street_number": "3a",
-          "email_messages_count": 2
+          "company_id": 77
         } ],
         "success": true,
         "additional_data": {
           "pagination": {
-            "start": 0,
-            "limit": 100,
             "next_start": 100,
-            "more_items_in_collection": false
-          }
-        },
-        "related_objects": {
-          "picture": {
-            "1": {
-              "update_time": "0000-00-00 00:00:00",
-              "active_flag": true,
-              "item_type": "person",
-              "item_id": 25,
-              "added_by_user_id": 967055,
-              "pictures": {
-                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-              },
-              "id": 1,
-              "add_time": "2020-09-08 08:17:52"
-            }
-          },
-          "organization": {
-            "1": {
-              "active_flag": true,
-              "owner_id": 123,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 1,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 1,
-              "name": "Org Name"
-            }
-          },
-          "user": {
-            "123": {
-              "name": "Jane Doe",
-              "email": "jane@pipedrive.com",
-              "active_flag": true,
-              "id": 123,
-              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-              "has_pic": 1
-            }
+            "more_items_in_collection": false,
+            "start": 0,
+            "limit": 100
           }
         }
       }
@@ -15611,14 +15580,9 @@
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Adds a new organization. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the organizationFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-an-organization\" target=\"_blank\" rel=\"noopener noreferrer\">adding an organization</a>.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/organizations",
@@ -15744,6 +15708,7 @@
       "optionsDataSource": null
     } ],
     "title": "Add an organization",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -17521,8 +17486,86 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "123": {
+              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+              "has_pic": 1,
+              "name": "Jane Doe",
+              "email": "jane@pipedrive.com",
+              "active_flag": true,
+              "id": 123
+            }
+          },
+          "picture": {
+            "1": {
+              "id": 1,
+              "add_time": "2020-09-08 08:17:52",
+              "update_time": "0000-00-00 00:00:00",
+              "active_flag": true,
+              "item_type": "person",
+              "item_id": 25,
+              "added_by_user_id": 967055,
+              "pictures": {
+                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+              }
+            }
+          },
+          "organization": {
+            "1": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 1,
+              "name": "Org Name",
+              "active_flag": true,
+              "owner_id": 123,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 1
+            }
+          }
+        },
         "success": true,
         "data": {
+          "related_open_deals_count": 2,
+          "last_activity_id": 34,
+          "name": "Bolt",
+          "address_country": "Estonia",
+          "notes_count": 0,
+          "first_char": "b",
+          "address_admin_area_level_1": "Harju maakond",
+          "address_admin_area_level_2": "",
+          "owner_id": {
+            "has_pic": 0,
+            "name": "Will Smith",
+            "email": "will.smith@pipedrive.com",
+            "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+            "active_flag": true,
+            "value": 10,
+            "id": 10
+          },
+          "related_lost_deals_count": 0,
+          "won_deals_count": 0,
+          "address_locality": "Tallinn",
+          "picture_id": {
+            "add_time": "2020-09-08 08:17:52",
+            "value": 101,
+            "update_time": "0000-00-00 00:00:00",
+            "active_flag": true,
+            "item_type": "person",
+            "item_id": 25,
+            "added_by_user_id": 967055,
+            "pictures": {
+              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg",
+              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg"
+            }
+          },
+          "activities_count": 2,
+          "done_activities_count": 1,
+          "next_activity_date": "2019-11-29",
+          "address_formatted_address": "Mustamäe tee 3a, 10616 Tallinn, Estonia",
+          "people_count": 1,
+          "address_street_number": "3a",
+          "email_messages_count": 2,
           "next_activity_id": 128,
           "open_deals_count": 1,
           "related_won_deals_count": 0,
@@ -17548,99 +17591,16 @@
           "add_time": "2020-02-25 10:04:08",
           "related_closed_deals_count": 1,
           "cc_email": "org@pipedrivemail.com",
-          "company_id": 77,
-          "related_open_deals_count": 2,
-          "last_activity_id": 34,
-          "name": "Bolt",
-          "address_country": "Estonia",
-          "notes_count": 0,
-          "first_char": "b",
-          "address_admin_area_level_1": "Harju maakond",
-          "address_admin_area_level_2": "",
-          "owner_id": {
-            "email": "will.smith@pipedrive.com",
-            "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-            "active_flag": true,
-            "value": 10,
-            "id": 10,
-            "has_pic": 0,
-            "name": "Will Smith"
-          },
-          "related_lost_deals_count": 0,
-          "won_deals_count": 0,
-          "address_locality": "Tallinn",
-          "picture_id": {
-            "update_time": "0000-00-00 00:00:00",
-            "active_flag": true,
-            "item_type": "person",
-            "item_id": 25,
-            "added_by_user_id": 967055,
-            "pictures": {
-              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg",
-              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg"
-            },
-            "add_time": "2020-09-08 08:17:52",
-            "value": 101
-          },
-          "activities_count": 2,
-          "done_activities_count": 1,
-          "next_activity_date": "2019-11-29",
-          "address_formatted_address": "Mustamäe tee 3a, 10616 Tallinn, Estonia",
-          "people_count": 1,
-          "address_street_number": "3a",
-          "email_messages_count": 2
-        },
-        "related_objects": {
-          "picture": {
-            "1": {
-              "update_time": "0000-00-00 00:00:00",
-              "active_flag": true,
-              "item_type": "person",
-              "item_id": 25,
-              "added_by_user_id": 967055,
-              "pictures": {
-                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-              },
-              "id": 1,
-              "add_time": "2020-09-08 08:17:52"
-            }
-          },
-          "organization": {
-            "1": {
-              "active_flag": true,
-              "owner_id": 123,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 1,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 1,
-              "name": "Org Name"
-            }
-          },
-          "user": {
-            "123": {
-              "name": "Jane Doe",
-              "email": "jane@pipedrive.com",
-              "active_flag": true,
-              "id": 123,
-              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-              "has_pic": 1
-            }
-          }
+          "company_id": 77
         }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -17776,6 +17736,7 @@
       "optionsDataSource": null
     } ],
     "title": "Search organizations",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -18267,25 +18228,25 @@
         "data": {
           "items": [ {
             "item": {
+              "id": 1,
+              "name": "Organization name",
+              "notes": [ ],
               "owner": {
                 "id": 1
               },
               "address": "Mustamäe tee 3a, 10615 Tallinn",
               "custom_fields": [ ],
               "visible_to": 3,
-              "type": "organization",
-              "id": 1,
-              "name": "Organization name",
-              "notes": [ ]
+              "type": "organization"
             },
             "result_score": 0.316
           } ]
         },
         "additional_data": {
           "pagination": {
-            "limit": 100,
             "more_items_in_collection": false,
-            "start": 0
+            "start": 0,
+            "limit": 100
           }
         }
       }
@@ -18293,14 +18254,9 @@
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -18331,6 +18287,7 @@
       "optionsDataSource": null
     } ],
     "title": "Delete an organization",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -18419,23 +18376,18 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
           "id": 123
-        },
-        "success": true
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns the details of an organization. Note that this also returns some additional fields which are not present when asking for all organizations. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of organizationFields.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -18466,6 +18418,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get details of an organization",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -20437,8 +20390,49 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
           "allOf": [ {
+            "related_open_deals_count": 2,
+            "last_activity_id": 34,
+            "name": "Bolt",
+            "address_country": "Estonia",
+            "notes_count": 0,
+            "first_char": "b",
+            "address_admin_area_level_1": "Harju maakond",
+            "address_admin_area_level_2": "",
+            "owner_id": {
+              "has_pic": 0,
+              "name": "Will Smith",
+              "email": "will.smith@pipedrive.com",
+              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+              "active_flag": true,
+              "value": 10,
+              "id": 10
+            },
+            "related_lost_deals_count": 0,
+            "won_deals_count": 0,
+            "address_locality": "Tallinn",
+            "picture_id": {
+              "add_time": "2020-09-08 08:17:52",
+              "value": 101,
+              "update_time": "0000-00-00 00:00:00",
+              "active_flag": true,
+              "item_type": "person",
+              "item_id": 25,
+              "added_by_user_id": 967055,
+              "pictures": {
+                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg",
+                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg"
+              }
+            },
+            "activities_count": 2,
+            "done_activities_count": 1,
+            "next_activity_date": "2019-11-29",
+            "address_formatted_address": "Mustamäe tee 3a, 10616 Tallinn, Estonia",
+            "people_count": 1,
+            "address_street_number": "3a",
+            "email_messages_count": 2,
             "next_activity_id": 128,
             "open_deals_count": 1,
             "related_won_deals_count": 0,
@@ -20464,98 +20458,49 @@
             "add_time": "2020-02-25 10:04:08",
             "related_closed_deals_count": 1,
             "cc_email": "org@pipedrivemail.com",
-            "company_id": 77,
-            "related_open_deals_count": 2,
-            "last_activity_id": 34,
-            "name": "Bolt",
-            "address_country": "Estonia",
-            "notes_count": 0,
-            "first_char": "b",
-            "address_admin_area_level_1": "Harju maakond",
-            "address_admin_area_level_2": "",
-            "owner_id": {
-              "email": "will.smith@pipedrive.com",
-              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-              "active_flag": true,
-              "value": 10,
-              "id": 10,
-              "has_pic": 0,
-              "name": "Will Smith"
-            },
-            "related_lost_deals_count": 0,
-            "won_deals_count": 0,
-            "address_locality": "Tallinn",
-            "picture_id": {
-              "update_time": "0000-00-00 00:00:00",
-              "active_flag": true,
-              "item_type": "person",
-              "item_id": 25,
-              "added_by_user_id": 967055,
-              "pictures": {
-                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg",
-                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg"
-              },
-              "add_time": "2020-09-08 08:17:52",
-              "value": 101
-            },
-            "activities_count": 2,
-            "done_activities_count": 1,
-            "next_activity_date": "2019-11-29",
-            "address_formatted_address": "Mustamäe tee 3a, 10616 Tallinn, Estonia",
-            "people_count": 1,
-            "address_street_number": "3a",
-            "email_messages_count": 2
+            "company_id": 77
           }, {
-            "type": "object",
             "properties": {
-              "related_objects": {
-                "picture": {
-                  "1": {
-                    "update_time": "0000-00-00 00:00:00",
-                    "active_flag": true,
-                    "item_type": "person",
-                    "item_id": 25,
-                    "added_by_user_id": 967055,
-                    "pictures": {
-                      "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-                      "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-                    },
-                    "id": 1,
-                    "add_time": "2020-09-08 08:17:52"
-                  }
-                },
-                "organization": {
-                  "1": {
-                    "active_flag": true,
-                    "owner_id": 123,
-                    "cc_email": "org@pipedrivemail.com",
-                    "id": 1,
-                    "address": "Mustamäe tee 3a, 10615 Tallinn",
-                    "people_count": 1,
-                    "name": "Org Name"
-                  }
-                },
-                "user": {
-                  "123": {
-                    "name": "Jane Doe",
-                    "email": "jane@pipedrive.com",
-                    "active_flag": true,
-                    "id": 123,
-                    "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-                    "has_pic": 1
-                  }
-                }
-              },
-              "additional_data": {
-                "pagination": {
-                  "start": 0,
-                  "limit": 100,
-                  "next_start": 100,
-                  "more_items_in_collection": false
-                }
-              },
-              "next_activity": "",
               "last_activity": {
+                "created_by_user_id": 1234,
+                "location_postal_code": 10616.0,
+                "owner_name": "Creator",
+                "person_dropbox_bcc": "company@pipedrivemail.com",
+                "conference_meeting_id": 1.758746701E9,
+                "duration": "01:00",
+                "company_id": 22122,
+                "last_notification_user_id": 7655,
+                "type": "deadline",
+                "notification_language_id": 1,
+                "public_description": "This is a description",
+                "conference_meeting_url": "https://pipedrive.zoom.us/link",
+                "series": [ ],
+                "attendees": [ {
+                  "is_organizer": 0,
+                  "user_id": "",
+                  "name": "Attendee",
+                  "email_address": "attendee@pipedrivemail.com",
+                  "person_id": 25312,
+                  "status": "noreply"
+                } ],
+                "location_street_number": 3.0,
+                "deal_dropbox_bcc": "company+deal300@pipedrivemail.com",
+                "person_id": 1101,
+                "org_id": 5,
+                "reference_id": 7,
+                "due_time": "10:00",
+                "update_user_id": 5596,
+                "location_locality": "Tallinn",
+                "id": 8,
+                "location_subpremise": "",
+                "rec_master_activity_id": 1,
+                "file": {
+                  "id": "376892,",
+                  "clean_name": "Audio 10:55:07.m4a",
+                  "url": "https://pipedrive-files.s3-eu-west-1.amazonaws.com/Audio-recording.m4a"
+                },
+                "gcal_event_id": "",
+                "done": false,
                 "note": "A note for the activity",
                 "location_formatted_address": "Mustamäe tee 3, 10616 Tallinn, Estonia",
                 "last_notification_time": "2020-08-08 12:37:56",
@@ -20593,64 +20538,67 @@
                 "reference_type": "scheduler-service",
                 "deal_id": 300,
                 "add_time": "2020-06-08 12:37:56",
-                "person_name": "Person",
-                "created_by_user_id": 1234,
-                "location_postal_code": 10616.0,
-                "owner_name": "Creator",
-                "person_dropbox_bcc": "company@pipedrivemail.com",
-                "conference_meeting_id": 1.758746701E9,
-                "duration": "01:00",
-                "company_id": 22122,
-                "last_notification_user_id": 7655,
-                "type": "deadline",
-                "notification_language_id": 1,
-                "public_description": "This is a description",
-                "conference_meeting_url": "https://pipedrive.zoom.us/link",
-                "series": [ ],
-                "attendees": [ {
-                  "name": "Attendee",
-                  "email_address": "attendee@pipedrivemail.com",
-                  "person_id": 25312,
-                  "status": "noreply",
-                  "is_organizer": 0,
-                  "user_id": ""
-                } ],
-                "location_street_number": 3.0,
-                "deal_dropbox_bcc": "company+deal300@pipedrivemail.com",
-                "person_id": 1101,
-                "org_id": 5,
-                "reference_id": 7,
-                "due_time": "10:00",
-                "update_user_id": 5596,
-                "location_locality": "Tallinn",
-                "id": 8,
-                "location_subpremise": "",
-                "rec_master_activity_id": 1,
-                "file": {
-                  "id": "376892,",
-                  "clean_name": "Audio 10:55:07.m4a",
-                  "url": "https://pipedrive-files.s3-eu-west-1.amazonaws.com/Audio-recording.m4a"
+                "person_name": "Person"
+              },
+              "related_objects": {
+                "user": {
+                  "123": {
+                    "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+                    "has_pic": 1,
+                    "name": "Jane Doe",
+                    "email": "jane@pipedrive.com",
+                    "active_flag": true,
+                    "id": 123
+                  }
                 },
-                "gcal_event_id": "",
-                "done": false
-              }
-            }
+                "picture": {
+                  "1": {
+                    "id": 1,
+                    "add_time": "2020-09-08 08:17:52",
+                    "update_time": "0000-00-00 00:00:00",
+                    "active_flag": true,
+                    "item_type": "person",
+                    "item_id": 25,
+                    "added_by_user_id": 967055,
+                    "pictures": {
+                      "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+                      "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+                    }
+                  }
+                },
+                "organization": {
+                  "1": {
+                    "address": "Mustamäe tee 3a, 10615 Tallinn",
+                    "people_count": 1,
+                    "name": "Org Name",
+                    "active_flag": true,
+                    "owner_id": 123,
+                    "cc_email": "org@pipedrivemail.com",
+                    "id": 1
+                  }
+                }
+              },
+              "additional_data": {
+                "pagination": {
+                  "next_start": 100,
+                  "more_items_in_collection": false,
+                  "start": 0,
+                  "limit": 100
+                }
+              },
+              "next_activity": ""
+            },
+            "type": "object"
           } ]
-        },
-        "success": true
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns all persons.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -20792,6 +20740,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get all persons",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -22899,14 +22848,73 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "123": {
+              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+              "has_pic": 1,
+              "name": "Jane Doe",
+              "email": "jane@pipedrive.com",
+              "active_flag": true,
+              "id": 123
+            }
+          },
+          "picture": {
+            "1": {
+              "id": 1,
+              "add_time": "2020-09-08 08:17:52",
+              "update_time": "0000-00-00 00:00:00",
+              "active_flag": true,
+              "item_type": "person",
+              "item_id": 25,
+              "added_by_user_id": 967055,
+              "pictures": {
+                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+              }
+            }
+          },
+          "organization": {
+            "1": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 1,
+              "name": "Org Name",
+              "active_flag": true,
+              "owner_id": 123,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 1
+            }
+          }
+        },
         "data": [ {
+          "last_activity_id": 34,
+          "last_activity_date": "2019-11-28",
+          "cc_email": "org@pipedrivemail.com",
+          "label": 1,
+          "followers_count": 3,
+          "related_lost_deals_count": 1,
+          "first_char": "w",
+          "undone_activities_count": 2,
+          "related_closed_deals_count": 3,
+          "last_incoming_mail_time": "2019-05-29 18:21:42",
+          "done_activities_count": 1,
+          "phone": [ {
+            "primary": true,
+            "value": 12345.0,
+            "label": "work"
+          } ],
+          "activities_count": 1,
+          "active_flag": true,
+          "visible_to": 3.0,
+          "org_name": "Organization name",
+          "next_activity_date": "2019-11-29",
           "related_open_deals_count": 2,
           "won_deals_count": 3,
           "lost_deals_count": 1,
           "email": [ {
+            "primary": true,
             "value": "12345@email.com",
-            "label": "work",
-            "primary": true
+            "label": "work"
           } ],
           "participant_closed_deals_count": 1,
           "notes_count": 2,
@@ -22920,113 +22928,54 @@
           "id": 1,
           "related_won_deals_count": 3,
           "owner_id": {
+            "has_pic": 1,
+            "name": "Jane Doe",
             "email": "jane@pipedrive.com",
             "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
             "active_flag": true,
             "value": 123,
-            "id": 123,
-            "has_pic": 1,
-            "name": "Jane Doe"
+            "id": 123
           },
           "primary_email": "12345@email.com",
           "participant_open_deals_count": 1,
           "last_name": "Smith",
           "org_id": {
+            "address": "Mustamäe tee 3a, 10615 Tallinn",
+            "people_count": 1,
+            "name": "Org Name",
             "active_flag": true,
             "owner_id": 123,
             "cc_email": "org@pipedrivemail.com",
-            "value": 1234,
-            "address": "Mustamäe tee 3a, 10615 Tallinn",
-            "people_count": 1,
-            "name": "Org Name"
+            "value": 1234
           },
           "marketing_status": "no_consent",
           "open_deals_count": 2,
           "email_messages_count": 1,
           "picture_id": {
+            "add_time": "2020-09-08 08:17:52",
+            "value": 4,
             "update_time": "0000-00-00 00:00:00",
             "active_flag": true,
             "item_type": "person",
             "item_id": 25,
             "added_by_user_id": 967055,
             "pictures": {
-              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-            },
-            "add_time": "2020-09-08 08:17:52",
-            "value": 4
+              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+            }
           },
           "company_id": 12,
           "closed_deals_count": 3,
           "name": "Will Smith",
-          "update_time": "2020-05-08 05:30:20",
-          "last_activity_id": 34,
-          "last_activity_date": "2019-11-28",
-          "cc_email": "org@pipedrivemail.com",
-          "label": 1,
-          "followers_count": 3,
-          "related_lost_deals_count": 1,
-          "first_char": "w",
-          "undone_activities_count": 2,
-          "related_closed_deals_count": 3,
-          "last_incoming_mail_time": "2019-05-29 18:21:42",
-          "done_activities_count": 1,
-          "phone": [ {
-            "value": 12345.0,
-            "label": "work",
-            "primary": true
-          } ],
-          "activities_count": 1,
-          "active_flag": true,
-          "visible_to": 3.0,
-          "org_name": "Organization name",
-          "next_activity_date": "2019-11-29"
+          "update_time": "2020-05-08 05:30:20"
         } ],
         "success": true,
         "additional_data": {
           "pagination": {
-            "start": 0,
-            "limit": 100,
             "next_start": 100,
-            "more_items_in_collection": false
-          }
-        },
-        "related_objects": {
-          "picture": {
-            "1": {
-              "update_time": "0000-00-00 00:00:00",
-              "active_flag": true,
-              "item_type": "person",
-              "item_id": 25,
-              "added_by_user_id": 967055,
-              "pictures": {
-                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-              },
-              "id": 1,
-              "add_time": "2020-09-08 08:17:52"
-            }
-          },
-          "organization": {
-            "1": {
-              "active_flag": true,
-              "owner_id": 123,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 1,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 1,
-              "name": "Org Name"
-            }
-          },
-          "user": {
-            "123": {
-              "name": "Jane Doe",
-              "email": "jane@pipedrive.com",
-              "active_flag": true,
-              "id": 123,
-              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-              "has_pic": 1
-            }
+            "more_items_in_collection": false,
+            "start": 0,
+            "limit": 100
           }
         }
       }
@@ -23034,14 +22983,9 @@
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Adds a new person. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the personFields and look for `key` values.<br>If a company uses the [Campaigns product](https://pipedrive.readme.io/docs/campaigns-in-pipedrive-api), then this endpoint will also accept and return the `data.marketing_status` field.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/persons",
@@ -23427,6 +23371,7 @@
       "optionsDataSource": null
     } ],
     "title": "Add a person",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -25022,15 +24967,48 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "123": {
+              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+              "has_pic": 1,
+              "name": "Jane Doe",
+              "email": "jane@pipedrive.com",
+              "active_flag": true,
+              "id": 123
+            }
+          }
+        },
         "success": true,
         "data": {
+          "last_activity_id": 34,
+          "last_activity_date": "2019-11-28",
+          "cc_email": "org@pipedrivemail.com",
+          "label": 1,
+          "followers_count": 3,
+          "related_lost_deals_count": 1,
+          "first_char": "w",
+          "undone_activities_count": 2,
+          "related_closed_deals_count": 3,
+          "last_incoming_mail_time": "2019-05-29 18:21:42",
+          "done_activities_count": 1,
+          "phone": [ {
+            "primary": true,
+            "value": 12345.0,
+            "label": "work"
+          } ],
+          "activities_count": 1,
+          "active_flag": true,
+          "visible_to": 3.0,
+          "org_name": "Organization name",
+          "next_activity_date": "2019-11-29",
           "related_open_deals_count": 2,
           "won_deals_count": 3,
           "lost_deals_count": 1,
           "email": [ {
+            "primary": true,
             "value": "12345@email.com",
-            "label": "work",
-            "primary": true
+            "label": "work"
           } ],
           "participant_closed_deals_count": 1,
           "notes_count": 2,
@@ -25044,93 +25022,55 @@
           "id": 1,
           "related_won_deals_count": 3,
           "owner_id": {
+            "has_pic": 1,
+            "name": "Jane Doe",
             "email": "jane@pipedrive.com",
             "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
             "active_flag": true,
             "value": 123,
-            "id": 123,
-            "has_pic": 1,
-            "name": "Jane Doe"
+            "id": 123
           },
           "primary_email": "12345@email.com",
           "participant_open_deals_count": 1,
           "last_name": "Smith",
           "org_id": {
+            "address": "Mustamäe tee 3a, 10615 Tallinn",
+            "people_count": 1,
+            "name": "Org Name",
             "active_flag": true,
             "owner_id": 123,
             "cc_email": "org@pipedrivemail.com",
-            "value": 1234,
-            "address": "Mustamäe tee 3a, 10615 Tallinn",
-            "people_count": 1,
-            "name": "Org Name"
+            "value": 1234
           },
           "marketing_status": "no_consent",
           "open_deals_count": 2,
           "email_messages_count": 1,
           "picture_id": {
+            "add_time": "2020-09-08 08:17:52",
+            "value": 4,
             "update_time": "0000-00-00 00:00:00",
             "active_flag": true,
             "item_type": "person",
             "item_id": 25,
             "added_by_user_id": 967055,
             "pictures": {
-              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-            },
-            "add_time": "2020-09-08 08:17:52",
-            "value": 4
+              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+            }
           },
           "company_id": 12,
           "closed_deals_count": 3,
           "name": "Will Smith",
-          "update_time": "2020-05-08 05:30:20",
-          "last_activity_id": 34,
-          "last_activity_date": "2019-11-28",
-          "cc_email": "org@pipedrivemail.com",
-          "label": 1,
-          "followers_count": 3,
-          "related_lost_deals_count": 1,
-          "first_char": "w",
-          "undone_activities_count": 2,
-          "related_closed_deals_count": 3,
-          "last_incoming_mail_time": "2019-05-29 18:21:42",
-          "done_activities_count": 1,
-          "phone": [ {
-            "value": 12345.0,
-            "label": "work",
-            "primary": true
-          } ],
-          "activities_count": 1,
-          "active_flag": true,
-          "visible_to": 3.0,
-          "org_name": "Organization name",
-          "next_activity_date": "2019-11-29"
-        },
-        "related_objects": {
-          "user": {
-            "123": {
-              "name": "Jane Doe",
-              "email": "jane@pipedrive.com",
-              "active_flag": true,
-              "id": 123,
-              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-              "has_pic": 1
-            }
-          }
+          "update_time": "2020-05-08 05:30:20"
         }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Searches all persons by name, email, phone, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found persons can be filtered by organization ID.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -25316,6 +25256,7 @@
       "optionsDataSource": null
     } ],
     "title": "Search persons",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -25926,14 +25867,6 @@
         "data": {
           "items": [ {
             "item": {
-              "name": "Jane Doe",
-              "custom_fields": [ ],
-              "type": "person",
-              "organization": {
-                "id": 1,
-                "name": "Organization name",
-                "address": ""
-              },
               "notes": [ ],
               "id": 1,
               "owner": {
@@ -25941,16 +25874,24 @@
               },
               "phones": [ "+372 555555555" ],
               "emails": [ "jane@pipedrive.com" ],
-              "visible_to": 3
+              "visible_to": 3,
+              "name": "Jane Doe",
+              "custom_fields": [ ],
+              "type": "person",
+              "organization": {
+                "address": "",
+                "id": 1,
+                "name": "Organization name"
+              }
             },
             "result_score": 0.5092
           } ]
         },
         "additional_data": {
           "pagination": {
-            "limit": 100,
             "more_items_in_collection": false,
-            "start": 0
+            "start": 0,
+            "limit": 100
           }
         }
       }
@@ -25958,14 +25899,9 @@
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -25996,6 +25932,7 @@
       "optionsDataSource": null
     } ],
     "title": "Delete a person",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -26084,23 +26021,18 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "success": true,
         "data": {
           "id": 12
-        },
-        "success": true
+        }
       }
     },
     "perform": null
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Returns the details of a person. Note that this also returns some additional fields which are not present when asking for all persons. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of personFields.<br>If a company uses the [Campaigns product](https://pipedrive.readme.io/docs/campaigns-in-pipedrive-api), then this endpoint will also return the `data.marketing_status` field.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -26131,6 +26063,7 @@
       "optionsDataSource": null
     } ],
     "title": "Get details of a person",
+    "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -28115,14 +28048,73 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
+        "related_objects": {
+          "user": {
+            "123": {
+              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
+              "has_pic": 1,
+              "name": "Jane Doe",
+              "email": "jane@pipedrive.com",
+              "active_flag": true,
+              "id": 123
+            }
+          },
+          "picture": {
+            "1": {
+              "id": 1,
+              "add_time": "2020-09-08 08:17:52",
+              "update_time": "0000-00-00 00:00:00",
+              "active_flag": true,
+              "item_type": "person",
+              "item_id": 25,
+              "added_by_user_id": 967055,
+              "pictures": {
+                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+              }
+            }
+          },
+          "organization": {
+            "1": {
+              "address": "Mustamäe tee 3a, 10615 Tallinn",
+              "people_count": 1,
+              "name": "Org Name",
+              "active_flag": true,
+              "owner_id": 123,
+              "cc_email": "org@pipedrivemail.com",
+              "id": 1
+            }
+          }
+        },
         "data": {
+          "last_activity_id": 34,
+          "last_activity_date": "2019-11-28",
+          "cc_email": "org@pipedrivemail.com",
+          "label": 1,
+          "followers_count": 3,
+          "related_lost_deals_count": 1,
+          "first_char": "w",
+          "undone_activities_count": 2,
+          "related_closed_deals_count": 3,
+          "last_incoming_mail_time": "2019-05-29 18:21:42",
+          "done_activities_count": 1,
+          "phone": [ {
+            "primary": true,
+            "value": 12345.0,
+            "label": "work"
+          } ],
+          "activities_count": 1,
+          "active_flag": true,
+          "visible_to": 3.0,
+          "org_name": "Organization name",
+          "next_activity_date": "2019-11-29",
           "related_open_deals_count": 2,
           "won_deals_count": 3,
           "lost_deals_count": 1,
           "email": [ {
+            "primary": true,
             "value": "12345@email.com",
-            "label": "work",
-            "primary": true
+            "label": "work"
           } ],
           "participant_closed_deals_count": 1,
           "notes_count": 2,
@@ -28136,260 +28128,60 @@
           "id": 1,
           "related_won_deals_count": 3,
           "owner_id": {
+            "has_pic": 1,
+            "name": "Jane Doe",
             "email": "jane@pipedrive.com",
             "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
             "active_flag": true,
             "value": 123,
-            "id": 123,
-            "has_pic": 1,
-            "name": "Jane Doe"
+            "id": 123
           },
           "primary_email": "12345@email.com",
           "participant_open_deals_count": 1,
           "last_name": "Smith",
           "org_id": {
+            "address": "Mustamäe tee 3a, 10615 Tallinn",
+            "people_count": 1,
+            "name": "Org Name",
             "active_flag": true,
             "owner_id": 123,
             "cc_email": "org@pipedrivemail.com",
-            "value": 1234,
-            "address": "Mustamäe tee 3a, 10615 Tallinn",
-            "people_count": 1,
-            "name": "Org Name"
+            "value": 1234
           },
           "marketing_status": "no_consent",
           "open_deals_count": 2,
           "email_messages_count": 1,
           "picture_id": {
+            "add_time": "2020-09-08 08:17:52",
+            "value": 4,
             "update_time": "0000-00-00 00:00:00",
             "active_flag": true,
             "item_type": "person",
             "item_id": 25,
             "added_by_user_id": 967055,
             "pictures": {
-              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-            },
-            "add_time": "2020-09-08 08:17:52",
-            "value": 4
+              "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg",
+              "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg"
+            }
           },
           "company_id": 12,
           "closed_deals_count": 3,
           "name": "Will Smith",
-          "update_time": "2020-05-08 05:30:20",
-          "last_activity_id": 34,
-          "last_activity_date": "2019-11-28",
-          "cc_email": "org@pipedrivemail.com",
-          "label": 1,
-          "followers_count": 3,
-          "related_lost_deals_count": 1,
-          "first_char": "w",
-          "undone_activities_count": 2,
-          "related_closed_deals_count": 3,
-          "last_incoming_mail_time": "2019-05-29 18:21:42",
-          "done_activities_count": 1,
-          "phone": [ {
-            "value": 12345.0,
-            "label": "work",
-            "primary": true
-          } ],
-          "activities_count": 1,
-          "active_flag": true,
-          "visible_to": 3.0,
-          "org_name": "Organization name",
-          "next_activity_date": "2019-11-29"
+          "update_time": "2020-05-08 05:30:20"
         },
         "success": true,
         "additional_data": {
           "dropbox_email": "test@email.com"
-        },
-        "related_objects": {
-          "picture": {
-            "1": {
-              "update_time": "0000-00-00 00:00:00",
-              "active_flag": true,
-              "item_type": "person",
-              "item_id": 25,
-              "added_by_user_id": 967055,
-              "pictures": {
-                "512": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg",
-                "128": "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"
-              },
-              "id": 1,
-              "add_time": "2020-09-08 08:17:52"
-            }
-          },
-          "organization": {
-            "1": {
-              "active_flag": true,
-              "owner_id": 123,
-              "cc_email": "org@pipedrivemail.com",
-              "id": 1,
-              "address": "Mustamäe tee 3a, 10615 Tallinn",
-              "people_count": 1,
-              "name": "Org Name"
-            }
-          },
-          "user": {
-            "123": {
-              "name": "Jane Doe",
-              "email": "jane@pipedrive.com",
-              "active_flag": true,
-              "id": 123,
-              "pic_hash": "2611ace8ac6a3afe2f69ed56f9e08c6b",
-              "has_pic": 1
-            }
-          }
         }
       }
     },
     "perform": null
   } ],
-  "category": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "api_key",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "value",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Value",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": true,
-        "metadata": { },
-        "required": true,
-        "name": "addTo",
-        "type": "STRING",
-        "defaultValue": "QUERY_PARAMETERS",
-        "exampleValue": null,
-        "label": "Add to",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "API Key",
-      "type": "API_KEY",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null
-    }, {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": { },
-      "scopes": { },
-      "tokenUrl": { }
-    } ],
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
-  "customAction": true,
-  "customActionHelp": null,
-  "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-  "icon": "path:assets/pipedrive.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "pipedrive",
-  "resources": null,
-  "version": 1,
-  "title": "Pipedrive",
   "triggers": [ {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever a new activity is added.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "newActivity",
     "outputFunction": null,
@@ -28398,8 +28190,11 @@
     "title": "New Activity",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -29828,25 +29623,18 @@
       },
       "sampleOutput": "{\n    \"id\": 8,\n    \"company_id\": 22122,\n    \"user_id\": 1234,\n    \"done\": false,\n    \"type\": \"deadline\",\n    \"reference_type\": \"scheduler-service\",\n    \"reference_id\": 7,\n    \"conference_meeting_client\": \"871b8bc88d3a1202\",\n    \"conference_meeting_url\": \"https://pipedrive.zoom.us/link\",\n    \"conference_meeting_id\": \"01758746701\",\n    \"due_date\": \"2020-06-09\",\n    \"due_time\": \"10:00\",\n    \"duration\": \"01:00\",\n    \"busy_flag\": true,\n    \"add_time\": \"2020-06-08 12:37:56\",\n    \"marked_as_done_time\": \"2020-08-08 08:08:38\",\n    \"last_notification_time\": \"2020-08-08 12:37:56\",\n    \"last_notification_user_id\": 7655,\n    \"notification_language_id\": 1,\n    \"subject\": \"Deadline\",\n    \"public_description\": \"This is a description\",\n    \"calendar_sync_include_context\": \"\",\n    \"location\": \"Mustamäe tee 3, Tallinn, Estonia\",\n    \"org_id\": 5,\n    \"person_id\": 1101,\n    \"deal_id\": 300,\n    \"lead_id\": \"46c3b0e1-db35-59ca-1828-4817378dff71\",\n    \"project_id\": null,\n    \"active_flag\": true,\n    \"update_time\": \"2020-08-08 12:37:56\",\n    \"update_user_id\": 5596,\n    \"gcal_event_id\": \"\",\n    \"google_calendar_id\": \"\",\n    \"google_calendar_etag\": \"\",\n    \"source_timezone\": \"\",\n    \"rec_rule\": \"RRULE:FREQ=WEEKLY;BYDAY=WE\",\n    \"rec_rule_extension\": \"\",\n    \"rec_master_activity_id\": 1,\n    \"series\": [],\n    \"note\": \"A note for the activity\",\n    \"created_by_user_id\": 1234,\n    \"location_subpremise\": \"\",\n    \"location_street_number\": \"3\",\n    \"location_route\": \"Mustamäe tee\",\n    \"location_sublocality\": \"Kristiine\",\n    \"location_locality\": \"Tallinn\",\n    \"location_admin_area_level_1\": \"Harju maakond\",\n    \"location_admin_area_level_2\": \"\",\n    \"location_country\": \"Estonia\",\n    \"location_postal_code\": \"10616\",\n    \"location_formatted_address\": \"Mustamäe tee 3, 10616 Tallinn, Estonia\",\n    \"attendees\":\n    [\n        {\n            \"email_address\": \"attendee@pipedrivemail.com\",\n            \"is_organizer\": 0,\n            \"name\": \"Attendee\",\n            \"person_id\": 25312,\n            \"status\": \"noreply\",\n            \"user_id\": null\n        }\n    ],\n    \"participants\":\n    [\n        {\n            \"person_id\": 17985,\n            \"primary_flag\": false\n        },\n        {\n            \"person_id\": 1101,\n            \"primary_flag\": true\n        }\n    ],\n    \"org_name\": \"Organization\",\n    \"person_name\": \"Person\",\n    \"deal_title\": \"Deal\",\n    \"owner_name\": \"Creator\",\n    \"person_dropbox_bcc\": \"company@pipedrivemail.com\",\n    \"deal_dropbox_bcc\": \"company+deal300@pipedrivemail.com\",\n    \"assigned_to_user_id\": 1235,\n    \"file\":\n    {\n        \"id\": \"376892,\",\n        \"clean_name\": \"Audio 10:55:07.m4a\",\n        \"url\": \"https://pipedrive-files.s3-eu-west-1.amazonaws.com/Audio-recording.m4a\"\n    }\n}\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever a new deal is added.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "newDeal",
     "outputFunction": null,
@@ -29855,8 +29643,11 @@
     "title": "New Deal",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -31655,25 +31446,18 @@
       },
       "sampleOutput": "{\n    \"id\": 1,\n    \"creator_user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"person_id\":\n    {\n        \"active_flag\": true,\n        \"name\": \"Person\",\n        \"email\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"person@pipedrive.com\",\n                \"primary\": true\n            }\n        ],\n        \"phone\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"37244499911\",\n                \"primary\": true\n            }\n        ],\n        \"value\": 1101\n    },\n    \"org_id\":\n    {\n        \"name\": \"Organization\",\n        \"people_count\": 2,\n        \"owner_id\": 8877,\n        \"address\": \"\",\n        \"active_flag\": true,\n        \"cc_email\": \"org@pipedrivemail.com\",\n        \"value\": 5\n    },\n    \"stage_id\": 2,\n    \"title\": \"Deal One\",\n    \"value\": 5000,\n    \"currency\": \"EUR\",\n    \"add_time\": \"2019-05-29 04:21:51\",\n    \"update_time\": \"2019-11-28 16:19:50\",\n    \"stage_change_time\": \"2019-11-28 15:41:22\",\n    \"active\": true,\n    \"deleted\": false,\n    \"status\": \"open\",\n    \"probability\": null,\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": null,\n    \"last_activity_date\": null,\n    \"lost_reason\": null,\n    \"visible_to\": \"1\",\n    \"close_time\": null,\n    \"pipeline_id\": 1,\n    \"won_time\": \"2019-11-27 11:40:36\",\n    \"first_won_time\": \"2019-11-27 11:40:36\",\n    \"lost_time\": \"\",\n    \"products_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 2,\n    \"followers_count\": 0,\n    \"email_messages_count\": 4,\n    \"activities_count\": 1,\n    \"done_activities_count\": 0,\n    \"undone_activities_count\": 1,\n    \"participants_count\": 1,\n    \"expected_close_date\": \"2019-06-29\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": \"11\",\n    \"stage_order_nr\": 2,\n    \"person_name\": \"Person\",\n    \"org_name\": \"Organization\",\n    \"next_activity_subject\": \"Call\",\n    \"next_activity_type\": \"call\",\n    \"next_activity_duration\": \"00:30:00\",\n    \"next_activity_note\": \"Note content\",\n    \"formatted_value\": \"€5,000\",\n    \"weighted_value\": 5000,\n    \"formatted_weighted_value\": \"€5,000\",\n    \"weighted_value_currency\": \"EUR\",\n    \"rotten_time\": null,\n    \"owner_name\": \"Creator\",\n    \"cc_email\": \"company+deal1@pipedrivemail.com\",\n    \"org_hidden\": false,\n    \"person_hidden\": false\n}\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever a new organization is added.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "newOrganization",
     "outputFunction": null,
@@ -31682,8 +31466,11 @@
     "title": "New Organization",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -32909,25 +32696,18 @@
       },
       "sampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 77,\n    \"owner_id\":\n    {\n        \"id\": 10,\n        \"name\": \"Will Smith\",\n        \"email\": \"will.smith@pipedrive.com\",\n        \"has_pic\": 0,\n        \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n        \"active_flag\": true,\n        \"value\": 10\n    },\n    \"name\": \"Bolt\",\n    \"open_deals_count\": 1,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 1,\n    \"email_messages_count\": 2,\n    \"people_count\": 1,\n    \"activities_count\": 2,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 0,\n    \"followers_count\": 1,\n    \"won_deals_count\": 0,\n    \"related_won_deals_count\": 0,\n    \"lost_deals_count\": 0,\n    \"related_lost_deals_count\": 0,\n    \"active_flag\": true,\n    \"picture_id\":\n    {\n        \"item_type\": \"person\",\n        \"item_id\": 25,\n        \"active_flag\": true,\n        \"add_time\": \"2020-09-08 08:17:52\",\n        \"update_time\": \"0000-00-00 00:00:00\",\n        \"added_by_user_id\": 967055,\n        \"pictures\":\n        {\n            \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\n            \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"\n        },\n        \"value\": 101\n    },\n    \"country_code\": \"USA\",\n    \"first_char\": \"b\",\n    \"update_time\": \"2020-09-08 12:14:11\",\n    \"add_time\": \"2020-02-25 10:04:08\",\n    \"visible_to\": \"3\",\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"label\": 7,\n    \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n    \"address_subpremise\": \"\",\n    \"address_street_number\": \"3a\",\n    \"address_route\": \"Mustamäe tee\",\n    \"address_sublocality\": \"Kristiine\",\n    \"address_locality\": \"Tallinn\",\n    \"address_admin_area_level_1\": \"Harju maakond\",\n    \"address_admin_area_level_2\": \"\",\n    \"address_country\": \"Estonia\",\n    \"address_postal_code\": \"10616\",\n    \"address_formatted_address\": \"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\n    \"owner_name\": \"John Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n}\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever a new person is added.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "newPerson",
     "outputFunction": null,
@@ -32936,8 +32716,11 @@
     "title": "New Person",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -34447,25 +34230,18 @@
       },
       "sampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 12,\n    \"owner_id\": {\n      \"id\": 123,\n      \"name\": \"Jane Doe\",\n      \"email\": \"jane@pipedrive.com\",\n      \"has_pic\": 1,\n      \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n      \"active_flag\": true,\n      \"value\": 123\n    },\n    \"org_id\": {\n      \"name\": \"Org Name\",\n      \"people_count\": 1,\n      \"owner_id\": 123,\n      \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n      \"active_flag\": true,\n      \"cc_email\": \"org@pipedrivemail.com\",\n      \"value\": 1234\n    },\n    \"name\": \"Will Smith\",\n    \"first_name\": \"Will\",\n    \"last_name\": \"Smith\",\n    \"open_deals_count\": 2,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 3,\n    \"participant_open_deals_count\": 1,\n    \"participant_closed_deals_count\": 1,\n    \"email_messages_count\": 1,\n    \"activities_count\": 1,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 2,\n    \"files_count\": 2,\n    \"notes_count\": 2,\n    \"followers_count\": 3,\n    \"won_deals_count\": 3,\n    \"related_won_deals_count\": 3,\n    \"lost_deals_count\": 1,\n    \"related_lost_deals_count\": 1,\n    \"active_flag\": true,\n    \"phone\": [\n      {\n        \"value\": \"12345\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"email\": [\n      {\n        \"value\": \"12345@email.com\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"primary_email\": \"12345@email.com\",\n    \"first_char\": \"w\",\n    \"update_time\": \"2020-05-08 05:30:20\",\n    \"add_time\": \"2017-10-18 13:23:07\",\n    \"visible_to\": \"3\",\n    \"marketing_status\": \"no_consent\",\n    \"picture_id\": {\n      \"item_type\": \"person\",\n      \"item_id\": 25,\n      \"active_flag\": true,\n      \"add_time\": \"2020-09-08 08:17:52\",\n      \"update_time\": \"0000-00-00 00:00:00\",\n      \"added_by_user_id\": 967055,\n      \"pictures\": {\n        \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\n        \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"\n      },\n      \"value\": 4\n    },\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": 1,\n    \"org_name\": \"Organization name\",\n    \"owner_name\": \"Jane Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n  }\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever an existing deal is updated.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "updatedDeal",
     "outputFunction": null,
@@ -34474,8 +34250,11 @@
     "title": "Updated Deal",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -36274,25 +36053,18 @@
       },
       "sampleOutput": "{\n    \"id\": 1,\n    \"creator_user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"person_id\":\n    {\n        \"active_flag\": true,\n        \"name\": \"Person\",\n        \"email\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"person@pipedrive.com\",\n                \"primary\": true\n            }\n        ],\n        \"phone\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"37244499911\",\n                \"primary\": true\n            }\n        ],\n        \"value\": 1101\n    },\n    \"org_id\":\n    {\n        \"name\": \"Organization\",\n        \"people_count\": 2,\n        \"owner_id\": 8877,\n        \"address\": \"\",\n        \"active_flag\": true,\n        \"cc_email\": \"org@pipedrivemail.com\",\n        \"value\": 5\n    },\n    \"stage_id\": 2,\n    \"title\": \"Deal One\",\n    \"value\": 5000,\n    \"currency\": \"EUR\",\n    \"add_time\": \"2019-05-29 04:21:51\",\n    \"update_time\": \"2019-11-28 16:19:50\",\n    \"stage_change_time\": \"2019-11-28 15:41:22\",\n    \"active\": true,\n    \"deleted\": false,\n    \"status\": \"open\",\n    \"probability\": null,\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": null,\n    \"last_activity_date\": null,\n    \"lost_reason\": null,\n    \"visible_to\": \"1\",\n    \"close_time\": null,\n    \"pipeline_id\": 1,\n    \"won_time\": \"2019-11-27 11:40:36\",\n    \"first_won_time\": \"2019-11-27 11:40:36\",\n    \"lost_time\": \"\",\n    \"products_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 2,\n    \"followers_count\": 0,\n    \"email_messages_count\": 4,\n    \"activities_count\": 1,\n    \"done_activities_count\": 0,\n    \"undone_activities_count\": 1,\n    \"participants_count\": 1,\n    \"expected_close_date\": \"2019-06-29\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": \"11\",\n    \"stage_order_nr\": 2,\n    \"person_name\": \"Person\",\n    \"org_name\": \"Organization\",\n    \"next_activity_subject\": \"Call\",\n    \"next_activity_type\": \"call\",\n    \"next_activity_duration\": \"00:30:00\",\n    \"next_activity_note\": \"Note content\",\n    \"formatted_value\": \"€5,000\",\n    \"weighted_value\": 5000,\n    \"formatted_weighted_value\": \"€5,000\",\n    \"weighted_value_currency\": \"EUR\",\n    \"rotten_time\": null,\n    \"owner_name\": \"Creator\",\n    \"cc_email\": \"company+deal1@pipedrivemail.com\",\n    \"org_hidden\": false,\n    \"person_hidden\": false\n}\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever an existing organization is updated.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "updatedOrganization",
     "outputFunction": null,
@@ -36301,8 +36073,11 @@
     "title": "Updated Organization",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -37528,25 +37303,18 @@
       },
       "sampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 77,\n    \"owner_id\":\n    {\n        \"id\": 10,\n        \"name\": \"Will Smith\",\n        \"email\": \"will.smith@pipedrive.com\",\n        \"has_pic\": 0,\n        \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n        \"active_flag\": true,\n        \"value\": 10\n    },\n    \"name\": \"Bolt\",\n    \"open_deals_count\": 1,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 1,\n    \"email_messages_count\": 2,\n    \"people_count\": 1,\n    \"activities_count\": 2,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 0,\n    \"followers_count\": 1,\n    \"won_deals_count\": 0,\n    \"related_won_deals_count\": 0,\n    \"lost_deals_count\": 0,\n    \"related_lost_deals_count\": 0,\n    \"active_flag\": true,\n    \"picture_id\":\n    {\n        \"item_type\": \"person\",\n        \"item_id\": 25,\n        \"active_flag\": true,\n        \"add_time\": \"2020-09-08 08:17:52\",\n        \"update_time\": \"0000-00-00 00:00:00\",\n        \"added_by_user_id\": 967055,\n        \"pictures\":\n        {\n            \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\n            \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"\n        },\n        \"value\": 101\n    },\n    \"country_code\": \"USA\",\n    \"first_char\": \"b\",\n    \"update_time\": \"2020-09-08 12:14:11\",\n    \"add_time\": \"2020-02-25 10:04:08\",\n    \"visible_to\": \"3\",\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"label\": 7,\n    \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n    \"address_subpremise\": \"\",\n    \"address_street_number\": \"3a\",\n    \"address_route\": \"Mustamäe tee\",\n    \"address_sublocality\": \"Kristiine\",\n    \"address_locality\": \"Tallinn\",\n    \"address_admin_area_level_1\": \"Harju maakond\",\n    \"address_admin_area_level_2\": \"\",\n    \"address_country\": \"Estonia\",\n    \"address_postal_code\": \"10616\",\n    \"address_formatted_address\": \"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\n    \"owner_name\": \"John Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n}\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   }, {
     "batch": null,
-    "componentName": "pipedrive",
-    "componentDescription": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-    "componentTitle": "Pipedrive",
-    "componentVersion": 1,
     "defaultOutputFunction": true,
     "deprecated": null,
     "description": "Trigger off whenever an existing person is updated.",
-    "nodeDescriptionFunction": null,
     "help": null,
     "name": "updatedPerson",
     "outputFunction": null,
@@ -37555,8 +37323,11 @@
     "title": "Updated Person",
     "type": "DYNAMIC_WEBHOOK",
     "webhookRawBody": null,
+    "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -39066,15 +38837,134 @@
       },
       "sampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 12,\n    \"owner_id\": {\n      \"id\": 123,\n      \"name\": \"Jane Doe\",\n      \"email\": \"jane@pipedrive.com\",\n      \"has_pic\": 1,\n      \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n      \"active_flag\": true,\n      \"value\": 123\n    },\n    \"org_id\": {\n      \"name\": \"Org Name\",\n      \"people_count\": 1,\n      \"owner_id\": 123,\n      \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n      \"active_flag\": true,\n      \"cc_email\": \"org@pipedrivemail.com\",\n      \"value\": 1234\n    },\n    \"name\": \"Will Smith\",\n    \"first_name\": \"Will\",\n    \"last_name\": \"Smith\",\n    \"open_deals_count\": 2,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 3,\n    \"participant_open_deals_count\": 1,\n    \"participant_closed_deals_count\": 1,\n    \"email_messages_count\": 1,\n    \"activities_count\": 1,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 2,\n    \"files_count\": 2,\n    \"notes_count\": 2,\n    \"followers_count\": 3,\n    \"won_deals_count\": 3,\n    \"related_won_deals_count\": 3,\n    \"lost_deals_count\": 1,\n    \"related_lost_deals_count\": 1,\n    \"active_flag\": true,\n    \"phone\": [\n      {\n        \"value\": \"12345\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"email\": [\n      {\n        \"value\": \"12345@email.com\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"primary_email\": \"12345@email.com\",\n    \"first_char\": \"w\",\n    \"update_time\": \"2020-05-08 05:30:20\",\n    \"add_time\": \"2017-10-18 13:23:07\",\n    \"visible_to\": \"3\",\n    \"marketing_status\": \"no_consent\",\n    \"picture_id\": {\n      \"item_type\": \"person\",\n      \"item_id\": 25,\n      \"active_flag\": true,\n      \"add_time\": \"2020-09-08 08:17:52\",\n      \"update_time\": \"0000-00-00 00:00:00\",\n      \"added_by_user_id\": 967055,\n      \"pictures\": {\n        \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\n        \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"\n      },\n      \"value\": 4\n    },\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": 1,\n    \"org_name\": \"Organization name\",\n    \"owner_name\": \"Jane Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n  }\n"
     },
-    "dynamicWebhookDisable": { },
-    "poll": null,
-    "deduplicate": null,
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
-    "webhookValidate": null
+    "webhookValidate": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { }
   } ],
-  "allowedConnections": null
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "api_key",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "value",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Value",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": true,
+        "metadata": { },
+        "required": true,
+        "name": "addTo",
+        "type": "STRING",
+        "defaultValue": "QUERY_PARAMETERS",
+        "exampleValue": null,
+        "label": "Add to",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "API Key",
+      "type": "API_KEY",
+      "acquire": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
+    }, {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "acquire": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": { },
+      "scopes": { },
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  }
 }
