@@ -126,7 +126,11 @@ const Property = ({
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    const showMentionInput = controlType === 'FILE_ENTRY' || (mentionInput && !!dataPills?.length);
+    let showMentionInput = controlType === 'FILE_ENTRY' || (mentionInput && !!dataPills?.length);
+
+    if (controlType === 'OBJECT_BUILDER' && !!properties?.length) {
+        showMentionInput = false;
+    }
 
     let showInputTypeSwitchButton = type !== 'STRING' && !!dataPills?.length && !!name;
 
