@@ -1826,6 +1826,10 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        connectionsCount:
+          description: "The number of workflow connections"
+          type: "integer"
+          readOnly: true
         description:
           description: "The description of a workflow."
           type: "string"
@@ -1833,6 +1837,10 @@ components:
         id:
           description: "The id of the workflow."
           type: "string"
+          readOnly: true
+        inputsCount:
+          description: "The number of workflow inputs"
+          type: "integer"
           readOnly: true
         label:
           description: "The descriptive name for the workflow"
