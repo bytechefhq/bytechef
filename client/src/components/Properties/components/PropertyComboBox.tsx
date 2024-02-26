@@ -25,7 +25,7 @@ type ComboBoxItemType = {
     [key: string]: unknown;
 };
 
-type PropertyComboBoxProps = {
+interface PropertyComboBoxProps {
     description?: string;
     options: OptionModel[];
     label?: string;
@@ -38,7 +38,7 @@ type PropertyComboBoxProps = {
     required?: boolean;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
-};
+}
 
 const PropertyComboBox = ({
     description,

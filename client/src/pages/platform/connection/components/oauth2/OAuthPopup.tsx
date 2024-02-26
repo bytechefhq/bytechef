@@ -8,11 +8,11 @@ const checkState = (receivedState: string) => {
     return state === receivedState;
 };
 
-type Props = {
+interface OAuthPopupProps {
     Component?: React.ReactElement;
-};
+}
 
-const OAuthPopup = (props: Props) => {
+const OAuthPopup = (props: OAuthPopupProps) => {
     const {Component = <div className="flex h-screen items-center justify-center text-xl">Loading...</div>} = props;
 
     // On mount

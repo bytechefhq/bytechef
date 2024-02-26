@@ -1,7 +1,7 @@
 import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
-import DataPillPanelBody, {ComponentActionData} from '@/pages/automation/project/components/DataPillPanelBody';
+import DataPillPanelBody, {ComponentActionDataI} from '@/pages/automation/project/components/DataPillPanelBody';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useState} from 'react';
@@ -14,7 +14,7 @@ const DataPillPanel = ({
     workflowNodeOutputs,
 }: {
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflowNodeOutputs: WorkflowNodeOutputModel[];
+    workflowNodeOutputs: Array<WorkflowNodeOutputModel>;
 }) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
@@ -22,7 +22,7 @@ const DataPillPanel = ({
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
-    const componentActionData: ComponentActionData[] = workflowNodeOutputs
+    const componentActionData: Array<ComponentActionDataI> = workflowNodeOutputs
         .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
         .filter(
             (workflowStepOutput) =>
@@ -40,7 +40,7 @@ const DataPillPanel = ({
                 outputSchema: workflowStepOutput.outputSchema,
                 sampleOutput: workflowStepOutput.sampleOutput,
                 workflowNodeName: workflowStepOutput.workflowNodeName,
-            } as ComponentActionData;
+            } as ComponentActionDataI;
         });
 
     return (

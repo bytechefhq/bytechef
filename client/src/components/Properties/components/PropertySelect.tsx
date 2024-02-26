@@ -12,7 +12,7 @@ export type SelectOptionType = {
     value: string;
 };
 
-type PropertySelectProps = {
+interface PropertySelectProps {
     options: Array<SelectOptionType>;
     description?: string;
     label?: string;
@@ -22,7 +22,7 @@ type PropertySelectProps = {
     placeholder?: string;
     required?: boolean;
     value?: string;
-};
+}
 
 const PropertySelect = ({
     description,

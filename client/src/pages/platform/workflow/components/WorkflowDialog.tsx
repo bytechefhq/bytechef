@@ -20,7 +20,7 @@ import {useForm} from 'react-hook-form';
 
 const SPACE = 4;
 
-type WorkflowDialogProps = {
+interface WorkflowDialogProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
     onClose?: () => void;
@@ -29,7 +29,7 @@ type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
     workflow?: WorkflowModel;
-};
+}
 
 const WorkflowDialog = ({
     createWorkflowMutation,

@@ -6,13 +6,13 @@ import {ComponentActionType, ComponentDataType, DataPillType} from '@/types/type
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface workflowTaskData {
+type WorkflowTaskDataType = {
     actionNames?: Array<string>;
     componentNames: Array<string>;
     nodeNames: Array<string>;
-}
+};
 
-interface WorkflowDataState {
+interface WorkflowDataStateI {
     componentActions: Array<ComponentActionType>;
     setComponentActions: (componentActions: Array<ComponentActionType>) => void;
 
@@ -31,11 +31,11 @@ interface WorkflowDataState {
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
 
-    workflow: WorkflowModel & workflowTaskData;
-    setWorkflow: (workflowDefinition: WorkflowModel & workflowTaskData) => void;
+    workflow: WorkflowModel & WorkflowTaskDataType;
+    setWorkflow: (workflowDefinition: WorkflowModel & WorkflowTaskDataType) => void;
 }
 
-const useWorkflowDataStore = create<WorkflowDataState>()(
+const useWorkflowDataStore = create<WorkflowDataStateI>()(
     devtools(
         (set) => ({
             componentActions: [],

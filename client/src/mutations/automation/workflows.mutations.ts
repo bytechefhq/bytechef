@@ -7,10 +7,10 @@ import {
 } from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type DeleteWorkflowMutationProps = {
+interface DeleteWorkflowMutationProps {
     onSuccess?: (result: void, variables: DeleteProjectWorkflowRequest) => void;
     onError?: (error: Error, variables: DeleteProjectWorkflowRequest) => void;
-};
+}
 
 export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutationProps) =>
     useMutation({
@@ -21,10 +21,10 @@ export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutation
         onSuccess: mutationProps?.onSuccess,
     });
 
-type DuplicateWorkflowMutationProps = {
+interface DuplicateWorkflowMutationProps {
     onSuccess?: (result: WorkflowModel, variables: DuplicateWorkflowRequest) => void;
     onError?: (error: Error, variables: DuplicateWorkflowRequest) => void;
-};
+}
 
 export const useDuplicateWorkflowMutation = (mutationProps?: DuplicateWorkflowMutationProps) =>
     useMutation({
@@ -35,10 +35,10 @@ export const useDuplicateWorkflowMutation = (mutationProps?: DuplicateWorkflowMu
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateWorkflowMutationProps = {
+interface UpdateWorkflowMutationProps {
     onSuccess?: (result: WorkflowModel, variables: UpdateWorkflowRequest) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
-};
+}
 
 export const useUpdateWorkflowMutation = (mutationProps?: UpdateWorkflowMutationProps) =>
     useMutation({

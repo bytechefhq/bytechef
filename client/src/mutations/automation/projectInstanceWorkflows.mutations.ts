@@ -5,10 +5,10 @@ import {
 } from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type EnableProjectInstanceWorkflowMutationProps = {
+interface EnableProjectInstanceWorkflowMutationProps {
     onSuccess?: (result: void, variables: EnableProjectInstanceWorkflowRequest) => void;
     onError?: (error: Error, variables: EnableProjectInstanceWorkflowRequest) => void;
-};
+}
 
 export const useEnableProjectInstanceWorkflowMutation = (mutationProps: EnableProjectInstanceWorkflowMutationProps) =>
     useMutation({
@@ -19,10 +19,10 @@ export const useEnableProjectInstanceWorkflowMutation = (mutationProps: EnablePr
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateProjectInstanceWorkflowMutationProps = {
+interface UpdateProjectInstanceWorkflowMutationProps {
     onSuccess?: (result: ProjectInstanceWorkflowModel, variables: ProjectInstanceWorkflowModel) => void;
     onError?: (error: Error, variables: ProjectInstanceWorkflowModel) => void;
-};
+}
 
 export const useUpdateProjectInstanceWorkflowMutation = (mutationProps?: UpdateProjectInstanceWorkflowMutationProps) =>
     useMutation({

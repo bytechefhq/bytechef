@@ -2,14 +2,14 @@ import {PropertyType} from '@/types/types';
 
 import PropertyField from './PropertyField';
 
-type SchemaPropertiesProps = {
+interface SchemaPropertiesProps {
     copiedValue: string | null;
     copyToClipboard: (text: string) => Promise<boolean>;
     parentPath?: string;
     properties: Array<PropertyType>;
     sampleOutput: object;
     workflowNodeName: string;
-};
+}
 
 const SchemaProperties = ({
     copiedValue,

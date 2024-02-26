@@ -38,10 +38,9 @@ const PaginationItem = React.forwardRef<
 ))
 PaginationItem.displayName = "PaginationItem"
 
-type PaginationLinkProps = {
+interface PaginationLinkProps extends Pick<ButtonProps, "size">, React.ComponentProps<"a"> {
   isActive?: boolean
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">
+}
 
 const PaginationLink = ({
   className,

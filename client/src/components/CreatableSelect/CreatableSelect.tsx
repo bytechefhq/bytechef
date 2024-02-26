@@ -8,13 +8,14 @@ import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import {GroupBase} from 'react-select';
 
-export interface SelectOptionType {
+export type SelectOptionType = {
     value: string;
     label: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     [key: string]: any;
-}
+};
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 type CreatableSelectProps<
     Option,
     IsMulti extends boolean = false,
@@ -29,7 +30,7 @@ type CreatableSelectProps<
     isMulti?: boolean;
     label?: string;
     name?: string;
-    options: SelectOptionType[];
+    options: Array<SelectOptionType>;
 } & CreatableProps<Option, IsMulti, Group>;
 
 const CreatableSelect = <

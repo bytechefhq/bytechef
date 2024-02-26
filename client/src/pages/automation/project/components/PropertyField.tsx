@@ -4,7 +4,7 @@ import {ClipboardCheck, ClipboardIcon} from 'lucide-react';
 
 import getNestedObject from '../utils/getNestedObject';
 
-type PropertyFieldProps = {
+interface PropertyFieldProps {
     copiedValue: string | null;
     copyToClipboard: (text: string) => Promise<boolean>;
     label: string;
@@ -13,7 +13,7 @@ type PropertyFieldProps = {
     sampleOutput: object;
     valueToCopy?: string;
     workflowNodeName: string;
-};
+}
 
 const PropertyField = ({
     copiedValue,

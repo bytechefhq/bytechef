@@ -26,12 +26,12 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
-export type WorkflowEditorProps = {
+export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasicModel[];
     projectId: number;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
-};
+}
 
 const WorkflowEditor = ({
     componentDefinitions,

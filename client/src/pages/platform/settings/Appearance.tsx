@@ -2,7 +2,6 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {useTheme} from '@/providers/theme-provider';
 import {zodResolver} from '@hookform/resolvers/zod';
-import React from 'react';
 import {useForm} from 'react-hook-form';
 import * as z from 'zod';
 
@@ -12,12 +11,12 @@ const appearanceFormSchema = z.object({
     }),
 });
 
-type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
+type AppearanceFormValuesType = z.infer<typeof appearanceFormSchema>;
 
 export default function Appearance() {
     const {setTheme, theme} = useTheme();
 
-    const form = useForm<AppearanceFormValues>({
+    const form = useForm<AppearanceFormValuesType>({
         defaultValues: {
             theme,
         },

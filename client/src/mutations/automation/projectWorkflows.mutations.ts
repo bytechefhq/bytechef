@@ -1,10 +1,10 @@
 import {CreateProjectWorkflowRequest, ProjectApi, WorkflowModel} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type CreateProjectWorkflowMutationProps = {
+interface CreateProjectWorkflowMutationProps {
     onSuccess?: (result: WorkflowModel, variables: CreateProjectWorkflowRequest) => void;
     onError?: (error: Error, variables: CreateProjectWorkflowRequest) => void;
-};
+}
 
 export const useCreateProjectWorkflowMutation = (mutationProps?: CreateProjectWorkflowMutationProps) => {
     return useMutation({

@@ -1,12 +1,12 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface ConnectionNoteState {
+interface ConnectionNoteStateI {
     showConnectionNote: boolean;
     setShowConnectionNote: (showConnectionNote: boolean) => void;
 }
 
-export const useConnectionNoteStore = create<ConnectionNoteState>()(
+export const useConnectionNoteStore = create<ConnectionNoteStateI>()(
     devtools(
         (set) => ({
             setShowConnectionNote: (connectionNoteStatus) =>

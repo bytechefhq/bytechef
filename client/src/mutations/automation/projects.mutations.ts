@@ -1,10 +1,10 @@
 import {useMutation} from '@tanstack/react-query';
 import {ProjectApi, ProjectModel, PublishProjectRequest} from 'middleware/automation/configuration';
 
-type CreateProjectMutationProps = {
+interface CreateProjectMutationProps {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
     onError?: (error: Error, variables: ProjectModel) => void;
-};
+}
 
 export const useCreateProjectMutation = (mutationProps?: CreateProjectMutationProps) =>
     useMutation({
@@ -17,10 +17,10 @@ export const useCreateProjectMutation = (mutationProps?: CreateProjectMutationPr
         onSuccess: mutationProps?.onSuccess,
     });
 
-type DeleteProjectMutationProps = {
+interface DeleteProjectMutationProps {
     onSuccess?: (result: void, variables: number) => void;
     onError?: (error: Error, variables: number) => void;
-};
+}
 
 export const useDeleteProjectMutation = (mutationProps?: DeleteProjectMutationProps) =>
     useMutation({
@@ -31,10 +31,10 @@ export const useDeleteProjectMutation = (mutationProps?: DeleteProjectMutationPr
         onSuccess: mutationProps?.onSuccess,
     });
 
-type DuplicateProjectMutationProps = {
+interface DuplicateProjectMutationProps {
     onSuccess?: (result: ProjectModel, variables: number) => void;
     onError?: (error: Error, variables: number) => void;
-};
+}
 
 export const useDuplicateProjectMutation = (mutationProps?: DuplicateProjectMutationProps) =>
     useMutation({
@@ -47,10 +47,10 @@ export const useDuplicateProjectMutation = (mutationProps?: DuplicateProjectMuta
         onSuccess: mutationProps?.onSuccess,
     });
 
-type PublishProjectMutationProps = {
+interface PublishProjectMutationProps {
     onSuccess?: (result: ProjectModel, variables: PublishProjectRequest) => void;
     onError?: (error: Error, variables: PublishProjectRequest) => void;
-};
+}
 
 export const usePublishProjectMutation = (mutationProps?: PublishProjectMutationProps) =>
     useMutation({
@@ -61,10 +61,10 @@ export const usePublishProjectMutation = (mutationProps?: PublishProjectMutation
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateProjectMutationProps = {
+interface UpdateProjectMutationProps {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
     onError?: (error: Error, variables: ProjectModel) => void;
-};
+}
 
 export const useUpdateProjectMutation = (mutationProps?: UpdateProjectMutationProps) =>
     useMutation({

@@ -1,19 +1,19 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 
-import useOAuth2, {CodePayload, TokenPayload} from './oauth2/useOAuth2';
+import useOAuth2, {CodePayloadI, TokenPayloadI} from './oauth2/useOAuth2';
 
-type OAuth2ButtonProps = {
+interface OAuth2ButtonProps {
     authorizationUrl: string;
     clientId: string;
     redirectUri: string;
     responseType: 'code' | 'token';
     scope?: string;
     onClick: (getAuth: () => void) => void;
-    onCodeSuccess?: (payload: CodePayload) => void;
+    onCodeSuccess?: (payload: CodePayloadI) => void;
     onError?: (error: string) => void;
-    onTokenSuccess?: (payload: TokenPayload) => void;
-};
+    onTokenSuccess?: (payload: TokenPayloadI) => void;
+}
 
 const OAuth2Button = ({
     authorizationUrl,

@@ -1,16 +1,16 @@
 import {ComponentDefinitionApi, WorkflowModel, WorkflowTaskModel} from '@/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
-import {WorkflowDefinition} from '@/types/types';
+import {WorkflowDefinitionType} from '@/types/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 const SPACE = 4;
 
-interface UpdateWorkflowRequest {
+type UpdateWorkflowRequestType = {
     id: string;
     workflowModel: WorkflowModel;
-}
+};
 
-interface NodeDataType {
+type NodeDataType = {
     actionName?: string;
     componentName: string;
     icon?: JSX.Element | string;
@@ -19,12 +19,12 @@ interface NodeDataType {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
     type?: string;
-}
+};
 
 export default async function saveWorkflowDefinition(
     nodeData: NodeDataType,
     workflow: WorkflowModel,
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestType, unknown>,
     index?: number
 ) {
     const {actionName, componentName, label, name, parameters} = nodeData;
@@ -54,7 +54,7 @@ export default async function saveWorkflowDefinition(
     }
 
     let tasks: WorkflowTaskModel[];
-    const workflowDefinition: WorkflowDefinition = JSON.parse(workflow.definition!);
+    const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     if (existingWorkflowTask) {
         const existingTaskIndex = workflowDefinition.tasks?.findIndex(

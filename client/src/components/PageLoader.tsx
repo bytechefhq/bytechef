@@ -1,9 +1,9 @@
 import {CrossCircledIcon} from '@radix-ui/react-icons';
 import {PropsWithChildren} from 'react';
 
-type TError = Error | null;
+type TErrorType = Error | null;
 
-const PageLoader = ({children, errors, loading}: PropsWithChildren<{errors: TError[]; loading: boolean}>) => {
+const PageLoader = ({children, errors, loading}: PropsWithChildren<{errors: Array<TErrorType>; loading: boolean}>) => {
     let errorExists = false;
 
     errors.forEach((error) => {

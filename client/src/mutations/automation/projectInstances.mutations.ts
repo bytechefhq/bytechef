@@ -5,10 +5,10 @@ import {
 } from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type CreateProjectInstanceMutationProps = {
+interface CreateProjectInstanceMutationProps {
     onSuccess?: (result: ProjectInstanceModel, variables: ProjectInstanceModel) => void;
     onError?: (error: Error, variables: ProjectInstanceModel) => void;
-};
+}
 
 export const useCreateProjectInstanceMutation = (mutationProps?: CreateProjectInstanceMutationProps) =>
     useMutation({
@@ -21,10 +21,10 @@ export const useCreateProjectInstanceMutation = (mutationProps?: CreateProjectIn
         onSuccess: mutationProps?.onSuccess,
     });
 
-type DeleteProjectInstanceMutationProps = {
+interface DeleteProjectInstanceMutationProps {
     onSuccess?: (result: void, variables: number) => void;
     onError?: (error: Error, variables: number) => void;
-};
+}
 
 export const useDeleteProjectInstanceMutation = (mutationProps?: DeleteProjectInstanceMutationProps) =>
     useMutation({
@@ -37,10 +37,10 @@ export const useDeleteProjectInstanceMutation = (mutationProps?: DeleteProjectIn
         onSuccess: mutationProps?.onSuccess,
     });
 
-type EnableProjectInstanceMutationProps = {
+interface EnableProjectInstanceMutationProps {
     onSuccess?: (result: void, variables: EnableProjectInstanceRequest) => void;
     onError?: (error: Error, variables: EnableProjectInstanceRequest) => void;
-};
+}
 
 export const useEnableProjectInstanceMutation = (mutationProps: EnableProjectInstanceMutationProps) =>
     useMutation({
@@ -51,10 +51,10 @@ export const useEnableProjectInstanceMutation = (mutationProps: EnableProjectIns
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateProjectInstanceMutationProps = {
+interface UpdateProjectInstanceMutationProps {
     onSuccess?: (result: ProjectInstanceModel, variables: ProjectInstanceModel) => void;
     onError?: (error: Error, variables: ProjectInstanceModel) => void;
-};
+}
 
 export const useUpdateProjectInstanceMutation = (mutationProps?: UpdateProjectInstanceMutationProps) =>
     useMutation({

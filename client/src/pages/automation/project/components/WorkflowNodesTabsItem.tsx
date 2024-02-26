@@ -3,17 +3,17 @@ import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'midd
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
-interface DragEvent<T = Element> extends MouseEvent<T, DragEventInit> {
+interface DragEventI<T = Element> extends MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
 }
 
-type WorkflowNodesTabsItemProps = {
+interface WorkflowNodesTabsItemProps extends HTMLAttributes<HTMLLIElement> {
     handleClick?: () => void;
     node: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
-} & HTMLAttributes<HTMLLIElement>;
+}
 
 const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabsItemProps) => {
-    const onDragStart = (event: DragEvent, name: string) => {
+    const onDragStart = (event: DragEventI, name: string) => {
         event.dataTransfer.setData('application/reactflow', name);
         event.dataTransfer.effectAllowed = 'move';
     };

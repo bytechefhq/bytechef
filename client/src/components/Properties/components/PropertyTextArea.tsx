@@ -5,13 +5,13 @@ import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-
 import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-type PropertyTextAreaProps = {
+interface PropertyTextAreaProps extends TextareaProps {
     description?: string;
     error?: string | undefined;
     label?: string;
     labelClassName?: string;
     name: string;
-} & TextareaProps;
+}
 
 const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
     ({description, error, label, labelClassName, name, required, ...props}, ref) => (

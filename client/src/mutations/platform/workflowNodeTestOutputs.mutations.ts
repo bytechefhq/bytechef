@@ -7,10 +7,10 @@ import {
 } from '@/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type DeleteWorkflowNodeTestOutputProps = {
+interface DeleteWorkflowNodeTestOutputProps {
     onSuccess?: (result: void, variables: DeleteWorkflowNodeTestOutputRequest) => void;
     onError?: (error: Error, variables: DeleteWorkflowNodeTestOutputRequest) => void;
-};
+}
 
 export const useDeleteWorkflowNodeTestOutputMutation = (mutationProps?: DeleteWorkflowNodeTestOutputProps) =>
     useMutation({
@@ -21,10 +21,10 @@ export const useDeleteWorkflowNodeTestOutputMutation = (mutationProps?: DeleteWo
         onSuccess: mutationProps?.onSuccess,
     });
 
-type SaveWorkflowNodeTestOutputProps = {
+interface SaveWorkflowNodeTestOutputProps {
     onSuccess?: (result: WorkflowNodeTestOutputModel, variables: SaveWorkflowNodeTestOutputRequest) => void;
     onError?: (error: Error, variables: SaveWorkflowNodeTestOutputRequest) => void;
-};
+}
 
 export const useSaveWorkflowNodeTestOutputMutation = (mutationProps?: SaveWorkflowNodeTestOutputProps) =>
     useMutation({
@@ -35,10 +35,10 @@ export const useSaveWorkflowNodeTestOutputMutation = (mutationProps?: SaveWorkfl
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UploadSampleOutputRequestProps = {
+interface UploadSampleOutputRequestProps {
     onSuccess?: (result: WorkflowNodeTestOutputModel, variables: UploadWorkflowNodeSampleOutputRequest) => void;
     onError?: (error: Error, variables: UploadWorkflowNodeSampleOutputRequest) => void;
-};
+}
 
 export const useUploadSampleOutputRequestMutation = (mutationProps?: UploadSampleOutputRequestProps) =>
     useMutation({
