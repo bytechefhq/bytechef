@@ -146,4 +146,30 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
     );
 };
 
-export default ProjectInstanceDialogWorkflowsStepItemConnection;
+const ProjectInstanceDialogWorkflowsStepItemConnections = ({
+    control,
+    workflowConnections,
+    workflowIndex,
+}: {
+    control: Control<ProjectInstanceModel>;
+    workflowConnections: WorkflowConnectionModel[];
+    workflowIndex: number;
+}) => {
+    return workflowConnections.length ? (
+        <>
+            {workflowConnections.map((workflowConnection, workflowConnectionIndex) => (
+                <ProjectInstanceDialogWorkflowsStepItemConnection
+                    control={control}
+                    key={workflowConnectionIndex + '_' + workflowConnection.key}
+                    workflowConnection={workflowConnection}
+                    workflowConnectionIndex={workflowConnectionIndex}
+                    workflowIndex={workflowIndex}
+                />
+            ))}
+        </>
+    ) : (
+        <p className="text-sm">No defined connections.</p>
+    );
+};
+
+export default ProjectInstanceDialogWorkflowsStepItemConnections;
