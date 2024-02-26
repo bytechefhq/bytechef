@@ -62,11 +62,6 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(List<Long> ids) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<Connection> getConnections(String componentName, int version, Type type) {
         throw new UnsupportedOperationException();
     }

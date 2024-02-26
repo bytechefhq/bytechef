@@ -232,15 +232,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .toList();
     }
 
-    private boolean containsConnection(String componentName) {
-        return componentDefinitionRegistry
-            .getComponentDefinitions()
-            .stream()
-            .map(ComponentDefinition::getConnection)
-            .flatMap(Optional::stream)
-            .anyMatch(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
-    }
-
     private static ApplyFunction getDefaultApply(AuthorizationType type) {
         return switch (type) {
             case API_KEY -> (Parameters connectionParameters, Context context) -> {

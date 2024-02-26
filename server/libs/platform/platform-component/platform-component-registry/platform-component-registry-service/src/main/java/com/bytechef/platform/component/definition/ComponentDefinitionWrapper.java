@@ -41,6 +41,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     private final Boolean additionalConnections;
     protected final String category;
     protected final ConnectionDefinition connection;
+    private final Boolean connectionRequired;
     protected final Boolean customAction;
     protected final Help customActionHelp;
     protected final String description;
@@ -70,6 +71,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         this.additionalConnections = OptionalUtils.orElse(componentDefinition.getAdditionalConnections(), null);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
+        this.connectionRequired = OptionalUtils.orElse(componentDefinition.getConnectionRequired(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
         this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
@@ -109,6 +111,11 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     @Override
     public Optional<ConnectionDefinition> getConnection() {
         return Optional.ofNullable(connection);
+    }
+
+    @Override
+    public Optional<Boolean> getConnectionRequired() {
+        return Optional.ofNullable(connectionRequired);
     }
 
     @Override
