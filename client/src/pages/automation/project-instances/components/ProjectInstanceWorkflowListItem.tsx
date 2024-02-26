@@ -215,7 +215,10 @@ const ProjectInstanceWorkflowListItem = ({
 
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                            disabled={projectInstanceEnabled}
+                            disabled={
+                                projectInstanceEnabled ||
+                                (workflow.connectionsCount === 0 && workflow?.inputsCount === 0)
+                            }
                             onClick={() => setShowEditWorkflowDialog(true)}
                         >
                             Edit
