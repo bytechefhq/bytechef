@@ -30,9 +30,9 @@ public interface ConnectionFacade {
 
     void delete(Long id);
 
-    ConnectionDTO getConnection(Long id);
+    List<ConnectionDTO> getComponentConnections(String componentName, Integer componentVersion, Type type);
 
-    List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, Type type);
+    ConnectionDTO getConnection(Long id);
 
     List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, Type type);
 

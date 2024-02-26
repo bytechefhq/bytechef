@@ -74,12 +74,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(List<Long> ids) {
-        return connectionRepository.findAllById(ids);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Connection> getConnections(String componentName, int version, Type type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
             componentName, version, type.getId());
