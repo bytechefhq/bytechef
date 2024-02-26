@@ -2,10 +2,10 @@ import {ConnectionApi} from '@/middleware/automation/connection';
 import {ConnectionModel} from '@/middleware/platform/connection';
 import {useMutation} from '@tanstack/react-query';
 
-type CreateConnectionMutationProps = {
+interface CreateConnectionMutationProps {
     onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
     onError?: (error: Error, variables: ConnectionModel) => void;
-};
+}
 
 export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMutationProps) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
@@ -18,10 +18,10 @@ export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMuta
         onSuccess: mutationProps?.onSuccess,
     });
 
-type DeleteConnectionMutationProps = {
+interface DeleteConnectionMutationProps {
     onSuccess?: () => void;
     onError?: (error: Error, id: number) => void;
-};
+}
 
 export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMutationProps) =>
     useMutation<void, Error, number>({
@@ -34,10 +34,10 @@ export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMuta
         onSuccess: mutationProps?.onSuccess,
     });
 
-type UpdateConnectionMutationProps = {
+interface UpdateConnectionMutationProps {
     onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
     onError?: (error: Error, variables: ConnectionModel) => void;
-};
+}
 
 export const useUpdateConnectionMutation = (mutationProps?: UpdateConnectionMutationProps) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({

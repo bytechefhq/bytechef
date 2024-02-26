@@ -65,48 +65,48 @@ export type ClickedItemType = {
     componentName?: string;
 } & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
 
-export interface WorkflowDefinition {
+export type WorkflowDefinitionType = {
     description?: string;
     label?: string;
-    inputs?: Array<WorkflowInput>;
-    outputs?: Array<WorkflowOutput>;
-    tasks?: Array<WorkflowTask>;
-    triggers?: Array<WorkflowTrigger>;
-}
+    inputs?: Array<WorkflowInputType>;
+    outputs?: Array<WorkflowOutputType>;
+    tasks?: Array<WorkflowTaskType>;
+    triggers?: Array<WorkflowTriggerType>;
+};
 
-export interface WorkflowInput {
+export type WorkflowInputType = {
     label?: string;
     name: string;
     required?: boolean;
     type?: string;
-}
+};
 
-export interface WorkflowOutput {
+export type WorkflowOutputType = {
     name: string;
     value: object;
-}
+};
 
-export interface WorkflowTask {
-    finalize?: Array<WorkflowTask>;
+export type WorkflowTaskType = {
+    finalize?: Array<WorkflowTaskType>;
     label?: string;
     name: string;
     node?: string;
     parameters?: {[key: string]: object};
-    post?: Array<WorkflowTask>;
-    pre?: Array<WorkflowTask>;
+    post?: Array<WorkflowTaskType>;
+    pre?: Array<WorkflowTaskType>;
     timeout?: string;
     type: string;
-}
+};
 
-export interface WorkflowTrigger {
+export type WorkflowTriggerType = {
     label?: string;
     name: string;
     parameters?: {[key: string]: object};
     timeout?: string;
     type: string;
-}
+};
 
-type PropertyTypeAll = ArrayPropertyModel &
+type PropertyTypeAllType = ArrayPropertyModel &
     BooleanPropertyModel &
     DatePropertyModel &
     DateTimePropertyModel &
@@ -122,6 +122,6 @@ type PropertyTypeAll = ArrayPropertyModel &
     TimePropertyModel &
     ValuePropertyModel;
 
-export type PropertyType = Omit<PropertyTypeAll, 'controlType'> & {
+export type PropertyType = Omit<PropertyTypeAllType, 'controlType'> & {
     controlType?: ControlTypeModel;
 };

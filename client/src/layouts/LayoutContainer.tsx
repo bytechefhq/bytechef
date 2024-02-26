@@ -3,7 +3,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-type SidebarContentLayoutProps = {
+interface SidebarContentLayoutProps {
     className?: string;
     footer?: ReactNode;
     header?: ReactNode;
@@ -17,7 +17,7 @@ type SidebarContentLayoutProps = {
     rightSidebarWidth?: '96' | '460';
     rightToolbarBody?: ReactNode;
     rightToolbarOpen?: boolean;
-};
+}
 
 const leftSidebarWidths = {
     56: ['md:w-56', 'md:pl-56'],

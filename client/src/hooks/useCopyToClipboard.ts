@@ -1,15 +1,15 @@
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {useState} from 'react';
 
-type CopiedValue = string | null;
-type CopyFn = (text: string) => Promise<boolean>; // Return success
+type CopiedValueType = string | null;
+type CopyFnType = (text: string) => Promise<boolean>; // Return success
 
-function useCopyToClipboard(): [CopiedValue, CopyFn] {
-    const [copiedText, setCopiedText] = useState<CopiedValue>(null);
+function useCopyToClipboard(): [CopiedValueType, CopyFnType] {
+    const [copiedText, setCopiedText] = useState<CopiedValueType>(null);
 
     const {setCopiedPropertyData} = useWorkflowNodeDetailsPanelStore();
 
-    const copy: CopyFn = async (text) => {
+    const copy: CopyFnType = async (text) => {
         if (!navigator?.clipboard) {
             console.warn('Clipboard not supported');
             return false;

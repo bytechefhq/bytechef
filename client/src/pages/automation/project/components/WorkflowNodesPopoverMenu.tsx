@@ -3,13 +3,13 @@ import {PropsWithChildren} from 'react';
 
 import WorkflowNodesPopoverMenuList from './WorkflowNodesPopoverMenuList';
 
-type WorkflowNodesPopoverMenuProps = {
+interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     id?: string;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
-} & PropsWithChildren;
+}
 
 const WorkflowNodesPopoverMenu = ({
     children,

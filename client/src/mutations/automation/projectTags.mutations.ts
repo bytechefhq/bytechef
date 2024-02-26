@@ -1,10 +1,10 @@
 import {ProjectTagApi, UpdateProjectTagsRequest} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type UpdateProjectTagsMutationProps = {
+interface UpdateProjectTagsMutationProps {
     onSuccess?: (result: void, variables: UpdateProjectTagsRequest) => void;
     onError?: (error: Error, variables: UpdateProjectTagsRequest) => void;
-};
+}
 
 export const useUpdateProjectTagsMutation = (mutationProps?: UpdateProjectTagsMutationProps) =>
     useMutation({

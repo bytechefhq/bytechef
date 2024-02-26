@@ -20,13 +20,13 @@ import PropertyField from '../PropertyField';
 import SchemaProperties from '../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
-type OutputTabProps = {
+interface OutputTabProps {
     currentNode: NodeProps['data'];
     outputDefined: boolean;
     outputSchema: PropertyModel;
     sampleOutput: object;
     workflowId: string;
-};
+}
 
 const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutput, workflowId}: OutputTabProps) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);

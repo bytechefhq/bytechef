@@ -4,7 +4,7 @@ import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'midd
 
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
 
-type WorkflowNodesTabsProps = {
+interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasicModel>;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     hideActionComponents?: boolean;
@@ -13,7 +13,7 @@ type WorkflowNodesTabsProps = {
     itemsDraggable?: boolean;
     onItemClick?: (clickedItem: ClickedItemType) => void;
     triggerComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-};
+}
 
 const WorkflowNodesTabs = ({
     actionComponentDefinitions,

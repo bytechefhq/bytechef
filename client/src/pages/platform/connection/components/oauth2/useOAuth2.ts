@@ -3,20 +3,20 @@ import {useCallback, useRef, useState} from 'react';
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {objectToQuery} from './tools';
 
-export type TokenPayload = {
+export interface TokenPayloadI {
     token_type: string;
     expires_in: number;
     access_token: string;
     scope: string;
     refresh_token: string;
-};
+}
 
-export type CodePayload = {
+export interface CodePayloadI {
     code: string;
     [key: string]: string;
-};
+}
 
-export type Oauth2Props = {
+export interface Oauth2Props {
     authorizationUrl: string;
     clientId: string;
     redirectUri: string;
@@ -24,10 +24,10 @@ export type Oauth2Props = {
     scope?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extraQueryParameters?: Record<string, any>;
-    onCodeSuccess?: (payload: CodePayload) => void;
+    onCodeSuccess?: (payload: CodePayloadI) => void;
     onError?: (error: string) => void;
-    onTokenSuccess?: (payload: TokenPayload) => void;
-};
+    onTokenSuccess?: (payload: TokenPayloadI) => void;
+}
 
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;

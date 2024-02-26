@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {create} from 'zustand';
 
-interface WorkflowExecutionDetailsState {
+interface WorkflowExecutionDetailsStateI {
     workflowExecutionDetailsDialogOpen: boolean;
     setWorkflowExecutionDetailsDialogOpen: (workflowExecutionDetailsDialogOpen: boolean) => void;
 
@@ -9,7 +9,7 @@ interface WorkflowExecutionDetailsState {
     setWorkflowExecutionId: (workflowExecutionId: number) => void;
 }
 
-export const useWorkflowExecutionDetailsDialogStore = create<WorkflowExecutionDetailsState>()((set) => ({
+export const useWorkflowExecutionDetailsDialogStore = create<WorkflowExecutionDetailsStateI>()((set) => ({
     workflowExecutionId: 0,
     setWorkflowExecutionId: (workflowExecutionId) =>
         set((state) => ({

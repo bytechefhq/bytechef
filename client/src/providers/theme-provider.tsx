@@ -1,24 +1,24 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 
-type Theme = 'dark' | 'light' | 'system';
+type ThemeType = 'dark' | 'light' | 'system';
 
-type ThemeProviderProps = {
+interface ThemeProviderProps {
     children: React.ReactNode;
-    defaultTheme?: Theme;
+    defaultTheme?: ThemeType;
     storageKey?: string;
-};
+}
 
-type ThemeProviderState = {
-    theme: Theme;
-    setTheme: (theme: Theme) => void;
-};
+interface ThemeProviderStateI {
+    theme: ThemeType;
+    setTheme: (theme: ThemeType) => void;
+}
 
-const initialState: ThemeProviderState = {
+const initialState: ThemeProviderStateI = {
     setTheme: () => null,
     theme: 'system',
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+const ThemeProviderContext = createContext<ThemeProviderStateI>(initialState);
 
 export function ThemeProvider({
     children,
@@ -26,7 +26,9 @@ export function ThemeProvider({
     storageKey = 'bytechef-ui-theme',
     ...props
 }: ThemeProviderProps) {
-    const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme);
+    const [theme, setTheme] = useState<ThemeType>(
+        () => (localStorage.getItem(storageKey) as ThemeType) || defaultTheme
+    );
 
     useEffect(() => {
         const root = window.document.documentElement;
@@ -45,7 +47,7 @@ export function ThemeProvider({
     }, [theme]);
 
     const value = {
-        setTheme: (theme: Theme) => {
+        setTheme: (theme: ThemeType) => {
             localStorage.setItem(storageKey, theme);
             setTheme(theme);
         },

@@ -38,7 +38,7 @@ const MentionInputListItem = (item: DataPillType) => {
     return div;
 };
 
-type PropertyMentionsInputProps = {
+interface PropertyMentionsInputProps {
     arrayName?: string;
     controlType?: string;
     currentComponent?: CurrentComponentType;
@@ -57,7 +57,7 @@ type PropertyMentionsInputProps = {
     singleMention?: boolean;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
     workflow?: WorkflowModel;
-};
+}
 
 const PropertyMentionsInput = forwardRef(
     (

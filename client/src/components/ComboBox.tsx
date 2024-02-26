@@ -15,7 +15,7 @@ export type ComboBoxItemType = {
     [key: string]: unknown;
 };
 
-export type ComboBoxProps = {
+export interface ComboBoxProps {
     disabled?: boolean;
     items: ComboBoxItemType[];
     maxHeight?: boolean;
@@ -24,7 +24,7 @@ export type ComboBoxProps = {
     onChange: (item?: ComboBoxItemType) => void;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
-};
+}
 
 const ComboBox = ({disabled, items, maxHeight = false, name, onBlur, onChange, value}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);

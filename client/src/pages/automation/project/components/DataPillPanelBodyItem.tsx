@@ -7,14 +7,14 @@ import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import {ComponentActionData} from './DataPillPanelBody';
+import {ComponentActionDataI} from './DataPillPanelBody';
 
 const DataPillPanelBodyItem = ({
     componentAction,
     filteredProperties,
     sampleOutput,
 }: {
-    componentAction: ComponentActionData;
+    componentAction: ComponentActionDataI;
     filteredProperties: Array<PropertyType>;
     sampleOutput: object;
 }) => {

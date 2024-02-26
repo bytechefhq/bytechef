@@ -1,18 +1,18 @@
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import {twMerge} from 'tailwind-merge';
 
-export interface IToggleItem {
+export type ToggleItemType = {
     label: string;
     value: string;
-}
+};
 
-type ToggleGroupProps = {
+interface ToggleGroupProps {
     containerClassName?: string;
     defaultValue?: string;
     onValueChange?(value: string): void;
-    toggleItems: IToggleItem[];
+    toggleItems: Array<ToggleItemType>;
     value?: string;
-};
+}
 
 const ToggleGroup = ({containerClassName, defaultValue, onValueChange, toggleItems, value}: ToggleGroupProps) => (
     <ToggleGroupPrimitive.Root

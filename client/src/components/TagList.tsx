@@ -5,7 +5,7 @@ import CreatableSelect, {SelectOptionType} from 'components/CreatableSelect/Crea
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
-interface TagModel {
+type TagModelType = {
     readonly createdBy?: string;
     readonly createdDate?: Date;
     id?: number;
@@ -13,11 +13,11 @@ interface TagModel {
     readonly lastModifiedDate?: Date;
     name: string;
     version?: number;
-}
+};
 
 interface TagProps {
-    tag: TagModel;
-    onDeleteTag: (deletedTag: TagModel) => void;
+    tag: TagModelType;
+    onDeleteTag: (deletedTag: TagModelType) => void;
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
@@ -33,19 +33,19 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
 
 interface TagListProps {
     id: number;
-    remainingTags?: TagModel[];
-    tags: TagModel[];
+    remainingTags?: Array<TagModelType>;
+    tags: Array<TagModelType>;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateTagsMutation: UseMutationResult<void, object, any, unknown>;
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    getRequest: (id: number, tags: TagModel[]) => any;
+    getRequest: (id: number, tags: Array<TagModelType>) => any;
 }
 
 const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagListProps) => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
-    const handleAddTag = (newTag: TagModel) => {
+    const handleAddTag = (newTag: TagModelType) => {
         const newTags = (tags && [...tags]) || [];
 
         newTags.push(newTag);
@@ -53,7 +53,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
         updateTagsMutation.mutate(getRequest(id, newTags));
     };
 
-    const handleDeleteTag = (deletedTag: TagModel) => {
+    const handleDeleteTag = (deletedTag: TagModelType) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
         updateTagsMutation.mutate(getRequest(id, newTags));
@@ -102,7 +102,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
 
                         setIsNewTagWindowVisible(false);
                     }}
-                    options={remainingTags!.map((tag: TagModel) => ({
+                    options={remainingTags!.map((tag: TagModelType) => ({
                         label: `${tag.name}`,
                         tag,
                         value: tag.name.toLowerCase().replace(/\W/g, ''),

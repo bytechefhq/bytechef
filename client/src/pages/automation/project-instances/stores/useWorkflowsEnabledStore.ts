@@ -1,12 +1,12 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export interface WorkflowsEnabledState {
+export interface WorkflowsEnabledStateI {
     workflowEnabledMap: Map<string, boolean>;
     setWorkflowEnabled: (workflowId: string, enabled: boolean) => void;
 }
 
-export const useWorkflowsEnabledStore = create<WorkflowsEnabledState>()(
+export const useWorkflowsEnabledStore = create<WorkflowsEnabledStateI>()(
     devtools(
         (set) => ({
             setWorkflowEnabled: (workflowId, enabled) =>

@@ -4,7 +4,7 @@ import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutati
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/queries/platform/workflowNodeDescriptions.queries';
-import {WorkflowDefinition} from '@/types/types';
+import {WorkflowDefinitionType} from '@/types/types';
 import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';
@@ -102,7 +102,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             return;
         }
 
-        const workflowDefinition: WorkflowDefinition = JSON.parse(workflow?.definition);
+        const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
 
         const updatedTasks = workflowDefinition!.tasks?.filter((task) => task.name !== data.name);
 

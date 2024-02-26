@@ -5,10 +5,10 @@ import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowD
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workflowNodeDynamicProperties.queries';
 
-type PropertyDynamicPropertiesProps = {
+interface PropertyDynamicPropertiesProps {
     name?: string;
     propertiesDataSource?: PropertiesDataSourceModel;
-};
+}
 
 const PropertyDynamicProperties = ({name, propertiesDataSource}: PropertyDynamicPropertiesProps) => {
     const {workflow} = useWorkflowDataStore();

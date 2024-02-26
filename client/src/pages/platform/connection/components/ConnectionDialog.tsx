@@ -17,7 +17,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {TokenPayload} from '@/pages/platform/connection/components/oauth2/useOAuth2';
+import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
 import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/platform/oauth2.queries';
 import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
@@ -251,7 +251,7 @@ const ConnectionDialog = ({
         }
     }
 
-    async function handleTokenSuccess(payload: TokenPayload) {
+    async function handleTokenSuccess(payload: TokenPayloadI) {
         if (payload.access_token) {
             await saveConnection(payload);
         }

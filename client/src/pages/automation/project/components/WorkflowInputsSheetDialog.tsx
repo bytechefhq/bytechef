@@ -18,7 +18,7 @@ import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutati
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
-import {WorkflowDefinition} from '@/types/types';
+import {WorkflowDefinitionType} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -101,7 +101,7 @@ const WorkflowInputsSheetDialog = ({
     function handleSave(input: WorkflowInputModel & {testValue?: string}) {
         delete input['testValue'];
 
-        const workflowDefinition: WorkflowDefinition = JSON.parse(workflow.definition!);
+        const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
         let inputs: WorkflowInputModel[] = workflowDefinition.inputs ?? [];
 

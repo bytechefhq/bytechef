@@ -9,12 +9,12 @@ import {useEffect, useState} from 'react';
 
 import Property from './Property';
 
-type ArrayPropertyProps = {
+interface ArrayPropertyProps {
     currentComponentData?: ComponentDataType;
     dataPills?: Array<DataPillType>;
     property: PropertyType;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
-};
+}
 
 type ArrayPropertyType = Array<PropertyModel & {controlType?: ControlTypeModel; defaultValue?: string}>;
 

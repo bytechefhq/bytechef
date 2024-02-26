@@ -15,13 +15,13 @@ import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
-type WorkflowNodesListProps = {
+interface WorkflowNodesListProps {
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     id: string;
-};
+}
 
 const WorkflowNodesPopoverMenuList = memo(
     ({

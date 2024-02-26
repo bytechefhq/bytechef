@@ -36,7 +36,7 @@ const LeftSidebarNav = ({bottomBody, bottomTitle, className, topBody, topTitle}:
     </div>
 );
 
-type LeftSidebarNavItemProps = {
+interface LeftSidebarNavItemProps {
     item: {
         filterData: boolean;
         name: string;
@@ -45,7 +45,7 @@ type LeftSidebarNavItemProps = {
     };
     toLink?: string;
     icon?: ReactNode;
-};
+}
 
 const LeftSidebarNavItem = ({
     icon,

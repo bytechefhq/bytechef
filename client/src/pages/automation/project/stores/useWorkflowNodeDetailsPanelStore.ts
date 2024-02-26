@@ -4,7 +4,7 @@ import {ReactNode} from 'react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface Node {
+type NodeType = {
     componentName?: string;
     icon?: ReactNode;
     id: string;
@@ -12,14 +12,14 @@ interface Node {
     name: string;
     type: 'component' | 'flowControl';
     version: number;
-}
+};
 
-interface WorkflowNodeDetailsPanelState {
+interface WorkflowNodeDetailsPanelStateI {
     copiedPropertyData: DataPillType;
     setCopiedPropertyData: (copiedPropertyData: DataPillType) => void;
 
-    currentNode: Node;
-    setCurrentNode: (currentNode: Node) => void;
+    currentNode: NodeType;
+    setCurrentNode: (currentNode: NodeType) => void;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     focusedInput: any;
@@ -29,7 +29,7 @@ interface WorkflowNodeDetailsPanelState {
     setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 }
 
-export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelState>()(
+export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
     devtools(
         (set) => ({
             copiedPropertyData: {} as DataPillType,

@@ -2,12 +2,12 @@ import './header.css';
 
 import {Button} from '@/components/ui/button';
 
-type User = {
+type UserType = {
     name: string;
 };
 
 interface HeaderProps {
-    user?: User;
+    user?: UserType;
     onLogin: () => void;
     onLogout: () => void;
     onCreateAccount: () => void;

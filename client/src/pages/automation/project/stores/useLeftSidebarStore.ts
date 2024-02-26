@@ -1,12 +1,12 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface LeftSidebarState {
+interface LeftSidebarStateI {
     leftSidebarOpen: boolean;
     setLeftSidebarOpen: (leftSidebarStatus: boolean) => void;
 }
 
-const useLeftSidebarStore = create<LeftSidebarState>()(
+const useLeftSidebarStore = create<LeftSidebarStateI>()(
     devtools(
         (set) => ({
             leftSidebarOpen: false,

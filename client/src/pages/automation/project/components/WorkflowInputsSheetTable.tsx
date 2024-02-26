@@ -21,7 +21,7 @@ import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from 
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {WorkflowDefinition} from '@/types/types';
+import {WorkflowDefinitionType} from '@/types/types';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {AlignJustifyIcon, PlusIcon} from 'lucide-react';
@@ -53,7 +53,7 @@ const WorkflowInputsSheetTable = ({
     });
 
     function handleDelete(input: WorkflowInputModel) {
-        const definitionObject: WorkflowDefinition = JSON.parse(workflow.definition!);
+        const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
         const inputs: WorkflowInputModel[] = definitionObject.inputs ?? [];
 

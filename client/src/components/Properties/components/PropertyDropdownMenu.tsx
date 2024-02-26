@@ -9,7 +9,7 @@ import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-export interface IDropdownMenuItem {
+export type DropdownMenuItemType = {
     danger?: boolean;
     icon?: ReactNode;
     integrationId?: number;
@@ -17,13 +17,13 @@ export interface IDropdownMenuItem {
     onClick?: (id: number, event: React.MouseEvent) => void;
     separator?: boolean;
     shortcut?: string;
-}
+};
 
-type PropertyDropdownMenuProps = {
-    menuItems: IDropdownMenuItem[];
+interface PropertyDropdownMenuProps {
+    menuItems: Array<DropdownMenuItemType>;
     trigger?: ReactNode;
     id?: number;
-};
+}
 
 const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenuProps) => (
     <DropdownMenu>

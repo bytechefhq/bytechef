@@ -5,7 +5,7 @@ import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-type PropertyInputProps = {
+interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     description?: string;
     error?: boolean;
     errorMessage?: string;
@@ -15,7 +15,7 @@ type PropertyInputProps = {
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     type?: string;
     value?: string;
-} & InputHTMLAttributes<HTMLInputElement>;
+}
 
 const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
     (

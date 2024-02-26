@@ -3,7 +3,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 
 import reactLogo from '../assets/logo.svg';
 
-type Props = {
+interface MobileSidebarProps {
     user: {name: string; email: string; imageUrl: string};
     navigation: {
         name: string;
@@ -12,9 +12,9 @@ type Props = {
     }[];
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (value: boolean) => void;
-};
+}
 
-export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, user}: Props) {
+export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, user}: MobileSidebarProps) {
     return (
         <Dialog onOpenChange={setMobileMenuOpen} open={mobileMenuOpen}>
             <DialogContent className="flex h-full flex-col bg-white focus:outline-none">

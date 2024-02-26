@@ -4,12 +4,12 @@ import {Header} from './Header';
 
 import './page.css';
 
-type User = {
+type UserType = {
     name: string;
 };
 
 export const Page: React.VFC = () => {
-    const [user, setUser] = React.useState<User>();
+    const [user, setUser] = React.useState<UserType>();
 
     return (
         <article>

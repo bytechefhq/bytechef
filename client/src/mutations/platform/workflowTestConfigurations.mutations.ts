@@ -7,10 +7,10 @@ import {
 } from '@/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
 
-type SaveWorkflowTestConfigurationMutationProps = {
+interface SaveWorkflowTestConfigurationMutationProps {
     onSuccess?: (result: WorkflowTestConfigurationModel, variables: SaveWorkflowTestConfigurationRequest) => void;
     onError?: (error: Error, variables: SaveWorkflowTestConfigurationRequest) => void;
-};
+}
 
 export const useSaveWorkflowTestConfigurationMutation = (mutationProps?: SaveWorkflowTestConfigurationMutationProps) =>
     useMutation({
@@ -21,10 +21,10 @@ export const useSaveWorkflowTestConfigurationMutation = (mutationProps?: SaveWor
         onSuccess: mutationProps?.onSuccess,
     });
 
-type SaveWorkflowTestConfigurationConnectionRequestProps = {
+interface SaveWorkflowTestConfigurationConnectionRequestProps {
     onSuccess?: (result: void, variables: SaveWorkflowTestConfigurationConnectionRequest) => void;
     onError?: (error: Error, variables: SaveWorkflowTestConfigurationConnectionRequest) => void;
-};
+}
 
 export const useSaveWorkflowTestConfigurationConnectionMutation = (
     mutationProps?: SaveWorkflowTestConfigurationConnectionRequestProps
@@ -37,10 +37,10 @@ export const useSaveWorkflowTestConfigurationConnectionMutation = (
         onSuccess: mutationProps?.onSuccess,
     });
 
-type SaveWorkflowTestConfigurationInputsRequestProps = {
+interface SaveWorkflowTestConfigurationInputsRequestProps {
     onSuccess?: (result: void, variables: SaveWorkflowTestConfigurationInputsRequest) => void;
     onError?: (error: Error, variables: SaveWorkflowTestConfigurationInputsRequest) => void;
-};
+}
 
 export const useSaveWorkflowTestConfigurationInputsMutation = (
     mutationProps?: SaveWorkflowTestConfigurationInputsRequestProps

@@ -2,12 +2,12 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface DataPillPanelState {
+interface DataPillPanelStateI {
     dataPillPanelOpen: boolean;
     setDataPillPanelOpen: (dataPillPanelOpen: boolean) => void;
 }
 
-export const useDataPillPanelStore = create<DataPillPanelState>()(
+export const useDataPillPanelStore = create<DataPillPanelStateI>()(
     devtools(
         (set) => ({
             dataPillPanelOpen: false,

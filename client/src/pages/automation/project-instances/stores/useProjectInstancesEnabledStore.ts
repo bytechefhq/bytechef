@@ -1,12 +1,12 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export interface ProjectInstancesEnabledState {
+export interface ProjectInstancesEnabledStateI {
     projectInstanceMap: Map<number, boolean>;
     setProjectInstanceEnabled: (projectInstanceId: number, enabled: boolean) => void;
 }
 
-export const useProjectInstancesEnabledStore = create<ProjectInstancesEnabledState>()(
+export const useProjectInstancesEnabledStore = create<ProjectInstancesEnabledStateI>()(
     devtools(
         (set) => ({
             projectInstanceMap: new Map<number, boolean>(),
