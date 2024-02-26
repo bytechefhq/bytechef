@@ -24,7 +24,11 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.service.AppEventService;
 import com.bytechef.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -52,8 +56,8 @@ public class WorkflowApiControllerIntTest {
             "label": "label",
             "tasks": [
                 {
-                    "name": "name",
-                    "type": "type"
+                    "name": "airtable",
+                    "type": "airtable/v1/create"
                 }
             ]
         }
@@ -71,6 +75,9 @@ public class WorkflowApiControllerIntTest {
     private WebTestClient webTestClient;
 
     @MockBean
+    private WorkflowFacade workflowFacade;
+
+    @MockBean
     private WorkflowService workflowService;
 
     @MockBean
@@ -86,8 +93,8 @@ public class WorkflowApiControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(workflowService.getWorkflow("1"))
-                .thenReturn(getWorkflow());
+            when(workflowFacade.getWorkflow("1"))
+                .thenReturn(getWorkflowDTO());
 
             this.webTestClient
                 .get()
@@ -114,7 +121,7 @@ public class WorkflowApiControllerIntTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(WorkflowModel.class)
+                .expectBodyList(WorkflowBasicModel.class)
                 .hasSize(1);
         } catch (Exception exception) {
             Assertions.fail(exception);
@@ -123,16 +130,16 @@ public class WorkflowApiControllerIntTest {
 
     @Test
     public void testPutWorkflow() {
-        Workflow workflow = getWorkflow();
-
         WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION)
             .version(0);
 
-        when(workflowService.update("1", DEFINITION, 0))
-            .thenReturn(workflow);
+        WorkflowDTO workflowDTO = getWorkflowDTO();
 
-        Workflow.Format format = workflow.getFormat();
+        when(workflowFacade.update("1", DEFINITION, 0))
+            .thenReturn(workflowDTO);
+
+        Workflow.Format format = workflowDTO.format();
 
         try {
             this.webTestClient
@@ -148,21 +155,30 @@ public class WorkflowApiControllerIntTest {
                 .jsonPath("$.format")
                 .isEqualTo(format.toString())
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
+                .isEqualTo(Validate.notNull(workflowDTO.id(), "id"))
                 .jsonPath("$.label")
-                .isEqualTo(workflow.getLabel())
+                .isEqualTo(workflowDTO.label())
                 .jsonPath("$.tasks")
                 .isArray()
                 .jsonPath("$.tasks[0].name")
-                .isEqualTo("name")
+                .isEqualTo("airtable")
                 .jsonPath("$.tasks[0].type")
-                .isEqualTo("type");
+                .isEqualTo("airtable/v1/create");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
     }
 
     private Workflow getWorkflow() {
-        return new Workflow("1", DEFINITION, Workflow.Format.JSON, 0);
+        return new Workflow("1", DEFINITION, Workflow.Format.JSON, 1);
+    }
+
+    private WorkflowDTO getWorkflowDTO() {
+        Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON, 1);
+
+        return new WorkflowDTO(
+            workflow, List.of(new WorkflowTaskDTO(workflow.getTasks()
+                .getFirst(), List.of(), null)),
+            List.of());
     }
 }

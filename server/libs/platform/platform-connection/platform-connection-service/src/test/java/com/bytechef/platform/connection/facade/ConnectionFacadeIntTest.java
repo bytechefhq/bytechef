@@ -22,6 +22,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
@@ -33,6 +34,7 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
@@ -42,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
@@ -273,5 +276,31 @@ public class ConnectionFacadeIntTest {
 
         @MockBean
         WorkflowTestConfigurationService workflowTestConfigurationService;
+
+        @Bean
+        InstanceAccessor instanceAccessor() {
+            return new InstanceAccessor() {
+
+                @Override
+                public boolean isConnectionUsed(long connectionId) {
+                    return false;
+                }
+
+                @Override
+                public boolean isWorkflowEnabled(long instanceId, String workflowId) {
+                    return false;
+                }
+
+                @Override
+                public Map<String, ?> getInputMap(long instanceId, String workflowId) {
+                    return Map.of();
+                }
+
+                @Override
+                public Type getType() {
+                    return Type.AUTOMATION;
+                }
+            };
+        }
     }
 }

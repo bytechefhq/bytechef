@@ -33,16 +33,9 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Output;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.constant.ScriptConstants;
-import com.bytechef.platform.component.constant.MetadataConstants;
-import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -66,19 +59,10 @@ public class ScriptJavaScriptAction implements TaskHandler<Object> {
                 .description("Add your JavaScript custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .output(new ActionOutputFunction() {
-            @Override
-            public Output apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-                throws Exception {
-                return null;
-            }
-        });
+        .output();
 
     @Override
     public Object handle(TaskExecution taskExecution) {
-        Map<String, Long> connectIdMap = MapUtils.getMap(
-            taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
-
         return ScriptConstants.POLYGLOT_ENGINE.execute("js", taskExecution.getParameters());
     }
 }
