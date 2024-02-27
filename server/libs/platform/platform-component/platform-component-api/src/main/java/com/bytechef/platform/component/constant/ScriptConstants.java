@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script;
-
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.platform.component.constant;
 
 /**
- * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public class ScriptComponentDefinitionFactoryrTest {
+public class ScriptConstants {
 
-    @Test
-    public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/script_v1.json",
-            new ScriptComponentDefinitionFactory().getDefinition());
-    }
+    public static final String SCRIPT = "script";
 }

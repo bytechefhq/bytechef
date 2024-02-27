@@ -29,19 +29,23 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.PYTHON;
-import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
+import static com.bytechef.platform.component.constant.ScriptConstants.SCRIPT;
 
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.constant.ScriptConstants;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class ScriptPythonAction {
+@Component(SCRIPT + "/v1/python")
+public class ScriptPythonAction implements TaskHandler<Object> {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(PYTHON)
         .title("Python")
@@ -64,5 +68,10 @@ public class ScriptPythonAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return ScriptConstants.POLYGLOT_ENGINE.execute("python", inputParameters);
+    }
+
+    @Override
+    public Object handle(TaskExecution taskExecution) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("python", taskExecution.getParameters());
     }
 }

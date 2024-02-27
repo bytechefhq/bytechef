@@ -24,7 +24,7 @@ import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowServ
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.configuration.constant.MetadataConstants;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.fasterxml.jackson.core.type.TypeReference;

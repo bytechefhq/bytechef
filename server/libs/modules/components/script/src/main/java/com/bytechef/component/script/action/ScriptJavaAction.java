@@ -29,19 +29,21 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.JAVA;
-import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
+import static com.bytechef.platform.component.constant.ScriptConstants.SCRIPT;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.constant.ScriptConstants;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class ScriptJavaAction {
+@Component(SCRIPT + "/v1/java")
+public class ScriptJavaAction implements TaskHandler<Object> {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(JAVA)
         .title("Java")
@@ -57,12 +59,10 @@ public class ScriptJavaAction {
                 .description("Add your Java custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .output()
-        .perform(ScriptJavaAction::perform);
+        .output();
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return ScriptConstants.POLYGLOT_ENGINE.execute("java", inputParameters);
+    @Override
+    public Object handle(TaskExecution taskExecution) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("java", taskExecution.getParameters());
     }
 }

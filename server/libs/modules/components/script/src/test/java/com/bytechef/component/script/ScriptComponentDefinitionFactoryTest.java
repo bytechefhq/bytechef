@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.constant;
+package com.bytechef.component.script;
 
-import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Matija Petanjek
  */
-public class ScriptConstants {
+public class ScriptComponentDefinitionFactoryTest {
 
-    public static final String INPUT = "input";
-    public static final String JAVA = "java";
-    public static final String JAVASCRIPT = "javascript";
-    public static final String PYTHON = "python";
-    public static final String RUBY = "ruby";
-    public static final String R = "r";
-
-    public static final PolyglotEngine POLYGLOT_ENGINE = new PolyglotEngine();
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/script_v1.json",
+            new ScriptComponentDefinitionFactory().getDefinition());
+    }
 }
