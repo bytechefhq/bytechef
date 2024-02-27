@@ -18,12 +18,14 @@ package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record WorkflowTriggerDTO(
     List<WorkflowConnection> connections, String name, String label, Map<String, ?> parameters, String timeout,
     String type) {

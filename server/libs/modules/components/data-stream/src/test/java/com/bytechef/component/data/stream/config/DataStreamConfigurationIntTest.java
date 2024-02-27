@@ -67,8 +67,9 @@ class DataStreamConfigurationIntTest {
     }
 
     @Test
-    void importUserJob_WhenJobEnds_ThenStatusCompleted() throws Exception {
+    void importUserJobWhenJobEndsThenStatusCompleted() throws Exception {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+
         Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
     }
 }

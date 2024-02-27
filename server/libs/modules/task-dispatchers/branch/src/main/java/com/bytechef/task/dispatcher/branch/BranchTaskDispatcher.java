@@ -144,10 +144,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     private Map<String, ?> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = MapUtils.getList(
+        List<Map<String, Object>> cases = MapUtils.getRequiredList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {});
-
-        Validate.notNull(cases, "you must specify 'cases' in a branch statement");
 
         for (Map<String, Object> oneCase : cases) {
             Object key = MapUtils.getRequired(oneCase, KEY);
