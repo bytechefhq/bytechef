@@ -78,6 +78,7 @@ const Property = ({
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
+    const [loadDependency, setLoadDependency] = useState({});
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -333,6 +334,20 @@ const Property = ({
         isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
     }, [defaultValue, isNumericalInput, taskParameterValue]);
 
+    useEffect(() => {
+        const loadDependencyOptions = optionsDataSource?.loadOptionsDependsOn?.reduce(
+            (acc, key) => ({
+                ...acc,
+                [key]: currentComponentData?.parameters?.[key],
+            }),
+            {}
+        );
+
+        if (loadDependencyOptions) {
+            setLoadDependency(loadDependencyOptions);
+        }
+    }, [currentComponentData?.parameters, optionsDataSource?.loadOptionsDependsOn]);
+
     if (controlType === 'OBJECT_BUILDER' && !properties?.length && !additionalProperties?.length) {
         return <></>;
     }
@@ -519,6 +534,7 @@ const Property = ({
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                loadDependency={loadDependency}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
@@ -532,6 +548,7 @@ const Property = ({
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                loadDependency={loadDependency}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
