@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.configuration.domain.DataStream;
 import com.bytechef.platform.configuration.domain.DataStream.DataStreamComponent;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public final class WorkflowTaskDTO {
 
     private final List<WorkflowConnection> connections;

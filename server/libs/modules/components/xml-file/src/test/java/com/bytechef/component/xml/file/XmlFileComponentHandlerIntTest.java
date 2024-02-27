@@ -102,7 +102,7 @@ public class XmlFileComponentHandlerIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        FileEntry fileEntry = MapUtils.get(outputs, "writeXMLFile", FileEntry.class);
+        FileEntry fileEntry = MapUtils.getRequired(outputs, "writeXMLFile", FileEntry.class);
 
         Assertions.assertThat(fileEntry.getName())
             .isEqualTo("file.xml");

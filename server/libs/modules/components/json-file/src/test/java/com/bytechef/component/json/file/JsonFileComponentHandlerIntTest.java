@@ -91,7 +91,7 @@ public class JsonFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        FileEntry fileEntry = MapUtils.get(
+        FileEntry fileEntry = MapUtils.getRequired(
             taskFileStorage.readJobOutputs(job.getOutputs()), "writeJSONFile", FileEntry.class);
 
         Assertions.assertThat(fileEntry.getName())

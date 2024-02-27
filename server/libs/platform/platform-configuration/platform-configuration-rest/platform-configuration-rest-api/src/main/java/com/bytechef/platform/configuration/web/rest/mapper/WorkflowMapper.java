@@ -49,7 +49,7 @@ public abstract class WorkflowMapper {
     }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public static abstract class WorkflowModelToWorkflowBasicModel implements Converter<Workflow, WorkflowBasicModel> {
+    public abstract static class WorkflowModelToWorkflowBasicModel implements Converter<Workflow, WorkflowBasicModel> {
 
         @Autowired
         private WorkflowConnectionFacade workflowConnectionFacade;

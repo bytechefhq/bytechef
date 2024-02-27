@@ -20,12 +20,14 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record DataStream(DataStreamComponent source, DataStreamComponent destination) {
 
     public static DataStream of(Map<String, ?> extensions) {
@@ -53,6 +55,7 @@ public record DataStream(DataStreamComponent source, DataStreamComponent destina
             MapUtils.getMap(map, WorkflowConstants.PARAMETERS, new TypeReference<>() {}, Map.of()));
     }
 
+    @SuppressFBWarnings("EI")
     public record DataStreamComponent(String componentName, int componentVersion, Map<String, ?> parameters) {
     }
 }

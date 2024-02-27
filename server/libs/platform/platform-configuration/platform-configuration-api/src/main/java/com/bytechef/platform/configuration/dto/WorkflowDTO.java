@@ -17,12 +17,14 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record WorkflowDTO(
     String createdBy, LocalDateTime createdDate, String definition, String description, Workflow.Format format,
     String id, List<Workflow.Input> inputs, String label, String lastModifiedBy, LocalDateTime lastModifiedDate,
