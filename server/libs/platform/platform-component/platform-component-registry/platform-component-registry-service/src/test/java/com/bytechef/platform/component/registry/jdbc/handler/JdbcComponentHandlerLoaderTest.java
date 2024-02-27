@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class JdbcComponentHandlerTest {
+public class JdbcComponentHandlerLoaderTest {
 
     @Disabled
     @Test

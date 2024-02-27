@@ -26,7 +26,7 @@ public class JdbcComponentHandlerLoaderTest {
 
     @Disabled
     @Test
-    public void testLoadComponentTaskHandlerFactories() {
+    public void testLoadComponentHandlers() {
         // TODO
     }
 }

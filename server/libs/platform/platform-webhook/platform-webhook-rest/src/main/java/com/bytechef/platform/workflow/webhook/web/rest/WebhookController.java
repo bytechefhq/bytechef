@@ -26,7 +26,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentTy
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
@@ -35,6 +34,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;

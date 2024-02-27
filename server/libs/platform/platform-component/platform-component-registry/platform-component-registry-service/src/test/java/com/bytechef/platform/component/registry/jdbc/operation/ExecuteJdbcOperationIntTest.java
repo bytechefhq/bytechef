@@ -17,10 +17,10 @@
 package com.bytechef.platform.component.registry.jdbc.operation;
 
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
-import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
-import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
-import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.platform.component.registry.jdbc.DataSourceFactory;
+import com.bytechef.platform.component.registry.jdbc.JdbcExecutor;
+import com.bytechef.platform.component.registry.jdbc.constant.JdbcConstants;
+import com.bytechef.platform.component.registry.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
 import javax.sql.DataSource;
