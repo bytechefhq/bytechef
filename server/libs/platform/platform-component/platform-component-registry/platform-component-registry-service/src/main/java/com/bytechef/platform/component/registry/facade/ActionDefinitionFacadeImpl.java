@@ -64,17 +64,6 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters) {
-
-        return actionDefinitionService.executeNodeDescription(
-            componentName, componentVersion, actionName, inputParameters,
-            contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null));
-    }
-
-    @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
@@ -114,6 +103,17 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
                 componentConnection));
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters) {
+
+        return actionDefinitionService.executeWorkflowNodeDescription(
+            componentName, componentVersion, actionName, inputParameters,
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, null));
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

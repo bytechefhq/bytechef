@@ -239,7 +239,6 @@ public final class ComponentDSL {
         private boolean defaultOutputFunction;
         private Boolean deprecated;
         private String description;
-        private ActionNodeDescriptionFunction nodeDescriptionFunction;
         private PerformFunction performFunction;
         private Help help;
         private Map<String, Object> metadata;
@@ -249,6 +248,7 @@ public final class ComponentDSL {
         private List<? extends Property> properties;
         private Object sampleOutput;
         private String title;
+        private ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -278,12 +278,6 @@ public final class ComponentDSL {
 
         public ModifiableActionDefinition description(String description) {
             this.description = description;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition nodeDescription(ActionNodeDescriptionFunction nodeDescription) {
-            this.nodeDescriptionFunction = nodeDescription;
 
             return this;
         }
@@ -364,6 +358,14 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableActionDefinition workflowNodeDescription(
+            ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction) {
+
+            this.workflowNodeDescriptionFunction = workflowNodeDescriptionFunction;
+
+            return this;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -379,21 +381,22 @@ public final class ComponentDSL {
                 && Objects.equals(componentDescription, that.componentDescription)
                 && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(deprecated, that.deprecated)
                 && Objects.equals(description, that.description)
-                && Objects.equals(nodeDescriptionFunction, that.nodeDescriptionFunction)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(outputSchema, that.outputSchema)
                 && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
                 && Objects.equals(outputFunction, that.outputFunction)
                 && Objects.equals(sampleOutput, that.sampleOutput)
-                && Objects.equals(properties, that.properties) && Objects.equals(title, that.title);
+                && Objects.equals(properties, that.properties) && Objects.equals(title, that.title)
+                && Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
-                deprecated, description, nodeDescriptionFunction, performFunction, help, metadata, name,
-                outputSchema, defaultOutputFunction, outputFunction, sampleOutput, properties, title);
+                deprecated, description, performFunction, help, metadata, name,
+                outputSchema, defaultOutputFunction, outputFunction, sampleOutput, properties, title,
+                workflowNodeDescriptionFunction);
         }
 
         @Override
@@ -429,11 +432,6 @@ public final class ComponentDSL {
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
-        }
-
-        @Override
-        public Optional<ActionNodeDescriptionFunction> getNodeDescriptionFunction() {
-            return Optional.ofNullable(nodeDescriptionFunction);
         }
 
         @Override
@@ -474,6 +472,11 @@ public final class ComponentDSL {
         @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
+        }
+
+        @Override
+        public Optional<ActionWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction() {
+            return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 
         @Override
@@ -1087,11 +1090,15 @@ public final class ComponentDSL {
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition;
 
-            this.connection.componentDescription = this.getDescription()
-                .orElse(null);
+            Optional<String> descriptionOptional = this.getDescription();
+
+            this.connection.componentDescription = descriptionOptional.orElse(null);
             this.connection.componentName = this.getName();
-            this.connection.componentTitle = this.getTitle()
-                .orElse(null);
+
+            Optional<String> titleOptional = this.getTitle();
+
+            this.connection.componentTitle = titleOptional.orElse(null);
+            this.connection.workflowConnectionKeys = List.of(this.getName());
 
             return this;
         }
@@ -1468,6 +1475,11 @@ public final class ComponentDSL {
         @Override
         public int getVersion() {
             return version;
+        }
+
+        @Override
+        public List<String> getWorkflowConnectionKeys() {
+            return workflowConnectionKeys;
         }
     }
 
@@ -2893,7 +2905,6 @@ public final class ComponentDSL {
         private DynamicWebhookEnableFunction dynamicWebhookEnableFunction;
         private DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction;
         private DynamicWebhookRequestFunction dynamicWebhookRequestFunction;
-        private TriggerNodeDescriptionFunction nodeDescriptionFunction;
         private Help help;
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
@@ -2908,6 +2919,7 @@ public final class ComponentDSL {
         private TriggerType type;
         private Boolean webhookRawBody;
         private WebhookValidateFunction webhookValidateFunction;
+        private TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
         private Boolean workflowSyncExecution;
         private Boolean workflowSyncValidation;
 
@@ -2959,12 +2971,6 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition dynamicWebhookRequest(DynamicWebhookRequestFunction dynamicWebhookRequest) {
             this.dynamicWebhookRequestFunction = dynamicWebhookRequest;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition nodeDescription(TriggerNodeDescriptionFunction nodeDescription) {
-            this.nodeDescriptionFunction = nodeDescription;
 
             return this;
         }
@@ -3091,6 +3097,14 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableTriggerDefinition workflowNodeDescription(
+            TriggerWorkflowNodeDescriptionFunction workflowNodeDescription) {
+
+            this.workflowNodeDescriptionFunction = workflowNodeDescription;
+
+            return this;
+        }
+
         public ModifiableTriggerDefinition workflowSyncExecution(boolean workflowSyncExecution) {
             this.workflowSyncExecution = workflowSyncExecution;
 
@@ -3123,7 +3137,6 @@ public final class ComponentDSL {
                 && Objects.equals(dynamicWebhookEnableFunction, that.dynamicWebhookEnableFunction)
                 && Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction)
                 && Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction)
-                && Objects.equals(nodeDescriptionFunction, that.nodeDescriptionFunction)
                 && Objects.equals(help, that.help)
                 && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
                 && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
@@ -3137,6 +3150,7 @@ public final class ComponentDSL {
                 && Objects.equals(title, that.title) && type == that.type
                 && Objects.equals(webhookRawBody, that.webhookRawBody)
                 && Objects.equals(webhookValidateFunction, that.webhookValidateFunction)
+                && Objects.equals(workflowNodeDescriptionFunction, that.workflowNodeDescriptionFunction)
                 && Objects.equals(workflowSyncExecution, that.workflowSyncExecution)
                 && Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
         }
@@ -3146,10 +3160,10 @@ public final class ComponentDSL {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
                 deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
-                nodeDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
-                outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
-                pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody, webhookValidateFunction,
-                workflowSyncExecution, workflowSyncValidation);
+                help, listenerDisableConsumer, listenerEnableConsumer, name, outputSchema, defaultOutputFunction,
+                outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequest, title, type,
+                webhookRawBody, webhookValidateFunction, workflowNodeDescriptionFunction, workflowSyncExecution,
+                workflowSyncValidation);
         }
 
         @Override
@@ -3210,11 +3224,6 @@ public final class ComponentDSL {
         @Override
         public Optional<DynamicWebhookRequestFunction> getDynamicWebhookRequest() {
             return Optional.ofNullable(dynamicWebhookRequestFunction);
-        }
-
-        @Override
-        public Optional<TriggerNodeDescriptionFunction> getNodeDescriptionFunction() {
-            return Optional.ofNullable(nodeDescriptionFunction);
         }
 
         @Override
@@ -3280,6 +3289,11 @@ public final class ComponentDSL {
         @Override
         public Optional<WebhookValidateFunction> getWebhookValidate() {
             return Optional.ofNullable(webhookValidateFunction);
+        }
+
+        @Override
+        public Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction() {
+            return Optional.ofNullable(workflowNodeDescriptionFunction);
         }
 
         @Override
