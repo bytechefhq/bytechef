@@ -14,7 +14,7 @@ import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, RefreshCwOffIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -44,6 +44,12 @@ const WorkflowCodeEditorSheet = ({
     const queryClient = useQueryClient();
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
+        onError: () => {
+            toast({
+                description: `The workflow ${workflow.label} is not saved.`,
+                variant: 'destructive',
+            });
+        },
         onSuccess: (workflow: WorkflowModel) => {
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.projectWorkflows(projectId!),
@@ -54,10 +60,6 @@ const WorkflowCodeEditorSheet = ({
             });
 
             setDirty(false);
-
-            toast({
-                description: `The workflow ${workflow.label} is saved.`,
-            });
         },
     });
 
@@ -84,7 +86,7 @@ const WorkflowCodeEditorSheet = ({
         }
     };
 
-    const handleWorkflowCodeEditorSheetSave = (definition: string) => {
+    const handleWorkflowCodeEditorSheetSave = (workflow: WorkflowModel, definition: string) => {
         if (workflow && workflow.id) {
             updateWorkflowMutation.mutate({
                 id: workflow.id,
@@ -96,9 +98,30 @@ const WorkflowCodeEditorSheet = ({
         }
     };
 
+    const handleOpenChange = () => {
+        if (dirty) {
+            handleWorkflowCodeEditorSheetSave(workflow, definition);
+        }
+
+        onClose();
+    };
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (dirty) {
+                handleWorkflowCodeEditorSheetSave(workflow, definition);
+            }
+        }, 1000);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [definition, dirty, workflow]);
+
     return (
         <>
-            <Sheet onOpenChange={onClose} open={true}>
+            <Sheet onOpenChange={handleOpenChange} open={true}>
                 <SheetContent
                     className="flex w-11/12 flex-col gap-2 p-0 sm:max-w-[1024px]"
                     onFocusOutside={(event) => event.preventDefault()}
@@ -129,7 +152,9 @@ const WorkflowCodeEditorSheet = ({
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     disabled={!dirty}
-                                                    onClick={() => handleWorkflowCodeEditorSheetSave(definition)}
+                                                    onClick={() =>
+                                                        handleWorkflowCodeEditorSheetSave(workflow, definition)
+                                                    }
                                                     size="icon"
                                                     type="submit"
                                                     variant="ghost"
