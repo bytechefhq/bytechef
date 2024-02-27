@@ -10,7 +10,7 @@ import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowD
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeOptionsQuery} from '@/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {FocusEventHandler, ReactNode, useState} from 'react';
+import {FocusEventHandler, ReactNode, useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -27,12 +27,13 @@ type ComboBoxItemType = {
 
 interface PropertyComboBoxProps {
     description?: string;
-    options: OptionModel[];
     label?: string;
+    loadDependency?: any;
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
-    onValueChange?(value: string): void;
+    onValueChange?: (value: string) => void;
+    options: Array<OptionModel>;
     optionsDataSource?: OptionsDataSourceModel;
     placeholder?: string;
     required?: boolean;
@@ -44,6 +45,7 @@ const PropertyComboBox = ({
     description,
     label,
     leadingIcon,
+    loadDependency,
     name,
     onBlur,
     onValueChange,
@@ -54,11 +56,19 @@ const PropertyComboBox = ({
     value,
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
+    const [loadDependencyValues, setLoadDependencyValues] = useState<Array<string>>(
+        Object.values(loadDependency ?? {})
+    );
 
     const {workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {data: optionsData, isLoading} = useGetWorkflowNodeOptionsQuery(
+    const {
+        data: optionsData,
+        isLoading,
+        isRefetching,
+        refetch,
+    } = useGetWorkflowNodeOptionsQuery(
         {
             id: workflow.id!,
             propertyName: name!,
@@ -66,6 +76,7 @@ const PropertyComboBox = ({
         },
         !!optionsDataSource
     );
+
     if (optionsData) {
         options = optionsData.map((option) => ({
             description: option.description,
@@ -77,6 +88,21 @@ const PropertyComboBox = ({
     const items = options as Array<ComboBoxItemType>;
 
     const item = items?.find((item) => item.value === value);
+
+    placeholder = loadDependencyValues?.length ? `Depends on ${Object.keys(loadDependency)}` : placeholder;
+
+    useEffect(() => {
+        if (loadDependency && typeof loadDependency === 'object') {
+            setLoadDependencyValues(Object.values(loadDependency));
+        }
+    }, [loadDependency]);
+
+    useEffect(() => {
+        if (loadDependencyValues?.length) {
+            refetch();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loadDependencyValues]);
 
     return (
         <fieldset className="w-full space-y-2">
@@ -104,7 +130,8 @@ const PropertyComboBox = ({
                 <PopoverTrigger asChild onBlur={onBlur}>
                     <Button
                         aria-expanded={open}
-                        className={twMerge(leadingIcon && 'relative', 'relative w-full justify-between')}
+                        className={twMerge('relative w-full justify-between', leadingIcon && 'relative')}
+                        disabled={isRefetching}
                         name={name}
                         role="combobox"
                         variant="outline"
@@ -115,22 +142,28 @@ const PropertyComboBox = ({
                             </div>
                         )}
 
+                        {optionsDataSource && loadDependency && isRefetching && !item?.label && (
+                            <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
+                                <LoadingIcon /> Refetching...
+                            </span>
+                        )}
+
                         {optionsDataSource && isLoading && (
-                            <div className={twMerge(leadingIcon && 'ml-9', 'flex items-center')}>
+                            <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Loading...
-                            </div>
+                            </span>
                         )}
 
                         {!optionsDataSource && !options.length && (
-                            <div className="rounded-md border p-2 text-sm text-muted-foreground">
+                            <span className="rounded-md border p-2 text-sm text-muted-foreground">
                                 No options available
-                            </div>
+                            </span>
                         )}
 
                         {((optionsDataSource && !isLoading) || !optionsDataSource) && (
                             <>
                                 {value ? (
-                                    <span className={twMerge(leadingIcon && 'ml-9', 'flex w-full items-center')}>
+                                    <span className={twMerge('flex w-full items-center', leadingIcon && 'ml-9')}>
                                         {item?.icon && <InlineSVG className="mr-2 size-6 flex-none" src={item?.icon} />}
 
                                         {item?.label}
