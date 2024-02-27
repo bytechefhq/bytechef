@@ -47,7 +47,7 @@ public class RemoteActionDefinitionFacadeController {
     public ResponseEntity<String> executeEditorDescription(
         @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
 
-        return ResponseEntity.ok(actionDefinitionFacade.executeNodeDescription(
+        return ResponseEntity.ok(actionDefinitionFacade.executeWorkflowNodeDescription(
             nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
             nodeDescriptionRequest.actionName, nodeDescriptionRequest.inputParameters));
     }

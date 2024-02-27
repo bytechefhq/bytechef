@@ -97,7 +97,7 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-node-description",
+        value = "/execute-workflow-node-description",
         consumes = {
             "application/json"
         })
@@ -105,7 +105,7 @@ public class RemoteTriggerDefinitionFacadeController {
         @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
 
         return ResponseEntity.ok(
-            triggerDefinitionFacade.executeNodeDescription(
+            triggerDefinitionFacade.executeWorkflowNodeDescription(
                 nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
                 nodeDescriptionRequest.triggerName, nodeDescriptionRequest.inputParameters));
     }

@@ -29,12 +29,12 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
-    private boolean nodeDescriptionDefined;
     private Output output;
     private boolean outputDefined;
     private boolean outputFunctionDefined;
     private List<? extends Property> properties;
     private boolean webhookRawBody;
+    private boolean workflowNodeDescriptionDefined;
     private boolean workflowSyncExecution;
     private boolean workflowSyncValidation;
 
@@ -44,8 +44,6 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     public TriggerDefinition(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
         super(triggerDefinition);
 
-        this.nodeDescriptionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getNodeDescriptionFunction(), nodeDescriptionFunction -> true, false);
         this.output = OptionalUtils.mapOrElse(
             triggerDefinition.getOutput(),
             output -> SchemaUtils.toOutput(
@@ -59,6 +57,8 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
+        this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getWorkflowNodeDescriptionFunction(), nodeDescriptionFunction -> true, false);
         this.workflowSyncExecution = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncExecution(), false);
         this.workflowSyncValidation = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncValidation(), false);
     }
@@ -77,9 +77,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             return false;
         }
 
-        return nodeDescriptionDefined == that.nodeDescriptionDefined
-            && output == that.output && outputDefined == that.outputDefined
+        return output == that.output && outputDefined == that.outputDefined
             && outputFunctionDefined == that.outputFunctionDefined && webhookRawBody == that.webhookRawBody
+            && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined
             && workflowSyncExecution == that.workflowSyncExecution
             && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(properties, that.properties);
     }
@@ -87,8 +87,8 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), nodeDescriptionDefined, output, outputDefined, outputFunctionDefined, properties,
-            webhookRawBody, workflowSyncExecution, workflowSyncValidation);
+            super.hashCode(), output, outputDefined, outputFunctionDefined, properties,
+            webhookRawBody, workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation);
     }
 
     public Output getOutput() {
@@ -97,10 +97,6 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     public List<? extends Property> getProperties() {
         return properties;
-    }
-
-    public boolean isNodeDescriptionDefined() {
-        return nodeDescriptionDefined;
     }
 
     public boolean isOutputDefined() {
@@ -115,6 +111,10 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         return webhookRawBody;
     }
 
+    public boolean isWorkflowNodeDescriptionDefined() {
+        return workflowNodeDescriptionDefined;
+    }
+
     public boolean isWorkflowSyncExecution() {
         return workflowSyncExecution;
     }
@@ -126,7 +126,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     @Override
     public String toString() {
         return "TriggerDefinition{" +
-            "nodeDescriptionDefined=" + nodeDescriptionDefined +
+            "workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             ", output=" + output +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +

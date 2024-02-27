@@ -72,8 +72,7 @@ public class JobTestExecutor {
                             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                     taskExecution.getOutput() == null
                         ? null
-                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput())
-                )));
+                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()))));
     }
 
     private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {

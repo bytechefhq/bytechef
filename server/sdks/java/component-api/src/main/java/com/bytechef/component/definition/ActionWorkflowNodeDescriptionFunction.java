@@ -20,12 +20,12 @@ package com.bytechef.component.definition;
  *
  */
 @FunctionalInterface
-public interface TriggerNodeDescriptionFunction {
+public interface ActionWorkflowNodeDescriptionFunction {
 
     /**
      * @param inputParameters
      * @param context
      * @return
      */
-    String apply(Parameters inputParameters, TriggerContext context) throws Exception;
+    String apply(Parameters inputParameters, ActionContext context) throws Exception;
 }

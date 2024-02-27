@@ -53,18 +53,6 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-node-description"),
-            new NodeDescriptionRequest(
-                componentVersion, componentName, actionName, inputParameters),
-            String.class);
-    }
-
-    @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
@@ -101,6 +89,19 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
                 componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
                 inputParameters, connectionId),
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters) {
+
+        return defaultRestClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-workflow-node-description"),
+            new NodeDescriptionRequest(
+                componentVersion, componentName, actionName, inputParameters),
+            String.class);
     }
 
     private record NodeDescriptionRequest(

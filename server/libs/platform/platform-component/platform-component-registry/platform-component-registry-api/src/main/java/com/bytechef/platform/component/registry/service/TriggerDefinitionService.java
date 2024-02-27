@@ -56,7 +56,7 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
 
-    String executeNodeDescription(
+    String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters,
         @NonNull TriggerContext context);

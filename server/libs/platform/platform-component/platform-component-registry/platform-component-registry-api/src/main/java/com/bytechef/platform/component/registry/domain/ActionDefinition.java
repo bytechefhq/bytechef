@@ -29,7 +29,7 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private boolean nodeDescriptionDefined;
+    private boolean workflowNodeDescriptionDefined;
     private Output output;
     private boolean outputDefined;
     private boolean outputFunctionDefined;
@@ -41,8 +41,6 @@ public class ActionDefinition extends ActionDefinitionBasic {
     public ActionDefinition(com.bytechef.component.definition.ActionDefinition actionDefinition) {
         super(actionDefinition);
 
-        this.nodeDescriptionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getNodeDescriptionFunction(), actionNodeDescriptionFunction -> true, false);
         this.output = OptionalUtils.mapOrElse(
             actionDefinition.getOutput(),
             output -> SchemaUtils.toOutput(
@@ -55,6 +53,8 @@ public class ActionDefinition extends ActionDefinitionBasic {
             actionDefinition.getOutputFunction(), outputFunction -> true, actionDefinition.isDefaultOutputFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
+        this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getWorkflowNodeDescriptionFunction(), actionNodeDescriptionFunction -> true, false);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
             return false;
         }
 
-        return nodeDescriptionDefined == that.nodeDescriptionDefined
+        return workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined
             && Objects.equals(output, that.output) && outputDefined == that.outputDefined
             && outputFunctionDefined == that.outputFunctionDefined && Objects.equals(properties, that.properties);
     }
@@ -79,15 +79,15 @@ public class ActionDefinition extends ActionDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), nodeDescriptionDefined, output, outputDefined, outputFunctionDefined, properties);
-    }
-
-    public boolean isNodeDescriptionDefined() {
-        return nodeDescriptionDefined;
+            super.hashCode(), output, outputDefined, outputFunctionDefined, properties, workflowNodeDescriptionDefined);
     }
 
     public Output getOutput() {
         return output;
+    }
+
+    public List<? extends Property> getProperties() {
+        return properties;
     }
 
     public boolean isOutputDefined() {
@@ -98,14 +98,14 @@ public class ActionDefinition extends ActionDefinitionBasic {
         return outputFunctionDefined;
     }
 
-    public List<? extends Property> getProperties() {
-        return properties;
+    public boolean isWorkflowNodeDescriptionDefined() {
+        return workflowNodeDescriptionDefined;
     }
 
     @Override
     public String toString() {
         return "Definition{" +
-            "nodeDescriptionDefined=" + nodeDescriptionDefined +
+            "workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
             ", output=" + output +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +

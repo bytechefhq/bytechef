@@ -130,12 +130,6 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<TriggerNodeDescriptionFunction> getNodeDescriptionFunction();
-
-    /**
-     *
-     * @return
-     */
     Optional<Help> getHelp();
 
     /**
@@ -210,6 +204,12 @@ public interface TriggerDefinition {
      * @return
      */
     Optional<WebhookValidateFunction> getWebhookValidate();
+
+    /**
+     *
+     * @return
+     */
+    Optional<TriggerWorkflowNodeDescriptionFunction> getWorkflowNodeDescriptionFunction();
 
     /**
      * TODO

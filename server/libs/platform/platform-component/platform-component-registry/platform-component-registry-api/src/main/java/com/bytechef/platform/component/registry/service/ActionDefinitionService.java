@@ -37,11 +37,6 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
-    String executeNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        @NonNull ActionContext context);
-
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
@@ -55,6 +50,11 @@ public interface ActionDefinitionService {
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
+
+    String executeWorkflowNodeDescription(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters,
         @NonNull ActionContext context);
 
     ActionDefinition getActionDefinition(
