@@ -40,19 +40,12 @@ public class RemoteProjectInstanceWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
-            "{workflowNodeName}/{workflowConnectionKey}",
+        value = "/is-connection-used/{connectionId}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        @PathVariable long projectInstanceId, @PathVariable String workflowId,
-        @PathVariable String workflowNodeName, @PathVariable String workflowConnectionKey) {
-
-        return ResponseEntity.ok(
-            projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
-                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey)
-                .orElse(null));
+    public ResponseEntity<Boolean> isConnectionUsed(@PathVariable long connectionId) {
+        return ResponseEntity.ok(projectInstanceWorkflowService.isConnectionUsed(connectionId));
     }
 
     @RequestMapping(

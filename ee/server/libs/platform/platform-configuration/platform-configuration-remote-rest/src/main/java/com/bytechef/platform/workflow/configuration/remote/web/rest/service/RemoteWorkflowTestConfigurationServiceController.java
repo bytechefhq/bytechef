@@ -9,8 +9,6 @@ package com.bytechef.platform.workflow.configuration.remote.web.rest.service;
 
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import io.swagger.v3.oas.annotations.Hidden;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,12 +35,11 @@ public class RemoteWorkflowTestConfigurationServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-connection/{workflowId}/{workflowTaskNames}",
+        value = "/is-connection-used/{connectionId}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<Long>> getConnection(@PathVariable String workflowId, String workflowTaskNames) {
-        return ResponseEntity.ok(workflowTestConfigurationService.getWorkflowTestConfigurationConnectionIds(
-            workflowId, Arrays.asList(workflowTaskNames.split(","))));
+    public ResponseEntity<Boolean> isConnectionUsed(@PathVariable long connectionId) {
+        return ResponseEntity.ok(workflowTestConfigurationService.isConnectionUsed(connectionId));
     }
 }

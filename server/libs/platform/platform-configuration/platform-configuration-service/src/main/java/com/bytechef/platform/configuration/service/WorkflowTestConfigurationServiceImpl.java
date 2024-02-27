@@ -75,23 +75,17 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public List<Long> getWorkflowTestConfigurationConnectionIds(String workflowId, List<String> workflowTaskNames) {
-        if (workflowTaskNames.isEmpty()) {
-            return List.of();
-        }
-
-        return workflowTestConfigurationConnectionRepository
-            .findByWorkflowIdAndWorkflowNodeNames(workflowId, workflowTaskNames)
-            .stream()
-            .map(WorkflowTestConfigurationConnection::getConnectionId)
-            .toList();
-    }
-
-    @Override
     public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId) {
         return fetchWorkflowTestConfiguration(workflowId)
             .map(WorkflowTestConfiguration::getInputs)
             .orElse(Map.of());
+    }
+
+    @Override
+    public boolean isConnectionUsed(long connectionId) {
+        return !workflowTestConfigurationConnectionRepository
+            .findByConnectionId(connectionId)
+            .isEmpty();
     }
 
     @Override
