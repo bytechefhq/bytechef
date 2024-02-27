@@ -38,7 +38,7 @@ import com.bytechef.platform.component.registry.service.TriggerDefinitionService
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.constant.Type;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;

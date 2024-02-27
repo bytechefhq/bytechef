@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.trigger;
+package com.bytechef.platform.component.trigger;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;

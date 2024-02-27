@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.defiition;
+package com.bytechef.platform.component.definition;
 
 import static com.bytechef.component.definition.ComponentDSL.object;
 

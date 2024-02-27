@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:platform:platform-registry-api"))
+    api(project(":server:libs:platform:platform-api"))
     api(project(":server:sdks:java:component-api"))
 
     implementation("org.apache.commons:commons-lang3")

@@ -27,7 +27,7 @@ import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
