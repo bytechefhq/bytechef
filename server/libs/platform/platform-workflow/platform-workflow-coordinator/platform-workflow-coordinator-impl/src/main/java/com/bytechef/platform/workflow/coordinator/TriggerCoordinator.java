@@ -22,7 +22,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.registry.trigger.WebhookRequest;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;

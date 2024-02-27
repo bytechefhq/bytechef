@@ -19,7 +19,6 @@ package com.bytechef.platform.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +44,6 @@ public class ComponentDefinition {
     private List<TriggerDefinitionBasic> triggers;
     private String title;
     private int version;
-    private List<String> workflowConnectionKeys;
 
     private ComponentDefinition() {
     }
@@ -55,7 +53,6 @@ public class ComponentDefinition {
         this.name = name;
         this.tags = List.of();
         this.triggers = List.of();
-        this.workflowConnectionKeys = List.of();
     }
 
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
@@ -78,12 +75,6 @@ public class ComponentDefinition {
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
         this.version = componentDefinition.getVersion();
-
-        if (componentDefinition instanceof DataStreamComponentDefinition dataStreamComponentDefinition) {
-            this.workflowConnectionKeys = dataStreamComponentDefinition.getWorkflowConnectionKeys();
-        } else {
-            this.workflowConnectionKeys = connection == null ? List.of() : List.of(componentDefinition.getName());
-        }
     }
 
     public List<ActionDefinitionBasic> getActions() {
@@ -147,10 +138,6 @@ public class ComponentDefinition {
         return version;
     }
 
-    public List<String> getWorkflowConnectionKeys() {
-        return workflowConnectionKeys;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -166,15 +153,14 @@ public class ComponentDefinition {
             Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
             Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
             Objects.equals(tags, that.tags) && Objects.equals(triggers, that.triggers) &&
-            Objects.equals(title, that.title) && version == that.version &&
-            Objects.equals(workflowConnectionKeys, that.workflowConnectionKeys);
+            Objects.equals(title, that.title) && version == that.version;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
             actions, category, connection, connectionRequired, description, icon, name, resources, tags, triggers,
-            title, version, workflowConnectionKeys);
+            title, version);
     }
 
     @Override
@@ -190,7 +176,6 @@ public class ComponentDefinition {
             ", resources=" + resources +
             ", tags=" + tags +
             ", triggers=" + triggers +
-            ", workflowConnectionKeys=" + workflowConnectionKeys +
             ", title='" + title + '\'' +
             ", version=" + version +
             '}';

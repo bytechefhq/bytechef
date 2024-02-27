@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.worker;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.platform.component.registry.trigger.TriggerOutput;
+import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.configuration.domain.CancelControlTrigger;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionCompleteEvent;

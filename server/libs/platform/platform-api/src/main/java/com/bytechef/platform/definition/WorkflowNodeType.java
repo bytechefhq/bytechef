@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.registry.definition;
+package com.bytechef.platform.definition;
 
 /**
  * @author Ivica Cardic

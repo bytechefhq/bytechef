@@ -20,7 +20,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
-import com.bytechef.platform.component.registry.defiition.PropertyFactory;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -30,7 +30,7 @@ import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.platform.component.registry.factory.ComponentHandlerListFactory;
+import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
 import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;

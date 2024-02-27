@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.exception;
+package com.bytechef.platform.component.exception;
 
 import java.util.Collections;
 import java.util.Map;

@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.webhook.executor;
 
-import com.bytechef.platform.component.registry.trigger.WebhookRequest;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 
 /**

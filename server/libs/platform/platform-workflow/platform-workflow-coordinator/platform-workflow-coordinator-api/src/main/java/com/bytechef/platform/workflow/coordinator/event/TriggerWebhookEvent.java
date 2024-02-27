@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.coordinator.event;
 
-import com.bytechef.platform.component.registry.trigger.WebhookRequest;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

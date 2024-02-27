@@ -23,7 +23,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

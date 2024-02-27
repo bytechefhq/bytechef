@@ -21,7 +21,7 @@ import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableO
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;

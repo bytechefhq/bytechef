@@ -28,7 +28,7 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
-import com.bytechef.platform.registry.definition.WorkflowNodeType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
