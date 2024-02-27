@@ -16,9 +16,6 @@
 
 package com.bytechef.platform.connection.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
@@ -27,7 +24,6 @@ import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -64,16 +60,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
-    private final WorkflowConnectionFacade workflowConnectionFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
-    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, InstanceAccessorRegistry instanceAccessorRegistry,
-        OAuth2Service oAuth2Service, TagService tagService, WorkflowConnectionFacade workflowConnectionFacade,
-        WorkflowTestConfigurationService workflowTestConfigurationService, WorkflowService workflowService) {
+        OAuth2Service oAuth2Service, TagService tagService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
@@ -81,9 +75,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
-        this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
-        this.workflowService = workflowService;
     }
 
     @Override
@@ -131,7 +123,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         connection = connectionService.create(connection);
 
-        return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id"), type), connection, tags);
+        return new ConnectionDTO(false, connection, tags);
     }
 
     @Override
@@ -233,62 +225,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private boolean isConnectionUsed(long connectionId, Type type) {
-        List<Workflow> workflows = workflowService.getWorkflows(type.getId());
-
-        for (Workflow workflow : workflows) {
-            if (isConnectionUsed(workflow.getId(), workflow.getTasks(), connectionId, type)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isConnectionUsed(
-        String workflowId, List<WorkflowTask> workflowTasks, long connectionId, Type type) {
-
-        boolean connectionUsed = false;
-
-        for (WorkflowTask workflowTask : workflowTasks) {
-            if (isConnectionUsed(workflowId, workflowTask, connectionId, type)) {
-                connectionUsed = true;
-
-                break;
-            }
-        }
-
-        if (!connectionUsed) {
-            List<String> workflowTaskNames = workflowTasks
-                .stream()
-                .map(WorkflowTask::getName)
-                .toList();
-
-            connectionUsed = workflowTestConfigurationService
-                .getWorkflowTestConfigurationConnectionIds(workflowId, workflowTaskNames)
-                .stream()
-                .anyMatch(curConnectionId -> connectionId == curConnectionId);
-        }
-
-        return connectionUsed;
-    }
-
-    private boolean isConnectionUsed(String workflowId, WorkflowTask workflowTask, long id, Type type) {
-        return workflowConnectionFacade
-            .getWorkflowConnections(workflowTask)
-            .stream()
-            .map(workflowConnection -> isConnectionUsed(
-                workflowId, workflowConnection.workflowNodeName(), workflowConnection.key(), id, type))
-            .findFirst()
-            .orElse(false);
-    }
-
-    private boolean isConnectionUsed(
-        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
-        Type type) {
+        boolean connectionUsed;
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
 
-        return instanceAccessor.isConnectionUsed(connectionId, workflowId, workflowNodeName, workflowConnectionKey);
+        connectionUsed = instanceAccessor.isConnectionUsed(connectionId);
+
+        if (!connectionUsed) {
+            connectionUsed = workflowTestConfigurationService.isConnectionUsed(connectionId);
+        }
+
+        return connectionUsed;
     }
 
     private List<Tag> filterTags(List<Tag> tags, Connection connection) {

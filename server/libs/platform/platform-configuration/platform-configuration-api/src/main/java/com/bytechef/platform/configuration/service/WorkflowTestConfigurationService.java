@@ -34,11 +34,11 @@ public interface WorkflowTestConfigurationService {
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String workflowNodeName);
 
-    WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
-
-    List<Long> getWorkflowTestConfigurationConnectionIds(String workflowId, List<String> workflowTaskNames);
-
     Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId);
+
+    boolean isConnectionUsed(long connectionId);
+
+    WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String key, long connectionId);
