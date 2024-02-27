@@ -25,7 +25,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;

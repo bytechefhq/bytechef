@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.registry.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import java.util.Optional;
