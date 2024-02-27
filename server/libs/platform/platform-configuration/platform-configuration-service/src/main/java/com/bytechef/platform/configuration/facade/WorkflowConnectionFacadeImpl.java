@@ -17,14 +17,11 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.ScriptConstants;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
-import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.DataStream;
-import com.bytechef.platform.configuration.domain.DataStream.ComponentType;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -32,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +69,8 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
-        } else if (workflowTask && componentDefinition instanceof DataStreamComponentDefinition) {
+        if (workflowTask
+            && StringUtils.startsWith(componentDefinition.getName(), DataStreamComponentDefinition.DATA_STREAM)) {
             workflowConnections = getWorkflowConnections(DataStream.of(extensions), workflowNodeName);
         } else if (workflowTask && StringUtils.startsWith(componentDefinition.getName(), ScriptConstants.SCRIPT)) {
             workflowConnections = WorkflowConnection.of(extensions, workflowNodeName);
@@ -90,40 +87,43 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
         if (dataStream != null) {
             if (dataStream.source() != null) {
-                OptionalUtils.ifPresent(
-                    fetchWorkflowConnection(
-                        workflowNodeName,
-                        StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.SOURCE.name()),
-                        dataStream.source()),
-                    workflowConnections::add);
+                WorkflowConnection workflowConnection = getWorkflowConnection(
+                    workflowNodeName,
+                    StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.SOURCE.name()),
+                    dataStream.source());
+
+                if (workflowConnection != null) {
+                    workflowConnections.add(workflowConnection);
+                }
             }
 
             if (dataStream.destination() != null) {
-                OptionalUtils.ifPresent(
-                    fetchWorkflowConnection(
-                        workflowNodeName,
-                        StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.DESTINATION.name()),
-                        dataStream.destination()),
-                    workflowConnections::add);
+                WorkflowConnection workflowConnection = getWorkflowConnection(
+                    workflowNodeName,
+                    StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.DESTINATION.name()),
+                    dataStream.destination());
+
+                if (workflowConnection != null) {
+                    workflowConnections.add(workflowConnection);
+                }
             }
         }
 
         return workflowConnections;
     }
 
-    Optional<WorkflowConnection> fetchWorkflowConnection(
-        String workflowNodeName, String workflowConnectionKey, ComponentType componentType) {
+    private WorkflowConnection getWorkflowConnection(
+        String workflowNodeName, String workflowConnectionKey, DataStream.DataStreamComponent dataStreamComponent) {
 
-        Optional<WorkflowConnection> workflowConnectionOptional = Optional.empty();
+        WorkflowConnection workflowConnection = null;
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-            componentType.componentName(), componentType.componentVersion());
+            dataStreamComponent.componentName(), dataStreamComponent.componentVersion());
 
         if (componentDefinition.getConnection() != null) {
-            workflowConnectionOptional = Optional.of(
-                WorkflowConnection.of(workflowNodeName, workflowConnectionKey, componentDefinition));
+            workflowConnection = WorkflowConnection.of(workflowNodeName, workflowConnectionKey, componentDefinition);
         }
 
-        return workflowConnectionOptional;
+        return workflowConnection;
     }
 }
