@@ -20,8 +20,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.registry.handler.ComponentTaskHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

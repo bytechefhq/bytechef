@@ -28,7 +28,6 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.component.registry.definition.FileEntryImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
