@@ -21,6 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.component.script.action.ScriptJavaScriptAction;
+import com.bytechef.component.script.action.ScriptPythonAction;
+import com.bytechef.component.script.action.ScriptRAction;
+import com.bytechef.component.script.action.ScriptRubyAction;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ScriptComponentHandlerIntTest {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
-    private TaskHandler<Object> taskHandler = taskExecution -> {
+    private final TaskHandler<Object> taskHandler = taskExecution -> {
         Map<String, ?> parameters = taskExecution.getParameters();
 
         return parameters.get("value");
@@ -60,7 +64,8 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformJavaScript() {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
+            Map.of("factor", 3),
+            Map.of("var/v1/set", taskHandler, "script/v1/javascript", new ScriptJavaScriptAction()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -73,7 +78,7 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformPython() {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
+            Map.of("factor", 3), Map.of("var/v1/set", taskHandler, "script/v1/python", new ScriptPythonAction()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -87,7 +92,7 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformR() {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
+            Map.of("factor", 3), Map.of("var/v1/set", taskHandler, "script/v1/r", new ScriptRAction()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -100,7 +105,7 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformRuby() {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
+            Map.of("factor", 3), Map.of("var/v1/set", taskHandler, "script/v1/ruby", new ScriptRubyAction()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 

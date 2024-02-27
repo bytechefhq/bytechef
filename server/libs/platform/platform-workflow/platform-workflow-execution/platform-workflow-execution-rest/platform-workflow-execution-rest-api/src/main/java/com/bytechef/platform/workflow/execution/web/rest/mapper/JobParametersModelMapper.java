@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.web.rest.mapper;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.platform.configuration.constant.MetadataConstants;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobConnectionModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobParametersModel;

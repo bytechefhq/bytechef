@@ -17,9 +17,9 @@
 package com.bytechef.component.script.engine;
 
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
-import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
+import static com.bytechef.platform.component.constant.ScriptConstants.SCRIPT;
 
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.commons.util.MapUtils;
 import java.util.Map;
 import java.util.function.Function;
 import org.graalvm.polyglot.Context;
@@ -32,22 +32,24 @@ import org.graalvm.polyglot.proxy.ProxyObject;
  */
 public class PolyglotEngine {
 
-    private static final Engine engine = Engine.newBuilder()
+    private static final Engine engine = Engine
+        .newBuilder()
         .build();
 
-    @SuppressWarnings("unchecked")
-    public Object execute(String languageId, Parameters inputParameters) {
-        try (Context polyglotContext = Context.newBuilder()
+    public Object execute(String languageId, Map<String, ?> inputParameters) {
+        try (Context polyglotContext = Context
+            .newBuilder()
             .engine(engine)
             .allowAllAccess(true)
             .build()) {
-            polyglotContext.eval(languageId, inputParameters.getRequiredString(SCRIPT));
+
+            polyglotContext.eval(languageId, MapUtils.getRequiredString(inputParameters, SCRIPT));
 
             Function<ProxyObject, Object> performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform")
                 .as(new TypeLiteral<>() {});
 
-            return performFunction.apply(ProxyObject.fromMap((Map<String, Object>) inputParameters.getMap(INPUT)));
+            return performFunction.apply(ProxyObject.fromMap(MapUtils.getMap(inputParameters, INPUT, Object.class)));
         }
     }
 }
