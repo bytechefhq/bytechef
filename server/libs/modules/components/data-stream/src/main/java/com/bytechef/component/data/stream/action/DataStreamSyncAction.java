@@ -19,7 +19,7 @@ package com.bytechef.component.data.stream.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.platform.component.constant.DataStreamConstants.DATA_STREAM;
+import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;

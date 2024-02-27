@@ -17,7 +17,7 @@
 package com.bytechef.component.script;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
+import static com.bytechef.platform.component.constant.ScriptConstants.SCRIPT;
 
 import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.definition.ComponentDefinition;

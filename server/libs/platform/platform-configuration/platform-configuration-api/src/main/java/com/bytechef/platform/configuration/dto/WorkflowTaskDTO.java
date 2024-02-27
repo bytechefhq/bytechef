@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.configuration.domain.DataStream;
-import com.bytechef.platform.configuration.domain.DataStream.ComponentType;
+import com.bytechef.platform.configuration.domain.DataStream.DataStreamComponent;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Objects;
 public final class WorkflowTaskDTO {
 
     private final List<WorkflowConnection> connections;
-    private final ComponentType destination;
+    private final DataStreamComponent destination;
     private final List<WorkflowTask> finalize;
     private final String label;
     private final int maxRetries;
@@ -39,7 +39,7 @@ public final class WorkflowTaskDTO {
     private final Map<String, ?> parameters;
     private final List<WorkflowTask> post;
     private final List<WorkflowTask> pre;
-    private final ComponentType source;
+    private final DataStreamComponent source;
     private final int taskNumber;
     private final String timeout;
     private final String type;
@@ -48,9 +48,9 @@ public final class WorkflowTaskDTO {
      *
      */
     public WorkflowTaskDTO(
-        List<WorkflowConnection> connections, ComponentType destination, List<WorkflowTask> finalize,
+        List<WorkflowConnection> connections, DataStreamComponent destination, List<WorkflowTask> finalize,
         String label, int maxRetries, String name, String node, Map<String, ?> parameters, List<WorkflowTask> post,
-        List<WorkflowTask> pre, ComponentType source, int taskNumber, String timeout, String type) {
+        List<WorkflowTask> pre, DataStreamComponent source, int taskNumber, String timeout, String type) {
 
         this.connections = connections;
         this.destination = destination;
@@ -81,7 +81,7 @@ public final class WorkflowTaskDTO {
         return connections;
     }
 
-    public ComponentType getDestination() {
+    public DataStreamComponent getDestination() {
         return destination;
     }
 
@@ -117,7 +117,7 @@ public final class WorkflowTaskDTO {
         return pre;
     }
 
-    public ComponentType getSource() {
+    public DataStreamComponent getSource() {
         return source;
     }
 

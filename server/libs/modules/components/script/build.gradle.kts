@@ -7,6 +7,8 @@ dependencies {
     implementation(rootProject.libs.org.graalvm.polyglot.python)
     implementation(rootProject.libs.org.graalvm.polyglot.ruby)
     implementation("org.springframework:spring-context")
+    implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
 
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))

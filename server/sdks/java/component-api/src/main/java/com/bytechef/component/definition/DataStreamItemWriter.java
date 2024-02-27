@@ -18,6 +18,8 @@ package com.bytechef.component.definition;
 
 /**
  * @author Ivica Cardic
+ *
+ *         TODO
  */
 public interface DataStreamItemWriter {
 }
