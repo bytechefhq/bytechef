@@ -1,14 +1,22 @@
 {
+  "category": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "dataStreamItemReader": null,
+  "dataStreamItemWriter": null,
+  "description": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
+  "icon": "path:assets/google-docs.svg",
+  "tags": null,
+  "metadata": null,
+  "name": "googleDocs",
+  "resources": null,
+  "version": 1,
+  "title": "Google Docs",
   "actions": [ {
     "batch": null,
-    "componentName": "googleDocs",
-    "componentDescription": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
-    "componentTitle": "Google Docs",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Create a document on Google Docs",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createDocument",
@@ -53,18 +61,14 @@
       "optionsDataSource": null
     } ],
     "title": "Create document",
+    "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "googleDocs",
-    "componentDescription": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
-    "componentTitle": "Google Docs",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Edit a template file and replace the values with the ones provided",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "createDocumentBasedOnTemplate",
@@ -125,8 +129,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Key: Image ID (get it manually from the Read File Action), Value: Image URL",
@@ -164,22 +168,18 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Edit template file",
+    "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
   }, {
     "batch": null,
-    "componentName": "googleDocs",
-    "componentDescription": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
-    "componentTitle": "Google Docs",
-    "componentVersion": 1,
     "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Read a document from Google Docs",
-    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "readDocument",
@@ -205,10 +205,11 @@
       "optionsDataSource": null
     } ],
     "title": "Read document",
+    "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
   } ],
-  "category": null,
+  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -257,36 +258,21 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
-    "componentName": "googleDocs",
-    "componentDescription": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
-    "componentTitle": "Google Docs",
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
-  "icon": "path:assets/google-docs.svg",
-  "tags": null,
-  "metadata": null,
-  "name": "googleDocs",
-  "resources": null,
-  "version": 1,
-  "title": "Google Docs",
-  "triggers": null,
-  "allowedConnections": null
+  }
 }

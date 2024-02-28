@@ -65,12 +65,10 @@ public class GoogleDocsCreateDocumentAction {
 
         Document newDocument = createDocument(inputParameters.getRequiredString(TITLE), docs);
 
-        InsertTextRequest insertTextRequest = new InsertTextRequest()
-            .setText(inputParameters.getRequiredString(BODY))
-            .setEndOfSegmentLocation(new EndOfSegmentLocation());
-
         Request request = new Request()
-            .setInsertText(insertTextRequest);
+            .setInsertText(new InsertTextRequest()
+                .setText(inputParameters.getRequiredString(BODY))
+                .setEndOfSegmentLocation(new EndOfSegmentLocation()));
 
         writeToDocument(docs, newDocument.getDocumentId(), List.of(request));
 

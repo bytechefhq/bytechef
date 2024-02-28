@@ -79,15 +79,15 @@ public class GoogleDocsCreateDocumentBasedOnTemplateAction {
         for (Map.Entry<String, String> entry : values.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            ReplaceAllTextRequest replaceAllTextRequest = new ReplaceAllTextRequest()
-                .setContainsText(
-                    new SubstringMatchCriteria()
-                        .setText("[[" + key + "]]")
-                        .setMatchCase(true))
-                .setReplaceText(value);
 
             Request request = new Request()
-                .setReplaceAllText(replaceAllTextRequest);
+                .setReplaceAllText(
+                    new ReplaceAllTextRequest()
+                        .setContainsText(
+                            new SubstringMatchCriteria()
+                                .setText("[[" + key + "]]")
+                                .setMatchCase(true))
+                        .setReplaceText(value));
 
             requests.add(request);
         }
@@ -97,12 +97,12 @@ public class GoogleDocsCreateDocumentBasedOnTemplateAction {
         for (Map.Entry<String, String> entry : images.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            ReplaceImageRequest replaceImageRequest = new ReplaceImageRequest()
-                .setImageObjectId(key)
-                .setUri(value);
 
             Request request = new Request()
-                .setReplaceImage(replaceImageRequest);
+                .setReplaceImage(
+                    new ReplaceImageRequest()
+                        .setImageObjectId(key)
+                        .setUri(value));
 
             requests.add(request);
         }
