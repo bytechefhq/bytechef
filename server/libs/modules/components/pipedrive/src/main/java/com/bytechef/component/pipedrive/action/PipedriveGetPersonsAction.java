@@ -260,20 +260,18 @@ public class PipedriveGetPersonsAction {
                             .description(
                                 "The date and time when the person was added/created. Format: YYYY-MM-DD HH:MM:SS")
                             .required(false),
-                        integer("done_activities_count")
-                            .description("The count of done activities related to the person")
+                        integer("done_activities_count").description(
+                            "The count of done activities related to the person")
                             .required(false))
                     .description("The array of persons"))
                     .description("The array of persons")
                     .required(false),
-                object(
-                    "related_objects")
-                        .properties(object("organization").properties(string("name").description(
-                            "The name of the organization associated with the item")
+                object("related_objects")
+                    .properties(
+                        object("organization").additionalProperties(object().properties(integer("id")
+                            .description("The ID of the organization associated with the item")
                             .required(false),
-                            integer("id").description("The ID of the organization associated with the item")
-                                .required(false),
-                            string("address").description("The address of the organization")
+                            string("name").description("The name of the organization associated with the item")
                                 .required(false),
                             integer("people_count").description(
                                 "The number of people connected with the organization that is associated with the item")
@@ -281,47 +279,52 @@ public class PipedriveGetPersonsAction {
                             integer("owner_id").description(
                                 "The ID of the owner of the organization that is associated with the item")
                                 .required(false),
+                            string("address").description("The address of the organization")
+                                .required(false),
                             string("cc_email").description("The BCC email of the organization associated with the item")
-                                .required(false))
+                                .required(false)))
                             .required(false),
-                            object("user").properties(string("name").description("The name of the user")
-                                .required(false), object("USER_ID").required(false),
-                                integer("has_pic").description(
-                                    "Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
-                                    .required(false),
-                                bool("active_flag").description("Whether the user is active or not")
-                                    .required(false),
-                                integer("id").description("The ID of the user")
+                        object("user")
+                            .additionalProperties(object().properties(integer("id").description("The ID of the user")
+                                .required(false),
+                                string("name").description("The name of the user")
                                     .required(false),
                                 string("email").description("The email of the user")
                                     .required(false),
-                                string("pic_hash").description("The user picture hash")
-                                    .required(false))
-                                .required(false),
-                            object("picture")
-                                .properties(string("update_time").description("The update time of the picture")
+                                integer("has_pic")
+                                    .description(
+                                        "Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
                                     .required(false),
-                                    integer("added_by_user_id").description("The ID of the user who added the picture")
+                                string("pic_hash").description("The user picture hash")
+                                    .required(false),
+                                bool("active_flag").description("Whether the user is active or not")
+                                    .required(false)))
+                            .required(false),
+                        object("picture")
+                            .additionalProperties(object().properties(
+                                integer("id").description("The ID of the picture associated with the item")
+                                    .required(false),
+                                string("item_type").description("The type of item the picture is related to")
+                                    .required(false),
+                                integer("item_id").description("The ID of related item")
+                                    .required(false),
+                                bool("active_flag").description("Whether the associated picture is active or not")
+                                    .required(false),
+                                string("add_time").description("The add time of the picture")
+                                    .required(false),
+                                string("update_time").description("The update time of the picture")
+                                    .required(false),
+                                integer("added_by_user_id").description("The ID of the user who added the picture")
+                                    .required(false),
+                                object("pictures")
+                                    .properties(string("128").description("The URL of the 128*128 picture")
                                         .required(false),
-                                    integer("item_id").description("The ID of related item")
-                                        .required(false),
-                                    string("item_type").description("The type of item the picture is related to")
-                                        .required(false),
-                                    bool("active_flag").description("Whether the associated picture is active or not")
-                                        .required(false),
-                                    integer("id").description("The ID of the picture associated with the item")
-                                        .required(false),
-                                    string("add_time").description("The add time of the picture")
-                                        .required(false),
-                                    object("pictures")
-                                        .properties(string("128").description("The URL of the 128*128 picture")
-                                            .required(false),
-                                            string("512").description("The URL of the 512*512 picture")
-                                                .required(false))
-                                        .required(false))
-                                .description("The picture that is associated with the item")
-                                .required(false))
-                        .required(false),
+                                        string("512").description("The URL of the 512*512 picture")
+                                            .required(false))
+                                    .required(false)))
+                            .description("The picture that is associated with the item")
+                            .required(false))
+                    .required(false),
                 bool("success").description("If the response is successful or not")
                     .required(false))
             .metadata(

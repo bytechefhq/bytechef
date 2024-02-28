@@ -242,8 +242,8 @@ public class PipedriveAddPersonAction {
                         .required(false),
                     string("address").description("The address of the organization")
                         .required(false),
-                    integer("owner_id")
-                        .description("The ID of the owner of the organization that is associated with the item")
+                    integer("owner_id").description(
+                        "The ID of the owner of the organization that is associated with the item")
                         .required(false),
                     string("cc_email").description("The BCC email of the organization associated with the item")
                         .required(false),
@@ -267,26 +267,30 @@ public class PipedriveAddPersonAction {
                         .required(false),
                     string("next_activity_time").description("The time of the next activity associated with the deal")
                         .required(false),
-                    string("add_time")
-                        .description("The date and time when the person was added/created. Format: YYYY-MM-DD HH:MM:SS")
+                    string("add_time").description(
+                        "The date and time when the person was added/created. Format: YYYY-MM-DD HH:MM:SS")
                         .required(false),
                     integer("done_activities_count").description("The count of done activities related to the person")
                         .required(false),
                     object("related_objects")
-                        .properties(object("user").properties(string("name").description("The name of the user")
-                            .required(false), object("USER_ID").required(false),
-                            integer("has_pic")
-                                .description("Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
-                                .required(false),
-                            bool("active_flag").description("Whether the user is active or not")
-                                .required(false),
-                            integer("id").description("The ID of the user")
-                                .required(false),
-                            string("email").description("The email of the user")
-                                .required(false),
-                            string("pic_hash").description("The user picture hash")
+                        .properties(
+                            object("user")
+                                .additionalProperties(object().properties(
+                                    integer("id").description("The ID of the user")
+                                        .required(false),
+                                    string("name").description("The name of the user")
+                                        .required(false),
+                                    string("email").description("The email of the user")
+                                        .required(false),
+                                    integer("has_pic")
+                                        .description(
+                                            "Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
+                                        .required(false),
+                                    string("pic_hash").description("The user picture hash")
+                                        .required(false),
+                                    bool("active_flag").description("Whether the user is active or not")
+                                        .required(false)))
                                 .required(false))
-                            .required(false))
                         .required(false),
                     bool("success").description("If the response is successful or not")
                         .required(false))

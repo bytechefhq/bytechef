@@ -292,68 +292,84 @@ public class PipedriveGetDealAction {
                 .required(false))
                 .required(false),
             object("related_objects")
-                .properties(object("user").properties(integer("id").description("The ID of the user")
-                    .required(false),
-                    string("name").description("The name of the user")
-                        .required(false),
-                    string("email").description("The email of the user")
-                        .required(false),
-                    bool("has_pic").description("If the user has a picture or not")
-                        .required(false),
-                    string("pic_hash").description("The user picture hash")
-                        .required(false),
-                    bool("active_flag").description("Whether the user is active or not")
-                        .required(false))
-                    .description("The user who is associated with the deal")
-                    .required(false),
-                    object("organization").properties(string("name").description(
-                        "The name of the organization associated with the deal")
-                        .required(false),
-                        integer("people_count")
-                            .description(
-                                "The number of people connected with the organization that is associated with the deal")
+                .properties(
+                    object(
+                        "user").additionalProperties(
+                            object().properties(integer("id").description("The ID of the user")
+                                .required(false),
+                                string("name").description("The name of the user")
+                                    .required(false),
+                                string("email").description("The email of the user")
+                                    .required(false),
+                                integer("has_pic")
+                                    .description(
+                                        "Whether the user has picture or not. 0 = No picture, 1 = Has picture.")
+                                    .required(false),
+                                string("pic_hash").description("The user picture hash")
+                                    .required(false),
+                                bool("active_flag").description("Whether the user is active or not")
+                                    .required(false)))
                             .required(false),
-                        integer("owner_id").description(
-                            "The ID of the owner of the organization that is associated with the deal")
-                            .required(false),
-                        string("address").description(
-                            "The address of the organization that is associated with the deal")
-                            .required(false),
-                        bool("active_flag").description("Whether the associated organization is active or not")
-                            .required(false),
-                        string("cc_email").description("The BCC email of the organization associated with the deal")
-                            .required(false))
-                        .description("The organization which is associated with the deal")
-                        .required(false),
                     object("person")
-                        .properties(bool("active_flag").description("Whether the associated person is active or not")
-                            .required(false),
-                            string("name").description("The name of the person associated with the deal")
-                                .required(false),
-                            array("email")
-                                .items(object().properties(string("label").description("The type of the email")
-                                    .required(false),
-                                    string("value").description("The email of the associated person")
+                        .additionalProperties(
+                            object()
+                                .properties(
+                                    bool("active_flag").description("Whether the associated person is active or not")
                                         .required(false),
-                                    bool("primary").description("If this is the primary email or not")
-                                        .required(false))
-                                    .description("The emails of the person associated with the deal"))
-                                .description("The emails of the person associated with the deal")
+                                    integer("id").description("The ID of the person associated with the item")
+                                        .required(false),
+                                    string("name").description("The name of the person associated with the item")
+                                        .required(false),
+                                    array(
+                                        "email")
+                                            .items(object().properties(
+                                                string("label").description("The type of the email")
+                                                    .required(false),
+                                                string("value").description("The email of the associated person")
+                                                    .required(false),
+                                                bool("primary").description("Whether this is the primary email or not")
+                                                    .required(false))
+                                                .description("The emails of the person associated with the item"))
+                                            .description("The emails of the person associated with the item")
+                                            .required(false),
+                                    array("phone")
+                                        .items(
+                                            object()
+                                                .properties(string("label").description("The type of the phone number")
+                                                    .required(false),
+                                                    string("value")
+                                                        .description(
+                                                            "The phone number of the person associated with the item")
+                                                        .required(false),
+                                                    bool("primary")
+                                                        .description("Whether this is the primary phone number or not")
+                                                        .required(false))
+                                                .description(
+                                                    "The phone numbers of the person associated with the item"))
+                                        .description("The phone numbers of the person associated with the item")
+                                        .required(false),
+                                    integer("owner_id").description(
+                                        "The ID of the owner of the person that is associated with the item")
+                                        .required(false)))
+                        .required(false),
+                    object("organization")
+                        .additionalProperties(object().properties(bool("active_flag")
+                            .description("Whether the associated organization is active or not")
+                            .required(false),
+                            integer("id").description("The ID of the organization associated with the item")
                                 .required(false),
-                            array("phone").items(object().properties(
-                                string("label").description("The type of the phone number")
-                                    .required(false),
-                                string("value").description("The phone number of the person associated with the deal")
-                                    .required(false),
-                                bool("primary").description("If this is the primary phone number or not")
-                                    .required(false))
-                                .description("The phone numbers of the person associated with the deal"))
-                                .description("The phone numbers of the person associated with the deal")
+                            string("name").description("The name of the organization associated with the item")
+                                .required(false),
+                            integer("people_count").description(
+                                "The number of people connected with the organization that is associated with the item")
                                 .required(false),
                             integer("owner_id")
-                                .description("The ID of the owner of the person that is associated with the deal")
-                                .required(false))
-                        .description("The person who is associated with the deal")
+                                .description("The ID of the owner of the organization that is associated with the item")
+                                .required(false),
+                            string("address").description("The address of the organization")
+                                .required(false),
+                            string("cc_email").description("The BCC email of the organization associated with the item")
+                                .required(false)))
                         .required(false))
                 .required(false))
             .metadata(

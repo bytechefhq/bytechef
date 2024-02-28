@@ -475,110 +475,107 @@ paths:
                         description: "If there are more list items in the collection\
                           \ than displayed or not"
                   related_objects:
-                    type: "object"
+                    type: object
                     properties:
                       user:
-                        description: "The user who is associated with the deal"
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
-                            description: "The ID of the user"
-                          name:
-                            type: "string"
-                            description: "The name of the user"
-                          email:
-                            type: "string"
-                            description: "The email of the user"
-                          has_pic:
-                            type: "boolean"
-                            description: "If the user has a picture or not"
-                          pic_hash:
-                            type: "string"
-                            nullable: true
-                            description: "The user picture hash"
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the user is active or not"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: The ID of the user
+                            name:
+                              type: string
+                              description: The name of the user
+                            email:
+                              type: string
+                              description: The email of the user
+                            has_pic:
+                              type: integer
+                              description: 'Whether the user has picture or not. 0 = No picture, 1 = Has picture.'
+                            pic_hash:
+                              type: string
+                              nullable: true
+                              description: The user picture hash
+                            active_flag:
+                              type: boolean
+                              description: Whether the user is active or not
                       organization:
-                        type: "object"
-                        description: "The organization which is associated with the\
-                          \ deal"
-                        properties:
-                          name:
-                            type: "string"
-                            description: "The name of the organization associated\
-                              \ with the deal"
-                          people_count:
-                            type: "integer"
-                            description: "The number of people connected with the\
-                              \ organization that is associated with the deal"
-                          owner_id:
-                            type: "integer"
-                            description: "The ID of the owner of the organization\
-                              \ that is associated with the deal"
-                          address:
-                            type: "string"
-                            description: "The address of the organization that is\
-                              \ associated with the deal"
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the associated organization is active\
-                              \ or not"
-                          cc_email:
-                            type: "string"
-                            description: "The BCC email of the organization associated\
-                              \ with the deal"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          description: The ID of the organization associated with the item
+                          properties:
+                            active_flag:
+                              type: boolean
+                              description: Whether the associated organization is active or not
+                            id:
+                              type: integer
+                              description: The ID of the organization associated with the item
+                            name:
+                              type: string
+                              description: The name of the organization associated with the item
+                            people_count:
+                              type: integer
+                              description: The number of people connected with the organization that is associated with the item
+                            owner_id:
+                              type: integer
+                              description: The ID of the owner of the organization that is associated with the item
+                            address:
+                              type: string
+                              description: The address of the organization
+                            cc_email:
+                              type: string
+                              description: The BCC email of the organization associated with the item
                       person:
-                        type: "object"
-                        description: "The person who is associated with the deal"
-                        properties:
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the associated person is active\
-                              \ or not"
-                          name:
-                            type: "string"
-                            description: "The name of the person associated with the\
-                              \ deal"
-                          email:
-                            type: "array"
-                            description: "The emails of the person associated with\
-                              \ the deal"
-                            items:
-                              type: "object"
-                              properties:
-                                label:
-                                  type: "string"
-                                  description: "The type of the email"
-                                value:
-                                  type: "string"
-                                  description: "The email of the associated person"
-                                primary:
-                                  type: "boolean"
-                                  description: "If this is the primary email or not"
-                          phone:
-                            type: "array"
-                            description: "The phone numbers of the person associated\
-                              \ with the deal"
-                            items:
-                              type: "object"
-                              properties:
-                                label:
-                                  type: "string"
-                                  description: "The type of the phone number"
-                                value:
-                                  type: "string"
-                                  description: "The phone number of the person associated\
-                                    \ with the deal"
-                                primary:
-                                  type: "boolean"
-                                  description: "If this is the primary phone number\
-                                    \ or not"
-                          owner_id:
-                            type: "integer"
-                            description: "The ID of the owner of the person that is\
-                              \ associated with the deal"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          description: The ID of the person associated with the item
+                          properties:
+                            active_flag:
+                              type: boolean
+                              description: Whether the associated person is active or not
+                            id:
+                              type: integer
+                              description: The ID of the person associated with the item
+                            name:
+                              type: string
+                              description: The name of the person associated with the item
+                            email:
+                              type: array
+                              description: The emails of the person associated with the item
+                              items:
+                                type: object
+                                properties:
+                                  label:
+                                    type: string
+                                    description: The type of the email
+                                  value:
+                                    type: string
+                                    description: The email of the associated person
+                                  primary:
+                                    type: boolean
+                                    description: Whether this is the primary email or not
+                            phone:
+                              type: array
+                              description: The phone numbers of the person associated with the item
+                              items:
+                                type: object
+                                properties:
+                                  label:
+                                    type: string
+                                    description: The type of the phone number
+                                  value:
+                                    type: string
+                                    description: The phone number of the person associated with the item
+                                  primary:
+                                    type: boolean
+                                    description: Whether this is the primary phone number or not
+                            owner_id:
+                              type: integer
+                              description: The ID of the owner of the person that is associated with the item
               example:
                 success: true
                 data:
@@ -1234,110 +1231,105 @@ paths:
                             description: "If the person that is associated with the\
                               \ deal is hidden or not"
                   related_objects:
-                    type: "object"
+                    type: object
                     properties:
                       user:
-                        description: "The user who is associated with the deal"
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
-                            description: "The ID of the user"
-                          name:
-                            type: "string"
-                            description: "The name of the user"
-                          email:
-                            type: "string"
-                            description: "The email of the user"
-                          has_pic:
-                            type: "boolean"
-                            description: "If the user has a picture or not"
-                          pic_hash:
-                            type: "string"
-                            nullable: true
-                            description: "The user picture hash"
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the user is active or not"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: The ID of the user
+                            name:
+                              type: string
+                              description: The name of the user
+                            email:
+                              type: string
+                              description: The email of the user
+                            has_pic:
+                              type: integer
+                              description: 'Whether the user has picture or not. 0 = No picture, 1 = Has picture.'
+                            pic_hash:
+                              type: string
+                              nullable: true
+                              description: The user picture hash
+                            active_flag:
+                              type: boolean
+                              description: Whether the user is active or not
                       organization:
-                        type: "object"
-                        description: "The organization which is associated with the\
-                          \ deal"
-                        properties:
-                          name:
-                            type: "string"
-                            description: "The name of the organization associated\
-                              \ with the deal"
-                          people_count:
-                            type: "integer"
-                            description: "The number of people connected with the\
-                              \ organization that is associated with the deal"
-                          owner_id:
-                            type: "integer"
-                            description: "The ID of the owner of the organization\
-                              \ that is associated with the deal"
-                          address:
-                            type: "string"
-                            description: "The address of the organization that is\
-                              \ associated with the deal"
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the associated organization is active\
-                              \ or not"
-                          cc_email:
-                            type: "string"
-                            description: "The BCC email of the organization associated\
-                              \ with the deal"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            active_flag:
+                              type: boolean
+                              description: Whether the associated organization is active or not
+                            id:
+                              type: integer
+                              description: The ID of the organization associated with the item
+                            name:
+                              type: string
+                              description: The name of the organization associated with the item
+                            people_count:
+                              type: integer
+                              description: The number of people connected with the organization that is associated with the item
+                            owner_id:
+                              type: integer
+                              description: The ID of the owner of the organization that is associated with the item
+                            address:
+                              type: string
+                              description: The address of the organization
+                            cc_email:
+                              type: string
+                              description: The BCC email of the organization associated with the item
                       person:
-                        type: "object"
-                        description: "The person who is associated with the deal"
-                        properties:
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the associated person is active\
-                              \ or not"
-                          name:
-                            type: "string"
-                            description: "The name of the person associated with the\
-                              \ deal"
-                          email:
-                            type: "array"
-                            description: "The emails of the person associated with\
-                              \ the deal"
-                            items:
-                              type: "object"
-                              properties:
-                                label:
-                                  type: "string"
-                                  description: "The type of the email"
-                                value:
-                                  type: "string"
-                                  description: "The email of the associated person"
-                                primary:
-                                  type: "boolean"
-                                  description: "If this is the primary email or not"
-                          phone:
-                            type: "array"
-                            description: "The phone numbers of the person associated\
-                              \ with the deal"
-                            items:
-                              type: "object"
-                              properties:
-                                label:
-                                  type: "string"
-                                  description: "The type of the phone number"
-                                value:
-                                  type: "string"
-                                  description: "The phone number of the person associated\
-                                    \ with the deal"
-                                primary:
-                                  type: "boolean"
-                                  description: "If this is the primary phone number\
-                                    \ or not"
-                          owner_id:
-                            type: "integer"
-                            description: "The ID of the owner of the person that is\
-                              \ associated with the deal"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            active_flag:
+                              type: boolean
+                              description: Whether the associated person is active or not
+                            id:
+                              type: integer
+                              description: The ID of the person associated with the item
+                            name:
+                              type: string
+                              description: The name of the person associated with the item
+                            email:
+                              type: array
+                              description: The emails of the person associated with the item
+                              items:
+                                type: object
+                                properties:
+                                  label:
+                                    type: string
+                                    description: The type of the email
+                                  value:
+                                    type: string
+                                    description: The email of the associated person
+                                  primary:
+                                    type: boolean
+                                    description: Whether this is the primary email or not
+                            phone:
+                              type: array
+                              description: The phone numbers of the person associated with the item
+                              items:
+                                type: object
+                                properties:
+                                  label:
+                                    type: string
+                                    description: The type of the phone number
+                                  value:
+                                    type: string
+                                    description: The phone number of the person associated with the item
+                                  primary:
+                                    type: boolean
+                                    description: Whether this is the primary phone number or not
+                            owner_id:
+                              type: integer
+                              description: The ID of the owner of the person that is associated with the item
               example:
                 success: true
                 data:
@@ -2265,110 +2257,105 @@ paths:
                         type: "string"
                         description: "The BCC email of the deal"
                   related_objects:
-                    type: "object"
+                    type: object
                     properties:
                       user:
-                        description: "The user who is associated with the deal"
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
-                            description: "The ID of the user"
-                          name:
-                            type: "string"
-                            description: "The name of the user"
-                          email:
-                            type: "string"
-                            description: "The email of the user"
-                          has_pic:
-                            type: "boolean"
-                            description: "If the user has a picture or not"
-                          pic_hash:
-                            type: "string"
-                            nullable: true
-                            description: "The user picture hash"
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the user is active or not"
-                      organization:
-                        type: "object"
-                        description: "The organization which is associated with the\
-                          \ deal"
-                        properties:
-                          name:
-                            type: "string"
-                            description: "The name of the organization associated\
-                              \ with the deal"
-                          people_count:
-                            type: "integer"
-                            description: "The number of people connected with the\
-                              \ organization that is associated with the deal"
-                          owner_id:
-                            type: "integer"
-                            description: "The ID of the owner of the organization\
-                              \ that is associated with the deal"
-                          address:
-                            type: "string"
-                            description: "The address of the organization that is\
-                              \ associated with the deal"
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the associated organization is active\
-                              \ or not"
-                          cc_email:
-                            type: "string"
-                            description: "The BCC email of the organization associated\
-                              \ with the deal"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: The ID of the user
+                            name:
+                              type: string
+                              description: The name of the user
+                            email:
+                              type: string
+                              description: The email of the user
+                            has_pic:
+                              type: integer
+                              description: 'Whether the user has picture or not. 0 = No picture, 1 = Has picture.'
+                            pic_hash:
+                              type: string
+                              nullable: true
+                              description: The user picture hash
+                            active_flag:
+                              type: boolean
+                              description: Whether the user is active or not
                       person:
-                        type: "object"
-                        description: "The person who is associated with the deal"
-                        properties:
-                          active_flag:
-                            type: "boolean"
-                            description: "Whether the associated person is active\
-                              \ or not"
-                          name:
-                            type: "string"
-                            description: "The name of the person associated with the\
-                              \ deal"
-                          email:
-                            type: "array"
-                            description: "The emails of the person associated with\
-                              \ the deal"
-                            items:
-                              type: "object"
-                              properties:
-                                label:
-                                  type: "string"
-                                  description: "The type of the email"
-                                value:
-                                  type: "string"
-                                  description: "The email of the associated person"
-                                primary:
-                                  type: "boolean"
-                                  description: "If this is the primary email or not"
-                          phone:
-                            type: "array"
-                            description: "The phone numbers of the person associated\
-                              \ with the deal"
-                            items:
-                              type: "object"
-                              properties:
-                                label:
-                                  type: "string"
-                                  description: "The type of the phone number"
-                                value:
-                                  type: "string"
-                                  description: "The phone number of the person associated\
-                                    \ with the deal"
-                                primary:
-                                  type: "boolean"
-                                  description: "If this is the primary phone number\
-                                    \ or not"
-                          owner_id:
-                            type: "integer"
-                            description: "The ID of the owner of the person that is\
-                              \ associated with the deal"
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            active_flag:
+                              type: boolean
+                              description: Whether the associated person is active or not
+                            id:
+                              type: integer
+                              description: The ID of the person associated with the item
+                            name:
+                              type: string
+                              description: The name of the person associated with the item
+                            email:
+                              type: array
+                              description: The emails of the person associated with the item
+                              items:
+                                type: object
+                                properties:
+                                  label:
+                                    type: string
+                                    description: The type of the email
+                                  value:
+                                    type: string
+                                    description: The email of the associated person
+                                  primary:
+                                    type: boolean
+                                    description: Whether this is the primary email or not
+                            phone:
+                              type: array
+                              description: The phone numbers of the person associated with the item
+                              items:
+                                type: object
+                                properties:
+                                  label:
+                                    type: string
+                                    description: The type of the phone number
+                                  value:
+                                    type: string
+                                    description: The phone number of the person associated with the item
+                                  primary:
+                                    type: boolean
+                                    description: Whether this is the primary phone number or not
+                            owner_id:
+                              type: integer
+                              description: The ID of the owner of the person that is associated with the item
+                      organization:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties:
+                            active_flag:
+                              type: boolean
+                              description: Whether the associated organization is active or not
+                            id:
+                              type: integer
+                              description: The ID of the organization associated with the item
+                            name:
+                              type: string
+                              description: The name of the organization associated with the item
+                            people_count:
+                              type: integer
+                              description: The number of people connected with the organization that is associated with the item
+                            owner_id:
+                              type: integer
+                              description: The ID of the owner of the organization that is associated with the item
+                            address:
+                              type: string
+                              description: The address of the organization
+                            cc_email:
+                              type: string
+                              description: The BCC email of the organization associated with the item
               example:
                 success: true
                 data:
@@ -3860,121 +3847,91 @@ paths:
                               type: "integer"
                               description: "Next pagination start"
                     related_objects:
-                      type: "object"
+                      type: object
                       properties:
                         organization:
-                          type: "object"
-                          properties:
-                            ORGANIZATION_ID:
-                              type: "object"
-                              description: "The ID of the organization associated\
-                                \ with the item"
-                              allOf:
-                              - type: "object"
-                                properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the organization associated\
-                                      \ with the item"
-                              - type: "object"
-                                properties:
-                                  name:
-                                    type: "string"
-                                    description: "The name of the organization associated\
-                                      \ with the item"
-                                  people_count:
-                                    type: "integer"
-                                    description: "The number of people connected with\
-                                      \ the organization that is associated with the\
-                                      \ item"
-                                  owner_id:
-                                    type: "integer"
-                                    description: "The ID of the owner of the organization\
-                                      \ that is associated with the item"
-                                  address:
-                                    type: "string"
-                                    description: "The address of the organization"
-                                  cc_email:
-                                    type: "string"
-                                    description: "The BCC email of the organization\
-                                      \ associated with the item"
+                          type: object
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The ID of the organization associated with the item
+                              name:
+                                type: string
+                                description: The name of the organization associated with the item
+                              people_count:
+                                type: integer
+                                description: The number of people connected with the organization that is associated with the item
+                              owner_id:
+                                type: integer
+                                description: The ID of the owner of the organization that is associated with the item
+                              address:
+                                type: string
+                                description: The address of the organization
+                              cc_email:
+                                type: string
+                                description: The BCC email of the organization associated with the item
                         user:
-                          type: "object"
-                          properties:
-                            USER_ID:
-                              type: "object"
-                              title: "userDataWithId"
-                              allOf:
-                              - properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the user"
-                                  name:
-                                    type: "string"
-                                    description: "The name of the user"
-                                  email:
-                                    type: "string"
-                                    description: "The email of the user"
-                                  has_pic:
-                                    type: "integer"
-                                    description: "Whether the user has picture or\
-                                      \ not. 0 = No picture, 1 = Has picture."
-                                  pic_hash:
-                                    type: "string"
-                                    nullable: true
-                                    description: "The user picture hash"
-                                  active_flag:
-                                    type: "boolean"
-                                    description: "Whether the user is active or not"
-                              - type: "object"
-                                description: "The ID of the user"
+                          type: object
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The ID of the user
+                              name:
+                                type: string
+                                description: The name of the user
+                              email:
+                                type: string
+                                description: The email of the user
+                              has_pic:
+                                type: integer
+                                description: 'Whether the user has picture or not. 0 = No picture, 1 = Has picture.'
+                              pic_hash:
+                                type: string
+                                nullable: true
+                                description: The user picture hash
+                              active_flag:
+                                type: boolean
+                                description: Whether the user is active or not
                         picture:
-                          type: "object"
-                          description: "The picture that is associated with the item"
-                          properties:
-                            PICTURE_ID:
-                              type: "object"
-                              description: "The ID of the picture"
-                              allOf:
-                              - allOf:
-                                - type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                      description: "The ID of the picture associated\
-                                        \ with the item"
-                                - type: "object"
-                                  properties:
-                                    item_type:
-                                      type: "string"
-                                      description: "The type of item the picture is\
-                                        \ related to"
-                                    item_id:
-                                      type: "integer"
-                                      description: "The ID of related item"
-                                    active_flag:
-                                      type: "boolean"
-                                      description: "Whether the associated picture\
-                                        \ is active or not"
-                                    add_time:
-                                      type: "string"
-                                      description: "The add time of the picture"
-                                    update_time:
-                                      type: "string"
-                                      description: "The update time of the picture"
-                                    added_by_user_id:
-                                      type: "integer"
-                                      description: "The ID of the user who added the\
-                                        \ picture"
-                                    pictures:
-                                      type: "object"
-                                      properties:
-                                        "128":
-                                          type: "string"
-                                          description: "The URL of the 128*128 picture"
-                                        "512":
-                                          type: "string"
-                                          description: "The URL of the 512*512 picture"
+                          type: object
+                          description: The picture that is associated with the item
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The ID of the picture associated with the item
+                              item_type:
+                                type: string
+                                description: The type of item the picture is related to
+                              item_id:
+                                type: integer
+                                description: The ID of related item
+                              active_flag:
+                                type: boolean
+                                description: Whether the associated picture is active or not
+                              add_time:
+                                type: string
+                                description: The add time of the picture
+                              update_time:
+                                type: string
+                                description: The update time of the picture
+                              added_by_user_id:
+                                type: integer
+                                description: The ID of the user who added the picture
+                              pictures:
+                                type: object
+                                properties:
+                                  '128':
+                                    type: string
+                                    description: The URL of the 128*128 picture
+                                  '512':
+                                    type: string
+                                    description: The URL of the 512*512 picture
               example:
                 success: true
                 data:
@@ -4427,117 +4384,98 @@ paths:
                       properties:
                         organization:
                           type: "object"
-                          properties:
-                            ORGANIZATION_ID:
-                              type: "object"
-                              description: "The ID of the organization associated\
-                                \ with the item"
-                              allOf:
-                              - type: "object"
-                                properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the organization associated\
-                                      \ with the item"
-                              - type: "object"
-                                properties:
-                                  name:
-                                    type: "string"
-                                    description: "The name of the organization associated\
-                                      \ with the item"
-                                  people_count:
-                                    type: "integer"
-                                    description: "The number of people connected with\
-                                      \ the organization that is associated with the\
-                                      \ item"
-                                  owner_id:
-                                    type: "integer"
-                                    description: "The ID of the owner of the organization\
-                                      \ that is associated with the item"
-                                  address:
-                                    type: "string"
-                                    description: "The address of the organization"
-                                  cc_email:
-                                    type: "string"
-                                    description: "The BCC email of the organization\
-                                      \ associated with the item"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
+                                description: "The ID of the organization associated\
+                                  \ with the item"
+                              name:
+                                type: "string"
+                                description: "The name of the organization associated\
+                                  \ with the item"
+                              people_count:
+                                type: "integer"
+                                description: "The number of people connected with\
+                                  \ the organization that is associated with the\
+                                  \ item"
+                              owner_id:
+                                type: "integer"
+                                description: "The ID of the owner of the organization\
+                                  \ that is associated with the item"
+                              address:
+                                type: "string"
+                                description: "The address of the organization"
+                              cc_email:
+                                type: "string"
+                                description: "The BCC email of the organization\
+                                  \ associated with the item"
                         user:
                           type: "object"
-                          properties:
-                            USER_ID:
-                              type: "object"
-                              title: "userDataWithId"
-                              allOf:
-                              - properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the user"
-                                  name:
-                                    type: "string"
-                                    description: "The name of the user"
-                                  email:
-                                    type: "string"
-                                    description: "The email of the user"
-                                  has_pic:
-                                    type: "integer"
-                                    description: "Whether the user has picture or\
-                                      \ not. 0 = No picture, 1 = Has picture."
-                                  pic_hash:
-                                    type: "string"
-                                    nullable: true
-                                    description: "The user picture hash"
-                                  active_flag:
-                                    type: "boolean"
-                                    description: "Whether the user is active or not"
-                              - type: "object"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
                                 description: "The ID of the user"
+                              name:
+                                type: "string"
+                                description: "The name of the user"
+                              email:
+                                type: "string"
+                                description: "The email of the user"
+                              has_pic:
+                                type: "integer"
+                                description: "Whether the user has picture or\
+                                  \ not. 0 = No picture, 1 = Has picture."
+                              pic_hash:
+                                type: "string"
+                                nullable: true
+                                description: "The user picture hash"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the user is active or not"
                         picture:
                           type: "object"
                           description: "The picture that is associated with the item"
-                          properties:
-                            PICTURE_ID:
-                              type: "object"
-                              description: "The ID of the picture"
-                              allOf:
-                              - allOf:
-                                - type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                      description: "The ID of the picture associated\
-                                        \ with the item"
-                                - type: "object"
-                                  properties:
-                                    item_type:
-                                      type: "string"
-                                      description: "The type of item the picture is\
-                                        \ related to"
-                                    item_id:
-                                      type: "integer"
-                                      description: "The ID of related item"
-                                    active_flag:
-                                      type: "boolean"
-                                      description: "Whether the associated picture\
-                                        \ is active or not"
-                                    add_time:
-                                      type: "string"
-                                      description: "The add time of the picture"
-                                    update_time:
-                                      type: "string"
-                                      description: "The update time of the picture"
-                                    added_by_user_id:
-                                      type: "integer"
-                                      description: "The ID of the user who added the\
-                                        \ picture"
-                                    pictures:
-                                      type: "object"
-                                      properties:
-                                        "128":
-                                          type: "string"
-                                          description: "The URL of the 128*128 picture"
-                                        "512":
-                                          type: "string"
-                                          description: "The URL of the 512*512 picture"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
+                                description: "The ID of the picture associated\
+                                  \ with the item"
+                              item_type:
+                                type: "string"
+                                description: "The type of item the picture is\
+                                  \ related to"
+                              item_id:
+                                type: "integer"
+                                description: "The ID of related item"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the associated picture\
+                                  \ is active or not"
+                              add_time:
+                                type: "string"
+                                description: "The add time of the picture"
+                              update_time:
+                                type: "string"
+                                description: "The update time of the picture"
+                              added_by_user_id:
+                                type: "integer"
+                                description: "The ID of the user who added the\
+                                  \ picture"
+                              pictures:
+                                type: "object"
+                                properties:
+                                  "128":
+                                    type: "string"
+                                    description: "The URL of the 128*128 picture"
+                                  "512":
+                                    type: "string"
+                                    description: "The URL of the 512*512 picture"
               example:
                 success: true
                 data:
@@ -5194,117 +5132,98 @@ paths:
                       properties:
                         organization:
                           type: "object"
-                          properties:
-                            ORGANIZATION_ID:
-                              type: "object"
-                              description: "The ID of the organization associated\
-                                \ with the item"
-                              allOf:
-                              - type: "object"
-                                properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the organization associated\
-                                      \ with the item"
-                              - type: "object"
-                                properties:
-                                  name:
-                                    type: "string"
-                                    description: "The name of the organization associated\
-                                      \ with the item"
-                                  people_count:
-                                    type: "integer"
-                                    description: "The number of people connected with\
-                                      \ the organization that is associated with the\
-                                      \ item"
-                                  owner_id:
-                                    type: "integer"
-                                    description: "The ID of the owner of the organization\
-                                      \ that is associated with the item"
-                                  address:
-                                    type: "string"
-                                    description: "The address of the organization"
-                                  cc_email:
-                                    type: "string"
-                                    description: "The BCC email of the organization\
-                                      \ associated with the item"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
+                                description: "The ID of the organization associated\
+                                  \ with the item"
+                              name:
+                                type: "string"
+                                description: "The name of the organization associated\
+                                  \ with the item"
+                              people_count:
+                                type: "integer"
+                                description: "The number of people connected with\
+                                  \ the organization that is associated with the\
+                                  \ item"
+                              owner_id:
+                                type: "integer"
+                                description: "The ID of the owner of the organization\
+                                  \ that is associated with the item"
+                              address:
+                                type: "string"
+                                description: "The address of the organization"
+                              cc_email:
+                                type: "string"
+                                description: "The BCC email of the organization\
+                                  \ associated with the item"
                         user:
                           type: "object"
-                          properties:
-                            USER_ID:
-                              type: "object"
-                              title: "userDataWithId"
-                              allOf:
-                              - properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the user"
-                                  name:
-                                    type: "string"
-                                    description: "The name of the user"
-                                  email:
-                                    type: "string"
-                                    description: "The email of the user"
-                                  has_pic:
-                                    type: "integer"
-                                    description: "Whether the user has picture or\
-                                      \ not. 0 = No picture, 1 = Has picture."
-                                  pic_hash:
-                                    type: "string"
-                                    nullable: true
-                                    description: "The user picture hash"
-                                  active_flag:
-                                    type: "boolean"
-                                    description: "Whether the user is active or not"
-                              - type: "object"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
                                 description: "The ID of the user"
+                              name:
+                                type: "string"
+                                description: "The name of the user"
+                              email:
+                                type: "string"
+                                description: "The email of the user"
+                              has_pic:
+                                type: "integer"
+                                description: "Whether the user has picture or\
+                                  \ not. 0 = No picture, 1 = Has picture."
+                              pic_hash:
+                                type: "string"
+                                nullable: true
+                                description: "The user picture hash"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the user is active or not"
                         picture:
                           type: "object"
                           description: "The picture that is associated with the item"
-                          properties:
-                            PICTURE_ID:
-                              type: "object"
-                              description: "The ID of the picture"
-                              allOf:
-                              - allOf:
-                                - type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                      description: "The ID of the picture associated\
-                                        \ with the item"
-                                - type: "object"
-                                  properties:
-                                    item_type:
-                                      type: "string"
-                                      description: "The type of item the picture is\
-                                        \ related to"
-                                    item_id:
-                                      type: "integer"
-                                      description: "The ID of related item"
-                                    active_flag:
-                                      type: "boolean"
-                                      description: "Whether the associated picture\
-                                        \ is active or not"
-                                    add_time:
-                                      type: "string"
-                                      description: "The add time of the picture"
-                                    update_time:
-                                      type: "string"
-                                      description: "The update time of the picture"
-                                    added_by_user_id:
-                                      type: "integer"
-                                      description: "The ID of the user who added the\
-                                        \ picture"
-                                    pictures:
-                                      type: "object"
-                                      properties:
-                                        "128":
-                                          type: "string"
-                                          description: "The URL of the 128*128 picture"
-                                        "512":
-                                          type: "string"
-                                          description: "The URL of the 512*512 picture"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
+                                description: "The ID of the picture associated\
+                                  \ with the item"
+                              item_type:
+                                type: "string"
+                                description: "The type of item the picture is\
+                                  \ related to"
+                              item_id:
+                                type: "integer"
+                                description: "The ID of related item"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the associated picture\
+                                  \ is active or not"
+                              add_time:
+                                type: "string"
+                                description: "The add time of the picture"
+                              update_time:
+                                type: "string"
+                                description: "The update time of the picture"
+                              added_by_user_id:
+                                type: "integer"
+                                description: "The ID of the user who added the\
+                                  \ picture"
+                              pictures:
+                                type: "object"
+                                properties:
+                                  "128":
+                                    type: "string"
+                                    description: "The URL of the 128*128 picture"
+                                  "512":
+                                    type: "string"
+                                    description: "The URL of the 512*512 picture"
               example:
                 success: true
                 data:
@@ -5899,121 +5818,91 @@ paths:
                               type: "integer"
                               description: "Next pagination start"
                     related_objects:
-                      type: "object"
+                      type: object
                       properties:
                         organization:
-                          type: "object"
-                          properties:
-                            ORGANIZATION_ID:
-                              type: "object"
-                              description: "The ID of the organization associated\
-                                \ with the item"
-                              allOf:
-                              - type: "object"
-                                properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the organization associated\
-                                      \ with the item"
-                              - type: "object"
-                                properties:
-                                  name:
-                                    type: "string"
-                                    description: "The name of the organization associated\
-                                      \ with the item"
-                                  people_count:
-                                    type: "integer"
-                                    description: "The number of people connected with\
-                                      \ the organization that is associated with the\
-                                      \ item"
-                                  owner_id:
-                                    type: "integer"
-                                    description: "The ID of the owner of the organization\
-                                      \ that is associated with the item"
-                                  address:
-                                    type: "string"
-                                    description: "The address of the organization"
-                                  cc_email:
-                                    type: "string"
-                                    description: "The BCC email of the organization\
-                                      \ associated with the item"
+                          type: object
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The ID of the organization associated with the item
+                              name:
+                                type: string
+                                description: The name of the organization associated with the item
+                              people_count:
+                                type: integer
+                                description: The number of people connected with the organization that is associated with the item
+                              owner_id:
+                                type: integer
+                                description: The ID of the owner of the organization that is associated with the item
+                              address:
+                                type: string
+                                description: The address of the organization
+                              cc_email:
+                                type: string
+                                description: The BCC email of the organization associated with the item
                         user:
-                          type: "object"
-                          properties:
-                            USER_ID:
-                              type: "object"
-                              title: "userDataWithId"
-                              allOf:
-                              - properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the user"
-                                  name:
-                                    type: "string"
-                                    description: "The name of the user"
-                                  email:
-                                    type: "string"
-                                    description: "The email of the user"
-                                  has_pic:
-                                    type: "integer"
-                                    description: "Whether the user has picture or\
-                                      \ not. 0 = No picture, 1 = Has picture."
-                                  pic_hash:
-                                    type: "string"
-                                    nullable: true
-                                    description: "The user picture hash"
-                                  active_flag:
-                                    type: "boolean"
-                                    description: "Whether the user is active or not"
-                              - type: "object"
-                                description: "The ID of the user"
+                          type: object
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The ID of the user
+                              name:
+                                type: string
+                                description: The name of the user
+                              email:
+                                type: string
+                                description: The email of the user
+                              has_pic:
+                                type: integer
+                                description: 'Whether the user has picture or not. 0 = No picture, 1 = Has picture.'
+                              pic_hash:
+                                type: string
+                                nullable: true
+                                description: The user picture hash
+                              active_flag:
+                                type: boolean
+                                description: Whether the user is active or not
                         picture:
-                          type: "object"
-                          description: "The picture that is associated with the item"
-                          properties:
-                            PICTURE_ID:
-                              type: "object"
-                              description: "The ID of the picture"
-                              allOf:
-                              - allOf:
-                                - type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                      description: "The ID of the picture associated\
-                                        \ with the item"
-                                - type: "object"
-                                  properties:
-                                    item_type:
-                                      type: "string"
-                                      description: "The type of item the picture is\
-                                        \ related to"
-                                    item_id:
-                                      type: "integer"
-                                      description: "The ID of related item"
-                                    active_flag:
-                                      type: "boolean"
-                                      description: "Whether the associated picture\
-                                        \ is active or not"
-                                    add_time:
-                                      type: "string"
-                                      description: "The add time of the picture"
-                                    update_time:
-                                      type: "string"
-                                      description: "The update time of the picture"
-                                    added_by_user_id:
-                                      type: "integer"
-                                      description: "The ID of the user who added the\
-                                        \ picture"
-                                    pictures:
-                                      type: "object"
-                                      properties:
-                                        "128":
-                                          type: "string"
-                                          description: "The URL of the 128*128 picture"
-                                        "512":
-                                          type: "string"
-                                          description: "The URL of the 512*512 picture"
+                          type: object
+                          description: The picture that is associated with the item
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: The ID of the picture associated with the item
+                              item_type:
+                                type: string
+                                description: The type of item the picture is related to
+                              item_id:
+                                type: integer
+                                description: The ID of related item
+                              active_flag:
+                                type: boolean
+                                description: Whether the associated picture is active or not
+                              add_time:
+                                type: string
+                                description: The add time of the picture
+                              update_time:
+                                type: string
+                                description: The update time of the picture
+                              added_by_user_id:
+                                type: integer
+                                description: The ID of the user who added the picture
+                              pictures:
+                                type: object
+                                properties:
+                                  '128':
+                                    type: string
+                                    description: The URL of the 128*128 picture
+                                  '512':
+                                    type: string
+                                    description: The URL of the 512*512 picture
               example:
                 success: true
                 data:
@@ -6602,34 +6491,29 @@ paths:
                       properties:
                         user:
                           type: "object"
-                          properties:
-                            USER_ID:
-                              type: "object"
-                              title: "userDataWithId"
-                              allOf:
-                              - properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the user"
-                                  name:
-                                    type: "string"
-                                    description: "The name of the user"
-                                  email:
-                                    type: "string"
-                                    description: "The email of the user"
-                                  has_pic:
-                                    type: "integer"
-                                    description: "Whether the user has picture or\
-                                      \ not. 0 = No picture, 1 = Has picture."
-                                  pic_hash:
-                                    type: "string"
-                                    nullable: true
-                                    description: "The user picture hash"
-                                  active_flag:
-                                    type: "boolean"
-                                    description: "Whether the user is active or not"
-                              - type: "object"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
                                 description: "The ID of the user"
+                              name:
+                                type: "string"
+                                description: "The name of the user"
+                              email:
+                                type: "string"
+                                description: "The email of the user"
+                              has_pic:
+                                type: "integer"
+                                description: "Whether the user has picture or\
+                                  \ not. 0 = No picture, 1 = Has picture."
+                              pic_hash:
+                                type: "string"
+                                nullable: true
+                                description: "The user picture hash"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the user is active or not"
               example:
                 success: true
                 data:
@@ -7333,117 +7217,98 @@ paths:
                       properties:
                         organization:
                           type: "object"
-                          properties:
-                            ORGANIZATION_ID:
-                              type: "object"
-                              description: "The ID of the organization associated\
-                                \ with the item"
-                              allOf:
-                              - type: "object"
-                                properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the organization associated\
-                                      \ with the item"
-                              - type: "object"
-                                properties:
-                                  name:
-                                    type: "string"
-                                    description: "The name of the organization associated\
-                                      \ with the item"
-                                  people_count:
-                                    type: "integer"
-                                    description: "The number of people connected with\
-                                      \ the organization that is associated with the\
-                                      \ item"
-                                  owner_id:
-                                    type: "integer"
-                                    description: "The ID of the owner of the organization\
-                                      \ that is associated with the item"
-                                  address:
-                                    type: "string"
-                                    description: "The address of the organization"
-                                  cc_email:
-                                    type: "string"
-                                    description: "The BCC email of the organization\
-                                      \ associated with the item"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
+                                description: "The ID of the organization associated\
+                                  \ with the item"
+                              name:
+                                type: "string"
+                                description: "The name of the organization associated\
+                                  \ with the item"
+                              people_count:
+                                type: "integer"
+                                description: "The number of people connected with\
+                                  \ the organization that is associated with the\
+                                  \ item"
+                              owner_id:
+                                type: "integer"
+                                description: "The ID of the owner of the organization\
+                                  \ that is associated with the item"
+                              address:
+                                type: "string"
+                                description: "The address of the organization"
+                              cc_email:
+                                type: "string"
+                                description: "The BCC email of the organization\
+                                  \ associated with the item"
                         user:
                           type: "object"
-                          properties:
-                            USER_ID:
-                              type: "object"
-                              title: "userDataWithId"
-                              allOf:
-                              - properties:
-                                  id:
-                                    type: "integer"
-                                    description: "The ID of the user"
-                                  name:
-                                    type: "string"
-                                    description: "The name of the user"
-                                  email:
-                                    type: "string"
-                                    description: "The email of the user"
-                                  has_pic:
-                                    type: "integer"
-                                    description: "Whether the user has picture or\
-                                      \ not. 0 = No picture, 1 = Has picture."
-                                  pic_hash:
-                                    type: "string"
-                                    nullable: true
-                                    description: "The user picture hash"
-                                  active_flag:
-                                    type: "boolean"
-                                    description: "Whether the user is active or not"
-                              - type: "object"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
                                 description: "The ID of the user"
+                              name:
+                                type: "string"
+                                description: "The name of the user"
+                              email:
+                                type: "string"
+                                description: "The email of the user"
+                              has_pic:
+                                type: "integer"
+                                description: "Whether the user has picture or\
+                                  \ not. 0 = No picture, 1 = Has picture."
+                              pic_hash:
+                                type: "string"
+                                nullable: true
+                                description: "The user picture hash"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the user is active or not"
                         picture:
                           type: "object"
                           description: "The picture that is associated with the item"
-                          properties:
-                            PICTURE_ID:
-                              type: "object"
-                              description: "The ID of the picture"
-                              allOf:
-                              - allOf:
-                                - type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                      description: "The ID of the picture associated\
-                                        \ with the item"
-                                - type: "object"
-                                  properties:
-                                    item_type:
-                                      type: "string"
-                                      description: "The type of item the picture is\
-                                        \ related to"
-                                    item_id:
-                                      type: "integer"
-                                      description: "The ID of related item"
-                                    active_flag:
-                                      type: "boolean"
-                                      description: "Whether the associated picture\
-                                        \ is active or not"
-                                    add_time:
-                                      type: "string"
-                                      description: "The add time of the picture"
-                                    update_time:
-                                      type: "string"
-                                      description: "The update time of the picture"
-                                    added_by_user_id:
-                                      type: "integer"
-                                      description: "The ID of the user who added the\
-                                        \ picture"
-                                    pictures:
-                                      type: "object"
-                                      properties:
-                                        "128":
-                                          type: "string"
-                                          description: "The URL of the 128*128 picture"
-                                        "512":
-                                          type: "string"
-                                          description: "The URL of the 512*512 picture"
+                          additionalProperties:
+                            type: object
+                            properties:
+                              id:
+                                type: "integer"
+                                description: "The ID of the picture associated\
+                                  \ with the item"
+                              item_type:
+                                type: "string"
+                                description: "The type of item the picture is\
+                                  \ related to"
+                              item_id:
+                                type: "integer"
+                                description: "The ID of related item"
+                              active_flag:
+                                type: "boolean"
+                                description: "Whether the associated picture\
+                                  \ is active or not"
+                              add_time:
+                                type: "string"
+                                description: "The add time of the picture"
+                              update_time:
+                                type: "string"
+                                description: "The update time of the picture"
+                              added_by_user_id:
+                                type: "integer"
+                                description: "The ID of the user who added the\
+                                  \ picture"
+                              pictures:
+                                type: "object"
+                                properties:
+                                  "128":
+                                    type: "string"
+                                    description: "The URL of the 128*128 picture"
+                                  "512":
+                                    type: "string"
+                                    description: "The URL of the 512*512 picture"
               example:
                 success: true
                 data:
