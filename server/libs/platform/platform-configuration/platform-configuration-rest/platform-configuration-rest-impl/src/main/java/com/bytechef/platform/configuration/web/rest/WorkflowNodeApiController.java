@@ -107,7 +107,7 @@ public class WorkflowNodeApiController implements WorkflowNodeApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeOutputFacade.getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
-                workflowStepOutputDTO -> conversionService.convert(workflowStepOutputDTO,
+                workflowNodeOutputDTO -> conversionService.convert(workflowNodeOutputDTO,
                     WorkflowNodeOutputModel.class)));
     }
 

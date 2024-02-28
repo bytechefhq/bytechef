@@ -46,7 +46,7 @@ public class WorkflowTestConfigurationFacade {
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
-    public void cleanWorkflowTestConfigurationConnections(Workflow workflow) {
+    public void removeUnusedWorkflowTestConfigurationConnections(Workflow workflow) {
         workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(Validate.notNull(workflow.getId(), "id"))
             .ifPresent(workflowTestConfiguration -> {
