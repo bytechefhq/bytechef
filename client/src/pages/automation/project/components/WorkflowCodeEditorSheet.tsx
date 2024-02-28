@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {toast} from '@/components/ui/use-toast';
 import {WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
@@ -45,10 +44,11 @@ const WorkflowCodeEditorSheet = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onError: () => {
-            toast({
-                description: `The workflow ${workflow.label} is not saved.`,
-                variant: 'destructive',
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
             });
+
+            setDirty(true);
         },
         onSuccess: (workflow: WorkflowModel) => {
             queryClient.invalidateQueries({
