@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:infobip"))
     implementation(project(":server:libs:modules:components:jira"))
     implementation(project(":server:libs:modules:components:json-file"))
+    implementation(project(":server:libs:modules:components:keap"))
     implementation(project(":server:libs:modules:components:logger"))
     implementation(project(":server:libs:modules:components:filesystem"))
     implementation(project(":server:libs:modules:components:google:google-calendar"))
