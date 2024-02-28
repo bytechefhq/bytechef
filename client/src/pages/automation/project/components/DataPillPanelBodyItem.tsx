@@ -12,10 +12,12 @@ import {ComponentActionDataI} from './DataPillPanelBody';
 const DataPillPanelBodyItem = ({
     componentAction,
     filteredProperties,
+    outputSchemaExists,
     sampleOutput,
 }: {
     componentAction: ComponentActionDataI;
     filteredProperties: Array<PropertyType>;
+    outputSchemaExists: boolean;
     sampleOutput: object;
 }) => {
     const {icon, title} = componentAction.componentDefinition;
@@ -57,7 +59,7 @@ const DataPillPanelBodyItem = ({
                 className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${componentAction.workflowNodeName}`}
             >
-                {filteredProperties.length ? (
+                {outputSchemaExists ? (
                     <>
                         <DataPill
                             componentIcon={componentAction.componentDefinition.icon}

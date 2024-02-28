@@ -47,6 +47,7 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
                                 <DataPillPanelBodyItem
                                     componentAction={componentAction}
                                     filteredProperties={filteredProperties}
+                                    outputSchemaExists={!!outputSchema}
                                     sampleOutput={componentActionData[index].sampleOutput}
                                 />
                             )}
