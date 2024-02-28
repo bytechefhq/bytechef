@@ -197,6 +197,6 @@ public class HttpClientActionUtils {
     private static ResponseType getResponseType(Parameters inputParameters) {
         return inputParameters.containsKey(HttpClientConstants.RESPONSE_FORMAT)
             ? Http.ResponseType.valueOf(inputParameters.getString(HttpClientConstants.RESPONSE_FORMAT))
-            : null;
+            : ResponseType.JSON;
     }
 }
