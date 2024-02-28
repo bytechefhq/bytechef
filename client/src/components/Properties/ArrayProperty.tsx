@@ -138,7 +138,7 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
             ))}
 
             {multipleValues && (
-                <div className="relative ml-2 w-full self-start border-l pl-2 pt-2">
+                <div className="relative mt-2 w-full self-start">
                     {newPropertyTypeOptions?.length && newPropertyTypeOptions?.length > 1 ? (
                         <PropertyDropdownMenu
                             menuItems={newPropertyTypeOptions}

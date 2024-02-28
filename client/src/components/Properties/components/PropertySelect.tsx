@@ -1,7 +1,7 @@
+import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {Label} from '@radix-ui/react-label';
 import {Item, ItemIndicator, ItemText, Value} from '@radix-ui/react-select';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';

@@ -7,31 +7,35 @@ const getNestedObject = (jsonObject: any, selector: string) => {
             return undefined;
         }
 
-        let finalKey: string | undefined = key;
-        let index = -1;
+        try {
+            let finalKey: string | undefined = key;
+            let index = -1;
 
-        if (finalKey === '[index]') {
-            index = 0;
+            if (finalKey === '[index]') {
+                index = 0;
 
-            finalKey = undefined;
-        } else if (finalKey.endsWith('[index]')) {
-            index = 0;
+                finalKey = undefined;
+            } else if (finalKey.endsWith('[index]')) {
+                index = 0;
 
-            finalKey = finalKey.substring(0, finalKey.length - '[index]'.length);
-        }
-
-        if (Array.isArray(object)) {
-            index = 0;
-        }
-
-        if (index > -1) {
-            if (finalKey) {
-                return Array.isArray(object) ? object[index][finalKey] : object[finalKey][index];
-            } else {
-                return object[index];
+                finalKey = finalKey.substring(0, finalKey.length - '[index]'.length);
             }
-        } else {
-            return finalKey ? object[finalKey] : undefined;
+
+            if (Array.isArray(object)) {
+                index = 0;
+            }
+
+            if (index > -1) {
+                if (finalKey) {
+                    return Array.isArray(object) ? object[index][finalKey] : object[finalKey][index];
+                } else {
+                    return object[index];
+                }
+            } else {
+                return finalKey ? object[finalKey] : undefined;
+            }
+        } catch (error) {
+            return undefined;
         }
     }, jsonObject);
 };

@@ -92,7 +92,10 @@ const ObjectProperty = ({
 
     return (
         <>
-            <ul className={twMerge('space-y-4', label && 'ml-2 border-l', subProperties?.length && 'pb-2')} key={name}>
+            <ul
+                className={twMerge('space-y-4', label && 'ml-2 border-l', subProperties?.length && 'pb-2 pt-1')}
+                key={name}
+            >
                 {(subProperties as unknown as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
                         subProperty.controlType === 'OBJECT_BUILDER' &&
@@ -125,7 +128,7 @@ const ObjectProperty = ({
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
-                            className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                            className="mt-2 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
                             size="sm"
                             variant="ghost"
                         >
