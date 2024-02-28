@@ -88,13 +88,20 @@ const WorkflowCodeEditorSheet = ({
 
     const handleWorkflowCodeEditorSheetSave = (workflow: WorkflowModel, definition: string) => {
         if (workflow && workflow.id) {
-            updateWorkflowMutation.mutate({
-                id: workflow.id,
-                workflowModel: {
-                    definition,
-                    version: workflow.version,
-                },
-            });
+            try {
+                // validate
+                JSON.parse(definition);
+
+                updateWorkflowMutation.mutate({
+                    id: workflow.id,
+                    workflowModel: {
+                        definition,
+                        version: workflow.version,
+                    },
+                });
+            } catch (e) {
+                //ignore
+            }
         }
     };
 
