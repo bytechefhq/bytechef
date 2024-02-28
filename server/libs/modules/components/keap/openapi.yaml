@@ -1,0 +1,1467 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Keap REST API"
+  description: "Keep is a customer comprehensive customer relationship management platform designed to help small \
+  businesses streamline sales, marketing, and customer management processes in one integrated system."
+  version: "1"
+paths:
+  /v1/companies:
+    post:
+      description: "Creates a new company"
+      summary: "Create a Company"
+      tags:
+        - "Company"
+      operationId: "createCompany"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "company_name"
+              properties:
+                address:
+                  title: "CompanyAddress"
+                  type: "object"
+                  properties:
+                    address:
+                      title: "CompanyAddress"
+                      type: "object"
+                      properties:
+                        country_code:
+                          type: "string"
+                        line1:
+                          type: "string"
+                        line2:
+                          type: "string"
+                        locality:
+                          type: "string"
+                        region:
+                          type: "string"
+                        zip_code:
+                          type: "string"
+                        zip_four:
+                          type: "string"
+                    company_name:
+                      type: "string"
+                    custom_fields:
+                      type: "array"
+                      items:
+                        title: "CustomFieldValue"
+                        type: "object"
+                        properties:
+                          content:
+                            type: "object"
+                          id:
+                            type: "integer"
+                            format: "int64"
+                    email_address:
+                      type: "string"
+                    fax_number:
+                      title: "CompanyFaxNumber"
+                      type: "object"
+                      properties:
+                        number:
+                          type: "string"
+                        type:
+                          type: "string"
+                    notes:
+                      type: "string"
+                    opt_in_reason:
+                      type: "string"
+                    phone_number:
+                      title: "CompanyPhoneNumber"
+                      type: "object"
+                      properties:
+                        extension:
+                          type: "string"
+                        number:
+                          type: "string"
+                        type:
+                          type: "string"
+                    website:
+                      type: "string"
+      responses:
+        201:
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                title: "Company"
+                type: "object"
+                properties:
+                  address:
+                    title: "CompanyAddress"
+                    type: "object"
+                    properties:
+                      country_code:
+                        type: "string"
+                      line1:
+                        type: "string"
+                      line2:
+                        type: "string"
+                      locality:
+                        type: "string"
+                      region:
+                        type: "string"
+                      zip_code:
+                        type: "string"
+                      zip_four:
+                        type: "string"
+                  company_name:
+                    type: "string"
+                  custom_fields:
+                    type: "array"
+                    items:
+                      title: "CustomFieldValue"
+                      type: "object"
+                      properties:
+                        content:
+                          type: "object"
+                        id:
+                          type: "integer"
+                          format: "int64"
+                  email_address:
+                    type: "string"
+                  email_opted_in:
+                    type: "boolean"
+                  email_status:
+                    type: "string"
+                    enum:
+                      - "UnengagedMarketable"
+                      - "SingleOptIn"
+                      - "DoubleOptin"
+                      - "Confirmed"
+                      - "UnengagedNonMarketable"
+                      - "NonMarketable"
+                      - "Lockdown"
+                      - "Bounce"
+                      - "HardBounce"
+                      - "Manual"
+                      - "Admin"
+                      - "System"
+                      - "ListUnsubscribe"
+                      - "Feedback"
+                      - "Spam"
+                      - "Invalid"
+                      - "Deactivated"
+                  fax_number:
+                    title: "CompanyFaxNumber"
+                    type: "object"
+                    properties:
+                      number:
+                        type: "string"
+                      type:
+                        type: "string"
+                  id:
+                    type: "integer"
+                    format: "int64"
+                  notes:
+                    type: "string"
+                  phone_number:
+                    title: "CompanyPhoneNumber"
+                    type: "object"
+                    properties:
+                      extension:
+                        type: "string"
+                      number:
+                        type: "string"
+                      type:
+                        type: "string"
+                  website:
+                    type: "string"
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                title: "Error"
+                type: "object"
+                properties:
+                  cause:
+                    title: "Throwable"
+                    type: "object"
+                    properties:
+                      cause:
+                        $ref: "#/components/schemas/Throwable"
+                      localizedMessage:
+                        type: "string"
+                      message:
+                        type: "string"
+                      stackTrace:
+                        type: "array"
+                        items:
+                          title: "StackTraceElement"
+                          type: "object"
+                          properties:
+                            classLoaderName:
+                              type: "string"
+                            className:
+                              type: "string"
+                            fileName:
+                              type: "string"
+                            lineNumber:
+                              type: "integer"
+                              format: "int32"
+                            methodName:
+                              type: "string"
+                            moduleName:
+                              type: "string"
+                            moduleVersion:
+                              type: "string"
+                            nativeMethod:
+                              type: "boolean"
+                      suppressed:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Throwable"
+                  localizedMessage:
+                    type: "string"
+                  message:
+                    type: "string"
+                  stackTrace:
+                    type: "array"
+                    items:
+                      title: "StackTraceElement"
+                      type: "object"
+                      properties:
+                        classLoaderName:
+                          type: "string"
+                        className:
+                          type: "string"
+                        fileName:
+                          type: "string"
+                        lineNumber:
+                          type: "integer"
+                          format: "int32"
+                        methodName:
+                          type: "string"
+                        moduleName:
+                          type: "string"
+                        moduleVersion:
+                          type: "string"
+                        nativeMethod:
+                          type: "boolean"
+                  suppressed:
+                    type: "array"
+                    items:
+                      title: "Throwable"
+                      type: "object"
+                      properties:
+                        cause:
+                          $ref: "#/components/schemas/Throwable"
+                        localizedMessage:
+                          type: "string"
+                        message:
+                          type: "string"
+                        stackTrace:
+                          type: "array"
+                          items:
+                            title: "StackTraceElement"
+                            type: "object"
+                            properties:
+                              classLoaderName:
+                                type: "string"
+                              className:
+                                type: "string"
+                              fileName:
+                                type: "string"
+                              lineNumber:
+                                type: "integer"
+                                format: "int32"
+                              methodName:
+                                type: "string"
+                              moduleName:
+                                type: "string"
+                              moduleVersion:
+                                type: "string"
+                              nativeMethod:
+                                type: "boolean"
+                        suppressed:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Throwable"
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                title: "Error"
+                type: "object"
+                properties:
+                  cause:
+                    title: "Throwable"
+                    type: "object"
+                    properties:
+                      cause:
+                        $ref: "#/components/schemas/Throwable"
+                      localizedMessage:
+                        type: "string"
+                      message:
+                        type: "string"
+                      stackTrace:
+                        type: "array"
+                        items:
+                          title: "StackTraceElement"
+                          type: "object"
+                          properties:
+                            classLoaderName:
+                              type: "string"
+                            className:
+                              type: "string"
+                            fileName:
+                              type: "string"
+                            lineNumber:
+                              type: "integer"
+                              format: "int32"
+                            methodName:
+                              type: "string"
+                            moduleName:
+                              type: "string"
+                            moduleVersion:
+                              type: "string"
+                            nativeMethod:
+                              type: "boolean"
+                      suppressed:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Throwable"
+                  localizedMessage:
+                    type: "string"
+                  message:
+                    type: "string"
+                  stackTrace:
+                    type: "array"
+                    items:
+                      title: "StackTraceElement"
+                      type: "object"
+                      properties:
+                        classLoaderName:
+                          type: "string"
+                        className:
+                          type: "string"
+                        fileName:
+                          type: "string"
+                        lineNumber:
+                          type: "integer"
+                          format: "int32"
+                        methodName:
+                          type: "string"
+                        moduleName:
+                          type: "string"
+                        moduleVersion:
+                          type: "string"
+                        nativeMethod:
+                          type: "boolean"
+                  suppressed:
+                    type: "array"
+                    items:
+                      title: "Throwable"
+                      type: "object"
+                      properties:
+                        cause:
+                          $ref: "#/components/schemas/Throwable"
+                        localizedMessage:
+                          type: "string"
+                        message:
+                          type: "string"
+                        stackTrace:
+                          type: "array"
+                          items:
+                            title: "StackTraceElement"
+                            type: "object"
+                            properties:
+                              classLoaderName:
+                                type: "string"
+                              className:
+                                type: "string"
+                              fileName:
+                                type: "string"
+                              lineNumber:
+                                type: "integer"
+                                format: "int32"
+                              methodName:
+                                type: "string"
+                              moduleName:
+                                type: "string"
+                              moduleVersion:
+                                type: "string"
+                              nativeMethod:
+                                type: "boolean"
+                        suppressed:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Throwable"
+  /v1/tasks:
+    post:
+      description: "Creates a new task"
+      summary: "Create a Task"
+      tags:
+        - "Task"
+      operationId: "createTask"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Task"
+              type: "object"
+              properties:
+                completed:
+                  type: "boolean"
+                completion_date:
+                  type: "string"
+                  format: "date-time"
+                contact:
+                  title: "BasicContact"
+                  type: "object"
+                  properties:
+                    email:
+                      type: "string"
+                    first_name:
+                      type: "string"
+                    id:
+                      type: "integer"
+                      format: "int64"
+                    last_name:
+                      type: "string"
+                creation_date:
+                  type: "string"
+                  format: "date-time"
+                description:
+                  type: "string"
+                due_date:
+                  type: "string"
+                  format: "date-time"
+                funnel_id:
+                  type: "integer"
+                  format: "int64"
+                jgraph_id:
+                  type: "integer"
+                  format: "int64"
+                modification_date:
+                  type: "string"
+                  format: "date-time"
+                priority:
+                  type: "integer"
+                  format: "int32"
+                remind_time:
+                  type: "integer"
+                  description: "Value in minutes before start_date to show pop-up reminder.
+        Acceptable values are in [`5`,`10`,`15`,`30`,`60`,`120`,`240`,`480`,`1440`,`2880`]"
+                  format: "int32"
+                title:
+                  type: "string"
+                type:
+                  type: "string"
+                url:
+                  type: "string"
+                user_id:
+                  type: "integer"
+                  format: "int64"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                title: "Task"
+                type: "object"
+                properties:
+                  completed:
+                    type: "boolean"
+                  completion_date:
+                    type: "string"
+                    format: "date-time"
+                  contact:
+                    title: "BasicContact"
+                    type: "object"
+                    properties:
+                      email:
+                        type: "string"
+                      first_name:
+                        type: "string"
+                      id:
+                        type: "integer"
+                        format: "int64"
+                      last_name:
+                        type: "string"
+                  creation_date:
+                    type: "string"
+                    format: "date-time"
+                  description:
+                    type: "string"
+                  due_date:
+                    type: "string"
+                    format: "date-time"
+                  funnel_id:
+                    type: "integer"
+                    format: "int64"
+                  jgraph_id:
+                    type: "integer"
+                    format: "int64"
+                  modification_date:
+                    type: "string"
+                    format: "date-time"
+                  priority:
+                    type: "integer"
+                    format: "int32"
+                  remind_time:
+                    type: "integer"
+                    description: "Value in minutes before start_date to show pop-up reminder.
+      Acceptable values are in [`5`,`10`,`15`,`30`,`60`,`120`,`240`,`480`,`1440`,`2880`]"
+                    format: "int32"
+                  title:
+                    type: "string"
+                  type:
+                    type: "string"
+                  url:
+                    type: "string"
+                  user_id:
+                    type: "integer"
+                    format: "int64"
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                title: "Error"
+                type: "object"
+                properties:
+                  cause:
+                    title: "Throwable"
+                    type: "object"
+                    properties:
+                      cause:
+                        $ref: "#/components/schemas/Throwable"
+                      localizedMessage:
+                        type: "string"
+                      message:
+                        type: "string"
+                      stackTrace:
+                        type: "array"
+                        items:
+                          title: "StackTraceElement"
+                          type: "object"
+                          properties:
+                            classLoaderName:
+                              type: "string"
+                            className:
+                              type: "string"
+                            fileName:
+                              type: "string"
+                            lineNumber:
+                              type: "integer"
+                              format: "int32"
+                            methodName:
+                              type: "string"
+                            moduleName:
+                              type: "string"
+                            moduleVersion:
+                              type: "string"
+                            nativeMethod:
+                              type: "boolean"
+                      suppressed:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Throwable"
+                  localizedMessage:
+                    type: "string"
+                  message:
+                    type: "string"
+                  stackTrace:
+                    type: "array"
+                    items:
+                      title: "StackTraceElement"
+                      type: "object"
+                      properties:
+                        classLoaderName:
+                          type: "string"
+                        className:
+                          type: "string"
+                        fileName:
+                          type: "string"
+                        lineNumber:
+                          type: "integer"
+                          format: "int32"
+                        methodName:
+                          type: "string"
+                        moduleName:
+                          type: "string"
+                        moduleVersion:
+                          type: "string"
+                        nativeMethod:
+                          type: "boolean"
+                  suppressed:
+                    type: "array"
+                    items:
+                      title: "Throwable"
+                      type: "object"
+                      properties:
+                        cause:
+                          $ref: "#/components/schemas/Throwable"
+                        localizedMessage:
+                          type: "string"
+                        message:
+                          type: "string"
+                        stackTrace:
+                          type: "array"
+                          items:
+                            title: "StackTraceElement"
+                            type: "object"
+                            properties:
+                              classLoaderName:
+                                type: "string"
+                              className:
+                                type: "string"
+                              fileName:
+                                type: "string"
+                              lineNumber:
+                                type: "integer"
+                                format: "int32"
+                              methodName:
+                                type: "string"
+                              moduleName:
+                                type: "string"
+                              moduleVersion:
+                                type: "string"
+                              nativeMethod:
+                                type: "boolean"
+                        suppressed:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Throwable"
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                title: "Error"
+                type: "object"
+                properties:
+                  cause:
+                    title: "Throwable"
+                    type: "object"
+                    properties:
+                      cause:
+                        $ref: "#/components/schemas/Throwable"
+                      localizedMessage:
+                        type: "string"
+                      message:
+                        type: "string"
+                      stackTrace:
+                        type: "array"
+                        items:
+                          title: "StackTraceElement"
+                          type: "object"
+                          properties:
+                            classLoaderName:
+                              type: "string"
+                            className:
+                              type: "string"
+                            fileName:
+                              type: "string"
+                            lineNumber:
+                              type: "integer"
+                              format: "int32"
+                            methodName:
+                              type: "string"
+                            moduleName:
+                              type: "string"
+                            moduleVersion:
+                              type: "string"
+                            nativeMethod:
+                              type: "boolean"
+                      suppressed:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Throwable"
+                  localizedMessage:
+                    type: "string"
+                  message:
+                    type: "string"
+                  stackTrace:
+                    type: "array"
+                    items:
+                      title: "StackTraceElement"
+                      type: "object"
+                      properties:
+                        classLoaderName:
+                          type: "string"
+                        className:
+                          type: "string"
+                        fileName:
+                          type: "string"
+                        lineNumber:
+                          type: "integer"
+                          format: "int32"
+                        methodName:
+                          type: "string"
+                        moduleName:
+                          type: "string"
+                        moduleVersion:
+                          type: "string"
+                        nativeMethod:
+                          type: "boolean"
+                  suppressed:
+                    type: "array"
+                    items:
+                      title: "Throwable"
+                      type: "object"
+                      properties:
+                        cause:
+                          $ref: "#/components/schemas/Throwable"
+                        localizedMessage:
+                          type: "string"
+                        message:
+                          type: "string"
+                        stackTrace:
+                          type: "array"
+                          items:
+                            title: "StackTraceElement"
+                            type: "object"
+                            properties:
+                              classLoaderName:
+                                type: "string"
+                              className:
+                                type: "string"
+                              fileName:
+                                type: "string"
+                              lineNumber:
+                                type: "integer"
+                                format: "int32"
+                              methodName:
+                                type: "string"
+                              moduleName:
+                                type: "string"
+                              moduleVersion:
+                                type: "string"
+                              nativeMethod:
+                                type: "boolean"
+                        suppressed:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Throwable"
+  /v1/contacts:
+    post:
+      description: "Creates a new contact"
+      summary: "Create a Contact"
+      tags:
+        - "Contact"
+      operationId: "createContact"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "CreateOrPatchContact"
+              type: "object"
+              properties:
+                addresses:
+                  type: "array"
+                  items:
+                    title: "ContactAddress"
+                    required:
+                      - "field"
+                    type: "object"
+                    properties:
+                      country_code:
+                        type: "string"
+                      field:
+                        type: "string"
+                        enum:
+                          - "BILLING"
+                          - "SHIPPING"
+                          - "OTHER"
+                      line1:
+                        type: "string"
+                      line2:
+                        type: "string"
+                      locality:
+                        type: "string"
+                      postal_code:
+                        type: "string"
+                        description: "Field used to store postal codes containing a combination of letters and numbers ex. 'EC1A', 'S1 2HE', '75000'"
+                      region:
+                        type: "string"
+                      zip_code:
+                        type: "string"
+                        description: "Mainly used in the United States, this is typically numeric. ex. '85001', '90002' Note: this is to be used instead of 'postal_code', not in addition to."
+                      zip_four:
+                        type: "string"
+                        description: "Last four of a full zip code ex. '8244', '4320'. This field is supplemental to the zip_code field, otherwise will be ignored."
+                anniversary:
+                  type: "string"
+                  format: "date-time"
+                birthday:
+                  type: "string"
+                  format: "date-time"
+                company:
+                  title: "RequestCompanyReference"
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      format: "int64"
+                contact_type:
+                  type: "string"
+                custom_fields:
+                  type: "array"
+                  items:
+                    title: "CustomFieldValue"
+                    type: "object"
+                    properties:
+                      content:
+                        type: "object"
+                      id:
+                        type: "integer"
+                        format: "int64"
+                email_addresses:
+                  type: "array"
+                  items:
+                    title: "EmailAddress"
+                    required:
+                      - "field"
+                    type: "object"
+                    properties:
+                      email:
+                        type: "string"
+                      field:
+                        type: "string"
+                        enum:
+                          - "EMAIL1"
+                          - "EMAIL2"
+                          - "EMAIL3"
+                family_name:
+                  type: "string"
+                fax_numbers:
+                  type: "array"
+                  items:
+                    title: "FaxNumber"
+                    required:
+                      - "field"
+                    type: "object"
+                    properties:
+                      field:
+                        type: "string"
+                        enum:
+                          - "FAX1"
+                          - "FAX2"
+                      number:
+                        type: "string"
+                      type:
+                        type: "string"
+                given_name:
+                  type: "string"
+                job_title:
+                  type: "string"
+                lead_source_id:
+                  type: "integer"
+                  format: "int64"
+                middle_name:
+                  type: "string"
+                opt_in_reason:
+                  type: "string"
+                origin:
+                  title: "CreateContactOrigin"
+                  required:
+                    - "ip_address"
+                  type: "object"
+                  properties:
+                    ip_address:
+                      type: "string"
+                owner_id:
+                  type: "integer"
+                  format: "int64"
+                phone_numbers:
+                  type: "array"
+                  items:
+                    title: "PhoneNumber"
+                    required:
+                      - "field"
+                    type: "object"
+                    properties:
+                      extension:
+                        type: "string"
+                      field:
+                        type: "string"
+                        enum:
+                          - "PHONE1"
+                          - "PHONE2"
+                          - "PHONE3"
+                          - "PHONE4"
+                          - "PHONE5"
+                      number:
+                        type: "string"
+                      type:
+                        type: "string"
+                preferred_locale:
+                  type: "string"
+                  example: "en_US"
+                preferred_name:
+                  type: "string"
+                prefix:
+                  type: "string"
+                social_accounts:
+                  type: "array"
+                  items:
+                    title: "SocialAccount"
+                    type: "object"
+                    properties:
+                      name:
+                        type: "string"
+                      type:
+                        type: "string"
+                        enum:
+                          - "Facebook"
+                          - "Twitter"
+                          - "LinkedIn"
+                          - "Instagram"
+                          - "Snapchat"
+                          - "YouTube"
+                          - "Pinterest"
+                source_type:
+                  type: "string"
+                  enum:
+                    - "APPOINTMENT"
+                    - "FORMAPIHOSTED"
+                    - "FORMAPIINTERNAL"
+                    - "WEBFORM"
+                    - "INTERNALFORM"
+                    - "LANDINGPAGE"
+                    - "IMPORT"
+                    - "MANUAL"
+                    - "API"
+                    - "OTHER"
+                    - "UNKNOWN"
+                spouse_name:
+                  type: "string"
+                suffix:
+                  type: "string"
+                time_zone:
+                  type: "string"
+                website:
+                  type: "string"
+      responses:
+        201:
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                title: "FullContact"
+                type: "object"
+                properties:
+                  ScoreValue:
+                    type: "string"
+                  addresses:
+                    type: "array"
+                    items:
+                      title: "ContactAddress"
+                      required:
+                        - "field"
+                      type: "object"
+                      properties:
+                        country_code:
+                          type: "string"
+                        field:
+                          type: "string"
+                          enum:
+                            - "BILLING"
+                            - "SHIPPING"
+                            - "OTHER"
+                        line1:
+                          type: "string"
+                        line2:
+                          type: "string"
+                        locality:
+                          type: "string"
+                        postal_code:
+                          type: "string"
+                          description: "Field used to store postal codes containing a combination of letters and numbers ex. 'EC1A', 'S1 2HE', '75000'"
+                        region:
+                          type: "string"
+                        zip_code:
+                          type: "string"
+                          description: "Mainly used in the United States, this is typically numeric. ex. '85001', '90002' Note: this is to be used instead of 'postal_code', not in addition to."
+                        zip_four:
+                          type: "string"
+                          description: "Last four of a full zip code ex. '8244', '4320'. This field is supplemental to the zip_code field, otherwise will be ignored."
+                  anniversary:
+                    type: "string"
+                    format: "date-time"
+                  birthday:
+                    type: "string"
+                    format: "date-time"
+                  company:
+                    title: "CompanyReference"
+                    type: "object"
+                    properties:
+                      company_name:
+                        type: "string"
+                      id:
+                        type: "integer"
+                        format: "int64"
+                  company_name:
+                    type: "string"
+                  contact_type:
+                    type: "string"
+                  custom_fields:
+                    type: "array"
+                    items:
+                      title: "CustomFieldValue"
+                      type: "object"
+                      properties:
+                        content:
+                          type: "object"
+                        id:
+                          type: "integer"
+                          format: "int64"
+                  date_created:
+                    type: "string"
+                    format: "date-time"
+                  email_addresses:
+                    type: "array"
+                    items:
+                      title: "EmailAddress"
+                      required:
+                        - "field"
+                      type: "object"
+                      properties:
+                        email:
+                          type: "string"
+                        field:
+                          type: "string"
+                          enum:
+                            - "EMAIL1"
+                            - "EMAIL2"
+                            - "EMAIL3"
+                  email_opted_in:
+                    type: "boolean"
+                  email_status:
+                    type: "string"
+                    enum:
+                      - "UnengagedMarketable"
+                      - "SingleOptIn"
+                      - "DoubleOptin"
+                      - "Confirmed"
+                      - "UnengagedNonMarketable"
+                      - "NonMarketable"
+                      - "Lockdown"
+                      - "Bounce"
+                      - "HardBounce"
+                      - "Manual"
+                      - "Admin"
+                      - "System"
+                      - "ListUnsubscribe"
+                      - "Feedback"
+                      - "Spam"
+                      - "Invalid"
+                      - "Deactivated"
+                  family_name:
+                    type: "string"
+                  fax_numbers:
+                    type: "array"
+                    items:
+                      title: "FaxNumber"
+                      required:
+                        - "field"
+                      type: "object"
+                      properties:
+                        field:
+                          type: "string"
+                          enum:
+                            - "FAX1"
+                            - "FAX2"
+                        number:
+                          type: "string"
+                        type:
+                          type: "string"
+                  given_name:
+                    type: "string"
+                  id:
+                    type: "integer"
+                    format: "int64"
+                  job_title:
+                    type: "string"
+                  last_updated:
+                    type: "string"
+                    format: "date-time"
+                  lead_source_id:
+                    type: "integer"
+                    format: "int64"
+                  middle_name:
+                    type: "string"
+                  opt_in_reason:
+                    type: "string"
+                  origin:
+                    title: "ContactOrigin"
+                    required:
+                      - "date"
+                      - "ip_address"
+                    type: "object"
+                    properties:
+                      date:
+                        type: "string"
+                        format: "date-time"
+                      ip_address:
+                        type: "string"
+                  owner_id:
+                    type: "integer"
+                    format: "int64"
+                  phone_numbers:
+                    type: "array"
+                    items:
+                      title: "PhoneNumber"
+                      required:
+                        - "field"
+                      type: "object"
+                      properties:
+                        extension:
+                          type: "string"
+                        field:
+                          type: "string"
+                          enum:
+                            - "PHONE1"
+                            - "PHONE2"
+                            - "PHONE3"
+                            - "PHONE4"
+                            - "PHONE5"
+                        number:
+                          type: "string"
+                        type:
+                          type: "string"
+                  preferred_locale:
+                    type: "string"
+                    example: "en_US"
+                  preferred_name:
+                    type: "string"
+                  prefix:
+                    type: "string"
+                  relationships:
+                    type: "array"
+                    items:
+                      title: "Relationship"
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          format: "int64"
+                        linked_contact_id:
+                          type: "integer"
+                          format: "int64"
+                        relationship_type_id:
+                          type: "integer"
+                          format: "int64"
+                  social_accounts:
+                    type: "array"
+                    items:
+                      title: "SocialAccount"
+                      type: "object"
+                      properties:
+                        name:
+                          type: "string"
+                        type:
+                          type: "string"
+                          enum:
+                            - "Facebook"
+                            - "Twitter"
+                            - "LinkedIn"
+                            - "Instagram"
+                            - "Snapchat"
+                            - "YouTube"
+                            - "Pinterest"
+                  source_type:
+                    type: "string"
+                    enum:
+                      - "APPOINTMENT"
+                      - "FORMAPIHOSTED"
+                      - "FORMAPIINTERNAL"
+                      - "WEBFORM"
+                      - "INTERNALFORM"
+                      - "LANDINGPAGE"
+                      - "IMPORT"
+                      - "MANUAL"
+                      - "API"
+                      - "OTHER"
+                      - "UNKNOWN"
+                  spouse_name:
+                    type: "string"
+                  suffix:
+                    type: "string"
+                  tag_ids:
+                    type: "array"
+                    items:
+                      type: "integer"
+                      format: "int64"
+                  time_zone:
+                    type: "string"
+                  website:
+                    type: "string"
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                title: "Error"
+                type: "object"
+                properties:
+                  cause:
+                    title: "Throwable"
+                    type: "object"
+                    properties:
+                      cause:
+                        $ref: "#/components/schemas/Throwable"
+                      localizedMessage:
+                        type: "string"
+                      message:
+                        type: "string"
+                      stackTrace:
+                        type: "array"
+                        items:
+                          title: "StackTraceElement"
+                          type: "object"
+                          properties:
+                            classLoaderName:
+                              type: "string"
+                            className:
+                              type: "string"
+                            fileName:
+                              type: "string"
+                            lineNumber:
+                              type: "integer"
+                              format: "int32"
+                            methodName:
+                              type: "string"
+                            moduleName:
+                              type: "string"
+                            moduleVersion:
+                              type: "string"
+                            nativeMethod:
+                              type: "boolean"
+                      suppressed:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Throwable"
+                  localizedMessage:
+                    type: "string"
+                  message:
+                    type: "string"
+                  stackTrace:
+                    type: "array"
+                    items:
+                      title: "StackTraceElement"
+                      type: "object"
+                      properties:
+                        classLoaderName:
+                          type: "string"
+                        className:
+                          type: "string"
+                        fileName:
+                          type: "string"
+                        lineNumber:
+                          type: "integer"
+                          format: "int32"
+                        methodName:
+                          type: "string"
+                        moduleName:
+                          type: "string"
+                        moduleVersion:
+                          type: "string"
+                        nativeMethod:
+                          type: "boolean"
+                  suppressed:
+                    type: "array"
+                    items:
+                      title: "Throwable"
+                      type: "object"
+                      properties:
+                        cause:
+                          $ref: "#/components/schemas/Throwable"
+                        localizedMessage:
+                          type: "string"
+                        message:
+                          type: "string"
+                        stackTrace:
+                          type: "array"
+                          items:
+                            title: "StackTraceElement"
+                            type: "object"
+                            properties:
+                              classLoaderName:
+                                type: "string"
+                              className:
+                                type: "string"
+                              fileName:
+                                type: "string"
+                              lineNumber:
+                                type: "integer"
+                                format: "int32"
+                              methodName:
+                                type: "string"
+                              moduleName:
+                                type: "string"
+                              moduleVersion:
+                                type: "string"
+                              nativeMethod:
+                                type: "boolean"
+                        suppressed:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Throwable"
+        403:
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                title: "Error"
+                type: "object"
+                properties:
+                  cause:
+                    title: "Throwable"
+                    type: "object"
+                    properties:
+                      cause:
+                        $ref: "#/components/schemas/Throwable"
+                      localizedMessage:
+                        type: "string"
+                      message:
+                        type: "string"
+                      stackTrace:
+                        type: "array"
+                        items:
+                          title: "StackTraceElement"
+                          type: "object"
+                          properties:
+                            classLoaderName:
+                              type: "string"
+                            className:
+                              type: "string"
+                            fileName:
+                              type: "string"
+                            lineNumber:
+                              type: "integer"
+                              format: "int32"
+                            methodName:
+                              type: "string"
+                            moduleName:
+                              type: "string"
+                            moduleVersion:
+                              type: "string"
+                            nativeMethod:
+                              type: "boolean"
+                      suppressed:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/Throwable"
+                  localizedMessage:
+                    type: "string"
+                  message:
+                    type: "string"
+                  stackTrace:
+                    type: "array"
+                    items:
+                      title: "StackTraceElement"
+                      type: "object"
+                      properties:
+                        classLoaderName:
+                          type: "string"
+                        className:
+                          type: "string"
+                        fileName:
+                          type: "string"
+                        lineNumber:
+                          type: "integer"
+                          format: "int32"
+                        methodName:
+                          type: "string"
+                        moduleName:
+                          type: "string"
+                        moduleVersion:
+                          type: "string"
+                        nativeMethod:
+                          type: "boolean"
+                  suppressed:
+                    type: "array"
+                    items:
+                      title: "Throwable"
+                      type: "object"
+                      properties:
+                        cause:
+                          $ref: "#/components/schemas/Throwable"
+                        localizedMessage:
+                          type: "string"
+                        message:
+                          type: "string"
+                        stackTrace:
+                          type: "array"
+                          items:
+                            title: "StackTraceElement"
+                            type: "object"
+                            properties:
+                              classLoaderName:
+                                type: "string"
+                              className:
+                                type: "string"
+                              fileName:
+                                type: "string"
+                              lineNumber:
+                                type: "integer"
+                                format: "int32"
+                              methodName:
+                                type: "string"
+                              moduleName:
+                                type: "string"
+                              moduleVersion:
+                                type: "string"
+                              nativeMethod:
+                                type: "boolean"
+                        suppressed:
+                          type: "array"
+                          items:
+                            $ref: "#/components/schemas/Throwable"
+components:
+  schemas:
+    Throwable:
+      title: "Throwable"
+      type: "object"
+      properties:
+        cause:
+          $ref: "#/components/schemas/Throwable"
+        localizedMessage:
+          type: "string"
+        message:
+          type: "string"
+        stackTrace:
+          type: "array"
+          items:
+            title: "StackTraceElement"
+            type: "object"
+            properties:
+              classLoaderName:
+                type: "string"
+              className:
+                type: "string"
+              fileName:
+                type: "string"
+              lineNumber:
+                type: "integer"
+                format: "int32"
+              methodName:
+                type: "string"
+              moduleName:
+                type: "string"
+              moduleVersion:
+                type: "string"
+              nativeMethod:
+                type: "boolean"
+        suppressed:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Throwable"
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://accounts.infusionsoft.com/app/oauth/authorize"
+          tokenUrl: "https://api.infusionsoft.com/token"
+
