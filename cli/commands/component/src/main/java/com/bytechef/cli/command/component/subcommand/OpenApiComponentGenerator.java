@@ -1469,7 +1469,17 @@ public class OpenApiComponentGenerator {
             Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
 
             if (StringUtils.isEmpty(additionalPropertiesSchema.get$ref())) {
-                builder.add(".additionalProperties($L())", getAdditionalPropertiesItemType(additionalPropertiesSchema));
+                Map<String, ?> additionalPropertiesSchemaProperties = additionalPropertiesSchema.getProperties();
+
+                if (additionalPropertiesSchemaProperties == null || additionalPropertiesSchemaProperties.isEmpty()) {
+                    builder.add(
+                        ".additionalProperties($L())", getAdditionalPropertiesItemType(additionalPropertiesSchema));
+                } else {
+                    builder.add(
+                        ".additionalProperties($L().properties($L))",
+                        getAdditionalPropertiesItemType(additionalPropertiesSchema),
+                        getObjectPropertiesCodeBlock(propertyName, additionalPropertiesSchema, outputSchema, openAPI));
+                }
             } else {
                 String ref = additionalPropertiesSchema.get$ref();
 
