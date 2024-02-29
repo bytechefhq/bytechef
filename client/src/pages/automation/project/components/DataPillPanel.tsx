@@ -19,27 +19,26 @@ const DataPillPanel = ({
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const componentActionData: Array<ComponentActionDataI> = workflowNodeOutputs
         .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
         .filter(
-            (workflowStepOutput) =>
-                workflowStepOutput.workflowNodeName !== currentNode.name &&
-                (workflowStepOutput.actionDefinition!.outputDefined ||
-                    workflowStepOutput.actionDefinition!.outputFunctionDefined)
+            (workflowNodeOutput) =>
+                workflowNodeOutput.workflowNodeName !== currentNode.name &&
+                (workflowNodeOutput.actionDefinition?.outputDefined ||
+                    workflowNodeOutput.actionDefinition?.outputFunctionDefined ||
         )
-        .map((workflowStepOutput) => {
+        .map((workflowNodeOutput) => {
             return {
-                ...workflowStepOutput.actionDefinition,
+                ...workflowNodeOutput.actionDefinition,
                 componentDefinition: previousComponentDefinitions?.find(
                     (currentComponentDefinition) =>
-                        currentComponentDefinition.name === workflowStepOutput.actionDefinition!.componentName
+                        currentComponentDefinition.name === workflowNodeOutput.actionDefinition?.componentName ||
                 ),
-                outputSchema: workflowStepOutput.outputSchema,
-                sampleOutput: workflowStepOutput.sampleOutput,
-                workflowNodeName: workflowStepOutput.workflowNodeName,
+                outputSchema: workflowNodeOutput.outputSchema,
+                sampleOutput: workflowNodeOutput.sampleOutput,
+                workflowNodeName: workflowNodeOutput.workflowNodeName,
             } as ComponentActionDataI;
         });
 

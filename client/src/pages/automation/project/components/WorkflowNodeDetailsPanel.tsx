@@ -64,10 +64,10 @@ const TABS = [
 
 const WorkflowNodeDetailsPanel = ({
     previousComponentDefinitions,
-    workflowStepOutputs,
+    workflowNodeOutputs,
 }: {
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflowStepOutputs: WorkflowNodeOutputModel[];
+    workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
     const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
@@ -195,16 +195,16 @@ const WorkflowNodeDetailsPanel = ({
 
     const previousNodeNames = nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : [];
 
-    const actionDefinitions = workflowStepOutputs
-        .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
-        .map((workflowStepOutput) => workflowStepOutput.actionDefinition!);
+    const actionDefinitions = workflowNodeOutputs
+        .filter((workflowNodeOutput) => workflowNodeOutput?.actionDefinition)
+        .map((workflowNodeOutput) => workflowNodeOutput.actionDefinition!);
 
     const previousComponentProperties = previousComponentDefinitions?.map((componentDefinition, index) => {
         if (!actionDefinitions?.length) {
             return;
         }
 
-        const outputSchemaDefinition: PropertyType | undefined = workflowStepOutputs[index]?.outputSchema;
+        const outputSchemaDefinition: PropertyType | undefined = workflowNodeOutputs[index]?.outputSchema;
 
         const properties = outputSchemaDefinition?.properties?.length
             ? outputSchemaDefinition.properties

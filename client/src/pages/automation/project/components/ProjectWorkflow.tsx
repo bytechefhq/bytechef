@@ -54,13 +54,15 @@ const ProjectWorkflow = ({
     }, [workflow.tasks]);
 
     const previousComponentDefinitions = workflowNodeOutputs
-        ? workflowNodeOutputs.map(
-              (workflowStepOutput) =>
-                  componentDefinitions.filter(
-                      (componentDefinition) =>
-                          componentDefinition.name === workflowStepOutput?.actionDefinition?.componentName
-                  )[0]
-          )
+        ? workflowNodeOutputs
+              .filter((workflowNodeOutput) => workflowNodeOutput.actionDefinition)
+              .map(
+                  (workflowNodeOutput) =>
+                      componentDefinitions.filter(
+                          (componentDefinition) =>
+                              componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName
+                      )[0]
+              )
         : [];
 
     return (
@@ -75,7 +77,7 @@ const ProjectWorkflow = ({
             {currentNode.name && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
-                    workflowStepOutputs={workflowNodeOutputs ?? []}
+                    workflowNodeOutputs={workflowNodeOutputs ?? []}
                 />
             )}
 
