@@ -391,11 +391,12 @@ const WorkflowNodeDetailsPanel = ({
         currentComponent?.name,
     ]);
 
+    // Close the panel if the current node is deleted
     useEffect(() => {
-        if (currentNode.componentName && !componentNames.includes(currentNode.componentName)) {
+        if (currentNode.name && !nodeNames.includes(currentNode.name)) {
             setWorkflowNodeDetailsPanelOpen(false);
         }
-    }, [componentNames, currentNode.componentName, setWorkflowNodeDetailsPanelOpen]);
+    }, [currentNode.name, nodeNames, setWorkflowNodeDetailsPanelOpen]);
 
     return (
         <Dialog.Root modal={false} open={workflowNodeDetailsPanelOpen}>
