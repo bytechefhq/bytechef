@@ -42,6 +42,8 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,26 +78,31 @@ public class GoogleSheetsUpdateRowAction {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        int sheetId = inputParameters.getRequiredInteger(SHEET_ID);
-        int rowNumber = inputParameters.getRequiredInteger(ROW_NUMBER);
+        String range = createRange(
+            inputParameters.getRequiredInteger(SHEET_ID), inputParameters.getRequiredInteger(ROW_NUMBER));
 
-        String range = createRange(sheetId, rowNumber);
+        List<Object> row;
 
-        List<Object> values = inputParameters.getRequiredList(VALUES, Object.class);
+        Object rowMap = inputParameters.getRequired(VALUES);
+        Class<?> valuesClass = rowMap.getClass();
+
+        if (valuesClass.equals(LinkedHashMap.class)) {
+            row = new ArrayList<>(((LinkedHashMap<String, Object>) rowMap).values());
+        } else {
+            row = inputParameters.getRequiredList(VALUES, Object.class);
+        }
+
         ValueRange valueRange = new ValueRange()
-            .setValues(List.of(values))
+            .setValues(List.of(row))
             .setMajorDimension("ROWS");
-
-        String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
 
         sheets
             .spreadsheets()
             .values()
-            .update(
-                spreadsheetId, range, valueRange)
+            .update(inputParameters.getRequiredString(SPREADSHEET_ID), range, valueRange)
             .setValueInputOption("USER_ENTERED")
             .execute();
 
-        return getMapOfValuesForRow(inputParameters, sheets, values);
+        return getMapOfValuesForRow(inputParameters, sheets, row);
     }
 }
