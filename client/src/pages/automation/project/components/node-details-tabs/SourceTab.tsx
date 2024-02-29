@@ -1,20 +1,13 @@
 import ComboBox from '@/components/ComboBox';
 import {Label} from '@/components/ui/label';
-import {
-    ComponentDefinitionModel,
-    GetDataStreamComponentDefinitionsComponentTypeEnum,
-} from '@/middleware/platform/configuration';
+import {GetDataStreamComponentDefinitionsComponentTypeEnum} from '@/middleware/platform/configuration';
 import {useGetDataStreamComponentDefinitions} from '@/queries/platform/componentDefinitions.queries';
 
-interface SourceTabProps {
-    componentDefinition: ComponentDefinitionModel;
-}
-
-const SourceTab = ({componentDefinition}: SourceTabProps) => {
+const SourceTab = () => {
     const {data: componentDefinitions} = useGetDataStreamComponentDefinitions({
         componentType: GetDataStreamComponentDefinitionsComponentTypeEnum.Source,
     });
-    console.log(componentDefinition);
+
     return (
         <div className="flex h-full flex-col overflow-auto p-4">
             {componentDefinitions && (
