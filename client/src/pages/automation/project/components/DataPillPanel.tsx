@@ -48,12 +48,7 @@ const DataPillPanel = ({
         <Dialog.Root
             modal={false}
             onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
-            open={
-                dataPillPanelOpen &&
-                workflowNodeDetailsPanelOpen &&
-                !!previousComponentDefinitions &&
-                !!componentActionData.length
-            }
+            open={dataPillPanelOpen && workflowNodeDetailsPanelOpen}
         >
             <Dialog.Portal>
                 <Dialog.Content
