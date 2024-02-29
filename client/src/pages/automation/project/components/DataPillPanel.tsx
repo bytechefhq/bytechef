@@ -22,12 +22,13 @@ const DataPillPanel = ({
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const componentActionData: Array<ComponentActionDataI> = workflowNodeOutputs
-        .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
         .filter(
             (workflowNodeOutput) =>
                 workflowNodeOutput.workflowNodeName !== currentNode.name &&
                 (workflowNodeOutput.actionDefinition?.outputDefined ||
                     workflowNodeOutput.actionDefinition?.outputFunctionDefined ||
+                    workflowNodeOutput.triggerDefinition?.outputDefined ||
+                    workflowNodeOutput.triggerDefinition?.outputFunctionDefined)
         )
         .map((workflowNodeOutput) => {
             return {
@@ -35,6 +36,7 @@ const DataPillPanel = ({
                 componentDefinition: previousComponentDefinitions?.find(
                     (currentComponentDefinition) =>
                         currentComponentDefinition.name === workflowNodeOutput.actionDefinition?.componentName ||
+                        currentComponentDefinition.name === workflowNodeOutput.triggerDefinition?.componentName
                 ),
                 outputSchema: workflowNodeOutput.outputSchema,
                 sampleOutput: workflowNodeOutput.sampleOutput,
