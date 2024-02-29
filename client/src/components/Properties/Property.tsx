@@ -76,6 +76,7 @@ const Property = ({
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
+    const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [loadDependency, setLoadDependency] = useState({});
@@ -89,7 +90,7 @@ const Property = ({
 
     let {name} = property;
 
-    let defaultValue: string | undefined = property.defaultValue;
+    const defaultValue = property.defaultValue || '';
 
     const {
         additionalProperties,
@@ -162,10 +163,6 @@ const Property = ({
         }
     });
 
-    if (actionName && name && currentComponentData?.parameters?.[name]) {
-        defaultValue = currentComponentData?.parameters?.[name];
-    }
-
     const {data: displayCondition, isLoading: isDisplayConditionLoading} = useEvaluateWorkflowNodeDisplayConditionQuery(
         {
             evaluateWorkflowNodeDisplayConditionRequestModel: {
@@ -233,6 +230,9 @@ const Property = ({
 
     const handleInputTypeSwitchButtonClick = () => {
         setMentionInput(!mentionInput);
+        setNumericValue(defaultValue);
+        setInputValue(defaultValue);
+        setMentionInputValue(defaultValue);
 
         if (mentionInput) {
             setTimeout(() => {
@@ -336,6 +336,8 @@ const Property = ({
         }
 
         isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
+
+        setMentionInputValue(taskParameterValue || '');
     }, [defaultValue, isNumericalInput, taskParameterValue]);
 
     useEffect(() => {
@@ -419,8 +421,10 @@ const Property = ({
                         }}
                         ref={editorRef}
                         required={required}
+                        setValue={setMentionInputValue}
                         singleMention={controlType !== 'TEXT'}
                         updateWorkflowMutation={updateWorkflowMutation}
+                        value={mentionInputValue}
                         workflow={workflow}
                     />
                 )}

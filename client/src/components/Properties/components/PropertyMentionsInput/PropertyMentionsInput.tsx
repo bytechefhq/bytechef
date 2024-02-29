@@ -54,8 +54,10 @@ interface PropertyMentionsInputProps {
     onKeyPress?: (event: KeyboardEvent) => void;
     placeholder?: string;
     required?: boolean;
+    setValue: (value: string) => void;
     singleMention?: boolean;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    value: string;
     workflow?: WorkflowModel;
 }
 
@@ -76,13 +78,14 @@ const PropertyMentionsInput = forwardRef(
             onKeyPress,
             placeholder = "Show data pills using '{'",
             required,
+            setValue,
             singleMention,
             updateWorkflowMutation,
+            value,
             workflow,
         }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>
     ) => {
-        const [value, setValue] = useState(defaultValue || '');
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {copiedPropertyData, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
@@ -177,10 +180,6 @@ const PropertyMentionsInput = forwardRef(
 
         const isFocused = focusedInput?.props.id === elementId;
 
-        const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
-
-        const taskPropertyValue = name ? currentWorkflowTask?.parameters?.[name] : '';
-
         const handleOnBlur = () => {
             if (!currentComponentData || !workflow || !updateWorkflowMutation) {
                 return;
@@ -236,7 +235,9 @@ const PropertyMentionsInput = forwardRef(
         };
 
         const handleOnChange = (value: string) => {
-            setValue(value);
+            if (setValue) {
+                setValue(value);
+            }
 
             if (onChange) {
                 onChange({
@@ -301,14 +302,6 @@ const PropertyMentionsInput = forwardRef(
         };
 
         useEffect(() => {
-            if (taskPropertyValue === undefined) {
-                return;
-            }
-
-            setValue(taskPropertyValue as string);
-        }, [taskPropertyValue]);
-
-        useEffect(() => {
             // @ts-expect-error Quill false positive
             if (!ref?.current) {
                 return;
@@ -319,12 +312,6 @@ const PropertyMentionsInput = forwardRef(
 
             delete keyboard.bindings[9];
         }, [ref]);
-
-        useEffect(() => {
-            if (defaultValue && !value) {
-                setValue(defaultValue);
-            }
-        }, [defaultValue, value]);
 
         return (
             <fieldset className="w-full space-y-2">
