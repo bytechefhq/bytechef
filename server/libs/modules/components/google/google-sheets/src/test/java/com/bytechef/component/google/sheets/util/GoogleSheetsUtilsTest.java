@@ -20,6 +20,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -113,16 +116,48 @@ class GoogleSheetsUtilsTest {
                     .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), anyString(), anyInt(), anyInt()))
                     .thenReturn(List.of("header1", "header2", "header3"));
 
-                List<Property.ArrayProperty> result = GoogleSheetsUtils.createArrayPropertyForRow(
+                List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
                     mockedParameters, mockedParameters, mockedContext);
 
                 assertEquals(1, result.size());
-                assertEquals(3, result.getFirst().getItems().get().size());
-                assertEquals("header1", result.getFirst().getItems().get().getFirst().getName());
-                assertEquals("header2", result.getFirst().getItems().get().get(1).getName());
-                assertEquals("header3", result.getFirst().getItems().get().getLast().getName());
+
+                ModifiableObjectProperty first = (ModifiableObjectProperty) result.getFirst();
+
+                assertEquals(VALUES, first.getName());
+                assertEquals("Values", first.getLabel().get());
+
+                List<? extends Property.ValueProperty<?>> properties = first.getProperties().get();
+
+                assertEquals(3, properties.size());
+                assertEquals("header1", properties.getFirst().getName());
+                assertEquals("header2", properties.get(1).getName());
+                assertEquals("header3", properties.get(2).getName());
             }
         }
+    }
+
+    @Test
+    void testCreateArrayPropertyForRowWhereFirstRowNotHeader() throws IOException {
+        when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
+            .thenReturn(false);
+        when(mockedParameters.getRequiredString(SPREADSHEET_ID))
+            .thenReturn("spreadsheetId");
+        when(mockedParameters.getRequiredInteger(SHEET_ID))
+            .thenReturn(123);
+
+        List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
+            mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(1, result.size());
+
+        Property.ValueProperty<?> array = result.getFirst();
+
+
+        assertEquals(3, ((ComponentDSL.ModifiableArrayProperty) array).getItems().get().size());
+
+        assertEquals(VALUES, array.getName());
+        assertEquals("Values", array.getLabel().get());
+        assertEquals(true, array.getRequired().get());
     }
 
     @Test
