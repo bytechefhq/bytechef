@@ -1,5 +1,5 @@
 [versions]
-ch-qos-logback = "1.4.14"
+ch-qos-logback = "1.5.1"
 checkstyle = "10.12.5"
 com-google-auto-service = "1.1.1"
 gradle-git-properties = "2.4.1"
@@ -48,9 +48,9 @@ org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processo
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
-org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.3.1"
+org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.4.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.23.19"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.24.13"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
