@@ -16,15 +16,20 @@
 
 package com.bytechef.platform.configuration.service;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.registry.util.SchemaUtils;
+import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +59,32 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     @Transactional(readOnly = true)
     public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
         return workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);
+    }
+
+    @Override
+    public void removeUnusedNodeTestOutputs(Workflow workflow) {
+        List<String> workflowTaskNames = workflow
+            .getAllTasks()
+            .stream()
+            .map(WorkflowTask::getName)
+            .toList();
+
+        List<String> workflowTriggerNames = WorkflowTrigger
+            .of(workflow)
+            .stream()
+            .map(WorkflowTrigger::getName)
+            .toList();
+
+        List<WorkflowNodeTestOutput> workflowNodeTestOutputs = workflowNodeTestOutputRepository
+            .findByWorkflowId(Validate.notNull(workflow.getId(), "id"));
+
+        for (WorkflowNodeTestOutput workflowNodeTestOutput : workflowNodeTestOutputs) {
+            if (!workflowTaskNames.contains(workflowNodeTestOutput.getWorkflowNodeName()) &&
+                !workflowTriggerNames.contains(workflowNodeTestOutput.getWorkflowNodeName())) {
+
+                workflowNodeTestOutputRepository.delete(workflowNodeTestOutput);
+            }
+        }
     }
 
     @Override

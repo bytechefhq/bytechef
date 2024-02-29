@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.repository;
 
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Repository;
 public interface WorkflowNodeTestOutputRepository
     extends ListCrudRepository<WorkflowNodeTestOutput, Long> {
 
-    Optional<WorkflowNodeTestOutput> findByWorkflowIdAndWorkflowNodeName(
-        String workflowId, String workflowNodeName);
+    List<WorkflowNodeTestOutput> findByWorkflowId(String workflowId);
+
+    Optional<WorkflowNodeTestOutput> findByWorkflowIdAndWorkflowNodeName(String workflowId, String workflowNodeName);
 }

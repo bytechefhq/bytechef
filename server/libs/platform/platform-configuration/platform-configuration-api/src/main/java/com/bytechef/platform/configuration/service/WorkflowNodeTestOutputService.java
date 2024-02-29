@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.service;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -29,6 +30,8 @@ public interface WorkflowNodeTestOutputService {
     void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
 
     Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName);
+
+    void removeUnusedNodeTestOutputs(Workflow workflow);
 
     WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Object sampleOutput);
