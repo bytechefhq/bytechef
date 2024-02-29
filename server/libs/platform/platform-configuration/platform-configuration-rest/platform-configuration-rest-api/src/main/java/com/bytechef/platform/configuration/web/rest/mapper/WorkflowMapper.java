@@ -76,12 +76,15 @@ public abstract class WorkflowMapper {
                     .map(workflowTask -> WorkflowNodeType.ofType(workflowTask.getType()))
                     .map(WorkflowNodeType::componentName)
                     .toList());
+
+            List<String> workflowTriggerComponentNames = workflowTriggers
+                .stream()
+                .map(workflowTrigger -> WorkflowNodeType.ofType(workflowTrigger.getType()))
+                .map(WorkflowNodeType::componentName)
+                .toList();
+
             workflowBasicModel.setWorkflowTriggerComponentNames(
-                workflowTriggers
-                    .stream()
-                    .map(workflowTrigger -> WorkflowNodeType.ofType(workflowTrigger.getType()))
-                    .map(WorkflowNodeType::componentName)
-                    .toList());
+                workflowTriggerComponentNames.isEmpty() ? List.of("manual") : workflowTriggerComponentNames);
         }
 
         private long getWorkflowTaskConnectionsCount(List<WorkflowTask> workflowTasks) {
