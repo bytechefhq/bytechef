@@ -472,11 +472,9 @@ const WorkflowNodeDetailsPanel = ({
                                             />
                                         )}
 
-                                        {activeTab === 'source' && <SourceTab componentDefinition={currentComponent} />}
+                                        {activeTab === 'source' && <SourceTab />}
 
-                                        {activeTab === 'destination' && (
-                                            <DestinationTab componentDefinition={currentComponent} />
-                                        )}
+                                        {activeTab === 'destination' && <DestinationTab />}
 
                                         {activeTab === 'connection' && workflowConnections.length > 0 && (
                                             <ConnectionTab
