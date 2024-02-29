@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.util;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
@@ -29,7 +30,8 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -68,32 +70,36 @@ public class GoogleSheetsUtils {
         return sheetName + "!" + rowNumber + ":" + rowNumber;
     }
 
-    public static List<Property.ArrayProperty> createArrayPropertyForRow(
+    public static List<Property.ValueProperty<?>> createArrayPropertyForRow(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
-
-        ModifiableArrayProperty updatedRow = array(VALUES)
-            .label("Values")
-            .required(true);
 
         if (isFirstRowHeader) {
             List<Object> firstRow = GoogleSheetsRowUtils.getRow(
                 GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
                 inputParameters.getRequiredInteger(SHEET_ID), 1);
 
-            List<ModifiableStringProperty> list = new ArrayList<>();
+            List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
 
             for (Object value : firstRow) {
                 list.add(string(value.toString()));
             }
 
-            updatedRow.items(list);
-        } else {
-            updatedRow.items(bool(), number(), string());
-        }
+            ModifiableObjectProperty updatedRow = object(VALUES)
+                .label("Values")
+                .properties(list)
+                .required(true);
 
-        return List.of(updatedRow);
+            return List.of(updatedRow);
+        } else {
+            ModifiableArrayProperty updatedRow = array(VALUES)
+                .label("Values")
+                .items(bool(), number(), string())
+                .required(true);
+
+            return List.of(updatedRow);
+        }
     }
 
     public static Map<String, Object> getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row)
