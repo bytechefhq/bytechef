@@ -19,7 +19,9 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,40 +52,53 @@ public class WorkflowTestConfigurationFacade {
         workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(Validate.notNull(workflow.getId(), "id"))
             .ifPresent(workflowTestConfiguration -> {
-                Map<String, String> inputMap = new HashMap<>(workflowTestConfiguration.getInputs());
-
-                for (String key : new HashSet<>(inputMap.keySet())) {
-                    if (!CollectionUtils.anyMatch(workflow.getInputs(),
-                        input -> Objects.equals(input.name(), key))) {
-                        inputMap.remove(key);
-                    }
-                }
-
-                workflowTestConfiguration.setInputs(inputMap);
+                workflowTestConfiguration.setInputs(getInputs(workflow, workflowTestConfiguration));
 
                 List<WorkflowConnection> taskWorkflowConnections = CollectionUtils.flatMap(
-                    workflow.getTasks(), workflowConnectionFacade::getWorkflowConnections);
+                    workflow.getAllTasks(), workflowConnectionFacade::getWorkflowConnections);
+                List<WorkflowConnection> triggerWorkflowConnections = CollectionUtils.flatMap(
+                    WorkflowTrigger.of(workflow), workflowConnectionFacade::getWorkflowConnections);
 
-                List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections = new ArrayList<>(
-                    workflowTestConfiguration.getConnections());
-
-                workflowTestConfigurationConnections.removeIf(connection -> !CollectionUtils.anyMatch(
-                    taskWorkflowConnections,
-                    workflowConnection -> Objects.equals(
-                        workflowConnection.workflowNodeName(), connection.getWorkflowNodeName())));
-
-                // TODO
-//                List<WorkflowConnection> triggerWorkflowConnections = CollectionUtils.flatMap(
-//                    WorkflowTrigger.of(workflow), workflowConnectionFacade::getWorkflowConnections);
-//
-//                workflowTestConfigurationConnections.removeIf(connection -> !CollectionUtils.anyMatch(
-//                    triggerWorkflowConnections,
-//                    workflowConnection -> Objects.equals(
-//                        workflowConnection.getOperationName(), connection.getOperationName())));
-
-                workflowTestConfiguration.setConnections(workflowTestConfigurationConnections);
+                workflowTestConfiguration.setConnections(
+                    getWorkflowTestConfigurationConnections(
+                        taskWorkflowConnections, triggerWorkflowConnections, workflowTestConfiguration));
 
                 workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
             });
+    }
+
+    private static Map<String, String> getInputs(
+        Workflow workflow, WorkflowTestConfiguration workflowTestConfiguration) {
+
+        Map<String, String> inputMap = new HashMap<>(workflowTestConfiguration.getInputs());
+
+        for (String key : new HashSet<>(inputMap.keySet())) {
+            if (!CollectionUtils.anyMatch(workflow.getInputs(), input -> Objects.equals(input.name(), key))) {
+                inputMap.remove(key);
+            }
+        }
+        return inputMap;
+    }
+
+    private static List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
+        List<WorkflowConnection> taskWorkflowConnections, List<WorkflowConnection> triggerWorkflowConnections,
+        WorkflowTestConfiguration workflowTestConfiguration) {
+
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections = new ArrayList<>(
+            workflowTestConfiguration.getConnections());
+
+        workflowTestConfigurationConnections.removeIf(connection -> anyMatch(taskWorkflowConnections, connection)
+            && anyMatch(triggerWorkflowConnections, connection));
+
+        return workflowTestConfigurationConnections;
+    }
+
+    private static boolean anyMatch(
+        List<WorkflowConnection> taskWorkflowConnections, WorkflowTestConfigurationConnection connection) {
+
+        return !CollectionUtils.anyMatch(
+            taskWorkflowConnections,
+            workflowConnection -> Objects.equals(
+                workflowConnection.workflowNodeName(), connection.getWorkflowNodeName()));
     }
 }

@@ -26,9 +26,7 @@ import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfig
 import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -64,72 +62,38 @@ public abstract class WorkflowMapper {
 
         @AfterMapping
         public void afterMapping(Workflow workflow, @MappingTarget WorkflowBasicModel workflowBasicModel) {
+            List<WorkflowTask> workflowTasks = workflow.getAllTasks();
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
             workflowBasicModel.setConnectionsCount(
-                (int) getWorkflowTaskConnectionsCount(workflow) + (int) getWorkflowTriggerConnectionsCount(workflow));
+                (int) getWorkflowTaskConnectionsCount(workflowTasks) +
+                    (int) getWorkflowTriggerConnectionsCount(workflowTriggers));
             workflowBasicModel.setInputsCount(CollectionUtils.size(workflow.getInputs()));
             workflowBasicModel.setManualTrigger(CollectionUtils.isEmpty(WorkflowTrigger.of(workflow)));
-            workflowBasicModel.setWorkflowTaskComponentNames(getWorkflowTaskComponentNames(workflow.getTasks()));
-            workflowBasicModel.setWorkflowTriggerComponentNames(getWorkflowTriggerComponentNames(workflow));
+            workflowBasicModel.setWorkflowTaskComponentNames(
+                workflowTasks
+                    .stream()
+                    .map(workflowTask -> WorkflowNodeType.ofType(workflowTask.getType()))
+                    .map(WorkflowNodeType::componentName)
+                    .toList());
+            workflowBasicModel.setWorkflowTriggerComponentNames(
+                workflowTriggers
+                    .stream()
+                    .map(workflowTrigger -> WorkflowNodeType.ofType(workflowTrigger.getType()))
+                    .map(WorkflowNodeType::componentName)
+                    .toList());
         }
 
-        private static List<String> getWorkflowTaskComponentNames(List<WorkflowTask> workflowTasks) {
-            List<String> workflowTaskComponentNames = new ArrayList<>();
-
-            for (WorkflowTask workflowTask : workflowTasks) {
-                workflowTaskComponentNames.add(
-                    WorkflowNodeType
-                        .ofType(workflowTask.getType())
-                        .componentName());
-
-                Map<String, ?> parameters = workflowTask.getParameters();
-
-                for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                    if (entry.getValue() instanceof WorkflowTask curWorkflowTask) {
-                        workflowTaskComponentNames.addAll(getWorkflowTaskComponentNames(List.of(curWorkflowTask)));
-                    } else if (entry.getValue() instanceof List<?> curList) {
-                        if (!curList.isEmpty() && curList.getFirst() instanceof WorkflowTask) {
-                            for (Object item : curList) {
-                                workflowTaskComponentNames.addAll(
-                                    getWorkflowTaskComponentNames(List.of((WorkflowTask) item)));
-                            }
-                        }
-                    } else if (entry.getValue() instanceof Map<?, ?> curMap) {
-                        for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
-                            if (curMapEntry.getValue() instanceof WorkflowTask curWorkflowTask) {
-                                workflowTaskComponentNames.addAll(
-                                    getWorkflowTaskComponentNames(List.of(curWorkflowTask)));
-                            }
-                        }
-                    }
-                }
-            }
-
-            return workflowTaskComponentNames;
-        }
-
-        private long getWorkflowTaskConnectionsCount(Workflow workflow) {
-            return workflow
-                .getTasks()
+        private long getWorkflowTaskConnectionsCount(List<WorkflowTask> workflowTasks) {
+            return workflowTasks
                 .stream()
                 .flatMap(workflowTask -> CollectionUtils.stream(
                     workflowConnectionFacade.getWorkflowConnections(workflowTask)))
                 .count();
         }
 
-        private static List<String> getWorkflowTriggerComponentNames(Workflow workflow) {
-            List<String> workflowTriggerComponentNames = WorkflowTrigger
-                .of(workflow)
-                .stream()
-                .map(workflowTrigger -> WorkflowNodeType.ofType(workflowTrigger.getType()))
-                .map(WorkflowNodeType::componentName)
-                .toList();
-
-            return workflowTriggerComponentNames.isEmpty() ? List.of("manual") : workflowTriggerComponentNames;
-        }
-
-        private long getWorkflowTriggerConnectionsCount(Workflow workflow) {
-            return WorkflowTrigger
-                .of(workflow)
+        private long getWorkflowTriggerConnectionsCount(List<WorkflowTrigger> workflowTriggers) {
+            return workflowTriggers
                 .stream()
                 .flatMap(workflowTrigger -> CollectionUtils.stream(
                     workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))

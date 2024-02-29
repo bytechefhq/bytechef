@@ -26,6 +26,7 @@ import com.bytechef.commons.util.MapUtils;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -253,6 +254,10 @@ public final class Workflow implements Persistable<String>, Serializable {
         return getClass().hashCode();
     }
 
+    public List<WorkflowTask> getAllTasks() {
+        return getAllTasks(tasks);
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -399,11 +404,35 @@ public final class Workflow implements Persistable<String>, Serializable {
             '}';
     }
 
-    public record Input(String name, String label, String type, boolean required)
-        implements Serializable {
-    }
+    private static List<WorkflowTask> getAllTasks(List<WorkflowTask> workflowTasks) {
+        List<WorkflowTask> allWorkflowTasks = new ArrayList<>();
 
-    public record Output(String name, Object value) implements Serializable {
+        for (WorkflowTask workflowTask : workflowTasks) {
+            allWorkflowTasks.add(workflowTask);
+
+            Map<String, ?> parameters = workflowTask.getParameters();
+
+            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
+                if (entry.getValue() instanceof WorkflowTask curWorkflowTask) {
+                    allWorkflowTasks.addAll(getAllTasks(List.of(curWorkflowTask)));
+                } else if (entry.getValue() instanceof List<?> curList) {
+                    if (!curList.isEmpty() && curList.getFirst() instanceof WorkflowTask) {
+                        for (Object item : curList) {
+                            allWorkflowTasks.addAll(
+                                getAllTasks(List.of((WorkflowTask) item)));
+                        }
+                    }
+                } else if (entry.getValue() instanceof Map<?, ?> curMap) {
+                    for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
+                        if (curMapEntry.getValue() instanceof WorkflowTask curWorkflowTask) {
+                            allWorkflowTasks.addAll(getAllTasks(List.of(curWorkflowTask)));
+                        }
+                    }
+                }
+            }
+        }
+
+        return allWorkflowTasks;
     }
 
     private static Map<String, ?> readWorkflowMap(String definition, String id, int format) {
@@ -415,5 +444,14 @@ public final class Workflow implements Persistable<String>, Serializable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public record Input(String name, String label, String type, boolean required)
+        implements Serializable {
+
+    }
+
+    public record Output(String name, Object value) implements Serializable {
+
     }
 }

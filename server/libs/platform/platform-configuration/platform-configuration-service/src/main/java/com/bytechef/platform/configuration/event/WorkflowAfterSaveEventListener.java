@@ -36,10 +36,11 @@ public class WorkflowAfterSaveEventListener extends AbstractRelationalEventListe
     protected void onAfterSave(AfterSaveEvent<Workflow> afterSaveEvent) {
         Workflow workflow = afterSaveEvent.getEntity();
 
-        workflowTestConfigurationFacade.cleanWorkflowTestConfigurationConnections(
-            // refresh definition
-            new Workflow(
-                Validate.notNull(workflow.getId(), "id"), workflow.getDefinition(), workflow.getFormat(),
-                workflow.getType()));
+        // refresh definition
+        workflow = new Workflow(
+            Validate.notNull(workflow.getId(), "id"), workflow.getDefinition(), workflow.getFormat(),
+            workflow.getType());
+
+        workflowTestConfigurationFacade.removeUnusedWorkflowTestConfigurationConnections(workflow);
     }
 }

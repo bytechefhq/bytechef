@@ -75,7 +75,14 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
-        return workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of());
+        List<WorkflowTrigger> workflowTriggers = workflow.getExtensions(
+            WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of());
+
+        return workflowTriggers.isEmpty()
+            ? List.of(
+                new WorkflowTrigger(
+                    Map.of(WorkflowConstants.NAME, "manual", WorkflowConstants.TYPE, "manual/v1/manual")))
+            : workflowTriggers;
     }
 
     public static WorkflowTrigger of(String triggerName, Workflow workflow) {
