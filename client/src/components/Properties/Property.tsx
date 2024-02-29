@@ -128,7 +128,7 @@ const Property = ({
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    let showMentionInput = controlType === 'FILE_ENTRY' || (mentionInput && !!dataPills?.length);
+    let showMentionInput = controlType === 'FILE_ENTRY' || mentionInput;
 
     if (controlType === 'OBJECT_BUILDER' && !!properties?.length) {
         showMentionInput = false;
@@ -138,6 +138,10 @@ const Property = ({
 
     if (controlType === 'FILE_ENTRY') {
         showInputTypeSwitchButton = false;
+    }
+
+    if (controlType === 'SELECT') {
+        showInputTypeSwitchButton = true;
     }
 
     const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
@@ -395,7 +399,7 @@ const Property = ({
                     </Button>
                 )}
 
-                {showMentionInput && (controlType === 'FILE_ENTRY' || !!dataPills?.length) && (
+                {showMentionInput && (
                     <PropertyMentionsInput
                         arrayName={arrayName}
                         controlType={controlType}
