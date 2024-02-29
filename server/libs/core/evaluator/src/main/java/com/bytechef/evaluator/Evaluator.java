@@ -20,6 +20,7 @@ package com.bytechef.evaluator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -146,7 +147,7 @@ public class Evaluator {
     }
 
     private static Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context) {
-        Map<String, Object> newMap = new HashMap<>();
+        Map<String, Object> newMap = new LinkedHashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
             newMap.put((String) entry.getKey(), evaluate(entry.getValue(), context));
