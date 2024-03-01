@@ -226,9 +226,9 @@ const Property = ({
 
     const handleInputTypeSwitchButtonClick = () => {
         setMentionInput(!mentionInput);
-        setNumericValue(defaultValue);
-        setInputValue(defaultValue);
-        setMentionInputValue(defaultValue);
+        setNumericValue('');
+        setInputValue('');
+        setMentionInputValue('');
 
         if (mentionInput) {
             setTimeout(() => {
@@ -337,15 +337,21 @@ const Property = ({
         }
     }, [formState, name, path]);
 
+    // set value to taskParameterValue only on initial render
     useEffect(() => {
-        if (taskParameterValue === undefined) {
-            return;
+        if (mentionInputValue === '' && taskParameterValue) {
+            setMentionInputValue(taskParameterValue);
         }
 
-        isNumericalInput ? setNumericValue(taskParameterValue || '') : setInputValue(taskParameterValue || '');
+        if (inputValue === '' && taskParameterValue) {
+            setInputValue(taskParameterValue);
+        }
 
-        setMentionInputValue(taskParameterValue || '');
-    }, [defaultValue, isNumericalInput, taskParameterValue]);
+        if (numericValue === '' && taskParameterValue) {
+            setNumericValue(taskParameterValue);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const loadDependencyOptions = optionsDataSource?.loadOptionsDependsOn?.reduce(
@@ -382,7 +388,7 @@ const Property = ({
             <div className="relative w-full">
                 {showInputTypeSwitchButton && (
                     <Button
-                        className="absolute right-0 top-0 z-50 size-auto p-0.5"
+                        className="absolute right-0 top-0 size-auto p-0.5"
                         onClick={handleInputTypeSwitchButtonClick}
                         size="icon"
                         title="Switch input type"
