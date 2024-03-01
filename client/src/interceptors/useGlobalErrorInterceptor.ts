@@ -6,7 +6,7 @@ export default function useGlobalErrorInterceptor() {
 
     const unregister = fetchIntercept.register({
         response: function (response) {
-            if (response.status < 200 || response.status > 499) {
+            if (response.status < 200 || response.status > 299) {
                 const clonedResponse = response.clone();
 
                 clonedResponse.json().then((data) => {
