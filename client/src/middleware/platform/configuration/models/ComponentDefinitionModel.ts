@@ -63,6 +63,12 @@ export interface ComponentDefinitionModel {
      */
     connection?: ConnectionDefinitionBasicModel;
     /**
+     * If connection is required or not if it is defined.
+     * @type {boolean}
+     * @memberof ComponentDefinitionModel
+     */
+    connectionRequired: boolean;
+    /**
      * The description.
      * @type {string}
      * @memberof ComponentDefinitionModel
@@ -117,6 +123,7 @@ export interface ComponentDefinitionModel {
  */
 export function instanceOfComponentDefinitionModel(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "connectionRequired" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "version" in value;
 
@@ -136,6 +143,7 @@ export function ComponentDefinitionModelFromJSONTyped(json: any, ignoreDiscrimin
         'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
         'category': !exists(json, 'category') ? undefined : json['category'],
         'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
+        'connectionRequired': json['connectionRequired'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'name': json['name'],
@@ -159,6 +167,7 @@ export function ComponentDefinitionModelToJSON(value?: ComponentDefinitionModel 
         'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionBasicModelToJSON)),
         'category': value.category,
         'connection': ConnectionDefinitionBasicModelToJSON(value.connection),
+        'connectionRequired': value.connectionRequired,
         'description': value.description,
         'icon': value.icon,
         'name': value.name,
