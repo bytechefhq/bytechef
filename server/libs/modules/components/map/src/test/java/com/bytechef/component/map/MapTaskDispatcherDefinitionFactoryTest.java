@@ -16,16 +16,17 @@
 
 package com.bytechef.component.map;
 
+import com.bytechef.task.dispatcher.map.MapTaskDispatcherDefinitionFactory;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class MapComponentDefinitionFactoryTest {
+public class MapTaskDispatcherDefinitionFactoryTest {
 
     @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/map_v1.json", new MapComponentDefinitionFactory().getDefinition());
+    public void testGetTaskDispatcherDefinition() {
+        JsonFileAssert.assertEquals("definition/map_v1.json", new MapTaskDispatcherDefinitionFactory().getDefinition());
     }
 }
