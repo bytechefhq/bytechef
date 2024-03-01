@@ -1037,6 +1037,7 @@ components:
       required:
       - "name"
       - "version"
+      - "connectionRequired"
       properties:
         actions:
           description: "The list of all available actions the component can perform."
@@ -1048,6 +1049,9 @@ components:
           type: "string"
         connection:
           $ref: "#/components/schemas/ConnectionDefinitionBasic"
+        connectionRequired:
+          description: "If connection is required or not if it is defined."
+          type: "boolean"
         description:
           description: "The description."
           type: "string"
