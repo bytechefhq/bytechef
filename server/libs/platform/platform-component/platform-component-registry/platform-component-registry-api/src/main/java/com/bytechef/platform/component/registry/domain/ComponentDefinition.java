@@ -77,12 +77,12 @@ public class ComponentDefinition {
         this.version = componentDefinition.getVersion();
     }
 
-    public List<ActionDefinitionBasic> getActions() {
-        return actions;
-    }
-
     public boolean isConnectionRequired() {
         return connectionRequired;
+    }
+
+    public List<ActionDefinitionBasic> getActions() {
+        return actions;
     }
 
     public int getActionsCount() {

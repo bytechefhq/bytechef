@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.event;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
@@ -30,6 +31,7 @@ public class WorkflowAfterSaveEventListener extends AbstractRelationalEventListe
     private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
+    @SuppressFBWarnings("EI")
     public WorkflowAfterSaveEventListener(
         WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
