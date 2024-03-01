@@ -6,5 +6,6 @@ dependencies {
     implementation ("com.google.apis:google-api-services-docs:v1-rev20220609-2.0.0")
     implementation ("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0")
     implementation("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
+    implementation ("com.google.apis:google-api-services-people:v1-rev20220531-2.0.0")
     implementation ("com.google.apis:google-api-services-sheets:v4-rev20220927-2.0.0")
 }

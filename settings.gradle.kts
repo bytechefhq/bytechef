@@ -173,6 +173,7 @@ include("server:libs:modules:components:google:google-commons")
 include("server:libs:modules:components:google:google-docs")
 include("server:libs:modules:components:google:google-drive")
 include("server:libs:modules:components:google:google-mail")
+include("server:libs:modules:components:google:google-people")
 include("server:libs:modules:components:google:google-sheets")
 include("server:libs:modules:components:http-client")
 include("server:libs:modules:components:hubspot")
@@ -259,3 +260,5 @@ include("ee:server:libs:platform:platform-workflow:platform-workflow-task-dispat
 include("ee:server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-rest")
 include("ee:server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest")
 include("ee:server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
+include("server:libs:modules:components:google:google-contacts")
+findProject(":server:libs:modules:components:google:google-contacts")?.name = "google-contacts"
