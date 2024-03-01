@@ -93,6 +93,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:logger"))
     implementation(project(":server:libs:modules:components:filesystem"))
     implementation(project(":server:libs:modules:components:google:google-calendar"))
+    implementation(project(":server:libs:modules:components:google:google-contacts"))
     implementation(project(":server:libs:modules:components:google:google-docs"))
     implementation(project(":server:libs:modules:components:google:google-drive"))
     implementation(project(":server:libs:modules:components:google:google-mail"))

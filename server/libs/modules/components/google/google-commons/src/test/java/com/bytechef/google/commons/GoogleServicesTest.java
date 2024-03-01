@@ -26,6 +26,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.sheets.v4.Sheets;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,13 @@ public class GoogleServicesTest {
         Calendar calendar = GoogleServices.getCalendar(mockedParameters);
 
         assertEquals("Google Calendar Component", calendar.getApplicationName());
+    }
+
+    @Test
+    void testGetPeopleService() {
+        PeopleService peopleService = GoogleServices.getPeopleService(mockedParameters);
+
+        assertEquals("Google People Component", peopleService.getApplicationName());
     }
 
     @Test
