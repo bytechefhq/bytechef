@@ -36,6 +36,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -107,7 +108,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
 
         if (!projectService.isProjectEnabled(projectId)) {
-            throw new IllegalArgumentException("Project id=%s is not published".formatted(projectId));
+            throw new ApplicationException(
+                "Project id=%s is not published".formatted(projectId), ProjectInstance.class, 100);
         }
 
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
@@ -169,14 +171,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             .getProjectInstanceWorkflows(id);
 
         if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
-            throw new IllegalArgumentException(
-                "ProjectInstance id=%s has executed workflows.".formatted(id));
+            throw new ApplicationException(
+                "ProjectInstance id=%s has executed workflows".formatted(id), ProjectInstance.class, 101);
         }
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             if (projectInstanceWorkflow.isEnabled()) {
-                throw new IllegalArgumentException(
-                    "ProjectInstanceWorkflow id=%s must be disabled.".formatted(projectInstanceWorkflow.getId()));
+                throw new ApplicationException(
+                    "ProjectInstanceWorkflow id=%s must be disabled".formatted(projectInstanceWorkflow.getId()),
+                    ProjectInstance.class, 102);
             }
 
             projectInstanceWorkflowService.delete(projectInstanceWorkflow.getId());

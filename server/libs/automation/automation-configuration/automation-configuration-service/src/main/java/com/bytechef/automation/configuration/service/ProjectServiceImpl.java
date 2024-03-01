@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.configuration.exception.ApplicationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -169,7 +170,8 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = getProject(id);
 
         if (CollectionUtils.count(project.getWorkflowIds()) == 1) {
-            throw new IllegalArgumentException("The last workflow cannot be deleted");
+            throw new ApplicationException(
+                "The last workflow id=%s cannot be deleted".formatted(workflowId), Project.class, 102);
         }
 
         project.removeWorkflow(workflowId);

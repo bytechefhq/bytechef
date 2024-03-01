@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -136,6 +137,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void deleteProject(long id) {
+        if (!CollectionUtils.isEmpty(projectInstanceService.getProjectInstances(id))) {
+            throw new ApplicationException(
+                "Project id=%s cannot be deleted".formatted(id), Project.class, 100);
+        }
+
         Project project = projectService.getProject(id);
 
         for (String workflowId : project.getWorkflowIds()) {
@@ -163,7 +169,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 projectInstanceWorkflows,
                 projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
 
-                throw new IllegalArgumentException("Workflow id=%s is in use".formatted(workflowId));
+                throw new ApplicationException("Workflow id=%s is in use".formatted(workflowId), Project.class, 101);
             }
         }
 

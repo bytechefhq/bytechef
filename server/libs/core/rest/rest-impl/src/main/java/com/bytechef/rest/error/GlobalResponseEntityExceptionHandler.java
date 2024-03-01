@@ -40,6 +40,22 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
+    public ResponseEntity<ProblemDetail> handleIllegalArgumentExceptionException(
+        final IllegalArgumentException exception, final WebRequest request) {
+
+        logger.error(exception.getMessage(), exception);
+
+        return ResponseEntity
+            .of(
+                createProblemDetail(
+                    exception.getCause() == null ? exception : (Exception) exception.getCause(),
+                    HttpStatus.BAD_REQUEST, exception.getMessage(), null, null, request))
+            .build();
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
@@ -50,7 +66,7 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
             .of(
                 createProblemDetail(
                     throwable.getCause() == null ? (Exception) throwable : (Exception) throwable.getCause(),
-                    HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null, null, request))
+                    HttpStatus.INTERNAL_SERVER_ERROR, throwable.getMessage(), null, null, request))
             .build();
     }
 

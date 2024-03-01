@@ -16,75 +16,51 @@
 
 package com.bytechef.platform.component.exception;
 
+import com.bytechef.platform.exception.AbstractException;
 import java.util.Collections;
 import java.util.Map;
 
 /**
  * @author Igor Beslic
  */
-public class ComponentExecutionException extends RuntimeException {
+public class ComponentExecutionException extends AbstractException {
 
-    private final Class<?> entityClass;
-    private final int errorKey;
     private Map<String, ?> inputParameters;
 
     public ComponentExecutionException(String message, Class<?> entityClass, int errorKey) {
-        super(message);
-
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        super(message, entityClass, errorKey);
     }
 
     public ComponentExecutionException(
         String message, Map<String, ?> inputParameters, Class<?> entityClass, int errorKey) {
 
-        super(message);
+        super(message, entityClass, errorKey);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
         this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
     public ComponentExecutionException(Throwable cause, Class<?> entityClass, int errorKey) {
-        super(cause);
-
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        super(cause, entityClass, errorKey);
     }
 
     public ComponentExecutionException(
         Throwable cause, Map<String, ?> inputParameters, Class<?> entityClass, int errorKey) {
 
-        super(cause);
+        super(cause, entityClass, errorKey);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
         this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
     public ComponentExecutionException(String message, Throwable cause, Class<?> entityClass, int errorKey) {
-        super(message, cause);
-
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        super(message, cause, entityClass, errorKey);
     }
 
     public ComponentExecutionException(
         String message, Throwable cause, Map<String, ?> inputParameters, Class<?> entityClass, int errorKey) {
 
-        super(message, cause);
+        super(message, cause, entityClass, errorKey);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
         this.inputParameters = Collections.unmodifiableMap(inputParameters);
-    }
-
-    public Class<?> getEntityClass() {
-        return entityClass;
-    }
-
-    public int getErrorKey() {
-        return errorKey;
     }
 
     public Map<String, ?> getInputParameters() {
@@ -94,10 +70,7 @@ public class ComponentExecutionException extends RuntimeException {
     @Override
     public String toString() {
         return "ComponentExecutionException{" +
-            "entityClass=" + entityClass +
-            ", errorKey=" + errorKey +
-            ", inputParameters=" + inputParameters +
-            ", message=" + super.toString() +
-            "} ";
+            "inputParameters=" + inputParameters +
+            "} " + super.toString();
     }
 }
