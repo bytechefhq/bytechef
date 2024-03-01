@@ -129,11 +129,7 @@ const Property = ({
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    let showMentionInput = controlType === 'FILE_ENTRY' || mentionInput;
-
-    if (controlType === 'OBJECT_BUILDER' && !!properties?.length) {
-        showMentionInput = false;
-    }
+    const showMentionInput = controlType === 'FILE_ENTRY' || mentionInput;
 
     let showInputTypeSwitchButton = type !== 'STRING' && !!name;
 
@@ -324,7 +320,11 @@ const Property = ({
         if (controlType === 'ARRAY_BUILDER') {
             setMentionInput(false);
         }
-    }, [controlType]);
+
+        if (controlType === 'OBJECT_BUILDER' && !!properties?.length) {
+            setMentionInput(false);
+        }
+    }, [controlType, properties?.length]);
 
     useEffect(() => {
         if (formState && name) {
@@ -382,7 +382,7 @@ const Property = ({
             <div className="relative w-full">
                 {showInputTypeSwitchButton && (
                     <Button
-                        className="absolute right-0 top-0 size-auto p-0.5"
+                        className="absolute right-0 top-0 z-50 size-auto p-0.5"
                         onClick={handleInputTypeSwitchButtonClick}
                         size="icon"
                         title="Switch input type"
