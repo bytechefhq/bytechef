@@ -37,7 +37,7 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
     }, []);
 
     const handleAddItemClick = () => {
-        if (!arrayItems) {
+        if (!arrayItems.length) {
             return;
         }
 
