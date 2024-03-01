@@ -36,6 +36,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +49,8 @@ import org.springframework.stereotype.Component;
     "CT", "EI"
 })
 public class ComponentDefinitionRegistry {
+
+    private static final Logger log = LoggerFactory.getLogger(ComponentDefinitionRegistry.class);
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
         .title("Manual")
@@ -221,6 +225,10 @@ public class ComponentDefinitionRegistry {
                 componentDefinition.getActions(), List.of());
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Validating %s.%s".formatted(componentDefinition.getName(), actionDefinition.getName()));
+                }
+
                 PropertyUtils.checkInputProperties(
                     OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
@@ -231,6 +239,10 @@ public class ComponentDefinitionRegistry {
                 componentDefinition.getTriggers(), List.of());
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Validating %s.%s".formatted(componentDefinition.getName(), triggerDefinition.getName()));
+                }
+
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
                     OptionalUtils.mapOrElse(triggerDefinition.getOutput(), Output::getOutputSchema, null));

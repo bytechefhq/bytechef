@@ -16,7 +16,11 @@
 
 package com.bytechef.platform.registry.util;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseProperty;
+import com.bytechef.definition.BaseProperty.BaseArrayProperty;
+import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import java.util.List;
 
 /**
@@ -29,7 +33,15 @@ public class PropertyUtils {
             String name = property.getName();
 
             if (name == null || name.isEmpty()) {
-                throw new IllegalArgumentException("Defined properties cannot have empty names");
+                throw new IllegalStateException("Defined properties cannot have empty names");
+            }
+
+            if (property instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty) {
+                checkArrayProperty(arrayProperty, false);
+            }
+
+            if (property instanceof BaseObjectProperty<? extends BaseProperty> objectProperty) {
+                checkObjectProperty(objectProperty);
             }
         }
     }
@@ -41,12 +53,81 @@ public class PropertyUtils {
 
         String name = property.getName();
 
-        if (name == null) {
-            return;
+        if (name != null) {
+            throw new IllegalArgumentException("Defined property=%s must have empty name".formatted(name));
         }
 
-        if (!name.isEmpty()) {
-            throw new IllegalArgumentException("Defined property=%s must have empty name".formatted(name));
+        if (property instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty) {
+            checkArrayProperty(arrayProperty, true);
+        }
+
+        if (property instanceof BaseObjectProperty<?> objectProperty) {
+            checkObjectProperty(objectProperty);
+        }
+    }
+
+    private static void checkArrayProperty(BaseArrayProperty<? extends BaseProperty> arrayProperty, boolean checkName) {
+        List<? extends BaseProperty> itemProperties = OptionalUtils.orElse(arrayProperty.getItems(), List.of());
+
+        for (BaseProperty itemProperty : itemProperties) {
+            String name = itemProperty.getName();
+
+            if (checkName && name != null) {
+                throw new IllegalStateException(
+                    "Defined array property=%s must have empty name".formatted(arrayProperty.getName()));
+            }
+
+            if (itemProperty instanceof BaseArrayProperty<?> curArrayProperty) {
+                checkArrayProperty(curArrayProperty, checkName);
+            }
+
+            if (itemProperty instanceof BaseObjectProperty<?> objectProperty) {
+                checkObjectProperty(objectProperty);
+            }
+        }
+    }
+
+    private static void checkObjectProperty(BaseObjectProperty<? extends BaseProperty> objectProperty) {
+        List<? extends BaseProperty> objectProperties = OptionalUtils.orElse(
+            objectProperty.getProperties(), List.of());
+
+        for (BaseProperty property : objectProperties) {
+            String name = property.getName();
+
+            if (name == null || name.isEmpty()) {
+                throw new IllegalStateException(
+                    "Defined object property=%s cannot have properties with empty name".formatted(
+                        objectProperty.getName()));
+            }
+
+            if (property instanceof BaseArrayProperty<?> arrayProperty) {
+                checkArrayProperty(arrayProperty, false);
+            }
+
+            if (property instanceof BaseObjectProperty<?> curObjectProperty) {
+                checkObjectProperty(curObjectProperty);
+            }
+        }
+
+        List<? extends BaseProperty> objectAdditionalProperties = OptionalUtils.orElse(
+            objectProperty.getAdditionalProperties(), List.of());
+
+        for (BaseProperty itemProperty : objectAdditionalProperties) {
+            String name = itemProperty.getName();
+
+            if (name != null) {
+                throw new IllegalStateException("Defined additional property=%s must have empty name".formatted(name));
+            }
+
+            if (itemProperty instanceof BaseArrayProperty<?> curArrayProperty) {
+                checkArrayProperty(curArrayProperty, true);
+            }
+
+            if (itemProperty instanceof BaseObjectProperty<?> curObjectProperty &&
+                !CollectionUtils.isEmpty(OptionalUtils.orElse(curObjectProperty.getProperties(), List.of()))) {
+
+                checkObjectProperty(curObjectProperty);
+            }
         }
     }
 }

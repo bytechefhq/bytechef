@@ -2311,17 +2311,7 @@ public final class ComponentDSL {
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
             if (properties != null) {
-                for (Property property : properties) {
-                    String name = property.getName();
-
-                    if (name == null || name.isEmpty()) {
-                        throw new IllegalArgumentException("Name cannot be empty for property.");
-                    }
-                }
-
-                this.properties = properties.stream()
-                    .distinct()
-                    .toList();
+                this.properties = Collections.unmodifiableList(properties);
             }
 
             return this;
