@@ -135,7 +135,7 @@ const Property = ({
         showMentionInput = false;
     }
 
-    let showInputTypeSwitchButton = type !== 'STRING' && !!dataPills?.length && !!name;
+    let showInputTypeSwitchButton = type !== 'STRING' && !!name;
 
     if (controlType === 'FILE_ENTRY') {
         showInputTypeSwitchButton = false;
@@ -318,6 +318,13 @@ const Property = ({
             setInputValue(event.target.value);
         }
     };
+
+    // set default mentionInput state
+    useEffect(() => {
+        if (controlType === 'ARRAY_BUILDER') {
+            setMentionInput(false);
+        }
+    }, [controlType]);
 
     useEffect(() => {
         if (formState && name) {
