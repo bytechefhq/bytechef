@@ -61,23 +61,14 @@ class InfobipUtilsTest {
                     new SmsDeliveryTimeFromCustom(1, 1),
                     new SmsDeliveryTimeToCustom(1, 1)),
                 List.of(new SmsDestinationCustom("id", "to")),
-                true,
-                "from",
-                true,
-                new SmsLanguageCustom("TR"),
-                "application/json",
-                "notifyUrl",
+                true, "from", true, new SmsLanguageCustom("TR"), "application/json", "notifyUrl",
                 new SmsRegionalOptionsCustom(
                     new SmsIndiaDltOptionsCustom("contentTemplateId",
                         "principalEntityID"),
                     new SmsTurkeyIysOptionsCustom(1, "TACIR"),
                     new SmsSouthKoreaOptionsCustom(1)),
                 new OffsetDateTimeCustom(LocalDateTime.of(2015, Month.APRIL, 1, 1, 1), "Asia/Tokyo"),
-                "text",
-                "TURKISH",
-                123L,
-                "entityId",
-                "applicationId"));
+                "text", "TURKISH", 123L, "entityId", "applicationId"));
 
         List<SmsTextualMessage> smsTextualMessages = createSmsTextualMessageList(smsTextualMessageCustoms);
 
@@ -86,10 +77,10 @@ class InfobipUtilsTest {
         SmsTextualMessageCustom smsTextualMessageCustom = smsTextualMessageCustoms.getFirst();
         SmsTextualMessage smsTextualMessage = smsTextualMessages.getFirst();
 
-        assertEquals(smsTextualMessageCustom.callback(), smsTextualMessage.getCallbackData());
+        assertEquals(smsTextualMessageCustom.callbackData(), smsTextualMessage.getCallbackData());
 
         testCreateSmsDeliveryTimeWindow(
-            smsTextualMessageCustom.deliveryTimeWindowCustom(), smsTextualMessage.getDeliveryTimeWindow());
+            smsTextualMessageCustom.deliveryTimeWindow(), smsTextualMessage.getDeliveryTimeWindow());
 
         testCreateSmsDestinationList(smsTextualMessageCustom.destinations(), smsTextualMessage.getDestinations());
 

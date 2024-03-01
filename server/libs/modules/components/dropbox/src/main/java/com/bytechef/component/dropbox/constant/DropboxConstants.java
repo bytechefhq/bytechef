@@ -31,14 +31,14 @@ public final class DropboxConstants {
     // actions
 
     public static final String COPY = "copy";
-    public static final String CREATENEWFOLDER = "createNewFolder";
-    public static final String CREATENEWTEXTFILE = "createNewTextFile";
+    public static final String CREATE_FOLDER = "createFolder";
+    public static final String CREATE_TEXT_FILE = "createTextFile";
     public static final String DELETE = "delete";
-    public static final String GETFILELINK = "getFileLink";
-    public static final String LISTAFOLDER = "listAFolder";
+    public static final String GET_FILE_LINK = "getFileLink";
+    public static final String LIST_FOLDER = "listFolder";
     public static final String MOVE = "move";
     public static final String SEARCH = "search";
-    public static final String UPLOADFILE = "uploadFile";
+    public static final String UPLOAD_FILE = "uploadFile";
 
     private DropboxConstants() {
     }

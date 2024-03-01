@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATENEWFOLDER;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_FOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
@@ -38,7 +38,7 @@ import com.dropbox.core.v2.files.DbxUserFilesRequests;
  */
 public final class DropboxCreateNewFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATENEWFOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_FOLDER)
         .title("Create new folder")
         .description("Create a folder at a given path.")
         .properties(string(DESTINATION_FILENAME)
@@ -51,46 +51,33 @@ public final class DropboxCreateNewFolderAction {
                     object("folderMetadata")
                         .properties(
                             string("id")
-                                .label("ID")
                                 .required(true),
                             string("sharedFolderId")
-                                .label("Shared folder ID")
                                 .required(true),
                             object("sharingInfo")
                                 .properties(
                                     string("parentSharedFolderId")
-                                        .label("Parent shared folder ID")
                                         .required(true),
                                     string("sharedFolderId")
-                                        .label("Shared folder ID")
                                         .required(true),
-                                    bool("traverseOnly")
-                                        .label("Traverse only"),
+                                    bool("traverseOnly"),
                                     bool("noAccess")
-                                        .label("No access"))
-                                .label("Sharing info")
-                                .required(true),
-                            array("propertyGroups")
-                                .items(
-                                    object()
-                                        .properties(
-                                            string("templateId")
-                                                .label("Template ID")
-                                                .required(true),
-                                            array("fields")
-                                                .items(
-                                                    object()
-                                                        .properties(
-                                                            string("name")
-                                                                .label("Name")
-                                                                .required(true),
-                                                            string("value")
-                                                                .label("Value")
-                                                                .required(true))
-                                                        .label("Fields")))
-                                        .label("Property groups")
-                                        .required(true)))
-                        .label("Metadata"))
+                                        .required(true),
+                                    array("propertyGroups")
+                                        .items(
+                                            object()
+                                                .properties(
+                                                    string("templateId")
+                                                        .required(true),
+                                                    array("fields")
+                                                        .items(
+                                                            object()
+                                                                .properties(
+                                                                    string("name")
+                                                                        .required(true),
+                                                                    string("value")
+                                                                        .required(true))))
+                                                .required(true)))))
                 .label("Create folder result"))
         .perform(DropboxCreateNewFolderAction::perform);
 

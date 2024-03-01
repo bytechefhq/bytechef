@@ -134,13 +134,11 @@ public final class SlackConstants {
             array("httpResponseHeaders"),
             string("deprecatedArgument"),
             array("errors")
-                .items(
-                    string("error")),
+                .items(string()),
             object("responseMetadata")
                 .properties(
                     array("messages")
-                        .items(
-                            string("message"))),
+                        .items(string())),
             string("channel"),
             string("ts"),
             object("message")

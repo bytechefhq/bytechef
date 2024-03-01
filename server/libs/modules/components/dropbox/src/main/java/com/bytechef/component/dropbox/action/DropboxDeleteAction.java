@@ -52,19 +52,14 @@ public final class DropboxDeleteAction {
                     object("metadata")
                         .properties(
                             string("name")
-                                .label("Name")
                                 .required(true),
                             string("pathLower")
-                                .label("Path lowercase")
                                 .required(true),
                             string("pathDisplay")
-                                .label("Path display")
                                 .required(true),
                             string("parentSharedFolderId")
-                                .label("Parent shared folder")
                                 .required(true),
                             string("previewUrl")
-                                .label("Preview URL")
                                 .required(true))
                         .label("Metadata")))
         .perform(DropboxDeleteAction::perform);

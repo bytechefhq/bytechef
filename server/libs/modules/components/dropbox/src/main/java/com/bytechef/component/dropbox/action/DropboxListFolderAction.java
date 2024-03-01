@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.LISTAFOLDER;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.LIST_FOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
@@ -38,7 +38,7 @@ import com.dropbox.core.v2.files.ListFolderResult;
  */
 public final class DropboxListFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LISTAFOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_FOLDER)
         .title("List folder")
         .description("Lists content of a folder.")
         .properties(
@@ -50,32 +50,25 @@ public final class DropboxListFolderAction {
         .outputSchema(
             object()
                 .properties(
-                    array("entries").items(
-                        object()
-                            .properties(
-                                object("metadata")
-                                    .properties(
-                                        string("name")
-                                            .label("Name")
-                                            .required(true),
-                                        string("pathLower")
-                                            .label("Path lowercase")
-                                            .required(true),
-                                        string("pathDisplay")
-                                            .label("Path display")
-                                            .required(true),
-                                        string("parentSharedFolderId")
-                                            .label("Parent shared folder")
-                                            .required(true),
-                                        string("previewUrl")
-                                            .label("Preview URL")
-                                            .required(true))
-                                    .label("Entries"))),
+                    array("entries")
+                        .items(
+                            object()
+                                .properties(
+                                    object("metadata")
+                                        .properties(
+                                            string("name")
+                                                .required(true),
+                                            string("pathLower")
+                                                .required(true),
+                                            string("pathDisplay")
+                                                .required(true),
+                                            string("parentSharedFolderId")
+                                                .required(true),
+                                            string("previewUrl")
+                                                .required(true)))),
                     string("cursor")
-                        .label("Cursor")
                         .required(true),
                     bool("hasMore")
-                        .label("Has more")
                         .required(true)))
         .perform(DropboxListFolderAction::perform);
 

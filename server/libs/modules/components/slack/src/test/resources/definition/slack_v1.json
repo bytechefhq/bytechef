@@ -350,6 +350,7 @@
     } ],
     "title": "Send message",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -511,7 +512,7 @@
             "hidden": null,
             "metadata": { },
             "required": null,
-            "name": "error",
+            "name": null,
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
@@ -568,7 +569,7 @@
               "hidden": null,
               "metadata": { },
               "required": null,
-              "name": "message",
+              "name": null,
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
@@ -823,8 +824,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1163,6 +1163,7 @@
     } ],
     "title": "Send direct message",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1324,7 +1325,7 @@
             "hidden": null,
             "metadata": { },
             "required": null,
-            "name": "error",
+            "name": null,
             "type": "STRING",
             "defaultValue": null,
             "exampleValue": null,
@@ -1381,7 +1382,7 @@
               "hidden": null,
               "metadata": { },
               "required": null,
-              "name": "message",
+              "name": null,
               "type": "STRING",
               "defaultValue": null,
               "exampleValue": null,
@@ -1636,8 +1637,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null,
   "connection": {
@@ -1688,16 +1688,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
+      "clientId": null,
       "apply": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "clientId": null,
       "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     } ],
     "properties": null,
     "version": 1,

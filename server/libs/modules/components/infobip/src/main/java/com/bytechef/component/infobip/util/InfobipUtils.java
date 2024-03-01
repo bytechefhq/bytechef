@@ -47,8 +47,8 @@ public class InfobipUtils {
 
         for (InfobipUtils.SmsTextualMessageCustom smsTextualMessageCustom : smsTextualMessageCustoms) {
             SmsTextualMessage smsTextualMessage = new SmsTextualMessage()
-                .callbackData(smsTextualMessageCustom.callback())
-                .deliveryTimeWindow(createSmsDeliveryTimeWindow(smsTextualMessageCustom.deliveryTimeWindowCustom()))
+                .callbackData(smsTextualMessageCustom.callbackData())
+                .deliveryTimeWindow(createSmsDeliveryTimeWindow(smsTextualMessageCustom.deliveryTimeWindow()))
                 .destinations(createSmsDestinationList(smsTextualMessageCustom.destinations()))
                 .flash(smsTextualMessageCustom.flash())
                 .from(smsTextualMessageCustom.from())
@@ -154,20 +154,20 @@ public class InfobipUtils {
     }
 
     public record SmsTextualMessageCustom(
-        String callback, SmsDeliveryTimeWindowCustom deliveryTimeWindowCustom, List<SmsDestinationCustom> destinations,
+        String callbackData, SmsDeliveryTimeWindowCustom deliveryTimeWindow, List<SmsDestinationCustom> destinations,
         Boolean flash, String from, Boolean intermediateReport, SmsLanguageCustom language, String notifyContentType,
         String notifyUrl, SmsRegionalOptionsCustom regionalOptionsCustom, OffsetDateTimeCustom sendAtCustom,
         String text, String transliteration, Long validityPeriod, String entityId, String applicationId) {
 
         public SmsTextualMessageCustom(
-            String callback, SmsDeliveryTimeWindowCustom deliveryTimeWindowCustom,
+            String callbackData, SmsDeliveryTimeWindowCustom deliveryTimeWindow,
             List<SmsDestinationCustom> destinations, Boolean flash, String from, Boolean intermediateReport,
             SmsLanguageCustom language, String notifyContentType, String notifyUrl,
             SmsRegionalOptionsCustom regionalOptionsCustom, OffsetDateTimeCustom sendAtCustom, String text,
             String transliteration, Long validityPeriod, String entityId, String applicationId) {
 
-            this.callback = callback;
-            this.deliveryTimeWindowCustom = deliveryTimeWindowCustom;
+            this.callbackData = callbackData;
+            this.deliveryTimeWindow = deliveryTimeWindow;
             this.destinations = Collections.unmodifiableList(destinations);
             this.flash = flash;
             this.from = from;

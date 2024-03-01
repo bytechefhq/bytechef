@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATENEWTEXTFILE;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_TEXT_FILE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
@@ -41,7 +41,7 @@ import java.io.InputStream;
  */
 public final class DropboxCreateNewTextFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATENEWTEXTFILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEXT_FILE)
         .title("Create new text file")
         .description("Create a new text file.")
         .properties(
@@ -54,16 +54,12 @@ public final class DropboxCreateNewTextFileAction {
             object()
                 .properties(
                     string("url")
-                        .label("URL")
                         .required(true),
                     string("resultPath")
-                        .label("Result path")
                         .required(true),
                     string("fileId")
-                        .label("File ID")
                         .required(true),
                     integer("paperRevision")
-                        .label("Paper revision")
                         .required(true)))
         .perform(DropboxCreateNewTextFileAction::perform);
 

@@ -124,251 +124,283 @@ public class InfobipSendSMSAction {
                 .description(
                     "An array of message objects of a single message or multiple messages sent under one bulk ID.")
                 .items(
-                    string(CALLBACK_DATA)
-                        .label("Callback data")
-                        .description(
-                            "Additional data that can be used for identifying, managing, or monitoring a message. " +
-                                "Data included here will also be automatically included in the message Delivery " +
-                                "Report.")
-                        .maxLength(4000)
-                        .required(false),
-                    object(DELIVERY_TIME_WINDOW)
-                        .label("Delivery time window")
-                        .description(
-                            "Sets specific SMS delivery window outside of which messages won't be delivered. Often, " +
-                                "used when there are restrictions on when messages can be sent.")
+                    object()
                         .properties(
-                            array(DAYS)
-                                .label("Days")
-                                .description("Days of the week which are included in the delivery time window.")
+                            string(CALLBACK_DATA)
+                                .label("Callback data")
+                                .description(
+                                    "Additional data that can be used for identifying, managing, or monitoring a message. "
+                                        +
+                                        "Data included here will also be automatically included in the message Delivery "
+                                        +
+                                        "Report.")
+                                .maxLength(4000)
+                                .required(false),
+                            object(DELIVERY_TIME_WINDOW)
+                                .label("Delivery time window")
+                                .description(
+                                    "Sets specific SMS delivery window outside of which messages won't be delivered. Often, "
+                                        +
+                                        "used when there are restrictions on when messages can be sent.")
+                                .properties(
+                                    array(DAYS)
+                                        .label("Days")
+                                        .description("Days of the week which are included in the delivery time window.")
+                                        .items(
+                                            string()
+                                                .options(
+                                                    option("Monday", "MONDAY"),
+                                                    option("Tuesday", "TUESDAY"),
+                                                    option("Wednesday", "WEDNESDAY"),
+                                                    option("Thursday", "THURSDAY"),
+                                                    option("Friday", "FRIDAY"),
+                                                    option("Saturday", "SATURDAY"),
+                                                    option("Sunday", "SUNDAY")))
+                                        .minItems(1)
+                                        .required(true),
+                                    object(FROM)
+                                        .label("From")
+                                        .description(
+                                            "The exact time of day to start sending messages. Time is expressed in the UTC "
+                                                +
+                                                "time zone. If set, use it together with the to property with minimum 1 hour "
+                                                +
+                                                "difference.")
+                                        .properties(
+                                            integer(HOUR)
+                                                .label("Hour")
+                                                .description("Hour when the time window opens.")
+                                                .maxValue(23)
+                                                .required(true),
+                                            integer(MINUTE)
+                                                .label(MINUTE_LABEL)
+                                                .description("Minute when the time window opens.")
+                                                .maxValue(59)
+                                                .required(true))
+                                        .required(false),
+                                    object(TO)
+                                        .label("To")
+                                        .description(
+                                            "The exact time of day to end sending messages. Time is expressed in the UTC "
+                                                +
+                                                "time zone. If set, use it together with the from property with minimum 1 "
+                                                +
+                                                "hour difference.")
+                                        .properties(
+                                            integer(HOUR)
+                                                .label("Hour")
+                                                .description("Hour when the time window closes.")
+                                                .maxValue(23)
+                                                .required(true),
+                                            integer(MINUTE)
+                                                .label(MINUTE_LABEL)
+                                                .description("Minute when the time window closes.")
+                                                .maxValue(59)
+                                                .required(true))
+                                        .required(false))
+                                .required(false),
+                            array(DESTINATIONS)
+                                .label("Destinations")
+                                .description(
+                                    "An array of destination objects for where messages are being sent. A valid destination "
+                                        +
+                                        "is required.")
                                 .items(
-                                    string()
-                                        .options(
-                                            option("Monday", "MONDAY"),
-                                            option("Tuesday", "TUESDAY"),
-                                            option("Wednesday", "WEDNESDAY"),
-                                            option("Thursday", "THURSDAY"),
-                                            option("Friday", "FRIDAY"),
-                                            option("Saturday", "SATURDAY"),
-                                            option("Sunday", "SUNDAY")))
-                                .minItems(1)
+                                    object()
+                                        .properties(
+                                            string(MESSAGE_ID)
+                                                .label("Message id")
+                                                .description("The ID that uniquely identifies the message sent.")
+                                                .required(false),
+                                            string(TO)
+                                                .label("To")
+                                                .description(
+                                                    "Message destination address. Addresses must be in international format")
+                                                .exampleValue("41793026727")
+                                                .maxLength(50)
+                                                .required(true)))
                                 .required(true),
-                            object(FROM)
+                            bool(FLASH)
+                                .label("Flash")
+                                .description(
+                                    "Allows for sending a flash SMS to automatically appear on recipient devices without "
+                                        +
+                                        "interaction. Set to true to enable flash SMS, or leave the default value, false to "
+                                        +
+                                        "send a standard SMS.")
+                                .defaultValue(false)
+                                .required(false),
+                            string(FROM)
                                 .label("From")
                                 .description(
-                                    "The exact time of day to start sending messages. Time is expressed in the UTC " +
-                                        "time zone. If set, use it together with the to property with minimum 1 hour " +
-                                        "difference.")
-                                .properties(
-                                    integer(HOUR)
-                                        .label("Hour")
-                                        .description("Hour when the time window opens.")
-                                        .maxValue(23)
-                                        .required(true),
-                                    integer(MINUTE)
-                                        .label(MINUTE_LABEL)
-                                        .description("Minute when the time window opens.")
-                                        .maxValue(59)
-                                        .required(true))
+                                    "The sender ID which can be alphanumeric or numeric (e.g., CompanyName). Make sure you "
+                                        +
+                                        "don't exceed character limit.")
                                 .required(false),
-                            object(TO)
-                                .label("To")
+                            bool(INTERMEDIATE_REPORT)
+                                .label("Intermediate report")
                                 .description(
-                                    "The exact time of day to end sending messages. Time is expressed in the UTC " +
-                                        "time zone. If set, use it together with the from property with minimum 1 " +
-                                        "hour difference.")
-                                .properties(
-                                    integer(HOUR)
-                                        .label("Hour")
-                                        .description("Hour when the time window closes.")
-                                        .maxValue(23)
-                                        .required(true),
-                                    integer(MINUTE)
-                                        .label(MINUTE_LABEL)
-                                        .description("Minute when the time window closes.")
-                                        .maxValue(59)
-                                        .required(true))
-                                .required(false))
-                        .required(false),
-                    array(DESTINATIONS)
-                        .label("Destinations")
-                        .description(
-                            "An array of destination objects for where messages are being sent. A valid destination " +
-                                "is required.")
-                        .items(
-                            string(MESSAGE_ID)
-                                .label("Message id")
-                                .description("The ID that uniquely identifies the message sent.")
+                                    "The real-time intermediate delivery report containing GSM error codes, messages status, "
+                                        +
+                                        "pricing, network and country codes, etc., which will be sent on your callback server.")
+                                .defaultValue(false)
                                 .required(false),
-                            string(TO)
-                                .label("To")
-                                .description("Message destination address. Addresses must be in international format")
-                                .exampleValue("41793026727")
-                                .maxLength(50)
-                                .required(true))
-                        .required(true),
-                    bool(FLASH)
-                        .label("Flash")
-                        .description(
-                            "Allows for sending a flash SMS to automatically appear on recipient devices without " +
-                                "interaction. Set to true to enable flash SMS, or leave the default value, false to " +
-                                "send a standard SMS.")
-                        .defaultValue(false)
-                        .required(false),
-                    string(FROM)
-                        .label("From")
-                        .description(
-                            "The sender ID which can be alphanumeric or numeric (e.g., CompanyName). Make sure you " +
-                                "don't exceed character limit.")
-                        .required(false),
-                    bool(INTERMEDIATE_REPORT)
-                        .label("Intermediate report")
-                        .description(
-                            "The real-time intermediate delivery report containing GSM error codes, messages status, " +
-                                "pricing, network and country codes, etc., which will be sent on your callback server.")
-                        .defaultValue(false)
-                        .required(false),
-                    object(LANGUAGE)
-                        .label("Language")
-                        .properties(
-                            string(LANGUAGE_CODE)
-                                .label("Language code")
-                                .description("Language code for the correct character set.")
-                                .options(
-                                    option("Turkish", "TR"),
-                                    option("Spanish", "ES"),
-                                    option("Portuguese", "PT"),
-                                    option("Autodetect", "AUTODETECT",
-                                        "Platform select the character set based on message content."))
-                                .required(false))
-                        .required(false),
-                    string(NOTIFY_CONTENT_TYPE)
-                        .label("Notify content type")
-                        .description("Preferred delivery report content type.")
-                        .options(
-                            option("application/json", "application/json"),
-                            option("application/xml", "application/xml"))
-                        .required(false),
-                    string(NOTIFY_URL)
-                        .label("Notify url")
-                        .description(
-                            "The URL on your call back server on to which a delivery report will be sent. The retry " +
-                                "cycle for when your URL becomes unavailable uses the following formula: " +
-                                "1min + (1min * retryNumber * retryNumber).")
-                        .required(false),
-                    object(REGIONAL)
-                        .label("Regional")
-                        .description("Region-specific parameters, often imposed by local laws. Use this, if country " +
-                            "or region that you are sending an SMS to requires additional information.")
-                        .properties(
-                            object(INDIA_DLT)
-                                .label("India DLT")
-                                .description(
-                                    "Distributed Ledger Technology (DLT) specific parameters required for sending " +
-                                        "SMS to phone numbers registered in India.")
+                            object(LANGUAGE)
+                                .label("Language")
                                 .properties(
-                                    string(CONTENT_TEMPLATE_ID)
-                                        .label("Content template ID")
-                                        .description(
-                                            "Registered DLT content template ID which matches message you are sending.")
-                                        .required(false),
-                                    string(PRINCIPAL_ENTITY_ID)
-                                        .label("Principal entity ID")
-                                        .description("Your assigned DLT principal entity ID.")
-                                        .required(true)),
-                            object(TURKEY_IYS)
-                                .label("Turkey IYS")
-                                .description(
-                                    "IYS regulations specific parameters required for sending promotional SMS to " +
-                                        "phone numbers registered in Turkey.")
-                                .properties(
-                                    integer(BRAND_CODE)
-                                        .label("Brand code")
-                                        .description(
-                                            "Brand code is an ID of the company based on a company VAT number. If " +
-                                                "not provided in request, default value is used from your Infobip " +
-                                                "account.")
-                                        .required(false),
-                                    string(RECIPIENT_TYPE)
-                                        .label("Recipient type")
-                                        .description("Recipient Type")
+                                    string(LANGUAGE_CODE)
+                                        .label("Language code")
+                                        .description("Language code for the correct character set.")
                                         .options(
-                                            option("Tacir", "TACIR"),
-                                            option("Bireysel", "BIREYSEL"))
-                                        .required(true))
-                                .required(false),
-                            object(SOUTH_KOREA)
-                                .label("South Korea")
-                                .description(
-                                    "Use case dependent parameters for sending SMS to phone numbers registered in " +
-                                        "South Korea.")
-                                .properties(
-                                    integer(RESELLER_CODE)
-                                        .label("Reseller code")
-                                        .description(
-                                            "Reseller identification code: 9-digit registration number in the " +
-                                                "business registration certificate for South Korea. Resellers should " +
-                                                "submit this when sending.")
+                                            option("Turkish", "TR"),
+                                            option("Spanish", "ES"),
+                                            option("Portuguese", "PT"),
+                                            option("Autodetect", "AUTODETECT",
+                                                "Platform select the character set based on message content."))
                                         .required(false))
-                                .required(false))
-                        .required(false),
-                    object(SEND_AT)
-                        .label("Send at")
-                        .description(
-                            "Date and time when the message is to be sent. Used for scheduled SMS. It can only be " +
-                                "scheduled for no later than 180 days in advance.")
-                        .properties(
-                            dateTime(DATE_TIME)
-                                .label("Date time")
                                 .required(false),
-                            string(ZONE_ID)
-                                .label("Zone id")
-                                .required(false))
-                        .required(false),
-                    string(TEXT)
-                        .label("Text")
-                        .description("Content of the message being sent.")
-                        .required(false),
-                    string(TRANSLITERATION)
-                        .label("Transliteration")
-                        .description(
-                            "The transliteration of your sent message from one script to another. Transliteration is " +
-                                "used to replace characters which are not recognized as part of your defaulted " +
-                                "alphabet.")
-                        .options(
-                            option("Turkish", "TURKISH"),
-                            option("Greek", "GREEK"),
-                            option("Cyrillic", "CYRILLIC"),
-                            option("Serbian cyrillic", "SERBIAN_CYRILLIC"),
-                            option("Bulgarian cyrillic", "BULGARIAN_CYRILLIC"),
-                            option("Central european", "CENTRAL_EUROPEAN"),
-                            option("Baltic", "BALTIC"),
-                            option("Portuguese", "PORTUGUESE"),
-                            option("Colombian", "COLOMBIAN"),
-                            option("Non unicode", "NON_UNICODE"))
-                        .required(false),
-                    number(VALIDITY_PERIOD)
-                        .label("Validity period")
-                        .description(
-                            "The message validity period in minutes. When the period expires, it will not be allowed " +
-                                "for the message to be sent. Validity period longer than 48h is not supported. Any " +
-                                "bigger value will automatically default back to 2880.")
-                        .defaultValue(2880)
-                        .required(false),
-                    string(ENTITY_ID)
-                        .label("Entity id")
-                        .description(
-                            "Required for entity use in a send request for outbound traffic. Returned in " +
-                                "notification events.")
-                        .maxLength(50)
-                        .required(false),
-                    string(APPLICATION_ID)
-                        .label("Application ID")
-                        .description(
-                            "Required for application use in a send request for outbound traffic. Returned in " +
-                                "notification events.")
-                        .maxLength(50)
-                        .required(false))
+                            string(NOTIFY_CONTENT_TYPE)
+                                .label("Notify content type")
+                                .description("Preferred delivery report content type.")
+                                .options(
+                                    option("application/json", "application/json"),
+                                    option("application/xml", "application/xml"))
+                                .required(false),
+                            string(NOTIFY_URL)
+                                .label("Notify url")
+                                .description(
+                                    "The URL on your call back server on to which a delivery report will be sent. The retry "
+                                        +
+                                        "cycle for when your URL becomes unavailable uses the following formula: " +
+                                        "1min + (1min * retryNumber * retryNumber).")
+                                .required(false),
+                            object(REGIONAL)
+                                .label("Regional")
+                                .description(
+                                    "Region-specific parameters, often imposed by local laws. Use this, if country " +
+                                        "or region that you are sending an SMS to requires additional information.")
+                                .properties(
+                                    object(INDIA_DLT)
+                                        .label("India DLT")
+                                        .description(
+                                            "Distributed Ledger Technology (DLT) specific parameters required for sending "
+                                                +
+                                                "SMS to phone numbers registered in India.")
+                                        .properties(
+                                            string(CONTENT_TEMPLATE_ID)
+                                                .label("Content template ID")
+                                                .description(
+                                                    "Registered DLT content template ID which matches message you are sending.")
+                                                .required(false),
+                                            string(PRINCIPAL_ENTITY_ID)
+                                                .label("Principal entity ID")
+                                                .description("Your assigned DLT principal entity ID.")
+                                                .required(true)),
+                                    object(TURKEY_IYS)
+                                        .label("Turkey IYS")
+                                        .description(
+                                            "IYS regulations specific parameters required for sending promotional SMS to "
+                                                +
+                                                "phone numbers registered in Turkey.")
+                                        .properties(
+                                            integer(BRAND_CODE)
+                                                .label("Brand code")
+                                                .description(
+                                                    "Brand code is an ID of the company based on a company VAT number. If "
+                                                        +
+                                                        "not provided in request, default value is used from your Infobip "
+                                                        +
+                                                        "account.")
+                                                .required(false),
+                                            string(RECIPIENT_TYPE)
+                                                .label("Recipient type")
+                                                .description("Recipient Type")
+                                                .options(
+                                                    option("Tacir", "TACIR"),
+                                                    option("Bireysel", "BIREYSEL"))
+                                                .required(true))
+                                        .required(false),
+                                    object(SOUTH_KOREA)
+                                        .label("South Korea")
+                                        .description(
+                                            "Use case dependent parameters for sending SMS to phone numbers registered in "
+                                                +
+                                                "South Korea.")
+                                        .properties(
+                                            integer(RESELLER_CODE)
+                                                .label("Reseller code")
+                                                .description(
+                                                    "Reseller identification code: 9-digit registration number in the "
+                                                        +
+                                                        "business registration certificate for South Korea. Resellers should "
+                                                        +
+                                                        "submit this when sending.")
+                                                .required(false))
+                                        .required(false))
+                                .required(false),
+                            object(SEND_AT)
+                                .label("Send at")
+                                .description(
+                                    "Date and time when the message is to be sent. Used for scheduled SMS. It can only be "
+                                        +
+                                        "scheduled for no later than 180 days in advance.")
+                                .properties(
+                                    dateTime(DATE_TIME)
+                                        .label("Date time")
+                                        .required(false),
+                                    string(ZONE_ID)
+                                        .label("Zone id")
+                                        .required(false))
+                                .required(false),
+                            string(TEXT)
+                                .label("Text")
+                                .description("Content of the message being sent.")
+                                .required(false),
+                            string(TRANSLITERATION)
+                                .label("Transliteration")
+                                .description(
+                                    "The transliteration of your sent message from one script to another. Transliteration is "
+                                        +
+                                        "used to replace characters which are not recognized as part of your defaulted "
+                                        +
+                                        "alphabet.")
+                                .options(
+                                    option("Turkish", "TURKISH"),
+                                    option("Greek", "GREEK"),
+                                    option("Cyrillic", "CYRILLIC"),
+                                    option("Serbian cyrillic", "SERBIAN_CYRILLIC"),
+                                    option("Bulgarian cyrillic", "BULGARIAN_CYRILLIC"),
+                                    option("Central european", "CENTRAL_EUROPEAN"),
+                                    option("Baltic", "BALTIC"),
+                                    option("Portuguese", "PORTUGUESE"),
+                                    option("Colombian", "COLOMBIAN"),
+                                    option("Non unicode", "NON_UNICODE"))
+                                .required(false),
+                            number(VALIDITY_PERIOD)
+                                .label("Validity period")
+                                .description(
+                                    "The message validity period in minutes. When the period expires, it will not be allowed "
+                                        +
+                                        "for the message to be sent. Validity period longer than 48h is not supported. Any "
+                                        +
+                                        "bigger value will automatically default back to 2880.")
+                                .defaultValue(2880)
+                                .required(false),
+                            string(ENTITY_ID)
+                                .label("Entity id")
+                                .description(
+                                    "Required for entity use in a send request for outbound traffic. Returned in " +
+                                        "notification events.")
+                                .maxLength(50)
+                                .required(false),
+                            string(APPLICATION_ID)
+                                .label("Application ID")
+                                .description(
+                                    "Required for application use in a send request for outbound traffic. Returned in "
+                                        +
+                                        "notification events.")
+                                .maxLength(50)
+                                .required(false)))
                 .required(true),
             object(SENDING_SPEED_LIMIT)
                 .label("Sending speed limit")
@@ -488,7 +520,8 @@ public class InfobipSendSMSAction {
     public static SmsResponse perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws ApiException {
 
-        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(connectionParameters.getRequiredString(VALUE)))
+        ApiClient apiClient = ApiClient
+            .forApiKey(ApiKey.from(connectionParameters.getRequiredString(VALUE)))
             .build();
 
         SmsApi smsApi = new SmsApi(apiClient);
@@ -511,6 +544,5 @@ public class InfobipSendSMSAction {
         return smsApi
             .sendSmsMessage(smsAdvancedTextualRequest)
             .execute();
-
     }
 }

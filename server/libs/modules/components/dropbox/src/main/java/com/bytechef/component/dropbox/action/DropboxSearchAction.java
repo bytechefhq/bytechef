@@ -60,19 +60,17 @@ public final class DropboxSearchAction {
                                 .properties(
                                     array("highlightSpans")
                                         .items(
-                                            string("highlightStr")
-                                                .label("Highlight string")
-                                                .required(true),
-                                            bool("isHighlighted")
-                                                .label("Is highlighted")
-                                                .required(true))
+                                            object()
+                                                .properties(
+                                                    string("highlightStr")
+                                                        .required(true),
+                                                    bool("isHighlighted")
+                                                        .required(true)))
                                         .label("Highlight spans")))
                         .label("Matches"),
                     bool("hasMore")
-                        .label("Has more")
                         .required(true),
                     string("cursor")
-                        .label("Cursor")
                         .required(true)))
         .perform(DropboxSearchAction::perform);
 

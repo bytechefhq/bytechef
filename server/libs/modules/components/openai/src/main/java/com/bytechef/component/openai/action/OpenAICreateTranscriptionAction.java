@@ -171,8 +171,7 @@ public class OpenAICreateTranscriptionAction {
                                 number("end"),
                                 string("text"),
                                 array("tokens")
-                                    .items(
-                                        integer("token")),
+                                    .items(integer()),
                                 number("temperature"),
                                 number("averageLogProb"),
                                 number("compressionRatio"),

@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.GETFILELINK;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.GET_FILE_LINK;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
@@ -40,7 +40,7 @@ import com.dropbox.core.v2.files.GetTemporaryLinkResult;
  */
 public final class DropboxGetFileLinkAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GETFILELINK)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_FILE_LINK)
         .title("Get file link")
         .description(
             "Get a temporary link to stream content of a file. This link will expire in four hours and afterwards " +
@@ -95,10 +95,7 @@ public final class DropboxGetFileLinkAction {
                                         .label("Export as")
                                         .required(true),
                                     array("exportOptions")
-                                        .items(
-                                            string("option")
-                                                .label("Option")
-                                                .required(true))
+                                        .items(string())
                                         .label("Export options"))
                                 .label("Export info"),
                             array("propertyGroups")

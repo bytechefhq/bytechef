@@ -22,6 +22,7 @@ import static com.bytechef.component.xml.file.constant.XmlFileConstants.SOURCE;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
@@ -107,11 +108,11 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(fileEntry.getName())
             .isEqualTo("file.xml");
 
-        Assertions.assertThat(fileStorageService.readFileToString(FileEntryConstants.FILES_DIR, fileEntry))
+        Assertions
+            .assertThat(XmlUtils.read(fileStorageService.readFileToString(FileEntryConstants.FILES_DIR, fileEntry)))
             .isEqualTo(
-                """
-                    <root><Flower><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name><id>45</id><petals>9</petals></Flower></root>
-                    """);
+                XmlUtils.read(
+                    "<root><Flower><id>45</id><petals>9</petals><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name></Flower></root>"));
     }
 
     private File getFile(String filename) {
