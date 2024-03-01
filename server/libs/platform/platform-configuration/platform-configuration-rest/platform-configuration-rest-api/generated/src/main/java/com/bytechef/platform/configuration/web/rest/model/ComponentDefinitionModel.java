@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -37,6 +37,8 @@ public class ComponentDefinitionModel {
   private String category;
 
   private ConnectionDefinitionBasicModel connection;
+
+  private Boolean connectionRequired;
 
   private String description;
 
@@ -63,7 +65,8 @@ public class ComponentDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentDefinitionModel(String name, Integer version) {
+  public ComponentDefinitionModel(Boolean connectionRequired, String name, Integer version) {
+    this.connectionRequired = connectionRequired;
     this.name = name;
     this.version = version;
   }
@@ -134,6 +137,26 @@ public class ComponentDefinitionModel {
 
   public void setConnection(ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
+  }
+
+  public ComponentDefinitionModel connectionRequired(Boolean connectionRequired) {
+    this.connectionRequired = connectionRequired;
+    return this;
+  }
+
+  /**
+   * If connection is required or not if it is defined.
+   * @return connectionRequired
+  */
+  @NotNull 
+  @Schema(name = "connectionRequired", description = "If connection is required or not if it is defined.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("connectionRequired")
+  public Boolean getConnectionRequired() {
+    return connectionRequired;
+  }
+
+  public void setConnectionRequired(Boolean connectionRequired) {
+    this.connectionRequired = connectionRequired;
   }
 
   public ComponentDefinitionModel description(String description) {
@@ -324,6 +347,7 @@ public class ComponentDefinitionModel {
     return Objects.equals(this.actions, componentDefinition.actions) &&
         Objects.equals(this.category, componentDefinition.category) &&
         Objects.equals(this.connection, componentDefinition.connection) &&
+        Objects.equals(this.connectionRequired, componentDefinition.connectionRequired) &&
         Objects.equals(this.description, componentDefinition.description) &&
         Objects.equals(this.icon, componentDefinition.icon) &&
         Objects.equals(this.name, componentDefinition.name) &&
@@ -336,7 +360,7 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, category, connection, description, icon, name, resources, tags, title, triggers, version);
+    return Objects.hash(actions, category, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, version);
   }
 
   @Override
@@ -346,6 +370,7 @@ public class ComponentDefinitionModel {
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
+    sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

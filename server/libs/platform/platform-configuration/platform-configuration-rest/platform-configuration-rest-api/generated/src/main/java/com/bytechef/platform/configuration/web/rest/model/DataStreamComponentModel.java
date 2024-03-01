@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DataStreamComponent", description = "The source/destination data stream component.")
 @JsonTypeName("DataStreamComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:06.696196+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
 public class DataStreamComponentModel {
 
   private String componentName;
