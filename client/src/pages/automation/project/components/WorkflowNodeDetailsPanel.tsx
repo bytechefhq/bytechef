@@ -187,7 +187,7 @@ const WorkflowNodeDetailsPanel = ({
         !!currentComponent?.actions && !!getActionName()
     );
 
-    const {componentNames, nodeNames} = workflow;
+    const {nodeNames} = workflow;
 
     const currentActionProperties = currentActionDefinition?.properties;
 
