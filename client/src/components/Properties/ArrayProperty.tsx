@@ -16,10 +16,10 @@ interface ArrayPropertyProps {
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
-type ArrayPropertyType = Array<PropertyModel & {controlType?: ControlTypeModel; defaultValue?: string}>;
+type ArrayPropertyType = PropertyModel & {controlType?: ControlTypeModel; defaultValue?: string};
 
 const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflowMutation}: ArrayPropertyProps) => {
-    const [arrayItems, setArrayItems] = useState<ArrayPropertyType>(property.items || []);
+    const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType>>([]);
 
     const {items, multipleValues, name} = property;
 
@@ -37,20 +37,20 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
     }, []);
 
     const handleAddItemClick = () => {
-        if (!arrayItems.length) {
+        if (!property.items?.length) {
             return;
         }
 
         const newItem: PropertyType = {
-            controlType: arrayItems[0].controlType,
+            controlType: (property.items[0] as ArrayPropertyType).controlType,
             name: `${name}_${arrayItems.length}`,
-            type: arrayItems[0].type,
+            type: property.items[0].type,
         };
 
         setArrayItems([...arrayItems, newItem]);
     };
 
-    // set arrayItems[0].name if it's not set
+    // set property.items?.[0].name if it's not set
     useEffect(() => {
         if (!arrayItems?.length) {
             return;
@@ -77,18 +77,18 @@ const ArrayProperty = ({currentComponentData, dataPills, property, updateWorkflo
             return;
         }
 
-        const parameterArrayItems = Object.keys(currentComponentData.parameters).reduce(
-            (parameters: ArrayPropertyType, key: string) => {
+        const parameterArrayItems: Array<ArrayPropertyType> = Object.keys(currentComponentData.parameters).reduce(
+            (parameters: Array<ArrayPropertyType>, key: string) => {
                 if (arrayItems?.length && key.startsWith(`${name}_`)) {
                     const strippedValue: string = currentComponentData.parameters?.[key]
                         .replace(/<p>/g, '')
                         .replace(/<\/p>/g, '');
 
                     parameters.push({
-                        ...arrayItems[0],
+                        ...property.items?.[0],
                         defaultValue: strippedValue,
                         name: key,
-                        type: arrayItems[0].type,
+                        type: property.items?.[0].type,
                     });
                 }
 
