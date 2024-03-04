@@ -50,6 +50,7 @@ interface PropertyMentionsInputProps {
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
+    objectName?: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     placeholder?: string;
@@ -74,6 +75,7 @@ const PropertyMentionsInput = forwardRef(
             label,
             leadingIcon,
             name,
+            objectName,
             onChange,
             onKeyPress,
             placeholder = "Show data pills using '{'",
@@ -187,6 +189,8 @@ const PropertyMentionsInput = forwardRef(
 
             const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
 
+            const strippedValue = value.length ? value?.replace(/<p>|<\/p>/g, '') : '';
+
             if (arrayName && parameters) {
                 const combinedArray = Object.entries(parameters)
                     .filter(([key]) => key.startsWith(`${arrayName}_`))
@@ -215,23 +219,38 @@ const PropertyMentionsInput = forwardRef(
                 );
 
                 return;
-            }
-
-            const strippedValue = value.length ? value?.replace(/<p>|<\/p>/g, '') : '';
-
-            saveWorkflowDefinition(
-                {
-                    actionName,
-                    componentName,
-                    name: workflowNodeName,
-                    parameters: {
-                        ...parameters,
-                        [name as string]: strippedValue,
+            } else if (objectName) {
+                saveWorkflowDefinition(
+                    {
+                        actionName,
+                        componentName,
+                        name: workflowNodeName,
+                        parameters: {
+                            ...parameters,
+                            [objectName]: {
+                                ...parameters?.[objectName],
+                                [name as string]: strippedValue,
+                            },
+                        },
                     },
-                },
-                workflow,
-                updateWorkflowMutation
-            );
+                    workflow,
+                    updateWorkflowMutation
+                );
+            } else {
+                saveWorkflowDefinition(
+                    {
+                        actionName,
+                        componentName,
+                        name: workflowNodeName,
+                        parameters: {
+                            ...parameters,
+                            [name as string]: strippedValue,
+                        },
+                    },
+                    workflow,
+                    updateWorkflowMutation
+                );
+            }
         };
 
         const handleOnChange = (value: string) => {
