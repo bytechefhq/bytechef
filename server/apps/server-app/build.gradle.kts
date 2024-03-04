@@ -73,6 +73,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
     implementation(project(":server:libs:platform:platform-swagger"))
 
+    implementation(project(":server:libs:modules:components:accelo"))
     implementation(project(":server:libs:modules:components:affinity"))
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
