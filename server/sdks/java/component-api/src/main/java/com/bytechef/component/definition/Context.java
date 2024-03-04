@@ -24,9 +24,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -405,6 +407,27 @@ public interface Context {
              */
             public static Body of(Map<String, ?> content) {
                 Objects.requireNonNull(content);
+
+                return new Body(content, BodyContentType.JSON);
+            }
+
+            /**
+             *
+             * @param keyValueArray
+             * @return
+             */
+            public static Body of(Object... keyValueArray) {
+                Objects.requireNonNull(keyValueArray);
+                if (keyValueArray.length % 2 != 0) {
+                    throw new IllegalArgumentException();
+                }
+
+                HashMap<String, ?> content = IntStream.range(0, keyValueArray.length / 2)
+                    .filter(i -> keyValueArray[i * 2] != null && keyValueArray[i * 2 + 1] != null)
+                    .collect(
+                        HashMap::new,
+                        (map, i) -> map.put(String.valueOf(keyValueArray[i * 2]), keyValueArray[i * 2 + 1]),
+                        HashMap::putAll);
 
                 return new Body(content, BodyContentType.JSON);
             }
