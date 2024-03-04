@@ -398,6 +398,14 @@ const WorkflowNodeDetailsPanel = ({
         }
     }, [currentNode.name, nodeNames, setWorkflowNodeDetailsPanelOpen]);
 
+    // If the current component requires a connection, set the active tab to 'connection'
+    useEffect(() => {
+        if (currentComponent?.connectionRequired) {
+            setActiveTab('connection');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentComponent?.name]);
+
     return (
         <Dialog.Root modal={false} open={workflowNodeDetailsPanelOpen}>
             <Dialog.Portal>
