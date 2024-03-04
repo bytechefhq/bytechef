@@ -51,7 +51,7 @@ const ObjectProperty = ({
             {
                 controlType: 'TEXT',
                 defaultValue: '',
-                name: `${name}.${newPropertyName}`,
+                name: newPropertyName,
                 type: newPropertyType || additionalProperties?.[0].type || 'STRING',
             },
         ]);
@@ -59,6 +59,7 @@ const ObjectProperty = ({
         setNewPropertyName('');
     };
 
+    // on initial render, set subProperties if there are matching parameters
     useEffect(() => {
         if (!name || !currentComponentData?.parameters) {
             return;
@@ -84,7 +85,8 @@ const ObjectProperty = ({
         if (newSubProperties.length) {
             setSubProperties(newSubProperties);
         }
-    }, [additionalProperties, currentComponentData?.parameters, name, newPropertyType]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     if (!subProperties?.length && !additionalProperties?.length) {
         return <></>;
@@ -114,6 +116,7 @@ const ObjectProperty = ({
                             dataPills={dataPills}
                             key={`${property.name}_${subProperty.name}_${index}`}
                             mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
+                            objectName={name}
                             property={{
                                 ...subProperty,
                                 name: subProperty.name,

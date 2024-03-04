@@ -53,6 +53,7 @@ interface PropertyProps {
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
     mention?: boolean;
+    objectName?: string;
     path?: string;
     property: PropertyType;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -68,6 +69,7 @@ const Property = ({
     customClassName,
     dataPills,
     formState,
+    objectName,
     path = 'parameters',
     property,
     register,
@@ -174,16 +176,32 @@ const Property = ({
         if (currentComponentData) {
             const {parameters} = currentComponentData;
 
-            setComponentData([
-                ...otherComponentData,
-                {
-                    ...currentComponentData,
-                    parameters: {
-                        ...parameters,
-                        [event.target.name]: event.target.value,
+            if (objectName) {
+                setComponentData([
+                    ...otherComponentData,
+                    {
+                        ...currentComponentData,
+                        parameters: {
+                            ...parameters,
+                            [objectName]: {
+                                ...parameters?.[objectName],
+                                [event.target.name]: event.target.value,
+                            },
+                        },
                     },
-                },
-            ]);
+                ]);
+            } else {
+                setComponentData([
+                    ...otherComponentData,
+                    {
+                        ...currentComponentData,
+                        parameters: {
+                            ...parameters,
+                            [event.target.name]: event.target.value,
+                        },
+                    },
+                ]);
+            }
         }
     }, 200);
 
@@ -426,6 +444,7 @@ const Property = ({
                         label={label || (arrayName ? undefined : name)}
                         leadingIcon={typeIcon}
                         name={name || `${arrayName}_0`}
+                        objectName={objectName}
                         onChange={handlePropertyChange}
                         onKeyPress={(event: KeyboardEvent) => {
                             if (isNumericalInput) {
