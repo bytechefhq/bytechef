@@ -178,9 +178,11 @@ const ObjectProperty = ({
                                 <div className="flex w-full flex-col">
                                     <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
 
-                                    <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
-                                        {additionalProperties[0]?.type}
-                                    </span>
+                                    {additionalProperties[0]?.type && (
+                                        <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
+                                            {additionalProperties[0].type}
+                                        </span>
+                                    )}
                                 </div>
                             )}
                         </main>
