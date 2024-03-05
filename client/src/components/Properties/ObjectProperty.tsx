@@ -71,20 +71,27 @@ const ObjectProperty = ({
             return;
         }
 
-        const newSubProperties = matchingParameters.map((matchingParameter) => {
+        const preexistingProperties = matchingParameters.map((matchingParameter) => {
             const value: string = currentComponentData.parameters![matchingParameter];
 
             return {
+                ...currentComponentData.parameters![matchingParameter],
                 controlType: 'TEXT',
                 defaultValue: value,
                 name: matchingParameter,
-                type: newPropertyType || additionalProperties?.[0].type || ('STRING' as PropertyTypeModel),
+                type: newPropertyType || additionalProperties?.[0]?.type || ('STRING' as PropertyTypeModel),
             };
         });
 
-        if (newSubProperties.length) {
-            setSubProperties(newSubProperties);
-        }
+        setSubProperties((subProperties) => {
+            const newSubProperties = subProperties.filter(
+                (subProperty) =>
+                    !preexistingProperties.some((preexistingProperty) => preexistingProperty.name === subProperty.name)
+            );
+
+            return [...newSubProperties, ...preexistingProperties];
+        });
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -178,7 +185,7 @@ const ObjectProperty = ({
                                 <div className="flex w-full flex-col">
                                     <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
 
-                                    {additionalProperties[0]?.type && (
+                                    {additionalProperties[0] && (
                                         <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
                                             {additionalProperties[0].type}
                                         </span>
