@@ -151,6 +151,10 @@ const Property = ({
         taskParameterValue = defaultValue;
     }
 
+    if (objectName && name) {
+        taskParameterValue = currentComponentData?.parameters?.[objectName]?.[name];
+    }
+
     const otherComponentData = componentData.filter((component) => {
         if (component.componentName !== currentComponent?.name) {
             return true;
@@ -447,7 +451,7 @@ const Property = ({
                         objectName={objectName}
                         onChange={handlePropertyChange}
                         onKeyPress={(event: KeyboardEvent) => {
-                            if (isNumericalInput) {
+                            if (isNumericalInput || type === 'BOOLEAN') {
                                 event.key !== '{' && event.preventDefault();
                             }
                         }}
