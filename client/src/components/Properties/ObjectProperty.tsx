@@ -8,6 +8,7 @@ import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} fro
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
+import {XIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -18,6 +19,7 @@ interface ObjectPropertyProps {
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
+    handleDeleteProperty?: (arg1: string, arg2: string) => void;
     property: PropertyType;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
@@ -34,6 +36,7 @@ const ObjectProperty = ({
     currentComponent,
     currentComponentData,
     dataPills,
+    handleDeleteProperty,
     property,
     updateWorkflowMutation,
 }: ObjectPropertyProps) => {
@@ -57,6 +60,20 @@ const ObjectProperty = ({
         ]);
 
         setNewPropertyName('');
+    };
+
+    const handleDeletePropertyClick = (subPropertyName: string, propertyName: string) => {
+        if (!subPropertyName || !propertyName) {
+            return;
+        }
+
+        if (handleDeleteProperty) {
+            handleDeleteProperty(subPropertyName, propertyName);
+        }
+
+        setSubProperties((subProperties) =>
+            subProperties.filter((subProperty) => subProperty.name !== subPropertyName)
+        );
     };
 
     // on initial render, set subProperties if there are matching parameters
@@ -115,21 +132,32 @@ const ObjectProperty = ({
                     }
 
                     return (
-                        <Property
-                            actionName={actionName}
-                            currentComponent={currentComponent}
-                            currentComponentData={currentComponentData}
-                            customClassName={twMerge('last-of-type:pb-0', label && 'mb-0 pl-2')}
-                            dataPills={dataPills}
-                            key={`${property.name}_${subProperty.name}_${index}`}
-                            mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
-                            objectName={name}
-                            property={{
-                                ...subProperty,
-                                name: subProperty.name,
-                            }}
-                            updateWorkflowMutation={updateWorkflowMutation}
-                        />
+                        <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
+                            <Property
+                                actionName={actionName}
+                                currentComponent={currentComponent}
+                                currentComponentData={currentComponentData}
+                                customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
+                                dataPills={dataPills}
+                                mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
+                                objectName={name}
+                                property={{
+                                    ...subProperty,
+                                    name: subProperty.name,
+                                }}
+                                updateWorkflowMutation={updateWorkflowMutation}
+                            />
+
+                            <Button
+                                className="ml-1 self-end"
+                                onClick={() => handleDeletePropertyClick(subProperty.name!, name!)}
+                                size="icon"
+                                title="Delete property"
+                                variant="ghost"
+                            >
+                                <XIcon className="h-full w-auto cursor-pointer p-2 hover:text-red-500" />
+                            </Button>
+                        </div>
                     );
                 })}
             </ul>
