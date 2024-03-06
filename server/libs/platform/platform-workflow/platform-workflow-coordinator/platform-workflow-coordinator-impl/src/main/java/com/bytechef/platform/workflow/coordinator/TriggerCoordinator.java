@@ -214,8 +214,8 @@ public class TriggerCoordinator {
     private void dispatch(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(Type.valueOf(workflowExecutionId.getType()));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
+            Type.valueOf(workflowExecutionId.getType()));
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(

@@ -18,7 +18,7 @@ It is work in progress. Until the app is published, use ```bytechef.sh``` script
 
 ### Connector icon
 8. Find and download from internet the user interface icon in .svg format for your connector and put it in `server/libs/modules/components/yourconnector/src/main/resources/assets/yourconnector.svg`
-9. In `YourConnectorComponentHandler.class` override method `modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition)` with 
+9. In `YourConnectorComponentHandler.class` override method `modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition)` with
     ```
     return modifiableComponentDefinition
     .customAction(true)
