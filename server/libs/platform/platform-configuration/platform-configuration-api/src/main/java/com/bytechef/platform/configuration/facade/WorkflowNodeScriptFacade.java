@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.dto;
+package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.error.ExecutionError;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record ScriptTestExecutionDTO(ExecutionError error, Object output) {
+public interface WorkflowNodeScriptFacade {
+
+    ScriptTestExecutionDTO testWorkflowNodeScript(String workflowId, String workflowNodeName);
 }
