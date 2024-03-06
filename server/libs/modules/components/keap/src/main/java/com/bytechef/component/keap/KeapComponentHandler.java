@@ -17,23 +17,48 @@
 package com.bytechef.component.keap;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.keap.util.KeapUtils;
+import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.Objects;
 
 /**
- * This class will not be overwritten on the subsequent calls of generator.
- *
- * @generated
+ * @author Monika Domiter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class KeapComponentHandler extends AbstractKeapComponentHandler {
 
     @Override
-    public ComponentDSL.ModifiableComponentDefinition
-        modifyComponent(ComponentDSL.ModifiableComponentDefinition modifiableComponentDefinition) {
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/keap.svg");
+    }
+
+    @Override
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+
+        if ((Objects.equals(actionDefinition.getName(), "createContact"))) {
+            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
+                .get()) {
+                if (Objects.equals(baseProperty.getName(), "company")) {
+                    for (BaseProperty baseProperty1 : ((ModifiableObjectProperty) baseProperty).getProperties()
+                        .get()) {
+                        if (Objects.equals(baseProperty1.getName(), "id")) {
+                            ((ModifiableIntegerProperty) baseProperty1).options(KeapUtils.getCompanyIdOptions());
+                        }
+                    }
+                }
+            }
+        }
+
+        return modifiableProperty;
     }
 
 }
