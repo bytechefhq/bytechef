@@ -1,5 +1,9 @@
 /* eslint-disable sort-keys */
-import {GetWorkflowNodeOptionsRequest, type OptionModel, WorkflowNodeApi} from '@/middleware/platform/configuration';
+import {
+    GetWorkflowNodeOptionsRequest,
+    type OptionModel,
+    WorkflowNodeOptionApi,
+} from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeOptionKeys = {
@@ -13,6 +17,6 @@ export const WorkflowNodeOptionKeys = {
 export const useGetWorkflowNodeOptionsQuery = (request: GetWorkflowNodeOptionsRequest, enabled?: boolean) =>
     useQuery<Array<OptionModel>, Error>({
         queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(request),
-        queryFn: () => new WorkflowNodeApi().getWorkflowNodeOptions(request),
+        queryFn: () => new WorkflowNodeOptionApi().getWorkflowNodeOptions(request),
         enabled: enabled === undefined ? true : enabled,
     });
