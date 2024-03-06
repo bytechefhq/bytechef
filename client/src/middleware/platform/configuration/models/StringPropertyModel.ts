@@ -51,6 +51,12 @@ import {
  */
 export interface StringPropertyModel extends ValuePropertyModel {
     /**
+     * The language id used together with CODE_EDITOR control type.
+     * @type {string}
+     * @memberof StringPropertyModel
+     */
+    languageId?: string;
+    /**
      * The property default value.
      * @type {string}
      * @memberof StringPropertyModel
@@ -107,6 +113,7 @@ export function StringPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'languageId': !exists(json, 'languageId') ? undefined : json['languageId'],
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
         'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'maxLength': !exists(json, 'maxLength') ? undefined : json['maxLength'],
@@ -125,6 +132,7 @@ export function StringPropertyModelToJSON(value?: StringPropertyModel | null): a
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'languageId': value.languageId,
         'defaultValue': value.defaultValue,
         'exampleValue': value.exampleValue,
         'maxLength': value.maxLength,

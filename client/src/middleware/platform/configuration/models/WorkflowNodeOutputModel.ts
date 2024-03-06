@@ -39,7 +39,7 @@ import {
 } from './TriggerDefinitionModel';
 
 /**
- * The workflow step output
+ * The workflow node output
  * @export
  * @interface WorkflowNodeOutputModel
  */
