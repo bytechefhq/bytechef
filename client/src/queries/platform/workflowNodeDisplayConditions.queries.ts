@@ -1,5 +1,8 @@
 /* eslint-disable sort-keys */
-import {EvaluateWorkflowNodeDisplayConditionRequest, WorkflowNodeApi} from '@/middleware/platform/configuration';
+import {
+    EvaluateWorkflowNodeDisplayConditionRequest,
+    WorkflowNodeDisplayConditionApi,
+} from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeDisplayConditionKeys = {
@@ -18,6 +21,6 @@ export const useEvaluateWorkflowNodeDisplayConditionQuery = (
 ) =>
     useQuery<boolean, Error>({
         queryKey: WorkflowNodeDisplayConditionKeys.propertyWorkflowNodeDisplayConditions(request),
-        queryFn: () => new WorkflowNodeApi().evaluateWorkflowNodeDisplayCondition(request),
+        queryFn: () => new WorkflowNodeDisplayConditionApi().evaluateWorkflowNodeDisplayCondition(request),
         enabled: enabled === undefined ? true : enabled,
     });

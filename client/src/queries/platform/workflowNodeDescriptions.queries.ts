@@ -3,7 +3,7 @@ import {
     type GetWorkflowNodeDescription200ResponseModel,
     GetWorkflowNodeDescriptionRequest,
     GetWorkflowNodeOutputRequest,
-    WorkflowNodeApi,
+    WorkflowNodeDescriptionApi,
 } from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
@@ -18,6 +18,6 @@ export const WorkflowNodeDescriptionKeys = {
 export const useGetWorkflowNodeDescriptionQuery = (request: GetWorkflowNodeDescriptionRequest, enabled?: boolean) =>
     useQuery<GetWorkflowNodeDescription200ResponseModel, Error>({
         queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription(request),
-        queryFn: () => new WorkflowNodeApi().getWorkflowNodeDescription(request),
+        queryFn: () => new WorkflowNodeDescriptionApi().getWorkflowNodeDescription(request),
         enabled: enabled === undefined ? true : enabled,
     });

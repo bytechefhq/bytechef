@@ -2,7 +2,7 @@
 import {
     GetWorkflowNodeDynamicPropertiesRequest,
     type PropertyModel,
-    WorkflowNodeApi,
+    WorkflowNodeDynamicPropertiesApi,
 } from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
@@ -20,6 +20,6 @@ export const useGetWorkflowNodeDynamicPropertiesQuery = (
 ) =>
     useQuery<Array<PropertyModel>, Error>({
         queryKey: WorkflowNodeDynamicPropertyKeys.propertyWorkflowNodeDynamicProperties(request),
-        queryFn: () => new WorkflowNodeApi().getWorkflowNodeDynamicProperties(request),
+        queryFn: () => new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeDynamicProperties(request),
         enabled: enabled === undefined ? true : enabled,
     });
