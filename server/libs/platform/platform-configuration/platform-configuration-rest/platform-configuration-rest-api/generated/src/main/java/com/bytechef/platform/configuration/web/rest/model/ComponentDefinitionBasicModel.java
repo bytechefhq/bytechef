@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T14:06:10.952484+01:00[Europe/Zagreb]")
 public class ComponentDefinitionBasicModel {
 
   private Integer actionsCount;
@@ -36,6 +36,8 @@ public class ComponentDefinitionBasicModel {
 
   private Integer triggersCount;
 
+  private Integer version;
+
   public ComponentDefinitionBasicModel() {
     super();
   }
@@ -43,8 +45,9 @@ public class ComponentDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentDefinitionBasicModel(String name) {
+  public ComponentDefinitionBasicModel(String name, Integer version) {
     this.name = name;
+    this.version = version;
   }
 
   public ComponentDefinitionBasicModel actionsCount(Integer actionsCount) {
@@ -167,6 +170,26 @@ public class ComponentDefinitionBasicModel {
     this.triggersCount = triggersCount;
   }
 
+  public ComponentDefinitionBasicModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * The version of a component.
+   * @return version
+  */
+  @NotNull 
+  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -181,12 +204,13 @@ public class ComponentDefinitionBasicModel {
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
         Objects.equals(this.name, componentDefinitionBasic.name) &&
         Objects.equals(this.title, componentDefinitionBasic.title) &&
-        Objects.equals(this.triggersCount, componentDefinitionBasic.triggersCount);
+        Objects.equals(this.triggersCount, componentDefinitionBasic.triggersCount) &&
+        Objects.equals(this.version, componentDefinitionBasic.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionsCount, description, icon, name, title, triggersCount);
+    return Objects.hash(actionsCount, description, icon, name, title, triggersCount, version);
   }
 
   @Override
@@ -199,6 +223,7 @@ public class ComponentDefinitionBasicModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    triggersCount: ").append(toIndentedString(triggersCount)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

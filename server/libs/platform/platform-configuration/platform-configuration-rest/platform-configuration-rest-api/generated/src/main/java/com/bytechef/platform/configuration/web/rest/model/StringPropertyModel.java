@@ -33,8 +33,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T14:06:10.952484+01:00[Europe/Zagreb]")
 public class StringPropertyModel extends ValuePropertyModel {
+
+  private String languageId;
 
   private String defaultValue;
 
@@ -58,6 +60,26 @@ public class StringPropertyModel extends ValuePropertyModel {
    */
   public StringPropertyModel(ControlTypeModel controlType) {
     super(controlType);
+  }
+
+  public StringPropertyModel languageId(String languageId) {
+    this.languageId = languageId;
+    return this;
+  }
+
+  /**
+   * The language id used together with CODE_EDITOR control type.
+   * @return languageId
+  */
+  
+  @Schema(name = "languageId", description = "The language id used together with CODE_EDITOR control type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("languageId")
+  public String getLanguageId() {
+    return languageId;
+  }
+
+  public void setLanguageId(String languageId) {
+    this.languageId = languageId;
   }
 
   public StringPropertyModel defaultValue(String defaultValue) {
@@ -252,7 +274,8 @@ public class StringPropertyModel extends ValuePropertyModel {
       return false;
     }
     StringPropertyModel stringProperty = (StringPropertyModel) o;
-    return Objects.equals(this.defaultValue, stringProperty.defaultValue) &&
+    return Objects.equals(this.languageId, stringProperty.languageId) &&
+        Objects.equals(this.defaultValue, stringProperty.defaultValue) &&
         Objects.equals(this.exampleValue, stringProperty.exampleValue) &&
         Objects.equals(this.maxLength, stringProperty.maxLength) &&
         Objects.equals(this.minLength, stringProperty.minLength) &&
@@ -263,7 +286,7 @@ public class StringPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(defaultValue, exampleValue, maxLength, minLength, options, optionsDataSource, super.hashCode());
+    return Objects.hash(languageId, defaultValue, exampleValue, maxLength, minLength, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -271,6 +294,7 @@ public class StringPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class StringPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    languageId: ").append(toIndentedString(languageId)).append("\n");
     sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
     sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    maxLength: ").append(toIndentedString(maxLength)).append("\n");

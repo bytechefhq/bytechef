@@ -20,12 +20,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The workflow step output
+ * The workflow node output
  */
 
-@Schema(name = "WorkflowNodeOutput", description = "The workflow step output")
+@Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T14:06:10.952484+01:00[Europe/Zagreb]")
 public class WorkflowNodeOutputModel {
 
   private ActionDefinitionModel actionDefinition;

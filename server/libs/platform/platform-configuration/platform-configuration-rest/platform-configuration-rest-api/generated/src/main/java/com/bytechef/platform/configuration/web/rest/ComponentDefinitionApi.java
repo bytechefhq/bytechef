@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T14:06:10.952484+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition API")
 public interface ComponentDefinitionApi {
@@ -115,7 +115,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"triggersCount\" : 6 } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -162,7 +162,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"triggersCount\" : 6 } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -203,7 +203,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"triggersCount\" : 6 } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

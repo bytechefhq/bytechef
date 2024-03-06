@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("evaluateWorkflowNodeDisplayCondition_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T14:06:10.952484+01:00[Europe/Zagreb]")
 public class EvaluateWorkflowNodeDisplayConditionRequestModel {
 
   private String displayCondition;

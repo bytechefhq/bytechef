@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-01T18:01:12.585589+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T14:06:10.952484+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output API")
 public interface WorkflowNodeTestOutputApi {
@@ -42,10 +42,10 @@ public interface WorkflowNodeTestOutputApi {
     }
 
     /**
-     * DELETE /workflow-node-test-outputs/{workflowId}/{workflowNodeName} : Delete existing workflow node test output
+     * DELETE /workflows/{id}/test-outputs/{workflowNodeName} : Delete existing workflow node test output
      * Delete existing workflow node test output.
      *
-     * @param workflowId The id of a workflow. (required)
+     * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
      * @return Successful operation. (status code 200)
      */
@@ -60,11 +60,11 @@ public interface WorkflowNodeTestOutputApi {
     )
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName}"
+        value = "/workflows/{id}/test-outputs/{workflowNodeName}"
     )
     
     default ResponseEntity<Void> deleteWorkflowNodeTestOutput(
-        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -73,10 +73,10 @@ public interface WorkflowNodeTestOutputApi {
 
 
     /**
-     * PUT /workflow-node-test-outputs/{workflowId}/{workflowNodeName} : Create a new or update existing workflow node test output
+     * PUT /workflows/{id}/test-outputs/{workflowNodeName} : Create a new or update existing workflow node test output
      * Create a new or update existing workflow node test output.
      *
-     * @param workflowId The id of a workflow. (required)
+     * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
      * @return The workflow node test output object. (status code 200)
      */
@@ -93,12 +93,12 @@ public interface WorkflowNodeTestOutputApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName}",
+        value = "/workflows/{id}/test-outputs/{workflowNodeName}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<WorkflowNodeTestOutputModel> saveWorkflowNodeTestOutput(
-        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
     ) {
         getRequest().ifPresent(request -> {
@@ -116,10 +116,10 @@ public interface WorkflowNodeTestOutputApi {
 
 
     /**
-     * PUT /workflow-node-test-outputs/{workflowId}/{workflowNodeName}/sample-output : Upload a sample output to create a new or update existing workflow node test output
+     * PUT /workflows/{id}/test-outputs/{workflowNodeName}/sample-output : Upload a sample output to create a new or update existing workflow node test output
      * Upload a sample output to create a new or update existing workflow node test output.
      *
-     * @param workflowId The id of a workflow. (required)
+     * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
      * @param body  (required)
      * @return The workflow node test output object. (status code 200)
@@ -137,13 +137,13 @@ public interface WorkflowNodeTestOutputApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName}/sample-output",
+        value = "/workflows/{id}/test-outputs/{workflowNodeName}/sample-output",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
-        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "body", description = "", required = true) @Valid @RequestBody Object body
     ) {
