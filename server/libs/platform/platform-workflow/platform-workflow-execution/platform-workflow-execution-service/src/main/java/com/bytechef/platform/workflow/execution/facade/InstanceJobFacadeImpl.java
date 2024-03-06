@@ -52,12 +52,12 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     // TODO @Transactional
-    public Job createJob(JobParameters jobParameters, long instanceId, Type type) {
+    public long createJob(JobParameters jobParameters, long instanceId, Type type) {
         long jobId = jobFacade.createJob(jobParameters);
 
         instanceJobService.create(jobId, instanceId, type);
 
-        return jobService.getJob(jobId);
+        return jobId;
     }
 
     @Override

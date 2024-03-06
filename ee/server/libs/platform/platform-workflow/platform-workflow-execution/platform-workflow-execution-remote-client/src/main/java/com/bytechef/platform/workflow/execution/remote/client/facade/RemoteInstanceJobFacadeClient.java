@@ -34,13 +34,13 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @Override
-    public Job createJob(JobParameters jobParameters, long instanceId, Type type) {
+    public long createJob(JobParameters jobParameters, long instanceId, Type type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(INSTANCE_JOB_FACADE + "/create-job")
                 .build(),
-            new CreateJobRequest(jobParameters, instanceId, type), Job.class);
+            new CreateJobRequest(jobParameters, instanceId, type), Long.class);
     }
 
     @Override

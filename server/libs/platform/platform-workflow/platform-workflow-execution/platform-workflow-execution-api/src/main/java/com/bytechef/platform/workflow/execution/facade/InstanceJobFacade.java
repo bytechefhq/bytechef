@@ -25,7 +25,7 @@ import com.bytechef.platform.constant.Type;
  */
 public interface InstanceJobFacade {
 
-    Job createJob(JobParameters jobParameters, long instanceId, Type type);
+    long createJob(JobParameters jobParameters, long instanceId, Type type);
 
     Job createSyncJob(JobParameters jobParameters, long instanceId, Type type);
 }
