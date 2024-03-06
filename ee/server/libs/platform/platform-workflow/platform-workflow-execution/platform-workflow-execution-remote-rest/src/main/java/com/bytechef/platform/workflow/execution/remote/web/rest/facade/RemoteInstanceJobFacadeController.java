@@ -40,7 +40,7 @@ public class RemoteInstanceJobFacadeController {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/create-job")
-    public ResponseEntity<Job> createJob(@Valid @RequestBody CreateJobRequest createJobRequest) {
+    public ResponseEntity<Long> createJob(@Valid @RequestBody CreateJobRequest createJobRequest) {
         return ResponseEntity.ok(
             instanceJobFacade.createJob(
                 createJobRequest.jobParameters, createJobRequest.instanceId, createJobRequest.type));

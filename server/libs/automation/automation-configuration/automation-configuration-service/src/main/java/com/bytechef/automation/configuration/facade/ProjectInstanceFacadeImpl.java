@@ -159,10 +159,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
 
-        Job job = instanceJobFacade.createJob(
+        return instanceJobFacade.createJob(
             new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, Type.AUTOMATION);
-
-        return Validate.notNull(job.getId(), "id");
     }
 
     @Override

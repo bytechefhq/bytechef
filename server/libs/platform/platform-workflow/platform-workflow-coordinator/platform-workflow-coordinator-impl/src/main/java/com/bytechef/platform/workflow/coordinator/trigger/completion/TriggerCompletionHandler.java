@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
-import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
@@ -121,9 +120,7 @@ public class TriggerCompletionHandler {
     private long createJob(
         WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, Type type) {
 
-        Job job = instanceJobFacade.createJob(
+        return instanceJobFacade.createJob(
             new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap), instanceId, type);
-
-        return Validate.notNull(job.getId(), "id");
     }
 }
