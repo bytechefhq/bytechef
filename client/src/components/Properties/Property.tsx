@@ -337,6 +337,20 @@ const Property = ({
         }
     };
 
+    const handleDeleteProperty = (subPropertyName: string, propertyName: string) => {
+        if (!name || !currentComponentData?.parameters || !updateWorkflowMutation) {
+            return;
+        }
+
+        delete currentComponentData.parameters[propertyName][subPropertyName];
+
+        saveWorkflowDefinition(
+            {...currentComponentData, name: currentComponentData.workflowNodeName},
+            workflow,
+            updateWorkflowMutation
+        );
+    };
+
     // set default mentionInput state
     useEffect(() => {
         if (controlType === 'ARRAY_BUILDER') {
@@ -502,6 +516,7 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
+                                handleDeleteProperty={handleDeleteProperty}
                                 property={property}
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
