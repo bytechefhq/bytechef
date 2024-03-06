@@ -20,7 +20,7 @@ const WorkflowExecutionDetailsAccordionContent = ({
 }) => {
     return (
         <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
-            <div className="space-y-2 rounded-md bg-muted p-2">
+            <div className="space-y-2 rounded-md bg-gray-50 p-2">
                 <header className="flex items-center justify-between">
                     <span className="text-sm font-semibold uppercase">Input</span>
 
@@ -76,7 +76,7 @@ const WorkflowExecutionDetailsAccordionContent = ({
                 </div>
             </div>
 
-            <div className="space-y-2 rounded-md bg-muted p-2">
+            <div className="space-y-2 rounded-md bg-gray-50 p-2">
                 <header className="flex items-center justify-between">
                     <span className="text-sm font-semibold uppercase">Output</span>
 
@@ -133,7 +133,7 @@ const WorkflowExecutionDetailsAccordionContent = ({
             </div>
 
             {error && (
-                <div className="space-y-2 rounded-md bg-muted p-2">
+                <div className="space-y-2 rounded-md bg-gray-50 p-2">
                     <header className="flex items-center justify-between">
                         <span className="text-sm font-semibold uppercase text-destructive">Error</span>
 
