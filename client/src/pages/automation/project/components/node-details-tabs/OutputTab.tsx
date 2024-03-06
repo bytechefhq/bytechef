@@ -61,14 +61,14 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
 
     const handlePredefinedOutputSchemaClick = () => {
         deleteWorkflowNodeTestOutputMutation.mutate({
-            workflowId,
+            id: workflowId,
             workflowNodeName: currentNode.name,
         });
     };
 
     const handleTestComponentClick = () => {
         saveWorkflowNodeTestOutputMutation.mutate({
-            workflowId,
+            id: workflowId,
             workflowNodeName: currentNode.name,
         });
     };
@@ -76,7 +76,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
     const handleSampleDataDialogUpload = (value: string) => {
         uploadSampleOutputRequestMutation.mutate({
             body: JSON.parse(value),
-            workflowId,
+            id: workflowId,
             workflowNodeName: currentNode.name,
         });
 
