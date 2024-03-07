@@ -65,6 +65,8 @@ export type ClickedItemType = {
     componentName?: string;
 } & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
 
+export type SubPropertyType = PropertyType & {custom: boolean};
+
 export type WorkflowDefinitionType = {
     description?: string;
     label?: string;
