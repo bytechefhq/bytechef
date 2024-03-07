@@ -40,7 +40,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
         },
         ref
     ) => {
-        const [showPropertyCodeEditorSheet, setPropertyCodeEditorSheet] = useState(false);
+        const [showPropertyCodeEditorSheet, setShowPropertyCodeEditorSheet] = useState(false);
 
         return (
             <>
@@ -75,7 +75,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
 
                             <Button
                                 className="ml-10 flex-1 rounded-l-none"
-                                onClick={() => setPropertyCodeEditorSheet(true)}
+                                onClick={() => setShowPropertyCodeEditorSheet(true)}
                                 ref={ref}
                                 variant="outline"
                             >
@@ -101,9 +101,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                     <PropertyCodeEditorSheet
                         language={language}
                         onChange={onChange}
-                        onClose={() => {
-                            setPropertyCodeEditorSheet(false);
-                        }}
+                        onClose={() => setShowPropertyCodeEditorSheet(false)}
                         value={value || defaultValue}
                         workflow={workflow}
                         workflowNodeName={workflowNodeName}

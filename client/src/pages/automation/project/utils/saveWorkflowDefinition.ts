@@ -46,6 +46,7 @@ export default async function saveWorkflowDefinition(
         parameters,
         type: `${componentName}/v1/${actionName || newNodeComponentDefinition.actions?.[0].name}`,
     };
+
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);

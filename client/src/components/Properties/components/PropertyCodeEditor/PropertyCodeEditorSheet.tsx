@@ -85,35 +85,33 @@ const ConnectionLabel = ({
     });
 
     return (
-        <>
-            {componentDefinition && (
-                <div className="flex items-center justify-between">
-                    <div className="space-x-1">
-                        <Label>
-                            {`${componentDefinition?.title}`}
+        <div className="flex items-center justify-between">
+            <div className="space-x-1">
+                {componentDefinition && (
+                    <Label>
+                        {`${componentDefinition?.title}`}
 
-                            {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                        </Label>
+                        {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                    </Label>
+                )}
 
-                        {workflowConnectionsCount > 1 && (
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
-                                </TooltipTrigger>
+                {workflowConnectionsCount > 1 && (
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
+                        </TooltipTrigger>
 
-                                <TooltipContent>Workflow Connction Key</TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
+                        <TooltipContent>Workflow Connection Key</TooltipContent>
+                    </Tooltip>
+                )}
+            </div>
 
-                    <div>
-                        <Button className="text-destructive" onClick={onRemoveClick} size="sm" variant="link">
-                            Remove
-                        </Button>
-                    </div>
-                </div>
-            )}
-        </>
+            <div>
+                <Button className="text-destructive" onClick={onRemoveClick} size="sm" variant="link">
+                    Remove
+                </Button>
+            </div>
+        </div>
     );
 };
 
@@ -334,7 +332,7 @@ const ConnectionSelect = ({
     );
 };
 
-const Connections = ({
+const ConnectionsPanel = ({
     workflow,
     workflowConnections,
     workflowNodeName,
@@ -696,7 +694,7 @@ const PropertyCodeEditorSheet = ({
 
                         {showConnections && (
                             <div className="w-80 border-l">
-                                <Connections
+                                <ConnectionsPanel
                                     workflow={workflow}
                                     workflowConnections={currentWorkflowTask?.connections || []}
                                     workflowNodeName={workflowNodeName}

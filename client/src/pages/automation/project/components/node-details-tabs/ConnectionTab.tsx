@@ -40,21 +40,19 @@ const ConnectionLabel = ({
     });
 
     return (
-        <>
+        <div className="space-x-1">
             {componentDefinition && (
-                <div className="space-x-1">
-                    <Label>
-                        {`${componentDefinition?.title}`}
+                <Label>
+                    {`${componentDefinition.title}`}
 
-                        {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                    </Label>
-
-                    {workflowConnectionsCount > 1 && (
-                        <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
-                    )}
-                </div>
+                    {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                </Label>
             )}
-        </>
+
+            {workflowConnectionsCount > 1 && (
+                <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
+            )}
+        </div>
     );
 };
 

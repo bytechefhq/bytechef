@@ -178,11 +178,7 @@ const Property = ({
     );
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponentData || !updateWorkflowMutation) {
-            return;
-        }
-
-        if (!name) {
+        if (!currentComponentData || !updateWorkflowMutation || !name) {
             return;
         }
 
