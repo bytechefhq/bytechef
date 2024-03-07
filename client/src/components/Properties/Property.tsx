@@ -177,7 +177,6 @@ const Property = ({
         !!property.displayCondition
     );
 
-    const handlePropertyChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (!currentComponentData || !updateWorkflowMutation) {
             return;
@@ -204,6 +203,7 @@ const Property = ({
         );
     }, 200);
 
+    const handlePropertyChange = useDebouncedCallback((name: string, value: string) => {
         if (currentComponentData) {
             const {parameters} = currentComponentData;
 
@@ -216,7 +216,7 @@ const Property = ({
                             ...parameters,
                             [objectName]: {
                                 ...parameters?.[objectName],
-                                [event.target.name]: event.target.value,
+                                [name]: value,
                             },
                         },
                     },
@@ -228,7 +228,7 @@ const Property = ({
                         ...currentComponentData,
                         parameters: {
                             ...parameters,
-                            [event.target.name]: event.target.value,
+                            [name]: value,
                         },
                     },
                 ]);
@@ -354,11 +354,11 @@ const Property = ({
                 return;
             }
 
-            handlePropertyChange(event);
+            handlePropertyChange(event.target.name, event.target.value);
 
             setNumericValue(onlyNumericValue);
         } else {
-            handlePropertyChange(event);
+            handlePropertyChange(event.target.name, event.target.value);
 
             setInputValue(event.target.value);
         }
@@ -376,6 +376,12 @@ const Property = ({
             workflow,
             updateWorkflowMutation
         );
+    };
+
+    const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        handlePropertyChange(event.target.name, event.target.value);
+
+        setInputValue(event.target.value);
     };
 
     // set default mentionInput state
@@ -489,7 +495,7 @@ const Property = ({
                         leadingIcon={typeIcon}
                         name={name || `${arrayName}_0`}
                         objectName={objectName}
-                        onChange={handlePropertyChange}
+                        onChange={(event) => handlePropertyChange(event.target.name, event.target.value)}
                         onKeyPress={(event: KeyboardEvent) => {
                             if (isNumericalInput || type === 'BOOLEAN') {
                                 event.key !== '{' && event.preventDefault();
@@ -661,10 +667,12 @@ const Property = ({
                         {controlType === 'TEXT_AREA' && (
                             <PropertyTextArea
                                 description={description}
+                                error={hasError}
                                 key={name}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name!}
+                                onChange={handleTextAreaChange}
                                 required={required}
                             />
                         )}
