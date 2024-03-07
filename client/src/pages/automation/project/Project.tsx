@@ -568,29 +568,7 @@ const Project = () => {
                         </div>
 
                         <div className="flex items-center space-x-1">
-                            {!workflowIsRunning && runDisabled && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span tabIndex={0}>
-                                            <Button
-                                                className="font-semibold"
-                                                disabled={runDisabled}
-                                                size="sm"
-                                                variant="success"
-                                            >
-                                                <PlayIcon className="h-5" /> Run
-                                            </Button>
-                                        </span>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>
-                                        The workflow cannot be executed. Please set all required workflow input
-                                        parameters, connections and component properties.
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-
-                            {!workflowIsRunning && !runDisabled && (
+                            {!workflowIsRunning && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <span tabIndex={0}>
@@ -606,7 +584,11 @@ const Project = () => {
                                         </span>
                                     </TooltipTrigger>
 
-                                    <TooltipContent>Run the current workflow</TooltipContent>
+                                    <TooltipContent>
+                                        {runDisabled
+                                            ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
+                                            : `Run the current workflow`}
+                                    </TooltipContent>
                                 </Tooltip>
                             )}
 
