@@ -95,7 +95,6 @@ const Property = ({
     const defaultValue = property.defaultValue || '';
 
     const {
-        additionalProperties,
         controlType,
         description,
         hidden,
@@ -361,7 +360,13 @@ const Property = ({
     };
 
     const handleDeleteProperty = (subPropertyName: string, propertyName: string) => {
-        if (!name || !currentComponentData?.parameters || !updateWorkflowMutation) {
+        if (
+            !name ||
+            !currentComponentData?.parameters ||
+            !updateWorkflowMutation ||
+            !currentComponentData.parameters[propertyName] ||
+            !currentComponentData.parameters[propertyName][subPropertyName]
+        ) {
             return;
         }
 
@@ -529,6 +534,7 @@ const Property = ({
                             <ArrayProperty
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
+                                handleDeleteProperty={handleDeleteProperty}
                                 property={property}
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
