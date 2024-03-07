@@ -3,6 +3,7 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
+import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {
     WorkflowTestConfigurationKeys,
     useGetWorkflowTestConfigurationConnectionsQuery,
@@ -11,7 +12,11 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
-import {ComponentDefinitionModel, WorkflowConnectionModel} from 'middleware/platform/configuration';
+import {
+    ComponentDefinitionModel,
+    WorkflowConnectionModel,
+    WorkflowTestConfigurationConnectionModel,
+} from 'middleware/platform/configuration';
 import ConnectionDialog from 'pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
@@ -22,36 +27,69 @@ import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
-const ConnectionTab = ({
-    componentDefinition,
-    workflowConnections,
+const ConnectionLabel = ({
+    workflowConnection,
+    workflowConnectionsCount,
+}: {
+    workflowConnection: WorkflowConnectionModel;
+    workflowConnectionsCount: number;
+}) => {
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+        componentName: workflowConnection.componentName,
+        componentVersion: workflowConnection.componentVersion,
+    });
+
+    return (
+        <>
+            {componentDefinition && (
+                <div className="space-x-1">
+                    <Label>
+                        {`${componentDefinition?.title}`}
+
+                        {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                    </Label>
+
+                    {workflowConnectionsCount > 1 && (
+                        <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
+                    )}
+                </div>
+            )}
+        </>
+    );
+};
+
+const ConnectionSelect = ({
+    workflowConnection,
     workflowId,
     workflowNodeName,
+    workflowTestConfigurationConnection,
 }: {
-    componentDefinition: ComponentDefinitionModel;
-    workflowConnections: WorkflowConnectionModel[];
-    workflowNodeName: string;
+    workflowConnection: WorkflowConnectionModel;
     workflowId: string;
+    workflowNodeName: string;
+    workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
 }) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
 
-    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
-
-    const {data: connections} = useGetConnectionsQuery({
-        componentName: componentDefinition.name,
-        connectionVersion: componentDefinition?.connection?.version,
-    });
-
-    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
-        workflowId,
-        workflowNodeName,
-    });
-
     let connectionId: number | undefined;
 
-    if (workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0) {
-        connectionId = workflowTestConfigurationConnections[0].connectionId;
+    if (workflowTestConfigurationConnection) {
+        connectionId = workflowTestConfigurationConnection.connectionId;
     }
+
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+        componentName: workflowConnection.componentName,
+        componentVersion: workflowConnection.componentVersion,
+    });
+
+    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: connections} = useGetConnectionsQuery(
+        {
+            componentName: componentDefinition?.name!,
+            connectionVersion: componentDefinition?.connection?.version,
+        },
+        !!componentDefinition
+    );
 
     const queryClient = useQueryClient();
 
@@ -75,53 +113,102 @@ const ConnectionTab = ({
     };
 
     return (
+        <>
+            <Select
+                onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
+                required={workflowConnection.required}
+                value={connectionId ? connectionId.toString() : undefined}
+            >
+                <div className="flex space-x-2">
+                    <SelectTrigger>
+                        <SelectValue placeholder="Choose Connection..." />
+                    </SelectTrigger>
+
+                    <Button
+                        className="mt-auto p-2"
+                        onClick={() => setShowEditConnectionDialog(true)}
+                        title="Create a new connection"
+                        variant="outline"
+                    >
+                        <PlusIcon className="size-5" />
+                    </Button>
+                </div>
+
+                <SelectContent>
+                    {connections &&
+                        connections.map((connection) => (
+                            <SelectItem key={connection.id} value={connection.id!.toString()}>
+                                <div className="flex items-center">
+                                    <span className="mr-1 ">{connection.name}</span>
+
+                                    <span className="text-xs text-gray-500">
+                                        {connection?.tags?.map((tag) => tag.name).join(', ')}
+                                    </span>
+                                </div>
+                            </SelectItem>
+                        ))}
+                </SelectContent>
+            </Select>
+
+            {showEditConnectionDialog && (
+                <ConnectionDialog
+                    componentDefinition={componentDefinition}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                    connectionsQueryKey={ConnectionKeys.connections}
+                    onClose={() => setShowEditConnectionDialog(false)}
+                    useCreateConnectionMutation={useCreateConnectionMutation}
+                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                    useUpdateConnectionMutation={useUpdateConnectionMutation}
+                />
+            )}
+        </>
+    );
+};
+
+const ConnectionTab = ({
+    componentDefinition,
+    workflowConnections,
+    workflowId,
+    workflowNodeName,
+}: {
+    componentDefinition: ComponentDefinitionModel;
+    workflowConnections: WorkflowConnectionModel[];
+    workflowNodeName: string;
+    workflowId: string;
+}) => {
+    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+
+    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
+
+    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
+        workflowId,
+        workflowNodeName,
+    });
+
+    return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
             {workflowConnections?.length ? (
                 workflowConnections.map((workflowConnection) => (
                     <fieldset className="space-y-2" key={workflowConnection.key}>
-                        <Label>
-                            {`${componentDefinition.title} Connection`}
+                        <ConnectionLabel
+                            workflowConnection={workflowConnection}
+                            workflowConnectionsCount={workflowConnections.length}
+                        />
 
-                            {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                        </Label>
-
-                        {workflowConnections.length > 1 && <Label>{workflowConnection.key}</Label>}
-
-                        <Select
-                            onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
-                            required={workflowConnection.required}
-                            value={connectionId ? connectionId.toString() : undefined}
-                        >
-                            <div className="flex space-x-2">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Choose Connection..." />
-                                </SelectTrigger>
-
-                                <Button
-                                    className="mt-auto p-2"
-                                    onClick={() => setShowEditConnectionDialog(true)}
-                                    title="Create a new connection"
-                                    variant="outline"
-                                >
-                                    <PlusIcon className="size-5" />
-                                </Button>
-                            </div>
-
-                            <SelectContent>
-                                {connections &&
-                                    connections.map((connection) => (
-                                        <SelectItem key={connection.id} value={connection.id!.toString()}>
-                                            <div className="flex items-center">
-                                                <span className="mr-1 ">{connection.name}</span>
-
-                                                <span className="text-xs text-gray-500">
-                                                    {connection?.tags?.map((tag) => tag.name).join(', ')}
-                                                </span>
-                                            </div>
-                                        </SelectItem>
-                                    ))}
-                            </SelectContent>
-                        </Select>
+                        <ConnectionSelect
+                            workflowConnection={workflowConnection}
+                            workflowId={workflowId}
+                            workflowNodeName={workflowNodeName}
+                            workflowTestConfigurationConnection={
+                                workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0
+                                    ? workflowTestConfigurationConnections.filter(
+                                          (workflowTestConfigurationConnection) =>
+                                              workflowTestConfigurationConnection.workflowConnectionKey ===
+                                              workflowConnection.key
+                                      )[0]
+                                    : undefined
+                            }
+                        />
                     </fieldset>
                 ))
             ) : (
@@ -159,7 +246,7 @@ const ConnectionTab = ({
 
             {showEditConnectionDialog && (
                 <ConnectionDialog
-                    componentDefinition={componentDefinition}
+                    componentDefinition={workflowConnections.length === 1 ? componentDefinition : undefined}
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditConnectionDialog(false)}
