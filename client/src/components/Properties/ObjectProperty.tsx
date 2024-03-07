@@ -4,8 +4,9 @@ import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {PropertyTypeModel} from '@/middleware/platform/configuration';
-import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
+import {ControlTypeModel, PropertyTypeModel} from '@/middleware/platform/configuration';
+import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
+import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -25,13 +26,6 @@ interface ObjectPropertyProps {
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
-type SubPropertyType = {
-    controlType: string;
-    defaultValue: string;
-    name: string;
-    type: string;
-};
-
 const ObjectProperty = ({
     actionName,
     currentComponent,
@@ -41,24 +35,26 @@ const ObjectProperty = ({
     property,
     updateWorkflowMutation,
 }: ObjectPropertyProps) => {
-    const [subProperties, setSubProperties] = useState<Array<SubPropertyType>>(
-        (property.properties as Array<SubPropertyType>) || []
+    const [subProperties, setSubProperties] = useState<Array<PropertyType>>(
+        (property.properties as Array<PropertyType>) || []
     );
     const [newPropertyName, setNewPropertyName] = useState('');
-    const [newPropertyType, setNewPropertyType] = useState('');
+    const [newPropertyType, setNewPropertyType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
 
-    const {additionalProperties, controlType, label, multipleValues, name} = property;
+    const {additionalProperties, controlType, label, name} = property;
 
     const handleAddItemClick = () => {
-        setSubProperties([
-            ...subProperties,
-            {
-                controlType: 'TEXT',
-                defaultValue: '',
-                name: newPropertyName,
-                type: newPropertyType || additionalProperties?.[0].type || 'STRING',
-            },
-        ]);
+        const newItem: SubPropertyType = {
+            additionalProperties,
+            controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
+            custom: true,
+            name: newPropertyName,
+            type: (newPropertyType ||
+                additionalProperties?.[0].type ||
+                'STRING') as keyof typeof PROPERTY_CONTROL_TYPES,
+        };
+
+        setSubProperties([...subProperties, newItem]);
 
         setNewPropertyName('');
     };
@@ -121,9 +117,9 @@ const ObjectProperty = ({
         <>
             <ul
                 className={twMerge('space-y-4', label && 'ml-2 border-l', subProperties?.length && 'pb-2 pt-1')}
-                key={name}
+                key={`${name}_${newPropertyName}`}
             >
-                {(subProperties as unknown as Array<PropertyType>)?.map((subProperty, index) => {
+                {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => {
                     if (
                         subProperty.controlType === 'OBJECT_BUILDER' &&
                         !subProperty.additionalProperties?.length &&
@@ -149,26 +145,28 @@ const ObjectProperty = ({
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
 
-                            <Button
-                                className="absolute bottom-0 right-0 ml-1"
-                                onClick={() => handleDeletePropertyClick(subProperty.name!, name!)}
-                                size="icon"
-                                variant="ghost"
-                            >
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <XIcon className="size-8 cursor-pointer p-2 hover:text-red-500" />
-                                    </TooltipTrigger>
+                            {subProperty.custom && (
+	                            <Button
+	                                className="ml-1 self-end"
+	                                onClick={() => handleDeletePropertyClick(subProperty.name!, name!)}
+	                                size="icon"
+	                                variant="ghost"
+	                            >
+	                                <Tooltip>
+	                                    <TooltipTrigger>
+	                                        <XIcon className="size-8 cursor-pointer p-2 hover:text-red-500" />
+	                                    </TooltipTrigger>
 
-                                    <TooltipContent>Delete property</TooltipContent>
-                                </Tooltip>
-                            </Button>
+	                                    <TooltipContent>Delete property</TooltipContent>
+	                                </Tooltip>
+	                            </Button>
+                            )}
                         </div>
                     );
                 })}
             </ul>
 
-            {!!additionalProperties?.length && multipleValues && (
+            {!!additionalProperties?.length && (
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
@@ -206,7 +204,9 @@ const ObjectProperty = ({
                             {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
                                 <PropertySelect
                                     label="Type"
-                                    onValueChange={(value) => setNewPropertyType(value)}
+                                    onValueChange={(value) =>
+                                        setNewPropertyType(value as keyof typeof PROPERTY_CONTROL_TYPES)
+                                    }
                                     options={(additionalProperties as Array<PropertyType>).map(
                                         (additionalProperty) => ({
                                             label: additionalProperty.type!,
