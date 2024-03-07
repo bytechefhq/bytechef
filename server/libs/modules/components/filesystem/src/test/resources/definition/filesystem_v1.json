@@ -36,6 +36,7 @@
       "label": "Filename",
       "placeholder": "/data/your_file.pdf",
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -43,6 +44,7 @@
     } ],
     "title": "Read from file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -73,6 +75,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -92,6 +95,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -111,6 +115,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -130,6 +135,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -138,8 +144,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -178,6 +183,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -197,6 +203,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -216,6 +223,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -235,6 +243,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -256,6 +265,7 @@
       "label": "Filename",
       "placeholder": "/data/your_file.pdf",
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -263,6 +273,7 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -307,8 +318,7 @@
       "sampleOutput": {
         "bytes": 1024
       }
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -321,6 +331,7 @@
     "properties": null,
     "title": "Create Temp Directory",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -337,14 +348,14 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_tmp_dir"
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -369,6 +380,7 @@
       "label": "Filename",
       "placeholder": "/data/your_file.pdf",
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -376,6 +388,7 @@
     } ],
     "title": "File Path",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -392,14 +405,14 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -424,6 +437,7 @@
       "label": "Path",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -455,6 +469,7 @@
     } ],
     "title": "List",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -502,6 +517,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -521,6 +537,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -556,8 +573,7 @@
         "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -582,6 +598,7 @@
       "label": "Path",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -589,6 +606,7 @@
     } ],
     "title": "Create",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -605,14 +623,14 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -637,6 +655,7 @@
       "label": "Path",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -644,6 +663,7 @@
     } ],
     "title": "Remove",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -671,8 +691,7 @@
         "controlType": "SELECT"
       },
       "sampleOutput": true
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null,
   "connection": null

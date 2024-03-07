@@ -41,7 +41,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
-import com.bytechef.platform.component.definition.ScriptComponentDefinition.FilterConnectionDefinitionPredicate;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
@@ -232,14 +231,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        if (componentDefinition instanceof ScriptComponentDefinition scriptComponentDefinition) {
-            FilterConnectionDefinitionPredicate filterConnectionDefinitionPredicate = scriptComponentDefinition
-                .getFilterConnectionDefinition();
-
+        if (componentDefinition instanceof ScriptComponentDefinition) {
             return componentDefinitionRegistry
                 .getComponentDefinitions()
                 .stream()
-                .filter(curComponentDefinition -> filterConnectionDefinitionPredicate.apply(componentDefinition))
+                .filter(curComponentDefinition -> curComponentDefinition
+                    .getConnection()
+                    .isPresent())
                 .toList();
         } else {
             return List.of(componentDefinition);

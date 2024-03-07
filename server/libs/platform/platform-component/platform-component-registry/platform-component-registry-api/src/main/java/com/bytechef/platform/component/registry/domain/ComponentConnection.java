@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.registry.domain;
 
+import com.bytechef.platform.component.definition.ParameterConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
@@ -23,5 +24,27 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ComponentConnection(int version, Map<String, ?> parameters, String authorizationName) {
+public record ComponentConnection(
+    String componentName, int version, Map<String, ?> parameters, String authorizationName)
+    implements ParameterConnection {
+
+    @Override
+    public String getComponentName() {
+        return componentName;
+    }
+
+    @Override
+    public int getVersion() {
+        return version;
+    }
+
+    @Override
+    public Map<String, ?> getParameters() {
+        return parameters;
+    }
+
+    @Override
+    public String getAuthorizationName() {
+        return authorizationName;
+    }
 }

@@ -38,8 +38,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The maximum possible generated value.",
@@ -57,11 +57,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Int",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -80,12 +81,11 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -112,8 +112,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "The maximum possible generated value.",
@@ -131,11 +131,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Float",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -157,12 +158,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null,
   "connection": null

@@ -80,7 +80,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<ActionOutputFunction> getOutputFunction();
+    Optional<OutputFunction> getOutputFunction();
 
     /**
      *
@@ -109,8 +109,14 @@ public interface ActionDefinition {
     /**
      *
      */
-    @FunctionalInterface
     interface PerformFunction {
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface SingleConnectionPerformFunction extends PerformFunction {
 
         /**
          *
@@ -121,5 +127,26 @@ public interface ActionDefinition {
          */
         Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
+    }
+
+    /**
+     *
+     */
+    interface OutputFunction {
+    }
+
+    /**
+     *
+     */
+    interface SingleConnectionOutputFunction extends OutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param context
+         * @return
+         */
+        Output apply(
+            Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
     }
 }

@@ -18,7 +18,6 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Output;
@@ -41,7 +40,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final Map<String, Object> metadata;
     protected final String name;
     protected final Output output;
-    protected final ActionOutputFunction outputSchemaFunction;
+    protected final OutputFunction outputSchemaFunction;
     protected final boolean outputSchemaDefaultFunction;
     protected final PerformFunction performFunction;
     protected final List<? extends Property> properties;
@@ -100,7 +99,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<ActionOutputFunction> getOutputFunction() {
+    public Optional<OutputFunction> getOutputFunction() {
         return Optional.ofNullable(outputSchemaFunction);
     }
 

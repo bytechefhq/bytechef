@@ -26,12 +26,12 @@ import org.junit.jupiter.api.Test;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class ScheduleComponentDefinitionFactoryTest {
+public class ScheduleComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/schedule_v1.json",
-            new ScheduleComponentDefinitionFactory(null).getDefinition());
+            new ScheduleComponentHandler(null).getDefinition());
     }
 
     @Test

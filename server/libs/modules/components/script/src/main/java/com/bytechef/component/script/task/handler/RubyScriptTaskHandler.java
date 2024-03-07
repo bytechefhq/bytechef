@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script;
+package com.bytechef.component.script.task.handler;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
+
+import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public class ScriptComponentDefinitionFactoryTest {
+@Component(SCRIPT + "/v1/ruby")
+public class RubyScriptTaskHandler extends AbstractScriptTaskHandler {
 
-    @Test
-    public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/script_v1.json",
-            new ScriptComponentDefinitionFactory().getDefinition());
+    @SuppressFBWarnings("EI")
+    public RubyScriptTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
+        super("ruby", actionDefinitionFacade);
     }
 }

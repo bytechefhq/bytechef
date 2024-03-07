@@ -212,7 +212,7 @@ public class HttpClientExecutorTest {
         HttpClient httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Context.Http.allowUnauthorizedCerts(true)
                 .build(),
-            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
+            "componentName", new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertTrue(httpClient.authenticator()
             .isEmpty());
@@ -235,8 +235,8 @@ public class HttpClientExecutorTest {
         Map<String, List<String>> headers = new HashMap<>();
 
         httpClientExecutor.createHttpClient(
-            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
-            Mockito.mock(Context.class));
+            headers, new HashMap<>(), configuration, "componentName",
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
@@ -256,7 +256,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             new HashMap<>(), queryParameters, configuration, "componentName",
-            new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
 
@@ -274,8 +274,8 @@ public class HttpClientExecutorTest {
         headers = new HashMap<>();
 
         httpClientExecutor.createHttpClient(
-            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
-            Mockito.mock(Context.class));
+            headers, new HashMap<>(), configuration, "componentName",
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(
             Map.of(
@@ -296,8 +296,8 @@ public class HttpClientExecutorTest {
         headers = new HashMap<>();
 
         httpClientExecutor.createHttpClient(
-            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
-            Mockito.mock(Context.class));
+            headers, new HashMap<>(), configuration, "componentName",
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
@@ -315,8 +315,8 @@ public class HttpClientExecutorTest {
         headers = new HashMap<>();
 
         httpClientExecutor.createHttpClient(
-            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
-            Mockito.mock(Context.class));
+            headers, new HashMap<>(), configuration, "componentName",
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(
             Map.of(
@@ -336,8 +336,8 @@ public class HttpClientExecutorTest {
         headers = new HashMap<>();
 
         httpClientExecutor.createHttpClient(
-            headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
-            Mockito.mock(Context.class));
+            headers, new HashMap<>(), configuration, "componentName",
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
@@ -346,7 +346,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Context.Http.followRedirect(true)
                 .build(),
-            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
+            "componentName", new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
@@ -355,7 +355,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Context.Http.followAllRedirects(true)
                 .build(),
-            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
+            "componentName", new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
@@ -364,7 +364,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Context.Http.proxy("10.11.12.13:30")
                 .build(),
-            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
+            "componentName", new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertTrue(httpClient.proxy()
             .isPresent());
@@ -374,7 +374,7 @@ public class HttpClientExecutorTest {
         httpClient = httpClientExecutor.createHttpClient(
             new HashMap<>(), new HashMap<>(), Context.Http.timeout(Duration.ofMillis(2000))
                 .build(),
-            "componentName", new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
+            "componentName", new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(
             Duration.ofMillis(2000), httpClient.connectTimeout()
@@ -385,8 +385,8 @@ public class HttpClientExecutorTest {
     public void testCreateHTTPRequest() {
         HttpRequest httpRequest = httpClientExecutor.createHTTPRequest(
             "http://localhost:8080", Context.Http.RequestMethod.DELETE, Map.of("header1", List.of("value1")),
-            Map.of("param1", List.of("value1")), null, "componentName", new ComponentConnection(1, Map.of(), null),
-            Mockito.mock(Context.class));
+            Map.of("param1", List.of("value1")), null, "componentName",
+            new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 
         Assertions.assertEquals(Context.Http.RequestMethod.DELETE.name(), httpRequest.method());
 

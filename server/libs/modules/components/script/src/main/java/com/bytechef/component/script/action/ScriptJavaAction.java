@@ -31,38 +31,37 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.JAVA;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
-import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.constant.ScriptConstants;
-import org.springframework.stereotype.Component;
+import com.bytechef.component.script.definition.ScriptActionDefinition;
+import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-@Component(SCRIPT + "/v1/java")
-public class ScriptJavaAction implements TaskHandler<Object> {
+public class ScriptJavaAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(JAVA)
-        .title("Java")
-        .description("Executes custom Java code.")
-        .properties(
-            object(INPUT)
-                .label("Input")
-                .description("Initialize parameter values used in the custom code.")
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()),
-            string(SCRIPT)
-                .label("Java code")
-                .description("Add your Java custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR)
-                .required(true))
-        .output();
+    public final ScriptActionDefinition actionDefinition;
 
-    @Override
-    public Object handle(TaskExecution taskExecution) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("java", taskExecution.getParameters());
+    public ScriptJavaAction(PolyglotEngine polyglotEngine) {
+        this.actionDefinition = new ScriptActionDefinition(
+            action(JAVA)
+                .title("Java")
+                .description("Executes custom Java code.")
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                            time()),
+                    string(SCRIPT)
+                        .label("Java code")
+                        .description("Add your Java custom logic here.")
+                        .controlType(Property.ControlType.CODE_EDITOR)
+                        .defaultValue("public static Object perform(Map<String, ?> input) {\n\treturn null;\n}")
+                        .required(true))
+                .output(),
+            "java", polyglotEngine);
     }
 }

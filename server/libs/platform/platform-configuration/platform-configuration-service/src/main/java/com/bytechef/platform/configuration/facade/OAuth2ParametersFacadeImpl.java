@@ -48,6 +48,7 @@ public class OAuth2ParametersFacadeImpl implements OAuth2ParametersFacade {
         return connectionDefinitionFacade.getOAuth2AuthorizationParameters(
             componentName,
             new ComponentConnection(
+                componentName,
                 connectionVersion, oAuth2Service.checkPredefinedParameters(componentName, connectionParameters),
                 authorizationName));
     }

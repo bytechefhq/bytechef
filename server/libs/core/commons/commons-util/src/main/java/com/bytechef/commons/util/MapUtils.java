@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 
 /**
  * @author Ivica Cardic
@@ -716,6 +717,28 @@ public class MapUtils {
             .collect(Collectors.toMap(keyMapper, valueMapper));
     }
 
+    public static <K, V> MultiValueMap<K, V> toMultiValueMap(Map<K, List<V>> targetMap) {
+        return org.springframework.util.CollectionUtils.toMultiValueMap(targetMap);
+    }
+
+    public static String toString(Map<String, ?> map) {
+        return map.keySet()
+            .stream()
+            .map(key -> {
+                Object value = map.get(key);
+                Class<?> valueClass = value.getClass();
+
+                if (map.get(key) instanceof Collection<?> collection) {
+                    value = CollectionUtils.toString(collection);
+                } else if (valueClass.isArray()) {
+                    value = CollectionUtils.toString(Arrays.asList(getArray(value)));
+                }
+
+                return key + "=" + value;
+            })
+            .collect(Collectors.joining(", ", "{", "}"));
+    }
+
     private static <T> T convert(Object value, Class<T> elementType) {
         return objectMapper.convertValue(value, elementType);
     }
@@ -740,24 +763,6 @@ public class MapUtils {
         }
 
         return value;
-    }
-
-    public static String toString(Map<String, ?> map) {
-        return map.keySet()
-            .stream()
-            .map(key -> {
-                Object value = map.get(key);
-                Class<?> valueClass = value.getClass();
-
-                if (map.get(key) instanceof Collection<?> collection) {
-                    value = CollectionUtils.toString(collection);
-                } else if (valueClass.isArray()) {
-                    value = CollectionUtils.toString(Arrays.asList(getArray(value)));
-                }
-
-                return key + "=" + value;
-            })
-            .collect(Collectors.joining(", ", "{", "}"));
     }
 
     @Autowired

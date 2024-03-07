@@ -68,26 +68,27 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
             new OutputRequest(
-                componentName, componentVersion, actionName, inputParameters, connectionId),
+                componentName, componentVersion, actionName, inputParameters, connectionIds),
             new ParameterizedTypeReference<>() {});
     }
 
     @Override
     public Map<String, ?> executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
-        @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
+        @NonNull Map<String, Long> connectionIds) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
                 componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
-                inputParameters, connectionId),
+                inputParameters, connectionIds),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -115,12 +116,12 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     private record OutputRequest(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Long connectionId) {
+        Map<String, Long> connectionIds) {
     }
 
     private record PerformRequest(
         String componentName, int componentVersion, String actionName, int type, Long instanceId, String workflowId,
-        long jobId, Map<String, ?> inputParameters, Long connectionId) {
+        long jobId, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
     }
 
     private record PropertiesRequest(

@@ -36,6 +36,7 @@
       "label": "From",
       "placeholder": null,
       "controlType": "EMAIL",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -69,6 +70,7 @@
         "label": "Email address",
         "placeholder": null,
         "controlType": "EMAIL",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -78,8 +80,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Email subject.",
@@ -95,6 +97,7 @@
       "label": "Subject",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -128,6 +131,7 @@
         "label": "Email address",
         "placeholder": null,
         "controlType": "EMAIL",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -137,8 +141,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Cc recipients email addresses.",
@@ -168,6 +172,7 @@
         "label": "Email address",
         "placeholder": null,
         "controlType": "EMAIL",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -177,8 +182,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Reply-to email addresses.",
@@ -208,6 +213,7 @@
         "label": "Email address",
         "placeholder": null,
         "controlType": "EMAIL",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -217,8 +223,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The HTML version of the message.",
@@ -234,6 +240,7 @@
       "label": "HTML",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -253,6 +260,7 @@
       "label": "Text",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -272,6 +280,7 @@
       "label": "React",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -305,6 +314,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -313,8 +323,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "A list of attachments to send with the email.",
@@ -358,6 +368,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -377,6 +388,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -396,6 +408,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -415,6 +428,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -426,8 +440,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -474,6 +488,7 @@
           "label": "Name",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": 256,
           "minLength": null,
           "options": null,
@@ -493,20 +508,21 @@
           "label": "Value",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": 256,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send Email",
     "workflowNodeDescriptionFunction": null,
@@ -544,13 +560,14 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     }
@@ -576,6 +593,7 @@
         "label": "Token",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -585,6 +603,8 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -592,8 +612,6 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "authorizationCallback": null
     } ],
     "properties": null,

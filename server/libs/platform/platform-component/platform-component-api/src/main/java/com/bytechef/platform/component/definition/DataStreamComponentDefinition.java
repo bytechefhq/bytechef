@@ -16,12 +16,10 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.component.definition.ComponentDefinition;
-
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamComponentDefinition extends ComponentDefinition {
+public interface DataStreamComponentDefinition extends PlatformComponentDefinition {
 
     /**
      *

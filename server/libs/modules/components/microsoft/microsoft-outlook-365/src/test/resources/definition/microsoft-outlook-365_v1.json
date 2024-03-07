@@ -36,6 +36,7 @@
       "label": "Message id",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -125,6 +126,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -144,23 +146,24 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -193,6 +196,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -212,13 +216,14 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -234,6 +239,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -301,6 +307,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -320,23 +327,24 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -352,6 +360,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -405,8 +414,8 @@
               "label": null,
               "placeholder": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "DATE_TIME"
+              "controlType": "DATE_TIME",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -422,13 +431,14 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -461,8 +471,8 @@
               "label": null,
               "placeholder": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "DATE_TIME"
+              "controlType": "DATE_TIME",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -478,13 +488,14 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -500,6 +511,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -536,8 +548,8 @@
               "label": null,
               "placeholder": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "DATE_TIME"
+              "controlType": "DATE_TIME",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -553,16 +565,17 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -629,6 +642,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -648,19 +662,20 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -700,6 +715,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -719,6 +735,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -769,6 +786,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -788,20 +806,21 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -817,6 +836,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -932,6 +952,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -968,8 +989,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -985,13 +1006,14 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1055,6 +1077,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -1074,23 +1097,24 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1157,6 +1181,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -1176,16 +1201,17 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1201,6 +1227,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -1268,6 +1295,7 @@
                   "label": null,
                   "placeholder": null,
                   "controlType": "TEXT",
+                  "languageId": null,
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
@@ -1287,23 +1315,24 @@
                   "label": null,
                   "placeholder": null,
                   "controlType": "TEXT",
+                  "languageId": null,
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
                   "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1336,6 +1365,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -1355,13 +1385,14 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1377,16 +1408,17 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     }
@@ -1422,8 +1454,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     }
@@ -1516,6 +1548,7 @@
               "label": "Address",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -1535,23 +1568,24 @@
               "label": "Name",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The body of the message. It can be in HTML or text format. ",
@@ -1584,6 +1618,7 @@
           "label": "Content",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1603,6 +1638,7 @@
           "label": "Content type",
           "placeholder": null,
           "controlType": "SELECT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": [ {
@@ -1616,8 +1652,8 @@
           } ],
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The first 255 characters of the message body content.",
@@ -1633,6 +1669,7 @@
         "label": "Body preview",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -1700,6 +1737,7 @@
               "label": "Address",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -1719,23 +1757,24 @@
               "label": "Name",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The ID of the conversation the email belongs to.",
@@ -1751,6 +1790,7 @@
         "label": "Conversation ID",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -1804,8 +1844,8 @@
             "label": "Date Time",
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Represents a time zone, for example, 'Pacific Standard Time'.",
@@ -1821,13 +1861,14 @@
             "label": "Time Zone",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The date and time that the follow-up is to be finished. Note: To set the due date, you must also specify the startDateTime; otherwise, you get a 400 Bad Request response.",
@@ -1860,8 +1901,8 @@
             "label": "Date Time",
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Represents a time zone, for example, 'Pacific Standard Time'.",
@@ -1877,13 +1918,14 @@
             "label": "Time Zone",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The status for follow-up for an item.",
@@ -1899,6 +1941,7 @@
           "label": "Flag status",
           "placeholder": null,
           "controlType": "SELECT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": [ {
@@ -1947,8 +1990,8 @@
             "label": "Date Time",
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": "Represents a time zone, for example, 'Pacific Standard Time'.",
@@ -1964,16 +2007,17 @@
             "label": "Time Zone",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The owner of the mailbox from which the message is sent. In most cases, this value is the same as the sender property, except for sharing or delegation scenarios. The value must correspond to the actual mailbox used.",
@@ -2040,6 +2084,7 @@
               "label": "Address",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -2059,19 +2104,20 @@
               "label": "Name",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "Indicates whether the message has attachments. This property doesn't include inline attachments, so if a message contains only inline attachments, this property is false.",
@@ -2111,6 +2157,7 @@
         "label": "Importance",
         "placeholder": null,
         "controlType": "SELECT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": [ {
@@ -2142,6 +2189,7 @@
         "label": "Inference classification type",
         "placeholder": null,
         "controlType": "SELECT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": [ {
@@ -2200,6 +2248,7 @@
             "label": "Name",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -2219,20 +2268,21 @@
             "label": "Value",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The message ID in the format specified by RFC2822.",
@@ -2248,6 +2298,7 @@
         "label": "Internet message ID",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2363,6 +2414,7 @@
         "label": "Parent folder ID",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2399,8 +2451,8 @@
           "label": "Date time",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2416,13 +2468,14 @@
           "label": "Zone id",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The email addresses to use when replying.",
@@ -2486,6 +2539,7 @@
               "label": "Address",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -2505,23 +2559,24 @@
               "label": "Name",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The account that is actually used to generate the message. In most cases, this value is the same as the from property. You can set this property to a different value when sending a message from a shared mailbox, for a shared calendar, or as a delegate. In any case, the value must correspond to the actual mailbox used.",
@@ -2588,6 +2643,7 @@
               "label": "Address",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -2607,19 +2663,20 @@
               "label": "Name",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The date and time the message was sent.",
@@ -2652,8 +2709,8 @@
           "label": "Date time",
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2669,13 +2726,14 @@
           "label": "Zone id",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The subject of the message.",
@@ -2691,6 +2749,7 @@
         "label": "Subject",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2758,6 +2817,7 @@
               "label": "Address",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -2777,23 +2837,24 @@
               "label": "Name",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "",
@@ -2826,6 +2887,7 @@
           "label": "Content",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2845,6 +2907,7 @@
           "label": "Content type",
           "placeholder": null,
           "controlType": "SELECT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": [ {
@@ -2858,8 +2921,8 @@
           } ],
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": "The URL to open the message in Outlook on the web.",
@@ -2875,13 +2938,14 @@
         "label": "Web link",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Indicates whether to save the message in Sent Items.",
@@ -2933,6 +2997,7 @@
         "label": "Client Id",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2952,6 +3017,7 @@
         "label": "Client Secret",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2971,6 +3037,7 @@
         "label": "Tenant Id",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2980,8 +3047,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -2989,6 +3054,8 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
       "authorizationCallback": null
     } ],
     "properties": null,

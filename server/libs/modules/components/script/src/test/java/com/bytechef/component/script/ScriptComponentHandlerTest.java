@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component;
+package com.bytechef.component.script;
 
-import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * Default component definition factory.
- *
- * @author Ivica Cardic
+ * @author Matija Petanjek
  */
-public interface ComponentDefinitionFactory {
+public class ScriptComponentHandlerTest {
 
-    /**
-     *
-     * @return
-     */
-    ComponentDefinition getDefinition();
-
-    default String getName() {
-        ComponentDefinition componentDefinition = getDefinition();
-
-        return componentDefinition.getName();
-    }
-
-    default int getVersion() {
-        ComponentDefinition componentDefinition = getDefinition();
-
-        return componentDefinition.getVersion();
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/script_v1.json",
+            new ScriptComponentHandler(null).getDefinition());
     }
 }

@@ -36,6 +36,7 @@
       "label": "Script",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -43,6 +44,7 @@
     } ],
     "title": "Execute",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -59,14 +61,14 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       },
       "sampleOutput": "Sample result"
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null,
   "connection": null

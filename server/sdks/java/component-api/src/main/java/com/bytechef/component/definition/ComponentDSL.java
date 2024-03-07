@@ -21,10 +21,6 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.component.definition.TriggerOutputFunction.DynamicWebhookTriggerOutputFunction;
-import com.bytechef.component.definition.TriggerOutputFunction.ListenerTriggerOutputFunction;
-import com.bytechef.component.definition.TriggerOutputFunction.PollTriggerOutputFunction;
-import com.bytechef.component.definition.TriggerOutputFunction.StaticWebhookTriggerOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -236,7 +232,7 @@ public final class ComponentDSL {
         private Map<String, Object> metadata;
         private final String name;
         private ModifiableValueProperty<?, ?> outputSchema;
-        private ActionOutputFunction outputFunction;
+        private OutputFunction outputFunction;
         private List<? extends Property> properties;
         private Object sampleOutput;
         private String title;
@@ -265,6 +261,12 @@ public final class ComponentDSL {
         }
 
         public ModifiableActionDefinition perform(PerformFunction perform) {
+            this.performFunction = perform;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition perform(SingleConnectionPerformFunction perform) {
             this.performFunction = perform;
 
             return this;
@@ -305,7 +307,14 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition output(ActionOutputFunction output) {
+        public ModifiableActionDefinition output(OutputFunction output) {
+            this.outputFunction = output;
+            this.defaultOutputFunction = false;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition output(SingleConnectionOutputFunction output) {
             this.outputFunction = output;
             this.defaultOutputFunction = false;
 
@@ -417,7 +426,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<ActionOutputFunction> getOutputFunction() {
+        public Optional<OutputFunction> getOutputFunction() {
             return Optional.ofNullable(outputFunction);
         }
 
@@ -2592,6 +2601,7 @@ public final class ComponentDSL {
         implements Property.StringProperty {
 
         private ControlType controlType;
+        private String languageId;
         private List<String> loadOptionsDependsOn;
         private Integer maxLength;
         private Integer minLength;
@@ -2620,6 +2630,12 @@ public final class ComponentDSL {
 
         public ModifiableStringProperty exampleValue(String exampleValue) {
             this.exampleValue = exampleValue;
+
+            return this;
+        }
+
+        public ModifiableStringProperty languageId(String languageId) {
+            this.languageId = languageId;
 
             return this;
         }
@@ -2701,6 +2717,11 @@ public final class ComponentDSL {
             } else {
                 return controlType;
             }
+        }
+
+        @Override
+        public Optional<String> getLanguageId() {
+            return Optional.ofNullable(languageId);
         }
 
         @Override

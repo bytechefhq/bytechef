@@ -21,7 +21,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.ComponentDefinitionFactory;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -134,7 +133,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
         public Map<String, TriggerHandler> getTriggerHandlerMap() {
             return componentHandlerEntries.stream()
                 .map(ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)
-                .map(ComponentDefinitionFactory::getDefinition)
+                .map(ComponentHandler::getDefinition)
                 .map(this::collect)
                 .reduce(Map.of(), MapUtils::concat);
         }

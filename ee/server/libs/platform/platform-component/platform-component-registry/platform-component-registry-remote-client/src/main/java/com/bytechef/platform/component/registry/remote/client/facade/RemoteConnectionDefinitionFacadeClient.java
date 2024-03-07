@@ -14,7 +14,6 @@ import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParame
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -37,16 +36,6 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public Authorization.ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull ComponentConnection connection) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-apply"),
-            new ConnectionRequest(componentName, connection), Authorization.ApplyResponse.class);
-    }
-
-    @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
         @NonNull String componentName,
         @NonNull ComponentConnection connection, @NonNull String redirectUri) {
@@ -56,15 +45,6 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
             new AuthorizationCallbackRequest(componentName, connection, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
-    }
-
-    @Override
-    public Optional<String> executeBaseUri(
-        @NonNull String componentName, ComponentConnection connection) {
-        return Optional.ofNullable(
-            defaultRestClient.post(
-                uriBuilder -> toUri(uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-base-uri"),
-                new ConnectionRequest(componentName, connection), String.class));
     }
 
     @Override

@@ -16,35 +16,13 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.component.definition.ComponentDefinition;
-
 /**
  * @author Ivica Cardic
  */
-public interface ScriptComponentDefinition extends ComponentDefinition {
+public interface ScriptComponentDefinition extends PlatformComponentDefinition {
 
     /**
      *
      */
     String SCRIPT = "script";
-
-    /**
-     *
-     * @return
-     */
-    FilterConnectionDefinitionPredicate getFilterConnectionDefinition();
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface FilterConnectionDefinitionPredicate {
-
-        /**
-         *
-         * @param componentDefinition
-         * @return
-         */
-        boolean apply(ComponentDefinition componentDefinition);
-    }
 }

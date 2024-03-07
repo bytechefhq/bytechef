@@ -26,7 +26,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.definition.TriggerOutputFunction.PollTriggerOutputFunction;
+import com.bytechef.component.definition.TriggerDefinition.PollTriggerOutputFunction;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

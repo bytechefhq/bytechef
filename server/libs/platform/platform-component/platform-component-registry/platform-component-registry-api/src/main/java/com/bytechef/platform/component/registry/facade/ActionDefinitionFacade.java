@@ -38,11 +38,12 @@ public interface ActionDefinitionFacade {
 
     Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
-        @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters, Long connectionId);
+        @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
+        @NonNull Map<String, Long> connectionIds);
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

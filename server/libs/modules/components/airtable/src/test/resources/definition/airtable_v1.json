@@ -43,6 +43,7 @@
       "label": "Base Id",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -67,6 +68,7 @@
       "label": "Table Id",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -94,6 +96,7 @@
     } ],
     "title": "Creates a record",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -315,6 +318,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -347,8 +351,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   } ],
   "triggers": [ {
     "batch": null,
@@ -373,6 +376,7 @@
       "label": "BaseId",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -392,6 +396,7 @@
       "label": "TableId",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -411,6 +416,7 @@
       "label": "TriggerField",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -423,9 +429,9 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "output": null,
     "deduplicate": null,
     "poll": { },
+    "output": null,
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
@@ -454,6 +460,7 @@
         "label": "Token",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,

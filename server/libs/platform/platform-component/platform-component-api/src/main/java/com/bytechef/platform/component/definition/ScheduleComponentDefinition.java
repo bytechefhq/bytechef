@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.component.definition;
 
 /**
- *
+ * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface ActionOutputFunction {
-
-    /**
-     * @param inputParameters
-     * @param connectionParameters
-     * @param context
-     * @return
-     */
-    Output apply(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
+public interface ScheduleComponentDefinition extends PlatformComponentDefinition {
 }

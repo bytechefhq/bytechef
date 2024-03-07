@@ -19,7 +19,6 @@ package com.bytechef.commons.util;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -29,7 +28,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.Nullable;
-import org.springframework.util.MultiValueMap;
 
 /**
  * @author Ivica Cardic
@@ -122,13 +120,24 @@ public final class CollectionUtils {
             elseObject);
     }
 
-    public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
+    public static <T> T findFirstFilterOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
         Validate.notNull(list, "'list' must not be null");
         Validate.notNull(filter, "'filter' must not be null");
 
         return OptionalUtils.orElse(
             list.stream()
                 .filter(filter)
+                .findFirst(),
+            elseObject);
+    }
+
+    public static <T, R> R findFirstMapOrElse(Collection<T> list, Function<? super T, R> mapper, R elseObject) {
+        Validate.notNull(list, "'list' must not be null");
+        Validate.notNull(mapper, "'mapper' must not be null");
+
+        return OptionalUtils.orElse(
+            list.stream()
+                .map(mapper)
                 .findFirst(),
             elseObject);
     }
@@ -144,26 +153,42 @@ public final class CollectionUtils {
             .toList();
     }
 
-    public static <T> T getFirst(Collection<T> list, Predicate<? super T> filter) {
-        Validate.notNull(list, "'list' must not be null");
+    public static <T> T getFirst(Collection<T> collection) {
+        return OptionalUtils.get(
+            collection.stream()
+                .findFirst());
+    }
+
+    public static <T> T getFirst(Collection<T> collection, Predicate<? super T> filter) {
+        Validate.notNull(collection, "'collection' must not be null");
         Validate.notNull(filter, "'filter' must not be null");
 
         return OptionalUtils.get(
-            list.stream()
+            collection.stream()
                 .filter(filter)
                 .findFirst());
     }
 
-    public static <T, U> U getFirst(
-        Collection<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
+    public static <T, U> U getFirstFilter(
+        Collection<T> collection, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
 
-        Validate.notNull(list, "'list' must not be null");
+        Validate.notNull(collection, "'list' must not be null");
         Validate.notNull(filter, "'filter' must not be null");
         Validate.notNull(mapper, "'mapper' must not be null");
 
         return OptionalUtils.get(
-            list.stream()
+            collection.stream()
                 .filter(filter)
+                .map(mapper)
+                .findFirst());
+    }
+
+    public static <T, U> U getFirstMap(Collection<T> collection, Function<? super T, ? extends U> mapper) {
+        Validate.notNull(collection, "'collection' must not be null");
+        Validate.notNull(mapper, "'mapper' must not be null");
+
+        return OptionalUtils.get(
+            collection.stream()
                 .map(mapper)
                 .findFirst());
     }
@@ -229,10 +254,6 @@ public final class CollectionUtils {
 
     public static <T> List<T> toList(Stream<T> stream) {
         return stream.toList();
-    }
-
-    public static <K, V> MultiValueMap<K, V> toMultiValueMap(Map<K, List<V>> targetMap) {
-        return org.springframework.util.CollectionUtils.toMultiValueMap(targetMap);
     }
 
     public static String toString(Collection<?> collection) {

@@ -237,7 +237,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             projects,
             project -> new ProjectDTO(
                 project,
-                CollectionUtils.findFirstOrElse(
+                CollectionUtils.findFirstFilterOrElse(
                     categoryService.getCategories(
                         projects
                             .stream()

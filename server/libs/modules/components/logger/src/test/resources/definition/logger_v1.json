@@ -36,6 +36,7 @@
       "label": null,
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -43,8 +44,8 @@
     } ],
     "title": "Debug",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -69,6 +70,7 @@
       "label": null,
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -76,8 +78,8 @@
     } ],
     "title": "Error",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -102,6 +104,7 @@
       "label": null,
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -109,8 +112,8 @@
     } ],
     "title": "Info",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -135,6 +138,7 @@
       "label": null,
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -142,8 +146,8 @@
     } ],
     "title": "Warn",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null,
   "connection": null
