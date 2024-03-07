@@ -46,15 +46,15 @@ export default async function saveWorkflowDefinition(
         parameters,
         type: `${componentName}/v1/${actionName || newNodeComponentDefinition.actions?.[0].name}`,
     };
+    const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-    const existingWorkflowTask = workflow.tasks?.find((task) => task.name === newTask.name);
+    const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
 
     if (existingWorkflowTask && !actionName) {
         return;
     }
 
     let tasks: WorkflowTaskModel[];
-    const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     if (existingWorkflowTask) {
         const existingTaskIndex = workflowDefinition.tasks?.findIndex(
@@ -83,10 +83,6 @@ export default async function saveWorkflowDefinition(
         if (existingWorkflowTask.type !== newTask.type) {
             delete tasks[existingTaskIndex].parameters;
         }
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        delete tasks[existingTaskIndex].connections;
     } else if (index !== undefined && index > -1) {
         tasks = [...(workflowDefinition.tasks || [])];
 
