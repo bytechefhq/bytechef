@@ -432,10 +432,6 @@ const Property = ({
         }
     }, [currentComponentData?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
-    if (controlType === 'OBJECT_BUILDER' && !properties?.length && !additionalProperties?.length) {
-        return <></>;
-    }
-
     if (displayCondition === false || (property.displayCondition && isDisplayConditionLoading)) {
         return <></>;
     }
