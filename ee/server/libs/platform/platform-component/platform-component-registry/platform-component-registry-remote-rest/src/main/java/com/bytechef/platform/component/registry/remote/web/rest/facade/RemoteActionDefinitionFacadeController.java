@@ -93,7 +93,7 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
                 performRequest.type, performRequest.instanceId, performRequest.workflowId,
-                performRequest.jobId, performRequest.inputParameters, performRequest.connectionId));
+                performRequest.jobId, performRequest.inputParameters, performRequest.connectionIds));
     }
 
     @RequestMapping(
@@ -108,7 +108,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOutput(
                 outputRequest.componentName, outputRequest.componentVersion, outputRequest.actionName,
-                outputRequest.inputParameters, outputRequest.connectionId));
+                outputRequest.inputParameters, outputRequest.connectionIds));
     }
 
     @SuppressFBWarnings("EI")
@@ -126,7 +126,7 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record OutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters, Long connectionId) {
+        Map<String, Object> inputParameters, @NotNull Map<String, Long> connectionIds) {
     }
 
     @SuppressFBWarnings("EI")
@@ -136,15 +136,9 @@ public class RemoteActionDefinitionFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record SampleOutputRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters, Long connectionId) {
-    }
-
-    @SuppressFBWarnings("EI")
     public record PerformRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, int type,
         Long instanceId, @NonNull String workflowId, long jobId, @NotNull Map<String, ?> inputParameters,
-        Long connectionId) {
+        @NotNull Map<String, Long> connectionIds) {
     }
 }

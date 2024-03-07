@@ -16,10 +16,13 @@
 
 package com.bytechef.platform.component.registry.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionOutputFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -28,6 +31,8 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
+import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
@@ -102,14 +107,24 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull ActionContext context) {
 
-        ActionOutputFunction outputFunction = getOutputFunction(componentName, componentVersion, actionName);
+        OutputFunction outputFunction = getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            com.bytechef.component.definition.Output output = outputFunction.apply(
-                new ParametersImpl(inputParameters),
-                new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
+            com.bytechef.component.definition.Output output = switch (outputFunction) {
+                case SingleConnectionOutputFunction singleConnectionOutputFunction ->
+                    singleConnectionOutputFunction.apply(
+                        new ParametersImpl(inputParameters),
+                        new ParametersImpl(
+                            CollectionUtils.findFirstMapOrElse(
+                                connections.values(), ComponentConnection::parameters, Map.of())),
+                        context);
+                case MultipleConnectionsOutputFunction multipleConnectionsOutputFunction ->
+                    multipleConnectionsOutputFunction.apply(new ParametersImpl(inputParameters), connections, context);
+                default -> throw new IllegalStateException();
+            };
 
             return SchemaUtils.toOutput(
                 output,
@@ -123,7 +138,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -131,9 +147,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return actionDefinition.getPerform()
             .map(performFunction -> {
                 try {
-                    return performFunction.apply(
-                        new ParametersImpl(inputParameters),
-                        new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
+                    return switch (performFunction) {
+                        case SingleConnectionPerformFunction singleConnectionPerformFunction ->
+                            singleConnectionPerformFunction.apply(
+                                new ParametersImpl(inputParameters),
+                                new ParametersImpl(
+                                    CollectionUtils.findFirstMapOrElse(
+                                        connections.values(), ComponentConnection::parameters, Map.of())),
+                                context);
+                        case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
+                            multipleConnectionsPerformFunction.apply(
+                                new ParametersImpl(inputParameters), connections, context);
+                        default -> throw new IllegalStateException();
+                    };
                 } catch (Exception e) {
                     throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 104);
                 }
@@ -225,7 +251,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             .orElse(componentDefinition.getName());
     }
 
-    private ActionOutputFunction getOutputFunction(
+    private OutputFunction getOutputFunction(
         String componentName, int componentVersion, String actionName) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
@@ -240,8 +266,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                 PerformFunction performFunction = OptionalUtils.get(actionDefinition.getPerform());
 
-                return (inputParameters, connectionParameters, context) -> context.output(
-                    output -> output.get(performFunction.apply(inputParameters, connectionParameters, context)));
+                return switch (performFunction) {
+                    case SingleConnectionPerformFunction singleConnectionPerformFunction ->
+                        (SingleConnectionOutputFunction) (inputParameters, connectionParameters, context) -> context
+                            .output(output -> output.get(
+                                singleConnectionPerformFunction.apply(inputParameters, connectionParameters, context)));
+                    case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
+                        (MultipleConnectionsOutputFunction) (inputParameters, connectionParameters, context) -> context
+                            .output(output -> output.get(
+                                multipleConnectionsPerformFunction.apply(
+                                    inputParameters, connectionParameters, context)));
+                    default -> throw new IllegalStateException();
+                };
             });
     }
 }

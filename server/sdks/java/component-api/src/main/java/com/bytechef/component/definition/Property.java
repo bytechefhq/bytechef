@@ -176,6 +176,12 @@ public interface Property extends BaseProperty {
      *
      */
     interface StringProperty extends BaseStringProperty, DynamicOptionsProperty<String>, ValueProperty<String> {
+
+        /**
+         *
+         * @return
+         */
+        Optional<String> getLanguageId();
     }
 
     /**

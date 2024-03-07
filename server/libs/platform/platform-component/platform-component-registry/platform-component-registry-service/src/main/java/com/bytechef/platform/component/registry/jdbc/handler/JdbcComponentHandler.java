@@ -33,7 +33,7 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionOutputFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -227,27 +227,27 @@ public class JdbcComponentHandler implements ComponentHandler {
         return componentDefinition;
     }
 
-    protected ActionOutputFunction getDeleteOutputSchemaFunction() {
+    protected SingleConnectionOutputFunction getDeleteOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performDelete(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputFunction getExecuteOutputSchemaFunction() {
+    protected SingleConnectionOutputFunction getExecuteOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.output(
             output -> output.get(performExecute(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputFunction getInsertOutputSchemaFunction() {
+    protected SingleConnectionOutputFunction getInsertOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performInsert(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputFunction getQueryOutputFunction() {
+    protected SingleConnectionOutputFunction getQueryOutputFunction() {
         return (inputParameters, connectionParameters, context) -> context.output(
             output -> output.get(performQuery(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputFunction getUpdateOutputSchemaFunction() {
+    protected SingleConnectionOutputFunction getUpdateOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performUpdate(inputParameters, connectionParameters, context)));
     }

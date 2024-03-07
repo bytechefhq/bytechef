@@ -29,6 +29,7 @@ import org.springframework.lang.Nullable;
  */
 public class StringProperty extends ValueProperty<String> {
 
+    private String languageId;
     private Integer maxLength;
     private Integer minLength;
     private List<Option> options;
@@ -40,6 +41,7 @@ public class StringProperty extends ValueProperty<String> {
     public StringProperty(Property.StringProperty stringProperty) {
         super(stringProperty);
 
+        this.languageId = OptionalUtils.orElse(stringProperty.getLanguageId(), null);
         this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);
         this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
         this.options = CollectionUtils.map(
@@ -51,6 +53,11 @@ public class StringProperty extends ValueProperty<String> {
     @Override
     public Object accept(PropertyVisitor propertyVisitor) {
         return propertyVisitor.visit(this);
+    }
+
+    @Nullable
+    public String getLanguageId() {
+        return languageId;
     }
 
     @Nullable

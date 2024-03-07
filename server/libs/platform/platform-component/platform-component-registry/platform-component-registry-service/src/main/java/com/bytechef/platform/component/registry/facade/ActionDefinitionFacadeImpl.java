@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.registry.facade;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
@@ -27,6 +28,8 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -80,29 +83,38 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
+        Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);
+
+        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
 
         return actionDefinitionService.executeOutput(
-            componentName, componentVersion, actionName, inputParameters, componentConnection,
+            componentName, componentVersion, actionName, inputParameters, componentConnections,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
+                componentName, componentVersion, actionName, null, null, null, null,
+                entries.size() == 1
+                    ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
+                    : null));
     }
 
     @Override
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull int type,
         Long instanceId, @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
-        Long connectionId) {
+        @NonNull Map<String, Long> connectionIds) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
+        Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);
+
+        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
 
         return actionDefinitionService.executePerform(
-            componentName, componentVersion, actionName, inputParameters, componentConnection,
+            componentName, componentVersion, actionName, inputParameters, componentConnections,
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
-                componentConnection));
+                entries.size() == 1
+                    ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
+                    : null));
     }
 
     @Override
@@ -123,9 +135,26 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             Connection connection = connectionService.getConnection(connectionId);
 
             componentConnection = new ComponentConnection(
-                connection.getConnectionVersion(), connection.getParameters(), connection.getAuthorizationName());
+                connection.getComponentName(), connection.getConnectionVersion(), connection.getParameters(),
+                connection.getAuthorizationName());
         }
 
         return componentConnection;
+    }
+
+    private Map<String, ComponentConnection> getComponentConnections(Map<String, Long> connectionIds) {
+        return connectionIds
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> {
+                        Connection connection = connectionService.getConnection(entry.getValue());
+
+                        return new ComponentConnection(
+                            connection.getComponentName(), connection.getConnectionVersion(),
+                            connection.getParameters(), connection.getAuthorizationName());
+                    }));
     }
 }

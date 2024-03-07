@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component;
+package com.bytechef.platform.configuration.workflow.connection;
 
-import com.bytechef.component.definition.JdbcComponentDefinition;
+import com.bytechef.platform.component.registry.domain.ComponentDefinition;
+import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import java.util.List;
+import java.util.Map;
 
 /**
- * The component definition factory used for JDBC based components.
- *
  * @author Ivica Cardic
  */
-public interface JdbcComponentDefinitionFactory {
+public interface WorkflowConnectionFactory {
 
-    /**
-     *
-     * @return
-     */
-    JdbcComponentDefinition getJdbcComponentDefinition();
+    List<WorkflowConnection> create(
+        String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition);
 }

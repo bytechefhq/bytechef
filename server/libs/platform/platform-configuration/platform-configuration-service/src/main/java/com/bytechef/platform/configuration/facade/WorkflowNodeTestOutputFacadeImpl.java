@@ -28,6 +28,7 @@ import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -72,20 +73,25 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        Long connectionId = workflowTestConfigurationService
-            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
-            .orElse(null);
-
         return WorkflowTrigger
             .fetch(workflow, workflowNodeName)
             .map(workflowTrigger -> saveTriggerWorkflowNodeTestOutput(
-                workflowId, workflowNodeName, workflowTrigger, connectionId))
-            .orElseGet(() -> saveActionWorkflowNodeTestOutput(workflowId, workflowNodeName, workflow, connectionId));
+                workflowId, workflowNodeName, workflowTrigger,
+                workflowTestConfigurationService
+                    .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+                    .orElse(null)))
+            .orElseGet(() -> saveActionWorkflowNodeTestOutput(
+                workflowId, workflowNodeName, workflow,
+                MapUtils.toMap(
+                    workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                        workflowId, workflowNodeName),
+                    WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                    WorkflowTestConfigurationConnection::getConnectionId)));
     }
 
     @SuppressWarnings("unchecked")
     private WorkflowNodeTestOutput saveActionWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Workflow workflow, Long connectionId) {
+        String workflowId, String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
@@ -104,13 +110,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         if (actionDefinition.isOutputFunctionDefined()) {
             Output output = actionDefinitionFacade.executeOutput(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), inputParameters, connectionId);
+                workflowNodeType.componentOperationName(), inputParameters, connectionIds);
 
             return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
         } else {
             Object sampleOutput = actionDefinitionFacade.executePerform(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), 0, null, workflowId, null, inputParameters, connectionId);
+                workflowNodeType.componentOperationName(), 0, null, workflowId, null, inputParameters, connectionIds);
 
             return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
         }

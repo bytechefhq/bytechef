@@ -50,6 +50,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -69,6 +70,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -88,6 +90,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -107,6 +110,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -128,6 +132,7 @@
       "label": "Sheet Name",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -245,8 +250,8 @@
     } ],
     "title": "Read from file",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -271,6 +276,7 @@
       "label": "Sheet Name",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -432,6 +438,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -481,6 +488,7 @@
       "label": "Filename",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -488,6 +496,7 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -518,6 +527,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -537,6 +547,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -556,6 +567,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -575,6 +587,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -583,8 +596,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null,
   "connection": null

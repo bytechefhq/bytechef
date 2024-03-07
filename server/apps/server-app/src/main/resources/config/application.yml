@@ -108,7 +108,7 @@ spring:
         queue-capacity: 10000
   threads:
     virtual:
-      enabled: true
+#      enabled: true
 
 server:
   servlet:

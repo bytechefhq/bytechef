@@ -16,6 +16,7 @@
 
 package com.bytechef.component;
 
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-public interface ComponentHandler extends ComponentDefinitionFactory {
+public interface ComponentHandler {
 
     /**
      * This can be useful if we still want to have only one method to handle all actions instead of defining
@@ -35,6 +36,24 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
      */
     default Optional<ActionHandlerFunction> getActionHandler() {
         return Optional.empty();
+    }
+
+    /**
+     *
+     * @return
+     */
+    ComponentDefinition getDefinition();
+
+    default String getName() {
+        ComponentDefinition componentDefinition = getDefinition();
+
+        return componentDefinition.getName();
+    }
+
+    default int getVersion() {
+        ComponentDefinition componentDefinition = getDefinition();
+
+        return componentDefinition.getVersion();
     }
 
     /**

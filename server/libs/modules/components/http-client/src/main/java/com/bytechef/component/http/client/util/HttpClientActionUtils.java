@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -142,7 +142,7 @@ public class HttpClientActionUtils {
         }
     }
 
-    public static PerformFunction getPerform(RequestMethod requestMethod) {
+    public static ActionDefinition.SingleConnectionPerformFunction getPerform(RequestMethod requestMethod) {
         return (inputParameters, connectionParameters, context) -> HttpClientActionUtils.execute(
             inputParameters, requestMethod, context);
     }

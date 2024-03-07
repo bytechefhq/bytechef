@@ -9,7 +9,7 @@ package com.bytechef.platform.component.registry.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.rest.client.DefaultRestClient;
-import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
@@ -53,7 +53,7 @@ public abstract class AbstractWorkerClient {
         Map<String, List<String>> queryParams) {
 
         return build(uriBuilder, serviceInstance, path)
-            .queryParams(CollectionUtils.toMultiValueMap(queryParams))
+            .queryParams(MapUtils.toMultiValueMap(queryParams))
             .build(uriVariables);
     }
 

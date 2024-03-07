@@ -44,18 +44,17 @@ public interface ActionDefinitionService {
 
     Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
         @NonNull ActionContext context);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
         @NonNull ActionContext context);
 
     String executeWorkflowNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        @NonNull ActionContext context);
+        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context);
 
     ActionDefinition getActionDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String actionName);

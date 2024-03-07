@@ -527,4 +527,86 @@ public interface TriggerDefinition {
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context);
     }
+
+    /**
+     *
+     */
+    interface TriggerOutputFunction {
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface DynamicWebhookTriggerOutputFunction extends TriggerOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param output
+         * @param context
+         * @return
+         */
+        Output apply(
+            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
+            TriggerContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ListenerTriggerOutputFunction extends TriggerOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param workflowExecutionId
+         */
+        Output accept(
+            Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
+            TriggerContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface PollTriggerOutputFunction extends TriggerOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param closureParameters
+         * @param context
+         * @return
+         */
+        Output apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
+            throws Exception;
+
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface StaticWebhookTriggerOutputFunction extends TriggerOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param headers
+         * @param parameters
+         * @param body
+         * @param method
+         * @param context
+         * @return
+         */
+        Output apply(
+            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext context) throws Exception;
+    }
 }

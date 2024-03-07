@@ -31,47 +31,38 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.PYTHON;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
-import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.constant.ScriptConstants;
-import org.springframework.stereotype.Component;
+import com.bytechef.component.script.definition.ScriptActionDefinition;
+import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-@Component(SCRIPT + "/v1/python")
-public class ScriptPythonAction implements TaskHandler<Object> {
+public class ScriptPythonAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(PYTHON)
-        .title("Python")
-        .description("Executes custom Python code.")
-        .properties(
-            object(INPUT)
-                .label("Input")
-                .description("Initialize parameter values used in the custom code.")
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()),
-            string(SCRIPT)
-                .label("Python code")
-                .description("Add your Python custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR)
-                .required(true))
-        .output()
-        .perform(ScriptPythonAction::perform);
+    public final ScriptActionDefinition actionDefinition;
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return ScriptConstants.POLYGLOT_ENGINE.execute("python", inputParameters);
-    }
-
-    @Override
-    public Object handle(TaskExecution taskExecution) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("python", taskExecution.getParameters());
+    public ScriptPythonAction(PolyglotEngine polyglotEngine) {
+        actionDefinition = new ScriptActionDefinition(
+            action(PYTHON)
+                .title("Python")
+                .description("Executes custom Python code.")
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                            time()),
+                    string(SCRIPT)
+                        .label("Python code")
+                        .description("Add your Python custom logic here.")
+                        .controlType(Property.ControlType.CODE_EDITOR)
+                        .languageId("python")
+                        .defaultValue("def perform(input):\n\treturn null")
+                        .required(true))
+                .output(),
+            "python", polyglotEngine);
     }
 }

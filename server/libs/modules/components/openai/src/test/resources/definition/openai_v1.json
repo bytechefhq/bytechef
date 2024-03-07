@@ -67,6 +67,7 @@
           "label": "Content",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -86,6 +87,7 @@
           "label": "Role",
           "placeholder": null,
           "controlType": "SELECT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": [ {
@@ -121,20 +123,21 @@
           "label": "Name",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "ID of the model to use.",
@@ -150,6 +153,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -174,8 +178,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Modify the likelihood of specified tokens appearing in the completion.",
@@ -210,14 +214,14 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum number of tokens to generate in the chat completion.",
@@ -235,8 +239,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "How many chat completion choices to generate for each input message.",
@@ -254,8 +258,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -276,8 +280,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An object specifying the format that the model must output. Compatible with gpt-4-1106-preview and gpt-3.5-turbo-1106",
@@ -296,8 +300,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "This feature is in Beta. If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.",
@@ -315,8 +319,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Up to 4 sequences where the API will stop generating further tokens.",
@@ -346,6 +350,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -355,8 +360,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -377,8 +382,8 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -399,8 +404,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.",
@@ -447,6 +452,7 @@
           "label": "Type",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -483,6 +489,7 @@
             "label": "Description",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -502,6 +509,7 @@
             "label": "Name",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": 64,
             "minLength": null,
             "options": null,
@@ -524,21 +532,21 @@
             "multipleValues": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -557,8 +565,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.",
@@ -574,6 +582,7 @@
       "label": "User",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -581,7 +590,6 @@
     } ],
     "title": "Ask ChatGPT",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -615,6 +623,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -634,6 +643,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -655,8 +665,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -672,6 +682,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -724,8 +735,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -758,6 +769,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -777,6 +789,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -796,6 +809,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -832,6 +846,7 @@
                   "label": null,
                   "placeholder": null,
                   "controlType": "TEXT",
+                  "languageId": null,
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
@@ -854,14 +869,14 @@
                   "multipleValues": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -877,20 +892,21 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -925,8 +941,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -944,8 +960,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -963,17 +979,18 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -998,6 +1015,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -1017,6 +1035,7 @@
       "label": "Name",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": 256,
       "minLength": null,
       "options": null,
@@ -1036,6 +1055,7 @@
       "label": "Description",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": 512,
       "minLength": null,
       "options": null,
@@ -1055,6 +1075,7 @@
       "label": "Instructions",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": 32768,
       "minLength": null,
       "options": null,
@@ -1105,6 +1126,7 @@
           "label": "Type",
           "placeholder": null,
           "controlType": "SELECT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": [ {
@@ -1153,6 +1175,7 @@
             "label": "Description",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -1172,6 +1195,7 @@
             "label": "Name",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": 64,
             "minLength": null,
             "options": null,
@@ -1208,27 +1232,27 @@
               "multipleValues": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A list of file IDs attached to this assistant.",
@@ -1258,6 +1282,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -1267,8 +1292,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information about the object in a structured format. Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.",
@@ -1298,6 +1323,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -1306,12 +1332,11 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Create assistant",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1345,6 +1370,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1364,6 +1390,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1385,8 +1412,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1402,6 +1429,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1421,6 +1449,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1440,6 +1469,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1459,6 +1489,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -1509,6 +1540,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -1545,6 +1577,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -1564,6 +1597,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -1586,21 +1620,21 @@
                 "multipleValues": null,
                 "options": null,
                 "properties": null,
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1630,6 +1664,7 @@
             "label": null,
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -1639,8 +1674,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1659,14 +1694,15 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1706,6 +1742,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -1733,6 +1770,7 @@
       "label": "Quality",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -1760,6 +1798,7 @@
       "label": "Response format",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -1787,6 +1826,7 @@
       "label": "Size",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -1809,6 +1849,7 @@
       "label": "Style",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -1836,6 +1877,7 @@
       "label": "User",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -1843,7 +1885,6 @@
     } ],
     "title": "Create image",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1879,8 +1920,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1927,6 +1968,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "URL",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -1946,6 +1988,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -1965,26 +2008,28 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2009,6 +2054,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -2036,6 +2082,7 @@
       "label": "Input",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": 4096,
       "minLength": null,
       "options": null,
@@ -2055,6 +2102,7 @@
       "label": "Voice",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -2098,6 +2146,7 @@
       "label": "Response format",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -2138,12 +2187,11 @@
       "minValue": 0.25,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "title": "Create speech",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2174,6 +2222,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2193,6 +2242,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2212,6 +2262,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2231,6 +2282,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2239,7 +2291,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2278,6 +2331,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2297,6 +2351,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2316,6 +2371,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2335,6 +2391,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -2356,6 +2413,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -2379,6 +2437,7 @@
       "label": "Language",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -2626,6 +2685,7 @@
       "label": "Prompt",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -2645,6 +2705,7 @@
       "label": "Response format",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -2689,12 +2750,11 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "title": "Create transcriptions",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2728,6 +2788,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2747,6 +2808,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2766,6 +2828,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -2790,8 +2853,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -2840,8 +2903,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -2859,8 +2922,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -2881,8 +2944,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -2903,8 +2966,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -2920,6 +2983,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -2955,15 +3019,15 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               } ],
               "maxItems": null,
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "ARRAY_BUILDER"
+              "controlType": "ARRAY_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -2984,8 +3048,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3006,8 +3070,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3028,8 +3092,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3050,8 +3114,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3077,21 +3141,22 @@
               } ],
               "controlType": "SELECT"
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -3130,6 +3195,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -3149,6 +3215,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -3168,6 +3235,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -3187,6 +3255,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -3208,6 +3277,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -3231,6 +3301,7 @@
       "label": "Prompt",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -3250,6 +3321,7 @@
       "label": "Response format",
       "placeholder": null,
       "controlType": "SELECT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": [ {
@@ -3294,12 +3366,11 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "title": "Create translation",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3333,6 +3404,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -3352,6 +3424,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -3371,6 +3444,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -3395,8 +3469,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -3445,8 +3519,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3464,8 +3538,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3486,8 +3560,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3508,8 +3582,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3525,6 +3599,7 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -3560,15 +3635,15 @@
                 "maxValue": null,
                 "minValue": null,
                 "options": null,
-                "optionsDataSource": null,
-                "controlType": "INTEGER"
+                "controlType": "INTEGER",
+                "optionsDataSource": null
               } ],
               "maxItems": null,
               "minItems": null,
               "multipleValues": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "ARRAY_BUILDER"
+              "controlType": "ARRAY_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3589,8 +3664,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3611,8 +3686,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3633,8 +3708,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3655,8 +3730,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "NUMBER"
+              "controlType": "NUMBER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -3682,21 +3757,22 @@
               } ],
               "controlType": "SELECT"
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -3783,6 +3859,7 @@
               "label": "Type",
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
@@ -3819,6 +3896,7 @@
                 "label": "URL",
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -3838,23 +3916,24 @@
                 "label": "Detail",
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The role of the messages author",
@@ -3870,6 +3949,7 @@
           "label": "Role",
           "placeholder": null,
           "controlType": "SELECT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": [ {
@@ -3905,20 +3985,21 @@
           "label": "Name",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "ID of the model to use.",
@@ -3934,6 +4015,7 @@
       "label": "Model",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -3958,8 +4040,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Modify the likelihood of specified tokens appearing in the completion.",
@@ -3994,14 +4076,14 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum number of tokens to generate in the chat completion.",
@@ -4019,8 +4101,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "How many chat completion choices to generate for each input message.",
@@ -4038,8 +4120,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -4060,8 +4142,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An object specifying the format that the model must output. Compatible with gpt-4-1106-preview and gpt-3.5-turbo-1106",
@@ -4080,8 +4162,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "This feature is in Beta. If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.",
@@ -4099,8 +4181,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Up to 4 sequences where the API will stop generating further tokens.",
@@ -4130,6 +4212,7 @@
         "label": null,
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -4139,8 +4222,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -4161,8 +4244,8 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -4183,8 +4266,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.",
@@ -4231,6 +4314,7 @@
           "label": "Type",
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -4267,6 +4351,7 @@
             "label": "Description",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
@@ -4286,6 +4371,7 @@
             "label": "Name",
             "placeholder": null,
             "controlType": "TEXT",
+            "languageId": null,
             "maxLength": 64,
             "minLength": null,
             "options": null,
@@ -4308,21 +4394,21 @@
             "multipleValues": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -4341,8 +4427,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.",
@@ -4358,6 +4444,7 @@
       "label": "User",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -4365,7 +4452,6 @@
     } ],
     "title": "Vision Prompt",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -4399,6 +4485,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -4418,6 +4505,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -4439,8 +4527,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -4456,6 +4544,7 @@
           "label": null,
           "placeholder": null,
           "controlType": "TEXT",
+          "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
@@ -4508,8 +4597,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -4542,6 +4631,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -4561,6 +4651,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -4580,6 +4671,7 @@
                 "label": null,
                 "placeholder": null,
                 "controlType": "TEXT",
+                "languageId": null,
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
@@ -4616,6 +4708,7 @@
                   "label": null,
                   "placeholder": null,
                   "controlType": "TEXT",
+                  "languageId": null,
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
@@ -4638,14 +4731,14 @@
                   "multipleValues": null,
                   "options": null,
                   "properties": null,
-                  "optionsDataSource": null,
-                  "controlType": "OBJECT_BUILDER"
+                  "controlType": "OBJECT_BUILDER",
+                  "optionsDataSource": null
                 } ],
-                "optionsDataSource": null,
-                "controlType": "OBJECT_BUILDER"
+                "controlType": "OBJECT_BUILDER",
+                "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             }, {
               "advancedOption": null,
               "description": null,
@@ -4661,20 +4754,21 @@
               "label": null,
               "placeholder": null,
               "controlType": "TEXT",
+              "languageId": null,
               "maxLength": null,
               "minLength": null,
               "options": null,
               "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -4709,8 +4803,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -4728,8 +4822,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -4747,17 +4841,18 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "triggers": null,
   "connection": {
@@ -4780,6 +4875,7 @@
         "label": "Token",
         "placeholder": null,
         "controlType": "TEXT",
+        "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
@@ -4789,16 +4885,16 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,

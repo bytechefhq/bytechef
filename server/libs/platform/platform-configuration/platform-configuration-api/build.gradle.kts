@@ -1,5 +1,6 @@
 dependencies {
     api(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    api(project(":server:libs:core:error-api"))
     api(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api"))
     api(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-api"))
 

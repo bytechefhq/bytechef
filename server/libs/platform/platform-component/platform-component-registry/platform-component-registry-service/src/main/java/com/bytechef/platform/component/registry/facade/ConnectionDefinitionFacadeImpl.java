@@ -16,13 +16,11 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -43,25 +41,11 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
     }
 
     @Override
-    public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, @NonNull ComponentConnection connection) {
-
-        return connectionDefinitionService.executeAuthorizationApply(
-            componentName, connection, contextFactory.createContext(componentName, null));
-    }
-
-    @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull String redirectUri) {
 
         return connectionDefinitionService.executeAuthorizationCallback(
             componentName, connection, contextFactory.createContext(componentName, null), redirectUri);
-    }
-
-    @Override
-    public Optional<String> executeBaseUri(@NonNull String componentName, ComponentConnection connection) {
-        return connectionDefinitionService.executeBaseUri(
-            componentName, connection, contextFactory.createContext(componentName, null));
     }
 
     @Override

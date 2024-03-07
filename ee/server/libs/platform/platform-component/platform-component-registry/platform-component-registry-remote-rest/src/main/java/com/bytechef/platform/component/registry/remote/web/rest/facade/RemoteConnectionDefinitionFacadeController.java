@@ -15,7 +15,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,23 +41,6 @@ public class RemoteConnectionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-authorization-apply",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<Authorization.ApplyResponse> executeAuthorizationApply(
-        @RequestBody ConnectionRequest connectionRequest) {
-
-        return ResponseEntity.ok(
-            connectionDefinitionFacade.executeAuthorizationApply(
-                connectionRequest.componentName, Validate.notNull(connectionRequest.connection, "connection")));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
         value = "/execute-authorization-callback",
         consumes = {
             "application/json"
@@ -73,18 +55,6 @@ public class RemoteConnectionDefinitionFacadeController {
             connectionDefinitionFacade.executeAuthorizationCallback(
                 authorizationCallbackRequest.componentName, authorizationCallbackRequest.connection,
                 authorizationCallbackRequest.redirectUri()));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-base-uri")
-    public ResponseEntity<String> executeBaseUri(@RequestBody ConnectionRequest connectionRequest) {
-        return connectionDefinitionFacade.executeBaseUri(
-            connectionRequest.componentName, connectionRequest.connection)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity
-                .noContent()
-                .build());
     }
 
     @RequestMapping(

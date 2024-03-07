@@ -19,30 +19,35 @@ package com.bytechef.component.data.stream;
 import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
-import com.bytechef.component.ComponentDefinitionFactory;
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(DATA_STREAM + "_v1_ComponentDefinitionFactory")
-public class DataStreamComponentDefinitionFactory implements ComponentDefinitionFactory {
+@Component(DATA_STREAM + "_v1_ComponentHandler")
+public class DataStreamComponentHandler implements ComponentHandler {
 
-    private static final DataStreamComponentDefinition COMPONENT_DEFINITION = new DataStreamComponentDefinitionImpl(
-        component(DATA_STREAM)
-            .title("Data Stream")
-            .description("With the Data Stream, you can transfer large amounts of data efficiently.")
-            .icon("path:assets/data-stream.svg")
-            .actions(DataStreamSyncAction.ACTION_DEFINITION)
-            .workflowConnectionKeys("source", "destination"));
+    private final DataStreamComponentDefinition componentDefinition;
+
+    public DataStreamComponentHandler(JobLauncher jobLauncher) {
+        this.componentDefinition = new DataStreamComponentDefinitionImpl(
+            component(DATA_STREAM)
+                .title("Data Stream")
+                .description("With the Data Stream, you can transfer large amounts of data efficiently.")
+                .icon("path:assets/data-stream.svg")
+                .actions(new DataStreamSyncAction(jobLauncher).actionDefinition)
+                .workflowConnectionKeys("source", "destination"));
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 
     private static class DataStreamComponentDefinitionImpl extends AbstractComponentDefinitionWrapper

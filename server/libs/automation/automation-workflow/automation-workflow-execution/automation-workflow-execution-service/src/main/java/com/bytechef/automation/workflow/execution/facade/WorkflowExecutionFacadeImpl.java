@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.workflow.execution.facade;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
@@ -32,11 +31,9 @@ import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowServ
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
@@ -50,7 +47,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -213,20 +209,5 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         }
 
         return triggerExecutionDTO;
-    }
-
-    private static void updateOperations(
-        Map.Entry<String, Map<String, Object>> connectionEntry, List<Map<String, Object>> workflowOperations) {
-
-        for (int i = 0; i < workflowOperations.size(); i++) {
-            Map<String, Object> workflowTask = workflowOperations.get(i);
-
-            if (Objects.equals(MapUtils.getString(workflowTask, WorkflowConstants.NAME), connectionEntry.getKey())) {
-                workflowOperations.set(
-                    i,
-                    MapUtils.concat(workflowTask,
-                        Map.of(WorkflowExtConstants.CONNECTIONS, connectionEntry.getValue())));
-            }
-        }
     }
 }

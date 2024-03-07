@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.ComponentDefinitionFactory;
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -60,19 +60,19 @@ public class ComponentDefinitionRegistry {
     private final List<ComponentDefinition> componentDefinitions;
 
     public ComponentDefinitionRegistry(
-        List<ComponentDefinitionFactory> componentDefinitionFactories,
+        List<ComponentHandler> componentHandlers,
         @Autowired(required = false) ComponentHandlerListFactory componentHandlerListFactory) {
 
-        List<ComponentDefinitionFactory> mergedComponentDefinitionFactories = CollectionUtils.concat(
-            componentDefinitionFactories,
+        List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
+            componentHandlers,
             componentHandlerListFactory == null
                 ? List.of()
                 : CollectionUtils.map(
                     componentHandlerListFactory.getComponentHandlers(),
-                    componentHandler -> (ComponentDefinitionFactory) componentHandler));
+                    componentHandler -> (ComponentHandler) componentHandler));
 
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
-            CollectionUtils.map(mergedComponentDefinitionFactories, ComponentDefinitionFactory::getDefinition),
+            CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
             MANUAL_COMPONENT_DEFINITION);
 
         this.componentDefinitions = CollectionUtils.sort(componentDefinitions, this::compare);
@@ -133,7 +133,7 @@ public class ComponentDefinitionRegistry {
                 .stream()
                 .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
                 .findFirst()
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(IllegalArgumentException::new);
         }
 
         return componentDefinition;
@@ -151,7 +151,7 @@ public class ComponentDefinitionRegistry {
     }
 
     public ConnectionDefinition getConnectionDefinition(String componentName) {
-        return CollectionUtils.getFirst(
+        return CollectionUtils.getFirstFilter(
             componentDefinitions,
             componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()),
             componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));

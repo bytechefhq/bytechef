@@ -16,8 +16,6 @@
 
 package com.bytechef.component.script.constant;
 
-import com.bytechef.component.script.engine.PolyglotEngine;
-
 /**
  * @author Matija Petanjek
  */
@@ -29,6 +27,4 @@ public class ScriptConstants {
     public static final String PYTHON = "python";
     public static final String RUBY = "ruby";
     public static final String R = "r";
-
-    public static final PolyglotEngine POLYGLOT_ENGINE = new PolyglotEngine();
 }

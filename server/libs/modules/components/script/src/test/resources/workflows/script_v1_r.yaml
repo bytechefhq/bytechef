@@ -20,4 +20,4 @@ tasks:
       factor: "${factor}"
       var: "${var1}"
     script: "perform <- function(input) {\n  return (2 * input$var * input$factor)\n\
-      }\n"
+      }"

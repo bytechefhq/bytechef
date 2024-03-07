@@ -40,7 +40,15 @@ import org.springframework.core.convert.converter.Converter;
 public abstract class WorkflowMapper {
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public abstract static class WorkflowToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
+    public abstract static class WorkflowToWorkflowModelMapper implements Converter<Workflow, WorkflowModel> {
+
+        @Override
+        @Mapping(target = "triggers", ignore = true)
+        public abstract WorkflowModel convert(Workflow workflow);
+    }
+
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public abstract static class WorkflowDTOToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
 
         @Override
         public abstract WorkflowModel convert(WorkflowDTO workflowDTO);

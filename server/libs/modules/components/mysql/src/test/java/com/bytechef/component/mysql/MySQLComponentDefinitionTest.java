@@ -28,7 +28,7 @@ public class MySQLComponentDefinitionTest {
     @Test
     public void testGetComponentDefinition() {
         JdbcComponentHandler jdbcComponentHandler = new JdbcComponentHandler(
-            new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition());
+            new MySQLJdbcComponentHandler().getJdbcComponentDefinition());
 
         JsonFileAssert.assertEquals("definition/mysql_v1.json", jdbcComponentHandler.getDefinition());
     }

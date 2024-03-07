@@ -33,12 +33,12 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": null,
     "output": null,
     "deduplicate": null,
-    "poll": null
+    "poll": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
+    "webhookValidate": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -62,6 +62,7 @@
       "label": "CSRF Token",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -78,12 +79,12 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": { },
     "output": null,
     "deduplicate": null,
-    "poll": null
+    "poll": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
+    "webhookValidate": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -107,6 +108,7 @@
       "label": "CSRF Token",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -128,8 +130,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "staticWebhookRequest": { },
     "title": "Await workflow and respond",
@@ -142,12 +144,12 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": { },
     "output": null,
     "deduplicate": null,
-    "poll": null
+    "poll": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
+    "webhookValidate": { }
   } ],
   "connection": null
 }

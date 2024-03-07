@@ -62,7 +62,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
+        @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -71,7 +72,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public Map<String, ?> executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ComponentConnection> connections, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

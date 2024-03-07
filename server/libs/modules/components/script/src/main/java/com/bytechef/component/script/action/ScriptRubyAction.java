@@ -30,38 +30,39 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
-import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.constant.ScriptConstants;
-import org.springframework.stereotype.Component;
+import com.bytechef.component.script.definition.ScriptActionDefinition;
+import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-@Component(SCRIPT + "/v1/ruby")
-public class ScriptRubyAction implements TaskHandler<Object> {
+public class ScriptRubyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ScriptConstants.RUBY)
-        .title("Ruby")
-        .description("Executes custom Ruby code.")
-        .properties(
-            object(INPUT)
-                .label("Input")
-                .description("Initialize parameter values used in the custom code.")
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()),
-            string(SCRIPT)
-                .label("Ruby code")
-                .description("Add your Ruby custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR)
-                .required(true))
-        .output();
+    public final ScriptActionDefinition actionDefinition;
 
-    @Override
-    public Object handle(TaskExecution taskExecution) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", taskExecution.getParameters());
+    public ScriptRubyAction(PolyglotEngine polyglotEngine) {
+        actionDefinition = new ScriptActionDefinition(
+            action(ScriptConstants.RUBY)
+                .title("Ruby")
+                .description("Executes custom Ruby code.")
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
+                            time()),
+                    string(SCRIPT)
+                        .label("Ruby code")
+                        .description("Add your Ruby custom logic here.")
+                        .controlType(Property.ControlType.CODE_EDITOR)
+                        .languageId("ruby")
+                        .defaultValue("def perform(input)\n\treturn null;\nend")
+                        .required(true))
+                .output(),
+            "ruby", polyglotEngine);
     }
 }

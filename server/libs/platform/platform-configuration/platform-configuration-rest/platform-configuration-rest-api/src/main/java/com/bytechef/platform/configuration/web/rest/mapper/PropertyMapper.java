@@ -291,6 +291,7 @@ public class PropertyMapper {
         ObjectPropertyModel map(
             com.bytechef.platform.workflow.task.dispatcher.registry.domain.ObjectProperty objectProperty);
 
+        @Mapping(target = "languageId", ignore = true)
         @Mapping(target = "optionsDataSource", ignore = true)
         StringPropertyModel map(
             com.bytechef.platform.workflow.task.dispatcher.registry.domain.StringProperty stringProperty);

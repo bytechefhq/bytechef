@@ -36,6 +36,7 @@
       "label": "Source",
       "placeholder": null,
       "controlType": "TEXT",
+      "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -43,8 +44,8 @@
     } ],
     "title": "Convert from JSON string",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -125,8 +126,8 @@
     } ],
     "title": "Convert to JSON string",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
   "triggers": null,
   "connection": null

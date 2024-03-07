@@ -79,7 +79,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflow.setNew(true);
         workflow.setSourceType(sourceType);
 
-        Workflow savedWorkflow = CollectionUtils.getFirst(
+        Workflow savedWorkflow = CollectionUtils.getFirstFilter(
             workflowCrudRepositories,
             workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
             workflowCrudRepository -> workflowCrudRepository.save(workflow));
@@ -281,7 +281,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         final Workflow workflow = getWorkflow(id);
 
-        return CollectionUtils.getFirst(
+        return CollectionUtils.getFirstFilter(
             workflowCrudRepositories,
             workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)),
             workflowCrudRepository -> update(definition, version, workflow, workflowCrudRepository));

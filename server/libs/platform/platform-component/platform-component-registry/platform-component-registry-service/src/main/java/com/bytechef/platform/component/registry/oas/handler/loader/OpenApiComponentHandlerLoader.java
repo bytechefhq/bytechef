@@ -19,7 +19,7 @@ package com.bytechef.platform.component.registry.oas.handler.loader;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.platform.component.registry.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.registry.handler.loader.AbstractComponentHandlerLoader;
 import com.bytechef.platform.component.registry.oas.handler.OpenApiComponentTaskHandler;
@@ -32,7 +32,7 @@ import java.util.function.Function;
  */
 public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoader<OpenApiComponentHandler> {
 
-    public static final Function<ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
+    public static final Function<ActionDefinition, SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils.execute(
             inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
             OptionalUtils.orElse(actionDefinition.getOutput(), null),

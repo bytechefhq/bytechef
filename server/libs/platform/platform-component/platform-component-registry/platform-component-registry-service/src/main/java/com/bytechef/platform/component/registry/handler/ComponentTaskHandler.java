@@ -19,9 +19,7 @@ package com.bytechef.platform.component.registry.handler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import java.util.Map;
@@ -57,8 +55,7 @@ public class ComponentTaskHandler implements TaskHandler<Object> {
                 MapUtils.getInteger(taskExecution.getMetadata(), MetadataConstants.TYPE, 0),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
-                Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(),
-                OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
+                Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap);
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
