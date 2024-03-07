@@ -655,7 +655,7 @@ const PropertyCodeEditorSheet = ({
                                                 scriptTestExecution.error && (
                                                     <div className="space-y-4 text-sm">
                                                         <div className="space-y-2">
-                                                            <div className="font-semibold">Message</div>
+                                                            <div className="font-semibold">Error</div>
 
                                                             <div>{scriptTestExecution.error.message}</div>
                                                         </div>
