@@ -2,6 +2,7 @@ import PropertyInput from '@/components/Properties/components/PropertyInput/Prop
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {PropertyTypeModel} from '@/middleware/platform/configuration';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
@@ -132,7 +133,7 @@ const ObjectProperty = ({
                     }
 
                     return (
-                        <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
+                        <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
                                 actionName={actionName}
                                 currentComponent={currentComponent}
@@ -149,13 +150,18 @@ const ObjectProperty = ({
                             />
 
                             <Button
-                                className="ml-1 self-end"
+                                className="absolute bottom-0 right-0 ml-1"
                                 onClick={() => handleDeletePropertyClick(subProperty.name!, name!)}
                                 size="icon"
-                                title="Delete property"
                                 variant="ghost"
                             >
-                                <XIcon className="h-full w-auto cursor-pointer p-2 hover:text-red-500" />
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <XIcon className="size-8 cursor-pointer p-2 hover:text-red-500" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Delete property</TooltipContent>
+                                </Tooltip>
                             </Button>
                         </div>
                     );
