@@ -1,3 +1,4 @@
+import PropertyCodeEditor from '@/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
 import PropertyComboBox from '@/components/Properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/components/Properties/components/PropertyDynamicProperties';
 import PropertyInput from '@/components/Properties/components/PropertyInput/PropertyInput';
@@ -16,7 +17,6 @@ import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType'
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
-import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
@@ -100,6 +100,7 @@ const Property = ({
         description,
         hidden,
         label,
+        languageId,
         maxLength,
         maxValue,
         minLength,
@@ -177,6 +178,32 @@ const Property = ({
     );
 
     const handlePropertyChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
+        if (!currentComponentData || !updateWorkflowMutation) {
+            return;
+        }
+
+        if (!name) {
+            return;
+        }
+
+        const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+
+        saveWorkflowDefinition(
+            {
+                actionName,
+                componentName,
+                name: workflowNodeName,
+                parameters: {
+                    ...parameters,
+                    [name]: value,
+                },
+            },
+            workflow,
+            updateWorkflowMutation
+        );
+    }, 200);
+
         if (currentComponentData) {
             const {parameters} = currentComponentData;
 
@@ -414,7 +441,6 @@ const Property = ({
     return (
         <li
             className={twMerge(
-                controlType === 'CODE_EDITOR' && 'h-5/6',
                 hidden && 'mb-0',
                 controlType === 'OBJECT_BUILDER' && 'flex-col',
                 controlType === 'ARRAY_BUILDER' && 'flex-col',
@@ -450,7 +476,7 @@ const Property = ({
                     </Button>
                 )}
 
-                {showMentionInput && (
+                {showMentionInput && controlType !== 'CODE_EDITOR' && (
                     <PropertyMentionsInput
                         arrayName={arrayName}
                         controlType={controlType}
@@ -632,32 +658,6 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'CODE_EDITOR' && (
-                            <div className="size-full border-2">
-                                <Editor
-                                    defaultValue="// Add your custom code here..."
-                                    language={actionName}
-                                    options={{
-                                        extraEditorClassName: 'code-editor',
-                                        folding: false,
-                                        glyphMargin: false,
-                                        lineDecorationsWidth: 0,
-                                        lineNumbers: 'off',
-                                        lineNumbersMinChars: 0,
-                                        minimap: {
-                                            enabled: false,
-                                        },
-                                        scrollBeyondLastLine: false,
-                                        scrollbar: {
-                                            horizontalScrollbarSize: 4,
-                                            verticalScrollbarSize: 4,
-                                        },
-                                        tabSize: 2,
-                                    }}
-                                />
-                            </div>
-                        )}
-
                         {controlType === 'TEXT_AREA' && (
                             <PropertyTextArea
                                 description={description}
@@ -678,6 +678,23 @@ const Property = ({
                             />
                         )}
                     </>
+                )}
+
+                {controlType === 'CODE_EDITOR' && (
+                    <PropertyCodeEditor
+                        defaultValue={defaultValue}
+                        description={description}
+                        key={name}
+                        label={label}
+                        language={languageId!}
+                        leadingIcon={typeIcon}
+                        name={name!}
+                        onChange={handleCodeEditorChange}
+                        required={required}
+                        value={taskParameterValue}
+                        workflow={workflow}
+                        workflowNodeName={currentNode.name}
+                    />
                 )}
             </div>
         </li>

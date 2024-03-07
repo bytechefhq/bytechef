@@ -87,6 +87,17 @@ export type WorkflowOutputType = {
 };
 
 export type WorkflowTaskType = {
+    connections: [
+        {
+            componentName: string;
+            componentVersion: number;
+            key: string;
+            required: boolean;
+            workflowNodeName: string;
+        },
+    ] & {
+        [key: string]: WorkflowConnectionType;
+    };
     finalize?: Array<WorkflowTaskType>;
     label?: string;
     name: string;
@@ -104,6 +115,11 @@ export type WorkflowTriggerType = {
     parameters?: {[key: string]: object};
     timeout?: string;
     type: string;
+};
+
+export type WorkflowConnectionType = {
+    componentName: string;
+    componentVersion: number;
 };
 
 type PropertyTypeAllType = ArrayPropertyModel &
