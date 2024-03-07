@@ -717,7 +717,6 @@ const Project = () => {
                             onClose={() => {
                                 setShowWorkflowCodeEditorSheet(false);
                             }}
-                            projectId={+projectId!}
                             runDisabled={runDisabled}
                             testConfigurationDisabled={testConfigurationDisabled}
                             workflow={workflow}

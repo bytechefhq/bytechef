@@ -12,14 +12,13 @@ import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {PlayIcon, RefreshCwIcon, RefreshCwOffIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
+import {useState} from 'react';
 
 const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
     onClose: () => void;
-    projectId: number;
     runDisabled: boolean;
     testConfigurationDisabled: boolean;
     workflow: WorkflowModel;
@@ -28,7 +27,6 @@ interface WorkflowCodeEditorSheetProps {
 
 const WorkflowCodeEditorSheet = ({
     onClose,
-    projectId,
     runDisabled,
     testConfigurationDisabled,
     workflow,
@@ -51,10 +49,6 @@ const WorkflowCodeEditorSheet = ({
             setDirty(true);
         },
         onSuccess: (workflow: WorkflowModel) => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.projectWorkflows(projectId!),
-            });
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
@@ -80,7 +74,7 @@ const WorkflowCodeEditorSheet = ({
                     setWorkflowIsRunning(false);
 
                     queryClient.invalidateQueries({
-                        queryKey: WorkflowKeys.projectWorkflows(projectId),
+                        queryKey: WorkflowKeys.workflow(workflow.id!),
                     });
                 });
         }
@@ -113,19 +107,6 @@ const WorkflowCodeEditorSheet = ({
         onClose();
     };
 
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            if (dirty) {
-                handleWorkflowCodeEditorSheetSave(workflow, definition);
-            }
-        }, 1000);
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [definition, dirty, workflow]);
-
     return (
         <>
             <Sheet onOpenChange={handleOpenChange} open={true}>
@@ -140,7 +121,7 @@ const WorkflowCodeEditorSheet = ({
                                 <div>Edit Workflow</div>
 
                                 <div className="flex items-center">
-                                    <div className="mr-4 flex items-center space-x-0.5">
+                                    <div className="mr-4 flex items-center">
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <Button
@@ -173,29 +154,12 @@ const WorkflowCodeEditorSheet = ({
                                             <TooltipContent>Save current workflow</TooltipContent>
                                         </Tooltip>
 
-                                        {!workflowIsRunning && runDisabled && (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span tabIndex={0}>
-                                                        <Button disabled={runDisabled} size="icon" variant="ghost">
-                                                            <PlayIcon className="h-5 text-success" />
-                                                        </Button>
-                                                    </span>
-                                                </TooltipTrigger>
-
-                                                <TooltipContent>
-                                                    The workflow cannot be executed. Please set all required workflow
-                                                    input parameters, connections and component properties.
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        )}
-
-                                        {!workflowIsRunning && !runDisabled && (
+                                        {!workflowIsRunning && (
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <span tabIndex={0}>
                                                         <Button
-                                                            disabled={runDisabled}
+                                                            disabled={runDisabled || dirty}
                                                             onClick={handleRunClick}
                                                             size="icon"
                                                             variant="ghost"
@@ -205,7 +169,11 @@ const WorkflowCodeEditorSheet = ({
                                                     </span>
                                                 </TooltipTrigger>
 
-                                                <TooltipContent>Run the current workflow</TooltipContent>
+                                                <TooltipContent>
+                                                    {runDisabled
+                                                        ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
+                                                        : `Run the current workflow`}
+                                                </TooltipContent>
                                             </Tooltip>
                                         )}
 
@@ -256,8 +224,6 @@ const WorkflowCodeEditorSheet = ({
                                         <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
                                     ) : (
                                         <div className="flex items-center gap-x-1 p-3 text-muted-foreground">
-                                            <RefreshCwOffIcon className="size-4" />
-
                                             <span>Workflow has not yet been executed.</span>
                                         </div>
                                     )
