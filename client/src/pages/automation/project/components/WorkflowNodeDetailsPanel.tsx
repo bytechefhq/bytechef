@@ -18,10 +18,7 @@ import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Properties from 'components/Properties/Properties';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
-import {
-    useGetComponentDefinitionQuery,
-    useGetComponentDefinitionsQuery,
-} from 'queries/platform/componentDefinitions.queries';
+import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -70,7 +67,6 @@ const WorkflowNodeDetailsPanel = ({
     workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
-    const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
     const [currentActionName, setCurrentActionName] = useState('');
     const [currentComponentData, setCurrentComponentData] = useState<ComponentDataType>();
 
@@ -174,10 +170,6 @@ const WorkflowNodeDetailsPanel = ({
             : (currentComponent?.actions?.[0]?.name as string);
     };
 
-    const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({
-        connectionDefinitions: true,
-    });
-
     const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
             actionName: getActionName(),
@@ -276,7 +268,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
-            return currentComponent?.name && componentDefinitionNames?.includes(currentComponent.name);
+            return workflowConnections.length > 0;
         }
 
         if (name === 'source' || name === 'destination') {
@@ -331,16 +323,6 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode.name]);
 
-    // Set componentDefinitionNames depending on componentDefinitions
-    useEffect(() => {
-        if (connectionComponentDefinitions?.length) {
-            setComponentDefinitionNames(
-                connectionComponentDefinitions.map((componentDefinition) => componentDefinition.name)
-            );
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [connectionComponentDefinitions?.length]);
-
     // Set dataPills depending on availableDataPills
     useEffect(() => {
         if (availableDataPills) {
@@ -357,11 +339,7 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
 
-        if (
-            activeTab === 'connection' &&
-            currentComponent?.name &&
-            !componentDefinitionNames?.includes(currentComponent.name)
-        ) {
+        if (activeTab === 'connection' && workflowConnections.length === 0) {
             setActiveTab('description');
         }
 
@@ -383,7 +361,6 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         activeTab,
-        componentDefinitionNames.length,
         currentActionDefinition?.outputDefined,
         currentActionDefinition?.outputFunctionDefined,
         currentActionFetched,
