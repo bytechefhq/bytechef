@@ -38,7 +38,7 @@ public class LoggerDebugAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Object text = inputParameters.get(TEXT);
+        Object text = inputParameters.getRequired(TEXT);
 
         context.logger(logger -> logger.debug(text.toString()));
 
