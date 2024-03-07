@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,10 +88,38 @@ public class PolyglotEngine {
             Value value = polyglotContext
                 .getBindings(languageId)
                 .getMember("perform")
-                .execute(ProxyObject.fromMap(inputParameters.getMap(INPUT, Object.class)));
+                .execute(copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId));
 
-            return copyToJavaValue(value);
+            return copyFromPolyglotContext(copyToJavaValue(value));
         }
+    }
+
+    /**
+     * Copy from PolyglotMap to Map and PolyglotList to List
+     *
+     * @param object
+     * @return
+     */
+    private static Object copyFromPolyglotContext(Object object) {
+        if (object instanceof Map<?, ?> map) {
+            Map<String, Object> hashMap = new HashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                hashMap.put((String) entry.getKey(), copyFromPolyglotContext(entry.getValue()));
+            }
+
+            return hashMap;
+        } else if (object instanceof List<?> list) {
+            List<Object> arrayList = new ArrayList<>();
+
+            for (Object item : list) {
+                arrayList.add(copyFromPolyglotContext(item));
+            }
+
+            return arrayList;
+        }
+
+        return object;
     }
 
     private static Object copyToJavaValue(Value value) {
@@ -111,21 +140,9 @@ public class PolyglotEngine {
         } else if (value.isString()) {
             return value.asString();
         } else if (value.hasArrayElements()) {
-            List<Object> list = new ArrayList<>();
-
-            for (int i = 0; i < value.getArraySize(); i++) {
-                list.add(copyToJavaValue(value.getArrayElement(i)));
-            }
-
-            return list;
+            return value.as(List.class);
         } else if (value.hasMembers()) {
-            Map<String, Object> map = new HashMap<>();
-
-            for (String key : value.getMemberKeys()) {
-                map.put(key, copyToJavaValue(value.getMember(key)));
-            }
-
-            return map;
+            return value.as(Map.class);
         } else if (value.isProxyObject()) {
             return value.asProxyObject();
         }
@@ -133,14 +150,23 @@ public class PolyglotEngine {
         throw new IllegalArgumentException("Cannot copy value %s to java type.".formatted(value));
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object copyToScriptValue(Object value, String languageId) {
+    private static Object copyToGuestValue(Object value, String languageId) {
         Class<?> valueClass = value.getClass();
 
         if (valueClass.isArray()) {
             return ProxyArray.fromArray((Object[]) value);
+        } else if (value instanceof Boolean bool) {
+            return bool;
         } else if (value instanceof Collection<?> collection) {
-            return ProxyArray.fromList(new ArrayList<>(collection));
+            List<Object> proxyList = new ArrayList<>();
+
+            for (Object item : collection) {
+                proxyList.add(copyToGuestValue(item, languageId));
+            }
+
+            return ProxyArray.fromList(proxyList);
+        } else if (value instanceof Date date) {
+            return ProxyInstant.from(date.toInstant());
         } else if (value instanceof Instant instant) {
             return ProxyInstant.from(instant);
         } else if (value instanceof LocalDate localDate) {
@@ -148,13 +174,27 @@ public class PolyglotEngine {
         } else if (value instanceof LocalTime localTime) {
             return ProxyTime.from(localTime);
         } else if (value instanceof Map<?, ?> map) {
-            return ProxyObject.fromMap((Map<String, Object>) map);
+            Map<String, Object> proxyMap = new HashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                proxyMap.put((String) entry.getKey(), copyToGuestValue(entry.getValue(), languageId));
+            }
+
+            return ProxyObject.fromMap(proxyMap);
         } else if (value instanceof Number number) {
             return number;
         } else if (value instanceof String string) {
             return string;
         } else if (ConvertUtils.canConvert(value, Map.class)) {
-            return ProxyObject.fromMap(ConvertUtils.convertValue(value, Map.class));
+            Map<String, Object> proxyMap = new HashMap<>();
+
+            Map<?, ?> map = ConvertUtils.convertValue(value, Map.class);
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                proxyMap.put((String) entry.getKey(), copyToGuestValue(entry.getValue(), languageId));
+            }
+
+            return ProxyObject.fromMap(proxyMap);
         } else {
             throw new IllegalArgumentException("Cannot copy value %s to %s type.".formatted(value, languageId));
         }
@@ -165,7 +205,9 @@ public class PolyglotEngine {
         String languageId, Map<String, ? extends ParameterConnection> parameterConnections) implements ProxyObject {
 
         @Override
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
         public ProxyExecutable getMember(String actionName) {
             return arguments -> {
                 Map<String, ?> inputParameters = arguments.length == 0
@@ -192,13 +234,14 @@ public class PolyglotEngine {
                 // TODO latest version should be used
 
                 Object result = actionDefinitionService.executePerform(
-                    componentDefinition.getName(), 1, actionName, inputParameters, connections, actionContext);
+                    componentDefinition.getName(), 1, actionName, (Map) copyFromPolyglotContext(inputParameters),
+                    connections, actionContext);
 
                 if (result == null) {
                     return null;
                 }
 
-                return copyToScriptValue(result, languageId);
+                return copyToGuestValue(result, languageId);
             };
         }
 
