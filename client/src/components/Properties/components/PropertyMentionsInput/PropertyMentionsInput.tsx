@@ -219,7 +219,11 @@ const PropertyMentionsInput = forwardRef(
                 );
 
                 return;
-            } else if (objectName) {
+            } else if (objectName && parameters && name) {
+                if (parameters![objectName]?.[name] === strippedValue) {
+                    return;
+                }
+
                 saveWorkflowDefinition(
                     {
                         actionName,
@@ -228,7 +232,7 @@ const PropertyMentionsInput = forwardRef(
                         parameters: {
                             ...parameters,
                             [objectName]: {
-                                ...parameters?.[objectName],
+                                ...parameters![objectName],
                                 [name as string]: strippedValue,
                             },
                         },
