@@ -56,5 +56,4 @@ public abstract class AbstractFreshsalesActionTest {
         when(mockedResponse.getBody(any(Context.TypeReference.class)))
             .thenReturn(responeseMap);
     }
-
 }

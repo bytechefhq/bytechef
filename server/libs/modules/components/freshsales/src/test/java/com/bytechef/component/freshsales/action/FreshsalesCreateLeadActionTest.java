@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  */
 class FreshsalesCreateLeadActionTest extends AbstractFreshsalesActionTest {
+
     @Test
     void testPerform() {
         Map<String, String> propertyStubsMap = createPropertyStubsMap();

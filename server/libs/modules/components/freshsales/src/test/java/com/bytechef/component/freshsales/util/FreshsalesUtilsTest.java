@@ -39,9 +39,7 @@ class FreshsalesUtilsTest {
         when(mockedParameters.getRequiredString(KEY))
             .thenReturn("key");
 
-        Map<String, List<String>> expectedHeaders = Map.of(
-            "Content-Type", List.of("application/json"),
-            "Authorization", List.of("Token token=key"));
+        Map<String, List<String>> expectedHeaders = Map.of("Authorization", List.of("Token token=key"));
 
         assertEquals(expectedHeaders, FreshsalesUtils.getHeaders(mockedParameters));
     }
