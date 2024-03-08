@@ -6,11 +6,11 @@ import {ComponentDataType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 
 import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover';
 import Property from './Property';
+import DeletePropertyButton from './components/DeletePropertyButton';
 import PropertySelect from './components/PropertySelect';
 
 interface ArrayPropertyProps {
@@ -144,16 +144,12 @@ const ArrayProperty = ({
                         updateWorkflowMutation={updateWorkflowMutation}
                     />
 
-                    {item.custom && (
-                        <Button
-                            className="ml-1 self-center"
-                            onClick={() => handleDeletePropertyClick(item.name!, name!)}
-                            size="icon"
-                            title="Delete property"
-                            variant="ghost"
-                        >
-                            <XIcon className="h-full w-auto cursor-pointer p-2 hover:text-red-500" />
-                        </Button>
+                    {item.custom && name && item.name && (
+                        <DeletePropertyButton
+                            handleDeletePropertyClick={handleDeletePropertyClick}
+                            propertyName={name}
+                            subPropertyName={item.name}
+                        />
                     )}
                 </div>
             ))}

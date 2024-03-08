@@ -2,7 +2,6 @@ import PropertyInput from '@/components/Properties/components/PropertyInput/Prop
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {ControlTypeModel, PropertyTypeModel} from '@/middleware/platform/configuration';
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
@@ -10,11 +9,11 @@ import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType, Sub
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
-import {XIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Property from './Property';
+import DeletePropertyButton from './components/DeletePropertyButton';
 
 interface ObjectPropertyProps {
     actionName?: string;
@@ -145,21 +144,12 @@ const ObjectProperty = ({
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
 
-                            {subProperty.custom && (
-	                            <Button
-	                                className="ml-1 self-end"
-	                                onClick={() => handleDeletePropertyClick(subProperty.name!, name!)}
-	                                size="icon"
-	                                variant="ghost"
-	                            >
-	                                <Tooltip>
-	                                    <TooltipTrigger>
-	                                        <XIcon className="size-8 cursor-pointer p-2 hover:text-red-500" />
-	                                    </TooltipTrigger>
-
-	                                    <TooltipContent>Delete property</TooltipContent>
-	                                </Tooltip>
-	                            </Button>
+                            {subProperty.custom && name && subProperty.name && (
+                                <DeletePropertyButton
+                                    handleDeletePropertyClick={handleDeletePropertyClick}
+                                    propertyName={name}
+                                    subPropertyName={subProperty.name}
+                                />
                             )}
                         </div>
                     );
