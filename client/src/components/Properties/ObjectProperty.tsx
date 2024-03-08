@@ -3,7 +3,7 @@ import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {ControlTypeModel, PropertyTypeModel} from '@/middleware/platform/configuration';
+import {ControlTypeModel} from '@/middleware/platform/configuration';
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
@@ -74,25 +74,24 @@ const ObjectProperty = ({
 
     // on initial render, set subProperties if there are matching parameters
     useEffect(() => {
-        if (!name || !currentComponentData?.parameters) {
+        if (!name || !currentComponentData?.parameters?.[name]) {
             return;
         }
 
-        const matchingParameters = Object.keys(currentComponentData.parameters).filter((key) => key.startsWith(name));
+        const objectParameters = Object.keys(currentComponentData.parameters![name]);
 
-        if (!matchingParameters.length) {
+        if (!objectParameters.length) {
             return;
         }
 
-        const preexistingProperties = matchingParameters.map((matchingParameter) => {
-            const value: string = currentComponentData.parameters![matchingParameter];
+        const preexistingProperties = objectParameters.map((parameter) => {
+            const value: string = currentComponentData.parameters![parameter];
+
+            const matchingSubProperty = subProperties.find((subProperty) => subProperty.name === parameter);
 
             return {
-                ...currentComponentData.parameters![matchingParameter],
-                controlType: 'TEXT',
+                ...matchingSubProperty,
                 defaultValue: value,
-                name: matchingParameter,
-                type: newPropertyType || additionalProperties?.[0]?.type || ('STRING' as PropertyTypeModel),
             };
         });
 
@@ -102,7 +101,10 @@ const ObjectProperty = ({
                     !preexistingProperties.some((preexistingProperty) => preexistingProperty.name === subProperty.name)
             );
 
-            return [...newSubProperties, ...preexistingProperties];
+            return [
+                ...newSubProperties,
+                ...preexistingProperties.map((property) => ({...property, defaultValue: undefined})),
+            ];
         });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
