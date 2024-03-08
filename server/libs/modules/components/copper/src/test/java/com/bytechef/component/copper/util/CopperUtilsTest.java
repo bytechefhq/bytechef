@@ -44,10 +44,8 @@ class CopperUtilsTest {
         Map<String, List<String>> expectedHeaders = Map.of(
             "X-PW-AccessToken", List.of("myAccessToken"),
             "X-PW-Application", List.of("developer_api"),
-            "X-PW-UserEmail", List.of("user@example.com"),
-            "Content-Type", List.of("application/json"));
+            "X-PW-UserEmail", List.of("user@example.com"));
 
         assertEquals(expectedHeaders, CopperUtils.getHeaders(mockedParameters));
     }
-
 }

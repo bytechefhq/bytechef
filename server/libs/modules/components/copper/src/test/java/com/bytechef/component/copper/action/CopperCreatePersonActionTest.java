@@ -43,7 +43,6 @@ class CopperCreatePersonActionTest extends AbstractCopperActionTest {
 
     @Test
     void testPerform() {
-
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
         when(mockedParameters.getString(NAME))

@@ -71,9 +71,9 @@ class CopperOptionUtilsTest {
 
     @Test
     void testGetActivityTypeOptions() {
-        LinkedHashMap<String, ArrayList<LinkedHashMap<String, Object>>> linkedHashMap = new LinkedHashMap<>();
-        ArrayList<LinkedHashMap<String, Object>> list = new ArrayList<>();
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        Map<String, List<Map<String, Object>>> linkedHashMap = new LinkedHashMap<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> map = new LinkedHashMap<>();
 
         map.put("name", "ActivityName");
         map.put("id", "ActivityId");
@@ -84,6 +84,7 @@ class CopperOptionUtilsTest {
             .thenReturn(linkedHashMap);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
+
         expectedOptions.add(option("ActivityName", "ActivityId"));
 
         assertEquals(expectedOptions,
@@ -92,9 +93,10 @@ class CopperOptionUtilsTest {
 
     @Test
     void testGetCompanyIdOptions() {
-        ArrayList<LinkedHashMap<String, String>> linkedHashMaps = new ArrayList<>();
+        List<Map<String, String>> linkedHashMaps = new ArrayList<>();
 
-        LinkedHashMap<String, String> tagMap = new LinkedHashMap<>();
+        Map<String, String> tagMap = new LinkedHashMap<>();
+
         tagMap.put("name", "companyName");
         tagMap.put("id", "123");
 
@@ -106,15 +108,17 @@ class CopperOptionUtilsTest {
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("companyName", "123"));
+
         assertEquals(expectedOptions,
             CopperOptionUtils.getCompanyIdOptions(mockedParameters, mockedParameters, "", mockedContext));
     }
 
     @Test
     void testGetContactTypesOptions() {
-        ArrayList<LinkedHashMap<String, Object>> linkedHashMaps = new ArrayList<>();
+        List<Map<String, Object>> linkedHashMaps = new ArrayList<>();
 
-        LinkedHashMap<String, Object> tagMap = new LinkedHashMap<>();
+        Map<String, Object> tagMap = new LinkedHashMap<>();
+
         tagMap.put("name", "ContactType");
         tagMap.put("id", "123");
 
@@ -126,6 +130,7 @@ class CopperOptionUtilsTest {
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("ContactType", "123"));
+
         assertEquals(expectedOptions,
             CopperOptionUtils.getContactTypesOptions(mockedParameters, mockedParameters, "", mockedContext));
 
@@ -133,9 +138,10 @@ class CopperOptionUtilsTest {
 
     @Test
     void testGetTagsOptions() {
-        ArrayList<LinkedHashMap<String, Object>> linkedHashMaps = new ArrayList<>();
+        List<Map<String, Object>> linkedHashMaps = new ArrayList<>();
 
-        LinkedHashMap<String, Object> tagMap = new LinkedHashMap<>();
+        Map<String, Object> tagMap = new LinkedHashMap<>();
+
         tagMap.put("name", "Tag1");
 
         linkedHashMaps.add(tagMap);
@@ -153,9 +159,10 @@ class CopperOptionUtilsTest {
 
     @Test
     void testGetUserOptions() {
-        ArrayList<LinkedHashMap<String, String>> linkedHashMaps = new ArrayList<>();
+        List<Map<String, String>> linkedHashMaps = new ArrayList<>();
 
-        LinkedHashMap<String, String> tagMap = new LinkedHashMap<>();
+        Map<String, String> tagMap = new LinkedHashMap<>();
+
         tagMap.put("name", "ContactType");
         tagMap.put("id", "123");
 
@@ -167,6 +174,7 @@ class CopperOptionUtilsTest {
         List<Option<String>> expectedOptions = new ArrayList<>();
 
         expectedOptions.add(option("ContactType", "123"));
+
         assertEquals(expectedOptions,
             CopperOptionUtils.getUserOptions(mockedParameters, mockedParameters, "", mockedContext));
     }

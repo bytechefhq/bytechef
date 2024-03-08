@@ -71,5 +71,4 @@ public abstract class AbstractCopperActionTest {
     public void afterEach() {
         copperUtilsMockedStatic.close();
     }
-
 }
