@@ -221,12 +221,11 @@ const WorkflowEditor = ({
         }
     }, [defaultNodesWithWorkflowNodes]);
 
-    // Only gets invoked when a new node is added to the workflow using the last node
     const handleNodeChange = async (changes: NodeDimensionChange[]) => {
         const changesIds = changes.map((change) => change.id);
 
         const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
-            changesIds.includes(node?.data.id)
+            changesIds.includes(node?.data.name)
         );
 
         if (changesIncludeExistingNodes) {
@@ -253,6 +252,7 @@ const WorkflowEditor = ({
                     return node?.data.name;
                 }
             });
+
             setWorkflow({
                 ...workflow,
                 nodeNames: workflowNodeNames.filter((nodeName) => !!nodeName),
