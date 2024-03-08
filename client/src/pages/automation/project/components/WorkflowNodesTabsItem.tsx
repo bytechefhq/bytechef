@@ -20,7 +20,7 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabs
 
     return (
         <li
-            className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
+            className="flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable={draggable}
             id={node?.title}
             onClick={handleClick}
