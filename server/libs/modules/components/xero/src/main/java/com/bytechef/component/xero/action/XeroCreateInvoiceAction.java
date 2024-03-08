@@ -40,12 +40,11 @@ import static com.bytechef.component.xero.constant.XeroConstants.TYPE;
 import static com.bytechef.component.xero.constant.XeroConstants.UNIT_AMOUNT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -145,40 +144,36 @@ public final class XeroCreateInvoiceAction {
     private XeroCreateInvoiceAction() {
     }
 
-    public static LinkedHashMap<String, ?> perform(
+    public static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        LinkedHashMap<String, ?> res = actionContext
+        return actionContext
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Invoices"))
-            .body(Context.Http.Body.of(
+            .body(Http.Body.of(
                 TYPE, inputParameters.getRequiredString(TYPE),
                 "Contact", Map.of(CONTACT_ID, inputParameters.getRequiredString(CONTACT_ID)),
                 LINE_ITEMS, inputParameters.getList(LINE_ITEMS)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
-
-        return res;
+            .getBody(new TypeReference<>() {});
     }
 
     public static List<Option<String>> getContactOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        LinkedHashMap<String, ?> response = context
+        Map<String, ?> response = context
             .http(http -> http.get("https://api.xero.com/api.xro/2.0/Contacts"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
-        ArrayList<LinkedHashMap<String, ?>> contactList =
-            (ArrayList<LinkedHashMap<String, ?>>) response.get("Contacts");
+        List<?> contactList = (List<?>) response.get("Contacts");
 
         return contactList
             .stream()
-            .map(contact -> (Option<String>) option(contact.get("Name")
-                .toString(),
-                contact.get("ContactID")
-                    .toString()))
+            .map(contact -> (Option<String>) option(
+                String.valueOf(((Map<?, ?>) contact).get("Name")),
+                String.valueOf(((Map<?, ?>) contact).get("ContactID"))))
             .toList();
     }
 }

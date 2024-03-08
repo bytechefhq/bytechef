@@ -26,9 +26,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,12 +45,12 @@ public class XeroCreateInvoiceActionTest {
         Context.Http.Executor mockedExecutor = Mockito.mock(Context.Http.Executor.class);
         Context.Http.Response mockedResponse = Mockito.mock(Context.Http.Response.class);
 
-        LinkedHashMap responseMap = new LinkedHashMap();
+        Map<String, Object> responseMap = new HashMap<>();
         Map<String, Object> propertyStubsMap = new HashMap<>();
 
         propertyStubsMap.put(TYPE, "typePropertyStub");
         propertyStubsMap.put("Contact", Map.of(CONTACT_ID, "contactIdPropertyStub"));
-        propertyStubsMap.put(LINE_ITEMS, new LinkedList<>()); // todo: test individual Line item properties
+        propertyStubsMap.put(LINE_ITEMS, new ArrayList<>()); // todo: test individual Line item properties
 
         Parameters mockedParameters = Mockito.mock(Parameters.class);
 
@@ -75,12 +75,14 @@ public class XeroCreateInvoiceActionTest {
         when(mockedResponse.getBody((Context.TypeReference<Object>) Mockito.any()))
             .thenReturn(responseMap);
 
-        LinkedHashMap<String, ?> result =
+        Map<String, ?> result =
             XeroCreateInvoiceAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertNotNull(result);
-        assertEquals(propertyStubsMap, bodyArgumentCaptor.getValue()
-            .getContent());
+
+        Context.Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(propertyStubsMap, body.getContent());
 
         // todo: somehow validate lambda parameter of http method
 //        Context.ContextFunction<Context.Http, ?> expectedFunction =

@@ -418,6 +418,7 @@ public interface Context {
              */
             public static Body of(Object... keyValueArray) {
                 Objects.requireNonNull(keyValueArray);
+
                 if (keyValueArray.length % 2 != 0) {
                     throw new IllegalArgumentException();
                 }

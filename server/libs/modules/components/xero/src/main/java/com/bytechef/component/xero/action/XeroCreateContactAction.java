@@ -37,7 +37,8 @@ import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_CATEGO
 import static com.bytechef.component.xero.constant.XeroConstants.TRACKING_OPTION_NAME;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import java.util.LinkedHashMap;
 
@@ -146,7 +147,7 @@ public final class XeroCreateContactAction {
 
         return actionContext
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
-            .body(Context.Http.Body.of(
+            .body(Http.Body.of(
                 NAME, inputParameters.getRequiredString(NAME),
                 CONTACT_NUMBER, inputParameters.getString(CONTACT_NUMBER),
                 FIRST_NAME, inputParameters.getString(FIRST_NAME),
@@ -159,8 +160,8 @@ public final class XeroCreateContactAction {
                 IS_CUSTOMER, inputParameters.getBoolean(IS_CUSTOMER),
                 TRACKING_CATEGORY_NAME, inputParameters.getString(TRACKING_CATEGORY_NAME),
                 TRACKING_OPTION_NAME, inputParameters.getString(TRACKING_OPTION_NAME)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 }

@@ -31,8 +31,6 @@ import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -82,15 +80,16 @@ public class XeroConnection {
             .execute();
 
         Object body = response.getBody();
-        if (body instanceof LinkedHashMap<?, ?>) {
-            return ((LinkedHashMap<String, String>) body).get("tenantId");
+
+        if (body instanceof Map<?, ?> map) {
+            return (String) map.get("tenantId");
         }
 
-        if (body instanceof ArrayList<?>) {
-            ArrayList<Object> tenantList = (ArrayList) response.getBody();
+        if (body instanceof List<?>) {
+            List<?> tenantList = (List<?>) response.getBody();
 
-            if (tenantList.get(0) instanceof LinkedHashMap<?, ?>) {
-                return ((LinkedHashMap<String, String>) tenantList.get(0)).get("tenantId");
+            if (tenantList.getFirst() instanceof Map<?, ?> map) {
+                return (String) map.get("tenantId");
             }
         }
         throw new RuntimeException("Xero did not return any Tenants.");
