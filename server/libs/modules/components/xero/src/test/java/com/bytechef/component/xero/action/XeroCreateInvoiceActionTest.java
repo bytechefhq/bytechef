@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
