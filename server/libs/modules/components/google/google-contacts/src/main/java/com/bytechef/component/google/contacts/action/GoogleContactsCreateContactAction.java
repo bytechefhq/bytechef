@@ -131,14 +131,12 @@ public class GoogleContactsCreateContactAction {
     }
 
     private static Organization createOrganization(Parameters inputParameters) {
-
         return new Organization()
             .setName(inputParameters.getString(COMPANY))
             .setTitle(inputParameters.getString(JOB_TITLE));
     }
 
     private static Name createName(Parameters inputParameters) {
-
         return new Name()
             .setGivenName(inputParameters.getRequiredString(FIRST_NAME))
             .setMiddleName(inputParameters.getString(MIDDLE_NAME))

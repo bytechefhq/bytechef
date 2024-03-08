@@ -21,9 +21,6 @@ package com.bytechef.component.google.contacts.constant;
  */
 public class GoogleContactsConstants {
 
-    private GoogleContactsConstants() {
-    }
-
     public static final String COMPANY = "company";
     public static final String CREATE_CONTACT = "createContact";
     public static final String CREATE_GROUP = "createGroup";
@@ -36,4 +33,6 @@ public class GoogleContactsConstants {
     public static final String NAME = "name";
     public static final String PHONE_NUMBER = "phoneNumber";
 
+    private GoogleContactsConstants() {
+    }
 }
