@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":ee:server:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":ee:server:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
 
+    implementation(project(":server:libs:modules:components:affinity"))
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
     implementation(project(":server:libs:modules:components:bash"))

@@ -155,6 +155,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl")
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service")
 
+include("server:libs:modules:components:affinity")
 include("server:libs:modules:components:airtable")
 include("server:libs:modules:components:aws:aws-s3")
 include("server:libs:modules:components:bash")
