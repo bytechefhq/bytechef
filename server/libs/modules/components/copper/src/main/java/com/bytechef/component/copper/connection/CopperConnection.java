@@ -41,8 +41,7 @@ public class CopperConnection {
                             .required(true),
                         string(KEY)
                             .label("Key")
-                            .required(true))
-                    .authorizationCallback());
+                            .required(true)));
 
     private CopperConnection() {
     }
