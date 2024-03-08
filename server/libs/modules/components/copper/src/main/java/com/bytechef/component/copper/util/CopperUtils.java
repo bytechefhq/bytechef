@@ -31,6 +31,7 @@ public class CopperUtils {
     private CopperUtils() {
     }
 
+    // TODO Move under apply method
     public static Map<String, List<String>> getHeaders(Parameters connectionParameters) {
         return Map.of(
             "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),

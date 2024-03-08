@@ -25,8 +25,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -36,11 +36,12 @@ public class CopperOptionUtils {
     private CopperOptionUtils() {
     }
 
-    private static List<Option<String>> createOptions(ArrayList<LinkedHashMap<String, Object>> value) {
+    private static List<Option<String>> createOptions(List<Map<String, Object>> value) {
         List<Option<String>> options = new ArrayList<>();
 
-        value.forEach(linkedHashMap -> options.add(
-            option(String.valueOf(linkedHashMap.get("name")), String.valueOf(linkedHashMap.get("id")))));
+        for (Map<String, Object> map : value) {
+            options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("id"))));
+        }
 
         return options;
     }
@@ -48,7 +49,7 @@ public class CopperOptionUtils {
     public static List<Option<String>> getActivityTypeOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        LinkedHashMap<String, ArrayList<LinkedHashMap<String, Object>>> linkedHashMap =
+        Map<String, ArrayList<Map<String, Object>>> body =
             context
                 .http(http -> http.get(BASE_URL + "/activity_types"))
                 .headers(getHeaders(connectionParameters))
@@ -58,7 +59,7 @@ public class CopperOptionUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        linkedHashMap
+        body
             .getOrDefault("user", new ArrayList<>())
             .forEach(map -> options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("id")))));
 
@@ -68,33 +69,33 @@ public class CopperOptionUtils {
     public static List<Option<String>> getCompanyIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        ArrayList<LinkedHashMap<String, Object>> value = context
+        List<Map<String, Object>> body = context
             .http(http -> http.post(BASE_URL + "/companies/search"))
             .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
-        return createOptions(value);
+        return createOptions(body);
     }
 
     public static List<Option<String>> getContactTypesOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        ArrayList<LinkedHashMap<String, Object>> value = context
+        List<Map<String, Object>> body = context
             .http(http -> http.get(BASE_URL + "/contact_types"))
             .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
-        return createOptions(value);
+        return createOptions(body);
     }
 
     public static List<Option<String>> getTagsOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        ArrayList<LinkedHashMap<String, Object>> value = context
+        List<Map<String, Object>> body = context
             .http(http -> http.get(BASE_URL + "/tags"))
             .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
@@ -103,11 +104,11 @@ public class CopperOptionUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        value.forEach(linkedHashMap -> {
+        for (Map<String, Object> linkedHashMap : body) {
             String name = String.valueOf(linkedHashMap.get("name"));
 
             options.add(option(name, name));
-        });
+        }
 
         return options;
     }
@@ -115,13 +116,13 @@ public class CopperOptionUtils {
     public static List<Option<String>> getUserOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        ArrayList<LinkedHashMap<String, Object>> value = context
+        List<Map<String, Object>> body = context
             .http(http -> http.post(BASE_URL + "/users/search"))
             .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 
-        return createOptions(value);
+        return createOptions(body);
     }
 }

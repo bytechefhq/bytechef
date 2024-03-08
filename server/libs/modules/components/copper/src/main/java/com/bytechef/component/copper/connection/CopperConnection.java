@@ -30,9 +30,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
  */
 public class CopperConnection {
 
-    private CopperConnection() {
-    }
-
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
             AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
@@ -44,4 +41,7 @@ public class CopperConnection {
                     string(KEY)
                         .label("Key")
                         .required(true)));
+
+    private CopperConnection() {
+    }
 }

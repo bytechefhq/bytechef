@@ -32,9 +32,6 @@ import com.bytechef.component.definition.OptionsDataSource;
  */
 public class CopperConstants {
 
-    private CopperConstants() {
-    }
-
     public static final String ADDRESS = "address";
     public static final String ASSIGNEE_ID = "assignee_id";
     public static final String ACTIVITY_TYPE = "activity_type";
@@ -176,4 +173,6 @@ public class CopperConstants {
                         .required(false)))
         .required(false);
 
+    private CopperConstants() {
+    }
 }
