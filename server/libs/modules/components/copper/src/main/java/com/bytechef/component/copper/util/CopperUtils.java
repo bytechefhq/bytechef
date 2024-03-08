@@ -36,7 +36,6 @@ public class CopperUtils {
         return Map.of(
             "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
             "X-PW-Application", List.of("developer_api"),
-            "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME)),
-            "Content-Type", List.of("application/json"));
+            "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME)));
     }
 }

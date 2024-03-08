@@ -31,16 +31,18 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class CopperConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                .title("API Key")
-                .properties(
-                    string(USERNAME)
-                        .label("Email address")
-                        .required(true),
-                    string(KEY)
-                        .label("Key")
-                        .required(true)));
+        .authorizations(
+            authorization(
+                AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
+                    .title("API Key")
+                    .properties(
+                        string(USERNAME)
+                            .label("Email address")
+                            .required(true),
+                        string(KEY)
+                            .label("Key")
+                            .required(true))
+                    .authorizationCallback());
 
     private CopperConnection() {
     }
