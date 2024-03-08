@@ -77,6 +77,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
     implementation(project(":server:libs:modules:components:bash"))
+    implementation(project(":server:libs:modules:components:capsule-crm"))
     implementation(project(":server:libs:modules:components:copper"))
     implementation(project(":server:libs:modules:components:csv-file"))
     implementation(project(":server:libs:modules:components:data-mapper"))
