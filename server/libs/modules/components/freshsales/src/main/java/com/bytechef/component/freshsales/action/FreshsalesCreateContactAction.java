@@ -51,7 +51,8 @@ import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 
@@ -134,7 +135,7 @@ public class FreshsalesCreateContactAction {
         return actionContext
             .http(http -> http.post(getUrl(connectionParameters, "contacts")))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(
+            .body(Http.Body.of(
                 FIRST_NAME, inputParameters.getString(FIRST_NAME),
                 LAST_NAME, inputParameters.getString(LAST_NAME),
                 JOB_TITLE, inputParameters.getString(JOB_TITLE),
@@ -150,9 +151,9 @@ public class FreshsalesCreateContactAction {
                 FACEBOOK, inputParameters.getString(FACEBOOK),
                 TWITTER, inputParameters.getString(TWITTER),
                 LINKEDIN, inputParameters.getString(LINKEDIN)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 
 }

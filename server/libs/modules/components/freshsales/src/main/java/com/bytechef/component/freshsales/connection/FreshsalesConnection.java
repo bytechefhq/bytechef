@@ -30,9 +30,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
  */
 public class FreshsalesConnection {
 
-    private FreshsalesConnection() {
-    }
-
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(
@@ -47,4 +44,7 @@ public class FreshsalesConnection {
                             .label("API Key")
                             .description("The API Key supplied by Freshsales")
                             .required(true)));
+
+    private FreshsalesConnection() {
+    }
 }

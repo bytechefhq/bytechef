@@ -33,7 +33,6 @@ public class FreshsalesUtils {
 
     public static Map<String, List<String>> getHeaders(Parameters connectionParameters) {
         return Map.of(
-            "Content-Type", List.of("application/json"),
             "Authorization", List.of("Token token=" + connectionParameters.getRequiredString(KEY)));
     }
 

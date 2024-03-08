@@ -36,7 +36,8 @@ import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 
@@ -77,12 +78,12 @@ public class FreshsalesCreateAccountAction {
         return actionContext
             .http(http -> http.post(getUrl(connectionParameters, "sales_accounts")))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(
+            .body(Http.Body.of(
                 NAME, inputParameters.getRequiredString(NAME),
                 WEBSITE, inputParameters.getString(WEBSITE),
                 PHONE, inputParameters.getString(PHONE)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 }
