@@ -71,7 +71,7 @@ const ConnectionLabel = ({
             <div className="space-x-1">
                 {componentDefinition && (
                     <Label>
-                        {`${componentDefinition?.title}`}
+                        ${componentDefinition?.title}
 
                         {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                     </Label>
@@ -88,11 +88,9 @@ const ConnectionLabel = ({
                 )}
             </div>
 
-            <div>
-                <Button className="text-destructive" onClick={onRemoveClick} size="sm" variant="link">
-                    Remove
-                </Button>
-            </div>
+            <Button className="text-destructive" onClick={onRemoveClick} size="sm" variant="link">
+                Remove
+            </Button>
         </div>
     );
 };
@@ -181,6 +179,7 @@ const ConnectionPopover = ({onSubmit}: {onSubmit: (values: z.infer<typeof connec
                                                         form.setValue('componentName', componentDefinition.name, {
                                                             shouldDirty: true,
                                                         });
+
                                                         form.setValue('componentVersion', componentDefinition.version, {
                                                             shouldDirty: true,
                                                         });
@@ -419,38 +418,41 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4 pt-3.5">
-            <div className="flex  items-center font-semibold">
+            <div className="flex items-center font-semibold">
                 <span>Connections</span>
             </div>
 
             {workflowConnections?.length ? (
                 <>
-                    {workflowConnections.map((workflowConnection) => (
-                        <fieldset className="space-y-2" key={workflowConnection.key}>
-                            <ConnectionLabel
-                                onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
-                                workflowConnection={workflowConnection}
-                                workflowConnectionsCount={workflowConnections.length}
-                            />
+                    {workflowConnections.map((workflowConnection) => {
+                        const workflowTestConfigurationConnection =
+                            workflowTestConfigurationConnections &&
+                            workflowTestConfigurationConnections.length > 0 &&
+                            workflowTestConfigurationConnections
+                                ? workflowTestConfigurationConnections.filter(
+                                      (workflowTestConfigurationConnection) =>
+                                          workflowTestConfigurationConnection.workflowConnectionKey ===
+                                          workflowConnection.key
+                                  )[0]
+                                : undefined;
 
-                            <ConnectionSelect
-                                workflowConnection={workflowConnection}
-                                workflowId={workflow.id!}
-                                workflowNodeName={workflowNodeName}
-                                workflowTestConfigurationConnection={
-                                    workflowTestConfigurationConnections &&
-                                    workflowTestConfigurationConnections.length > 0 &&
-                                    workflowTestConfigurationConnections
-                                        ? workflowTestConfigurationConnections.filter(
-                                              (workflowTestConfigurationConnection) =>
-                                                  workflowTestConfigurationConnection.workflowConnectionKey ===
-                                                  workflowConnection.key
-                                          )[0]
-                                        : undefined
-                                }
-                            />
-                        </fieldset>
-                    ))}
+                        return (
+                            <fieldset className="space-y-2" key={workflowConnection.key}>
+                                <ConnectionLabel
+                                    onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
+                                    workflowConnection={workflowConnection}
+                                    workflowConnectionsCount={workflowConnections.length}
+                                />
+
+                                <ConnectionSelect
+                                    workflowConnection={workflowConnection}
+                                    workflowId={workflow.id!}
+                                    workflowNodeName={workflowNodeName}
+                                    workflowTestConfigurationConnection={workflowTestConfigurationConnection}
+                                />
+                            </fieldset>
+                        );
+                    })}
 
                     <div className="flex justify-end">
                         <ConnectionPopover onSubmit={handleOnSubmit} />
