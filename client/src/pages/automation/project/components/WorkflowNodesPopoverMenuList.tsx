@@ -288,13 +288,14 @@ const WorkflowNodesPopoverMenuList = memo(
                     />
                 </header>
 
-                <main className="max-h-80 overflow-auto rounded-b-lg bg-gray-100">
+                <main className="h-96 rounded-b-lg bg-gray-100">
                     <WorkflowNodesTabs
                         actionComponentDefinitions={filteredActionComponentDefinitions}
                         hideActionComponents={hideActionComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
                         onItemClick={handleItemClick}
+                        popover
                         taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                         triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                     />

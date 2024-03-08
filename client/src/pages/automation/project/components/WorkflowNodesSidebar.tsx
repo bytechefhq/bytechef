@@ -57,7 +57,7 @@ const WorkflowNodesSidebar = ({
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <div className="flex h-full flex-col bg-white pb-12">
+        <div className="flex h-full flex-col bg-white">
             <header className="border-b border-gray-200 p-3 text-center text-gray-600">
                 <Input
                     name="workflowNodeFilter"
@@ -67,10 +67,11 @@ const WorkflowNodesSidebar = ({
                 />
             </header>
 
-            <main className="overflow-y-auto">
+            <main className="size-full pt-1">
                 <WorkflowNodesTabs
                     actionComponentDefinitions={filteredActionComponentDefinitions}
                     itemsDraggable
+                    popover={false}
                     taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />

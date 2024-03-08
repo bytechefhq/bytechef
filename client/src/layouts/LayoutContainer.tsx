@@ -53,7 +53,7 @@ const LayoutContainer = ({
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className={twMerge('size-full', className)}>
+        <div className={twMerge('size-full', topHeader && 'flex flex-col', className)}>
             <Dialog open={sidebarOpen}>
                 <DialogContent className="h-full sm:max-w-[425px]">
                     <div className="relative">
