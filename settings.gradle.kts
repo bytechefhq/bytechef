@@ -158,6 +158,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 include("server:libs:modules:components:airtable")
 include("server:libs:modules:components:aws:aws-s3")
 include("server:libs:modules:components:bash")
+include("server:libs:modules:components:copper")
 include("server:libs:modules:components:csv-file")
 include("server:libs:modules:components:data-mapper")
 include("server:libs:modules:components:data-storage")
@@ -264,3 +265,5 @@ include("ee:server:libs:platform:platform-workflow:platform-workflow-execution:p
 include("ee:server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
 include("server:libs:modules:components:google:google-contacts")
 findProject(":server:libs:modules:components:google:google-contacts")?.name = "google-contacts"
+include("server:libs:modules:components:copper")
+findProject(":server:libs:modules:components:copper")?.name = "copper"
