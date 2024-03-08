@@ -71,7 +71,7 @@ const ConnectionLabel = ({
             <div className="space-x-1">
                 {componentDefinition && (
                     <Label>
-                        ${componentDefinition?.title}
+                        <span>{componentDefinition?.title}</span>
 
                         {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                     </Label>
