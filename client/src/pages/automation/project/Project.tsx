@@ -124,7 +124,7 @@ const Project = () => {
     }[] = [
         {
             icon: PuzzleIcon,
-            name: 'Components & Control Flows',
+            name: 'Components & Flow Controls',
             onClick: () => {
                 setWorkflowNodeDetailsPanelOpen(false);
 
