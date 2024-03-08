@@ -128,7 +128,7 @@ const ObjectProperty = ({
                     }
 
                     return (
-                        <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
+                        <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
                                 actionName={actionName}
                                 currentComponent={currentComponent}
