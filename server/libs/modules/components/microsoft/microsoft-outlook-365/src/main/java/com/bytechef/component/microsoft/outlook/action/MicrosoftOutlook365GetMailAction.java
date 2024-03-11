@@ -17,17 +17,27 @@
 package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.nullable;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.time;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BASE_URL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.GET_MAIL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
-import com.microsoft.graph.models.Message;
-import com.microsoft.graph.requests.GraphServiceClient;
 
 /**
  * @author Monika Domiter
@@ -41,22 +51,25 @@ public class MicrosoftOutlook365GetMailAction {
             string(ID)
                 .label("Message id")
                 .description("Id of the message")
+                .options((ActionOptionsFunction<String>) MicrosoftOutlook365Utils::getMessageIdOptions)
                 .required(true))
-        .outputSchema(MESSAGE_OUTPUT_PROPERTY)
+        .outputSchema(
+            object()
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
         .perform(MicrosoftOutlook365GetMailAction::perform);
 
     private MicrosoftOutlook365GetMailAction() {
     }
 
-    public static Message perform(
+    public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        GraphServiceClient<?> graphClient = MicrosoftOutlook365Utils.getGraphServiceClient();
-
-        return graphClient
-            .me()
-            .messages(inputParameters.getRequiredString(ID))
-            .buildRequest()
-            .get();
+        return context
+            .http(http -> http
+                .get(BASE_URL + "/messages/" + inputParameters.getRequiredString(ID)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
