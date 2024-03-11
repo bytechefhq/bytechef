@@ -58,7 +58,7 @@ const WorkflowExecutionDetailsAccordion = ({
                 </div>
             </div>
 
-            <div>
+            <div className="overflow-y-auto">
                 <Accordion collapsible defaultValue={triggerExecution?.id || ''} type="single">
                     {triggerExecution && (
                         <WorkflowExecutionDetailsTriggerAccordionItem triggerExecution={triggerExecution} />
