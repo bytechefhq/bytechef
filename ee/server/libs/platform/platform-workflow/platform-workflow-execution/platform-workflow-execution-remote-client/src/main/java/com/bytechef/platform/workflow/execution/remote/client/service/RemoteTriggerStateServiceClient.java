@@ -34,6 +34,11 @@ public class RemoteTriggerStateServiceClient implements TriggerStateService {
     }
 
     @Override
+    public void delete(WorkflowExecutionId workflowExecutionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(

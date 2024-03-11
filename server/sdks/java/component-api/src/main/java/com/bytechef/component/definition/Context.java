@@ -590,7 +590,7 @@ public interface Context {
                 private boolean followRedirect;
                 private String proxy;
                 private ResponseType responseType;
-                private Duration timeout = Duration.ofMillis(1000);
+                private Duration timeout;
                 private boolean disableAuthorization;
 
                 private ConfigurationBuilder() {

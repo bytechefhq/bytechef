@@ -28,6 +28,7 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -49,6 +50,7 @@ public class TriggerCompletionHandler {
     private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateService triggerStateService;
 
+    @SuppressFBWarnings("EI")
     public TriggerCompletionHandler(
         InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
@@ -90,22 +92,24 @@ public class TriggerCompletionHandler {
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
 
-        Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
+        if (triggerExecution.getOutput() != null) {
+            Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
-        if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
-            for (Object triggerOutputValue : triggerOutputValues) {
+            if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
+                for (Object triggerOutputValue : triggerOutputValues) {
+                    triggerExecution.addJobId(
+                        createJob(
+                            workflowExecutionId,
+                            MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
+                            workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
+                }
+            } else {
                 triggerExecution.addJobId(
                     createJob(
                         workflowExecutionId,
-                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
+                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
                         workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
             }
-        } else {
-            triggerExecution.addJobId(
-                createJob(
-                    workflowExecutionId,
-                    MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
-                    workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
         }
 
         triggerExecutionService.update(triggerExecution);

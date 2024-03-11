@@ -31,24 +31,23 @@ import com.bytechef.platform.component.registry.service.TriggerDefinitionService
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;
-import com.bytechef.platform.workflow.webhook.web.rest.exception.WorkflowNotEnabledException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,19 +75,16 @@ public class WebhookController {
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
 
     private final FileStorageService fileStorageService;
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        FileStorageService fileStorageService, InstanceAccessorRegistry instanceAccessorRegistry,
-        TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
-        WorkflowService workflowService) {
+        FileStorageService fileStorageService, TriggerDefinitionService triggerDefinitionService,
+        WebhookExecutor webhookExecutor, WorkflowService workflowService) {
 
         this.fileStorageService = fileStorageService;
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
         this.workflowService = workflowService;
@@ -96,26 +92,22 @@ public class WebhookController {
 
     @RequestMapping(
         method = {
-            RequestMethod.GET, RequestMethod.POST
+            RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST
         },
         value = "/webhooks/{id}")
     public ResponseEntity<?> webhooks(@PathVariable String id, HttpServletRequest httpServletRequest)
         throws Exception {
 
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
-
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
-            Type.valueOf(workflowExecutionId.getType()));
-
-        if (!instanceAccessor.isWorkflowEnabled(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())) {
-
-            throw new WorkflowNotEnabledException(
-                "Workflow id=%s is not enabled".formatted(workflowExecutionId.getWorkflowId()));
+        if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name())) {
+            return ResponseEntity
+                .ok()
+                .build();
         }
 
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
         WebhookBodyImpl body = null;
-        String mediaType = httpServletRequest.getContentType();
+        String contentType = httpServletRequest.getContentType();
         Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
         Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
         ResponseEntity<?> responseEntity;
@@ -126,8 +118,8 @@ public class WebhookController {
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName());
 
-        if (mediaType != null) {
-            if (mediaType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
+        if (contentType != null) {
+            if (contentType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
                 MultiValueMap<String, Object> multipartFormDataMap = new LinkedMultiValueMap<>();
 
                 for (Part part : httpServletRequest.getParts()) {
@@ -150,7 +142,7 @@ public class WebhookController {
                 UriComponents uriComponents = getUriComponents(httpServletRequest);
 
                 parameters = toMap(uriComponents.getQueryParams());
-            } else if (mediaType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
+            } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
                 Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
 
                 UriComponents uriComponents = getUriComponents(httpServletRequest);
@@ -162,9 +154,10 @@ public class WebhookController {
                 }
 
                 body = new WebhookBodyImpl(
-                    parameterMap, ContentType.FORM_URL_ENCODED, httpServletRequest.getContentType());
+                    parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
+                    httpServletRequest.getContentType());
                 parameters = toMap(queryParams);
-            } else if (mediaType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
+            } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
                 Object content;
 
                 if (webhookTriggerFlags.webhookRawBody()) {
@@ -175,7 +168,7 @@ public class WebhookController {
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
-            } else if (mediaType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
+            } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
                 Object content;
 
                 if (webhookTriggerFlags.webhookRawBody()) {
@@ -186,7 +179,7 @@ public class WebhookController {
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
-            } else if (mediaType.startsWith("application/")) {
+            } else if (contentType.startsWith("application/")) {
                 body = new WebhookBodyImpl(
                     fileStorageService.storeFileContent(
                         FileEntryConstants.FILES_DIR, getFilename(httpServletRequest.getContentType()),
@@ -222,6 +215,78 @@ public class WebhookController {
         }
 
         return responseEntity;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, ?> parseFormUrlencodedParams(Map<String, String[]> parameterMap) {
+        Map<String, Object> multiMap = new HashMap<>();
+
+        for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+            String key = entry.getKey();
+            String[] values = entry.getValue();
+
+            // Split the key on [
+            String[] keys = key.split("\\[");
+
+            Map<String, Object> currentMap = multiMap;
+
+            for (int i = 0; i < keys.length; i++) {
+                String currentKey = keys[i];
+
+                // Remove any trailing ]
+                if (currentKey.endsWith("]")) {
+                    currentKey = currentKey.substring(0, currentKey.length() - 1);
+                }
+
+                if (i == keys.length - 1) {
+                    // If we're at the last key, add the value
+
+                    List<Object> convertedValues = Arrays
+                        .stream(values)
+                        .map(string -> (string == null || string.isBlank()) ? null : convertString(string))
+                        .toList();
+
+                    currentMap.put(
+                        currentKey,
+                        convertedValues.isEmpty()
+                            ? null
+                            : convertedValues.size() == 1 ? convertedValues.getFirst() : convertedValues);
+                } else {
+                    // Otherwise, add a new map if one doesn't already exist
+                    currentMap.putIfAbsent(currentKey, new HashMap<String, Object>());
+
+                    currentMap = (Map<String, Object>) currentMap.get(currentKey);
+                }
+            }
+        }
+
+        return multiMap;
+    }
+
+    private Object convertString(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            // Not an integer
+        }
+
+        try {
+            return Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            // Not a double
+        }
+
+        if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(str);
+        }
+
+        try {
+            return LocalDate.parse(str);
+        } catch (DateTimeParseException e) {
+            // Not a LocalDate
+        }
+
+        return str;
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {

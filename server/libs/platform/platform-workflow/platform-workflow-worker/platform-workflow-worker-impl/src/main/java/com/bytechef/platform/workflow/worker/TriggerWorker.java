@@ -151,10 +151,18 @@ public class TriggerWorker {
             triggerExecution.setState(null);
         } else {
             triggerExecution.setBatch(triggerOutput.batch());
-            triggerExecution.setOutput(
-                triggerFileStorage.storeTriggerExecutionOutput(
-                    Validate.notNull(triggerExecution.getId(), "id"), triggerOutput.value()));
-            triggerExecution.setState(triggerOutput.state());
+
+            if (triggerOutput.value() != null) {
+                triggerExecution.setOutput(
+                    triggerFileStorage.storeTriggerExecutionOutput(
+                        Validate.notNull(triggerExecution.getId(), "id"), triggerOutput.value()));
+            }
+
+            if (triggerOutput.state() == null) {
+                triggerExecution.setState(null);
+            } else {
+                triggerExecution.setState(triggerOutput.state());
+            }
         }
 
         triggerExecution.setEndDate(LocalDateTime.now());

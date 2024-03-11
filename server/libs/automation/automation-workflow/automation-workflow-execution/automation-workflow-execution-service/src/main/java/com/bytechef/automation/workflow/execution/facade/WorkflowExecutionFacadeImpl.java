@@ -17,6 +17,7 @@
 package com.bytechef.automation.workflow.execution.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
@@ -47,6 +48,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -138,8 +140,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                 CollectionUtils.map(workflowService.getWorkflows(Type.AUTOMATION.getId()), Workflow::getId));
         }
 
+        Page<WorkflowExecution> workflowExecutionPage;
+
         if (workflowIds.isEmpty()) {
-            return Page.empty();
+            workflowExecutionPage = Page.empty();
         } else {
             Page<Job> jobsPage = instanceJobService
                 .getJobIds(
@@ -158,7 +162,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             List<Workflow> workflows = workflowService.getWorkflows(
                 CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-            return jobsPage.map(job -> new WorkflowExecution(
+            workflowExecutionPage = jobsPage.map(job -> new WorkflowExecution(
                 Validate.notNull(job.getId(), "id"),
                 CollectionUtils.getFirst(
                     projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
@@ -171,6 +175,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                     projectInstanceId,
                     triggerExecutionService.getJobTriggerExecution(Validate.notNull(job.getId(), "id")), job)));
         }
+
+        return workflowExecutionPage;
     }
 
     private ComponentDefinition getComponentDefinition(String type) {
@@ -183,15 +189,20 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
         return CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
-            taskExecution -> new TaskExecutionDTO(
-                taskExecutionService.getTaskExecution(taskExecution.getId()),
-                getComponentDefinition(taskExecution.getType()),
-                taskFileStorage.readContextValue(
+            taskExecution -> {
+                Map<String, ?> context = taskFileStorage.readContextValue(
                     contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
-                taskExecution.getOutput() == null
-                    ? null
-                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput())));
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+
+                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+                return new TaskExecutionDTO(
+                    taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
+                    getComponentDefinition(taskExecution.getType()), workflowTask.evaluateParameters(context),
+                    taskExecution.getOutput() == null
+                        ? null
+                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            });
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

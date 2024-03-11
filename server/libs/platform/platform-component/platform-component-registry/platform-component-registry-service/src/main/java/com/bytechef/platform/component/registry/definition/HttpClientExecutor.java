@@ -52,6 +52,7 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +187,11 @@ public class HttpClientExecutor {
             builder.proxy(ProxySelector.of(new InetSocketAddress(proxyAddress[0], Integer.parseInt(proxyAddress[1]))));
         }
 
-        builder.connectTimeout(configuration.getTimeout());
+        if (configuration.getTimeout() == null) {
+            builder.connectTimeout(Duration.ofMillis(4000));
+        } else {
+            builder.connectTimeout(configuration.getTimeout());
+        }
 
         return builder.build();
     }
@@ -276,9 +281,11 @@ public class HttpClientExecutor {
         if (queryParameters.isEmpty()) {
             uri = URI.create(urlString);
         } else {
-            String parameter = queryParameters.entrySet()
+            String parameter = queryParameters
+                .entrySet()
                 .stream()
-                .flatMap(entry -> entry.getValue()
+                .flatMap(entry -> entry
+                    .getValue()
                     .stream()
                     .map(value -> entry.getKey() + "=" + value))
                 .collect(Collectors.joining("&"));
@@ -367,7 +374,7 @@ public class HttpClientExecutor {
             if (headers.containsKey("Content-Type")) {
                 List<String> values = headers.get("Content-Type");
 
-                filename = "file" + MimeTypeUtils.getDefaultExt(values.get(0));
+                filename = "file" + MimeTypeUtils.getDefaultExt(values.getFirst());
             } else {
                 filename = "file.txt";
             }
