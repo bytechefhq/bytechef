@@ -158,13 +158,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows(int type) {
-        return getWorkflows(type, Arrays.asList(SourceType.values()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Workflow> getWorkflows(int type, @NonNull List<SourceType> sourceTypes) {
         List<Workflow> workflows;
+        List<SourceType> sourceTypes = Arrays.asList(SourceType.values());
 
         List<WorkflowRepository> filteredWorkflowRepositories = CollectionUtils.filter(
             workflowRepositories, curWorkflowRepository -> sourceTypes.contains(curWorkflowRepository.getSourceType()));
@@ -174,8 +169,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = filteredWorkflowRepositories
                 .stream()
-                .flatMap(workflowRepository -> workflowRepository.findAll(type)
-                    .stream()
+                .flatMap(workflowRepository -> CollectionUtils.stream(workflowRepository.findAll(type))
                     .filter(Objects::nonNull)
                     .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType())))
                 .sorted((a, b) -> {

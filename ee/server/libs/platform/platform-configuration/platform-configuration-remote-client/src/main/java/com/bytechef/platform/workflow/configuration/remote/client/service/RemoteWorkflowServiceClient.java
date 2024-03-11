@@ -73,11 +73,6 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public List<Workflow> getWorkflows(int type, @NonNull List<Workflow.SourceType> sourceTypes) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<Workflow> getWorkflows(@NonNull List<String> workflowIds) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
