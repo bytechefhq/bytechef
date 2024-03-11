@@ -68,7 +68,7 @@ const PropertyCodeEditorSheet = ({
         <>
             <Sheet onOpenChange={onClose} open={true}>
                 <SheetContent
-                    className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-[1024px]"
+                    className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >

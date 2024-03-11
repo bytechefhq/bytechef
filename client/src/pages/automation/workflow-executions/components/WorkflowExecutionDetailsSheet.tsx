@@ -21,10 +21,10 @@ const WorkflowExecutionDetailsSheet = () => {
             onOpenChange={() => setWorkflowExecutionDetailsDialogOpen(!workflowExecutionDetailsDialogOpen)}
             open={workflowExecutionDetailsDialogOpen}
         >
-            <SheetContent className="flex w-11/12 gap-0 p-0 sm:max-w-[1280px]">
+            <SheetContent className="flex w-11/12 gap-0 p-0 sm:max-w-screen-xl">
                 {workflowExecutionLoading && <span>Loading...</span>}
 
-                <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
+                <div className="flex min-w-[500px] max-w-[500px] flex-col border-r border-gray-100 bg-white">
                     {workflowExecution?.job && (
                         <WorkflowExecutionDetailsAccordion
                             job={workflowExecution.job}
