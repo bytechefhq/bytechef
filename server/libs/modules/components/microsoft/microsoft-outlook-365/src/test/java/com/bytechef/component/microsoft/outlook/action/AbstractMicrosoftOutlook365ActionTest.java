@@ -16,46 +16,28 @@
 
 package com.bytechef.component.microsoft.outlook.action;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
-import com.microsoft.graph.requests.GraphServiceClient;
-import com.microsoft.graph.requests.UserRequestBuilder;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
  */
 public abstract class AbstractMicrosoftOutlook365ActionTest {
 
-    protected MockedStatic<MicrosoftOutlook365Utils> microsoftOutlook365UtilsMockedStatic;
     protected ActionContext mockedContext = mock(ActionContext.class);
-    @SuppressWarnings("rawtypes")
-
-    protected GraphServiceClient mockedGraphServiceClient = mock(GraphServiceClient.class);
+    protected Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
     protected Parameters mockedParameters = mock(Parameters.class);
-    protected UserRequestBuilder mockedUserRequestBuilder = mock(UserRequestBuilder.class);
+    protected Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
 
     @BeforeEach
-    public void beforeEach() {
-        microsoftOutlook365UtilsMockedStatic = mockStatic(MicrosoftOutlook365Utils.class);
-
-        microsoftOutlook365UtilsMockedStatic
-            .when(MicrosoftOutlook365Utils::getGraphServiceClient)
-            .thenReturn(mockedGraphServiceClient);
-
-        when(mockedGraphServiceClient.me())
-            .thenReturn(mockedUserRequestBuilder);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        microsoftOutlook365UtilsMockedStatic.close();
+    void beforeEach() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
     }
 }

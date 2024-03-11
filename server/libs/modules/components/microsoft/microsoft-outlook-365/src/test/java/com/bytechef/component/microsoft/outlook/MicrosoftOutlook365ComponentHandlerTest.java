@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-public class MicrosoftOutlook365ComponentHandlerTest {
+class MicrosoftOutlook365ComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {

@@ -16,16 +16,22 @@
 
 package com.bytechef.component.microsoft.outlook.action;
 
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SAVE_TO_SENT_ITEMS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
-import com.microsoft.graph.models.Message;
-import com.microsoft.graph.models.UserSendMailParameterSet;
-import com.microsoft.graph.requests.UserSendMailRequest;
-import com.microsoft.graph.requests.UserSendMailRequestBuilder;
+import com.bytechef.component.definition.Context;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -34,29 +40,64 @@ import org.mockito.ArgumentCaptor;
  */
 class MicrosoftOutlook365SendEmailActionTest extends AbstractMicrosoftOutlook365ActionTest {
 
-    private final Message mockedMessage = mock(Message.class);
-    private final UserSendMailRequest mockedUserSendMailRequest = mock(UserSendMailRequest.class);
-    private final UserSendMailRequestBuilder mockedUserSendMailRequestBuilder = mock(UserSendMailRequestBuilder.class);
-    private final ArgumentCaptor<UserSendMailParameterSet> userSendMailParameterSetArgumentCaptor =
-        ArgumentCaptor.forClass(UserSendMailParameterSet.class);
+    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
+        ArgumentCaptor.forClass(Context.Http.Body.class);
 
     @Test
     void testPerform() {
-        microsoftOutlook365UtilsMockedStatic
-            .when(() -> MicrosoftOutlook365Utils.createMessage(mockedParameters))
-            .thenReturn(mockedMessage);
-        when(mockedParameters.getBoolean(SAVE_TO_SENT_ITEMS))
-            .thenReturn(true);
-        when(mockedUserRequestBuilder.sendMail(userSendMailParameterSetArgumentCaptor.capture()))
-            .thenReturn(mockedUserSendMailRequestBuilder);
-        when(mockedUserSendMailRequestBuilder.buildRequest())
-            .thenReturn(mockedUserSendMailRequest);
+        Map<String, String> responeseMap = Map.of("key", "value");
+        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
-        MicrosoftOutlook365SendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        when(mockedParameters.get(FROM))
+            .thenReturn(propertyStubsMap.get(FROM));
+        when(mockedParameters.getRequiredString(SUBJECT))
+            .thenReturn((String) propertyStubsMap.get(SUBJECT));
+        when(mockedParameters.get(BODY))
+            .thenReturn(propertyStubsMap.get(BODY));
+        when(mockedParameters.getArray(TO_RECIPIENTS))
+            .thenReturn((Object[]) propertyStubsMap.get(TO_RECIPIENTS));
+        when(mockedParameters.getArray(CC_RECIPIENTS))
+            .thenReturn((Object[]) propertyStubsMap.get(CC_RECIPIENTS));
+        when(mockedParameters.getArray(BCC_RECIPIENTS))
+            .thenReturn((Object[]) propertyStubsMap.get(BCC_RECIPIENTS));
+        when(mockedParameters.getArray(REPLY_TO))
+            .thenReturn((Object[]) propertyStubsMap.get(REPLY_TO));
 
-        UserSendMailParameterSet userSendMailParameterSet = userSendMailParameterSetArgumentCaptor.getValue();
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+            .thenReturn(responeseMap);
 
-        assertEquals(true, userSendMailParameterSet.saveToSentItems);
-        assertEquals(mockedMessage, userSendMailParameterSet.message);
+        Object result = MicrosoftOutlook365SendEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertNull(result);
+
+        Context.Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of("message", propertyStubsMap), body.getContent());
+    }
+
+    private static Map<String, Object> createPropertyStubsMap() {
+        Map<String, String> content = Map.of("content", "test", "contentType", "text");
+        Map<String, Map<String, String>> recipient = Map.of(
+            "emailAddress", Map.of("address", "address", "name", "name"));
+        Object[] array = List.of(recipient)
+            .toArray();
+
+        Map<String, Object> propertyStubsMap = new HashMap<>();
+
+        propertyStubsMap.put(FROM, "testFrom");
+        propertyStubsMap.put(SUBJECT, "testSubject");
+        propertyStubsMap.put(BODY, content);
+        propertyStubsMap.put(TO_RECIPIENTS, array);
+        propertyStubsMap.put(CC_RECIPIENTS, array);
+        propertyStubsMap.put(BCC_RECIPIENTS, array);
+        propertyStubsMap.put(REPLY_TO, array);
+
+        return propertyStubsMap;
     }
 }
