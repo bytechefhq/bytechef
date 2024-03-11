@@ -16,8 +16,11 @@
 
 package com.bytechef.component.microsoft.outlook.action;
 
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CATEGORY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -28,11 +31,20 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-class MicrosoftOutlook365GetMailActionTest extends AbstractMicrosoftOutlook365ActionTest {
+class MicrosoftOutlook365SearchEmailActionTest extends AbstractMicrosoftOutlook365ActionTest {
 
     @Test
     void testPerform() {
         Map<String, String> responeseMap = Map.of("key", "value");
+
+        when(mockedParameters.getString(FROM))
+            .thenReturn("from");
+        when(mockedParameters.getString(TO))
+            .thenReturn("to");
+        when(mockedParameters.getString(SUBJECT))
+            .thenReturn("subject");
+        when(mockedParameters.getString(CATEGORY))
+            .thenReturn("category");
 
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -41,10 +53,8 @@ class MicrosoftOutlook365GetMailActionTest extends AbstractMicrosoftOutlook365Ac
         when(mockedResponse.getBody(any(Context.TypeReference.class)))
             .thenReturn(responeseMap);
 
-        Object result =
-            MicrosoftOutlook365GetMailAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftOutlook365SearchEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertNotNull(result);
         assertEquals(responeseMap, result);
     }
 }

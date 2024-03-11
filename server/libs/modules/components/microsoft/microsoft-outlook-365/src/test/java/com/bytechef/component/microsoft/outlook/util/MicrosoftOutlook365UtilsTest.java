@@ -16,49 +16,20 @@
 
 package com.bytechef.component.microsoft.outlook.util;
 
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY_PREVIEW;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.COMPLETED_DATE_TIME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONVERSATION_ID;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DUE_DATE_TIME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FLAG_STATUS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.HAS_ATTACHMENTS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.IMPORTANCE;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.INFERENCE_CLASSIFICATION;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.INTERNET_MESSAGE_HEADERS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.INTERNET_MESSAGE_ID;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.IS_DELIVERY_RECEIPT_REQUESTED;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.IS_DRAFT;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.IS_READ;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.IS_READ_RECEIPT_REQUESTED;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.PARENT_FOLDER_ID;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECEIVED_DATE_TIME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SENDER;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SENT_DATE_TIME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.START_DATE_TIME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.UNIQUE_BODY;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.WEB_LINK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Parameters;
-import com.microsoft.graph.models.DateTimeTimeZone;
-import com.microsoft.graph.models.EmailAddress;
-import com.microsoft.graph.models.InternetMessageHeader;
-import com.microsoft.graph.models.ItemBody;
-import com.microsoft.graph.models.Message;
-import com.microsoft.graph.models.Recipient;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Option;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -66,145 +37,67 @@ import org.junit.jupiter.api.Test;
  */
 class MicrosoftOutlook365UtilsTest {
 
-    private final Parameters mockedParameters = mock(Parameters.class);
-
-    private static final MicrosoftOutlook365Utils.DateTimeCustom dateTimeCustom =
-        new MicrosoftOutlook365Utils.DateTimeCustom(LocalDateTime.of(2015, 1, 1, 1, 1), "Pacific/Midway");
-    private static final MicrosoftOutlook365Utils.ItemBodyCustom itemBodyCustom =
-        new MicrosoftOutlook365Utils.ItemBodyCustom("content", "TEXT");
-
-    private static final MicrosoftOutlook365Utils.OffsetDateTimeCustom offsetDateTimeCustom =
-        new MicrosoftOutlook365Utils.OffsetDateTimeCustom(LocalDateTime.of(2015, 1, 1, 1, 1), "Pacific/Midway");
+    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
 
     @Test
-    void testCreateMessage() {
+    void testGetCategoryOptions() {
+        Map<String, String> displayName = new LinkedHashMap<>();
 
-        EmailAddress emailAddress = new EmailAddress();
+        displayName.put("displayName", "displayName1");
 
-        emailAddress.address = "email@email.com";
-        emailAddress.name = "name";
+        Map<String, Object> responeseMap = new LinkedHashMap<>();
 
-        Recipient recipient = new Recipient();
-        recipient.emailAddress = emailAddress;
+        responeseMap.put("value", new ArrayList(Arrays.asList(displayName)));
 
-        List<Recipient> recipients = List.of(recipient);
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+            .thenReturn(responeseMap);
 
-        InternetMessageHeader internetMessageHeader = new InternetMessageHeader();
+        List<Option<String>> categoryOptions = MicrosoftOutlook365Utils.getCategoryOptions(
+            null, null, anyString(), mockedContext);
 
-        internetMessageHeader.name = "name";
-        internetMessageHeader.value = "value";
+        assertEquals(1, categoryOptions.size());
 
-        List<InternetMessageHeader> internetMessageHeaders = List.of(internetMessageHeader);
+        Option<String> option = categoryOptions.getFirst();
 
-        when(mockedParameters.getList(BCC_RECIPIENTS, Recipient.class, List.of()))
-            .thenReturn(recipients);
-        when(mockedParameters.get(BODY, MicrosoftOutlook365Utils.ItemBodyCustom.class))
-            .thenReturn(itemBodyCustom);
-        when(mockedParameters.getString(BODY_PREVIEW))
-            .thenReturn("bodyPreview");
-        when(mockedParameters.getList(CC_RECIPIENTS, Recipient.class, List.of()))
-            .thenReturn(recipients);
-        when(mockedParameters.getString(CONVERSATION_ID))
-            .thenReturn("conversationId");
-        when(mockedParameters.get(COMPLETED_DATE_TIME, MicrosoftOutlook365Utils.DateTimeCustom.class))
-            .thenReturn(dateTimeCustom);
-        when(mockedParameters.get(DUE_DATE_TIME, MicrosoftOutlook365Utils.DateTimeCustom.class))
-            .thenReturn(dateTimeCustom);
-        when(mockedParameters.getString(FLAG_STATUS))
-            .thenReturn("COMPLETE");
-        when(mockedParameters.get(START_DATE_TIME, MicrosoftOutlook365Utils.DateTimeCustom.class))
-            .thenReturn(dateTimeCustom);
-        when(mockedParameters.get(FROM, Recipient.class))
-            .thenReturn(recipient);
-        when(mockedParameters.getBoolean(HAS_ATTACHMENTS))
-            .thenReturn(true);
-        when(mockedParameters.getString(IMPORTANCE))
-            .thenReturn("HIGH");
-        when(mockedParameters.getString(INFERENCE_CLASSIFICATION))
-            .thenReturn("FOCUSED");
-        when(mockedParameters.getList(INTERNET_MESSAGE_HEADERS, InternetMessageHeader.class, List.of()))
-            .thenReturn(internetMessageHeaders);
-        when(mockedParameters.getString(INTERNET_MESSAGE_ID))
-            .thenReturn("internetMessageId");
-        when(mockedParameters.getBoolean(IS_DELIVERY_RECEIPT_REQUESTED))
-            .thenReturn(false);
-        when(mockedParameters.getBoolean(IS_DRAFT))
-            .thenReturn(false);
-        when(mockedParameters.getBoolean(IS_READ))
-            .thenReturn(false);
-        when(mockedParameters.getBoolean(IS_READ_RECEIPT_REQUESTED))
-            .thenReturn(false);
-        when(mockedParameters.getString(PARENT_FOLDER_ID))
-            .thenReturn("parentFolderId");
-        when(mockedParameters.get(RECEIVED_DATE_TIME, MicrosoftOutlook365Utils.OffsetDateTimeCustom.class))
-            .thenReturn(offsetDateTimeCustom);
-        when(mockedParameters.getList(REPLY_TO, Recipient.class, List.of()))
-            .thenReturn(recipients);
-        when(mockedParameters.get(SENDER, Recipient.class))
-            .thenReturn(recipient);
-        when(mockedParameters.get(SENT_DATE_TIME, MicrosoftOutlook365Utils.OffsetDateTimeCustom.class))
-            .thenReturn(offsetDateTimeCustom);
-        when(mockedParameters.getString(SUBJECT))
-            .thenReturn("subject");
-        when(mockedParameters.getList(TO_RECIPIENTS, Recipient.class, List.of()))
-            .thenReturn(recipients);
-        when(mockedParameters.get(UNIQUE_BODY, MicrosoftOutlook365Utils.ItemBodyCustom.class))
-            .thenReturn(itemBodyCustom);
-        when(mockedParameters.getString(WEB_LINK))
-            .thenReturn("webLink");
-
-        Message message = MicrosoftOutlook365Utils.createMessage(mockedParameters);
-
-        assertEquals(recipients, message.bccRecipients);
-        assertEquals("bodyPreview", message.bodyPreview);
-        assertEquals(recipients, message.ccRecipients);
-        assertEquals("conversationId", message.conversationId);
-        assertEquals("COMPLETE", message.flag.flagStatus.toString());
-        assertEquals(recipient, message.from);
-        assertEquals(true, message.hasAttachments);
-        assertEquals("HIGH", message.importance.toString());
-        assertEquals("FOCUSED", message.inferenceClassification.toString());
-        assertEquals(internetMessageHeaders, message.internetMessageHeaders);
-        assertEquals("internetMessageId", message.internetMessageId);
-        assertEquals(false, message.isDeliveryReceiptRequested);
-        assertEquals(false, message.isDraft);
-        assertEquals(false, message.isRead);
-        assertEquals(false, message.isReadReceiptRequested);
-        assertEquals("parentFolderId", message.parentFolderId);
-        assertEquals(recipients, message.replyTo);
-        assertEquals(recipient, message.sender);
-        assertEquals("subject", message.subject);
-        assertEquals(recipients, message.toRecipients);
-        assertEquals("webLink", message.webLink);
-
-        testItemBody(message.body);
-        testItemBody(message.uniqueBody);
-
-        testDateTime(message.flag.completedDateTime);
-        testDateTime(message.flag.dueDateTime);
-        testDateTime(message.flag.startDateTime);
-
-        testOffsetDateTime(message.receivedDateTime);
-        testOffsetDateTime(message.sentDateTime);
+        assertEquals("displayName1", option.getValue());
+        assertEquals("displayName1", option.getLabel());
     }
 
-    private static void testOffsetDateTime(OffsetDateTime offsetDateTime) {
-        LocalDateTime dateTime = offsetDateTimeCustom.dateTime();
+    @Test
+    void testGetMessageIdOptions() {
+        Map<String, String> displayName = new LinkedHashMap<>();
 
-        assertEquals(dateTime, offsetDateTime.toLocalDateTime());
-        assertEquals(ZoneId.of(offsetDateTimeCustom.zoneId())
-            .getRules()
-            .getOffset(dateTime), offsetDateTime.getOffset());
-    }
+        displayName.put("id", "123");
 
-    private static void testDateTime(DateTimeTimeZone dateTimeTimeZone) {
-        assertEquals(dateTimeCustom.dateTime()
-            .toString(), dateTimeTimeZone.dateTime);
-        assertEquals(dateTimeCustom.timeZone(), dateTimeTimeZone.timeZone);
-    }
+        Map<String, Object> responeseMap = new LinkedHashMap<>();
 
-    private static void testItemBody(ItemBody itemBody) {
-        assertEquals(itemBodyCustom.content(), itemBody.content);
-        assertEquals(itemBodyCustom.contentType(), itemBody.contentType.toString());
+        responeseMap.put("value", new ArrayList(Arrays.asList(displayName)));
+
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+            .thenReturn(responeseMap);
+
+        List<Option<String>> messageIdOptions = MicrosoftOutlook365Utils.getMessageIdOptions(
+            null, null, anyString(), mockedContext);
+
+        assertEquals(1, messageIdOptions.size());
+
+        Option<String> option = messageIdOptions.getFirst();
+
+        assertEquals("123", option.getValue());
+        assertEquals("123", option.getLabel());
     }
 }
