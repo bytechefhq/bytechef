@@ -147,7 +147,7 @@ public final class XeroCreateContactAction {
 
         return actionContext
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
-            .body(Http.Body.of(
+            .body(Http.Body.of(false,
                 NAME, inputParameters.getRequiredString(NAME),
                 CONTACT_NUMBER, inputParameters.getString(CONTACT_NUMBER),
                 FIRST_NAME, inputParameters.getString(FIRST_NAME),

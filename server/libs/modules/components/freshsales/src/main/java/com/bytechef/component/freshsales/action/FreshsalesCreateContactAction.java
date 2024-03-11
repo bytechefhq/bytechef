@@ -135,7 +135,7 @@ public class FreshsalesCreateContactAction {
         return actionContext
             .http(http -> http.post(getUrl(connectionParameters, "contacts")))
             .headers(getHeaders(connectionParameters))
-            .body(Http.Body.of(
+            .body(Http.Body.of(false,
                 FIRST_NAME, inputParameters.getString(FIRST_NAME),
                 LAST_NAME, inputParameters.getString(LAST_NAME),
                 JOB_TITLE, inputParameters.getString(JOB_TITLE),

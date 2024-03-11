@@ -100,7 +100,7 @@ public class CopperCreateCompanyAction {
 
         return actionContext.http(http -> http.post(BASE_URL + "/companies"))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(
+            .body(Context.Http.Body.of(false,
                 NAME, inputParameters.getString(NAME),
                 ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
                 EMAIL_DOMAIN, inputParameters.getString(EMAIL_DOMAIN),
