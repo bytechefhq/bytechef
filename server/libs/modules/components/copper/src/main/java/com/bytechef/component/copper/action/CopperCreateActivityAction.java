@@ -95,7 +95,7 @@ public class CopperCreateActivityAction {
 
         return actionContext.http(http -> http.post(BASE_URL + "/activities"))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(
+            .body(Context.Http.Body.of(false,
                 TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),
                 DETAILS, inputParameters.getRequiredString(DETAILS),
                 PARENT, inputParameters.getRequired(PARENT)))

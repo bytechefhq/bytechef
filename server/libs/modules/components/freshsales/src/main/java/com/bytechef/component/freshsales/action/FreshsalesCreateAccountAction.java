@@ -78,7 +78,7 @@ public class FreshsalesCreateAccountAction {
         return actionContext
             .http(http -> http.post(getUrl(connectionParameters, "sales_accounts")))
             .headers(getHeaders(connectionParameters))
-            .body(Http.Body.of(
+            .body(Http.Body.of(false,
                 NAME, inputParameters.getRequiredString(NAME),
                 WEBSITE, inputParameters.getString(WEBSITE),
                 PHONE, inputParameters.getString(PHONE)))

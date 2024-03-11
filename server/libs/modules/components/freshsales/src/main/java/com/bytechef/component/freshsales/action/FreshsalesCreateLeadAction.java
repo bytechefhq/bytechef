@@ -72,7 +72,7 @@ public class FreshsalesCreateLeadAction {
         return actionContext
             .http(http -> http.post(getUrl(connectionParameters, "leads")))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(
+            .body(Context.Http.Body.of(false,
                 FIRST_NAME, inputParameters.getString(FIRST_NAME),
                 LAST_NAME, inputParameters.getString(LAST_NAME),
                 EMAIL, inputParameters.getRequiredString(EMAIL)))

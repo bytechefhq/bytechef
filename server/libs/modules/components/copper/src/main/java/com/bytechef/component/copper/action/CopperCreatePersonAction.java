@@ -134,7 +134,7 @@ public class CopperCreatePersonAction {
 
         return actionContext.http(http -> http.post(BASE_URL + "/people"))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(
+            .body(Context.Http.Body.of(false,
                 NAME, inputParameters.getString(NAME),
                 EMAILS, inputParameters.getList(EMAILS),
                 ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),

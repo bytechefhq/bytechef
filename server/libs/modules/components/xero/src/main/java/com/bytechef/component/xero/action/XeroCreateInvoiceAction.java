@@ -149,7 +149,7 @@ public final class XeroCreateInvoiceAction {
 
         return actionContext
             .http(http -> http.post("https://api.xero.com/api.xro/2.0/Invoices"))
-            .body(Http.Body.of(
+            .body(Http.Body.of(false,
                 TYPE, inputParameters.getRequiredString(TYPE),
                 "Contact", Map.of(CONTACT_ID, inputParameters.getRequiredString(CONTACT_ID)),
                 LINE_ITEMS, inputParameters.getList(LINE_ITEMS)))
