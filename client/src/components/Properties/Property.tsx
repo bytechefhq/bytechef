@@ -69,6 +69,7 @@ const Property = ({
     customClassName,
     dataPills,
     formState,
+    mention = true,
     objectName,
     path = 'parameters',
     property,
@@ -79,7 +80,7 @@ const Property = ({
     const [hasError, setHasError] = useState(false);
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
-    const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
+    const [mentionInput, setMentionInput] = useState(mention && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [loadDependency, setLoadDependency] = useState({});
 
