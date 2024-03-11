@@ -83,6 +83,7 @@ const Property = ({
     const [mentionInput, setMentionInput] = useState(mention && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [loadOptionsDependency, setLoadOptionsDependency] = useState({});
+    const [loadPropertiesDependency, setLoadPropertiesDependency] = useState({});
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -108,6 +109,7 @@ const Property = ({
         options,
         optionsDataSource,
         properties,
+        propertiesDataSource,
         required,
         type,
     } = property;
@@ -438,6 +440,20 @@ const Property = ({
         }
     }, [currentComponentData?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
+    useEffect(() => {
+        const loadPropertiesDependency = propertiesDataSource?.loadPropertiesDependsOn?.reduce(
+            (acc, key) => ({
+                ...acc,
+                [key]: currentComponentData?.parameters?.[key],
+            }),
+            {}
+        );
+
+        if (loadPropertiesDependency) {
+            setLoadPropertiesDependency(loadPropertiesDependency);
+        }
+    }, [currentComponentData?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
+
     if (displayCondition === false || (property.displayCondition && isDisplayConditionLoading)) {
         return <></>;
     }
@@ -680,6 +696,7 @@ const Property = ({
 
                         {type === 'DYNAMIC_PROPERTIES' && (
                             <PropertyDynamicProperties
+                                loadDependency={loadPropertiesDependency}
                                 name={name}
                                 propertiesDataSource={property.propertiesDataSource}
                             />
