@@ -83,7 +83,14 @@ public class PolyglotEngine {
                     "component",
                     new ComponentProxyObject(actionContext, applicationContext, languageId, parameterConnections));
 
-            polyglotContext.eval(languageId, inputParameters.getRequiredString(SCRIPT));
+            polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
+                case "java" -> "public static Object perform(Map<String, ?> input) {\n\treturn null;\n}";
+                case "js" -> "function perform(input) {\n\treturn null;\n}";
+                case "python" -> "def perform(input):\n\treturn null";
+                case "R" -> "perform <- function(input) {\n\treturn null\n}";
+                case "ruby" -> "def perform(input)\n\treturn null;\nend";
+                default -> throw new IllegalArgumentException("languageId=%s does not exist".formatted(languageId));
+            }));
 
             Value value = polyglotContext
                 .getBindings(languageId)
@@ -101,6 +108,10 @@ public class PolyglotEngine {
      * @return
      */
     private static Object copyFromPolyglotContext(Object object) {
+        if (object == null) {
+            return null;
+        }
+
         if (object instanceof Map<?, ?> map) {
             Map<String, Object> hashMap = new HashMap<>();
 
@@ -123,6 +134,10 @@ public class PolyglotEngine {
     }
 
     private static Object copyToJavaValue(Value value) {
+        if (value == null) {
+            return null;
+        }
+
         if (value.isBoolean()) {
             return value.asBoolean();
         } else if (value.isDate()) {
@@ -151,6 +166,10 @@ public class PolyglotEngine {
     }
 
     private static Object copyToGuestValue(Object value, String languageId) {
+        if (value == null) {
+            return null;
+        }
+
         Class<?> valueClass = value.getClass();
 
         if (valueClass.isArray()) {

@@ -27,6 +27,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.PollTriggerOutputFunction;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -67,23 +69,23 @@ public class AirtableNewRecordTrigger {
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();
 
-        List<Map<String, ?>> records = context.http(http -> http.get(
-            "/{%s}/{%s}".formatted(
-                inputParameters.getRequiredString(TABLE_ID),
-                inputParameters.getRequiredString(BASE_ID))))
-            .queryParameters(
-                Map.of(
-                    "filterByFormula",
-                    List.of(
-                        "IS_AFTER({%s}, DATETIME_PARSE(\"%s\", \"YYYY-MM-DD HH:mm:ss\"))"
-                            .formatted(
-                                inputParameters.getRequiredString(TRIGGER_FIELD),
-                                startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new Context.TypeReference<>() {});
+        String filterByFormula = URLEncoder.encode(
+            String.format(
+                "IS_AFTER({%s}, DATETIME_PARSE('%s', 'YYYY-MM-DD HH:mm:ss'))",
+                inputParameters.getRequiredString(TRIGGER_FIELD),
+                startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
+            StandardCharsets.UTF_8);
 
-        return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
+        Http.Response response = context.http(http -> http.get(
+            String.format(
+                "/%s/%s", inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID))))
+            .queryParameter("filterByFormula", filterByFormula)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute();
+
+        Map<String, List<?>> body = response.getBody(new Context.TypeReference<>() {});
+
+        return new PollOutput(body.get("records"), Map.of(LAST_TIME_CHECKED, endDate), false);
     }
 
     protected static PollTriggerOutputFunction getOutput() {

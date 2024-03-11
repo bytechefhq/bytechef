@@ -254,7 +254,7 @@ public class XlsxFileReadAction {
 
                         numericValue = formatter.format(cell.getDateCellValue());
                     } else {
-                        numericValue = valueOF(NumberToTextConverter.toText(cell.getNumericCellValue()), context);
+                        numericValue = valueOf(NumberToTextConverter.toText(cell.getNumericCellValue()), context);
                     }
 
                     yield numericValue;
@@ -277,7 +277,7 @@ public class XlsxFileReadAction {
         return value;
     }
 
-    private static Object valueOF(String string, Context context) {
+    private static Object valueOf(String string, Context context) {
         Object value = null;
 
         try {
