@@ -53,7 +53,8 @@ public class MailchimpSubscribeTrigger {
             string(LIST_ID)
                 .options(MailchimpUtils.getListIdOptions())
                 .label("List Id")
-                .description("The list id of intended audience to which you would like to add the contact."))
+                .description("The list id of intended audience to which you would like to add the contact.")
+                .required(true))
         .outputSchema(
             object()
                 .properties(
@@ -65,11 +66,12 @@ public class MailchimpSubscribeTrigger {
                             string("ip_opt"),
                             string("ip_signup"),
                             string("list_id"),
-                            object("merges").properties(
-                                string("EMAIL"),
-                                string("FNAME"),
-                                string("INTERESTS"),
-                                string("LNAME"))),
+                            object("merges")
+                                .properties(
+                                    string("EMAIL"),
+                                    string("FNAME"),
+                                    string("INTERESTS"),
+                                    string("LNAME"))),
                     dateTime("fired_at"),
                     string("type")))
         .dynamicWebhookDisable(MailchimpSubscribeTrigger::dynamicWebhookDisable)
@@ -84,8 +86,8 @@ public class MailchimpSubscribeTrigger {
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
         context.http(http -> http.delete(
-            "https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks/$%s".formatted(
-                server, inputParameters.getString(LIST_ID), outputParameters.get(LIST_ID))))
+            "https://%s.api.mailchimp.com/3.0/lists/%s/webhooks/%s".formatted(
+                server, inputParameters.getRequiredString(LIST_ID), outputParameters.get("id"))))
             .execute();
     }
 
@@ -97,16 +99,18 @@ public class MailchimpSubscribeTrigger {
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
 
         Map<?, ?> response = context
-            .http(http -> http.post("https://%s.api.mailchimp.com/3.0/lists/$%s/webhooks".formatted(
-                server, inputParameters.getString(LIST_ID))))
-            .body(Body.of(
-                Map.of(
-                    "url", webhookUrl,
-                    "events", Map.of(SUBSCRIBE, true),
-                    "sources", Map.of(
-                        "user", true,
-                        "admin", true,
-                        "api", true))))
+            .http(http -> http.post(
+                "https://%s.api.mailchimp.com/3.0/lists/%s/webhooks".formatted(
+                    server, inputParameters.getRequiredString(LIST_ID))))
+            .body(
+                Body.of(
+                    Map.of(
+                        "url", webhookUrl,
+                        "events", Map.of(SUBSCRIBE, true),
+                        "sources", Map.of(
+                            "user", true,
+                            "admin", true,
+                            "api", true))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -118,6 +122,10 @@ public class MailchimpSubscribeTrigger {
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         TriggerContext context) {
+
+        if (body == null) {
+            return null;
+        }
 
         return body.getContent();
     }
