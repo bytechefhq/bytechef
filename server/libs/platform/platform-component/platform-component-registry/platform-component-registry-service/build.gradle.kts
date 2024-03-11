@@ -15,7 +15,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")

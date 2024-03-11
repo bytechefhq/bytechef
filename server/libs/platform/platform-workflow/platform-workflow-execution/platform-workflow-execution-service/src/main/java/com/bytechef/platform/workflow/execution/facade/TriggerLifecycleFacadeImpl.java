@@ -25,6 +25,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerStateService triggerStateService;
 
+    @SuppressFBWarnings("EI")
     public TriggerLifecycleFacadeImpl(
         TriggerScheduler triggerScheduler, TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService) {
@@ -62,17 +64,18 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
             triggerWorkflowNodeType.componentOperationName());
 
-        DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-            triggerStateService.fetchValue(workflowExecutionId), null);
-
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
+                DynamicWebhookEnableOutput output = OptionalUtils.orElse(
+                    triggerStateService.fetchValue(workflowExecutionId), null);
+
                 triggerDefinitionFacade.executeDynamicWebhookDisable(
                     triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                     triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
                     output.parameters(), connectionId);
 
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
+                triggerStateService.delete(workflowExecutionId);
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
                 triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),

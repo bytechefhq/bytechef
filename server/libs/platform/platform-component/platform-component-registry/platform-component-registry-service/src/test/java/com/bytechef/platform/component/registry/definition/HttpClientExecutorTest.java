@@ -372,7 +372,8 @@ public class HttpClientExecutorTest {
         //
 
         httpClient = httpClientExecutor.createHttpClient(
-            new HashMap<>(), new HashMap<>(), Context.Http.timeout(Duration.ofMillis(2000))
+            new HashMap<>(), new HashMap<>(), Context.Http
+                .timeout(Duration.ofMillis(2000))
                 .build(),
             "componentName", new ComponentConnection("componentName", 1, Map.of(), null), Mockito.mock(Context.class));
 

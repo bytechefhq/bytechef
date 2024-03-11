@@ -24,6 +24,8 @@ import java.util.Optional;
  */
 public interface TriggerStateService {
 
+    void delete(WorkflowExecutionId workflowExecutionId);
+
     <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId);
 
     void save(WorkflowExecutionId workflowExecutionId, Object value);

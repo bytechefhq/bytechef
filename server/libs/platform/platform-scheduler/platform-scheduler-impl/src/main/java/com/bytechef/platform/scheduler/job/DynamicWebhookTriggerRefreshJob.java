@@ -75,11 +75,13 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     @Autowired
+    @SuppressFBWarnings("EI")
     public void setRemoteTriggerDefinitionFacade(TriggerDefinitionFacade triggerDefinitionService) {
         this.remoteTriggerDefinitionFacade = triggerDefinitionService;
     }
 
     @Autowired
+    @SuppressFBWarnings("EI")
     public void setTriggerStateService(TriggerStateService triggerStateService) {
         this.triggerStateService = triggerStateService;
     }

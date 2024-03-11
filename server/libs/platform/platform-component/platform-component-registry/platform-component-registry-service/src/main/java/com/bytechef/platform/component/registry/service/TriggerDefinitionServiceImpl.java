@@ -240,19 +240,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getDynamicWebhookRequest()
                 .map(dynamicWebhookRequestFunction -> executeDynamicWebhookTrigger(
-                    inputParameters, (DynamicWebhookEnableOutput) triggerState, webhookRequest,
-                    connection, context, dynamicWebhookRequestFunction))
+                    triggerDefinition, inputParameters, toDynamicWebhookEnableOutput((Map<?, ?>) triggerState),
+                    webhookRequest, connection, context, dynamicWebhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
             triggerOutput = triggerDefinition.getStaticWebhookRequest()
                 .map(staticWebhookRequestFunction -> executeStaticWebhookTrigger(
-                    inputParameters, webhookRequest, context, staticWebhookRequestFunction))
+                    triggerDefinition, inputParameters, webhookRequest, context, staticWebhookRequestFunction))
                 .orElseThrow();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             triggerOutput = triggerDefinition.getPoll()
                 .map(pollFunction -> executePollingTrigger(
-                    triggerDefinition, inputParameters, (Map<String, ?>) triggerState, context,
-                    pollFunction))
+                    triggerDefinition, inputParameters, triggerState == null ? Map.of() : (Map<String, ?>) triggerState,
+                    context, pollFunction))
                 .orElseThrow();
         } else {
             throw new IllegalArgumentException("Unknown trigger type: " + triggerType);
@@ -318,6 +318,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private static TriggerOutput executeDynamicWebhookTrigger(
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, DynamicWebhookEnableOutput output, WebhookRequest webhookRequest,
         ComponentConnection connection, TriggerContext triggerContext,
         DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
@@ -335,7 +336,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 105);
         }
 
-        return new TriggerOutput(webhookOutput, null, false);
+        return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));
     }
 
     private static TriggerOutput executePollingTrigger(
@@ -368,11 +369,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
 
         return new TriggerOutput(
-            records, pollOutput.closureParameters(),
-            OptionalUtils.orElse(triggerDefinition.getBatch(), false));
+            records, pollOutput.closureParameters(), OptionalUtils.orElse(triggerDefinition.getBatch(), false));
     }
 
     private static TriggerOutput executeStaticWebhookTrigger(
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext triggerContext,
         StaticWebhookRequestFunction staticWebhookRequestFunction) {
 
@@ -387,7 +388,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 108);
         }
 
-        return new TriggerOutput(webhookOutput, null, false);
+        return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));
     }
 
     private boolean executeWebhookValidate(
@@ -495,5 +496,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return triggerDefinition
             .getTitle()
             .orElse(triggerDefinition.getName());
+    }
+
+    @SuppressWarnings("unchecked")
+    private DynamicWebhookEnableOutput toDynamicWebhookEnableOutput(Map<?, ?> triggerState) {
+        if (triggerState == null) {
+            return null;
+        }
+
+        return new DynamicWebhookEnableOutput(
+            (Map<String, ?>) triggerState.get("parameters"), (LocalDateTime) triggerState.get("webhookExpirationDate"));
     }
 }

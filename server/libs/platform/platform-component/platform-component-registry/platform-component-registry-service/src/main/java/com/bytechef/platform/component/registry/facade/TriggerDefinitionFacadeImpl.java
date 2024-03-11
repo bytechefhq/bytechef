@@ -88,8 +88,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeDynamicWebhookEnable(
             componentName, componentVersion, triggerName, inputParameters,
-            createWebhookUrl(workflowExecutionId, webhookUrl), workflowExecutionId,
-            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
+            webhookUrl, workflowExecutionId, componentConnection,
+            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -184,10 +184,6 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, triggerName, inputParameters,
             contextFactory.createTriggerContext(componentName, triggerName, null));
-    }
-
-    private String createWebhookUrl(String workflowExecutionId, String webhookUrl) {
-        return webhookUrl + "/api/webhooks/" + workflowExecutionId;
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {
