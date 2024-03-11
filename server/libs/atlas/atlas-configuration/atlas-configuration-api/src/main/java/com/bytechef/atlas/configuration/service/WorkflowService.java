@@ -38,8 +38,6 @@ public interface WorkflowService {
 
     List<Workflow> getWorkflows(int type);
 
-    List<Workflow> getWorkflows(int type, @NonNull List<SourceType> sourceTypes);
-
     List<Workflow> getWorkflows(@NonNull List<String> workflowIds);
 
     void refreshCache(@NonNull String id);
