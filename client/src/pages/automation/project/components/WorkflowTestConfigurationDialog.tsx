@@ -20,7 +20,7 @@ import {
     WorkflowTestConfigurationModel,
 } from '@/middleware/platform/configuration';
 import {ConnectionModel} from '@/middleware/platform/connection';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useSaveWorkflowTestConfigurationMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {
@@ -319,7 +319,6 @@ const WorkflowTestConfigurationDialog = ({
                             onClose={() => setShowNewConnectionDialog(false)}
                             useCreateConnectionMutation={useCreateConnectionMutation}
                             useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                            useUpdateConnectionMutation={useUpdateConnectionMutation}
                         />
                     </Portal.Root>
                 )}

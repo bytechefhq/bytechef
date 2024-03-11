@@ -13,7 +13,7 @@ import {
     WorkflowModel,
     WorkflowTestConfigurationConnectionModel,
 } from '@/middleware/platform/configuration';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {useConnectionNoteStore} from '@/pages/automation/project/stores/useConnectionNoteStore';
@@ -217,7 +217,7 @@ const ConnectionSelect = ({
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
 }) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     let connectionId: number | undefined;
 
@@ -274,7 +274,7 @@ const ConnectionSelect = ({
 
                     <Button
                         className="mt-auto p-2"
-                        onClick={() => setShowEditConnectionDialog(true)}
+                        onClick={() => setShowNewConnectionDialog(true)}
                         title="Create a new connection"
                         variant="outline"
                     >
@@ -298,15 +298,14 @@ const ConnectionSelect = ({
                 </SelectContent>
             </Select>
 
-            {showEditConnectionDialog && (
+            {showNewConnectionDialog && (
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
-                    onClose={() => setShowEditConnectionDialog(false)}
+                    onClose={() => setShowNewConnectionDialog(false)}
                     useCreateConnectionMutation={useCreateConnectionMutation}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                    useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}
         </>
@@ -322,7 +321,7 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
     workflow: WorkflowModel;
     workflowNodeName: string;
 }) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
@@ -462,7 +461,7 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
                 <div className="flex flex-1 flex-col items-center justify-center">
                     <EmptyList
                         button={
-                            <Button onClick={() => setShowEditConnectionDialog(true)} title="Create a new connection">
+                            <Button onClick={() => setShowNewConnectionDialog(true)} title="Create a new connection">
                                 Create a connection
                             </Button>
                         }
@@ -493,14 +492,13 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
                 </div>
             )}
 
-            {showEditConnectionDialog && (
+            {showNewConnectionDialog && (
                 <ConnectionDialog
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
-                    onClose={() => setShowEditConnectionDialog(false)}
+                    onClose={() => setShowNewConnectionDialog(false)}
                     useCreateConnectionMutation={useCreateConnectionMutation}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                    useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}
         </div>

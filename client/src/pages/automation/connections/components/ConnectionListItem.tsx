@@ -20,11 +20,7 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
 import {useUpdateConnectionTagsMutation} from '@/mutations/automation/connectionTags.mutations';
-import {
-    useCreateConnectionMutation,
-    useDeleteConnectionMutation,
-    useUpdateConnectionMutation,
-} from '@/mutations/automation/connections.mutations';
+import {useDeleteConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/queries/automation/connections.queries';
 import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
@@ -86,7 +82,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
     return (
         <li key={connection.id}>
             <>
-                <div className="group flex items-center rounded-md bg-white p-2 py-3 hover:bg-gray-50">
+                <div className="group flex items-center rounded-md bg-white px-2 py-5 hover:bg-gray-50">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center gap-2">
@@ -185,8 +181,6 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                         connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowEditDialog(false)}
-                        triggerNode={<Button>Create Connection</Button>}
-                        useCreateConnectionMutation={useCreateConnectionMutation}
                         useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                         useUpdateConnectionMutation={useUpdateConnectionMutation}
                     />
