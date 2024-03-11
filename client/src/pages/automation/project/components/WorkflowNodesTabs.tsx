@@ -54,7 +54,7 @@ const WorkflowNodesTabs = ({
             </TabsList>
 
             <div>
-                <div className={twMerge('overflow-y-auto absolute', popover && 'h-80', !popover && 'h-full')}>
+                <div className={twMerge('overflow-y-auto absolute', popover && 'h-80 w-full', !popover && 'h-full')}>
                     {!hideTriggerComponents && (
                         <TabsContent value="triggers">
                             <ul className="space-y-0.5" role="list">
