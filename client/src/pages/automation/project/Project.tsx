@@ -469,7 +469,7 @@ const Project = () => {
                                 </DropdownMenu>
                             </div>
 
-                            <div className="mr-2 flex rounded-md border border-input bg-white shadow-sm">
+                            <div className="mr-2 flex min-w-72 max-w-72 rounded-md border border-input bg-white shadow-sm">
                                 {workflow && !!projectWorkflows && (
                                     <Select
                                         defaultValue={workflowId}
