@@ -39,6 +39,13 @@ public class TriggerStateServiceImpl implements TriggerStateService {
     }
 
     @Override
+    public void delete(WorkflowExecutionId workflowExecutionId) {
+        triggerStateRepository
+            .findByWorkflowExecutionId(workflowExecutionId.toString())
+            .ifPresent(triggerStateRepository::delete);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
