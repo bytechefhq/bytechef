@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.test.executor;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -31,6 +32,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -65,14 +67,20 @@ public class JobTestExecutor {
             job.getOutputs() == null ? null : taskFileStorage.readContextValue(job.getOutputs()),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
-                taskExecution -> new TaskExecutionDTO(
-                    taskExecution, getComponentDefinition(taskExecution),
-                    taskFileStorage.readContextValue(
+                taskExecution -> {
+                    Map<String, ?> context = taskFileStorage.readContextValue(
                         contextService.peek(
-                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
-                    taskExecution.getOutput() == null
-                        ? null
-                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()))));
+                            Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+
+                    WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+                    return new TaskExecutionDTO(
+                        taskExecution, getComponentDefinition(taskExecution),
+                        workflowTask.evaluateParameters(context),
+                        taskExecution.getOutput() == null
+                            ? null
+                            : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+                }));
     }
 
     private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {

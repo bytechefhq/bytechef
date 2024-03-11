@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import org.springframework.stereotype.Service;
 
 /**
@@ -51,6 +52,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
+
+    private static final Random RANDOM = new Random();
 
     private final ComponentDefinitionService componentDefinitionService;
     private final JobTestExecutor jobTestExecutor;
@@ -115,7 +118,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
                     Output output = triggerDefinition.getOutput();
 
-                    return output.getSampleOutput();
+                    return output == null ? null : output.getSampleOutput();
                 });
 
             if (sampleOutput == null) {
@@ -123,6 +126,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             }
 
             TriggerExecution triggerExecution = TriggerExecution.builder()
+                .id(-RANDOM.nextLong())
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now())
                 .status(Status.COMPLETED)
