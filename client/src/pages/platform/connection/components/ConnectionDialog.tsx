@@ -47,12 +47,12 @@ interface ConnectionDialogProps {
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
     onClose?: () => void;
-    useCreateConnectionMutation: (mutationProps: {
+    useCreateConnectionMutation?: (mutationProps: {
         onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
         onError?: (error: Error, variables: ConnectionModel) => void;
     }) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
     useGetConnectionTagsQuery: () => UseQueryResult<TagModel[], Error>;
-    useUpdateConnectionMutation: (mutationProps: {
+    useUpdateConnectionMutation?: (mutationProps: {
         onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
         onError?: (error: Error, variables: ConnectionModel) => void;
     }) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
@@ -140,23 +140,7 @@ const ConnectionDialog = ({
 
     const queryClient = useQueryClient();
 
-    const createConnectionMutation = useCreateConnectionMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ComponentDefinitionKeys.componentDefinitions,
-            });
-            queryClient.invalidateQueries({
-                queryKey: connectionsQueryKey,
-            });
-            queryClient.invalidateQueries({
-                queryKey: connectionTagsQueryKey,
-            });
-
-            closeDialog();
-        },
-    });
-
-    const updateConnectionMutation = useUpdateConnectionMutation({
+    const connectionMutation = (useUpdateConnectionMutation || useCreateConnectionMutation)!({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
@@ -236,8 +220,7 @@ const ConnectionDialog = ({
             setOAuth2Error(undefined);
             setWizardStep('configuration_step');
 
-            createConnectionMutation.reset();
-            updateConnectionMutation.reset();
+            connectionMutation.reset();
 
             if (onClose) {
                 onClose();
@@ -313,8 +296,8 @@ const ConnectionDialog = ({
             errors.push(connectionDefinitionError.message);
         }
 
-        if (createConnectionMutation.error && !createConnectionMutation.isPending) {
-            errors.push(createConnectionMutation.error?.message);
+        if (connectionMutation.error && !connectionMutation.isPending) {
+            errors.push(connectionMutation.error?.message);
         }
 
         if (tagsError && !tagsLoading) {
@@ -340,14 +323,15 @@ const ConnectionDialog = ({
         if (connection?.id) {
             const {name, tags} = getValues();
 
-            updateConnectionMutation.mutate({
+            connectionMutation.mutate({
+                componentName: connection.componentName,
                 id: connection?.id,
                 name,
                 tags,
                 version: connection?.version,
             } as ConnectionModel);
         } else {
-            return createConnectionMutation.mutateAsync(getNewConnection(additionalParameters));
+            return connectionMutation.mutateAsync(getNewConnection(additionalParameters));
         }
     }
 
@@ -385,16 +369,18 @@ const ConnectionDialog = ({
                     <Form {...form}>
                         <DialogHeader>
                             <div className="flex items-center justify-between">
-                                <DialogTitle>Create Connection</DialogTitle>
+                                <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Conection`}</DialogTitle>
 
                                 <DialogClose asChild>
                                     <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                                 </DialogClose>
                             </div>
 
-                            <DialogDescription>
-                                Create your connection to connect to the chosen service
-                            </DialogDescription>
+                            {!connection?.id && (
+                                <DialogDescription>
+                                    Create your connection to connect to the chosen service
+                                </DialogDescription>
+                            )}
                         </DialogHeader>
 
                         {errors?.length > 0 && <Errors errors={errors} />}
@@ -421,6 +407,7 @@ const ConnectionDialog = ({
                                                                         value: componentDefinition.name,
                                                                     })
                                                                 )}
+                                                                maxHeight={true}
                                                                 name="component"
                                                                 onBlur={field.onBlur}
                                                                 onChange={(item) =>
@@ -507,6 +494,7 @@ const ConnectionDialog = ({
                                 {showConnectionProperties && !!connectionDefinition.properties && (
                                     <Properties
                                         formState={formState}
+                                        mention={false}
                                         properties={connectionDefinition?.properties}
                                         register={register}
                                     />
@@ -560,6 +548,7 @@ const ConnectionDialog = ({
                                     authorizations[0]?.properties && (
                                         <Properties
                                             formState={formState}
+                                            mention={false}
                                             properties={authorizations[0]?.properties}
                                             register={register}
                                         />
@@ -647,7 +636,7 @@ const ConnectionDialog = ({
                             {wizardStep === 'oauth_step' && (
                                 <Button
                                     onClick={() => {
-                                        createConnectionMutation.reset();
+                                        connectionMutation.reset();
 
                                         setOAuth2Error(undefined);
 

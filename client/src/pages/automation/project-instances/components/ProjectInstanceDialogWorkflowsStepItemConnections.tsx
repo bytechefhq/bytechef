@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
@@ -138,7 +138,6 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                         onClose={() => setShowNewConnectionDialog(false)}
                         useCreateConnectionMutation={useCreateConnectionMutation}
                         useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                        useUpdateConnectionMutation={useUpdateConnectionMutation}
                     />
                 </Portal.Root>
             )}

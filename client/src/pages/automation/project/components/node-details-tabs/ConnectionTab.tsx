@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {
@@ -67,7 +67,7 @@ const ConnectionSelect = ({
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
 }) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     let connectionId: number | undefined;
 
@@ -124,7 +124,7 @@ const ConnectionSelect = ({
 
                     <Button
                         className="mt-auto p-2"
-                        onClick={() => setShowEditConnectionDialog(true)}
+                        onClick={() => setShowNewConnectionDialog(true)}
                         title="Create a new connection"
                         variant="outline"
                     >
@@ -148,15 +148,14 @@ const ConnectionSelect = ({
                 </SelectContent>
             </Select>
 
-            {showEditConnectionDialog && (
+            {showNewConnectionDialog && (
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
-                    onClose={() => setShowEditConnectionDialog(false)}
+                    onClose={() => setShowNewConnectionDialog(false)}
                     useCreateConnectionMutation={useCreateConnectionMutation}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                    useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}
         </>
@@ -174,7 +173,7 @@ const ConnectionTab = ({
     workflowNodeName: string;
     workflowId: string;
 }) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
@@ -212,7 +211,7 @@ const ConnectionTab = ({
             ) : (
                 <EmptyList
                     button={
-                        <Button onClick={() => setShowEditConnectionDialog(true)} title="Create a new connection">
+                        <Button onClick={() => setShowNewConnectionDialog(true)} title="Create a new connection">
                             Create a connection
                         </Button>
                     }
@@ -242,15 +241,14 @@ const ConnectionTab = ({
                 </div>
             )}
 
-            {showEditConnectionDialog && (
+            {showNewConnectionDialog && (
                 <ConnectionDialog
                     componentDefinition={workflowConnections.length === 1 ? componentDefinition : undefined}
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
-                    onClose={() => setShowEditConnectionDialog(false)}
+                    onClose={() => setShowNewConnectionDialog(false)}
                     useCreateConnectionMutation={useCreateConnectionMutation}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                    useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}
         </div>

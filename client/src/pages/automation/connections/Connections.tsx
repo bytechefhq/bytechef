@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
@@ -87,7 +87,6 @@ export const Connections = () => {
                             triggerNode={<Button>Create Connection</Button>}
                             useCreateConnectionMutation={useCreateConnectionMutation}
                             useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                            useUpdateConnectionMutation={useUpdateConnectionMutation}
                         />
                     }
                     title={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${pageTitle || 'All'}`}
@@ -178,7 +177,6 @@ export const Connections = () => {
                                 triggerNode={<Button>Create Connection</Button>}
                                 useCreateConnectionMutation={useCreateConnectionMutation}
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                                useUpdateConnectionMutation={useUpdateConnectionMutation}
                             />
                         }
                         icon={<Link2Icon className="size-12 text-gray-400" />}
