@@ -392,7 +392,10 @@ const Project = () => {
                     <>
                         {!workflowIsRunning ? (
                             workflowTestExecution?.job ? (
-                                <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
+                                <WorkflowExecutionDetailsAccordion
+                                    job={workflowTestExecution.job}
+                                    triggerExecution={workflowTestExecution.triggerExecution}
+                                />
                             ) : (
                                 <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
                                     <RefreshCwOffIcon className="size-5" />

@@ -44,7 +44,7 @@ const WorkflowExecutionDetailsAccordionContent = ({
                                 </DialogHeader>
 
                                 <div className="max-h-[80vh] overflow-y-auto">
-                                    {input ? (
+                                    {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
                                         typeof input === 'object' ? (
                                             <ReactJson
                                                 collapsed={false}
@@ -64,11 +64,11 @@ const WorkflowExecutionDetailsAccordionContent = ({
                 </header>
 
                 <div className="overflow-x-auto">
-                    {input ? (
+                    {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
                         typeof input === 'object' ? (
                             <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
                         ) : (
-                            input
+                            <span className="text-sm">input</span>
                         )
                     ) : (
                         <span className="text-sm">No input data.</span>
@@ -124,7 +124,7 @@ const WorkflowExecutionDetailsAccordionContent = ({
                         typeof output === 'object' ? (
                             <ReactJson enableClipboard={false} src={output as object} />
                         ) : (
-                            output
+                            <span className="text-sm">output</span>
                         )
                     ) : (
                         <span className="text-sm">No output data.</span>

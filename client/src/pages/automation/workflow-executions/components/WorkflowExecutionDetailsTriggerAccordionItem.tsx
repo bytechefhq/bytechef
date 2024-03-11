@@ -2,7 +2,6 @@ import {TriggerExecutionModel} from '@/middleware/automation/workflow/execution'
 import WorkflowExecutionDetailsAccordionBadge from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionBadge';
 import WorkflowExecutionDetailsAccordionContent from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionContent';
 import {AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
-import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
 import InlineSVG from 'react-inlinesvg';
 
 const WorkflowExecutionDetailsTriggerAccordionItem = ({
@@ -35,10 +34,6 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
 
                 <div className="flex items-center">
                     <span className="ml-auto mr-2 text-xs">{duration}ms</span>
-
-                    {triggerExecution.status === 'COMPLETED' && <CheckCircledIcon className="size-5 text-green-500" />}
-
-                    {triggerExecution.status === 'FAILED' && <CrossCircledIcon className="size-5 text-red-500" />}
                 </div>
             </AccordionTrigger>
 
