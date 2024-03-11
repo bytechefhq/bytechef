@@ -74,7 +74,10 @@ const PropertyComboBox = ({
             propertyName: name!,
             workflowNodeName: currentNode.name!,
         },
-        !!optionsDataSource
+        !!optionsDataSource &&
+            loadDependencyValues.reduce((enabled: boolean, loadDependencyValue: string) => {
+                return loadDependencyValue !== undefined;
+            }, true)
     );
 
     if (optionsData) {
