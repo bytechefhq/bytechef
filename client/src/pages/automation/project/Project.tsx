@@ -212,6 +212,7 @@ const Project = () => {
                 queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
+            setLeftSidebarOpen(false);
             setWorkflow({...workflow, componentNames, nodeNames});
 
             navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
