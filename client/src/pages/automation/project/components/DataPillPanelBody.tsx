@@ -2,6 +2,7 @@ import {
     ActionDefinitionModel,
     ComponentDefinitionBasicModel,
     type PropertyModel,
+    TriggerDefinitionModel,
 } from '@/middleware/platform/configuration';
 import getFilteredProperties from '@/pages/automation/project/utils/getFilteredProperties';
 import {PropertyType} from '@/types/types';
@@ -9,24 +10,33 @@ import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
 import DataPillPanelBodyItem from './DataPillPanelBodyItem';
 
-export interface ComponentActionDataI extends ActionDefinitionModel {
+export interface ComponentActionI extends ActionDefinitionModel {
     componentDefinition: ComponentDefinitionBasicModel;
     outputSchema: PropertyModel;
     sampleOutput: object;
     workflowNodeName: string;
 }
 
+export interface ComponentTriggerI extends TriggerDefinitionModel {
+    componentDefinition: ComponentDefinitionBasicModel;
+    outputSchema: PropertyModel;
+    sampleOutput: object;
+    workflowNodeName: string;
+}
+
+export type ComponentOperationType = ComponentActionI & ComponentTriggerI;
+
 interface DataPillPanelBodyProps {
-    componentActionData: Array<ComponentActionDataI>;
+    componentOperations: Array<ComponentOperationType>;
     dataPillFilterQuery: string;
 }
 
-const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillPanelBodyProps) => (
+const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillPanelBodyProps) => (
     <div className="relative h-full overflow-y-auto">
         <div className="absolute left-0 top-0 w-full">
             <Accordion className="h-full" collapsible type="single">
-                {componentActionData.map((componentAction: ComponentActionDataI, index: number) => {
-                    const outputSchema: PropertyType | undefined = componentActionData[index]?.outputSchema;
+                {componentOperations.map((componentOperation: ComponentOperationType, index: number) => {
+                    const outputSchema: PropertyType | undefined = componentOperations[index]?.outputSchema;
 
                     const properties: Array<PropertyType> | undefined = outputSchema?.properties;
 
@@ -40,15 +50,15 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
                     return (
                         <AccordionItem
                             className="group"
-                            key={`accordion-item-${componentAction.workflowNodeName}`}
-                            value={componentAction.workflowNodeName}
+                            key={`accordion-item-${componentOperation.workflowNodeName}`}
+                            value={componentOperation.workflowNodeName}
                         >
-                            {componentActionData[index] && (
+                            {componentOperations[index] && (
                                 <DataPillPanelBodyItem
-                                    componentAction={componentAction}
+                                    componentAction={componentOperation}
                                     filteredProperties={filteredProperties}
                                     outputSchemaExists={!!outputSchema}
-                                    sampleOutput={componentActionData[index].sampleOutput}
+                                    sampleOutput={componentOperations[index].sampleOutput}
                                 />
                             )}
                         </AccordionItem>
