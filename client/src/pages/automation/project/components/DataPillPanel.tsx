@@ -1,7 +1,7 @@
 import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
-import DataPillPanelBody, {ComponentActionDataI} from '@/pages/automation/project/components/DataPillPanelBody';
+import DataPillPanelBody, {ComponentOperationType} from '@/pages/automation/project/components/DataPillPanelBody';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useState} from 'react';
@@ -21,7 +21,7 @@ const DataPillPanel = ({
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
-    const componentActionData: Array<ComponentActionDataI> = workflowNodeOutputs
+    const componentOperations: Array<ComponentOperationType> = workflowNodeOutputs
         .filter(
             (workflowNodeOutput) =>
                 workflowNodeOutput.workflowNodeName !== currentNode.name &&
@@ -41,7 +41,7 @@ const DataPillPanel = ({
                 outputSchema: workflowNodeOutput.outputSchema,
                 sampleOutput: workflowNodeOutput.sampleOutput,
                 workflowNodeName: workflowNodeOutput.workflowNodeName,
-            } as ComponentActionDataI;
+            } as ComponentOperationType;
         });
 
     return (
@@ -90,9 +90,9 @@ const DataPillPanel = ({
                                 />
                             </div>
 
-                            {componentActionData && (
+                            {componentOperations && (
                                 <DataPillPanelBody
-                                    componentActionData={componentActionData}
+                                    componentOperations={componentOperations}
                                     dataPillFilterQuery={dataPillFilterQuery}
                                 />
                             )}

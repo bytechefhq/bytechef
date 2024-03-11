@@ -55,12 +55,15 @@ const ProjectWorkflow = ({
 
     const previousComponentDefinitions = workflowNodeOutputs
         ? workflowNodeOutputs
-              .filter((workflowNodeOutput) => workflowNodeOutput.actionDefinition)
+              .filter(
+                  (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
+              )
               .map(
                   (workflowNodeOutput) =>
                       componentDefinitions.filter(
                           (componentDefinition) =>
-                              componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName
+                              componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName ||
+                              componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
                       )[0]
               )
         : [];
