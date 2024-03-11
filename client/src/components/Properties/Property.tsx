@@ -82,7 +82,7 @@ const Property = ({
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(mention && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
-    const [loadDependency, setLoadDependency] = useState({});
+    const [loadOptionsDependency, setLoadOptionsDependency] = useState({});
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -425,7 +425,7 @@ const Property = ({
     }, []);
 
     useEffect(() => {
-        const loadDependencyOptions = optionsDataSource?.loadOptionsDependsOn?.reduce(
+        const loadOptionsDependency = optionsDataSource?.loadOptionsDependsOn?.reduce(
             (acc, key) => ({
                 ...acc,
                 [key]: currentComponentData?.parameters?.[key],
@@ -433,8 +433,8 @@ const Property = ({
             {}
         );
 
-        if (loadDependencyOptions) {
-            setLoadDependency(loadDependencyOptions);
+        if (loadOptionsDependency) {
+            setLoadOptionsDependency(loadOptionsDependency);
         }
     }, [currentComponentData?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
@@ -624,7 +624,7 @@ const Property = ({
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                loadDependency={loadDependency}
+                                loadDependency={loadOptionsDependency}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
@@ -638,7 +638,7 @@ const Property = ({
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                loadDependency={loadDependency}
+                                loadDependency={loadOptionsDependency}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
