@@ -97,7 +97,7 @@ const ProjectInstanceWorkflowListItem = ({
             >
                 <div
                     className={twMerge(
-                        'w-80 text-sm font-semibold',
+                        'w-96 text-sm font-semibold',
                         !projectInstanceWorkflow.enabled && 'text-muted-foreground'
                     )}
                 >
