@@ -30,8 +30,13 @@ definitions:
           type: "object"
           additionalProperties:
             type: "object"
+      triggers:
+        description: "The triggers that can trigger a workflow."
+        type: "array"
+        items:
+          $ref: "#/schemas/Trigger"
       tasks:
-        description: "The steps that make up the workflow."
+        description: "The steps that make up a workflow."
         type: "array"
         items:
           oneOf:
@@ -42,7 +47,7 @@ definitions:
         type: "integer"
         format: "int32"
   Task:
-    description: "Represents a step that make up the workflow."
+    description: "Represents a step that make up a workflow."
     type: "object"
     required:
     - "type"
@@ -59,6 +64,10 @@ definitions:
       label:
         description: "The human-readable name description of the task."
         type: "string"
+      maxRetries:
+        description: "The maximum number of times a task may retry."
+        type: "integer"
+        format: "int32"
       name:
         description: "The identifier name of the task. Task names are used for assigning\
           \ the output of one task so it can be later used by subsequent tasks."
@@ -89,9 +98,35 @@ definitions:
         description: "The type of the task. Type strings are mapped to \"TaskHandler\"\
           \ implementations designed to handle that type of task."
         type: "string"
-      additionalProperties:
-        description: "The additional properties defined by particular task."
+      parameters:
+        description: "The parameters defined by particular task."
         type: "object"
+    Trigger:
+      description: "Represents a trigger that can trigger a workflow."
+      type: "object"
+      required:
+        - "type"
+      properties:
+        description:
+          description: "The human-readable description of the trigger."
+          type: "string"
+        label:
+          description: "The human-readable name description of the trigger."
+          type: "string"
+        name:
+          description: "The identifier name of the trigger. Task names are used for assigning\
+            \ the output of one trigger so it can be later used by subsequent tasks."
+          type: "string"
+        timeout:
+          description: "The timeout expression which describes when this trigger should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "The type of the trigger."
+          type: "string"
+        parameters:
+          description: "The parameters defined by particular task."
+          type: "object"
   TaskDispatcher:
     description: "Represents a strategy for dispatching tasks to be executed."
     type: "object"
