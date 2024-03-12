@@ -132,25 +132,25 @@ public class FreshsalesCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post(getUrl(connectionParameters, "contacts")))
+        return actionContext.http(http -> http.post(getUrl(connectionParameters, "contacts")))
             .headers(getHeaders(connectionParameters))
-            .body(Http.Body.of(false,
-                FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                LAST_NAME, inputParameters.getString(LAST_NAME),
-                JOB_TITLE, inputParameters.getString(JOB_TITLE),
-                EMAIL, inputParameters.getRequiredString(EMAIL),
-                WORK_NUMBER, inputParameters.getString(WORK_NUMBER),
-                MOBILE_NUMBER, inputParameters.getString(MOBILE_NUMBER),
-                ADDRESS, inputParameters.getString(ADDRESS),
-                CITY, inputParameters.getString(CITY),
-                STATE, inputParameters.getString(STATE),
-                ZIPCODE, inputParameters.getString(ZIPCODE),
-                COUNTRY, inputParameters.getString(COUNTRY),
-                MEDIUM, inputParameters.getString(MEDIUM),
-                FACEBOOK, inputParameters.getString(FACEBOOK),
-                TWITTER, inputParameters.getString(TWITTER),
-                LINKEDIN, inputParameters.getString(LINKEDIN)))
+            .body(
+                Http.Body.of(
+                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getString(LAST_NAME),
+                    JOB_TITLE, inputParameters.getString(JOB_TITLE),
+                    EMAIL, inputParameters.getRequiredString(EMAIL),
+                    WORK_NUMBER, inputParameters.getString(WORK_NUMBER),
+                    MOBILE_NUMBER, inputParameters.getString(MOBILE_NUMBER),
+                    ADDRESS, inputParameters.getString(ADDRESS),
+                    CITY, inputParameters.getString(CITY),
+                    STATE, inputParameters.getString(STATE),
+                    ZIPCODE, inputParameters.getString(ZIPCODE),
+                    COUNTRY, inputParameters.getString(COUNTRY),
+                    MEDIUM, inputParameters.getString(MEDIUM),
+                    FACEBOOK, inputParameters.getString(FACEBOOK),
+                    TWITTER, inputParameters.getString(TWITTER),
+                    LINKEDIN, inputParameters.getString(LINKEDIN)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

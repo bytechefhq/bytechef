@@ -42,6 +42,7 @@ import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
@@ -95,11 +96,12 @@ public class CopperCreateActivityAction {
 
         return actionContext.http(http -> http.post(BASE_URL + "/activities"))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(false,
-                TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),
-                DETAILS, inputParameters.getRequiredString(DETAILS),
-                PARENT, inputParameters.getRequired(PARENT)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),
+                    DETAILS, inputParameters.getRequiredString(DETAILS),
+                    PARENT, inputParameters.getRequired(PARENT)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
     }

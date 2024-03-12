@@ -91,8 +91,7 @@ public class MicrosoftOutlook365SearchEmailAction {
 
         String encode = URLEncoder.encode(stringBuilder.toString(), StandardCharsets.UTF_8);
 
-        return context
-            .http(http -> http.get(BASE_URL + "/messages?$search=" + encode))
+        return context.http(http -> http.get(BASE_URL + "/messages?$search=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -103,8 +102,8 @@ public class MicrosoftOutlook365SearchEmailAction {
             if (!parameterName.equals("from") && !stringBuilder.isEmpty()) {
                 stringBuilder.append(" AND ");
             }
-            stringBuilder
-                .append("\"")
+
+            stringBuilder.append("\"")
                 .append(parameterName)
                 .append(":")
                 .append(parameterValue)

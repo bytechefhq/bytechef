@@ -40,6 +40,7 @@ import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -69,14 +70,14 @@ public class FreshsalesCreateLeadAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post(getUrl(connectionParameters, "leads")))
+        return actionContext.http(http -> http.post(getUrl(connectionParameters, "leads")))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(false,
-                FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                LAST_NAME, inputParameters.getString(LAST_NAME),
-                EMAIL, inputParameters.getRequiredString(EMAIL)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getString(LAST_NAME),
+                    EMAIL, inputParameters.getRequiredString(EMAIL)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 

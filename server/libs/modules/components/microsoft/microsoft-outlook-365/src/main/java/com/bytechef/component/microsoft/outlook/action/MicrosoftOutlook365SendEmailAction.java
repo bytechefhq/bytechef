@@ -93,16 +93,19 @@ public class MicrosoftOutlook365SendEmailAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        actionContext
-            .http(http -> http.post(BASE_URL + "/sendMail"))
-            .body(Http.Body.of(true, "message",
-                FROM, inputParameters.get(FROM),
-                SUBJECT, inputParameters.getRequiredString(SUBJECT),
-                BODY, inputParameters.get(BODY),
-                TO_RECIPIENTS, inputParameters.getArray(TO_RECIPIENTS),
-                CC_RECIPIENTS, inputParameters.getArray(CC_RECIPIENTS),
-                BCC_RECIPIENTS, inputParameters.getArray(BCC_RECIPIENTS),
-                REPLY_TO, inputParameters.getArray(REPLY_TO)))
+        actionContext.http(http -> http.post(BASE_URL + "/sendMail"))
+            .body(
+                Http.Body.of(
+                    "message",
+                    new Object[] {
+                        FROM, inputParameters.get(FROM),
+                        SUBJECT, inputParameters.getRequiredString(SUBJECT),
+                        BODY, inputParameters.get(BODY),
+                        TO_RECIPIENTS, inputParameters.getArray(TO_RECIPIENTS),
+                        CC_RECIPIENTS, inputParameters.getArray(CC_RECIPIENTS),
+                        BCC_RECIPIENTS, inputParameters.getArray(BCC_RECIPIENTS),
+                        REPLY_TO, inputParameters.getArray(REPLY_TO)
+                    }))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 

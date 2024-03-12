@@ -147,12 +147,12 @@ public final class XeroCreateInvoiceAction {
     public static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post("https://api.xero.com/api.xro/2.0/Invoices"))
-            .body(Http.Body.of(false,
-                TYPE, inputParameters.getRequiredString(TYPE),
-                "Contact", Map.of(CONTACT_ID, inputParameters.getRequiredString(CONTACT_ID)),
-                LINE_ITEMS, inputParameters.getList(LINE_ITEMS)))
+        return actionContext.http(http -> http.post("https://api.xero.com/api.xro/2.0/Invoices"))
+            .body(
+                Http.Body.of(
+                    TYPE, inputParameters.getRequiredString(TYPE),
+                    "Contact", Map.of(CONTACT_ID, inputParameters.getRequiredString(CONTACT_ID)),
+                    LINE_ITEMS, inputParameters.getList(LINE_ITEMS)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -161,16 +161,14 @@ public final class XeroCreateInvoiceAction {
     public static List<Option<String>> getContactOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, ?> response = context
-            .http(http -> http.get("https://api.xero.com/api.xro/2.0/Contacts"))
+        Map<String, ?> response = context.http(http -> http.get("https://api.xero.com/api.xro/2.0/Contacts"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         List<?> contactList = (List<?>) response.get("Contacts");
 
-        return contactList
-            .stream()
+        return contactList.stream()
             .map(contact -> (Option<String>) option(
                 String.valueOf(((Map<?, ?>) contact).get("Name")),
                 String.valueOf(((Map<?, ?>) contact).get("ContactID"))))

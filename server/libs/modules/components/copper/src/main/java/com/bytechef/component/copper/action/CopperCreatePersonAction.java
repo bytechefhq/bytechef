@@ -60,6 +60,7 @@ import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -134,20 +135,21 @@ public class CopperCreatePersonAction {
 
         return actionContext.http(http -> http.post(BASE_URL + "/people"))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(false,
-                NAME, inputParameters.getString(NAME),
-                EMAILS, inputParameters.getList(EMAILS),
-                ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
-                TITLE, inputParameters.getString(TITLE),
-                COMPANY_ID, inputParameters.getString(COMPANY_ID),
-                CONTACT_TYPE_ID, inputParameters.getString(CONTACT_TYPE_ID),
-                DETAILS, inputParameters.getString(DETAILS),
-                PHONE_NUMBERS, inputParameters.getList(PHONE_NUMBERS),
-                SOCIALS, inputParameters.getList(SOCIALS),
-                WEBSITES, inputParameters.getList(WEBSITES),
-                ADDRESS, inputParameters.get(ADDRESS),
-                TAGS, inputParameters.getList(TAGS)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getString(NAME),
+                    EMAILS, inputParameters.getList(EMAILS),
+                    ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
+                    TITLE, inputParameters.getString(TITLE),
+                    COMPANY_ID, inputParameters.getString(COMPANY_ID),
+                    CONTACT_TYPE_ID, inputParameters.getString(CONTACT_TYPE_ID),
+                    DETAILS, inputParameters.getString(DETAILS),
+                    PHONE_NUMBERS, inputParameters.getList(PHONE_NUMBERS),
+                    SOCIALS, inputParameters.getList(SOCIALS),
+                    WEBSITES, inputParameters.getList(WEBSITES),
+                    ADDRESS, inputParameters.get(ADDRESS),
+                    TAGS, inputParameters.getList(TAGS)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
     }

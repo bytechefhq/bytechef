@@ -53,6 +53,7 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -100,18 +101,19 @@ public class CopperCreateCompanyAction {
 
         return actionContext.http(http -> http.post(BASE_URL + "/companies"))
             .headers(getHeaders(connectionParameters))
-            .body(Context.Http.Body.of(false,
-                NAME, inputParameters.getString(NAME),
-                ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
-                EMAIL_DOMAIN, inputParameters.getString(EMAIL_DOMAIN),
-                CONTACT_TYPE_ID, inputParameters.getString(CONTACT_TYPE_ID),
-                DETAILS, inputParameters.getString(DETAILS),
-                PHONE_NUMBERS, inputParameters.getList(PHONE_NUMBERS),
-                SOCIALS, inputParameters.getList(SOCIALS),
-                WEBSITES, inputParameters.getList(WEBSITES),
-                ADDRESS, inputParameters.get(ADDRESS),
-                TAGS, inputParameters.getList(TAGS)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getString(NAME),
+                    ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
+                    EMAIL_DOMAIN, inputParameters.getString(EMAIL_DOMAIN),
+                    CONTACT_TYPE_ID, inputParameters.getString(CONTACT_TYPE_ID),
+                    DETAILS, inputParameters.getString(DETAILS),
+                    PHONE_NUMBERS, inputParameters.getList(PHONE_NUMBERS),
+                    SOCIALS, inputParameters.getList(SOCIALS),
+                    WEBSITES, inputParameters.getList(WEBSITES),
+                    ADDRESS, inputParameters.get(ADDRESS),
+                    TAGS, inputParameters.getList(TAGS)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
 

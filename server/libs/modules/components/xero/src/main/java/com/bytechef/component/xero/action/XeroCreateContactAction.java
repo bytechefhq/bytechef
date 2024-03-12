@@ -122,21 +122,22 @@ public final class XeroCreateContactAction {
                 .description(
                     "The name of the Tracking Option assigned to the contact under SalesTrackingCategories and " +
                         "PurchasesTrackingCategories"))
-        .outputSchema(object()
-            .properties(
-                string(NAME),
-                string(CONTACT_NUMBER),
-                string(ACCOUNT_NUMBER),
-                string(FIRST_NAME),
-                string(LAST_NAME),
-                string(COMPANY_NUMBER),
-                string(EMAIL_ADDRESS),
-                string(BANK_ACCOUNT_DETAILS),
-                string(TAX_NUMBER),
-                bool(IS_SUPPLIER),
-                bool(IS_CUSTOMER),
-                string(TRACKING_CATEGORY_NAME),
-                string(TRACKING_OPTION_NAME)))
+        .outputSchema(
+            object()
+                .properties(
+                    string(NAME),
+                    string(CONTACT_NUMBER),
+                    string(ACCOUNT_NUMBER),
+                    string(FIRST_NAME),
+                    string(LAST_NAME),
+                    string(COMPANY_NUMBER),
+                    string(EMAIL_ADDRESS),
+                    string(BANK_ACCOUNT_DETAILS),
+                    string(TAX_NUMBER),
+                    bool(IS_SUPPLIER),
+                    bool(IS_CUSTOMER),
+                    string(TRACKING_CATEGORY_NAME),
+                    string(TRACKING_OPTION_NAME)))
         .perform(XeroCreateContactAction::perform);
 
     private XeroCreateContactAction() {
@@ -145,21 +146,21 @@ public final class XeroCreateContactAction {
     public static LinkedHashMap<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
-            .body(Http.Body.of(false,
-                NAME, inputParameters.getRequiredString(NAME),
-                CONTACT_NUMBER, inputParameters.getString(CONTACT_NUMBER),
-                FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                LAST_NAME, inputParameters.getString(LAST_NAME),
-                COMPANY_NUMBER, inputParameters.getString(COMPANY_NUMBER),
-                EMAIL_ADDRESS, inputParameters.getString(EMAIL_ADDRESS),
-                BANK_ACCOUNT_DETAILS, inputParameters.getString(BANK_ACCOUNT_DETAILS),
-                TAX_NUMBER, inputParameters.getString(TAX_NUMBER),
-                IS_SUPPLIER, inputParameters.getBoolean(IS_SUPPLIER),
-                IS_CUSTOMER, inputParameters.getBoolean(IS_CUSTOMER),
-                TRACKING_CATEGORY_NAME, inputParameters.getString(TRACKING_CATEGORY_NAME),
-                TRACKING_OPTION_NAME, inputParameters.getString(TRACKING_OPTION_NAME)))
+        return actionContext.http(http -> http.post("https://api.xero.com/api.xro/2.0/Contacts"))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getRequiredString(NAME),
+                    CONTACT_NUMBER, inputParameters.getString(CONTACT_NUMBER),
+                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getString(LAST_NAME),
+                    COMPANY_NUMBER, inputParameters.getString(COMPANY_NUMBER),
+                    EMAIL_ADDRESS, inputParameters.getString(EMAIL_ADDRESS),
+                    BANK_ACCOUNT_DETAILS, inputParameters.getString(BANK_ACCOUNT_DETAILS),
+                    TAX_NUMBER, inputParameters.getString(TAX_NUMBER),
+                    IS_SUPPLIER, inputParameters.getBoolean(IS_SUPPLIER),
+                    IS_CUSTOMER, inputParameters.getBoolean(IS_CUSTOMER),
+                    TRACKING_CATEGORY_NAME, inputParameters.getString(TRACKING_CATEGORY_NAME),
+                    TRACKING_OPTION_NAME, inputParameters.getString(TRACKING_OPTION_NAME)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

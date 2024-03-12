@@ -75,13 +75,13 @@ public class FreshsalesCreateAccountAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post(getUrl(connectionParameters, "sales_accounts")))
+        return actionContext.http(http -> http.post(getUrl(connectionParameters, "sales_accounts")))
             .headers(getHeaders(connectionParameters))
-            .body(Http.Body.of(false,
-                NAME, inputParameters.getRequiredString(NAME),
-                WEBSITE, inputParameters.getString(WEBSITE),
-                PHONE, inputParameters.getString(PHONE)))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getRequiredString(NAME),
+                    WEBSITE, inputParameters.getString(WEBSITE),
+                    PHONE, inputParameters.getString(PHONE)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
