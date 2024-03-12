@@ -120,6 +120,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:resend"))
     implementation(project(":server:libs:modules:components:schedule"))
     implementation(project(":server:libs:modules:components:script"))
+    implementation(project(":server:libs:modules:components:shopify"))
     implementation(project(":server:libs:modules:components:slack"))
     implementation(project(":server:libs:modules:components:text-helper"))
     implementation(project(":server:libs:modules:components:twilio"))

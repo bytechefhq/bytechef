@@ -1,0 +1,102 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Shopify API"
+  description: "Shopify is an e-commerce platform for online stores and retail point-of-sale systems.\
+  \ The Shopify platform offers online retailers a suite of services, including payments, marketing,\
+  \ shipping and customer engagement tools."
+  version: "v0"
+servers:
+  - url: "https://${shopName}.myshopify.com/"
+paths:
+  /admin/api/2024-01/orders.json:
+    post:
+      summary: "Creates an order"
+      description: "Adds an order into a Shopify store."
+      operationId: "createOrder"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Order"
+              type: "object"
+              properties:
+                line_items:
+                  title: "Line items"
+                  description: "A list of line item objects, each containing information about an item in the order."
+                  type: "array"
+                  items:
+                    type: "object"
+                    properties:
+                      variant_id:
+                        type: "integer"
+                      quantity:
+                        type: "integer"
+                fullfillment_status:
+                  title: "Fullfillment status"
+                  description: "How far along an order is in terms line items fulfilled."
+                  type: "string"
+                  enum:
+                    - "null"
+                    - "fulfilled"
+                    - "partial"
+                    - "not_eligible"
+                financial_status:
+                  title: "Financial status"
+                  description: "The status of payments associated with the order. Can only be set when the order is created."
+                  type: "string"
+                  enum:
+                    - "pending"
+                    - "authorized"
+                    - "partially_paid"
+                    - "paid"
+                    - "partially_refunded"
+                    - "refunded"
+                    - "voided"
+                total_tax:
+                  title: "Total tax"
+                  description: "The sum of all the taxes applied to the order in the shop currency. Must be positive."
+                  type: "string"
+                currency:
+                  title: "Currency"
+                  description: "The three-letter code (ISO 4217 format) for the shop currency"
+                  type: "string"
+                email:
+                  title: "Email"
+                  description: "The customer's email address"
+                  type: "string"
+
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                title: "Order"
+                properties:
+                  id:
+                    type: "integer"
+                  app_id:
+                    type: "integer"
+                  confirmation_number:
+                    type: "string"
+                  created_at:
+                    type: "string"
+                    format: "date-time"
+                  currency:
+                    type: "string"
+                  current_total_price:
+                    type: "string"
+                  order_number:
+                    type: "integer"
+        "400":
+          description: "Invalid status value"
+components:
+  securitySchemes:
+    admin_api_key:
+      type: "apiKey"
+      in: "header"
+      name: "X-Shopify-Access-Token"
+security:
+  - admin_api_key: []
