@@ -22,7 +22,7 @@ import static com.bytechef.component.affinity.constant.AffinityConstants.LAST_NA
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class AffinityCreatePersonActionTest extends AbstractAffinityActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }

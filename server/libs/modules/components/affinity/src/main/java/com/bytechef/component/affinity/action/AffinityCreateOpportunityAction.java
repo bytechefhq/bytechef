@@ -63,9 +63,7 @@ public class AffinityCreateOpportunityAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(BASE_URL + "opportunities"))
-            .body(
-                Http.Body.of(
-                    NAME, inputParameters.getRequiredString(NAME)))
+            .body(Http.Body.of(NAME, inputParameters.getRequiredString(NAME)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

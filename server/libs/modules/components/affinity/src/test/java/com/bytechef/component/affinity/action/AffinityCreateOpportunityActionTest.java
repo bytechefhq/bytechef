@@ -20,7 +20,7 @@ import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class AffinityCreateOpportunityActionTest extends AbstractAffinityActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }
