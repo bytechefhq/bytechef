@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
@@ -30,6 +31,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
@@ -66,6 +68,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         """;
 
     private final CategoryService categoryService;
+    private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
@@ -74,11 +77,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ProjectInstanceService projectInstanceService, ProjectService projectService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, TagService tagService,
-        WorkflowService workflowService) {
+        CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
+        ProjectService projectService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        TagService tagService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
+        this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
@@ -169,7 +173,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 projectInstanceWorkflows,
                 projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
 
-                throw new ApplicationException("Workflow id=%s is in use".formatted(workflowId), Project.class, 101);
+                if (OptionalUtils.isPresent(jobService.fetchLastWorkflowJob(workflowId))) {
+                    throw new ApplicationException(
+                        "Workflow id=%s is in use".formatted(workflowId), Project.class, 101);
+                }
             }
         }
 
