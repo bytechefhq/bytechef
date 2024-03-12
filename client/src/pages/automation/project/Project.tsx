@@ -61,16 +61,7 @@ import {
 } from '@/queries/platform/workflowTestConfigurations.queries';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    CircleDotDashedIcon,
-    Code2Icon,
-    PlayIcon,
-    PuzzleIcon,
-    RefreshCwIcon,
-    RefreshCwOffIcon,
-    SlidersIcon,
-    SquareIcon,
-} from 'lucide-react';
+import {Code2Icon, PlayIcon, PuzzleIcon, RefreshCwIcon, RefreshCwOffIcon, SlidersIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
@@ -619,7 +610,7 @@ const Project = () => {
                                             }
                                             size="sm"
                                         >
-                                            <CircleDotDashedIcon className="h-5" /> Publish
+                                            Publish
                                         </Button>
                                     </TooltipTrigger>
 
@@ -632,7 +623,7 @@ const Project = () => {
                                     <TooltipTrigger asChild>
                                         <span>
                                             <Button disabled={!!project?.publishedDate} size="sm">
-                                                <CircleDotDashedIcon className="h-5" /> Publish
+                                                Publish
                                             </Button>
                                         </span>
                                     </TooltipTrigger>
