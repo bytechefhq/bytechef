@@ -95,17 +95,15 @@ const ObjectProperty = ({
             };
         });
 
-        setSubProperties((subProperties) => {
-            const newSubProperties = subProperties.filter(
-                (subProperty) =>
-                    !preexistingProperties.some((preexistingProperty) => preexistingProperty.name === subProperty.name)
-            );
-
-            return [
-                ...newSubProperties,
-                ...preexistingProperties.map((property) => ({...property, defaultValue: undefined})),
-            ];
-        });
+        setSubProperties((subProperties) =>
+            subProperties.map((subProperty) => {
+                if (preexistingProperties.find((property) => property.name === subProperty.name)) {
+                    return {...subProperty, defaultValue: undefined};
+                } else {
+                    return subProperty;
+                }
+            })
+        );
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
