@@ -159,17 +159,16 @@ class CopperOptionUtilsTest {
 
     @Test
     void testGetUserOptions() {
-        List<Map<String, String>> linkedHashMaps = new ArrayList<>();
-
+        List<Map<String, String>> tags = new ArrayList<>();
         Map<String, String> tagMap = new LinkedHashMap<>();
 
         tagMap.put("name", "ContactType");
         tagMap.put("id", "123");
 
-        linkedHashMaps.add(tagMap);
+        tags.add(tagMap);
 
         when(mockedResponse.getBody(any(Context.TypeReference.class)))
-            .thenReturn(linkedHashMaps);
+            .thenReturn(tags);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
