@@ -427,7 +427,7 @@ const Property = ({
     }, []);
 
     useEffect(() => {
-        const loadOptionsDependency = optionsDataSource?.loadOptionsDependsOn?.reduce(
+        const loadOptionsDependsOn = optionsDataSource?.loadOptionsDependsOn?.reduce(
             (acc, key) => ({
                 ...acc,
                 [key]: currentComponentData?.parameters?.[key],
@@ -435,13 +435,13 @@ const Property = ({
             {}
         );
 
-        if (loadOptionsDependency) {
-            setLoadOptionsDependency(loadOptionsDependency);
+        if (loadOptionsDependsOn) {
+            setLoadOptionsDependency(loadOptionsDependsOn);
         }
     }, [currentComponentData?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
     useEffect(() => {
-        const loadPropertiesDependency = propertiesDataSource?.loadPropertiesDependsOn?.reduce(
+        const loadPropertiesDependsOn = propertiesDataSource?.loadPropertiesDependsOn?.reduce(
             (acc, key) => ({
                 ...acc,
                 [key]: currentComponentData?.parameters?.[key],
@@ -449,8 +449,8 @@ const Property = ({
             {}
         );
 
-        if (loadPropertiesDependency) {
-            setLoadPropertiesDependency(loadPropertiesDependency);
+        if (loadPropertiesDependsOn) {
+            setLoadPropertiesDependency(loadPropertiesDependsOn);
         }
     }, [currentComponentData?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
