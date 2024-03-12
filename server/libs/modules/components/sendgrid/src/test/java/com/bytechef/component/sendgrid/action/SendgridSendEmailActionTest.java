@@ -100,9 +100,11 @@ public class SendgridSendEmailActionTest extends AbstractSendgridActionTest {
 
                 Request request = requestArgumentCaptor.getValue();
 
-                String expected = "{\"from\":{\"email\":\"from@mail.com\"},\"subject\":\"Sending with SendGrid is Fun\",\"personalizations\":[{\"to\":[{\"email\":\"to@mail.com\"}],\"cc\":[{\"email\":\"cc@mail.com\"}],\"bcc\":[{\"email\":\"bcc@mail.com\"}],\"dynamic_template_data\":{\"key1\":\"value1\",\"key2\":\"value2\"}}],\"content\":[{\"type\":\"text/plain\",\"value\":\"and easy to do anywhere, even with Java\"}],\"attachments\":[{\"content\":\"fileContent\",\"filename\":\"fileName\"}],\"template_id\":\"template_id\",\"reply_to\":{\"email\":\"replyTo@mail.com\"}}";
                 assertEquals(Method.POST, request.getMethod());
                 assertEquals("mail/send", request.getEndpoint());
+
+                String expected = "{\"from\":{\"email\":\"from@mail.com\"},\"subject\":\"Sending with SendGrid is Fun\",\"personalizations\":[{\"to\":[{\"email\":\"to@mail.com\"}],\"cc\":[{\"email\":\"cc@mail.com\"}],\"bcc\":[{\"email\":\"bcc@mail.com\"}],\"dynamic_template_data\":{\"key1\":\"value1\",\"key2\":\"value2\"}}],\"content\":[{\"type\":\"text/plain\",\"value\":\"and easy to do anywhere, even with Java\"}],\"attachments\":[{\"content\":\"fileContent\",\"filename\":\"fileName\"}],\"template_id\":\"template_id\",\"reply_to\":{\"email\":\"replyTo@mail.com\"}}";
+
                 assertEquals(expected, request.getBody());
             }
         }
