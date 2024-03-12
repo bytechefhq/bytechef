@@ -369,7 +369,7 @@ const ConnectionDialog = ({
                     <Form {...form}>
                         <DialogHeader>
                             <div className="flex items-center justify-between">
-                                <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Conection`}</DialogTitle>
+                                <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
                                 <DialogClose asChild>
                                     <Cross2Icon className="size-4 cursor-pointer opacity-70" />
@@ -407,7 +407,7 @@ const ConnectionDialog = ({
                                                                         value: componentDefinition.name,
                                                                     })
                                                                 )}
-                                                                maxHeight={true}
+                                                                maxHeight
                                                                 name="component"
                                                                 onBlur={field.onBlur}
                                                                 onChange={(item) =>
