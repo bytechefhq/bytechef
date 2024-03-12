@@ -25,11 +25,11 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,18 +56,17 @@ public class CapsuleCRMUtils {
     public static List<Option<String>> getCountryOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, ArrayList<LinkedHashMap<String, Object>>> body =
-            context
-                .http(http -> http.get(BASE_URL + "/countries"))
-                .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+        Map<String, List<Map<String, Object>>> body =
+            context.http(http -> http.get(BASE_URL + "/countries"))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new Context.TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
-        body
-            .getOrDefault("countries", new ArrayList<>())
-            .forEach(map -> options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("name")))));
+        for (Map<String, Object> map : body.getOrDefault("countries", List.of())) {
+            options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("name"))));
+        }
 
         return options;
     }

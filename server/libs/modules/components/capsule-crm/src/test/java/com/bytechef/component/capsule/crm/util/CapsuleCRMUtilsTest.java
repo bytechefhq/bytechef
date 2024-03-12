@@ -34,6 +34,7 @@ import com.bytechef.component.definition.Property;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,8 +52,8 @@ class CapsuleCRMUtilsTest {
         when(mockedParameters.getRequiredString(TYPE))
                 .thenReturn("person");
 
-        List<Property.ValueProperty<?>> nameProperties =
-                CapsuleCRMUtils.createNameProperties(mockedParameters, mockedParameters, mockedContext);
+        List<Property.ValueProperty<?>> nameProperties = CapsuleCRMUtils.createNameProperties(
+            mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(2, nameProperties.size());
 
@@ -63,10 +64,10 @@ class CapsuleCRMUtilsTest {
     @Test
     void testCreateNamePropertiesForOrganization() {
         when(mockedParameters.getRequiredString(TYPE))
-                .thenReturn("organization");
+            .thenReturn("organization");
 
-        List<Property.ValueProperty<?>> nameProperties =
-                CapsuleCRMUtils.createNameProperties(mockedParameters, mockedParameters, mockedContext);
+        List<Property.ValueProperty<?>> nameProperties = CapsuleCRMUtils.createNameProperties(
+            mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(1, nameProperties.size());
 
@@ -75,13 +76,15 @@ class CapsuleCRMUtilsTest {
 
     @Test
     void testGetCountryOptions() {
-        LinkedHashMap<String, ArrayList<LinkedHashMap<String, Object>>> linkedHashMap = new LinkedHashMap<>();
-        ArrayList<LinkedHashMap<String, Object>> list = new ArrayList<>();
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        Map<String, List<Map<String, Object>>> map = new LinkedHashMap<>();
+        List<Map<String, Object>> countries = new ArrayList<>();
+        Map<String, Object> countryMap = new LinkedHashMap<>();
 
-        map.put("name", "countryName");
-        list.add(map);
-        linkedHashMap.put("countries", list);
+        countryMap.put("name", "countryName");
+
+        countries.add(countryMap);
+
+        map.put("countries", countries);
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -92,12 +95,14 @@ class CapsuleCRMUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(Context.TypeReference.class)))
-            .thenReturn(linkedHashMap);
+            .thenReturn(map);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
+
         expectedOptions.add(option("countryName", "countryName"));
 
-        assertEquals(expectedOptions,
+        assertEquals(
+            expectedOptions,
             CapsuleCRMUtils.getCountryOptions(mockedParameters, mockedParameters, "", mockedContext));
     }
 }
