@@ -23,11 +23,10 @@ import static java.util.Base64.Encoder;
 import static java.util.Base64.getEncoder;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -36,6 +35,7 @@ import com.sendgrid.helpers.mail.objects.Attachments;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marko Krišković
@@ -50,10 +50,13 @@ public class SendgridUtils {
         List<Attachments> attachments = new ArrayList<>();
 
         List<FileEntry> fileEntries = inputParameters.getFileEntries(ATTACHMENTS, List.of());
+
         for (FileEntry fileEntry : fileEntries) {
-            Attachments attachment = new Attachments.Builder(fileEntry.getName(),
-                ENCODER.encodeToString(actionContext.file(file -> file.readAllBytes(fileEntry))))
-                    .build();
+            Attachments.Builder builder = new Attachments.Builder(
+                fileEntry.getName(),
+                ENCODER.encodeToString(actionContext.file(file -> file.readAllBytes(fileEntry))));
+
+            Attachments attachment = builder.build();
 
             attachments.add(attachment);
         }
@@ -64,26 +67,24 @@ public class SendgridUtils {
     public static List<Option<String>> getTemplates(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
+
         Request request = new Request();
 
+        request.addQueryParam("generations", "dynamic"); // value: "legacy, dynamic"
         request.setMethod(Method.GET);
         request.setEndpoint("templates");
-        request.addQueryParam("generations", "dynamic"); // value: "legacy, dynamic"
 
         SendGrid sg = new SendGrid(connectionParameters.getRequiredString(TOKEN));
-        Response response = sg.api(request);
-        String json = response.getBody();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode node = objectMapper.readTree(json);
-        JsonNode path = node.path("templates");
+        Response response = sg.api(request);
+
+        Map<String, List<Map<String, String>>> result = context.json(
+            json -> json.read(response.getBody(), new Context.TypeReference<>() {}));
 
         List<Option<String>> options = new ArrayList<>();
-        for (JsonNode template : path) {
-            options.add(option(template.path("name")
-                .textValue(),
-                template.path("id")
-                    .textValue()));
+
+        for (Map<String, String> templates : result.get("templates")) {
+            options.add(option(templates.get("name"), templates.get("id")));
         }
 
         return options;

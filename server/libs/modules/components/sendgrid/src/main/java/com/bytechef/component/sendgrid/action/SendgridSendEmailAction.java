@@ -137,6 +137,7 @@ public final class SendgridSendEmailAction {
 
     public static Response perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+
         Mail mail = new Mail();
 
         mail.setFrom(new Email(inputParameters.getRequiredString(FROM)));
@@ -144,31 +145,39 @@ public final class SendgridSendEmailAction {
         mail.addContent(new Content(CONTENT_TYPE, inputParameters.getRequiredString(CONTENT_VALUE)));
 
         String templateId = inputParameters.getString(TEMPLATE_ID);
-        if (templateId != null)
+
+        if (templateId != null) {
             mail.setTemplateId(templateId);
+        }
 
         String replyTo = inputParameters.getString(REPLY_TO);
-        if (replyTo != null)
+
+        if (replyTo != null) {
             mail.setReplyTo(new Email(replyTo));
+        }
 
         Personalization personalization = new Personalization();
 
         Map<String, Object> map = inputParameters.getMap(DYNAMIC_TEMPLATE, Object.class, Map.of());
+
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             personalization.addDynamicTemplateData(entry.getKey(), entry.getValue());
         }
 
         List<String> toList = inputParameters.getList(TO, String.class, List.of());
+
         for (String to : toList) {
             personalization.addTo(new Email(to));
         }
 
         List<String> ccList = inputParameters.getList(CC, String.class, List.of());
+
         for (String cc : ccList) {
             personalization.addCc(new Email(cc));
         }
 
         List<String> bccList = inputParameters.getList(BCC, String.class, List.of());
+
         for (String bcc : bccList) {
             personalization.addBcc(new Email(bcc));
         }
@@ -176,6 +185,7 @@ public final class SendgridSendEmailAction {
         mail.addPersonalization(personalization);
 
         List<Attachments> attachments = SendgridUtils.getAttachments(inputParameters, actionContext);
+
         for (Attachments attachment : attachments) {
             mail.addAttachments(attachment);
         }

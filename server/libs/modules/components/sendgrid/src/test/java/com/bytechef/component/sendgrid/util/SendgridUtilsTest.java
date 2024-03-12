@@ -50,8 +50,10 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
     @Test
     void testGetAttachments() {
         List<FileEntry> fileEntries = new ArrayList<>();
+
         FileEntry fileEntry1 = mock(FileEntry.class);
         FileEntry fileEntry2 = mock(FileEntry.class);
+
         fileEntries.add(fileEntry1);
         fileEntries.add(fileEntry2);
 
@@ -75,6 +77,7 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
         when(connectionParameters.getRequiredString(anyString())).thenReturn("token");
 
         Response mockedResponse = mock(Response.class);
+
         when(mockedResponse.getBody()).thenReturn(
             "{\"templates\":[{\"id\":\"1\",\"name\":\"template1\",\"other\":\"other1\"},{\"id\":\"2\",\"name\":\"template2\",\"other\":\"other2\"}]}");
 
