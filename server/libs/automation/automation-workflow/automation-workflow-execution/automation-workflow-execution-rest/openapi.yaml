@@ -80,7 +80,7 @@ paths:
                 $ref: "#/components/schemas/Page"
   /workflow-executions/{id}:
     get:
-      description: "Get workflow execution by id."
+      description: "Get workflow executions by id."
       summary: "Get workflow executions by id"
       tags:
       - "workflow-execution"
