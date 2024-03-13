@@ -115,7 +115,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                     <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                            <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
                                 <div className="mr-1">
                                     {project.workflowIds?.length === 1
                                         ? `${project.workflowIds?.length} workflow`
@@ -178,6 +178,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+
                             <DropdownMenuItem
                                 onClick={() =>
                                     navigate(
@@ -185,10 +187,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     )
                                 }
                             >
-                                View
+                                View Workflows
                             </DropdownMenuItem>
-
-                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
                             <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
                                 Duplicate

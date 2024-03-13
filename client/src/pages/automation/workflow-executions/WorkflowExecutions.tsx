@@ -269,7 +269,7 @@ export const WorkflowExecutions = () => {
             header={<PageHeader centerTitle={true} position="main" title="All Workflow Executions" />}
             leftSidebarHeader={
                 <>
-                    <PageHeader position="sidebar" title="Executions" />
+                    <PageHeader position="sidebar" title="Execution History" />
 
                     <div className="space-y-4 px-4">
                         <div className="flex flex-col space-y-2">

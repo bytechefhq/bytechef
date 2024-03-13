@@ -29,7 +29,7 @@ const navigation: {
     {
         href: '/automation/instances',
         icon: Layers3Icon,
-        name: 'Instances',
+        name: 'Project Instances',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
