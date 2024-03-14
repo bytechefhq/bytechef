@@ -13,7 +13,6 @@ import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
-import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Properties from 'components/Properties/Properties';
@@ -384,15 +383,12 @@ const WorkflowNodeDetailsPanel = ({
     }, [currentComponent?.name]);
 
     return (
-        <Dialog.Root modal={false} open={workflowNodeDetailsPanelOpen}>
-            <Dialog.Portal>
-                <Dialog.Content
-                    className="fixed inset-y-0 bottom-4 right-[65px] top-[70px] z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
-                    onInteractOutside={(event) => event.preventDefault()}
-                >
+        <>
+            {workflowNodeDetailsPanelOpen && (
+                <div className="absolute inset-y-4 right-4 z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg">
                     {currentComponent ? (
                         <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
-                            <Dialog.Title className="flex items-center p-4 text-lg font-medium">
+                            <header className="flex items-center p-4 text-lg font-medium">
                                 {currentNode.label}
 
                                 <span className="mx-2 text-sm text-gray-500">({currentNode.name})</span>
@@ -416,9 +412,9 @@ const WorkflowNodeDetailsPanel = ({
                                 >
                                     <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
                                 </button>
-                            </Dialog.Title>
+                            </header>
 
-                            <div className="flex h-full flex-col">
+                            <main className="flex h-full flex-col">
                                 {!!currentComponent?.actions?.length && (
                                     <CurrentActionSelect
                                         actions={currentComponent.actions}
@@ -504,7 +500,7 @@ const WorkflowNodeDetailsPanel = ({
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </main>
 
                             <footer className="z-50 mt-auto flex bg-white px-4 py-2">
                                 <Select defaultValue={currentComponent.version.toString()}>
@@ -523,9 +519,9 @@ const WorkflowNodeDetailsPanel = ({
                             <span className="text-gray-500">Something went wrong 👾</span>
                         </div>
                     )}
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                </div>
+            )}
+        </>
     );
 };
 

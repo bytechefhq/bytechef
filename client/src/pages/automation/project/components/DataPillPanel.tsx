@@ -2,7 +2,6 @@ import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
 import DataPillPanelBody, {ComponentOperationType} from '@/pages/automation/project/components/DataPillPanelBody';
-import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useState} from 'react';
 
@@ -45,19 +44,11 @@ const DataPillPanel = ({
         });
 
     return (
-        <Dialog.Root
-            modal={false}
-            onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
-            open={dataPillPanelOpen && workflowNodeDetailsPanelOpen}
-        >
-            <Dialog.Portal>
-                <Dialog.Content
-                    className="fixed inset-y-2 bottom-4 right-[530px] top-[70px] z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
-                    onInteractOutside={(event) => event.preventDefault()}
-                    onOpenAutoFocus={(event) => event.preventDefault()}
-                >
+        <>
+            {dataPillPanelOpen && workflowNodeDetailsPanelOpen && (
+                <div className="absolute inset-y-4 right-[485px] z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg">
                     <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
-                        <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium">
+                        <header className="flex content-center items-center p-4 text-lg font-medium">
                             <span>Data Pill Panel</span>
 
                             <Tooltip>
@@ -78,9 +69,9 @@ const DataPillPanel = ({
                             >
                                 <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
                             </button>
-                        </Dialog.Title>
+                        </header>
 
-                        <div className="flex w-full grow flex-col">
+                        <main className="flex w-full grow flex-col">
                             <div className="mb-0 border-b border-gray-100 p-4">
                                 <Input
                                     name="dataPillFilter"
@@ -96,11 +87,11 @@ const DataPillPanel = ({
                                     dataPillFilterQuery={dataPillFilterQuery}
                                 />
                             )}
-                        </div>
+                        </main>
                     </div>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                </div>
+            )}
+        </>
     );
 };
 
