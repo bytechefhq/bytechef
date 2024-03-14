@@ -512,6 +512,7 @@ const ConnectionDialog = ({
                                                     onValueChange={(value) => {
                                                         setAuthorizationName(value);
                                                         setUsePredefinedOAuthApp(false);
+                                                        setValue('authorizationName', value);
                                                     }}
                                                     {...field}
                                                 >
