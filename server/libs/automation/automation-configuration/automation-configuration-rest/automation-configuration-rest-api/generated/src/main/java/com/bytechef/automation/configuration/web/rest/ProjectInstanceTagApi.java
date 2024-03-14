@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:02.564620+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-14T08:44:07.445792+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instance-tag", description = "The Automation Project Instance Tag API")
 public interface ProjectInstanceTagApi {
@@ -46,7 +46,7 @@ public interface ProjectInstanceTagApi {
      * GET /project-instances/tags : Get project instance tags
      * Get project instance tags.
      *
-     * @return The list of project tags. (status code 200)
+     * @return The list of project instance tags. (status code 200)
      */
     @Operation(
         operationId = "getProjectInstanceTags",
@@ -54,7 +54,7 @@ public interface ProjectInstanceTagApi {
         description = "Get project instance tags.",
         tags = { "project-instance-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of project tags.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of project instance tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
             })
         }

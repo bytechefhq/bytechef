@@ -1,4 +1,4 @@
-package com.bytechef.automation.configuration.web.rest.model;
+package com.bytechef.automation.workflow.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -19,13 +19,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A group of workflows that make one logical project.
+ * ProjectInstanceAllOfProjectModel
  */
 
-@Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
-@JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-14T08:44:07.445792+01:00[Europe/Zagreb]")
-public class ProjectBasicModel {
+@JsonTypeName("ProjectInstance_allOf_project")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-14T08:44:10.522436+01:00[Europe/Zagreb]")
+public class ProjectInstanceAllOfProjectModel {
 
   private String createdBy;
 
@@ -85,18 +84,18 @@ public class ProjectBasicModel {
 
   private StatusEnum status;
 
-  public ProjectBasicModel() {
+  public ProjectInstanceAllOfProjectModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ProjectBasicModel(String name) {
+  public ProjectInstanceAllOfProjectModel(String name) {
     this.name = name;
   }
 
-  public ProjectBasicModel createdBy(String createdBy) {
+  public ProjectInstanceAllOfProjectModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -116,7 +115,7 @@ public class ProjectBasicModel {
     this.createdBy = createdBy;
   }
 
-  public ProjectBasicModel createdDate(LocalDateTime createdDate) {
+  public ProjectInstanceAllOfProjectModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -136,7 +135,7 @@ public class ProjectBasicModel {
     this.createdDate = createdDate;
   }
 
-  public ProjectBasicModel description(String description) {
+  public ProjectInstanceAllOfProjectModel description(String description) {
     this.description = description;
     return this;
   }
@@ -156,7 +155,7 @@ public class ProjectBasicModel {
     this.description = description;
   }
 
-  public ProjectBasicModel id(Long id) {
+  public ProjectInstanceAllOfProjectModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -176,7 +175,7 @@ public class ProjectBasicModel {
     this.id = id;
   }
 
-  public ProjectBasicModel lastModifiedBy(String lastModifiedBy) {
+  public ProjectInstanceAllOfProjectModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -196,7 +195,7 @@ public class ProjectBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ProjectInstanceAllOfProjectModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -216,7 +215,7 @@ public class ProjectBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectBasicModel name(String name) {
+  public ProjectInstanceAllOfProjectModel name(String name) {
     this.name = name;
     return this;
   }
@@ -236,7 +235,7 @@ public class ProjectBasicModel {
     this.name = name;
   }
 
-  public ProjectBasicModel publishedDate(LocalDateTime publishedDate) {
+  public ProjectInstanceAllOfProjectModel publishedDate(LocalDateTime publishedDate) {
     this.publishedDate = publishedDate;
     return this;
   }
@@ -256,7 +255,7 @@ public class ProjectBasicModel {
     this.publishedDate = publishedDate;
   }
 
-  public ProjectBasicModel projectVersion(Integer projectVersion) {
+  public ProjectInstanceAllOfProjectModel projectVersion(Integer projectVersion) {
     this.projectVersion = projectVersion;
     return this;
   }
@@ -276,7 +275,7 @@ public class ProjectBasicModel {
     this.projectVersion = projectVersion;
   }
 
-  public ProjectBasicModel status(StatusEnum status) {
+  public ProjectInstanceAllOfProjectModel status(StatusEnum status) {
     this.status = status;
     return this;
   }
@@ -304,17 +303,17 @@ public class ProjectBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectBasicModel projectBasic = (ProjectBasicModel) o;
-    return Objects.equals(this.createdBy, projectBasic.createdBy) &&
-        Objects.equals(this.createdDate, projectBasic.createdDate) &&
-        Objects.equals(this.description, projectBasic.description) &&
-        Objects.equals(this.id, projectBasic.id) &&
-        Objects.equals(this.lastModifiedBy, projectBasic.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, projectBasic.lastModifiedDate) &&
-        Objects.equals(this.name, projectBasic.name) &&
-        Objects.equals(this.publishedDate, projectBasic.publishedDate) &&
-        Objects.equals(this.projectVersion, projectBasic.projectVersion) &&
-        Objects.equals(this.status, projectBasic.status);
+    ProjectInstanceAllOfProjectModel projectInstanceAllOfProject = (ProjectInstanceAllOfProjectModel) o;
+    return Objects.equals(this.createdBy, projectInstanceAllOfProject.createdBy) &&
+        Objects.equals(this.createdDate, projectInstanceAllOfProject.createdDate) &&
+        Objects.equals(this.description, projectInstanceAllOfProject.description) &&
+        Objects.equals(this.id, projectInstanceAllOfProject.id) &&
+        Objects.equals(this.lastModifiedBy, projectInstanceAllOfProject.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, projectInstanceAllOfProject.lastModifiedDate) &&
+        Objects.equals(this.name, projectInstanceAllOfProject.name) &&
+        Objects.equals(this.publishedDate, projectInstanceAllOfProject.publishedDate) &&
+        Objects.equals(this.projectVersion, projectInstanceAllOfProject.projectVersion) &&
+        Objects.equals(this.status, projectInstanceAllOfProject.status);
   }
 
   @Override
@@ -325,7 +324,7 @@ public class ProjectBasicModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectBasicModel {\n");
+    sb.append("class ProjectInstanceAllOfProjectModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

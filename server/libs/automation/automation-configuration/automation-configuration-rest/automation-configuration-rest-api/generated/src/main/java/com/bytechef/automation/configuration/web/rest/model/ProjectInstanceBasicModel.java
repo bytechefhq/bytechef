@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:02.564620+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-14T08:44:07.445792+01:00[Europe/Zagreb]")
 public class ProjectInstanceBasicModel {
 
   private String description;
@@ -35,7 +35,8 @@ public class ProjectInstanceBasicModel {
 
   private Long id;
 
-  private String lastExecutionDate;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
@@ -139,7 +140,7 @@ public class ProjectInstanceBasicModel {
     this.id = id;
   }
 
-  public ProjectInstanceBasicModel lastExecutionDate(String lastExecutionDate) {
+  public ProjectInstanceBasicModel lastExecutionDate(LocalDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -148,14 +149,14 @@ public class ProjectInstanceBasicModel {
    * The last execution date.
    * @return lastExecutionDate
   */
-  
+  @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public String getLastExecutionDate() {
+  public LocalDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(String lastExecutionDate) {
+  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
@@ -245,11 +246,11 @@ public class ProjectInstanceBasicModel {
   }
 
   /**
-   * If a workflow is enabled or not in the project instance.
+   * If a project instance is enabled or not.
    * @return enabled
   */
   
-  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "enabled", description = "If a project instance is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
     return enabled;
