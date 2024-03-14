@@ -10,9 +10,9 @@ src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectBasicModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceAllOfProjectModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceBasicModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceModel.java
-src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceProjectModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceWorkflowConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceWorkflowModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectModel.java
