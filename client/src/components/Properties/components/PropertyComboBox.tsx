@@ -214,7 +214,7 @@ const PropertyComboBox = ({
                                                 </div>
                                             </div>
                                         ) : (
-                                            comboBoxItem.label
+                                            <span>{comboBoxItem.label}</span>
                                         )}
 
                                         <CheckIcon
