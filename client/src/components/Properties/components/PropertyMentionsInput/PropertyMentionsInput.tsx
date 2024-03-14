@@ -189,7 +189,15 @@ const PropertyMentionsInput = forwardRef(
 
             const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
 
-            const strippedValue = value.length ? value?.replace(/<p>|<\/p>/g, '') : '';
+            let strippedValue = value.length ? value?.replace(/<p>|<\/p>/g, '') : '';
+
+            strippedValue = strippedValue.replaceAll(/<[^>]*>?/gm, '');
+
+            strippedValue = strippedValue.substring(strippedValue.lastIndexOf('\n') + 1).trim();
+
+            if (strippedValue && !strippedValue.startsWith('{') && !strippedValue.endsWith('}')) {
+                strippedValue = `{${strippedValue}}`;
+            }
 
             if (arrayName && parameters) {
                 const combinedArray = Object.entries(parameters)
