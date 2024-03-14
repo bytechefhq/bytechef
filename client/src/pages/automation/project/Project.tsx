@@ -16,6 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {
     Select,
     SelectContent,
@@ -29,7 +30,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel} from '@/middleware/automation/configuration';
-import {JobModel, TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {
@@ -43,12 +43,12 @@ import {
     useUpdateWorkflowMutation,
 } from '@/mutations/automation/workflows.mutations';
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
+import WorkflowExecutionsTestOutput from '@/pages/automation/project/components/WorkflowExecutionsTestOutput';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
-import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
@@ -62,31 +62,28 @@ import {
 } from '@/queries/platform/workflowTestConfigurations.queries';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {Code2Icon, PlayIcon, PuzzleIcon, RefreshCwIcon, RefreshCwOffIcon, SlidersIcon, SquareIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {
+    CircleDotIcon,
+    Code2Icon,
+    PlayIcon,
+    PuzzleIcon,
+    SlidersIcon,
+    SquareIcon,
+    SquareTerminalIcon,
+} from 'lucide-react';
+import {useEffect, useRef, useState} from 'react';
+import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
 import PageLoader from '../../../components/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import ProjectWorkflow from './components/ProjectWorkflow';
-import ToggleGroup, {ToggleItemType} from './components/ToggleGroup';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
-import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
 const workflowTestApi = new WorkflowTestApi();
 
-const headerToggleItems: Array<ToggleItemType> = [
-    {
-        label: 'Build',
-        value: 'build',
-    },
-    {
-        label: 'Debug',
-        value: 'debug',
-    },
-];
-
 const Project = () => {
+    const [showBottomPanelOpen, setShowBottomPanelOpen] = useState(false);
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
@@ -96,8 +93,10 @@ const Project = () => {
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
+    const bottomImperativePanelHandleRef = useRef<ImperativePanelHandle>(null);
+
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
-    const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
+
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setComponentDefinitions, setProjectId, setTaskDispatcherDefinitions, setWorkflow, workflow} =
         useWorkflowDataStore();
@@ -204,8 +203,12 @@ const Project = () => {
                 queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
-            setLeftSidebarOpen(false);
+            setShowBottomPanelOpen(false);
             setWorkflow({...workflow, componentNames, nodeNames});
+
+            if (bottomImperativePanelHandleRef.current) {
+                bottomImperativePanelHandleRef.current.resize(0);
+            }
 
             navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
         },
@@ -306,9 +309,13 @@ const Project = () => {
     };
 
     const handleRunClick = () => {
-        setLeftSidebarOpen(true);
+        setShowBottomPanelOpen(true);
         setWorkflowTestExecution(undefined);
         setWorkflowIsRunning(true);
+
+        if (bottomImperativePanelHandleRef.current) {
+            bottomImperativePanelHandleRef.current.resize(35);
+        }
 
         if (workflow?.id) {
             workflowTestApi
@@ -318,6 +325,13 @@ const Project = () => {
                 .then((workflowTestExecution) => {
                     setWorkflowTestExecution(workflowTestExecution);
                     setWorkflowIsRunning(false);
+
+                    if (
+                        bottomImperativePanelHandleRef.current &&
+                        bottomImperativePanelHandleRef.current.getSize() === 0
+                    ) {
+                        bottomImperativePanelHandleRef.current.resize(35);
+                    }
                 })
                 .catch(() => {
                     setWorkflowIsRunning(false);
@@ -350,7 +364,11 @@ const Project = () => {
     }, [taskDispatcherDefinitions?.length]);
 
     useEffect(() => {
-        setLeftSidebarOpen(false);
+        setShowBottomPanelOpen(false);
+
+        if (bottomImperativePanelHandleRef.current) {
+            bottomImperativePanelHandleRef.current.resize(0);
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -381,33 +399,7 @@ const Project = () => {
         <>
             <LayoutContainer
                 className="bg-muted dark:bg-background"
-                leftSidebarBody={
-                    <>
-                        {!workflowIsRunning ? (
-                            workflowTestExecution?.job ? (
-                                <WorkflowExecutionDetailsAccordion
-                                    job={workflowTestExecution.job as JobModel}
-                                    triggerExecution={workflowTestExecution.triggerExecution as TriggerExecutionModel}
-                                />
-                            ) : (
-                                <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
-                                    <RefreshCwOffIcon className="size-5" />
-
-                                    <span>Workflow has not yet been executed.</span>
-                                </div>
-                            )
-                        ) : (
-                            <div className="flex size-full items-center justify-center gap-x-1 p-3">
-                                <span className="flex animate-spin text-gray-400">
-                                    <RefreshCwIcon className="size-5" />
-                                </span>
-
-                                <span className="text-muted-foreground">Workflow is running...</span>
-                            </div>
-                        )}
-                    </>
-                }
-                leftSidebarOpen={leftSidebarOpen}
+                leftSidebarOpen={false}
                 leftSidebarWidth="112"
                 rightSidebarBody={
                     componentDefinitions &&
@@ -426,43 +418,41 @@ const Project = () => {
                 rightToolbarOpen={true}
                 topHeader={
                     <header className="flex items-center border-b px-3 py-2">
-                        <div className="flex">
-                            <div className="mr-2 flex items-center">
-                                <h1>{project?.name}</h1>
+                        <div className="mr-2 flex flex-1 items-center space-x-1">
+                            <h1>{project?.name}</h1>
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button size="icon" variant="ghost">
-                                            <ChevronDownIcon />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                        <ChevronDownIcon />
+                                    </Button>
+                                </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
-                                            Edit
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
+                                        Edit
+                                    </DropdownMenuItem>
+
+                                    {project && (
+                                        <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
+                                            Duplicate
                                         </DropdownMenuItem>
+                                    )}
 
-                                        {project && (
-                                            <DropdownMenuItem
-                                                onClick={() => duplicateProjectMutation.mutate(project.id!)}
-                                            >
-                                                Duplicate
-                                            </DropdownMenuItem>
-                                        )}
+                                    <DropdownMenuSeparator />
 
-                                        <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        className="text-red-600"
+                                        onClick={() => setShowDeleteProjectAlertDialog(true)}
+                                    >
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
 
-                                        <DropdownMenuItem
-                                            className="text-red-600"
-                                            onClick={() => setShowDeleteProjectAlertDialog(true)}
-                                        >
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-
-                            <div className="mr-2 flex min-w-72 max-w-72 rounded-md border border-input bg-white shadow-sm">
+                        <div className="flex items-center space-x-4">
+                            <div className="flex space-x-1">
                                 {workflow && !!projectWorkflows && (
                                     <Select
                                         defaultValue={workflowId}
@@ -470,8 +460,8 @@ const Project = () => {
                                         onValueChange={handleProjectWorkflowValueChange}
                                         value={workflowId}
                                     >
-                                        <SelectTrigger className="mr-0.5 border-0 bg-white shadow-none">
-                                            <SelectValue placeholder="Select a workflow" />
+                                        <SelectTrigger className="mr-0.5 w-60 border-0 shadow-none hover:bg-gray-200">
+                                            <SelectValue className="font-semibold" placeholder="Select a workflow" />
                                         </SelectTrigger>
 
                                         <SelectContent>
@@ -490,7 +480,7 @@ const Project = () => {
 
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button className="border-0 bg-white shadow-none" size="icon" variant="outline">
+                                        <Button className="hover:bg-gray-200" size="icon" variant="ghost">
                                             <DotsVerticalIcon />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -535,11 +525,7 @@ const Project = () => {
                                         createWorkflowMutation={createProjectWorkflowMutation}
                                         parentId={parseInt(projectId)}
                                         triggerNode={
-                                            <Button
-                                                className="border-0 bg-white shadow-none"
-                                                size="icon"
-                                                variant="outline"
-                                            >
+                                            <Button className="hover:bg-gray-200" size="icon" variant="ghost">
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <PlusIcon className="mx-2 size-5" />
@@ -551,87 +537,90 @@ const Project = () => {
                                         }
                                     />
                                 )}
-                            </div>
-                        </div>
 
-                        <div className="flex flex-1 justify-center">
-                            <ToggleGroup
-                                defaultValue="build"
-                                onValueChange={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                                toggleItems={headerToggleItems}
-                                value={leftSidebarOpen ? 'debug' : 'build'}
-                            />
-                        </div>
-
-                        <div className="flex items-center space-x-1">
-                            {!workflowIsRunning && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span tabIndex={0}>
+                                {!workflowIsRunning && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <Button
-                                                className="font-semibold"
+                                                className="hover:bg-gray-200"
                                                 disabled={runDisabled}
                                                 onClick={handleRunClick}
-                                                size="sm"
-                                                variant="success"
+                                                size="icon"
+                                                variant="ghost"
                                             >
-                                                <PlayIcon className="h-5" /> Run
+                                                <PlayIcon className="h-5 text-success" />
+                                            </Button>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            {runDisabled
+                                                ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
+                                                : `Run the current workflow`}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+
+                                {workflowIsRunning && (
+                                    <Button
+                                        className="hover:bg-gray-200"
+                                        onClick={() => {
+                                            // TODO
+                                        }}
+                                        size="icon"
+                                        variant="ghost"
+                                    >
+                                        <SquareIcon className="h-5 text-destructive" />
+                                    </Button>
+                                )}
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            className="hover:bg-gray-200"
+                                            onClick={() => {
+                                                setShowBottomPanelOpen(!showBottomPanelOpen);
+
+                                                if (bottomImperativePanelHandleRef.current) {
+                                                    bottomImperativePanelHandleRef.current.resize(
+                                                        !showBottomPanelOpen ? 35 : 0
+                                                    );
+                                                }
+                                            }}
+                                            size="icon"
+                                            variant="ghost"
+                                        >
+                                            <SquareTerminalIcon className="h-5" />
+                                        </Button>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Show the current workflow test execution output</TooltipContent>
+                                </Tooltip>
+                            </div>
+
+                            <div>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span>
+                                            <Button
+                                                className="hover:bg-gray-200"
+                                                disabled={!!project?.publishedDate}
+                                                onClick={() =>
+                                                    publishProjectMutation.mutate({
+                                                        id: +projectId!,
+                                                    })
+                                                }
+                                                variant="ghost"
+                                            >
+                                                <CircleDotIcon className="h-5" /> Publish
                                             </Button>
                                         </span>
                                     </TooltipTrigger>
 
                                     <TooltipContent>
-                                        {runDisabled
-                                            ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
-                                            : `Run the current workflow`}
+                                        {project?.publishedDate ? `The project is published` : `Publish the project.`}
                                     </TooltipContent>
                                 </Tooltip>
-                            )}
-
-                            {workflowIsRunning && (
-                                <Button
-                                    onClick={() => {
-                                        // TODO
-                                    }}
-                                    size="sm"
-                                    variant="destructive"
-                                >
-                                    <SquareIcon className="h-5" /> Stop
-                                </Button>
-                            )}
-
-                            {!project?.publishedDate && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            onClick={() =>
-                                                publishProjectMutation.mutate({
-                                                    id: +projectId!,
-                                                })
-                                            }
-                                            size="sm"
-                                        >
-                                            Publish
-                                        </Button>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Publish the project.</TooltipContent>
-                                </Tooltip>
-                            )}
-
-                            {project?.publishedDate && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span>
-                                            <Button disabled={!!project?.publishedDate} size="sm">
-                                                Publish
-                                            </Button>
-                                        </span>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>The project is published</TooltipContent>
-                                </Tooltip>
-                            )}
+                            </div>
                         </div>
                     </header>
                 }
@@ -641,12 +630,32 @@ const Project = () => {
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading || projectWorkflowsLoading}
                 >
                     {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
-                        <ProjectWorkflow
-                            componentDefinitions={componentDefinitions}
-                            projectId={+projectId!}
-                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            updateWorkflowMutation={updateWorkflowMutation}
-                        />
+                        <ResizablePanelGroup className="flex-1" direction="vertical">
+                            <ResizablePanel className="relative" defaultSize={65}>
+                                <ProjectWorkflow
+                                    componentDefinitions={componentDefinitions}
+                                    projectId={+projectId!}
+                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                    updateWorkflowMutation={updateWorkflowMutation}
+                                />
+                            </ResizablePanel>
+
+                            <ResizableHandle />
+
+                            <ResizablePanel className="bg-white" defaultSize={0} ref={bottomImperativePanelHandleRef}>
+                                <WorkflowExecutionsTestOutput
+                                    onCloseClick={() => {
+                                        setShowBottomPanelOpen(false);
+
+                                        if (bottomImperativePanelHandleRef.current) {
+                                            bottomImperativePanelHandleRef.current.resize(0);
+                                        }
+                                    }}
+                                    workflowIsRunning={workflowIsRunning}
+                                    workflowTestExecution={workflowTestExecution}
+                                />
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
                     )}
                 </PageLoader>
             </LayoutContainer>

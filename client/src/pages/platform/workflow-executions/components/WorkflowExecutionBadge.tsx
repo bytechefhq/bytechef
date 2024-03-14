@@ -1,6 +1,6 @@
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowExecutionDetailsAccordionBadge = ({success}: {success: boolean}) => {
+const WorkflowExecutionBadge = ({success}: {success: boolean}) => {
     return (
         <div className="flex items-center">
             <div
@@ -16,6 +16,4 @@ const WorkflowExecutionDetailsAccordionBadge = ({success}: {success: boolean}) =
     );
 };
 
-WorkflowExecutionDetailsAccordionBadge.displayName = 'WorkflowExecutionDetailsAccordionContent';
-
-export default WorkflowExecutionDetailsAccordionBadge;
+export default WorkflowExecutionBadge;

@@ -176,7 +176,7 @@ const PropertyCodeEditorSheet = ({
                                             )
                                         ) : (
                                             <div className="flex items-center gap-x-1 text-muted-foreground">
-                                                <span>Script has not yet been executed.</span>
+                                                <span>The script has not yet been executed.</span>
                                             </div>
                                         )
                                     ) : (

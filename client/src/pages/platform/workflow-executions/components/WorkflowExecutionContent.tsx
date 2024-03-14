@@ -1,25 +1,24 @@
 import {Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import {ExecutionErrorModel} from '@/middleware/automation/workflow/execution';
-import {AccordionContent} from '@radix-ui/react-accordion';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {ExpandIcon} from 'lucide-react';
 import ReactJson from 'react-json-view';
 
-const WorkflowExecutionDetailsAccordionContent = ({
+const WorkflowExecutionContent = ({
     endDate,
     error,
     input,
     output,
     startDate,
 }: {
-    endDate: Date | undefined;
+    endDate?: Date;
     error?: ExecutionErrorModel;
     input?: {[key: string]: string};
     output?: object;
-    startDate: Date | undefined;
+    startDate?: Date;
 }) => {
     return (
-        <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
+        <>
             <div className="space-y-2 rounded-md bg-gray-50 p-2">
                 <header className="flex items-center justify-between">
                     <span className="text-sm font-semibold uppercase">Input</span>
@@ -63,12 +62,12 @@ const WorkflowExecutionDetailsAccordionContent = ({
                     </div>
                 </header>
 
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto text-nowrap">
                     {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
                         typeof input === 'object' ? (
                             <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
                         ) : (
-                            <span className="text-sm">input</span>
+                            <span className="text-sm">{input}</span>
                         )
                     ) : (
                         <span className="text-sm">No input data.</span>
@@ -76,61 +75,63 @@ const WorkflowExecutionDetailsAccordionContent = ({
                 </div>
             </div>
 
-            <div className="space-y-2 rounded-md bg-gray-50 p-2">
-                <header className="flex items-center justify-between">
-                    <span className="text-sm font-semibold uppercase">Output</span>
+            {!error && (
+                <div className="space-y-2 rounded-md bg-gray-50 p-2">
+                    <header className="flex items-center justify-between">
+                        <span className="text-sm font-semibold uppercase">Output</span>
 
-                    <div className="flex items-center space-x-1">
-                        <span className="text-xs">{endDate?.toLocaleString()}</span>
+                        <div className="flex items-center space-x-1">
+                            <span className="text-xs">{endDate?.toLocaleString()}</span>
 
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <ExpandIcon className="h-4 cursor-pointer" />
-                            </DialogTrigger>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <ExpandIcon className="h-4 cursor-pointer" />
+                                </DialogTrigger>
 
-                            <DialogContent className="max-w-[1000px]">
-                                <DialogHeader>
-                                    <div className="flex items-center justify-between uppercase">
-                                        <DialogTitle>Output</DialogTitle>
+                                <DialogContent className="max-w-[1000px]">
+                                    <DialogHeader>
+                                        <div className="flex items-center justify-between uppercase">
+                                            <DialogTitle>Output</DialogTitle>
 
-                                        <DialogClose asChild>
-                                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                        </DialogClose>
-                                    </div>
-                                </DialogHeader>
+                                            <DialogClose asChild>
+                                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
+                                            </DialogClose>
+                                        </div>
+                                    </DialogHeader>
 
-                                <div className="max-h-[80vh] overflow-y-auto">
-                                    {output ? (
-                                        typeof output === 'object' ? (
-                                            <ReactJson
-                                                collapsed={false}
-                                                enableClipboard={false}
-                                                src={output as object}
-                                            />
+                                    <div className="max-h-[80vh] overflow-y-auto">
+                                        {output ? (
+                                            typeof output === 'object' ? (
+                                                <ReactJson
+                                                    collapsed={false}
+                                                    enableClipboard={false}
+                                                    src={output as object}
+                                                />
+                                            ) : (
+                                                output
+                                            )
                                         ) : (
-                                            output
-                                        )
-                                    ) : (
-                                        <span className="text-sm">No output data.</span>
-                                    )}
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </header>
+                                            <span className="text-sm">No output data.</span>
+                                        )}
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    </header>
 
-                <div className="overflow-x-auto">
-                    {output ? (
-                        typeof output === 'object' ? (
-                            <ReactJson enableClipboard={false} src={output as object} />
+                    <div className="overflow-x-auto text-nowrap">
+                        {output ? (
+                            typeof output === 'object' ? (
+                                <ReactJson enableClipboard={false} src={output as object} />
+                            ) : (
+                                <span className="text-sm">{output}</span>
+                            )
                         ) : (
-                            <span className="text-sm">output</span>
-                        )
-                    ) : (
-                        <span className="text-sm">No output data.</span>
-                    )}
+                            <span className="text-sm">No output data.</span>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {error && (
                 <div className="space-y-2 rounded-md bg-gray-50 p-2">
@@ -183,8 +184,8 @@ const WorkflowExecutionDetailsAccordionContent = ({
                     </div>
                 </div>
             )}
-        </AccordionContent>
+        </>
     );
 };
 
-export default WorkflowExecutionDetailsAccordionContent;
+export default WorkflowExecutionContent;

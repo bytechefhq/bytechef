@@ -1,8 +1,10 @@
 import {Accordion} from '@/components/ui/accordion';
 import {JobModel, TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
-import WorkflowExecutionDetailsAccordionBadge from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionBadge';
-import WorkflowExecutionDetailsTaskAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTaskAccordionItem';
-import WorkflowExecutionDetailsTriggerAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTriggerAccordionItem';
+import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
+import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
+import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
+import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
+import {AccordionContent, AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionDetailsAccordion = ({
@@ -30,9 +32,7 @@ const WorkflowExecutionDetailsAccordion = ({
         <>
             <div className="px-3 py-4">
                 <div className="mb-3 flex items-center gap-x-2">
-                    <WorkflowExecutionDetailsAccordionBadge
-                        success={!!(taskExecutionsCompleted && triggerExecutionCompleted)}
-                    />
+                    <WorkflowExecutionBadge success={!!(taskExecutionsCompleted && triggerExecutionCompleted)} />
 
                     <span
                         className={twMerge(
@@ -61,15 +61,28 @@ const WorkflowExecutionDetailsAccordion = ({
             <div className="overflow-y-auto">
                 <Accordion collapsible defaultValue={triggerExecution?.id || ''} type="single">
                     {triggerExecution && (
-                        <WorkflowExecutionDetailsTriggerAccordionItem triggerExecution={triggerExecution} />
+                        <AccordionItem key={triggerExecution.id} value={triggerExecution.id || ''}>
+                            <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white data-[state=closed]:border-b">
+                                <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
+                            </AccordionTrigger>
+
+                            <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
+                                <WorkflowExecutionContent {...triggerExecution} />
+                            </AccordionContent>
+                        </AccordionItem>
                     )}
 
                     {job?.taskExecutions &&
                         job?.taskExecutions.map((taskExecution) => (
-                            <WorkflowExecutionDetailsTaskAccordionItem
-                                key={taskExecution.id}
-                                taskExecution={taskExecution}
-                            />
+                            <AccordionItem key={taskExecution.id} value={taskExecution.id || ''}>
+                                <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white data-[state=closed]:border-b">
+                                    <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                                </AccordionTrigger>
+
+                                <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
+                                    <WorkflowExecutionContent {...taskExecution} />
+                                </AccordionContent>
+                            </AccordionItem>
                         ))}
                 </Accordion>
             </div>
