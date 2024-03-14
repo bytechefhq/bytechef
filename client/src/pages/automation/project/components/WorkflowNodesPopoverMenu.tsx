@@ -24,7 +24,7 @@ const WorkflowNodesPopoverMenu = ({
 
         <PopoverContent
             align="start"
-            className="w-workflow-nodes-popover-menu-width p-0 will-change-auto"
+            className="w-workflow-nodes-popover-menu-width rounded-lg p-0 will-change-auto"
             side="right"
             sideOffset={4}
         >
