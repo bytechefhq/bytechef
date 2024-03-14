@@ -50,18 +50,15 @@ public class AcceloUtils {
         if (Objects.equals("company", againstType)) {
             return getCompanyIdOptions(inputParameters, connectionParameters, searchText, context);
         } else {
-            Map<String, Object> body =
-                context
-                    .http(http -> http.get(createUrl(connectionParameters, againstType + "s")))
-                    .configuration(Http.responseType(Http.ResponseType.JSON))
-                    .execute()
-                    .getBody(new TypeReference<>() {});
+            Map<String, List<Map<String, Object>>> body = context
+                .http(http -> http.get(createUrl(connectionParameters, againstType + "s")))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
             List<Option<String>> options = new ArrayList<>();
 
-            List<Map<String, Object>> response = (ArrayList<Map<String, Object>>) body.get("response");
-
-            for (Map<String, Object> map : response) {
+            for (Map<String, Object> map : body.get("response")) {
                 options.add(option(String.valueOf(map.get("title")), String.valueOf(map.get("id"))));
             }
 
@@ -72,18 +69,15 @@ public class AcceloUtils {
     public static List<Option<String>> getCompanyIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, Object> body =
-            context
-                .http(http -> http.get(createUrl(connectionParameters, "companies")))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, List<Map<String, Object>>> body = context
+            .http(http -> http.get(createUrl(connectionParameters, "companies")))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Map<String, Object>> response = (ArrayList<Map<String, Object>>) body.get("response");
-
-        for (Map<String, Object> map : response) {
+        for (Map<String, Object> map : body.get("response")) {
             options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("id"))));
         }
 

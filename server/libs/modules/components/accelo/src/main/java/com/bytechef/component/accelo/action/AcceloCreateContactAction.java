@@ -92,8 +92,7 @@ public class AcceloCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post(createUrl(connectionParameters, "contacts")))
+        return actionContext.http(http -> http.post(createUrl(connectionParameters, "contacts")))
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),

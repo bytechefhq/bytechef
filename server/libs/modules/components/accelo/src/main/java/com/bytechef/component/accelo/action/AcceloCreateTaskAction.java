@@ -84,8 +84,7 @@ public class AcceloCreateTaskAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post(createUrl(connectionParameters, "tasks")))
+        return actionContext.http(http -> http.post(createUrl(connectionParameters, "tasks")))
             .body(
                 Http.Body.of(
                     TITLE, inputParameters.getRequiredString(TITLE),

@@ -77,8 +77,7 @@ public class AcceloCreateCompanyAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post(createUrl(connectionParameters, "companies")))
+        return actionContext.http(http -> http.post(createUrl(connectionParameters, "companies")))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
