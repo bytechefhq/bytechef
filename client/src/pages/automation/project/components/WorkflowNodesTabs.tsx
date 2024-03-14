@@ -53,77 +53,71 @@ const WorkflowNodesTabs = ({
                 )}
             </TabsList>
 
-            <div>
-                <div className={twMerge('overflow-y-auto absolute', popover && 'h-80 w-full', !popover && 'h-full')}>
-                    {!hideTriggerComponents && (
-                        <TabsContent value="triggers">
-                            <ul className="space-y-0.5" role="list">
-                                {triggerComponentDefinitions.length ? (
-                                    triggerComponentDefinitions.map(
-                                        (componentDefinition: ComponentDefinitionBasicModel) => (
-                                            <WorkflowNodesTabsItem
-                                                draggable={itemsDraggable}
-                                                handleClick={() => onItemClick && onItemClick(componentDefinition)}
-                                                key={componentDefinition.name}
-                                                node={componentDefinition}
-                                            />
-                                        )
+            <div className={twMerge('overflow-y-auto', popover && 'h-80 w-full', !popover && 'h-full')}>
+                {!hideTriggerComponents && (
+                    <TabsContent className="mt-0" value="triggers">
+                        <ul className="space-y-2" role="list">
+                            {triggerComponentDefinitions.length ? (
+                                triggerComponentDefinitions.map(
+                                    (componentDefinition: ComponentDefinitionBasicModel) => (
+                                        <WorkflowNodesTabsItem
+                                            draggable={itemsDraggable}
+                                            handleClick={() => onItemClick && onItemClick(componentDefinition)}
+                                            key={componentDefinition.name}
+                                            node={componentDefinition}
+                                        />
                                     )
-                                ) : (
-                                    <span className="block px-3 py-2 text-xs text-gray-500">
-                                        No trigger components found.
-                                    </span>
-                                )}
-                            </ul>
-                        </TabsContent>
-                    )}
+                                )
+                            ) : (
+                                <span className="block px-3 py-2 text-xs text-gray-500">
+                                    No trigger components found.
+                                </span>
+                            )}
+                        </ul>
+                    </TabsContent>
+                )}
 
-                    {!hideActionComponents && (
-                        <TabsContent value="components">
-                            <ul className="space-y-0.5" role="list">
-                                {actionComponentDefinitions.length ? (
-                                    actionComponentDefinitions.map(
-                                        (componentDefinition: ComponentDefinitionBasicModel) => (
-                                            <WorkflowNodesTabsItem
-                                                draggable={itemsDraggable}
-                                                handleClick={() => onItemClick && onItemClick(componentDefinition)}
-                                                key={componentDefinition.name}
-                                                node={componentDefinition}
-                                            />
-                                        )
-                                    )
-                                ) : (
-                                    <span className="block px-3 py-2 text-xs text-gray-500">
-                                        No action components found.
-                                    </span>
-                                )}
-                            </ul>
-                        </TabsContent>
-                    )}
+                {!hideActionComponents && (
+                    <TabsContent className="mt-0" value="components">
+                        <ul className="space-y-2" role="list">
+                            {actionComponentDefinitions.length ? (
+                                actionComponentDefinitions.map((componentDefinition: ComponentDefinitionBasicModel) => (
+                                    <WorkflowNodesTabsItem
+                                        draggable={itemsDraggable}
+                                        handleClick={() => onItemClick && onItemClick(componentDefinition)}
+                                        key={componentDefinition.name}
+                                        node={componentDefinition}
+                                    />
+                                ))
+                            ) : (
+                                <span className="block px-3 py-2 text-xs text-gray-500">
+                                    No action components found.
+                                </span>
+                            )}
+                        </ul>
+                    </TabsContent>
+                )}
 
-                    {!hideTaskDispatchers && (
-                        <TabsContent value="taskDispatchers">
-                            <ul className="space-y-0.5" role="list">
-                                {taskDispatcherDefinitions.length ? (
-                                    taskDispatcherDefinitions.map(
-                                        (taskDispatcherDefinition: TaskDispatcherDefinitionModel) => (
-                                            <WorkflowNodesTabsItem
-                                                draggable={itemsDraggable}
-                                                handleClick={() => onItemClick && onItemClick(taskDispatcherDefinition)}
-                                                key={taskDispatcherDefinition.name}
-                                                node={taskDispatcherDefinition}
-                                            />
-                                        )
+                {!hideTaskDispatchers && (
+                    <TabsContent className="mt-0" value="taskDispatchers">
+                        <ul className="space-y-2" role="list">
+                            {taskDispatcherDefinitions.length ? (
+                                taskDispatcherDefinitions.map(
+                                    (taskDispatcherDefinition: TaskDispatcherDefinitionModel) => (
+                                        <WorkflowNodesTabsItem
+                                            draggable={itemsDraggable}
+                                            handleClick={() => onItemClick && onItemClick(taskDispatcherDefinition)}
+                                            key={taskDispatcherDefinition.name}
+                                            node={taskDispatcherDefinition}
+                                        />
                                     )
-                                ) : (
-                                    <span className="block px-3 py-2 text-xs text-gray-500">
-                                        No flow controls found.
-                                    </span>
-                                )}
-                            </ul>
-                        </TabsContent>
-                    )}
-                </div>
+                                )
+                            ) : (
+                                <span className="block px-3 py-2 text-xs text-gray-500">No flow controls found.</span>
+                            )}
+                        </ul>
+                    </TabsContent>
+                )}
             </div>
         </Tabs>
     </div>
