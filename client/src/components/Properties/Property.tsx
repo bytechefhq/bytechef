@@ -259,10 +259,18 @@ const Property = ({
                         actionName,
                         componentName,
                         name: workflowNodeName,
-                        parameters: {
-                            ...parameters,
-                            [name as string]: value,
-                        },
+                        parameters: objectName
+                            ? {
+                                  ...parameters,
+                                  [objectName]: {
+                                      ...parameters?.[objectName],
+                                      [name!]: value,
+                                  },
+                              }
+                            : {
+                                  ...parameters,
+                                  [name as string]: value,
+                              },
                     },
                     workflow,
                     updateWorkflowMutation
