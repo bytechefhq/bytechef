@@ -13,137 +13,100 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { CategoryModel } from './CategoryModel';
-import {
-    CategoryModelFromJSON,
-    CategoryModelFromJSONTyped,
-    CategoryModelToJSON,
-} from './CategoryModel';
-import type { TagModel } from './TagModel';
-import {
-    TagModelFromJSON,
-    TagModelFromJSONTyped,
-    TagModelToJSON,
-} from './TagModel';
-
 /**
- * A group of workflows that make one logical project.
+ * 
  * @export
- * @interface ProjectModel
+ * @interface ProjectInstanceAllOfProjectModel
  */
-export interface ProjectModel {
+export interface ProjectInstanceAllOfProjectModel {
     /**
      * The created by.
      * @type {string}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     readonly createdBy?: string;
     /**
      * The created date.
      * @type {Date}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     readonly createdDate?: Date;
     /**
      * The description of a project.
      * @type {string}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     description?: string;
     /**
      * The id of a project.
      * @type {number}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     readonly id?: number;
     /**
      * The last modified by.
      * @type {string}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
      * @type {Date}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a project.
      * @type {string}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     name: string;
     /**
      * The published date.
      * @type {Date}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     publishedDate?: Date;
     /**
      * The version of a project.
      * @type {number}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
     projectVersion?: number;
     /**
      * The status of a project.
      * @type {string}
-     * @memberof ProjectModel
+     * @memberof ProjectInstanceAllOfProjectModel
      */
-    status?: ProjectModelStatusEnum;
-    /**
-     * 
-     * @type {CategoryModel}
-     * @memberof ProjectModel
-     */
-    category?: CategoryModel;
-    /**
-     * 
-     * @type {Array<TagModel>}
-     * @memberof ProjectModel
-     */
-    tags?: Array<TagModel>;
-    /**
-     * The workflow ids belonging to this project.
-     * @type {Array<string>}
-     * @memberof ProjectModel
-     */
-    workflowIds?: Array<string>;
-    /**
-     * 
-     * @type {number}
-     * @memberof ProjectModel
-     */
-    version?: number;
+    status?: ProjectInstanceAllOfProjectModelStatusEnum;
 }
 
 
 /**
  * @export
  */
-export const ProjectModelStatusEnum = {
+export const ProjectInstanceAllOfProjectModelStatusEnum = {
     Published: 'PUBLISHED',
     Unpublished: 'UNPUBLISHED'
 } as const;
-export type ProjectModelStatusEnum = typeof ProjectModelStatusEnum[keyof typeof ProjectModelStatusEnum];
+export type ProjectInstanceAllOfProjectModelStatusEnum = typeof ProjectInstanceAllOfProjectModelStatusEnum[keyof typeof ProjectInstanceAllOfProjectModelStatusEnum];
 
 
 /**
- * Check if a given object implements the ProjectModel interface.
+ * Check if a given object implements the ProjectInstanceAllOfProjectModel interface.
  */
-export function instanceOfProjectModel(value: object): boolean {
+export function instanceOfProjectInstanceAllOfProjectModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
 
     return isInstance;
 }
 
-export function ProjectModelFromJSON(json: any): ProjectModel {
-    return ProjectModelFromJSONTyped(json, false);
+export function ProjectInstanceAllOfProjectModelFromJSON(json: any): ProjectInstanceAllOfProjectModel {
+    return ProjectInstanceAllOfProjectModelFromJSONTyped(json, false);
 }
 
-export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectModel {
+export function ProjectInstanceAllOfProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstanceAllOfProjectModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -159,14 +122,10 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
         'status': !exists(json, 'status') ? undefined : json['status'],
-        'category': !exists(json, 'category') ? undefined : CategoryModelFromJSON(json['category']),
-        'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
-        'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
-        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
-export function ProjectModelToJSON(value?: ProjectModel | null): any {
+export function ProjectInstanceAllOfProjectModelToJSON(value?: ProjectInstanceAllOfProjectModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -180,10 +139,6 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
         'projectVersion': value.projectVersion,
         'status': value.status,
-        'category': CategoryModelToJSON(value.category),
-        'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
-        'workflowIds': value.workflowIds,
-        '__version': value.version,
     };
 }
 

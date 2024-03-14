@@ -10,9 +10,9 @@ models/CategoryModel.ts
 models/CreateProjectInstanceWorkflowJob200ResponseModel.ts
 models/DataStreamComponentModel.ts
 models/ProjectBasicModel.ts
+models/ProjectInstanceAllOfProjectModel.ts
 models/ProjectInstanceBasicModel.ts
 models/ProjectInstanceModel.ts
-models/ProjectInstanceProjectModel.ts
 models/ProjectInstanceWorkflowConnectionModel.ts
 models/ProjectInstanceWorkflowModel.ts
 models/ProjectModel.ts

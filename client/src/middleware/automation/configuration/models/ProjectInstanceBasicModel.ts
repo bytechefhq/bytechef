@@ -45,10 +45,10 @@ export interface ProjectInstanceBasicModel {
     readonly id?: number;
     /**
      * The last execution date.
-     * @type {string}
+     * @type {Date}
      * @memberof ProjectInstanceBasicModel
      */
-    readonly lastExecutionDate?: string;
+    readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
      * @type {string}
@@ -74,7 +74,7 @@ export interface ProjectInstanceBasicModel {
      */
     projectId?: number;
     /**
-     * If a workflow is enabled or not in the project instance.
+     * If a project instance is enabled or not.
      * @type {boolean}
      * @memberof ProjectInstanceBasicModel
      */
@@ -105,7 +105,7 @@ export function ProjectInstanceBasicModelFromJSONTyped(json: any, ignoreDiscrimi
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : json['lastExecutionDate'],
+        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
