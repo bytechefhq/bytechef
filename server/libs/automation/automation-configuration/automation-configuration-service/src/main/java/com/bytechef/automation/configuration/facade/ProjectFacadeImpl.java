@@ -177,6 +177,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     throw new ApplicationException(
                         "Workflow id=%s is in use".formatted(workflowId), Project.class, 101);
                 }
+
+                projectInstanceWorkflows.stream()
+                    .filter(
+                        projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))
+                    .findFirst()
+                    .ifPresent(
+                        projectInstanceWorkflow -> projectInstanceWorkflowService.delete(
+                            projectInstanceWorkflow.getId()));
             }
         }
 
