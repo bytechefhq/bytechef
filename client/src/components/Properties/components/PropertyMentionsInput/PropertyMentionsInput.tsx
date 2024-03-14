@@ -195,8 +195,8 @@ const PropertyMentionsInput = forwardRef(
 
             strippedValue = strippedValue.substring(strippedValue.lastIndexOf('\n') + 1).trim();
 
-            if (strippedValue && !strippedValue.startsWith('{') && !strippedValue.endsWith('}')) {
-                strippedValue = `{${strippedValue}}`;
+            if (strippedValue && !strippedValue.startsWith('${') && !strippedValue.endsWith('}')) {
+                strippedValue = `\${${strippedValue}}`;
             }
 
             if (arrayName && parameters) {

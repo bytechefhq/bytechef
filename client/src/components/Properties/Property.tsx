@@ -427,8 +427,8 @@ const Property = ({
                 return;
             }
 
-            if (typeof taskParameterValue === 'string' && taskParameterValue.startsWith('{')) {
-                const componentName = taskParameterValue.split('_')[0].replace('{', '');
+            if (typeof taskParameterValue === 'string' && taskParameterValue.startsWith('${')) {
+                const componentName = taskParameterValue.split('_')[0].replace('${', '');
 
                 const componentIcon =
                     componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
@@ -437,7 +437,7 @@ const Property = ({
 
                 node.className = 'property-mention';
 
-                node.dataset.value = taskParameterValue.replace(/{|}/g, '');
+                node.dataset.value = taskParameterValue.replace(/\$\{|\}/g, '');
                 node.dataset.componentIcon = componentIcon;
 
                 setMentionInputValue(node.outerHTML);
