@@ -90,7 +90,7 @@ const Property = ({
 
     const {currentNode, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentData, setComponentData, workflow} = useWorkflowDataStore();
+    const {componentData, componentDefinitions, setComponentData, workflow} = useWorkflowDataStore();
 
     let {name} = property;
 
@@ -413,7 +413,29 @@ const Property = ({
     // set value to taskParameterValue only on initial render
     useEffect(() => {
         if (mentionInputValue === '' && taskParameterValue) {
-            setMentionInputValue(taskParameterValue);
+            const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
+
+            if (!mentionInputElement) {
+                return;
+            }
+
+            if (typeof taskParameterValue === 'string' && taskParameterValue.startsWith('{')) {
+                const componentName = taskParameterValue.split('_')[0].replace('{', '');
+
+                const componentIcon =
+                    componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
+
+                const node = document.createElement('div');
+
+                node.className = 'property-mention';
+
+                node.dataset.value = taskParameterValue.replace(/{|}/g, '');
+                node.dataset.componentIcon = componentIcon;
+
+                setMentionInputValue(node.outerHTML);
+            } else {
+                setMentionInputValue(taskParameterValue);
+            }
         }
 
         if (inputValue === '' && taskParameterValue) {
