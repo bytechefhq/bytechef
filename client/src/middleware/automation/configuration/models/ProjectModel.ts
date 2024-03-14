@@ -33,12 +33,6 @@ import {
  */
 export interface ProjectModel {
     /**
-     * 
-     * @type {CategoryModel}
-     * @memberof ProjectModel
-     */
-    category?: CategoryModel;
-    /**
      * The created by.
      * @type {string}
      * @memberof ProjectModel
@@ -100,6 +94,12 @@ export interface ProjectModel {
     status?: ProjectModelStatusEnum;
     /**
      * 
+     * @type {CategoryModel}
+     * @memberof ProjectModel
+     */
+    category?: CategoryModel;
+    /**
+     * 
      * @type {Array<TagModel>}
      * @memberof ProjectModel
      */
@@ -149,7 +149,6 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'category': !exists(json, 'category') ? undefined : CategoryModelFromJSON(json['category']),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'description': !exists(json, 'description') ? undefined : json['description'],
@@ -160,6 +159,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
         'status': !exists(json, 'status') ? undefined : json['status'],
+        'category': !exists(json, 'category') ? undefined : CategoryModelFromJSON(json['category']),
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
         'version': !exists(json, '__version') ? undefined : json['__version'],
@@ -175,12 +175,12 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
     }
     return {
         
-        'category': CategoryModelToJSON(value.category),
         'description': value.description,
         'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
         'projectVersion': value.projectVersion,
         'status': value.status,
+        'category': CategoryModelToJSON(value.category),
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         'workflowIds': value.workflowIds,
         '__version': value.version,

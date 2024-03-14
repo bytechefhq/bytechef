@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ProjectInstanceProjectModel } from './ProjectInstanceProjectModel';
+import type { ProjectInstanceAllOfProjectModel } from './ProjectInstanceAllOfProjectModel';
 import {
-    ProjectInstanceProjectModelFromJSON,
-    ProjectInstanceProjectModelFromJSONTyped,
-    ProjectInstanceProjectModelToJSON,
-} from './ProjectInstanceProjectModel';
+    ProjectInstanceAllOfProjectModelFromJSON,
+    ProjectInstanceAllOfProjectModelFromJSONTyped,
+    ProjectInstanceAllOfProjectModelToJSON,
+} from './ProjectInstanceAllOfProjectModel';
 import type { ProjectInstanceWorkflowModel } from './ProjectInstanceWorkflowModel';
 import {
     ProjectInstanceWorkflowModelFromJSON,
@@ -57,12 +57,6 @@ export interface ProjectInstanceModel {
      */
     readonly createdDate?: Date;
     /**
-     * If a workflow is enabled or not in the project instance.
-     * @type {boolean}
-     * @memberof ProjectInstanceModel
-     */
-    enabled?: boolean;
-    /**
      * The id of a project instance.
      * @type {number}
      * @memberof ProjectInstanceModel
@@ -93,17 +87,23 @@ export interface ProjectInstanceModel {
      */
     name: string;
     /**
-     * 
-     * @type {ProjectInstanceProjectModel}
-     * @memberof ProjectInstanceModel
-     */
-    project?: ProjectInstanceProjectModel;
-    /**
      * Th id of a project.
      * @type {number}
      * @memberof ProjectInstanceModel
      */
     projectId?: number;
+    /**
+     * If a project instance is enabled or not.
+     * @type {boolean}
+     * @memberof ProjectInstanceModel
+     */
+    enabled?: boolean;
+    /**
+     * 
+     * @type {ProjectInstanceAllOfProjectModel}
+     * @memberof ProjectInstanceModel
+     */
+    project?: ProjectInstanceAllOfProjectModel;
     /**
      * 
      * @type {Array<ProjectInstanceWorkflowModel>}
@@ -147,14 +147,14 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
         'description': !exists(json, 'description') ? undefined : json['description'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'project': !exists(json, 'project') ? undefined : ProjectInstanceProjectModelFromJSON(json['project']),
         'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
+        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
+        'project': !exists(json, 'project') ? undefined : ProjectInstanceAllOfProjectModelFromJSON(json['project']),
         'projectInstanceWorkflows': !exists(json, 'projectInstanceWorkflows') ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': !exists(json, '__version') ? undefined : json['__version'],
@@ -171,10 +171,10 @@ export function ProjectInstanceModelToJSON(value?: ProjectInstanceModel | null):
     return {
         
         'description': value.description,
-        'enabled': value.enabled,
         'name': value.name,
-        'project': ProjectInstanceProjectModelToJSON(value.project),
         'projectId': value.projectId,
+        'enabled': value.enabled,
+        'project': ProjectInstanceAllOfProjectModelToJSON(value.project),
         'projectInstanceWorkflows': value.projectInstanceWorkflows === undefined ? undefined : ((value.projectInstanceWorkflows as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         '__version': value.version,

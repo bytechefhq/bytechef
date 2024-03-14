@@ -45,7 +45,7 @@ export interface GetWorkflowExecutionsPageRequest {
 export class WorkflowExecutionApi extends runtime.BaseAPI {
 
     /**
-     * Get workflow execution by id.
+     * Get workflow executions by id.
      * Get workflow executions by id
      */
     async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
@@ -68,7 +68,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get workflow execution by id.
+     * Get workflow executions by id.
      * Get workflow executions by id
      */
     async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
