@@ -340,10 +340,18 @@ const Property = ({
                 actionName,
                 componentName,
                 name: workflowNodeName,
-                parameters: {
-                    ...parameters,
-                    [name as string]: isNumericalInput ? numericValue : inputValue,
-                },
+                parameters: objectName
+                    ? {
+                          ...parameters,
+                          [objectName]: {
+                              ...parameters?.[objectName],
+                              [name!]: isNumericalInput ? numericValue : inputValue,
+                          },
+                      }
+                    : {
+                          ...parameters,
+                          [name as string]: isNumericalInput ? numericValue : inputValue,
+                      },
             },
             workflow,
             updateWorkflowMutation
