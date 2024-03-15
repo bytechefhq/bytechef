@@ -36,7 +36,10 @@ const ArrayProperty = ({
     const {items, name} = property;
 
     const handleAddItemClick = () => {
+        const matchingItem = items?.find((item) => item.type === newItemType);
+
         const newItem: ArrayPropertyType = {
+            ...matchingItem,
             controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
             custom: true,
             name: `${name}_${arrayItems.length}`,
@@ -130,6 +133,28 @@ const ArrayProperty = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const availableItemTypes = items?.length
+        ? items?.reduce((types: Array<{label: string; value: string}>, item) => {
+              if (item.type) {
+                  types.push({
+                      label: item.type,
+                      value: item.type,
+                  });
+              }
+
+              return types;
+          }, [])
+        : Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
+              label: type,
+              value: type,
+          }));
+
+    useEffect(() => {
+        if (availableItemTypes.length === 1) {
+            setNewItemType(availableItemTypes[0].value as keyof typeof PROPERTY_CONTROL_TYPES);
+        }
+    }, [availableItemTypes]);
+
     return (
         <ul className="w-full">
             {arrayItems?.map((item) => (
@@ -154,47 +179,55 @@ const ArrayProperty = ({
                 </div>
             ))}
 
-            <Popover>
-                <PopoverTrigger asChild>
-                    <Button
-                        className="mt-2 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                        size="sm"
-                        variant="ghost"
-                    >
-                        <PlusIcon className="size-4" /> Add item
-                    </Button>
-                </PopoverTrigger>
+            {availableItemTypes.length > 1 ? (
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            className="mt-2 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                            size="sm"
+                            variant="ghost"
+                        >
+                            <PlusIcon className="size-4" /> Add item
+                        </Button>
+                    </PopoverTrigger>
 
-                <PopoverContent className="min-w-[400px]">
-                    <header className="flex items-center justify-between">
-                        <span className="font-medium">Add item</span>
+                    <PopoverContent className="min-w-[400px]">
+                        <header className="flex items-center justify-between">
+                            <span className="font-medium">Add item</span>
 
-                        <PopoverClose asChild>
-                            <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                        </PopoverClose>
-                    </header>
+                            <PopoverClose asChild>
+                                <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                            </PopoverClose>
+                        </header>
 
-                    <main className="my-2 space-y-2">
-                        <PropertySelect
-                            label="Type"
-                            onValueChange={(value: keyof typeof PROPERTY_CONTROL_TYPES) => setNewItemType(value)}
-                            options={Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
-                                label: type,
-                                value: type,
-                            }))}
-                            value={newItemType}
-                        />
-                    </main>
+                        <main className="my-2 space-y-2">
+                            <PropertySelect
+                                label="Type"
+                                onValueChange={(value: keyof typeof PROPERTY_CONTROL_TYPES) => setNewItemType(value)}
+                                options={availableItemTypes}
+                                value={newItemType}
+                            />
+                        </main>
 
-                    <footer className="flex items-center justify-end space-x-2">
-                        <PopoverClose asChild>
-                            <Button onClick={handleAddItemClick} size="sm">
-                                Add
-                            </Button>
-                        </PopoverClose>
-                    </footer>
-                </PopoverContent>
-            </Popover>
+                        <footer className="flex items-center justify-end space-x-2">
+                            <PopoverClose asChild>
+                                <Button onClick={handleAddItemClick} size="sm">
+                                    Add
+                                </Button>
+                            </PopoverClose>
+                        </footer>
+                    </PopoverContent>
+                </Popover>
+            ) : (
+                <Button
+                    className="mt-2 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                    onClick={handleAddItemClick}
+                    size="sm"
+                    variant="ghost"
+                >
+                    <PlusIcon className="size-4" /> Add item
+                </Button>
+            )}
         </ul>
     );
 };
