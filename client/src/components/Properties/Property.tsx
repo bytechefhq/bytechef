@@ -557,13 +557,15 @@ const Property = ({
 
                 {!showMentionInput && (
                     <>
-                        {(controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER') && label && (
+                        {(controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER') && (
                             <div className="flex items-center py-2">
-                                <span className="pr-2" title={type}>
-                                    {typeIcon}
-                                </span>
+                                {typeIcon && (
+                                    <span className="pr-2" title={type}>
+                                        {typeIcon}
+                                    </span>
+                                )}
 
-                                <Label>{label}</Label>
+                                {label && <Label>{label}</Label>}
 
                                 {description && (
                                     <Tooltip>
