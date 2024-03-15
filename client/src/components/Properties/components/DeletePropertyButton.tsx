@@ -14,7 +14,7 @@ const DeletePropertyButton = ({
     subPropertyName,
 }: DeletePropertyButtonProps) => (
     <Button
-        className="ml-1 self-end"
+        className="ml-1 self-center"
         onClick={() => handleDeletePropertyClick(subPropertyName!, propertyName!)}
         size="icon"
         variant="ghost"
