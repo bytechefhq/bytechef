@@ -31,13 +31,18 @@ import com.bytechef.platform.component.registry.service.TriggerDefinitionService
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -75,16 +80,19 @@ public class WebhookController {
     private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
 
     private final FileStorageService fileStorageService;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        FileStorageService fileStorageService, TriggerDefinitionService triggerDefinitionService,
-        WebhookExecutor webhookExecutor, WorkflowService workflowService) {
+        FileStorageService fileStorageService, InstanceAccessorRegistry instanceAccessorRegistry,
+        TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
+        WorkflowService workflowService) {
 
         this.fileStorageService = fileStorageService;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
         this.workflowService = workflowService;
@@ -98,19 +106,28 @@ public class WebhookController {
     public ResponseEntity<?> webhooks(@PathVariable String id, HttpServletRequest httpServletRequest)
         throws Exception {
 
-        if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name())) {
-            return ResponseEntity
-                .ok()
+        ResponseEntity<?> responseEntity;
+
+        if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) || !isWorkflowEnabled(id)) {
+            responseEntity = ResponseEntity.ok()
                 .build();
+        } else {
+            responseEntity = doProcessTrigger(id, httpServletRequest);
         }
 
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+        return responseEntity;
+    }
+
+    private ResponseEntity<?> doProcessTrigger(String id, HttpServletRequest httpServletRequest)
+        throws IOException, ServletException {
 
         WebhookBodyImpl body = null;
         String contentType = httpServletRequest.getContentType();
         Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
         Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
         ResponseEntity<?> responseEntity;
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
 
@@ -204,14 +221,17 @@ public class WebhookController {
             responseEntity = ResponseEntity.ok(webhookExecutor.executeSync(workflowExecutionId, webhookRequest));
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
             if (webhookExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest)) {
-                responseEntity = getResponseEntity(ResponseEntity.ok());
+                responseEntity = ResponseEntity.ok()
+                    .build();
             } else {
-                responseEntity = getResponseEntity(ResponseEntity.badRequest());
+                responseEntity = ResponseEntity.badRequest()
+                    .build();
             }
         } else {
             webhookExecutor.execute(workflowExecutionId, webhookRequest);
 
-            responseEntity = getResponseEntity(ResponseEntity.ok());
+            responseEntity = ResponseEntity.ok()
+                .build();
         }
 
         return responseEntity;
@@ -317,10 +337,6 @@ public class WebhookController {
         return headerMap;
     }
 
-    private static <T> ResponseEntity<T> getResponseEntity(ResponseEntity.BodyBuilder bodyBuilder) {
-        return bodyBuilder.build();
-    }
-
     private static UriComponents getUriComponents(HttpServletRequest httpServletRequest) {
         ServletServerHttpRequest servletServerHttpRequest = new ServletServerHttpRequest(httpServletRequest);
 
@@ -328,6 +344,16 @@ public class WebhookController {
             servletServerHttpRequest.getURI(), servletServerHttpRequest.getHeaders());
 
         return uriComponentsBuilder.build();
+    }
+
+    private boolean isWorkflowEnabled(String id) {
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
+            Type.valueOf(workflowExecutionId.getType()));
+
+        return instanceAccessor.isWorkflowEnabled(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
     }
 
     private static List<String> toList(Enumeration<String> enumeration) {

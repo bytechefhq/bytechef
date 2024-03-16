@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
 
