@@ -35,6 +35,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,6 +115,14 @@ public class MailchimpSubscribeTrigger {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
+
+        if (response.containsKey("errors")) {
+            List<?> errors = (List<?>) response.get("errors");
+
+            Map<?, ?> firstError = (Map<?, ?>) errors.getFirst();
+
+            throw new IllegalStateException((String) firstError.get("message"));
+        }
 
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
