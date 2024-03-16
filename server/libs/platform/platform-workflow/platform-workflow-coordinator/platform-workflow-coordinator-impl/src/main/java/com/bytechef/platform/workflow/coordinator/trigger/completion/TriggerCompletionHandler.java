@@ -92,7 +92,13 @@ public class TriggerCompletionHandler {
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
 
-        if (triggerExecution.getOutput() != null) {
+        if (triggerExecution.getOutput() == null) {
+            triggerExecution.addJobId(
+                createJob(
+                    workflowExecutionId,
+                    MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
+                    workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
+        } else {
             Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
             if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
