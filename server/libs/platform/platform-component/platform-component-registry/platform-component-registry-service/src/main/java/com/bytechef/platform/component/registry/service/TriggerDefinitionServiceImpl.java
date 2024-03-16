@@ -111,10 +111,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = getDynamicWebhookDisableConsumer(
             componentName, componentVersion, triggerName);
 
-        dynamicWebhookDisableConsumer.accept(
-            new ParametersImpl(inputParameters),
-            connection == null ? null : new ParametersImpl(connection.parameters()),
-            new ParametersImpl(outputParameters), workflowExecutionId, context);
+        try {
+            dynamicWebhookDisableConsumer.accept(
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
+                new ParametersImpl(outputParameters), workflowExecutionId, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 110);
+        }
     }
 
     @Override
@@ -126,10 +130,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         DynamicWebhookEnableFunction dynamicWebhookEnableFunction = getDynamicWebhookEnableFunction(
             componentName, componentVersion, triggerName);
 
-        return dynamicWebhookEnableFunction.apply(
-            new ParametersImpl(inputParameters),
-            connection == null ? null : new ParametersImpl(connection.parameters()),
-            webhookUrl, workflowExecutionId, context);
+        try {
+            return dynamicWebhookEnableFunction.apply(
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
+                webhookUrl, workflowExecutionId, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 109);
+        }
     }
 
     @Override
