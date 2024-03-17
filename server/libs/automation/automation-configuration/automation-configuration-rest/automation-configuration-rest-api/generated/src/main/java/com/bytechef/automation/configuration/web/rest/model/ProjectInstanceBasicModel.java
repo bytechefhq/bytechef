@@ -2,9 +2,11 @@ package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -23,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-14T08:44:07.445792+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-18T05:20:32.345117+01:00[Europe/Zagreb]")
 public class ProjectInstanceBasicModel {
 
   private String description;
@@ -32,6 +34,8 @@ public class ProjectInstanceBasicModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  private EnvironmentModel environment;
 
   private Long id;
 
@@ -118,6 +122,26 @@ public class ProjectInstanceBasicModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public ProjectInstanceBasicModel environment(EnvironmentModel environment) {
+    this.environment = environment;
+    return this;
+  }
+
+  /**
+   * Get environment
+   * @return environment
+  */
+  @Valid 
+  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environment")
+  public EnvironmentModel getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(EnvironmentModel environment) {
+    this.environment = environment;
   }
 
   public ProjectInstanceBasicModel id(Long id) {
@@ -272,6 +296,7 @@ public class ProjectInstanceBasicModel {
     return Objects.equals(this.description, projectInstanceBasic.description) &&
         Objects.equals(this.createdBy, projectInstanceBasic.createdBy) &&
         Objects.equals(this.createdDate, projectInstanceBasic.createdDate) &&
+        Objects.equals(this.environment, projectInstanceBasic.environment) &&
         Objects.equals(this.id, projectInstanceBasic.id) &&
         Objects.equals(this.lastExecutionDate, projectInstanceBasic.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, projectInstanceBasic.lastModifiedBy) &&
@@ -283,7 +308,7 @@ public class ProjectInstanceBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, enabled);
+    return Objects.hash(description, createdBy, createdDate, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, enabled);
   }
 
   @Override
@@ -293,6 +318,7 @@ public class ProjectInstanceBasicModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
