@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.cli.command.component.subcommand;
+package com.bytechef.cli.command.component.init;
 
 import com.bytechef.cli.command.component.ComponentCommand;
+import com.bytechef.cli.command.component.init.openapi.ComponentInitOpenApiGenerator;
 import java.io.File;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
@@ -25,7 +26,7 @@ import picocli.CommandLine;
  * @author Ivica Cardic
  */
 @CommandLine.Command(name = "init", description = "Generates project for a new component.")
-public class InitSubcommand implements Callable<Integer> {
+public class ComponentInitCommand implements Callable<Integer> {
 
     @CommandLine.Spec
     private transient CommandLine.Model.CommandSpec commandSpec;
@@ -95,7 +96,7 @@ public class InitSubcommand implements Callable<Integer> {
                 commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
         }
 
-        new OpenApiComponentGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
+        new ComponentInitOpenApiGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
             openApiPath, outputPath)
                 .generate();
     }

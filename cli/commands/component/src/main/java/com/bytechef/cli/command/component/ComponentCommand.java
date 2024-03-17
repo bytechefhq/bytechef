@@ -18,7 +18,7 @@ package com.bytechef.cli.command.component;
 
 import static picocli.CommandLine.Command;
 
-import com.bytechef.cli.command.component.subcommand.InitSubcommand;
+import com.bytechef.cli.command.component.init.ComponentInitCommand;
 import picocli.CommandLine;
 
 /**
@@ -28,7 +28,7 @@ import picocli.CommandLine;
     name = "component",
     description = "Manage, create, and publish a component",
     subcommands = {
-        CommandLine.HelpCommand.class, InitSubcommand.class
+        CommandLine.HelpCommand.class, ComponentInitCommand.class
     })
 public class ComponentCommand {
 }

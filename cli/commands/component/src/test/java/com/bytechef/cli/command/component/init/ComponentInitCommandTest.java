@@ -14,45 +14,36 @@
  * limitations under the License.
  */
 
-package com.bytechef.cli.command.component.subcommand;
+package com.bytechef.cli.command.component.init;
 
 import com.bytechef.cli.CliApplication;
 import java.io.File;
+import java.net.URL;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class InitSubcommandTest {
+public class ComponentInitCommandTest {
 
     @Test
     public void testComponentInit() {
-        CliApplication.main(new String[] {
-            "component",
-            "init",
-            "--open-api-path",
-            InitSubcommandTest.class.getResource("/dependencies/petstore.yaml")
-                .getFile(),
-            "--output-path",
-            new File("build/test/generated").getAbsolutePath(),
-            "petstore"
-        });
+        URL url = ComponentInitCommandTest.class.getResource("/dependencies/petstore.yaml");
+
+        CliApplication.main(
+            "component", "init", "--open-api-path", url.getFile(), "--output-path",
+            new File("build/test/generated").getAbsolutePath(), "petstore");
 
         // TODO Add asserts
     }
 
     @Test
     public void testComponentInit2() {
-        CliApplication.main(new String[] {
-            "component",
-            "init",
-            "--open-api-path",
-            InitSubcommandTest.class.getResource("/dependencies/petstore2.yaml")
-                .getFile(),
-            "--output-path",
-            new File("build/test/generated").getAbsolutePath(),
-            "petstore"
-        });
+        URL url = ComponentInitCommandTest.class.getResource("/dependencies/petstore2.yaml");
+
+        CliApplication.main(
+            "component", "init", "--open-api-path", url.getFile(), "--output-path",
+            new File("build/test/generated").getAbsolutePath(), "petstore");
 
         // TODO Add asserts
     }
