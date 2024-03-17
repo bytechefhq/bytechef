@@ -9,6 +9,7 @@ src/main/java/com/bytechef/automation/configuration/web/rest/ProjectTagApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectBasicModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceAllOfProjectModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceBasicModel.java
