@@ -3,6 +3,7 @@
 export * from './CategoryModel';
 export * from './CreateProjectInstanceWorkflowJob200ResponseModel';
 export * from './DataStreamComponentModel';
+export * from './EnvironmentModel';
 export * from './ProjectBasicModel';
 export * from './ProjectInstanceAllOfProjectModel';
 export * from './ProjectInstanceBasicModel';
