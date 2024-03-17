@@ -233,6 +233,8 @@ include("server:sdks:java:definition-api")
 
 // EE
 
+include("cli:ee:commands:component:init:openapi")
+
 include("server:ee:apps:api-gateway-app")
 include("server:ee:apps:config-server-app")
 include("server:ee:apps:configuration-app")
