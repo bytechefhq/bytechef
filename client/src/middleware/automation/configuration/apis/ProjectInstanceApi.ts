@@ -16,12 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   CreateProjectInstanceWorkflowJob200ResponseModel,
+  EnvironmentModel,
   ProjectInstanceModel,
   ProjectInstanceWorkflowModel,
 } from '../models/index';
 import {
     CreateProjectInstanceWorkflowJob200ResponseModelFromJSON,
     CreateProjectInstanceWorkflowJob200ResponseModelToJSON,
+    EnvironmentModelFromJSON,
+    EnvironmentModelToJSON,
     ProjectInstanceModelFromJSON,
     ProjectInstanceModelToJSON,
     ProjectInstanceWorkflowModelFromJSON,
@@ -57,6 +60,7 @@ export interface GetProjectInstanceRequest {
 }
 
 export interface GetProjectInstancesRequest {
+    environment?: EnvironmentModel;
     projectId?: number;
     tagId?: number;
 }
@@ -291,6 +295,10 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      */
     async getProjectInstancesRaw(requestParameters: GetProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
         const queryParameters: any = {};
+
+        if (requestParameters.environment !== undefined) {
+            queryParameters['environment'] = requestParameters.environment;
+        }
 
         if (requestParameters.projectId !== undefined) {
             queryParameters['projectId'] = requestParameters.projectId;

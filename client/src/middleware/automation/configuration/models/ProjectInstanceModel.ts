@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { EnvironmentModel } from './EnvironmentModel';
+import {
+    EnvironmentModelFromJSON,
+    EnvironmentModelFromJSONTyped,
+    EnvironmentModelToJSON,
+} from './EnvironmentModel';
 import type { ProjectInstanceAllOfProjectModel } from './ProjectInstanceAllOfProjectModel';
 import {
     ProjectInstanceAllOfProjectModelFromJSON,
@@ -56,6 +62,12 @@ export interface ProjectInstanceModel {
      * @memberof ProjectInstanceModel
      */
     readonly createdDate?: Date;
+    /**
+     * 
+     * @type {EnvironmentModel}
+     * @memberof ProjectInstanceModel
+     */
+    environment?: EnvironmentModel;
     /**
      * The id of a project instance.
      * @type {number}
@@ -147,6 +159,7 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
         'description': !exists(json, 'description') ? undefined : json['description'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
+        'environment': !exists(json, 'environment') ? undefined : EnvironmentModelFromJSON(json['environment']),
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
@@ -171,6 +184,7 @@ export function ProjectInstanceModelToJSON(value?: ProjectInstanceModel | null):
     return {
         
         'description': value.description,
+        'environment': EnvironmentModelToJSON(value.environment),
         'name': value.name,
         'projectId': value.projectId,
         'enabled': value.enabled,
