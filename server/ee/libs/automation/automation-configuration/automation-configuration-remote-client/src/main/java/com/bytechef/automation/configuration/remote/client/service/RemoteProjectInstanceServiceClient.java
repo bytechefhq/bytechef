@@ -10,6 +10,7 @@ package com.bytechef.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -73,7 +74,7 @@ public class RemoteProjectInstanceServiceClient implements ProjectInstanceServic
     }
 
     @Override
-    public List<ProjectInstance> getProjectInstances(Long projectId, Long tagId) {
+    public List<ProjectInstance> getProjectInstances(Environment environment, Long projectId, Long tagId) {
         throw new UnsupportedOperationException();
     }
 

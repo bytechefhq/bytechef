@@ -17,6 +17,8 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectInstance;
+import com.bytechef.platform.constant.Environment;
+
 import java.util.List;
 
 /**
@@ -38,7 +40,7 @@ public interface ProjectInstanceService {
 
     List<ProjectInstance> getProjectInstances(long projectId);
 
-    List<ProjectInstance> getProjectInstances(Long projectId, Long tagId);
+    List<ProjectInstance> getProjectInstances(Environment environment, Long projectId, Long tagId);
 
     ProjectInstance update(long id, List<Long> tagIds);
 

@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.tag.domain.Tag;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public interface ProjectInstanceFacade {
 
     List<Tag> getProjectInstanceTags();
 
-    List<ProjectInstanceDTO> getProjectInstances(Long projectId, Long tagId);
+    List<ProjectInstanceDTO> getProjectInstances(Environment environment, Long projectId, Long tagId);
 
     ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 

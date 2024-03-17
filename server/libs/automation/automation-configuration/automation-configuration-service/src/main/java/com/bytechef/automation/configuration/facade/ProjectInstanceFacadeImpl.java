@@ -38,6 +38,7 @@ import com.bytechef.platform.component.registry.service.TriggerDefinitionService
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -263,8 +264,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectInstanceDTO> getProjectInstances(Long projectId, Long tagId) {
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(projectId, tagId);
+    public List<ProjectInstanceDTO> getProjectInstances(Environment environment, Long projectId, Long tagId) {
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(
+            environment, projectId, tagId);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(CollectionUtils.map(projectInstances, ProjectInstance::getId));

@@ -20,9 +20,11 @@ import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
+import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -98,9 +100,13 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    public ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(Long projectId, Long tagId) {
+    public ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
+        EnvironmentModel environment, Long projectId, Long tagId) {
+
         return ResponseEntity.ok(
-            projectInstanceFacade.getProjectInstances(projectId, tagId)
+            projectInstanceFacade
+                .getProjectInstances(
+                    environment == null ? null : Environment.valueOf(environment.getValue()), projectId, tagId)
                 .stream()
                 .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
                 .toList());

@@ -46,7 +46,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Project implements Persistable<Long> {
 
     public enum Status {
-        PUBLISHED(1), UNPUBLISHED(0);
+        UNPUBLISHED(0), PUBLISHED(1);
 
         private final int id;
 

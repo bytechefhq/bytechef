@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.dto;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -29,9 +30,10 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectInstanceDTO(
-    String createdBy, LocalDateTime createdDate, String description, boolean enabled, Long id, String name,
-    LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate, Project project,
-    Long projectId, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, List<Tag> tags, int version) {
+    String createdBy, LocalDateTime createdDate, String description, boolean enabled, Environment environment, Long id,
+    String name, LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate,
+    Project project, Long projectId, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, List<Tag> tags,
+    int version) {
 
     public ProjectInstanceDTO(
         ProjectInstance projectInstance, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, Project project,
@@ -39,10 +41,10 @@ public record ProjectInstanceDTO(
 
         this(
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
-            projectInstance.isEnabled(), projectInstance.getId(), projectInstance.getName(), lastExecutionDate,
-            projectInstance.getLastModifiedBy(), projectInstance.getLastModifiedDate(), project,
-            projectInstance.getProjectId(), CollectionUtils.sort(projectInstanceWorkflows), tags,
-            projectInstance.getVersion());
+            projectInstance.isEnabled(), projectInstance.getEnvironment(), projectInstance.getId(),
+            projectInstance.getName(), lastExecutionDate, projectInstance.getLastModifiedBy(),
+            projectInstance.getLastModifiedDate(), project, projectInstance.getProjectId(),
+            CollectionUtils.sort(projectInstanceWorkflows), tags, projectInstance.getVersion());
     }
 
     public static Builder builder() {
@@ -54,6 +56,7 @@ public record ProjectInstanceDTO(
 
         projectInstance.setDescription(description);
         projectInstance.setEnabled(enabled);
+        projectInstance.setEnvironment(environment);
         projectInstance.setId(id);
         projectInstance.setName(name);
         projectInstance.setProjectId(projectId);
@@ -68,6 +71,7 @@ public record ProjectInstanceDTO(
         private LocalDateTime createdDate;
         private String description;
         private boolean enabled;
+        private Environment environment;
         private Long id;
         private String name;
         private LocalDateTime lastExecutionDate;
@@ -102,6 +106,12 @@ public record ProjectInstanceDTO(
 
         public Builder enabled(boolean enabled) {
             this.enabled = enabled;
+
+            return this;
+        }
+
+        public Builder environment(Environment environment) {
+            this.environment = environment;
 
             return this;
         }
@@ -168,7 +178,7 @@ public record ProjectInstanceDTO(
 
         public ProjectInstanceDTO build() {
             return new ProjectInstanceDTO(
-                createdBy, createdDate, description, enabled, id, name, lastExecutionDate, lastModifiedBy,
+                createdBy, createdDate, description, enabled, environment, id, name, lastExecutionDate, lastModifiedBy,
                 lastModifiedDate, project, projectId, projectInstanceWorkflows, tags, version);
         }
     }

@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -55,6 +56,9 @@ public class ProjectInstance implements Persistable<Long> {
 
     @Column
     private boolean enabled;
+
+    @Column
+    private int environment;
 
     @Id
     private Long id;
@@ -118,6 +122,10 @@ public class ProjectInstance implements Persistable<Long> {
         return enabled;
     }
 
+    public Environment getEnvironment() {
+        return Environment.valueOf(environment);
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -163,6 +171,10 @@ public class ProjectInstance implements Persistable<Long> {
         this.enabled = enabled;
     }
 
+    public void setEnvironment(Environment environment) {
+        this.environment = environment.getId();
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -201,6 +213,7 @@ public class ProjectInstance implements Persistable<Long> {
             "id=" + id +
             ", name='" + name + '\'' +
             ", enabled='" + enabled +
+            ", environment='" + environment + '\'' +
             ", projectId=" + projectId +
             ", description='" + description + '\'' +
             ", projectInstanceTags=" + projectInstanceTags +

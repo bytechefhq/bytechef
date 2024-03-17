@@ -21,7 +21,6 @@ import java.util.List;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -29,28 +28,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProjectInstanceRepository
-    extends ListPagingAndSortingRepository<ProjectInstance, Long>, CrudRepository<ProjectInstance, Long> {
+    extends ListPagingAndSortingRepository<ProjectInstance, Long>, CrudRepository<ProjectInstance, Long>,
+    CustomProjectInstanceRepository {
 
     @Query("SELECT project_instance.project_id FROM project_instance")
     List<Long> findAllProjectId();
-
-    List<ProjectInstance> findAllByProjectIdOrderByNameAscEnabledDesc(long projectId);
-
-    @Query("""
-            SELECT project_instance.* FROM project_instance
-            JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
-            WHERE project_instance.project_id = :projectId
-            AND project_instance_tag.tag_id = :tagId
-            ORDER BY project_instance.name ASC, project_instance.enabled DESC
-        """)
-    List<ProjectInstance> findAllByProjectIdAndTagIdOrderByNameAscEnabledDesc(
-        @Param("projectId") long projectId, @Param("tagId") long tagId);
-
-    @Query("""
-            SELECT project_instance.* FROM project_instance
-            JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
-            WHERE project_instance_tag.tag_id = :tagId
-            ORDER BY project_instance.name ASC, project_instance.enabled DESC
-        """)
-    List<ProjectInstance> findAllByTagIdOrderByNameAscEnabledDesc(@Param("tagId") long tagId);
 }
