@@ -27,6 +27,12 @@ paths:
       - "project-instance"
       operationId: "getProjectInstances"
       parameters:
+      - name: "environment"
+        description: "The project ids used for filtering project instances."
+        in: "query"
+        required: false
+        schema:
+          $ref: '#/components/schemas/Environment'
       - name: "projectId"
         description: "The project ids used for filtering project instances."
         in: "query"
@@ -729,6 +735,13 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    Environment:
+      description: "The environment of a project."
+      type: "string"
+      enum:
+        - "DEVELOPMENT"
+        - "STAGING"
+        - "PRODUCTION"
     Project:
       description: "A group of workflows that make one logical project."
       type: "object"
@@ -840,6 +853,8 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        environment:
+          $ref: '#/components/schemas/Environment'
         id:
           description: "The id of a project instance."
           type: "integer"

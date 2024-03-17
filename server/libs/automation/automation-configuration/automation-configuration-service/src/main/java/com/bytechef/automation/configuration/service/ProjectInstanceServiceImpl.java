@@ -20,9 +20,9 @@ import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.repository.ProjectInstanceRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
+
+import com.bytechef.platform.constant.Environment;
 import org.apache.commons.lang3.Validate;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,34 +79,19 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances() {
-        return getProjectInstances(null, null);
+        return getProjectInstances(null, null, null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances(long projectId) {
-        return getProjectInstances(projectId, null);
+        return getProjectInstances(null, projectId, null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectInstance> getProjectInstances(Long projectId, Long tagId) {
-        Iterable<ProjectInstance> projectInstanceIterable;
-
-        if (projectId == null && tagId == null) {
-            projectInstanceIterable = projectInstanceRepository.findAll(
-                Sort.by(Order.asc("name"), Order.desc("enabled")));
-        } else if (projectId != null && tagId == null) {
-            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdOrderByNameAscEnabledDesc(
-                projectId);
-        } else if (projectId == null) {
-            projectInstanceIterable = projectInstanceRepository.findAllByTagIdOrderByNameAscEnabledDesc(tagId);
-        } else {
-            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdAndTagIdOrderByNameAscEnabledDesc(
-                projectId, tagId);
-        }
-
-        return com.bytechef.commons.util.CollectionUtils.toList(projectInstanceIterable);
+    public List<ProjectInstance> getProjectInstances(Environment environment, Long projectId, Long tagId) {
+        return projectInstanceRepository.findAllProjectInstances(environment, projectId, tagId);
     }
 
     @Override

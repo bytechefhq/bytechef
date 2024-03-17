@@ -84,66 +84,79 @@ public record ProjectDTO(
 
         public Builder category(Category category) {
             this.category = category;
+
             return this;
         }
 
         public Builder createdBy(String createdBy) {
             this.createdBy = createdBy;
+
             return this;
         }
 
         public Builder createdDate(LocalDateTime createdDate) {
             this.createdDate = createdDate;
+
             return this;
         }
 
         public Builder description(String description) {
             this.description = description;
+
             return this;
         }
 
         public Builder id(Long id) {
             this.id = id;
+
             return this;
         }
 
         public Builder name(String name) {
             this.name = name;
+
             return this;
         }
 
         public Builder lastModifiedBy(String lastModifiedBy) {
             this.lastModifiedBy = lastModifiedBy;
+
             return this;
         }
 
         public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
+
             return this;
         }
 
         public Builder projectVersion(int projectVersion) {
             this.projectVersion = projectVersion;
+
             return this;
         }
 
         public Builder publishedDate(LocalDateTime publishedDate) {
             this.publishedDate = publishedDate;
+
             return this;
         }
 
         public Builder status(Project.Status status) {
             this.status = status;
+
             return this;
         }
 
         public Builder tags(List<Tag> tags) {
             this.tags = tags;
+
             return this;
         }
 
         public Builder version(int version) {
             this.version = version;
+
             return this;
         }
 
