@@ -57,6 +57,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:http-client"))
     implementation(project(":server:libs:modules:components:hubspot"))
     implementation(project(":server:libs:modules:components:infobip"))
+    implementation(project(":server:libs:modules:components:insightly"))
     implementation(project(":server:libs:modules:components:jira"))
     implementation(project(":server:libs:modules:components:json-file"))
     implementation(project(":server:libs:modules:components:keap"))
