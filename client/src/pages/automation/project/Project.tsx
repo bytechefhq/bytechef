@@ -77,7 +77,7 @@ import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
 import PageLoader from '../../../components/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
-import ProjectWorkflow from './components/ProjectWorkflow';
+import ProjectWorkflowEditor from './components/ProjectWorkflowEditor';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 
 const workflowTestApi = new WorkflowTestApi();
@@ -631,7 +631,7 @@ const Project = () => {
                     {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
                         <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel className="relative" defaultSize={65}>
-                                <ProjectWorkflow
+                                <ProjectWorkflowEditor
                                     componentDefinitions={componentDefinitions}
                                     projectId={+projectId!}
                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
