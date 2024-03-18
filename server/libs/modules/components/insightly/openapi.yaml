@@ -1,0 +1,175 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Insightly API"
+  description: "Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform."
+  version: "v1"
+servers:
+  - url: "https://api.{pod}.insightly.com/v3.1"
+paths:
+  /Contacts:
+    post:
+      tags:
+        - "Contacts"
+      summary: "Create contact"
+      description: "Creates new Contact"
+      operationId: "createContact"
+      requestBody:
+        description: "data of new Contact"
+        required: true
+        content:
+          application/json:
+            schema:
+              title: "Contact"
+              type: "object"
+              required:
+                - "FIRST_NAME"
+              properties:
+                FIRST_NAME:
+                  title: "First name"
+                  description: "The first name of the contact"
+                  type: "string"
+                  maxLength: "255"
+                LAST_NAME:
+                  title: "Last name"
+                  description: "The last name of the contact"
+                  type: "string"
+                  maxLength: "255"
+                EMAIL_ADDRESS:
+                  title: "Email address"
+                  description: "Email address of the contact"
+                  type: "string"
+                  maxLength: "255"
+                PHONE:
+                  title: "Phone"
+                  description: "Phone number of the contact"
+                  type: "string"
+                  maxLength: "255"
+                TITLE:
+                  title: "Title"
+                  description: "The contact's title in company."
+                  type: "string"
+                  maxLength: "255"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Contact"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                title: "Contact"
+                properties:
+                  CONTACT_ID:
+                    type: "integer"
+                  FIRST_NAME:
+                    type: "string"
+                  LAST_NAME:
+                    type: "string"
+                  EMAIL_ADDRESS:
+                    type: "string"
+                  PHONE:
+                    type: "string"
+                  TITLE:
+                    type: "string"
+  /Organisations:
+    post:
+      tags:
+        - "Organisations"
+      summary: "Create organization"
+      description: "Creates new Organization"
+      operationId: "createOrganization"
+      requestBody:
+        description: "data of new Organization"
+        required: true
+        content:
+          application/json:
+            schema:
+              title: "Organization"
+              type: "object"
+              required:
+                - "ORGANISATION_NAME"
+              properties:
+                ORGANISATION_NAME:
+                  title: "Organization name"
+                  description: "The name of the organization"
+                  type: "string"
+                  maxLength: "255"
+                PHONE:
+                  title: "Phone"
+                  description: "A contact phone number for the organization."
+                  type: "string"
+                  maxLength: "string"
+                WEBSITE:
+                  title: "Website"
+                  description: "The organization's website."
+                  type: "string"
+                  maxLength: "255"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Organization"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                title: "Organization"
+                properties:
+                  ORGANISATION_ID:
+                    type: "integer"
+                  ORGANISATION_NAME:
+                    type: "string"
+                  PHONE:
+                    type: "string"
+                  WEBSITE:
+                    type: "string"
+  /Tasks:
+    post:
+      tags:
+        - "Tasks"
+      summary: "Create task"
+      description: "Creates new Task"
+      operationId: "createTask"
+      requestBody:
+        description: "data of new Task"
+        required: true
+        content:
+          application/json:
+            schema:
+              title: "Task"
+              type: "object"
+              required:
+                - "TITLE"
+              properties:
+                TITLE:
+                  title: "Title"
+                  type: "string"
+                  maxLength: "500"
+                STATUS:
+                  title: "Status"
+                  description: "Task status"
+                  type: "string"
+                  enum:
+                    - "Not Started"
+                    - "In Progress"
+                    - "Completed"
+                    - "Deferred"
+                    - "Waiting"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Task"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                title: "Task"
+                properties:
+                  TASK_ID:
+                    type: "integer"
+                  TITLE:
+                    type: "string"
+                  STATUS:
+                    type: "string"
+components:
+  securitySchemes:
+    basicAuth:
+      type: "http"
+      scheme: "basic"
