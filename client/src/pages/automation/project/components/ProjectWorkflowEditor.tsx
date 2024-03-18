@@ -14,7 +14,7 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 import DataPillPanel from './DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './WorkflowEditor';
 
-const ProjectWorkflow = ({
+const ProjectWorkflowEditor = ({
     componentDefinitions,
     projectId,
     taskDispatcherDefinitions,
@@ -94,4 +94,4 @@ const ProjectWorkflow = ({
     );
 };
 
-export default ProjectWorkflow;
+export default ProjectWorkflowEditor;
