@@ -69,6 +69,9 @@ public class AcceloUtils {
     public static List<Option<String>> getCompanyIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
+        // Note for reviewer:
+        // Value type in Map<String,?> body can be ArrayList<String,String> or Map<String,String>
+
         Map<String, ?> body = context
             .http(http -> http.get(createUrl(connectionParameters, "companies")))
             .configuration(Http.responseType(Http.ResponseType.JSON))
