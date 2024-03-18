@@ -21,27 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.sendgrid.action.AbstractSendgridActionTest;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.objects.Attachments;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedConstruction;
 
 /**
  * @author Marko Krišković
@@ -75,7 +66,6 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
     public void testGetTemplates() throws IOException {
         Parameters connectionParameters = mock(Parameters.class);
         when(connectionParameters.getRequiredString(anyString())).thenReturn("token");
-        //String s = "{\"templates\":[{\"id\":\"1\",\"name\":\"template1\",\"other\":\"other1\"},{\"id\":\"2\",\"name\":\"template2\",\"other\":\"other2\"}]}";
         Map<String, List<Map<String, String>>> map = Map.of("templates",
             List.of(
                 Map.of("id", "1", "name", "template1", "other", "other1"),
