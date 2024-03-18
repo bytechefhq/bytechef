@@ -58,8 +58,12 @@ public class AcceloUtils {
 
             List<Option<String>> options = new ArrayList<>();
 
-            for (Map<String, String> map : (List<Map<String, String>>) body.get("response")) {
-                options.add(option(map.get("title"), map.get("id")));
+            if (body.get("response") instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get("title"), (String) map.get("id")));
+                    }
+                }
             }
 
             return options;
@@ -77,8 +81,12 @@ public class AcceloUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<String, String> map : (List<Map<String, String>>) body.get("response")) {
-            options.add(option(map.get("name"), map.get("id")));
+        if (body.get("response") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                }
+            }
         }
 
         return options;
