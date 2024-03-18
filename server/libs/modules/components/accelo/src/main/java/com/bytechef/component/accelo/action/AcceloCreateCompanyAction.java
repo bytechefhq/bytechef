@@ -23,16 +23,8 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.PHONE;
 import static com.bytechef.component.accelo.constant.AcceloConstants.WEBSITE;
 import static com.bytechef.component.accelo.util.AcceloUtils.createUrl;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -67,8 +59,16 @@ public class AcceloCreateCompanyAction {
                 .required(false))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    object("response")
+                        .properties(
+                            string("id"),
+                            string(NAME)),
+                    object("meta")
+                        .properties(
+                            string("more_info"),
+                            string("status"),
+                            string("message"))))
         .perform(AcceloCreateCompanyAction::perform);
 
     private AcceloCreateCompanyAction() {
