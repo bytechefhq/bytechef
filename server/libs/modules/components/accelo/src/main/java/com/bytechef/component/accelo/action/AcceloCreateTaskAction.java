@@ -23,17 +23,10 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.DATE_STARTE
 import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
 import static com.bytechef.component.accelo.util.AcceloUtils.createUrl;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.accelo.util.AcceloUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -74,8 +67,16 @@ public class AcceloCreateTaskAction {
                 .required(true))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    object("response")
+                        .properties(
+                            string("id"),
+                            string(TITLE)),
+                    object("meta")
+                        .properties(
+                            string("more_info"),
+                            string("status"),
+                            string("message"))))
         .perform(AcceloCreateTaskAction::perform);
 
     private AcceloCreateTaskAction() {
