@@ -20,16 +20,9 @@ import static com.bytechef.component.affinity.constant.AffinityConstants.BASE_UR
 import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_OPPORTUNITY;
 import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -52,8 +45,9 @@ public class AffinityCreateOpportunityAction {
                 .required(true))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    integer("id"),
+                    string(NAME)))
         .perform(AffinityCreateOpportunityAction::perform);
 
     private AffinityCreateOpportunityAction() {
