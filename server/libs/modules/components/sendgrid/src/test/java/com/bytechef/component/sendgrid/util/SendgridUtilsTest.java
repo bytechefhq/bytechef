@@ -37,6 +37,8 @@ import com.sendgrid.helpers.mail.objects.Attachments;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -45,8 +47,6 @@ import org.mockito.MockedConstruction;
  * @author Marko Krišković
  */
 class SendgridUtilsTest extends AbstractSendgridActionTest {
-    private final ArgumentCaptor<Request> optionArgumentCaptor = ArgumentCaptor.forClass(Request.class);
-
     @Test
     void testGetAttachments() {
         List<FileEntry> fileEntries = new ArrayList<>();
@@ -75,32 +75,25 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
     public void testGetTemplates() throws IOException {
         Parameters connectionParameters = mock(Parameters.class);
         when(connectionParameters.getRequiredString(anyString())).thenReturn("token");
+        //String s = "{\"templates\":[{\"id\":\"1\",\"name\":\"template1\",\"other\":\"other1\"},{\"id\":\"2\",\"name\":\"template2\",\"other\":\"other2\"}]}";
+        Map<String, List<Map<String, String>>> map = Map.of("templates",
+            List.of(
+                Map.of("id", "1", "name", "template1", "other", "other1"),
+                Map.of("id", "2", "name", "template2", "other", "other2")));
 
-        Response mockedResponse = mock(Response.class);
+        when(mockedContext.json(any())).thenReturn(map);
 
-        when(mockedResponse.getBody()).thenReturn(
-            "{\"templates\":[{\"id\":\"1\",\"name\":\"template1\",\"other\":\"other1\"},{\"id\":\"2\",\"name\":\"template2\",\"other\":\"other2\"}]}");
+        List<Option<String>> options =
+            SendgridUtils.getTemplates(mockedParameters, connectionParameters, "searchText", mockedContext);
 
-        try (MockedConstruction<SendGrid> sendgridMockedConstruction = mockConstruction(SendGrid.class,
-            (mock, context) -> when(mock.api(optionArgumentCaptor.capture())).thenReturn(mockedResponse))) {
-
-            List<Option<String>> options =
-                SendgridUtils.getTemplates(mockedParameters, connectionParameters, "searchText", mockedContext);
-
-            List<SendGrid> requests = sendgridMockedConstruction.constructed();
-            SendGrid mockSendgrid = requests.getFirst();
-
-            verify(mockSendgrid, times(1)).api(optionArgumentCaptor.capture());
-
-            assertEquals(2, options.size());
-            assertEquals("1", options.get(0)
-                .getValue());
-            assertEquals("template1", options.get(0)
-                .getLabel());
-            assertEquals("2", options.get(1)
-                .getValue());
-            assertEquals("template2", options.get(1)
-                .getLabel());
-        }
+        assertEquals(2, options.size());
+        assertEquals("1", options.get(0)
+            .getValue());
+        assertEquals("template1", options.get(0)
+            .getLabel());
+        assertEquals("2", options.get(1)
+            .getValue());
+        assertEquals("template2", options.get(1)
+            .getLabel());
     }
 }
