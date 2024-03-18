@@ -25,16 +25,10 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DE
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DUE_ON;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -80,8 +74,15 @@ public class CapsuleCRMCreateTaskAction {
                 .required(false))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    integer("id"),
+                    string(DESCRIPTION),
+                    date(DUE_ON),
+                    string(DETAIL),
+                    object(CATEGORY)
+                        .properties(
+                            string(NAME),
+                            string(COLOUR))))
         .perform(CapsuleCRMCreateTaskAction::perform);
 
     private CapsuleCRMCreateTaskAction() {
