@@ -17,16 +17,9 @@
 package com.bytechef.component.freshsales.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_LEAD;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL_PROPERTY;
@@ -60,8 +53,11 @@ public class FreshsalesCreateLeadAction {
                 .description("Primary email address of the lead"))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    number("id"),
+                    string(EMAIL),
+                    string(FIRST_NAME),
+                    string(LAST_NAME)))
         .perform(FreshsalesCreateLeadAction::perform);
 
     private FreshsalesCreateLeadAction() {
