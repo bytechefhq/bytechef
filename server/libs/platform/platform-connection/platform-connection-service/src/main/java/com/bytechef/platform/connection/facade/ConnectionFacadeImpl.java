@@ -107,6 +107,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         Map<String, ?> parameters = new HashMap<>(connection.getParameters());
 
+        parameters.remove("clientId");
+        parameters.remove("clientSecret");
         parameters.remove("state");
 
         connection.setParameters(parameters);
