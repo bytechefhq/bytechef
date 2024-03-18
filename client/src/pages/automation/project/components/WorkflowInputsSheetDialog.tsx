@@ -202,7 +202,7 @@ const WorkflowInputsSheetDialog = ({
                                         <FormControl>
                                             <Select defaultValue={field.value} onValueChange={field.onChange}>
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select an input type" />
+                                                    <SelectValue placeholder="Select input type" />
                                                 </SelectTrigger>
 
                                                 <SelectContent>
