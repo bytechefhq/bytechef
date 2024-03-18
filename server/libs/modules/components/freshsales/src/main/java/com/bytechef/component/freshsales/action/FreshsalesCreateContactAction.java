@@ -17,16 +17,9 @@
 package com.bytechef.component.freshsales.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ADDRESS;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CITY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.COUNTRY;
@@ -122,8 +115,23 @@ public class FreshsalesCreateContactAction {
                 .required(false))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    number("id"),
+                    string(FIRST_NAME),
+                    string(LAST_NAME),
+                    string(JOB_TITLE),
+                    string(CITY),
+                    string(STATE),
+                    string(ZIPCODE),
+                    string(COUNTRY),
+                    string(EMAIL),
+                    string(WORK_NUMBER),
+                    string(MOBILE_NUMBER),
+                    string(ADDRESS),
+                    string(MEDIUM),
+                    string(FACEBOOK),
+                    string(TWITTER),
+                    string(LINKEDIN)))
         .perform(FreshsalesCreateContactAction::perform);
 
     private FreshsalesCreateContactAction() {
