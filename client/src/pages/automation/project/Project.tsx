@@ -400,7 +400,6 @@ const Project = () => {
             <LayoutContainer
                 className="bg-muted dark:bg-background"
                 leftSidebarOpen={false}
-                leftSidebarWidth="112"
                 rightSidebarBody={
                     componentDefinitions &&
                     taskDispatcherDefinitions && (
