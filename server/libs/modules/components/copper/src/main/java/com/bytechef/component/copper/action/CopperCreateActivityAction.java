@@ -18,6 +18,7 @@ package com.bytechef.component.copper.action;
 
 import static com.bytechef.component.copper.constant.CopperConstants.ACTIVITY_TYPE;
 import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
+import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
 import static com.bytechef.component.copper.constant.CopperConstants.CREATE_ACTIVITY;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS_PROPERTY;
@@ -26,17 +27,9 @@ import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static com.bytechef.component.copper.util.CopperUtils.getHeaders;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -84,8 +77,17 @@ public class CopperCreateActivityAction {
                 .required(true))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    string(ID),
+                    object(TYPE)
+                        .properties(
+                            string(CATEGORY),
+                            string(ID)),
+                    string(DETAILS),
+                    object(PARENT)
+                        .properties(
+                            string(TYPE),
+                            string(ID))))
         .perform(CopperCreateActivityAction::perform);
 
     private CopperCreateActivityAction() {

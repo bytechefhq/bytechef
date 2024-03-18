@@ -21,34 +21,36 @@ import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS_PRO
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
+import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
+import static com.bytechef.component.copper.constant.CopperConstants.CITY;
 import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_PROPERTY;
+import static com.bytechef.component.copper.constant.CopperConstants.COUNTRY;
 import static com.bytechef.component.copper.constant.CopperConstants.CREATE_COMPANY;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.EMAIL_DOMAIN;
+import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME_PROPERTY;
+import static com.bytechef.component.copper.constant.CopperConstants.NUMBER;
 import static com.bytechef.component.copper.constant.CopperConstants.PHONE_NUMBERS;
 import static com.bytechef.component.copper.constant.CopperConstants.PHONE_NUMBERS_PROPERTY;
+import static com.bytechef.component.copper.constant.CopperConstants.POSTAL_CODE;
 import static com.bytechef.component.copper.constant.CopperConstants.SOCIALS;
 import static com.bytechef.component.copper.constant.CopperConstants.SOCIALS_PROPERTY;
+import static com.bytechef.component.copper.constant.CopperConstants.STATE;
+import static com.bytechef.component.copper.constant.CopperConstants.STREET;
 import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
 import static com.bytechef.component.copper.constant.CopperConstants.TAGS_PROPERTY;
+import static com.bytechef.component.copper.constant.CopperConstants.URL;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES_PROPERTY;
 import static com.bytechef.component.copper.util.CopperUtils.getHeaders;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
-import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.nullable;
-import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -89,8 +91,40 @@ public class CopperCreateCompanyAction {
                 .description("Tags associated with the Company"))
         .outputSchema(
             object()
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .properties(
+                    string(ID),
+                    string(NAME),
+                    object(ADDRESS)
+                        .properties(
+                            string(STREET),
+                            string(CITY),
+                            string(STATE),
+                            string(POSTAL_CODE),
+                            string(COUNTRY)),
+                    string(ASSIGNEE_ID),
+                    string(CONTACT_TYPE_ID),
+                    string(DETAILS),
+                    string(EMAIL_DOMAIN),
+                    array(PHONE_NUMBERS)
+                        .items(
+                            object()
+                                .properties(
+                                    string(NUMBER),
+                                    string(CATEGORY))),
+                    array(SOCIALS)
+                        .items(
+                            object()
+                                .properties(
+                                    string(URL),
+                                    string(CATEGORY))),
+                    array(TAGS)
+                        .items(string()),
+                    array(WEBSITES)
+                        .items(
+                            object()
+                                .properties(
+                                    string(URL),
+                                    string(CATEGORY)))))
         .perform(CopperCreateCompanyAction::perform);
 
     private CopperCreateCompanyAction() {
