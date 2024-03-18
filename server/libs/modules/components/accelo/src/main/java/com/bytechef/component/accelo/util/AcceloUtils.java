@@ -50,7 +50,7 @@ public class AcceloUtils {
         if (Objects.equals("company", againstType)) {
             return getCompanyIdOptions(inputParameters, connectionParameters, searchText, context);
         } else {
-            Map<String, List<Map<String, Object>>> body = context
+            Map<String, ?> body = context
                 .http(http -> http.get(createUrl(connectionParameters, againstType + "s")))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
@@ -58,8 +58,8 @@ public class AcceloUtils {
 
             List<Option<String>> options = new ArrayList<>();
 
-            for (Map<String, Object> map : body.get("response")) {
-                options.add(option(String.valueOf(map.get("title")), String.valueOf(map.get("id"))));
+            for (Map<String, String> map : (List<Map<String, String>>) body.get("response")) {
+                options.add(option(map.get("title"), map.get("id")));
             }
 
             return options;
@@ -69,7 +69,7 @@ public class AcceloUtils {
     public static List<Option<String>> getCompanyIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, List<Map<String, Object>>> body = context
+        Map<String, ?> body = context
             .http(http -> http.get(createUrl(connectionParameters, "companies")))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -77,8 +77,8 @@ public class AcceloUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<String, Object> map : body.get("response")) {
-            options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("id"))));
+        for (Map<String, String> map : (List<Map<String, String>>) body.get("response")) {
+            options.add(option(map.get("name"), map.get("id")));
         }
 
         return options;
