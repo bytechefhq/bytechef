@@ -114,7 +114,7 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                                 <span className="text-base font-semibold">{projectInstance.name}</span>
                             )}
 
-                            <span className="text-xs uppercase text-gray-700">{project?.name}</span>
+                            <span className="text-xs uppercase text-gray-700">{projectInstance?.environment}</span>
                         </div>
                     </div>
 
