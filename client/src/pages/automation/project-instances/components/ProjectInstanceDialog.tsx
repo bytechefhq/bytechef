@@ -14,7 +14,7 @@ import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {ProjectInstanceModel} from 'middleware/automation/configuration';
+import {EnvironmentModel, ProjectInstanceModel} from 'middleware/automation/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
@@ -40,6 +40,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
         defaultValues: {
             description: projectInstance?.description || '',
             enabled: projectInstance?.enabled || false,
+            environment: projectInstance?.environment || EnvironmentModel.Development,
             name: projectInstance?.name || '',
             project: projectInstance?.project || null,
             projectId: projectInstance?.id || undefined,

@@ -1,6 +1,7 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
 import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
@@ -116,6 +117,36 @@ const ProjectInstanceDialogBasicStep = ({
                             </FormItem>
                         )}
                         rules={{required: true}}
+                    />
+
+                    <FormField
+                        control={control}
+                        name="environment"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Environment</FormLabel>
+
+                                <FormControl>
+                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select environment" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
+
+                                            <SelectItem value="STAGING">Staging</SelectItem>
+
+                                            <SelectItem value="PRODUCTION">Production</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        rules={{required: true}}
+                        shouldUnregister={false}
                     />
 
                     <FormField
