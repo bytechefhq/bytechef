@@ -17,21 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The environment of a project.
+ * The status of a project.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
-public enum EnvironmentModel {
+public enum ProjectStatusModel {
   
-  DEVELOPMENT("DEVELOPMENT"),
+  PUBLISHED("PUBLISHED"),
   
-  STAGING("STAGING"),
-  
-  PRODUCTION("PRODUCTION");
+  UNPUBLISHED("UNPUBLISHED");
 
   private String value;
 
-  EnvironmentModel(String value) {
+  ProjectStatusModel(String value) {
     this.value = value;
   }
 
@@ -46,8 +44,8 @@ public enum EnvironmentModel {
   }
 
   @JsonCreator
-  public static EnvironmentModel fromValue(String value) {
-    for (EnvironmentModel b : EnvironmentModel.values()) {
+  public static ProjectStatusModel fromValue(String value) {
+    for (ProjectStatusModel b : ProjectStatusModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
