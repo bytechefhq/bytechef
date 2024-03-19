@@ -79,72 +79,79 @@ const Projects = () => {
                 />
             }
             leftSidebarBody={
-                <LeftSidebarNav
-                    bottomBody={
-                        <>
-                            {!tagsIsLoading &&
-                                (tags?.length ? (
-                                    tags?.map((item) => (
+                <>
+                    <LeftSidebarNav
+                        body={
+                            <>
+                                <LeftSidebarNavItem
+                                    item={{
+                                        filterData: !filterData?.id && filterData.type === Type.Category,
+                                        name: 'All Categories',
+                                        onItemClick: (id?: number | string) => {
+                                            setFilterData({
+                                                id: id as number,
+                                                type: Type.Category,
+                                            });
+                                        },
+                                    }}
+                                />
+
+                                {!categoriesIsLoading &&
+                                    categories?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={<TagIcon className="mr-1 size-4" />}
                                             item={{
-                                                filterData: filterData?.id === item.id && filterData.type === Type.Tag,
-                                                id: item.id!,
+                                                filterData:
+                                                    filterData?.id === item.id && filterData.type === Type.Category,
+                                                id: item.id,
                                                 name: item.name,
                                                 onItemClick: (id?: number | string) => {
                                                     setFilterData({
                                                         id: id as number,
-                                                        type: Type.Tag,
+                                                        type: Type.Category,
                                                     });
                                                 },
                                             }}
-                                            key={item.id}
-                                            toLink={`?tagId=${item.id}`}
+                                            key={item.name}
+                                            toLink={`?categoryId=${item.id}`}
                                         />
-                                    ))
-                                ) : (
-                                    <span className="px-3 text-xs">You have not created any tags yet.</span>
-                                ))}
-                        </>
-                    }
-                    bottomTitle="Tags"
-                    topBody={
-                        <>
-                            <LeftSidebarNavItem
-                                item={{
-                                    filterData: !filterData?.id && filterData.type === Type.Category,
-                                    name: 'All Categories',
-                                    onItemClick: (id?: number | string) => {
-                                        setFilterData({
-                                            id: id as number,
-                                            type: Type.Category,
-                                        });
-                                    },
-                                }}
-                            />
+                                    ))}
+                            </>
+                        }
+                        title="Categories"
+                    />
 
-                            {!categoriesIsLoading &&
-                                categories?.map((item) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            filterData: filterData?.id === item.id && filterData.type === Type.Category,
-                                            id: item.id,
-                                            name: item.name,
-                                            onItemClick: (id?: number | string) => {
-                                                setFilterData({
-                                                    id: id as number,
-                                                    type: Type.Category,
-                                                });
-                                            },
-                                        }}
-                                        key={item.name}
-                                        toLink={`?categoryId=${item.id}`}
-                                    />
-                                ))}
-                        </>
-                    }
-                    topTitle="Categories"
-                />
+                    <LeftSidebarNav
+                        body={
+                            <>
+                                {!tagsIsLoading &&
+                                    (tags?.length ? (
+                                        tags?.map((item) => (
+                                            <LeftSidebarNavItem
+                                                icon={<TagIcon className="mr-1 size-4" />}
+                                                item={{
+                                                    filterData:
+                                                        filterData?.id === item.id && filterData.type === Type.Tag,
+                                                    id: item.id!,
+                                                    name: item.name,
+                                                    onItemClick: (id?: number | string) => {
+                                                        setFilterData({
+                                                            id: id as number,
+                                                            type: Type.Tag,
+                                                        });
+                                                    },
+                                                }}
+                                                key={item.id}
+                                                toLink={`?tagId=${item.id}`}
+                                            />
+                                        ))
+                                    ) : (
+                                        <span className="px-3 text-xs">You have not created any tags yet.</span>
+                                    ))}
+                            </>
+                        }
+                        title="Tags"
+                    />
+                </>
             }
             leftSidebarHeader={<PageHeader position="sidebar" title="Projects" />}
         >

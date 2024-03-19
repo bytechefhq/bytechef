@@ -9,28 +9,18 @@ const SidebarSubtitle = ({title}: {title: string}) => (
 );
 
 export interface LeftSidebarNavProps {
-    bottomBody?: ReactNode;
-    bottomTitle?: string;
+    body?: ReactNode;
+    title?: string;
     className?: string;
-    topBody: ReactNode;
-    topTitle?: string;
 }
 
-const LeftSidebarNav = ({bottomBody, bottomTitle, className, topBody, topTitle}: LeftSidebarNavProps) => (
+const LeftSidebarNav = ({body, className, title}: LeftSidebarNavProps) => (
     <div className={twMerge('px-2', className)}>
-        {topBody && (
-            <div aria-label={topTitle} className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
-                {topTitle && <SidebarSubtitle title={topTitle} />}
+        {body && (
+            <div aria-label={title} className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0">
+                {title && <SidebarSubtitle title={title} />}
 
-                {topBody}
-            </div>
-        )}
-
-        {bottomBody && (
-            <div aria-label={bottomTitle} className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
-                {bottomTitle && <SidebarSubtitle title={bottomTitle} />}
-
-                {bottomBody}
+                {body}
             </div>
         )}
     </div>
@@ -56,7 +46,7 @@ const LeftSidebarNavItem = ({
         aria-current={filterData ? 'page' : undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            filterData ? 'bg-muted hover:bg-muted' : 'hover:bg-transparent hover:underline',
+            filterData ? 'bg-muted hover:bg-muted' : 'hover:bg-muted',
             'justify-start'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
