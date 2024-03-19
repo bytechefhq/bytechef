@@ -116,38 +116,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Boolean published) {
-        Iterable<Project> projectIterable;
-
-        if (categoryId == null && tagId == null) {
-            projectIterable = projectRepository.findAll(Sort.by("name"));
-        } else if (categoryId != null && tagId == null) {
-            projectIterable = projectRepository.findAllByCategoryIdOrderByName(categoryId);
-        } else if (categoryId == null) {
-            projectIterable = projectRepository.findAllByTagIdOrderByName(tagId);
-        } else {
-            projectIterable = projectRepository.findAllByCategoryIdAndTagIdOrderByName(
-                categoryId, tagId);
-        }
-
-        List<Project> projects = CollectionUtils.toList(projectIterable);
-
-        if (published != null) {
-            if (published) {
-                projects = CollectionUtils.filter(projects, project -> project.getStatus() == Project.Status.PUBLISHED);
-            } else {
-                projects = CollectionUtils.filter(
-                    projects, project -> project.getStatus() == Project.Status.UNPUBLISHED);
-            }
-        }
-
-        if (ids != null) {
-            projects = projects.stream()
-                .filter(project -> ids.contains(project.getId()))
-                .toList();
-        }
-
-        return projects;
+    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Status status) {
+        return projectRepository.findAllProjects(categoryId, ids, tagId, status == null ? null : status.ordinal());
     }
 
     @Override
