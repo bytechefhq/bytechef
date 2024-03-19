@@ -72,7 +72,7 @@ const Projects = () => {
                                 }
                             }}
                             project={undefined}
-                            triggerNode={<Button>Create Project</Button>}
+                            triggerNode={<Button>New Project</Button>}
                         />
                     }
                     title={`${searchParams.get('tagId') ? 'Tags' : 'Categories'}: ${pageTitle || 'All'}`}

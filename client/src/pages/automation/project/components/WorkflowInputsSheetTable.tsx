@@ -176,7 +176,7 @@ const WorkflowInputsSheetTable = ({
                                 triggerNode={
                                     <Button>
                                         <PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
-                                        Create Input
+                                        New Input
                                     </Button>
                                 }
                                 workflow={workflow}

@@ -84,7 +84,7 @@ export const Connections = () => {
                         <ConnectionDialog
                             connectionTagsQueryKey={ConnectionKeys.connectionTags}
                             connectionsQueryKey={ConnectionKeys.connections}
-                            triggerNode={<Button>Create Connection</Button>}
+                            triggerNode={<Button>New Connection</Button>}
                             useCreateConnectionMutation={useCreateConnectionMutation}
                             useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                         />
