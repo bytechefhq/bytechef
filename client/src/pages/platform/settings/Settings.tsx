@@ -22,7 +22,7 @@ export default function Settings() {
             header={<PageHeader title="Account" />}
             leftSidebarBody={
                 <LeftSidebarNav
-                    topBody={sidebarNavItems.map((item) => (
+                    body={sidebarNavItems.map((item) => (
                         <LeftSidebarNavItem
                             item={{
                                 filterData: location.pathname === item.href,
