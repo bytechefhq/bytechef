@@ -25,7 +25,7 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
         {tag.name}
 
         <Cross2Icon
-            className="ml-1.5 size-4 cursor-pointer rounded-full hover:bg-gray-200"
+            className="ml-1.5 size-3 cursor-pointer rounded-full hover:bg-gray-200"
             onClick={() => onDeleteTag(tag)}
         />
     </span>
