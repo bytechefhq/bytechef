@@ -11,6 +11,7 @@ export * from './ProjectInstanceModel';
 export * from './ProjectInstanceWorkflowConnectionModel';
 export * from './ProjectInstanceWorkflowModel';
 export * from './ProjectModel';
+export * from './ProjectStatusModel';
 export * from './TagModel';
 export * from './UpdateTagsRequestModel';
 export * from './WorkflowBasicModel';

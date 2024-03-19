@@ -19,6 +19,12 @@ import {
     CategoryModelFromJSONTyped,
     CategoryModelToJSON,
 } from './CategoryModel';
+import type { ProjectStatusModel } from './ProjectStatusModel';
+import {
+    ProjectStatusModelFromJSON,
+    ProjectStatusModelFromJSONTyped,
+    ProjectStatusModelToJSON,
+} from './ProjectStatusModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -87,11 +93,11 @@ export interface ProjectModel {
      */
     projectVersion?: number;
     /**
-     * The status of a project.
-     * @type {string}
+     * 
+     * @type {ProjectStatusModel}
      * @memberof ProjectModel
      */
-    status?: ProjectModelStatusEnum;
+    status?: ProjectStatusModel;
     /**
      * 
      * @type {CategoryModel}
@@ -117,17 +123,6 @@ export interface ProjectModel {
      */
     version?: number;
 }
-
-
-/**
- * @export
- */
-export const ProjectModelStatusEnum = {
-    Published: 'PUBLISHED',
-    Unpublished: 'UNPUBLISHED'
-} as const;
-export type ProjectModelStatusEnum = typeof ProjectModelStatusEnum[keyof typeof ProjectModelStatusEnum];
-
 
 /**
  * Check if a given object implements the ProjectModel interface.
@@ -158,7 +153,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'name': json['name'],
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'status': !exists(json, 'status') ? undefined : ProjectStatusModelFromJSON(json['status']),
         'category': !exists(json, 'category') ? undefined : CategoryModelFromJSON(json['category']),
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
@@ -179,7 +174,7 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
         'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
         'projectVersion': value.projectVersion,
-        'status': value.status,
+        'status': ProjectStatusModelToJSON(value.status),
         'category': CategoryModelToJSON(value.category),
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         'workflowIds': value.workflowIds,

@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ProjectStatusModel } from './ProjectStatusModel';
+import {
+    ProjectStatusModelFromJSON,
+    ProjectStatusModelFromJSONTyped,
+    ProjectStatusModelToJSON,
+} from './ProjectStatusModel';
+
 /**
  * 
  * @export
@@ -74,23 +81,12 @@ export interface ProjectInstanceAllOfProjectModel {
      */
     projectVersion?: number;
     /**
-     * The status of a project.
-     * @type {string}
+     * 
+     * @type {ProjectStatusModel}
      * @memberof ProjectInstanceAllOfProjectModel
      */
-    status?: ProjectInstanceAllOfProjectModelStatusEnum;
+    status?: ProjectStatusModel;
 }
-
-
-/**
- * @export
- */
-export const ProjectInstanceAllOfProjectModelStatusEnum = {
-    Published: 'PUBLISHED',
-    Unpublished: 'UNPUBLISHED'
-} as const;
-export type ProjectInstanceAllOfProjectModelStatusEnum = typeof ProjectInstanceAllOfProjectModelStatusEnum[keyof typeof ProjectInstanceAllOfProjectModelStatusEnum];
-
 
 /**
  * Check if a given object implements the ProjectInstanceAllOfProjectModel interface.
@@ -121,7 +117,7 @@ export function ProjectInstanceAllOfProjectModelFromJSONTyped(json: any, ignoreD
         'name': json['name'],
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'status': !exists(json, 'status') ? undefined : ProjectStatusModelFromJSON(json['status']),
     };
 }
 
@@ -138,7 +134,7 @@ export function ProjectInstanceAllOfProjectModelToJSON(value?: ProjectInstanceAl
         'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
         'projectVersion': value.projectVersion,
-        'status': value.status,
+        'status': ProjectStatusModelToJSON(value.status),
     };
 }
 

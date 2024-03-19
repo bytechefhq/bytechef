@@ -17,6 +17,7 @@ models/ProjectInstanceModel.ts
 models/ProjectInstanceWorkflowConnectionModel.ts
 models/ProjectInstanceWorkflowModel.ts
 models/ProjectModel.ts
+models/ProjectStatusModel.ts
 models/TagModel.ts
 models/UpdateTagsRequestModel.ts
 models/WorkflowBasicModel.ts
