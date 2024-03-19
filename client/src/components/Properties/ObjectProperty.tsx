@@ -17,6 +17,7 @@ import DeletePropertyButton from './components/DeletePropertyButton';
 
 interface ObjectPropertyProps {
     actionName?: string;
+    arrayName?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
@@ -27,6 +28,7 @@ interface ObjectPropertyProps {
 
 const ObjectProperty = ({
     actionName,
+    arrayName,
     currentComponent,
     currentComponentData,
     dataPills,
@@ -131,6 +133,7 @@ const ObjectProperty = ({
                         <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
                                 actionName={actionName}
+                                arrayName={arrayName}
                                 currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
                                 customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
