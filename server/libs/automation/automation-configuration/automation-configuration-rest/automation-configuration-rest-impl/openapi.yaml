@@ -332,12 +332,12 @@ paths:
         schema:
           type: "integer"
           format: "int64"
-      - name: "published"
-        description: "Use for filtering published projects."
+      - name: "status"
+        description: "Use for filtering projects per status."
         in: "query"
         required: false
         schema:
-          type: "boolean"
+          $ref: '#/components/schemas/ProjectStatus'
       responses:
         "200":
           description: "The list of projects."
@@ -806,11 +806,7 @@ components:
           description: "The version of a project."
           type: "integer"
         status:
-          description: "The status of a project."
-          type: "string"
-          enum:
-          - "PUBLISHED"
-          - "UNPUBLISHED"
+          $ref: '#/components/schemas/ProjectStatus'
     ProjectInstance:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
@@ -964,6 +960,12 @@ components:
         workflowNodeName:
           description: "The action/trigger name to which a connection belongs."
           type: "string"
+    ProjectStatus:
+      description: "The status of a project."
+      type: "string"
+      enum:
+        - "PUBLISHED"
+        - "UNPUBLISHED"
     Tag:
       description: "A tag."
       required:
