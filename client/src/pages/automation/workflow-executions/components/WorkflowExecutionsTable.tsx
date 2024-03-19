@@ -21,7 +21,15 @@ const columnHelper = createColumnHelper<WorkflowExecutionModel>();
 const columns = [
     columnHelper.accessor((row) => row.job, {
         cell: (info) => (
-            <Badge variant={info.getValue()?.status === 'COMPLETED' ? 'success' : 'destructive'}>
+            <Badge
+                variant={
+                    info.getValue()?.status === 'COMPLETED'
+                        ? 'success'
+                        : info.getValue()?.status === 'FAILED'
+                          ? 'destructive'
+                          : 'secondary'
+                }
+            >
                 {info.getValue()?.status ?? ''}
             </Badge>
         ),
