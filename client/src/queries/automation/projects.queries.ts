@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
-import {ProjectApi, ProjectModel} from 'middleware/automation/configuration';
+import {ProjectApi, ProjectModel, type ProjectStatusModel} from 'middleware/automation/configuration';
 
 export const ProjectKeys = {
     filteredProjects: (filters: {categoryId?: number; tagId?: number} | undefined) => [
@@ -22,7 +22,7 @@ export const useGetProjectsQuery = (filters?: {
     categoryId?: number;
     projectInstances?: boolean;
     tagId?: number;
-    published?: boolean;
+    status?: ProjectStatusModel;
 }) =>
     useQuery<ProjectModel[], Error>({
         queryKey: ProjectKeys.filteredProjects(filters),
