@@ -17,5 +17,6 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstan
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceWorkflowConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceWorkflowModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectStatusModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateTagsRequestModel.java

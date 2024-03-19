@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-18T05:20:32.345117+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {

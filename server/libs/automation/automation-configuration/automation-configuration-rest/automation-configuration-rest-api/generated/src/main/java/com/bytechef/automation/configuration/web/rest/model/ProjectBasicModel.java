@@ -2,6 +2,7 @@ package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
 @JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-18T05:20:32.345117+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
 public class ProjectBasicModel {
 
   private String createdBy;
@@ -48,42 +49,7 @@ public class ProjectBasicModel {
 
   private Integer projectVersion;
 
-  /**
-   * The status of a project.
-   */
-  public enum StatusEnum {
-    PUBLISHED("PUBLISHED"),
-    
-    UNPUBLISHED("UNPUBLISHED");
-
-    private String value;
-
-    StatusEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static StatusEnum fromValue(String value) {
-      for (StatusEnum b : StatusEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  private StatusEnum status;
+  private ProjectStatusModel status;
 
   public ProjectBasicModel() {
     super();
@@ -276,23 +242,23 @@ public class ProjectBasicModel {
     this.projectVersion = projectVersion;
   }
 
-  public ProjectBasicModel status(StatusEnum status) {
+  public ProjectBasicModel status(ProjectStatusModel status) {
     this.status = status;
     return this;
   }
 
   /**
-   * The status of a project.
+   * Get status
    * @return status
   */
-  
-  @Schema(name = "status", description = "The status of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Valid 
+  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")
-  public StatusEnum getStatus() {
+  public ProjectStatusModel getStatus() {
     return status;
   }
 
-  public void setStatus(StatusEnum status) {
+  public void setStatus(ProjectStatusModel status) {
     this.status = status;
   }
 
