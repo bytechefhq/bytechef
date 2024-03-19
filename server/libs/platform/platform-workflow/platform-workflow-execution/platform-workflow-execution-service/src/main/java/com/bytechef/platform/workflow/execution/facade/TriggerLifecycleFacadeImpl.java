@@ -66,13 +66,14 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
-                DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-                    triggerStateService.fetchValue(workflowExecutionId), null);
+                Map<String, ?> parameters = OptionalUtils.mapOrElse(
+                    triggerStateService.fetchValue(workflowExecutionId),
+                    DynamicWebhookEnableOutput::parameters, Map.of());
 
                 triggerDefinitionFacade.executeDynamicWebhookDisable(
                     triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                     triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
-                    output.parameters(), connectionId);
+                    parameters, connectionId);
 
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
                 triggerStateService.delete(workflowExecutionId);
