@@ -1,0 +1,179 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Pipeliner API"
+  description: "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management,
+  contact organization, sales forecasting, and reporting."
+  version: "v0"
+servers:
+  - url: "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/{space_id}"
+paths:
+  /entities/Accounts:
+    post:
+      tags:
+        - "Account"
+      summary: "Create account"
+      description: "Creates new account"
+      operationId: "createAccount"
+      requestBody:
+        description: "data of new Account"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Account"
+              properties:
+                owner_id:
+                  type: "string"
+                  format: "uuid"
+                  description: "User in Pipeliner Application that will become the owner of the newly created Account."
+                name:
+                  type: "string"
+                  description: "Account name"
+              required:
+                - "owner_id"
+                - "name"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Account"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  success:
+                    description: "True when response succeeded, false on error."
+                    type: "boolean"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        format: "uuid"
+                      owner_id:
+                        type: "string"
+                        format: "uuid"
+                      name:
+                        type: "string"
+  /entities/Contacts:
+    post:
+      tags:
+        - "Contact"
+      summary: "Create contact"
+      description: "Creates new Contact"
+      operationId: "createContact"
+      requestBody:
+        description: "data of new Contact"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Contact"
+              properties:
+                owner_id:
+                  type: "string"
+                  format: "uuid"
+                  description: "User in Pipeliner Application that will become the owner of the newly created Contact."
+                first_name:
+                  type: "string"
+                  description: "The firstname of the contact."
+                last_name:
+                  type: "string"
+                  description: "The lastname of the contact."
+              required:
+                - "owner_id"
+                - "last_name"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Contact"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  success:
+                    description: "True when response succeeded, false on error."
+                    type: "boolean"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        format: "uuid"
+                      owner_id:
+                        type: "string"
+                        format: "uuid"
+                      first_name:
+                        type: "string"
+                      last_name:
+                        type: "string"
+  /entities/Tasks:
+    post:
+      tags:
+        - "Tasks"
+      summary: "Create task"
+      description: "Creates new Task"
+      operationId: "createTask"
+      requestBody:
+        description: "data of new Task"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Task"
+              properties:
+                subject:
+                  type: "string"
+                  description: "Name of the entity and its default text representation."
+                activity_type_id:
+                  type: "string"
+                  format: "uuid"
+                  description: "Type of task"
+                unit_id:
+                  type: "string"
+                  format: "uuid"
+                  description: "Sales Unit ID"
+                owner_id:
+                  type: "string"
+                  format: "uuid"
+              required:
+                - "subject"
+                - "activity_type_id"
+                - "unit_id"
+                - "owner_id"
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Task"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  success:
+                    description: "True when response succeeded, false on error."
+                    type: "boolean"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        format: "uuid"
+                      subject:
+                        type: "string"
+                      activity_type_id:
+                        type: "string"
+                        format: "uuid"
+                      unit_id:
+                        type: "string"
+                        format: "uuid"
+                      owner_id:
+                        type: "string"
+                        format: "uuid"
+components:
+  securitySchemes:
+    basicAuth:
+      type: "http"
+      scheme: "basic"
