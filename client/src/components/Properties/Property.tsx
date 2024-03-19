@@ -236,7 +236,7 @@ const Property = ({
 
     const handleSelectChange = (value: string, name: string | undefined) => {
         if (currentComponentData) {
-            const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+            const {actionName, componentName, parameters} = currentComponentData;
 
             if (actionName) {
                 setComponentData([
@@ -247,6 +247,7 @@ const Property = ({
                             ...parameters,
                             [name!]: value,
                         },
+                        workflowNodeName: currentNode.name,
                     },
                 ]);
 
@@ -258,7 +259,7 @@ const Property = ({
                     {
                         actionName,
                         componentName,
-                        name: workflowNodeName,
+                        name: currentNode.name,
                         parameters: objectName
                             ? {
                                   ...parameters,
@@ -329,7 +330,7 @@ const Property = ({
             return;
         }
 
-        const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+        const {actionName, componentName, parameters} = currentComponentData;
 
         if (!name) {
             return;
@@ -339,7 +340,7 @@ const Property = ({
             {
                 actionName,
                 componentName,
-                name: workflowNodeName,
+                name: currentNode.name,
                 parameters: objectName
                     ? {
                           ...parameters,
@@ -428,7 +429,7 @@ const Property = ({
 
     // set value to taskParameterValue only on initial render
     useEffect(() => {
-        if (mentionInputValue === '' && taskParameterValue) {
+        if (mentionInput && mentionInputValue === '' && taskParameterValue) {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
             if (!mentionInputElement) {
@@ -624,7 +625,7 @@ const Property = ({
                                 defaultValue={defaultValue}
                                 description={description}
                                 error={hasError}
-                                key={name}
+                                key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 required={required}
@@ -642,7 +643,7 @@ const Property = ({
                                 description={description}
                                 error={hasError}
                                 errorMessage={errorMessage}
-                                key={name}
+                                key={`${currentNode.name}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
                                 max={maxValue}
@@ -666,6 +667,7 @@ const Property = ({
                         {!register && (isValidControlType || isNumericalInput) && !!options?.length && (
                             <PropertySelect
                                 description={description}
+                                key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
@@ -678,6 +680,7 @@ const Property = ({
                         {!register && (isValidControlType || isNumericalInput) && !!optionsDataSource && (
                             <PropertyComboBox
                                 description={description}
+                                key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependency={loadOptionsDependency}
@@ -692,6 +695,7 @@ const Property = ({
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 description={description}
+                                key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependency={loadOptionsDependency}
@@ -707,6 +711,7 @@ const Property = ({
                             <PropertySelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
+                                key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
@@ -723,7 +728,7 @@ const Property = ({
                             <PropertyTextArea
                                 description={description}
                                 error={hasError}
-                                key={name}
+                                key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name!}
@@ -748,7 +753,7 @@ const Property = ({
                     <PropertyCodeEditor
                         defaultValue={defaultValue}
                         description={description}
-                        key={name}
+                        key={`${currentNode.name}_${name}`}
                         label={label}
                         language={languageId!}
                         leadingIcon={typeIcon}
