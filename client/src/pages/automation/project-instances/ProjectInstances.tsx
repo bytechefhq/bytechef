@@ -87,7 +87,7 @@ const ProjectInstances = () => {
                 <PageHeader
                     centerTitle={true}
                     position="main"
-                    right={<ProjectInstanceDialog triggerNode={<Button>Create Instance</Button>} />}
+                    right={<ProjectInstanceDialog triggerNode={<Button>New Instance</Button>} />}
                     title={`${searchParams.get('tagId') ? 'Tags' : 'Projects'}: ${pageTitle || 'All'}`}
                 />
             }
