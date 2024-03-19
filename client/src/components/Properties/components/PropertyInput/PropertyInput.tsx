@@ -9,6 +9,7 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     description?: string;
     error?: boolean;
     errorMessage?: string;
+    key?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
@@ -26,6 +27,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             error,
             errorMessage,
             id,
+            key,
             label,
             leadingIcon,
             name,
@@ -77,6 +79,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         )}
                         disabled={disabled}
                         id={id || name}
+                        key={key}
                         name={name}
                         onChange={onChange}
                         ref={ref}

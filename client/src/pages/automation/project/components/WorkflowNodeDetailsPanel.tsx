@@ -307,7 +307,7 @@ const WorkflowNodeDetailsPanel = ({
                 workflowNodeName,
             });
         }
-    }, [currentActionName, currentComponent, currentComponentDefinition, workflow.tasks]);
+    }, [currentActionName, currentComponent, currentComponentDefinition, currentNode.name, workflow.tasks]);
 
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
@@ -454,6 +454,7 @@ const WorkflowNodeDetailsPanel = ({
                                             <DescriptionTab
                                                 componentDefinition={currentComponent}
                                                 currentComponentData={currentComponentData}
+                                                key={`${currentNode.name}_description`}
                                                 otherComponentData={otherComponentData}
                                             />
                                         )}
@@ -465,6 +466,7 @@ const WorkflowNodeDetailsPanel = ({
                                         {activeTab === 'connection' && workflowConnections.length > 0 && (
                                             <ConnectionTab
                                                 componentDefinition={currentComponent}
+                                                key={`${currentNode.name}_connection`}
                                                 workflowConnections={workflowConnections}
                                                 workflowId={workflow.id!}
                                                 workflowNodeName={currentNode.name}
@@ -479,6 +481,7 @@ const WorkflowNodeDetailsPanel = ({
                                                     currentComponentData={currentComponentData}
                                                     customClassName="p-4"
                                                     dataPills={dataPills}
+                                                    key={`${currentNode.name}_properties`}
                                                     mention={!!dataPills?.length}
                                                     properties={currentActionProperties}
                                                     updateWorkflowMutation={updateWorkflowMutation}
@@ -492,6 +495,7 @@ const WorkflowNodeDetailsPanel = ({
                                         {activeTab === 'output' && workflowNodeOutput && (
                                             <OutputTab
                                                 currentNode={currentNode}
+                                                key={`${currentNode.name}_output`}
                                                 outputDefined={currentActionDefinition?.outputDefined ?? false}
                                                 outputSchema={workflowNodeOutput.outputSchema}
                                                 sampleOutput={workflowNodeOutput.sampleOutput!}
