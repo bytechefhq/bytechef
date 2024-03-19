@@ -16,11 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   ProjectModel,
+  ProjectStatusModel,
   WorkflowModel,
 } from '../models/index';
 import {
     ProjectModelFromJSON,
     ProjectModelToJSON,
+    ProjectStatusModelFromJSON,
+    ProjectStatusModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models/index';
@@ -50,7 +53,7 @@ export interface GetProjectsRequest {
     categoryId?: number;
     projectInstances?: boolean;
     tagId?: number;
-    published?: boolean;
+    status?: ProjectStatusModel;
 }
 
 export interface PublishProjectRequest {
@@ -255,8 +258,8 @@ export class ProjectApi extends runtime.BaseAPI {
             queryParameters['tagId'] = requestParameters.tagId;
         }
 
-        if (requestParameters.published !== undefined) {
-            queryParameters['published'] = requestParameters.published;
+        if (requestParameters.status !== undefined) {
+            queryParameters['status'] = requestParameters.status;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
