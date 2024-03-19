@@ -89,7 +89,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             <div className="flex w-full items-center justify-between rounded-md px-2 py-5 hover:bg-gray-50">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
-                        <div className="relative flex items-center gap-3">
+                        <div className="relative flex items-center gap-2">
                             <Link
                                 className="flex gap-2"
                                 to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
