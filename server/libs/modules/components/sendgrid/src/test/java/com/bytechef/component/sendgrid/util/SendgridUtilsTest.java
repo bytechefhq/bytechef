@@ -43,9 +43,11 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
         List<FileEntry> fileEntries = new ArrayList<>();
 
         FileEntry fileEntry1 = mock(FileEntry.class);
-        FileEntry fileEntry2 = mock(FileEntry.class);
 
         fileEntries.add(fileEntry1);
+
+        FileEntry fileEntry2 = mock(FileEntry.class);
+
         fileEntries.add(fileEntry2);
 
         when(fileEntry1.getName()).thenReturn("file1");
@@ -65,7 +67,9 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
     @Test
     public void testGetTemplates() throws IOException {
         Parameters connectionParameters = mock(Parameters.class);
+
         when(connectionParameters.getRequiredString(anyString())).thenReturn("token");
+
         Map<String, List<Map<String, String>>> map = Map.of("templates",
             List.of(
                 Map.of("id", "1", "name", "template1", "other", "other1"),
@@ -73,8 +77,8 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
 
         when(mockedContext.json(any())).thenReturn(map);
 
-        List<Option<String>> options =
-            SendgridUtils.getTemplates(mockedParameters, connectionParameters, "searchText", mockedContext);
+        List<Option<String>> options = SendgridUtils.getTemplates(
+            mockedParameters, connectionParameters, "searchText", mockedContext);
 
         assertEquals(2, options.size());
         assertEquals("1", options.get(0)
