@@ -16,8 +16,15 @@
 
 package com.bytechef.component.insightly;
 
+import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.ComponentDSL.authorization;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.insightly.constant.InsightlyConstants.POD;
+
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -31,5 +38,28 @@ public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/insightly.svg");
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .authorizations(
+                authorization(
+                    AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
+                        .title("Basic Auth")
+                        .properties(
+                            string(POD)
+                                .label("Pod")
+                                .description(
+                                    "Your instances pod can be found under your API URL, e.g. " +
+                                        "https://api.{pod}.insightly.com/v3.1")
+                                .required(true),
+                            string(USERNAME)
+                                .label("API Key")
+                                .required(true)))
+            .baseUri((connectionParameters, context) -> "https://api." + connectionParameters.getRequiredString(POD)
+                + ".insightly.com/v3.1");
     }
 }
