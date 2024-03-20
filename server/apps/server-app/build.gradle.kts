@@ -15,7 +15,6 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
-    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config"))
@@ -140,6 +139,8 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:sequence"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
+
+    implementation(project(":server:ee:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
