@@ -81,11 +81,12 @@ const Property = ({
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
+    const [loadOptionsDependency, setLoadOptionsDependency] = useState({});
+    const [loadPropertiesDependency, setLoadPropertiesDependency] = useState({});
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(mention && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
-    const [loadOptionsDependency, setLoadOptionsDependency] = useState({});
-    const [loadPropertiesDependency, setLoadPropertiesDependency] = useState({});
+    const [selectValue, setSelectValue] = useState(property.defaultValue || '');
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -151,6 +152,10 @@ const Property = ({
     const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
 
     let taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+
+    if (currentWorkflowTask?.parameters && name && arrayName && arrayIndex !== undefined) {
+        taskParameterValue = (currentWorkflowTask?.parameters[arrayName] as {[key: string]: any})[arrayIndex]?.[name];
+    }
 
     if (name && name.endsWith('_0') && defaultValue) {
         taskParameterValue = defaultValue;
@@ -249,23 +254,11 @@ const Property = ({
         }
     }, 200);
 
-    const handleSelectChange = (value: string, name: string | undefined) => {
+    const handleSelectChange = (value: string, name?: string) => {
         if (currentComponentData) {
             const {actionName, parameters} = currentComponentData;
 
             if (actionName) {
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        parameters: {
-                            ...parameters,
-                            [name!]: value,
-                        },
-                        workflowNodeName: currentNode.name,
-                    },
-                ]);
-
                 if (!workflow || !updateWorkflowMutation) {
                     return;
                 }
@@ -296,6 +289,17 @@ const Property = ({
                         },
                     };
                 }
+
+                setSelectValue(value);
+
+                setComponentData([
+                    ...otherComponentData,
+                    {
+                        ...currentComponentData,
+                        parameters: data,
+                        workflowNodeName: currentNode.name,
+                    },
+                ]);
 
                 saveProperty(data);
             }
@@ -488,6 +492,10 @@ const Property = ({
             setInputValue(taskParameterValue);
         }
 
+        if (selectValue === '' && taskParameterValue) {
+            setSelectValue(taskParameterValue);
+        }
+
         if (numericValue === '' && taskParameterValue) {
             setNumericValue(taskParameterValue);
         }
@@ -619,6 +627,7 @@ const Property = ({
 
                         {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
                             <ArrayProperty
+                                currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
                                 handleDeleteProperty={handleDeleteProperty}
@@ -704,7 +713,7 @@ const Property = ({
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={options as Array<SelectOptionType>}
-                                value={taskParameterValue || defaultValue?.toString()}
+                                value={selectValue}
                             />
                         )}
 
@@ -719,7 +728,7 @@ const Property = ({
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
-                                value={taskParameterValue || defaultValue?.toString()}
+                                value={selectValue}
                             />
                         )}
 
@@ -734,7 +743,7 @@ const Property = ({
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
-                                value={taskParameterValue || defaultValue?.toString()}
+                                value={selectValue}
                             />
                         )}
 
