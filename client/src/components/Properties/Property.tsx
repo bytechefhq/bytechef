@@ -154,7 +154,7 @@ const Property = ({
     let taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
 
     if (currentWorkflowTask?.parameters && name && arrayName && arrayIndex !== undefined) {
-        taskParameterValue = (currentWorkflowTask?.parameters[arrayName] as {[key: string]: any})[arrayIndex]?.[name];
+        taskParameterValue = (currentWorkflowTask?.parameters[arrayName] as {[key: string]: any})?.[arrayIndex]?.[name];
     }
 
     if (name && name.endsWith('_0') && defaultValue) {
