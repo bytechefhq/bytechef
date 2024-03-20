@@ -113,7 +113,7 @@
             <column name="parent_id" type="BIGINT">
                 <constraints nullable="true"/>
             </column>
-            <column name="status" type="VARCHAR(256)">
+            <column name="status" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="progress" type="INT">

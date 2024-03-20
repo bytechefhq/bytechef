@@ -17,9 +17,11 @@
 package com.bytechef.data.storage.db.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.data.storage.db.domain.DataEntry;
 import com.bytechef.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.data.storage.service.DataStorageService;
+import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,30 +43,30 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> Optional<T> fetch(
-        String componentName, String actionName, int scope, String scopeId, String key,
-        int type) {
+        String componentName, String actionName, Scope scope, String scopeId, String key,
+        Type type) {
 
         return dataStorageRepository.findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
-            componentName, actionName, scope, scopeId, key, type)
+            componentName, actionName, scope, scopeId, key, type.ordinal())
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
     @Override
     public <T> T get(
-        String componentName, String actionName, int scope, String scopeId, String key,
-        int type) {
+        String componentName, String actionName, Scope scope, String scopeId, String key,
+        Type type) {
 
         return OptionalUtils.get(fetch(componentName, actionName, scope, scopeId, key, type));
     }
 
     @Override
     public void put(
-        String componentName, String actionName, int scope, String scopeId, String key,
-        int type, Object value) {
+        String componentName, String actionName, Scope scope, String scopeId, String key,
+        Type type, Object value) {
 
         dataStorageRepository
             .findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
-                componentName, actionName, scope, scopeId, key, type)
+                componentName, actionName, scope, scopeId, key, type.ordinal())
             .ifPresentOrElse(
                 dataEntry -> {
                     dataEntry.setValue(value);

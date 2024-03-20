@@ -8,7 +8,9 @@
 package com.bytechef.data.storage.db.remote.client.service;
 
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
+import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,8 +33,8 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     @Override
     public <T> Optional<T> fetch(
-        String componentName, String actionName, int scope, String scopeId, String key,
-        int type) {
+        String componentName, String actionName, Scope scope, String scopeId, String key,
+        Type type) {
 
         return Optional.ofNullable(
             get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}));
@@ -40,18 +42,19 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     @Override
     public <T> T get(
-        String componentName, String actionName, int scope, String scopeId, String key,
-        int type) {
+        String componentName, String actionName, Scope scope, String scopeId, String key,
+        Type type) {
 
-        return Optional.ofNullable(
-            get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}))
+        return Optional
+            .ofNullable(
+                get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}))
             .orElseThrow();
     }
 
     @Override
     public void put(
-        String componentName, String actionName, int scope, String scopeId, String key,
-        int type, Object value) {
+        String componentName, String actionName, Scope scope, String scopeId, String key,
+        Type type, Object value) {
 
         loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
@@ -63,7 +66,7 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
     }
 
     private <T> T get(
-        String componentName, String actionName, int scope, String scopeId, String key, int type,
+        String componentName, String actionName, Scope scope, String scopeId, String key, Type type,
         ParameterizedTypeReference<T> responseTypeRef) {
 
         return loadBalancedRestClient.get(

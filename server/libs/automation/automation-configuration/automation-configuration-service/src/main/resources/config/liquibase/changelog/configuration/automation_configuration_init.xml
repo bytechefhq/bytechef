@@ -15,7 +15,7 @@
             <column name="project_version" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
-            <column name="status" type="INTEGER">
+            <column name="status" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="published_date" type="TIMESTAMP"/>

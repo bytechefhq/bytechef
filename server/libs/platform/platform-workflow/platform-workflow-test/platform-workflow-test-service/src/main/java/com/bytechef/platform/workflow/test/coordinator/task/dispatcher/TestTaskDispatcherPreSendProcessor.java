@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.constant.Type;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -49,6 +50,9 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
         if (connectionIdsMap.containsKey(taskExecution.getName())) {
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdsMap.get(taskExecution.getName()));
         }
+
+        // TODO
+        taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
 
         return taskExecution;
     }

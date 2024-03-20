@@ -16,6 +16,8 @@
 
 package com.bytechef.data.storage.db.domain;
 
+import com.bytechef.component.definition.ActionContext.Data.Scope;
+import com.bytechef.platform.constant.Type;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -64,7 +66,7 @@ public class DataEntry implements Persistable<Long> {
     private LocalDateTime lastModifiedDate;
 
     @Column
-    private int scope;
+    private Scope scope;
 
     @Column("scope_id")
     private String scopeId;
@@ -82,14 +84,14 @@ public class DataEntry implements Persistable<Long> {
     }
 
     public DataEntry(
-        String componentName, String actionName, int scope, String scopeId, String key, Object value, int type) {
+        String componentName, String actionName, Scope scope, String scopeId, String key, Object value, Type type) {
 
         this.actionName = actionName;
         this.componentName = componentName;
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
-        this.type = type;
+        this.type = type.ordinal();
         this.value = new ValueWrapper(value, value.getClass());
     }
 
@@ -126,7 +128,7 @@ public class DataEntry implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public int getScope() {
+    public Scope getScope() {
         return scope;
     }
 
@@ -134,8 +136,8 @@ public class DataEntry implements Persistable<Long> {
         return scopeId;
     }
 
-    public int getType() {
-        return type;
+    public Type getType() {
+        return Type.values()[type];
     }
 
     public Object getValue() {

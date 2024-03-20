@@ -41,8 +41,8 @@ public class RemoteInstanceJobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable int type) {
-        return instanceJobService.fetchLastJobId(instanceId, Type.valueOf(type))
+    public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable Type type) {
+        return instanceJobService.fetchLastJobId(instanceId, type)
             .map(ResponseEntity::ok)
             .orElse(
                 ResponseEntity.noContent()
@@ -58,8 +58,8 @@ public class RemoteInstanceJobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> fetchJobInstanceId(@PathVariable long jobId, @PathVariable int type) {
-        return instanceJobService.fetchJobInstanceId(jobId, Type.valueOf(type))
+    public ResponseEntity<Long> fetchJobInstanceId(@PathVariable long jobId, @PathVariable Type type) {
+        return instanceJobService.fetchJobInstanceId(jobId, type)
             .map(ResponseEntity::ok)
             .orElse(
                 ResponseEntity.noContent()

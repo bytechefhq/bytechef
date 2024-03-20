@@ -123,7 +123,7 @@ public class ProjectInstance implements Persistable<Long> {
     }
 
     public Environment getEnvironment() {
-        return Environment.valueOf(environment);
+        return Environment.values()[environment];
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ProjectInstance implements Persistable<Long> {
     }
 
     public void setEnvironment(Environment environment) {
-        this.environment = environment.getId();
+        this.environment = environment.ordinal();
     }
 
     public void setId(Long id) {

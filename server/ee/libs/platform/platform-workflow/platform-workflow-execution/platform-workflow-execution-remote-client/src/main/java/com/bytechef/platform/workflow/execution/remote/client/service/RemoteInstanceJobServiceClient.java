@@ -7,6 +7,7 @@
 
 package com.bytechef.platform.workflow.execution.remote.client.service;
 
+import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
@@ -48,7 +49,7 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
                     .path(INSTANCE_JOB_SERVICE + "/fetch-last-job-id/{instanceId}/{type}")
-                    .build(instanceId, type.getId()),
+                    .build(instanceId, type),
                 Long.class));
     }
 
@@ -59,13 +60,13 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
                     .path(INSTANCE_JOB_SERVICE + "/fetch-job-instance-id/{jobId}/{type}")
-                    .build(jobId, type.getId()),
+                    .build(jobId, type),
                 Long.class));
     }
 
     @Override
     public Page<Long> getJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
         List<String> workflowIds, int pageNumber) {
 
         throw new UnsupportedOperationException();

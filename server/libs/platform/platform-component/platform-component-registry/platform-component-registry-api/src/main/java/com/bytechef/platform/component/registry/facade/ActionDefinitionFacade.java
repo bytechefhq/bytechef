@@ -19,6 +19,7 @@ package com.bytechef.platform.component.registry.facade;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.constant.Type;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -41,7 +42,7 @@ public interface ActionDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds);
 
     Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, Type type, Long instanceId,
         @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds);
 

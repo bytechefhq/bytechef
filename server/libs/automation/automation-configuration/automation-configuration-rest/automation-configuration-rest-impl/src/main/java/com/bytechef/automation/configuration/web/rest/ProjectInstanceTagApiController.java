@@ -49,10 +49,11 @@ public class ProjectInstanceTagApiController implements ProjectInstanceTagApi {
 
     @Override
     public ResponseEntity<List<TagModel>> getProjectInstanceTags() {
-        return ResponseEntity.ok(projectInstanceFacade.getProjectInstanceTags()
-            .stream()
-            .map(tag -> conversionService.convert(tag, TagModel.class))
-            .toList());
+        return ResponseEntity.ok(
+            projectInstanceFacade.getProjectInstanceTags()
+                .stream()
+                .map(tag -> conversionService.convert(tag, TagModel.class))
+                .toList());
     }
 
     @Override

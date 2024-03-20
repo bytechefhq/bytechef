@@ -86,7 +86,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION.getId());
+        taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;

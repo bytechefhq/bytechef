@@ -48,8 +48,8 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     private final Map<Integer, GitWorkflowOperations> gitWorkflowOperationsMap;
 
-    public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperationsMap) {
-        this.gitWorkflowOperationsMap = Map.of(0, gitWorkflowOperationsMap);
+    public GitWorkflowRepository(int type, GitWorkflowOperations gitWorkflowOperationsMap) {
+        this.gitWorkflowOperationsMap = Map.of(type, gitWorkflowOperationsMap);
     }
 
     public GitWorkflowRepository(Map<Integer, GitWorkflowRepositoryProperties> gitWorkflowRepositoryPropertiesMap) {

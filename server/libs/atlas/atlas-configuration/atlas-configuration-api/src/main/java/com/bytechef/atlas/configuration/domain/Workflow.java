@@ -57,18 +57,8 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Workflow implements Persistable<String>, Serializable {
 
     public enum Format {
-        JSON(1),
-        YAML(2);
 
-        private final int id;
-
-        Format(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
+        JSON, YAML;
 
         public static Format parse(String filename) {
             Validate.notNull(filename, "Filename '%s' can not be null".formatted(filename));
@@ -79,14 +69,6 @@ public final class Workflow implements Persistable<String>, Serializable {
                 .orElse("");
 
             return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
-        }
-
-        public static Format valueOf(int id) {
-            return switch (id) {
-                case 1 -> Format.JSON;
-                case 2 -> Format.YAML;
-                default -> throw new IllegalArgumentException("Unexpected id=%s".formatted(id));
-            };
         }
     }
 
@@ -173,13 +155,13 @@ public final class Workflow implements Persistable<String>, Serializable {
         Validate.notNull(metadata, "'metadata' must not be null");
 
         this.definition = definition;
-        this.format = format.getId();
+        this.format = format.ordinal();
         this.id = id;
         this.lastModifiedDate = lastModifiedDate;
         this.metadata = new HashMap<>(metadata);
         this.type = type;
 
-        Map<String, ?> sourceMap = readWorkflowMap(definition, id, format.getId());
+        Map<String, ?> sourceMap = readWorkflowMap(definition, id, format);
 
         for (Map.Entry<String, ?> entry : sourceMap.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
@@ -213,10 +195,10 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     @PersistenceCreator
-    public Workflow(String id, String definition, int format, LocalDateTime lastModifiedDate, int type)
+    public Workflow(String id, String definition, Format format, LocalDateTime lastModifiedDate, int type)
         throws Exception {
 
-        this(id, definition, Format.valueOf(format), type, lastModifiedDate, Map.of());
+        this(id, definition, format, type, lastModifiedDate, Map.of());
     }
 
     private Workflow() {
@@ -275,7 +257,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     public Format getFormat() {
-        return Format.valueOf(format);
+        return Format.values()[format];
     }
 
     /** Returns the unique identifier of the workflow. */
@@ -364,7 +346,7 @@ public final class Workflow implements Persistable<String>, Serializable {
         // Validate
 
         try {
-            readWorkflowMap(definition, id, format);
+            readWorkflowMap(definition, id, Format.values()[format]);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -435,12 +417,11 @@ public final class Workflow implements Persistable<String>, Serializable {
         return allWorkflowTasks;
     }
 
-    private static Map<String, ?> readWorkflowMap(String definition, String id, int format) {
+    private static Map<String, ?> readWorkflowMap(String definition, String id, Format format) {
         try {
             return WorkflowReader.readWorkflowMap(
                 new WorkflowResource(
-                    id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
-                    Format.valueOf(format)));
+                    id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), format));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

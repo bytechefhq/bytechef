@@ -59,6 +59,7 @@ import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorReg
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -73,6 +74,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
@@ -815,9 +817,9 @@ public class OpenApiComponentTaskHandlerIntTest {
             .id(1L)
             .jobId(1L)
             .metadata(
-                connection.getId() == null
-                    ? Map.of()
-                    : Map.of(MetadataConstants.CONNECTION_IDS, Map.of("petstore", connection.getId())))
+                Map.of(
+                    MetadataConstants.CONNECTION_IDS, Map.of("petstore", Validate.notNull(connection.getId(), "id")),
+                    MetadataConstants.TYPE, Type.AUTOMATION))
             .workflowTask(
                 new WorkflowTask(
                     Map.of(

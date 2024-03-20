@@ -59,11 +59,11 @@ public class RemoteWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-workflows/{workflowIds}",
+        value = "/get-workflows-by-ids/{workflowIds}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<Workflow>> getWorkflows(@PathVariable String workflowIds) {
+    public ResponseEntity<List<Workflow>> getWorkflowsByIds(@PathVariable String workflowIds) {
         Stream<String> stream = Arrays.stream(workflowIds.split(","));
 
         return ResponseEntity.ok(workflowService.getWorkflows(stream.toList()));

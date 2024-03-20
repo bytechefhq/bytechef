@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.Project.Status;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ public interface ProjectService {
 
     List<Project> getProjects(List<Long> ids);
 
-    List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Boolean published);
+    List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Status status);
 
     Project getWorkflowProject(String workflowId);
 

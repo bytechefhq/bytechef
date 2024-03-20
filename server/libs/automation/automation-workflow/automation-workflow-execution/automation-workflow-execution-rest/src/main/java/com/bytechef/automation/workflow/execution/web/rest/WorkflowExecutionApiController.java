@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.workflow.execution.web.rest;
 
+import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.facade.WorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
@@ -62,7 +63,8 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
         return ResponseEntity.ok(
             workflowExecutionFacade
                 .getWorkflowExecutions(
-                    jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
+                    jobStatus == null ? null : Status.valueOf(jobStatus), jobStartDate, jobEndDate, projectId,
+                    projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
                     workflowExecutionDTO, WorkflowExecutionBasicModel.class)));
     }

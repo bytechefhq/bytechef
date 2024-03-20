@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.platform.constant.Type;
 import java.io.Serializable;
 import org.apache.commons.lang3.Validate;
 
@@ -26,21 +27,21 @@ import org.apache.commons.lang3.Validate;
 public class WorkflowExecutionId implements Serializable {
 
     private long instanceId;
-    private int type;
+    private Type type;
     private String workflowId;
     private String triggerName;
 
     private WorkflowExecutionId() {
     }
 
-    private WorkflowExecutionId(int type, long instanceId, String workflowId, String triggerName) {
+    private WorkflowExecutionId(Type type, long instanceId, String workflowId, String triggerName) {
         this.instanceId = instanceId;
         this.triggerName = triggerName;
         this.type = type;
         this.workflowId = workflowId;
     }
 
-    public static WorkflowExecutionId of(int type, long instanceId, String workflowId, String triggerName) {
+    public static WorkflowExecutionId of(Type type, long instanceId, String workflowId, String triggerName) {
         Validate.notBlank(workflowId, "'workflowId' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
@@ -52,14 +53,15 @@ public class WorkflowExecutionId implements Serializable {
 
         String[] items = id.split(":");
 
-        return WorkflowExecutionId.of(Integer.parseInt(items[0]), Long.parseLong(items[1]), items[2], items[3]);
+        return WorkflowExecutionId.of(
+            Type.values()[Integer.parseInt(items[0])], Long.parseLong(items[1]), items[2], items[3]);
     }
 
     public long getInstanceId() {
         return instanceId;
     }
 
-    public int getType() {
+    public Type getType() {
         return type;
     }
 
@@ -74,7 +76,7 @@ public class WorkflowExecutionId implements Serializable {
     @Override
     public String toString() {
         return EncodingUtils.encodeBase64ToString(
-            type +
+            type.ordinal() +
                 ":" +
                 instanceId +
                 ":" +

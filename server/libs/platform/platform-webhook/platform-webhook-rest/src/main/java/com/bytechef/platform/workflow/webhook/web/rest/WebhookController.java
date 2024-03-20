@@ -33,7 +33,6 @@ import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
@@ -349,8 +348,7 @@ public class WebhookController {
     private boolean isWorkflowEnabled(String id) {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
-            Type.valueOf(workflowExecutionId.getType()));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.isWorkflowEnabled(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());

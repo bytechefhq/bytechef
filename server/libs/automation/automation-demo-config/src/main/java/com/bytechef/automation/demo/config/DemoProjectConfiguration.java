@@ -80,7 +80,7 @@ public class DemoProjectConfiguration {
                 for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.json")) {
                     Workflow workflow = workflowService.create(
                         resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.JSON, SourceType.JDBC,
-                        Type.AUTOMATION.getId());
+                        Type.AUTOMATION.ordinal());
 
                     projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
                 }

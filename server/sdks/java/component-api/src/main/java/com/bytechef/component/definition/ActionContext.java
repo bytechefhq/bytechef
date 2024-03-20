@@ -56,31 +56,14 @@ public interface ActionContext extends Context {
     interface Data {
 
         enum Scope {
-            ACCOUNT(4, "Account"),
-            CURRENT_EXECUTION(1, "Current Execution"),
-            WORKFLOW(2, "Workflow"),
-            INSTANCE(3, "Instance");
+            CURRENT_EXECUTION("Current Execution"),
+            WORKFLOW("Workflow"),
+            ACCOUNT("Account");
 
-            private final int id;
             private final String label;
 
-            Scope(int id, String label) {
-                this.id = id;
+            Scope(String label) {
                 this.label = label;
-            }
-
-            public static Data.Scope valueOf(int id) {
-                return switch (id) {
-                    case 1 -> Data.Scope.CURRENT_EXECUTION;
-                    case 2 -> Data.Scope.WORKFLOW;
-                    case 3 -> Data.Scope.INSTANCE;
-                    case 4 -> Data.Scope.ACCOUNT;
-                    default -> throw new IllegalArgumentException("Unexpected value: %s".formatted(id));
-                };
-            }
-
-            public int getId() {
-                return id;
             }
 
             public String getLabel() {

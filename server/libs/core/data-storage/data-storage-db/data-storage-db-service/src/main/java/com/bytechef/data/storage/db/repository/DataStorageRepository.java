@@ -16,6 +16,7 @@
 
 package com.bytechef.data.storage.db.repository;
 
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.data.storage.db.domain.DataEntry;
 import java.util.Optional;
 import org.springframework.data.relational.core.sql.LockMode;
@@ -33,5 +34,5 @@ public interface DataStorageRepository
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
     Optional<DataEntry> findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
-        String componentName, String actionName, int scope, String scopeId, String key, int type);
+        String componentName, String actionName, Scope scope, String scopeId, String key, int type);
 }

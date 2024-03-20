@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.domain;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.platform.constant.Type;
 import java.util.Objects;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
@@ -45,10 +46,10 @@ public class InstanceJob implements Persistable<Long> {
     public InstanceJob() {
     }
 
-    public InstanceJob(long instanceId, long jobId, int type) {
+    public InstanceJob(long instanceId, long jobId, Type type) {
         this.jobId = AggregateReference.to(jobId);
         this.instanceId = instanceId;
-        this.type = type;
+        this.type = type.ordinal();
     }
 
     @Override
@@ -84,8 +85,8 @@ public class InstanceJob implements Persistable<Long> {
         return jobId.getId();
     }
 
-    public int getType() {
-        return type;
+    public Type getType() {
+        return Type.values()[type];
     }
 
     @Override

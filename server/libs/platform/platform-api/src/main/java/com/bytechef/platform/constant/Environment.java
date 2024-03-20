@@ -21,24 +21,5 @@ package com.bytechef.platform.constant;
  */
 public enum Environment {
 
-    DEVELOPMENT(0), STAGING(1), PRODUCTION(2);
-
-    private final int id;
-
-    Environment(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public static Environment valueOf(int id) {
-        return switch (id) {
-            case 1 ->  DEVELOPMENT;
-            case 2 -> STAGING;
-            case 3 -> PRODUCTION;
-            default -> throw new IllegalArgumentException("Unexpected value=%s".formatted(id));
-        };
-    }
+    DEVELOPMENT, STAGING, PRODUCTION
 }

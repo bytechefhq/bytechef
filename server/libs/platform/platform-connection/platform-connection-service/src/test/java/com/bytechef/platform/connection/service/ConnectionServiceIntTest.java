@@ -119,7 +119,7 @@ public class ConnectionServiceIntTest {
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
-            .type(1)
+            .type(Type.AUTOMATION)
             .version(1)
             .build();
     }

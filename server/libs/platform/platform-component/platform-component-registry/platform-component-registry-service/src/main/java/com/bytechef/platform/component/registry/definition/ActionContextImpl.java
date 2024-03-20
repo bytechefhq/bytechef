@@ -22,6 +22,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, Long instanceId, Integer type,
+        String componentName, int componentVersion, String actionName, Long instanceId, Type type,
         String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
@@ -82,30 +83,33 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, Long instanceId, int type, String workflowId,
+        String componentName, Integer componentVersion, String actionName, Long instanceId, Type type,
+        String workflowId,
         Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
-            return dataStorageService.fetch(componentName, actionName, scope.getId(), getScopeId(scope), key, type);
+            return dataStorageService.fetch(
+                componentName, actionName, scope, getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
-            return dataStorageService.get(componentName, actionName, scope.getId(), getScopeId(scope), key, type);
+            return dataStorageService.get(
+                componentName, actionName, scope, getScopeId(scope), key, type);
         }
 
         @Override
         public void setValue(Scope scope, String key, Object value) {
-            dataStorageService.put(componentName, actionName, scope.getId(), getScopeId(scope), key, type, value);
+            dataStorageService.put(
+                componentName, actionName, scope, getScopeId(scope), key, type, value);
         }
 
         private String getScopeId(Scope scope) {
             return switch (scope) {
-                case ACCOUNT -> null;
-                case CURRENT_EXECUTION -> jobId + "";
-                case INSTANCE -> instanceId + "";
+                case CURRENT_EXECUTION -> String.valueOf(jobId);
                 case WORKFLOW -> workflowId;
+                case ACCOUNT -> null;
             };
         }
     }

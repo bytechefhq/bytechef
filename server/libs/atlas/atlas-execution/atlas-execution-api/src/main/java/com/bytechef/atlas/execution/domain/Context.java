@@ -36,25 +36,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Context implements Persistable<Long> {
 
     public enum Classname {
-        JOB(1), TASK_EXECUTION(2);
-
-        private final int id;
-
-        Classname(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static Classname valueOf(int id) {
-            return switch (id) {
-                case 1 -> Classname.JOB;
-                case 2 -> Classname.TASK_EXECUTION;
-                default -> throw new IllegalArgumentException("Unexpected value: %s".formatted(id));
-            };
-        }
+        JOB, TASK_EXECUTION;
     }
 
     @Column
@@ -107,7 +89,7 @@ public final class Context implements Persistable<Long> {
 
         this.stackId = stackId;
         this.subStackId = subStackId;
-        this.classnameId = classname.getId();
+        this.classnameId = classname.ordinal();
         this.value = value;
     }
 
@@ -132,7 +114,7 @@ public final class Context implements Persistable<Long> {
     }
 
     public Classname getClassname() {
-        return Classname.valueOf(classnameId);
+        return Classname.values()[classnameId];
     }
 
     public Integer getClassnameId() {

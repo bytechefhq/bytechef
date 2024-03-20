@@ -17,6 +17,7 @@
 package com.bytechef.atlas.configuration.repository.jdbc;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryJdbc;
@@ -43,8 +44,8 @@ public interface JdbcWorkflowRepository
     List<Workflow> findAll(@Param("type") int type);
 
     @Override
-    default Workflow.SourceType getSourceType() {
-        return Workflow.SourceType.JDBC;
+    default SourceType getSourceType() {
+        return SourceType.JDBC;
     }
 
     @Override

@@ -16,14 +16,12 @@
 
 package com.bytechef.platform.workflow.execution.repository;
 
-import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.commons.util.CollectionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +42,7 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
 
     @Override
     public Page<Long> findAllJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        Integer status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
         @NonNull List<String> workflowIds, Pageable pageable) {
 
         Page<Long> page;
@@ -66,7 +64,7 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
     }
 
     private Query buildQuery(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        Integer status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
         List<String> workflowIds, Pageable pageable, boolean countQuery) {
 
         String query;
@@ -83,12 +81,10 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
 
         arguments.add(type);
 
-        if (StringUtils.isNotBlank(status)) {
+        if (status != null) {
             query += "AND status = ? ";
 
-            Job.Status jobStatus = Job.Status.valueOf(status);
-
-            arguments.add(jobStatus.getId());
+            arguments.add(status);
         }
 
         if (startDate != null) {

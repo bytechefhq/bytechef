@@ -23,7 +23,7 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="status" type="VARCHAR(256)">
+            <column name="status" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="workflow_execution_id" type="VARCHAR(256)">

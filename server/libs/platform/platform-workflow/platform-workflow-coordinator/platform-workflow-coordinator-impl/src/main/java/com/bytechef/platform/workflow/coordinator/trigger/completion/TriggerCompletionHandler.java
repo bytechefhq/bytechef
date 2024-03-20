@@ -86,8 +86,7 @@ public class TriggerCompletionHandler {
             triggerStateService.save(workflowExecutionId, triggerExecution.getState());
         }
 
-        InstanceAccessor instanceAccessor =
-            instanceAccessorRegistry.getInstanceAccessor(Type.valueOf(workflowExecutionId.getType()));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
@@ -97,7 +96,7 @@ public class TriggerCompletionHandler {
                 createJob(
                     workflowExecutionId,
                     MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
-                    workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
+                    workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
         } else {
             Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
@@ -107,14 +106,14 @@ public class TriggerCompletionHandler {
                         createJob(
                             workflowExecutionId,
                             MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
-                            workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
+                            workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
                 }
             } else {
                 triggerExecution.addJobId(
                     createJob(
                         workflowExecutionId,
                         MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
-                        workflowExecutionId.getInstanceId(), Type.valueOf(workflowExecutionId.getType())));
+                        workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
             }
         }
 
@@ -122,7 +121,7 @@ public class TriggerCompletionHandler {
 
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "Task id={}, type='{}', name='{}' completed",
+                "Trigger id={}, type='{}', name='{}' completed",
                 triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName());
         }
     }

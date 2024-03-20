@@ -8,6 +8,7 @@
 package com.bytechef.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.Project.Status;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -100,7 +101,7 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Boolean published) {
+    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Status status) {
         throw new UnsupportedOperationException();
     }
 

@@ -26,6 +26,7 @@ import com.bytechef.platform.component.registry.definition.ContextImpl;
 import com.bytechef.platform.component.registry.definition.HttpClientExecutor;
 import com.bytechef.platform.component.registry.definition.TriggerContextImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
@@ -55,7 +56,7 @@ public class ContextFactory {
     }
 
     public ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable Integer type,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable Type type,
         @Nullable Long instanceId, @Nullable String workflowId, @Nullable Long jobId,
         @Nullable ComponentConnection connection) {
 

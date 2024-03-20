@@ -12,6 +12,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -37,7 +38,7 @@ public class WorkerHandlerConfiguration {
             return actionDefinitionFacade.executePerform(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName(),
-                MapUtils.getInteger(taskExecution.getMetadata(), MetadataConstants.TYPE),
+                MapUtils.getRequired(taskExecution.getMetadata(), MetadataConstants.TYPE, Type.class),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap);

@@ -17,7 +17,6 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -30,25 +29,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProjectRepository
-    extends ListPagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long> {
-
-    List<Project> findAllByCategoryIdOrderByName(Long categoryId);
-
-    @Query("""
-            SELECT project.* FROM project
-            JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project.category_id = :categoryId
-            AND project_tag.tag_id = :tagId
-        """)
-    List<Project> findAllByCategoryIdAndTagIdOrderByName(
-        @Param("categoryId") long categoryId, @Param("tagId") long tagId);
-
-    @Query("""
-            SELECT project.* FROM project
-            JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project_tag.tag_id = :tagId
-        """)
-    List<Project> findAllByTagIdOrderByName(@Param("tagId") long tagId);
+    extends ListPagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long>, CustomProjectRepository {
 
     @Query("""
             SELECT project.* FROM project

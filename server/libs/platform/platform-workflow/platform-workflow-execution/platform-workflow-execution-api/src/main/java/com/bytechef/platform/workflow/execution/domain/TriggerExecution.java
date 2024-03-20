@@ -62,9 +62,9 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     public enum Status {
         CREATED(false),
         STARTED(false),
+        COMPLETED(true),
         FAILED(true),
-        CANCELLED(true),
-        COMPLETED(true);
+        CANCELLED(true);
 
         private final boolean terminated;
 
@@ -140,7 +140,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     private Object state;
 
     @Column
-    private Status status;
+    private int status;
 
     @MappedCollection(idColumn = "trigger_execution_id")
     private Set<TriggerExecutionJob> triggerExecutionJobs = new HashSet<>();
@@ -344,7 +344,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
      * @return The status of the task.
      */
     public Status getStatus() {
-        return status;
+        return Status.values()[status];
     }
 
     @JsonIgnore
@@ -470,7 +470,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = status.ordinal();
     }
 
     public void setWorkflowExecutionId(WorkflowExecutionId workflowExecutionId) {

@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.platform.constant.Environment;
-
 import java.util.List;
 
 /**

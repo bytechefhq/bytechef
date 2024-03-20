@@ -8,7 +8,9 @@
 package com.bytechef.data.storage.db.remote.web.rest.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
+import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +44,8 @@ public class RemoteDbDataStorageServiceController {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(
-        @PathVariable String componentName, @PathVariable String actionName, @PathVariable int scope,
-        @PathVariable String scopeId, @PathVariable String key, @PathVariable int type) {
+        @PathVariable String componentName, @PathVariable String actionName, @PathVariable Scope scope,
+        @PathVariable String scopeId, @PathVariable String key, @PathVariable Type type) {
 
         return ResponseEntity.ok(
             OptionalUtils.orElse(dataStorageService.fetch(
@@ -57,8 +59,8 @@ public class RemoteDbDataStorageServiceController {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable String componentName, @PathVariable String actionName, @PathVariable int scope,
-        @PathVariable String scopeId, @PathVariable String key, @PathVariable int type, @RequestBody Object data) {
+        @PathVariable String componentName, @PathVariable String actionName, @PathVariable Scope scope,
+        @PathVariable String scopeId, @PathVariable String key, @PathVariable Type type, @RequestBody Object data) {
 
         dataStorageService.put(componentName, actionName, scope, scopeId, key, type, data);
 

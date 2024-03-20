@@ -284,11 +284,11 @@ public class ProjectFacadeIntTest {
 
         List<Workflow> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 
-        assertThat(
-            workflows.stream()
-                .map(Workflow::getId)
-                .toList())
-                    .contains(workflow.getId());
+        List<String> ids = workflows.stream()
+            .map(Workflow::getId)
+            .toList();
+
+        assertThat(ids).contains(workflow.getId());
     }
 
     @Test

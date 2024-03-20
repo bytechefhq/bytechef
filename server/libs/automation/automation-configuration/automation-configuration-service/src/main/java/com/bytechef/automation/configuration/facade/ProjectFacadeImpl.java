@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.Project.Status;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -92,8 +93,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public Workflow addProjectWorkflow(long id, @NonNull String definition) {
-        Workflow workflow = workflowService.create(
-            definition, Format.JSON, SourceType.JDBC, Type.AUTOMATION.getId());
+        Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC, Type.AUTOMATION.ordinal());
 
         projectService.addWorkflow(id, workflow.getId());
 
@@ -125,7 +125,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
-                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, Type.AUTOMATION.getId());
+                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, Type.AUTOMATION.ordinal());
 
             project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
         }
@@ -239,14 +239,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published) {
-        List<Long> projectIds = null;
+    public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status) {
+        List<Long> projectIds = List.of();
 
         if (projectInstances) {
             projectIds = projectInstanceService.getProjectIds();
         }
 
-        List<Project> projects = projectService.getProjects(categoryId, projectIds, tagId, published);
+        List<Project> projects = projectService.getProjects(categoryId, projectIds, tagId, status);
 
         return CollectionUtils.map(
             projects,
@@ -332,8 +332,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
             workflow = workflowService.create(
-                workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(),
-                Type.AUTOMATION.getId());
+                workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), Type.AUTOMATION.ordinal());
 
             newWorkflowIds.add(workflow.getId());
         }
