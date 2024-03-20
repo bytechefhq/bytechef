@@ -40,7 +40,7 @@ public class ProjectResourceWorkflowRepositoryConfiguration {
 
             @Override
             public int getType() {
-                return Type.AUTOMATION.getId();
+                return Type.AUTOMATION.ordinal();
             }
         };
     }
@@ -59,7 +59,7 @@ public class ProjectResourceWorkflowRepositoryConfiguration {
 
             @Override
             public int getType() {
-                return Type.AUTOMATION.getId();
+                return Type.AUTOMATION.ordinal();
             }
         };
     }

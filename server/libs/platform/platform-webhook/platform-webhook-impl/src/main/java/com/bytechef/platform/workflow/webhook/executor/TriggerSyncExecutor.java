@@ -28,7 +28,6 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -145,8 +144,7 @@ public class TriggerSyncExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(Type.valueOf(workflowExecutionId.getType()));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());

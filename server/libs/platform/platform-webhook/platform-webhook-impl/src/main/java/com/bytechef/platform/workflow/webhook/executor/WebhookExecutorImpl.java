@@ -25,7 +25,6 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
@@ -83,8 +82,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, inputMap, triggerOutputValue),
                     (jobParameters) -> instanceJobFacade.createSyncJob(
-                        jobParameters, workflowExecutionId.getInstanceId(),
-                        Type.valueOf(workflowExecutionId.getType())));
+                        jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
@@ -94,8 +92,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, inputMap, triggerOutput.value()),
                 (jobParameters) -> instanceJobFacade.createSyncJob(
-                    jobParameters, workflowExecutionId.getInstanceId(),
-                    Type.valueOf(workflowExecutionId.getType())));
+                    jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
@@ -125,8 +122,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
-            Type.valueOf(workflowExecutionId.getType()));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());

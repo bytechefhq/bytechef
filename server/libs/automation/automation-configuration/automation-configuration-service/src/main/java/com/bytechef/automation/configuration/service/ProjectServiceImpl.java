@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.Project.Status;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -65,7 +66,7 @@ public class ProjectServiceImpl implements ProjectService {
         Validate.notNull(project.getName(), "'name' must not be null");
 
         project.setProjectVersion(1);
-        project.setStatus(Project.Status.UNPUBLISHED);
+        project.setStatus(Status.UNPUBLISHED);
 
         return projectRepository.save(project);
     }
@@ -160,7 +161,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project curProject = getProject(id);
 
         curProject.setPublishedDate(LocalDateTime.now());
-        curProject.setStatus(Project.Status.PUBLISHED);
+        curProject.setStatus(Status.PUBLISHED);
 
         return projectRepository.save(curProject);
     }

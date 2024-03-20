@@ -119,7 +119,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tags);
         }
 
-        connection.setType(type.getId());
+        connection.setType(type);
 
         connection = connectionService.create(connection);
 
@@ -130,7 +130,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public void delete(Long id) {
         Connection connection = connectionService.getConnection(id);
 
-        if (isConnectionUsed(id, Type.valueOf(connection.getType()))) {
+        if (isConnectionUsed(id, connection.getType())) {
             throw new IllegalArgumentException("Connection id=%s is used".formatted(id));
         }
 
@@ -147,7 +147,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.getConnection(id);
 
         return new ConnectionDTO(
-            isConnectionUsed(Validate.notNull(connection.getId(), "id"), Type.valueOf(connection.getType())),
+            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()),
             connection, tagService.getTags(connection.getTagIds()));
     }
 
@@ -181,8 +181,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         return new ConnectionDTO(
-            isConnectionUsed(Validate.notNull(connection.getId(), "id"), Type.valueOf(connection.getType())),
-            connection, tags);
+            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection, tags);
     }
 
     @Override
@@ -193,8 +192,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         connection = connectionService.update(connection);
 
-        return new ConnectionDTO(
-            isConnectionUsed(connectionDTO.id(), Type.valueOf(connection.getType())), connection, tags);
+        return new ConnectionDTO(isConnectionUsed(connectionDTO.id(), connection.getType()), connection, tags);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -239,7 +237,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return CollectionUtils.map(
             connections,
             connection -> new ConnectionDTO(
-                isConnectionUsed(Validate.notNull(connection.getId(), "id"), Type.valueOf(connection.getType())),
-                connection, filterTags(tags, connection)));
+                isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
+                filterTags(tags, connection)));
     }
 }

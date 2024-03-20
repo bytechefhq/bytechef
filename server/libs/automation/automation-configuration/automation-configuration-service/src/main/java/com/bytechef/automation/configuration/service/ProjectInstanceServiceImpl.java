@@ -19,9 +19,8 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.repository.ProjectInstanceRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import java.util.List;
-
 import com.bytechef.platform.constant.Environment;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +90,8 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances(Environment environment, Long projectId, Long tagId) {
-        return projectInstanceRepository.findAllProjectInstances(environment, projectId, tagId);
+        return projectInstanceRepository.findAllProjectInstances(
+            environment == null ? null : environment.ordinal(), projectId, tagId);
     }
 
     @Override

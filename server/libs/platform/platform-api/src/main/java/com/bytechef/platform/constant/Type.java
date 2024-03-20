@@ -21,23 +21,5 @@ package com.bytechef.platform.constant;
  */
 public enum Type {
 
-    AUTOMATION(1), EMBEDDED(2);
-
-    private final int id;
-
-    Type(int id) {
-        this.id = id;
-    }
-
-    public static Type valueOf(int type) {
-        return switch (type) {
-            case 1 -> Type.AUTOMATION;
-            case 2 -> Type.EMBEDDED;
-            default -> throw new IllegalArgumentException("Type %s does not exist".formatted(type));
-        };
-    }
-
-    public int getId() {
-        return id;
-    }
+    AUTOMATION, EMBEDDED
 }

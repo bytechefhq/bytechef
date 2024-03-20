@@ -62,7 +62,8 @@ public class WorkflowServiceIntTest {
     public void testCreate() {
         Workflow workflow = getWorkflow();
 
-        workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC, 0);
+        workflow = workflowService.create(
+            workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC, 0);
 
         Assertions.assertEquals(workflow, OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
     }

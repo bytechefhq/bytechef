@@ -68,15 +68,14 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Transactional(readOnly = true)
     public List<Connection> getConnections(Type type) {
         return CollectionUtils.filter(
-            connectionRepository.findAll(Sort.by("name")),
-            connection -> connection.getType() == type.getId());
+            connectionRepository.findAll(Sort.by("name")), connection -> connection.getType() == type);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(String componentName, int version, Type type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
-            componentName, version, type.getId());
+            componentName, version, type.ordinal());
     }
 
     @Override
@@ -87,24 +86,24 @@ public class ConnectionServiceImpl implements ConnectionService {
         Iterable<Connection> connectionIterable;
 
         if (StringUtils.isBlank(componentName) && tagId == null) {
-            connectionIterable = connectionRepository.findAllByType(type.getId());
+            connectionIterable = connectionRepository.findAllByType(type.ordinal());
         } else if (StringUtils.isNotBlank(componentName) && tagId == null) {
             if (connectionVersion == null) {
                 connectionIterable = connectionRepository.findAllByComponentNameAndTypeOrderByName(
-                    componentName, type.getId());
+                    componentName, type.ordinal());
             } else {
                 connectionIterable = connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
-                    componentName, connectionVersion, type.getId());
+                    componentName, connectionVersion, type.ordinal());
             }
         } else if (StringUtils.isBlank(componentName)) {
-            connectionIterable = connectionRepository.findAllByTagIdAndType(tagId, type.getId());
+            connectionIterable = connectionRepository.findAllByTagIdAndType(tagId, type.ordinal());
         } else {
             if (connectionVersion == null) {
                 connectionIterable = connectionRepository.findAllByComponentNameAndTagIdAndType(
-                    componentName, tagId, type.getId());
+                    componentName, tagId, type.ordinal());
             } else {
                 connectionIterable = connectionRepository.findAllByCNCVTIT(
-                    componentName, connectionVersion, tagId, type.getId());
+                    componentName, connectionVersion, tagId, type.ordinal());
             }
 
         }

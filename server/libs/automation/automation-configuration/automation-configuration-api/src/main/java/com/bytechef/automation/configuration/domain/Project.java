@@ -46,25 +46,8 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Project implements Persistable<Long> {
 
     public enum Status {
-        UNPUBLISHED(0), PUBLISHED(1);
 
-        private final int id;
-
-        Status(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static Status valueOf(int id) {
-            return switch (id) {
-                case 0 -> Status.UNPUBLISHED;
-                case 1 -> Status.PUBLISHED;
-                default -> throw new IllegalArgumentException("Unexpected value=%s".formatted(id));
-            };
-        }
+        UNPUBLISHED, PUBLISHED
     }
 
     @Column("category_id")
@@ -120,7 +103,7 @@ public final class Project implements Persistable<Long> {
     public Project(
         AggregateReference<Category, Long> categoryId, String description, Long id, String name,
         Set<ProjectTag> projectTags, int projectVersion, Set<ProjectWorkflow> projectWorkflows,
-        LocalDateTime publishedDate, int status, int version) {
+        LocalDateTime publishedDate, Status status, int version) {
 
         this.categoryId = categoryId;
         this.description = description;
@@ -130,7 +113,7 @@ public final class Project implements Persistable<Long> {
         this.projectVersion = projectVersion;
         this.projectWorkflows.addAll(projectWorkflows);
         this.publishedDate = publishedDate;
-        this.status = status;
+        this.status = status.ordinal();
         this.version = version;
     }
 
@@ -204,7 +187,7 @@ public final class Project implements Persistable<Long> {
     }
 
     public Status getStatus() {
-        return Status.valueOf(status);
+        return Status.values()[status];
     }
 
     public List<Long> getTagIds() {
@@ -274,7 +257,7 @@ public final class Project implements Persistable<Long> {
     public void setStatus(Status status) {
         Validate.notNull(status, "'status' must not be null");
 
-        this.status = status.getId();
+        this.status = status.ordinal();
     }
 
     public void setTagIds(List<Long> tagIds) {

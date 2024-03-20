@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.automation.configuration.domain.Project.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.category.domain.Category;
 import com.bytechef.tag.domain.Tag;
@@ -48,7 +49,7 @@ public interface ProjectFacade {
 
     List<Workflow> getProjectWorkflows(long id);
 
-    List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published);
+    List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
 
     ProjectDTO publishProject(long id);
 

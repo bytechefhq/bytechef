@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -124,7 +125,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecution> getWorkflowExecutions(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
+        Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
@@ -137,7 +138,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             workflowIds.addAll(project.getWorkflowIds());
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(workflowService.getWorkflows(Type.AUTOMATION.getId()), Workflow::getId));
+                CollectionUtils.map(workflowService.getWorkflows(Type.AUTOMATION.ordinal()), Workflow::getId));
         }
 
         Page<WorkflowExecution> workflowExecutionPage;
@@ -210,7 +211,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
         TriggerExecutionDTO triggerExecutionDTO = null;
 
-        if (projectInstanceId != null) {
+        if (projectInstanceId != null && triggerExecution != null) {
             ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
                 projectInstanceId.longValue(), job.getWorkflowId());
 

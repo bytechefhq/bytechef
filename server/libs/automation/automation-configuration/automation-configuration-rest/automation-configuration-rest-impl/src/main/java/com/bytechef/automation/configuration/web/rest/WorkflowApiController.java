@@ -86,7 +86,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<List<WorkflowBasicModel>> getWorkflows() {
         return ResponseEntity.ok(
             workflowService
-                .getWorkflows(Type.AUTOMATION.getId())
+                .getWorkflows(Type.AUTOMATION.ordinal())
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, WorkflowBasicModel.class))
                 .toList());

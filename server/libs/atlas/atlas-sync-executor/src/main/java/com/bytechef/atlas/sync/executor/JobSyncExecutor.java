@@ -66,7 +66,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -83,26 +82,25 @@ public class JobSyncExecutor {
     private final WorkflowService workflowService;
 
     public JobSyncExecutor(
-        @NonNull ContextService contextService, @NonNull JobService jobService,
-        @NonNull ObjectMapper objectMapper, @NonNull TaskExecutionService taskExecutionService,
-        @NonNull TaskHandlerRegistry taskHandlerRegistry, @NonNull TaskFileStorage taskFileStorage,
-        @NonNull WorkflowService workflowService) {
+        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
+        TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this(
-            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(), List.of(), List.of(),
-            taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService);
+            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(),
+            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
+            workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        @NonNull ContextService contextService, @NonNull JobService jobService,
-        @NonNull SyncMessageBroker syncMessageBroker,
-        @NonNull List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
-        @NonNull List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
+        ContextService contextService, JobService jobService, SyncMessageBroker syncMessageBroker,
+        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        @NonNull List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
-        @NonNull TaskExecutionService taskExecutionService, @NonNull TaskHandlerRegistry taskHandlerRegistry,
-        @NonNull TaskFileStorage taskFileStorage, @NonNull WorkflowService workflowService) {
+        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
+        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = createEventPublisher(syncMessageBroker);

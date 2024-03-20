@@ -78,9 +78,9 @@ public final class TaskExecution
     public enum Status {
         CREATED(false),
         STARTED(false),
+        COMPLETED(true),
         FAILED(true),
-        CANCELLED(true),
-        COMPLETED(true);
+        CANCELLED(true);
 
         private final boolean terminated;
 
@@ -155,7 +155,7 @@ public final class TaskExecution
     private LocalDateTime startDate;
 
     @Column
-    private Status status;
+    private int status;
 
     @Column("task_number")
     private int taskNumber;
@@ -385,7 +385,7 @@ public final class TaskExecution
      * @return The status of the task.
      */
     public Status getStatus() {
-        return status;
+        return Status.values()[status];
     }
 
     @SuppressFBWarnings("EI")
@@ -499,7 +499,7 @@ public final class TaskExecution
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = status.ordinal();
     }
 
     public void setTaskNumber(int taskNumber) {

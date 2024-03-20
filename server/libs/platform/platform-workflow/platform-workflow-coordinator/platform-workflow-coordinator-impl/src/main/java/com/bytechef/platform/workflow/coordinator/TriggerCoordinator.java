@@ -26,7 +26,6 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
@@ -214,8 +213,7 @@ public class TriggerCoordinator {
     private void dispatch(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
-            Type.valueOf(workflowExecutionId.getType()));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(

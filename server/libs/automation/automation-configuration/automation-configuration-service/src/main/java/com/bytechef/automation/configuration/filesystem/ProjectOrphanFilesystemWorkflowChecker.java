@@ -66,7 +66,7 @@ public class ProjectOrphanFilesystemWorkflowChecker {
     @Transactional
     public void onApplicationReadyEvent() {
         List<Project> projects = projectService.getProjects();
-        List<Workflow> workflows = workflowService.getWorkflows(Type.AUTOMATION.getId());
+        List<Workflow> workflows = workflowService.getWorkflows(Type.AUTOMATION.ordinal());
 
         List<Workflow> orphanWorkflows = new ArrayList<>();
         List<String> projectWorkflowIds = CollectionUtils.flatMap(projects, Project::getWorkflowIds);

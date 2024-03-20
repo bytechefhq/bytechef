@@ -16,9 +16,11 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -84,10 +86,13 @@ public class ProjectApiController implements ProjectApi {
 
     @Override
     public ResponseEntity<List<ProjectModel>> getProjects(
-        Long categoryId, Boolean projectInstances, Long tagId, Boolean published) {
+        Long categoryId, Boolean projectInstances, Long tagId, ProjectStatusModel status) {
 
         return ResponseEntity.ok(
-            projectFacade.getProjects(categoryId, projectInstances != null, tagId, published)
+            projectFacade
+                .getProjects(
+                    categoryId, projectInstances != null, tagId,
+                    status == null ? null : Project.Status.valueOf(status.name()))
                 .stream()
                 .map(project -> conversionService.convert(project, ProjectModel.class))
                 .toList());

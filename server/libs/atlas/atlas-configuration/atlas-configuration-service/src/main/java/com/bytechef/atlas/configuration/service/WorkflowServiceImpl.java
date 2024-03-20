@@ -156,6 +156,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows(int type) {
         List<Workflow> workflows;

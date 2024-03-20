@@ -42,7 +42,7 @@ public class ProjectGitWorkflowRepositoryConfiguration {
 
             @Override
             public int getType() {
-                return Type.AUTOMATION.getId();
+                return Type.AUTOMATION.ordinal();
             }
         };
     }

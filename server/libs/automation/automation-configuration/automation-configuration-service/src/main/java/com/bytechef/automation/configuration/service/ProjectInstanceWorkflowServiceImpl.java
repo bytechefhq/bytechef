@@ -66,11 +66,11 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     @Transactional(readOnly = true)
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String workflowNodeName, String key) {
+        long projectInstanceId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
         return projectInstanceWorkflowConnectionRepository
             .findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
-                projectInstanceId, workflowId, workflowNodeName, key);
+                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey);
     }
 
     @Override

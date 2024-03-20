@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
+import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import java.time.LocalDateTime;
@@ -35,6 +36,6 @@ public interface InstanceJobService {
     Optional<Long> fetchJobInstanceId(long jobId, Type type);
 
     Page<Long> getJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
         List<String> workflowIds, int pageNumber);
 }

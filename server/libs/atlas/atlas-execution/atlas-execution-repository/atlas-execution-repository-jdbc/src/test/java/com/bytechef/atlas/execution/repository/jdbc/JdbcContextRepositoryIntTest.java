@@ -55,7 +55,7 @@ public class JdbcContextRepositoryIntTest {
         context = contextRepository.save(context);
 
         Context resultContext = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
-            1L, Context.Classname.TASK_EXECUTION.getId());
+            1L, Context.Classname.TASK_EXECUTION.ordinal());
 
         Assertions.assertEquals(context.getValue(), resultContext.getValue());
     }

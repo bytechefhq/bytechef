@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -101,6 +102,7 @@ public class ConnectionRepositoryIntTest {
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
+            .type(Type.AUTOMATION)
             .version(1)
             .build();
     }

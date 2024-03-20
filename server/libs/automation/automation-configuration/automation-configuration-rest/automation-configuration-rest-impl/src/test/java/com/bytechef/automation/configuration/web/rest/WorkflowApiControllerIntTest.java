@@ -170,11 +170,11 @@ public class WorkflowApiControllerIntTest {
     }
 
     private Workflow getWorkflow() {
-        return new Workflow("1", DEFINITION, Workflow.Format.JSON, 1);
+        return new Workflow("1", DEFINITION, Workflow.Format.JSON, 0);
     }
 
     private WorkflowDTO getWorkflowDTO() {
-        Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON, 1);
+        Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON, 0);
 
         return new WorkflowDTO(
             workflow, List.of(new WorkflowTaskDTO(workflow.getTasks()

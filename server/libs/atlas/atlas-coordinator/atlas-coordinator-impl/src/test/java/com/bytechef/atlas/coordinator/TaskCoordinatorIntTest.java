@@ -124,7 +124,7 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, objectMapper, taskExecutionService, taskHandlerMap::get,
+            contextService, jobService, objectMapper, List.of(), taskExecutionService, taskHandlerMap::get,
             new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));

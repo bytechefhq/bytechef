@@ -25,6 +25,7 @@ import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull int type,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull Type type,
         Long instanceId, @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds) {
 

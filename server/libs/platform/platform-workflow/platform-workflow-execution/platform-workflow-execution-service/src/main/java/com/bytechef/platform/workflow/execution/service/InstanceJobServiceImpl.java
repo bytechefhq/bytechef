@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
+import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import com.bytechef.platform.workflow.execution.repository.InstanceJobRepository;
@@ -44,29 +45,31 @@ public class InstanceJobServiceImpl implements InstanceJobService {
 
     @Override
     public InstanceJob create(long jobId, long instanceId, Type type) {
-        return instanceJobRepository.save(new InstanceJob(instanceId, jobId, type.getId()));
+        return instanceJobRepository.save(new InstanceJob(instanceId, jobId, type));
     }
 
     @Override
     public Optional<Long> fetchLastJobId(long instanceId, Type type) {
-        return instanceJobRepository.findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type.getId())
+        return instanceJobRepository
+            .findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type.ordinal())
             .map(InstanceJob::getJobId);
     }
 
     @Override
     public Optional<Long> fetchJobInstanceId(long jobId, Type type) {
-        return instanceJobRepository.findByJobIdAndType(jobId, type.getId())
+        return instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(InstanceJob::getInstanceId);
     }
 
     @Override
     public Page<Long> getJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
         List<String> workflowIds, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, InstanceJobRepository.DEFAULT_PAGE_SIZE);
 
         return instanceJobRepository.findAllJobIds(
-            status, startDate, endDate, instanceId, type.getId(), workflowIds, pageRequest);
+            status == null ? null : status.ordinal(), startDate, endDate, instanceId, type.ordinal(), workflowIds,
+            pageRequest);
     }
 }

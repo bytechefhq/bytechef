@@ -32,10 +32,10 @@ public interface ProjectInstanceWorkflowService {
 
     void delete(Long id);
 
-    ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
-
     Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceOd, String workflowId, String workflowNodeName, String key);
+        long projectInstanceOd, String workflowId, String workflowNodeName, String workflowConnectionKey);
+
+    ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
         long projectInstanceOd, String workflowId, String workflowNodeName);

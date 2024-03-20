@@ -58,7 +58,7 @@ public class ContextServiceImpl implements ContextService {
     @Transactional(readOnly = true)
     public FileEntry peek(long stackId, Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
-            stackId, classname.getId());
+            stackId, classname.ordinal());
 
         return context.getValue();
     }
@@ -66,7 +66,7 @@ public class ContextServiceImpl implements ContextService {
     @Override
     public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
-            stackId, subStackId, classname.getId());
+            stackId, subStackId, classname.ordinal());
 
         return context.getValue();
     }

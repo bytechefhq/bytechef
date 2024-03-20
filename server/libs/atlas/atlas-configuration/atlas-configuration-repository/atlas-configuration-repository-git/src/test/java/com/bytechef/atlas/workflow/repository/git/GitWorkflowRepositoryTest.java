@@ -19,6 +19,7 @@
 package com.bytechef.atlas.workflow.repository.git;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
@@ -54,7 +55,7 @@ public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {
-        GitWorkflowRepository workflowRepository = new GitWorkflowRepository(new DummyGitWorkflowOperations());
+        GitWorkflowRepository workflowRepository = new GitWorkflowRepository(0, new DummyGitWorkflowOperations());
 
         Iterable<Workflow> iterable = workflowRepository.findAll(0);
 
@@ -72,13 +73,13 @@ public class GitWorkflowRepositoryTest {
         @Override
         public List<WorkflowResource> getHeadFiles() {
             return List.of(new WorkflowResource(
-                "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Workflow.Format.YAML));
+                "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML));
         }
 
         @Override
         public WorkflowResource getFile(String fileId) {
             return new WorkflowResource(
-                "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Workflow.Format.YAML);
+                "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML);
         }
     }
 }

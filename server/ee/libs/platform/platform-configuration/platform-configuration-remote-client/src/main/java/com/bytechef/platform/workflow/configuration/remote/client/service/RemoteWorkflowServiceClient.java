@@ -77,7 +77,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
-                .path(WORKFLOW_SERVICE + "/get-workflows/" + String.join(",", workflowIds))
+                .path(WORKFLOW_SERVICE + "/get-workflows-by-ids/" + String.join(",", workflowIds))
                 .build(),
             new ParameterizedTypeReference<>() {});
     }

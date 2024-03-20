@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.domain;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -45,26 +46,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Connection implements Persistable<Long> {
 
     public enum CredentialStatus {
-        INVALID(0),
-        VALID(1);
-
-        private final int id;
-
-        CredentialStatus(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static CredentialStatus valueOf(int id) {
-            return switch (id) {
-                case 0 -> CredentialStatus.INVALID;
-                case 1 -> CredentialStatus.VALID;
-                default -> throw new IllegalArgumentException("Unexpected value=%s".formatted(id));
-            };
-        }
+        INVALID, VALID
     }
 
     @Column("authorization_name")
@@ -180,7 +162,7 @@ public final class Connection implements Persistable<Long> {
     }
 
     public CredentialStatus getCredentialStatus() {
-        return CredentialStatus.valueOf(credentialStatus);
+        return CredentialStatus.values()[credentialStatus];
     }
 
     /**
@@ -229,8 +211,8 @@ public final class Connection implements Persistable<Long> {
             .toList();
     }
 
-    public int getType() {
-        return type;
+    public Type getType() {
+        return Type.values()[type];
     }
 
     public int getVersion() {
@@ -259,7 +241,7 @@ public final class Connection implements Persistable<Long> {
     }
 
     public void setCredentialStatus(CredentialStatus credentialStatus) {
-        this.credentialStatus = credentialStatus.getId();
+        this.credentialStatus = credentialStatus.ordinal();
     }
 
     public void setId(Long id) {
@@ -276,8 +258,8 @@ public final class Connection implements Persistable<Long> {
         }
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setType(Type type) {
+        this.type = type.ordinal();
     }
 
     public void setTagIds(List<Long> tagIds) {
@@ -327,7 +309,7 @@ public final class Connection implements Persistable<Long> {
         private String name;
         private Map<String, Object> parameters;
         private List<Long> tagIds;
-        private int type;
+        private Type type;
         private int version;
 
         private Builder() {
@@ -375,7 +357,7 @@ public final class Connection implements Persistable<Long> {
             return this;
         }
 
-        public Builder type(int type) {
+        public Builder type(Type type) {
             this.type = type;
 
             return this;

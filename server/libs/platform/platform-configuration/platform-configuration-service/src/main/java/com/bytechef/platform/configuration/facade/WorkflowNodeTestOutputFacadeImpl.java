@@ -32,6 +32,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -116,7 +117,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         } else {
             Object sampleOutput = actionDefinitionFacade.executePerform(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), 0, null, workflowId, null, inputParameters, connectionIds);
+                workflowNodeType.componentOperationName(), Type.AUTOMATION, null, workflowId, null, inputParameters,
+                connectionIds);
 
             return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
         }

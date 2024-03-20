@@ -14,7 +14,7 @@
                 <column name="action_name" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>
-                <column name="scope" type="INT">
+                <column name="scope" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>
                 <column name="scope_id" type="VARCHAR(256)">

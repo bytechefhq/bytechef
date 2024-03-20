@@ -19,6 +19,7 @@
 package com.bytechef.atlas.configuration.repository;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +34,5 @@ public interface WorkflowRepository {
 
     Optional<Workflow> findById(String id);
 
-    Workflow.SourceType getSourceType();
+    SourceType getSourceType();
 }

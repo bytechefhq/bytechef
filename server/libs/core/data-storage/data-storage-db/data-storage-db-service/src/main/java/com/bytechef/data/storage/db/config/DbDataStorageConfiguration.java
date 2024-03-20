@@ -16,10 +16,12 @@
 
 package com.bytechef.data.storage.db.config;
 
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.db.service.DbDataStorageServiceImpl;
 import com.bytechef.data.storage.service.DataStorageService;
+import com.bytechef.platform.constant.Type;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,24 +58,24 @@ public class DbDataStorageConfiguration {
 
         @Override
         public <T> Optional<T> fetch(
-            String componentName, String actionName, int scope, String scopeId, String key,
-            int type) {
+            String componentName, String actionName, Scope scope, String scopeId, String key,
+            Type type) {
 
             return dbDataStorageService.fetch(componentName, actionName, scope, scopeId, key, type);
         }
 
         @Override
         public <T> T get(
-            String componentName, String actionName, int scope, String scopeId, String key,
-            int type) {
+            String componentName, String actionName, Scope scope, String scopeId, String key,
+            Type type) {
 
             return dbDataStorageService.get(componentName, actionName, scope, scopeId, key, type);
         }
 
         @Override
         public void put(
-            String componentName, String actionName, int scope, String scopeId, String key,
-            int type, Object value) {
+            String componentName, String actionName, Scope scope, String scopeId, String key,
+            Type type, Object value) {
 
             dbDataStorageService.put(componentName, actionName, scope, scopeId, key, type, value);
         }

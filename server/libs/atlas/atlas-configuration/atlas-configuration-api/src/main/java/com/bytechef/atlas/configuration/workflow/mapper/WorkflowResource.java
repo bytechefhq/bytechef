@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.configuration.workflow.mapper;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,16 +39,16 @@ public class WorkflowResource implements Resource {
     private final long lastModified;
     private final Map<String, Object> metadata;
     private final transient Resource resource;
-    private final Workflow.Format workflowFormat;
+    private final Format workflowFormat;
 
     public WorkflowResource(
-        String id, Map<String, Object> metadata, Resource resource, Workflow.Format workflowFormat) {
+        String id, Map<String, Object> metadata, Resource resource, Format workflowFormat) {
 
         this(id, 0, metadata, resource, workflowFormat);
     }
 
     public WorkflowResource(
-        String id, long lastModified, Map<String, Object> metadata, Resource resource, Workflow.Format workflowFormat) {
+        String id, long lastModified, Map<String, Object> metadata, Resource resource, Format workflowFormat) {
 
         this.id = id;
         this.lastModified = lastModified;
@@ -61,7 +61,7 @@ public class WorkflowResource implements Resource {
         return id;
     }
 
-    public Workflow.Format getWorkflowFormat() {
+    public Format getWorkflowFormat() {
         return workflowFormat;
     }
 

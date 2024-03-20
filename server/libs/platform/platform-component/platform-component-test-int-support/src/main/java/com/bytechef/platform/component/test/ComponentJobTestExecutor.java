@@ -27,8 +27,11 @@ import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.constant.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,8 +66,13 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, objectMapper, taskExecutionService,
-            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
+            contextService, jobService, objectMapper,
+            List.of(taskExecution -> {
+                taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
+
+                return taskExecution;
+            }),
+            taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
             new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));

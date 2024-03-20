@@ -126,7 +126,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
 
         return new ProjectInstanceDTO(
-            projectInstance, CollectionUtils.map(
+            projectInstance,
+            CollectionUtils.map(
                 projectInstanceWorkflows,
                 projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
                     projectInstanceWorkflow, getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
@@ -348,7 +349,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                Type.AUTOMATION.getId(), projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(),
+                Type.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(),
                 workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -367,7 +368,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                Type.AUTOMATION.getId(), projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(),
+                Type.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(),
                 workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -437,7 +438,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK) {
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        Type.AUTOMATION.getId(), projectInstanceId, workflow.getId(), workflowTrigger.getName()));
+                        Type.AUTOMATION, projectInstanceId, workflow.getId(), workflowTrigger.getName()));
             }
         }
 
