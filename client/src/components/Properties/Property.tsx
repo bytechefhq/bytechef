@@ -181,64 +181,77 @@ const Property = ({
         !!property.displayCondition
     );
 
-    const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
+    const saveProperty = (data: object) => {
         if (!currentComponentData || !updateWorkflowMutation || !name) {
             return;
         }
 
-        const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+        const {actionName, componentName, workflowNodeName} = currentComponentData;
 
         saveWorkflowDefinition(
             {
                 actionName,
                 componentName,
                 name: workflowNodeName,
-                parameters: {
-                    ...parameters,
-                    [name]: value,
-                },
+                parameters: data,
             },
             workflow,
             updateWorkflowMutation
         );
+    };
+
+    const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
+        if (!currentComponentData || !updateWorkflowMutation || !name) {
+            return;
+        }
+
+        saveProperty({...currentComponentData.parameters, [name]: value});
     }, 200);
 
     const handlePropertyChange = useDebouncedCallback((name: string, value: string) => {
         if (currentComponentData) {
             const {parameters} = currentComponentData;
 
-            if (objectName) {
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        parameters: {
-                            ...parameters,
-                            [objectName]: {
-                                ...parameters?.[objectName],
-                                [name]: value,
-                            },
-                        },
-                    },
-                ]);
-            } else {
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        parameters: {
-                            ...parameters,
+            let data = {
+                ...parameters,
+                [name]: value,
+            };
+
+            if (arrayName && arrayIndex !== undefined) {
+                data = {
+                    ...parameters,
+                    [arrayName]: [
+                        ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                        {
+                            ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
                             [name]: value,
                         },
+                        ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                    ],
+                };
+            } else if (objectName) {
+                data = {
+                    ...parameters,
+                    [objectName]: {
+                        ...parameters?.[objectName],
+                        [name]: value,
                     },
-                ]);
+                };
             }
+
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    parameters: data,
+                },
+            ]);
         }
     }, 200);
 
     const handleSelectChange = (value: string, name: string | undefined) => {
         if (currentComponentData) {
-            const {actionName, componentName, parameters} = currentComponentData;
+            const {actionName, parameters} = currentComponentData;
 
             if (actionName) {
                 setComponentData([
@@ -257,27 +270,34 @@ const Property = ({
                     return;
                 }
 
-                saveWorkflowDefinition(
-                    {
-                        actionName,
-                        componentName,
-                        name: currentNode.name,
-                        parameters: objectName
-                            ? {
-                                  ...parameters,
-                                  [objectName]: {
-                                      ...parameters?.[objectName],
-                                      [name!]: value,
-                                  },
-                              }
-                            : {
-                                  ...parameters,
-                                  [name as string]: value,
-                              },
-                    },
-                    workflow,
-                    updateWorkflowMutation
-                );
+                let data = {
+                    ...parameters,
+                    [name as string]: value,
+                };
+
+                if (arrayName && arrayIndex !== undefined) {
+                    data = {
+                        ...parameters,
+                        [arrayName]: [
+                            ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                            {
+                                ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                                [name!]: value,
+                            },
+                            ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                        ],
+                    };
+                } else if (objectName) {
+                    data = {
+                        ...parameters,
+                        [objectName]: {
+                            ...parameters?.[objectName],
+                            [name!]: value,
+                        },
+                    };
+                }
+
+                saveProperty(data);
             }
         }
     };
@@ -332,33 +352,40 @@ const Property = ({
             return;
         }
 
-        const {actionName, componentName, parameters} = currentComponentData;
+        const {parameters} = currentComponentData;
 
         if (!name) {
             return;
         }
 
-        saveWorkflowDefinition(
-            {
-                actionName,
-                componentName,
-                name: currentNode.name,
-                parameters: objectName
-                    ? {
-                          ...parameters,
-                          [objectName]: {
-                              ...parameters?.[objectName],
-                              [name!]: isNumericalInput ? numericValue : inputValue,
-                          },
-                      }
-                    : {
-                          ...parameters,
-                          [name as string]: isNumericalInput ? numericValue : inputValue,
-                      },
-            },
-            workflow,
-            updateWorkflowMutation
-        );
+        let data = {
+            ...parameters,
+            [name as string]: isNumericalInput ? numericValue : inputValue,
+        };
+
+        if (arrayName && arrayIndex !== undefined) {
+            data = {
+                ...parameters,
+                [arrayName]: [
+                    ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                    {
+                        ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                        [name]: isNumericalInput ? numericValue : inputValue,
+                    },
+                    ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                ],
+            };
+        } else if (objectName) {
+            data = {
+                ...parameters,
+                [objectName]: {
+                    ...parameters?.[objectName],
+                    [name!]: isNumericalInput ? numericValue : inputValue,
+                },
+            };
+        }
+
+        saveProperty(data);
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
