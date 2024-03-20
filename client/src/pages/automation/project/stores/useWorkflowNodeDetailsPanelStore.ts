@@ -25,6 +25,7 @@ interface WorkflowNodeDetailsPanelStateI {
     focusedInput: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFocusedInput: (focusedInput: any) => void;
+
     workflowNodeDetailsPanelOpen: boolean;
     setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 }
