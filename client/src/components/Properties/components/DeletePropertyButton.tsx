@@ -13,20 +13,20 @@ const DeletePropertyButton = ({
     propertyName,
     subPropertyName,
 }: DeletePropertyButtonProps) => (
-    <Button
-        className="ml-1 self-center"
-        onClick={() => handleDeletePropertyClick(subPropertyName!, propertyName!)}
-        size="icon"
-        variant="ghost"
-    >
-        <Tooltip>
-            <TooltipTrigger>
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <Button
+                className="ml-1 self-center"
+                onClick={() => handleDeletePropertyClick(subPropertyName!, propertyName!)}
+                size="icon"
+                variant="ghost"
+            >
                 <XIcon className="size-8 cursor-pointer p-2 hover:text-red-500" />
-            </TooltipTrigger>
+            </Button>
+        </TooltipTrigger>
 
-            <TooltipContent>Delete property</TooltipContent>
-        </Tooltip>
-    </Button>
+        <TooltipContent>Delete property</TooltipContent>
+    </Tooltip>
 );
 
 export default DeletePropertyButton;
