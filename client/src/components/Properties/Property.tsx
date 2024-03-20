@@ -46,6 +46,7 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
 
 interface PropertyProps {
     actionName?: string;
+    arrayIndex?: number;
     arrayName?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
@@ -63,6 +64,7 @@ interface PropertyProps {
 
 const Property = ({
     actionName,
+    arrayIndex,
     arrayName,
     currentComponent,
     currentComponentData,
@@ -601,6 +603,8 @@ const Property = ({
                         {controlType === 'OBJECT_BUILDER' && (
                             <ObjectProperty
                                 actionName={actionName}
+                                arrayIndex={arrayIndex}
+                                arrayName={arrayName}
                                 currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}

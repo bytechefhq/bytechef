@@ -157,9 +157,10 @@ const ArrayProperty = ({
 
     return (
         <ul className="w-full">
-            {arrayItems?.map((item) => (
+            {arrayItems?.map((item, index) => (
                 <div className="ml-2 flex w-full border-l pb-2" key={item.name || `${name}_0`}>
                     <Property
+                        arrayIndex={index}
                         arrayName={name}
                         currentComponentData={currentComponentData}
                         customClassName="pl-2 w-full"
