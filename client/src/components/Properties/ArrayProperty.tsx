@@ -69,16 +69,10 @@ const ArrayProperty = ({
             return;
         }
 
-        const updatedArrayItems = arrayItems.map((item) => {
-            if (!item.name) {
-                return {
-                    ...item,
-                    name: `${name}_0`,
-                };
-            }
-
-            return item;
-        });
+        const updatedArrayItems = arrayItems.map((item) => ({
+            ...item,
+            name: item.name || `${name}_0`,
+        }));
 
         setArrayItems(updatedArrayItems);
         // eslint-disable-next-line react-hooks/exhaustive-deps
