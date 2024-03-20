@@ -546,7 +546,7 @@ const Property = ({
             <div className="relative w-full">
                 {showInputTypeSwitchButton && (
                     <Button
-                        className="absolute right-0 top-0 size-auto p-0.5"
+                        className="absolute right-0 top-0 z-50 size-auto p-0.5"
                         onClick={handleInputTypeSwitchButtonClick}
                         size="icon"
                         title="Switch input type"
@@ -572,7 +572,7 @@ const Property = ({
                     </Button>
                 )}
 
-                {showMentionInput && controlType !== 'CODE_EDITOR' && (
+                {showMentionInput && currentComponent && currentComponentData && controlType !== 'CODE_EDITOR' && (
                     <PropertyMentionsInput
                         arrayName={arrayName}
                         controlType={controlType}
@@ -779,8 +779,10 @@ const Property = ({
 
                         {type === 'NULL' && <span>NULL</span>}
 
-                        {type === 'DYNAMIC_PROPERTIES' && (
+                        {type === 'DYNAMIC_PROPERTIES' && currentComponent && currentComponentData && (
                             <PropertyDynamicProperties
+                                currentComponent={currentComponent}
+                                currentComponentData={currentComponentData}
                                 loadDependency={loadPropertiesDependency}
                                 name={name}
                                 propertiesDataSource={property.propertiesDataSource}
