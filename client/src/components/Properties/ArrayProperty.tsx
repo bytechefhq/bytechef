@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {ControlTypeModel, PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {ComponentDataType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import DeletePropertyButton from './components/DeletePropertyButton';
 import PropertySelect from './components/PropertySelect';
 
 interface ArrayPropertyProps {
+    currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     dataPills?: Array<DataPillType>;
     handleDeleteProperty?: (subPropertyName: string, propertyName: string) => void;
@@ -24,6 +25,7 @@ interface ArrayPropertyProps {
 type ArrayPropertyType = PropertyModel & {controlType?: ControlTypeModel; custom?: boolean; defaultValue?: string};
 
 const ArrayProperty = ({
+    currentComponent,
     currentComponentData,
     dataPills,
     handleDeleteProperty,
@@ -162,6 +164,7 @@ const ArrayProperty = ({
                     <Property
                         arrayIndex={index}
                         arrayName={name}
+                        currentComponent={currentComponent}
                         currentComponentData={currentComponentData}
                         customClassName="pl-2 w-full"
                         dataPills={dataPills}
