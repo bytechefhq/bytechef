@@ -59,12 +59,15 @@
         "exampleValue": null,
         "label": "Owner Id",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
       }, {
         "advancedOption": null,
         "description": "Account name",
@@ -269,12 +272,15 @@
         "exampleValue": null,
         "label": "Owner Id",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
       }, {
         "advancedOption": null,
         "description": "The firstname of the contact.",
@@ -539,12 +545,15 @@
         "exampleValue": null,
         "label": "Activity Type Id",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
       }, {
         "advancedOption": null,
         "description": "Sales Unit ID",
@@ -559,12 +568,15 @@
         "exampleValue": null,
         "label": "Unit Id",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
       }, {
         "advancedOption": null,
         "description": null,
@@ -579,12 +591,15 @@
         "exampleValue": null,
         "label": "Owner Id",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
@@ -769,6 +784,62 @@
       "description": null,
       "name": "basic_auth",
       "properties": [ {
+        "advancedOption": null,
+        "description": "Your Space ID",
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "spaceId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Space Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "serverUrl",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Server URL",
+        "placeholder": null,
+        "controlType": "SELECT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": [ {
+          "description": null,
+          "label": "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/"
+        }, {
+          "description": null,
+          "label": "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/"
+        }, {
+          "description": null,
+          "label": "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/"
+        }, {
+          "description": null,
+          "label": "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/"
+        } ],
+        "optionsDataSource": null
+      }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
