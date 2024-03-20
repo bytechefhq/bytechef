@@ -41,8 +41,8 @@ const MentionInputListItem = (item: DataPillType) => {
 interface PropertyMentionsInputProps {
     arrayName?: string;
     controlType?: string;
-    currentComponent?: CurrentComponentType;
-    currentComponentData?: ComponentDataType;
+    currentComponent: CurrentComponentType;
+    currentComponentData: ComponentDataType;
     dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
@@ -189,10 +189,14 @@ const PropertyMentionsInput = forwardRef(
 
             const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
 
-            let strippedValue = value.match(/data-value="([^"]+)"/)?.[1];
+            let strippedValue = value;
 
-            if (strippedValue && !strippedValue.startsWith('${') && !strippedValue.endsWith('}')) {
-                strippedValue = `\${${strippedValue}}`;
+            const dataPillValue = value.match(/data-value="([^"]+)"/)?.[1];
+
+            if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
+                strippedValue = `\${${dataPillValue}}`;
+            } else {
+                strippedValue = value.replace(/<[^>]*>?/gm, '');
             }
 
             if (arrayName && parameters) {
