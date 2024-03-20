@@ -46,7 +46,11 @@ public class PipelinerUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions((List<Map<String, String>>) body.get("data"));
+        if (body.get("data") instanceof List<?> list) {
+            return getOptions(list);
+        } else {
+            return List.of();
+        }
     }
 
     public static List<Option<String>> getOwnerIdOptions(
@@ -60,8 +64,12 @@ public class PipelinerUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<String, String> map : (List<Map<String, String>>) body.get("data")) {
-            options.add(option(map.get("first_name") + " " + map.get("last_name"), map.get("id")));
+        if (body.get("data") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option(map.get("first_name") + " " + map.get("last_name"), (String) map.get("id")));
+                }
+            }
         }
 
         return options;
@@ -76,14 +84,20 @@ public class PipelinerUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions((List<Map<String, String>>) body.get("data"));
+        if (body.get("data") instanceof List<?> list) {
+            return getOptions(list);
+        } else {
+            return List.of();
+        }
     }
 
-    private static List<Option<String>> getOptions(List<Map<String, String>> data) {
+    private static List<Option<String>> getOptions(List<?> list) {
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<String, String> map : data) {
-            options.add(option(map.get("name"), map.get("id")));
+        for (Object item : list) {
+            if (item instanceof Map<?, ?> map) {
+                options.add(option((String) map.get("name"), (String) map.get("id")));
+            }
         }
 
         return options;
