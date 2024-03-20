@@ -121,6 +121,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:schedule"))
     implementation(project(":server:libs:modules:components:script"))
     implementation(project(":server:libs:modules:components:slack"))
+    implementation(project(":server:libs:modules:components:sendgrid"))
     implementation(project(":server:libs:modules:components:text-helper"))
     implementation(project(":server:libs:modules:components:twilio"))
 //    implementation(project(":server:libs:modules:components:shopify"))
@@ -130,7 +131,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:xml-file"))
     implementation(project(":server:libs:modules:components:xml-helper"))
     implementation(project(":server:libs:modules:components:webhook"))
-    implementation(project(":server:libs:modules:components:sendgrid"))
 
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
     implementation(project(":server:libs:modules:task-dispatchers:condition"))
