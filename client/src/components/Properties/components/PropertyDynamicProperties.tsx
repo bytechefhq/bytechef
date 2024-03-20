@@ -4,15 +4,24 @@ import {PropertiesDataSourceModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workflowNodeDynamicProperties.queries';
+import {ComponentDataType, CurrentComponentType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
 interface PropertyDynamicPropertiesProps {
-    name?: string;
+    currentComponent: CurrentComponentType;
+    currentComponentData: ComponentDataType;
     loadDependency?: {[key: string]: string};
+    name?: string;
     propertiesDataSource?: PropertiesDataSourceModel;
 }
 
-const PropertyDynamicProperties = ({loadDependency, name, propertiesDataSource}: PropertyDynamicPropertiesProps) => {
+const PropertyDynamicProperties = ({
+    currentComponent,
+    currentComponentData,
+    loadDependency,
+    name,
+    propertiesDataSource,
+}: PropertyDynamicPropertiesProps) => {
     const [loadDependencyValues, setLoadDependencyValues] = useState<Array<string>>(
         Object.values(loadDependency ?? {})
     );
@@ -58,7 +67,15 @@ const PropertyDynamicProperties = ({loadDependency, name, propertiesDataSource}:
         );
     }
 
-    return properties ? <Properties properties={properties} /> : <></>;
+    return properties ? (
+        <Properties
+            currentComponent={currentComponent}
+            currentComponentData={currentComponentData}
+            properties={properties}
+        />
+    ) : (
+        <></>
+    );
 };
 
 export default PropertyDynamicProperties;
