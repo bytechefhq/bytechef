@@ -17,6 +17,7 @@ import DeletePropertyButton from './components/DeletePropertyButton';
 
 interface ObjectPropertyProps {
     actionName?: string;
+    arrayIndex?: number;
     arrayName?: string;
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
@@ -28,6 +29,7 @@ interface ObjectPropertyProps {
 
 const ObjectProperty = ({
     actionName,
+    arrayIndex,
     arrayName,
     currentComponent,
     currentComponentData,
@@ -133,6 +135,7 @@ const ObjectProperty = ({
                         <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
                                 actionName={actionName}
+                                arrayIndex={arrayIndex}
                                 arrayName={arrayName}
                                 currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
