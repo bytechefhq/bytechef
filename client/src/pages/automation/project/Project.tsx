@@ -93,7 +93,7 @@ const Project = () => {
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
-    const bottomImperativePanelHandleRef = useRef<ImperativePanelHandle>(null);
+    const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
 
@@ -206,8 +206,8 @@ const Project = () => {
             setShowBottomPanelOpen(false);
             setWorkflow({...workflow, componentNames, nodeNames});
 
-            if (bottomImperativePanelHandleRef.current) {
-                bottomImperativePanelHandleRef.current.resize(0);
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
             }
 
             navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
@@ -313,8 +313,8 @@ const Project = () => {
         setWorkflowTestExecution(undefined);
         setWorkflowIsRunning(true);
 
-        if (bottomImperativePanelHandleRef.current) {
-            bottomImperativePanelHandleRef.current.resize(35);
+        if (bottomResizablePanelRef.current) {
+            bottomResizablePanelRef.current.resize(35);
         }
 
         if (workflow?.id) {
@@ -326,11 +326,8 @@ const Project = () => {
                     setWorkflowTestExecution(workflowTestExecution);
                     setWorkflowIsRunning(false);
 
-                    if (
-                        bottomImperativePanelHandleRef.current &&
-                        bottomImperativePanelHandleRef.current.getSize() === 0
-                    ) {
-                        bottomImperativePanelHandleRef.current.resize(35);
+                    if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
+                        bottomResizablePanelRef.current.resize(35);
                     }
                 })
                 .catch(() => {
@@ -366,8 +363,8 @@ const Project = () => {
     useEffect(() => {
         setShowBottomPanelOpen(false);
 
-        if (bottomImperativePanelHandleRef.current) {
-            bottomImperativePanelHandleRef.current.resize(0);
+        if (bottomResizablePanelRef.current) {
+            bottomResizablePanelRef.current.resize(0);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -579,8 +576,8 @@ const Project = () => {
                                             onClick={() => {
                                                 setShowBottomPanelOpen(!showBottomPanelOpen);
 
-                                                if (bottomImperativePanelHandleRef.current) {
-                                                    bottomImperativePanelHandleRef.current.resize(
+                                                if (bottomResizablePanelRef.current) {
+                                                    bottomResizablePanelRef.current.resize(
                                                         !showBottomPanelOpen ? 35 : 0
                                                     );
                                                 }
@@ -596,30 +593,26 @@ const Project = () => {
                                 </Tooltip>
                             </div>
 
-                            <div>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span>
-                                            <Button
-                                                className="hover:bg-gray-200"
-                                                disabled={!!project?.publishedDate}
-                                                onClick={() =>
-                                                    publishProjectMutation.mutate({
-                                                        id: +projectId!,
-                                                    })
-                                                }
-                                                variant="ghost"
-                                            >
-                                                <CircleDotIcon className="h-5" /> Publish
-                                            </Button>
-                                        </span>
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className="hover:bg-gray-200"
+                                        disabled={!!project?.publishedDate}
+                                        onClick={() =>
+                                            publishProjectMutation.mutate({
+                                                id: +projectId!,
+                                            })
+                                        }
+                                        variant="ghost"
+                                    >
+                                        <CircleDotIcon className="h-5" /> Publish
+                                    </Button>
+                                </TooltipTrigger>
 
-                                    <TooltipContent>
-                                        {project?.publishedDate ? `The project is published` : `Publish the project.`}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
+                                <TooltipContent>
+                                    {project?.publishedDate ? `The project is published` : `Publish the project.`}
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     </header>
                 }
@@ -641,13 +634,13 @@ const Project = () => {
 
                             <ResizableHandle />
 
-                            <ResizablePanel className="bg-white" defaultSize={0} ref={bottomImperativePanelHandleRef}>
+                            <ResizablePanel className="bg-white" defaultSize={0} ref={bottomResizablePanelRef}>
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={() => {
                                         setShowBottomPanelOpen(false);
 
-                                        if (bottomImperativePanelHandleRef.current) {
-                                            bottomImperativePanelHandleRef.current.resize(0);
+                                        if (bottomResizablePanelRef.current) {
+                                            bottomResizablePanelRef.current.resize(0);
                                         }
                                     }}
                                     workflowIsRunning={workflowIsRunning}

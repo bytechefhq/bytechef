@@ -88,19 +88,19 @@ const WorkflowExecutionsTestOutput = ({
                 {workflowTestExecution ? (
                     <WorkflowExecutionsTestOutputHeader job={job} triggerExecution={triggerExecution} />
                 ) : (
-                    <div className="text-sm uppercase">Test Output</div>
+                    <span className="text-sm uppercase">Test Output</span>
                 )}
 
                 {onCloseClick && (
-                    <div className="cursor-pointer p-2" onClick={() => onCloseClick()}>
+                    <button className="p-2" onClick={() => onCloseClick()}>
                         <ChevronDownIcon className="h-5" />
-                    </div>
+                    </button>
                 )}
             </div>
 
             <div className="relative size-full">
                 <div className="absolute inset-0 overflow-y-auto">
-                    {workflowIsRunning ? (
+                    {workflowIsRunning && (
                         <div className="flex size-full items-center justify-center gap-x-1 p-3">
                             <span className="flex animate-spin text-gray-400">
                                 <RefreshCwIcon className="size-5" />
@@ -108,7 +108,9 @@ const WorkflowExecutionsTestOutput = ({
 
                             <span className="text-muted-foreground">Workflow is running...</span>
                         </div>
-                    ) : workflowTestExecution?.job ? (
+                    )}
+
+                    {!workflowIsRunning && workflowTestExecution?.job ? (
                         <ResizablePanelGroup direction="horizontal">
                             <ResizablePanel className="overflow-y-auto py-4" defaultSize={30}>
                                 <ul className="divide-y divide-gray-100">
