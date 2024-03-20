@@ -19,7 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectModel, ProjectModelStatusEnum, TagModel} from '@/middleware/automation/configuration';
+import {ProjectModel, ProjectStatusModel, TagModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/mutations/automation/projectTags.mutations';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
@@ -147,8 +147,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Badge variant={project.status === ProjectModelStatusEnum.Published ? 'success' : 'secondary'}>
-                            {project.status === ProjectModelStatusEnum.Published
+                        <Badge variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}>
+                            {project.status === ProjectStatusModel.Published
                                 ? `Published V${project.projectVersion}`
                                 : 'Not Published'}
                         </Badge>
@@ -156,7 +156,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         <Tooltip>
                             <TooltipTrigger>
                                 <div className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                    {project.status === ProjectModelStatusEnum.Published ? (
+                                    {project.status === ProjectStatusModel.Published ? (
                                         <span>
                                             {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
                                         </span>

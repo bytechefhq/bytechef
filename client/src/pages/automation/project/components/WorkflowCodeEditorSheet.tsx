@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {JobModel} from '@/middleware/automation/workflow/execution';
 import {WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
@@ -221,7 +222,9 @@ const WorkflowCodeEditorSheet = ({
                             <div className="relative size-full overflow-y-auto p-4">
                                 {!workflowIsRunning ? (
                                     workflowTestExecution?.job ? (
-                                        <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
+                                        <WorkflowExecutionDetailsAccordion
+                                            job={workflowTestExecution.job as JobModel}
+                                        />
                                     ) : (
                                         <div className="flex items-center gap-x-1 p-3 text-muted-foreground">
                                             <span>Workflow has not yet been executed.</span>

@@ -29,6 +29,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel} from '@/middleware/automation/configuration';
+import {JobModel, TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {
@@ -385,8 +386,8 @@ const Project = () => {
                         {!workflowIsRunning ? (
                             workflowTestExecution?.job ? (
                                 <WorkflowExecutionDetailsAccordion
-                                    job={workflowTestExecution.job}
-                                    triggerExecution={workflowTestExecution.triggerExecution}
+                                    job={workflowTestExecution.job as JobModel}
+                                    triggerExecution={workflowTestExecution.triggerExecution as TriggerExecutionModel}
                                 />
                             ) : (
                                 <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
