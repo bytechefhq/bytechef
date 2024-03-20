@@ -233,12 +233,13 @@ include("server:ee:apps:webhook-app")
 include("server:ee:apps:worker-app")
 
 include("server:ee:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git")
+
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 include("server:ee:libs:atlas:atlas-worker:atlas-worker-remote-client")
 
-include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-client")
+include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
 
 include("server:ee:libs:core:commons:commons-discovery")
 include("server:ee:libs:core:commons:commons-rest-client")
