@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
-import {ControlTypeModel, PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {ControlTypeModel, ObjectPropertyModel, PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
@@ -32,7 +32,7 @@ const ArrayProperty = ({
     property,
     updateWorkflowMutation,
 }: ArrayPropertyProps) => {
-    const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType>>([]);
+    const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
 
     const {items, name} = property;
@@ -60,23 +60,10 @@ const ArrayProperty = ({
             handleDeleteProperty(subPropertyName, propertyName);
         }
 
-        setArrayItems((subProperties) => subProperties.filter((subProperty) => subProperty.name !== subPropertyName));
+        setArrayItems((subProperties) =>
+            subProperties.filter((subProperty) => (subProperty as ArrayPropertyType).name !== subPropertyName)
+        );
     };
-
-    // set property.items?.[0].name if it's not set
-    useEffect(() => {
-        if (!arrayItems?.length) {
-            return;
-        }
-
-        const updatedArrayItems = arrayItems.map((item) => ({
-            ...item,
-            name: item.name || `${name}_0`,
-        }));
-
-        setArrayItems(updatedArrayItems);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [arrayItems?.length, name]);
 
     // render individual array items with data gathered from parameters
     useEffect(() => {
@@ -84,48 +71,48 @@ const ArrayProperty = ({
             return;
         }
 
-        const parameterArrayItems: Array<ArrayPropertyType> = Object.keys(currentComponentData.parameters).reduce(
-            (parameters: Array<ArrayPropertyType>, key: string) => {
-                if (arrayItems?.length && key.startsWith(`${name}_`)) {
-                    const strippedValue: string = currentComponentData.parameters?.[key]
-                        .replace(/<p>/g, '')
-                        .replace(/<\/p>/g, '');
+        if (items?.length && name && items[0].type === 'OBJECT') {
+            const parameterArrayItems = currentComponentData.parameters[name]?.map(
+                (parameterItem: ArrayPropertyType, index: number) => {
+                    const subProperties = Object.keys(parameterItem).map((key) => {
+                        const matchingSubproperty = (items[0] as ObjectPropertyModel).properties?.find(
+                            (property) => property.name === key
+                        );
 
-                    parameters.push({
-                        ...items?.[0],
-                        defaultValue: strippedValue,
-                        name: key,
-                        type: items?.[0].type,
+                        return {
+                            ...matchingSubproperty,
+                            defaultValue: parameterItem[key as keyof ArrayPropertyType],
+                        };
                     });
+
+                    return {
+                        ...items[0],
+                        custom: true,
+                        name: `${name}_${index}`,
+                        properties: subProperties,
+                    };
                 }
+            );
 
-                return parameters;
-            },
-            []
-        );
-
-        parameterArrayItems.sort((first, second) => {
-            const firstName = first.name?.toLowerCase();
-            const secondName = second.name?.toLowerCase();
-
-            if (!firstName || !secondName) {
-                return 0;
+            if (parameterArrayItems?.length) {
+                setArrayItems(parameterArrayItems);
             }
+        } else if (name) {
+            const parameterArrayItems = currentComponentData.parameters[name]?.map(
+                (parameterItem: ArrayPropertyType) => ({
+                    controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
+                    custom: true,
+                    defaultValue: Object.values(parameterItem)[0],
+                    name: Object.keys(parameterItem)[0],
+                    type: newItemType,
+                })
+            );
 
-            if (firstName < secondName) {
-                return -1;
+            if (parameterArrayItems?.length) {
+                setArrayItems(parameterArrayItems);
             }
-
-            if (firstName > secondName) {
-                return 1;
-            }
-
-            return 0;
-        });
-
-        if (parameterArrayItems.length) {
-            setArrayItems(parameterArrayItems);
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -153,29 +140,62 @@ const ArrayProperty = ({
 
     return (
         <ul className="w-full">
-            {arrayItems?.map((item, index) => (
-                <div className="ml-2 flex w-full border-l pb-2" key={item.name || `${name}_0`}>
-                    <Property
-                        arrayIndex={index}
-                        arrayName={name}
-                        currentComponent={currentComponent}
-                        currentComponentData={currentComponentData}
-                        customClassName="pl-2 w-full"
-                        dataPills={dataPills}
-                        mention={!!dataPills?.length}
-                        property={item as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
-                        updateWorkflowMutation={updateWorkflowMutation}
-                    />
+            {arrayItems?.map((arrayItem, index) =>
+                (arrayItem as Array<ArrayPropertyType>).length ? (
+                    (arrayItem as Array<ArrayPropertyType>).map((subItem: ArrayPropertyType) => (
+                        <div className="ml-2 flex w-full border-l pb-2" key={subItem.name || `${name}_0`}>
+                            <Property
+                                arrayIndex={index}
+                                arrayName={name}
+                                currentComponent={currentComponent}
+                                currentComponentData={currentComponentData}
+                                customClassName="pl-2 w-full"
+                                dataPills={dataPills}
+                                mention={!!dataPills?.length}
+                                property={
+                                    subItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}
+                                }
+                                updateWorkflowMutation={updateWorkflowMutation}
+                            />
 
-                    {item.custom && name && item.name && (
-                        <DeletePropertyButton
-                            handleDeletePropertyClick={handleDeletePropertyClick}
-                            propertyName={name}
-                            subPropertyName={item.name}
+                            {subItem.custom && name && subItem.name && (
+                                <DeletePropertyButton
+                                    handleDeletePropertyClick={handleDeletePropertyClick}
+                                    propertyName={name}
+                                    subPropertyName={subItem.name}
+                                />
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    <div
+                        className="ml-2 flex w-full border-l pb-2"
+                        key={(arrayItem as ArrayPropertyType).name || `${name}_0`}
+                    >
+                        <Property
+                            arrayIndex={index}
+                            arrayName={name}
+                            currentComponent={currentComponent}
+                            currentComponentData={currentComponentData}
+                            customClassName="pl-2 w-full"
+                            dataPills={dataPills}
+                            mention={!!dataPills?.length}
+                            property={
+                                arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}
+                            }
+                            updateWorkflowMutation={updateWorkflowMutation}
                         />
-                    )}
-                </div>
-            ))}
+
+                        {(arrayItem as ArrayPropertyType).custom && name && (arrayItem as ArrayPropertyType).name && (
+                            <DeletePropertyButton
+                                handleDeletePropertyClick={handleDeletePropertyClick}
+                                propertyName={name}
+                                subPropertyName={(arrayItem as ArrayPropertyType).name!}
+                            />
+                        )}
+                    </div>
+                )
+            )}
 
             {availableItemTypes.length > 1 ? (
                 <Popover>
