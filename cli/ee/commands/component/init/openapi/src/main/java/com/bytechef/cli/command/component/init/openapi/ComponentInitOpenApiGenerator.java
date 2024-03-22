@@ -966,7 +966,7 @@ public class ComponentInitOpenApiGenerator {
     }
 
     private CodeBlock getExtensionsCodeBlock(
-        String propertyName, String propertyDescription, Boolean required, boolean outputSchema,
+        String propertyName, String propertyDescription, Boolean required, Schema<?> schema, boolean outputSchema,
         Map<String, Object> extensionMap) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
@@ -978,7 +978,10 @@ public class ComponentInitOpenApiGenerator {
         if (!StringUtils.isEmpty(propertyName) && !outputSchema &&
             !Objects.equals(extensionMap.get("x-property-type"), "dynamicProperties")) {
 
-            builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
+            builder.add(
+                ".label($S)",
+                buildPropertyLabel(
+                    StringUtils.isEmpty(schema.getTitle()) ? propertyName.replace("__", "") : schema.getTitle()));
         }
 
         if (propertyDescription != null) {
@@ -1681,7 +1684,11 @@ public class ComponentInitOpenApiGenerator {
                 }
 
                 if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
-                    builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
+                    builder.add(
+                        ".label($S)",
+                        buildPropertyLabel(
+                            StringUtils.isEmpty(schema.getTitle())
+                                ? propertyName.replace("__", "") : schema.getTitle()));
                 }
 
                 if (propertyDescription != null) {
@@ -1714,7 +1721,8 @@ public class ComponentInitOpenApiGenerator {
             }
         } else {
             builder.add(
-                getExtensionsCodeBlock(propertyName, propertyDescription, required, outputSchema, extensionMap));
+                getExtensionsCodeBlock(propertyName, propertyDescription, required, schema, outputSchema,
+                    extensionMap));
         }
 
         return builder.build();
