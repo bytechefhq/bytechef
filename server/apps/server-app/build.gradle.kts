@@ -133,6 +133,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:xml-file"))
     implementation(project(":server:libs:modules:components:xml-helper"))
     implementation(project(":server:libs:modules:components:webhook"))
+    implementation(project(":server:libs:modules:components:zendesk-sell"))
 
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
     implementation(project(":server:libs:modules:task-dispatchers:condition"))
