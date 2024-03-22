@@ -48,7 +48,7 @@ public class PipelinerCreateAccountAction {
             string("name").label("Name")
                 .description("Account name")
                 .required(true))
-            .label("Item")
+            .label("Account")
             .required(true)
             .metadata(
                 Map.of(

@@ -61,7 +61,7 @@ public class KeapCreateCompanyAction {
                         .required(false),
                     string("zip_four").label("Zip Four")
                         .required(false))
-                    .label("Address")
+                    .label("Company Address")
                     .required(false),
                     string("company_name").label("Company Name")
                         .required(false),
@@ -78,7 +78,7 @@ public class KeapCreateCompanyAction {
                         .required(false),
                         string("type").label("Type")
                             .required(false))
-                        .label("Fax Number")
+                        .label("Company Fax Number")
                         .required(false),
                     string("notes").label("Notes")
                         .required(false),
@@ -90,11 +90,11 @@ public class KeapCreateCompanyAction {
                             .required(false),
                         string("type").label("Type")
                             .required(false))
-                        .label("Phone Number")
+                        .label("Company Phone Number")
                         .required(false),
                     string("website").label("Website")
                         .required(false))
-                .label("Address")
+                .label("Company Address")
                 .required(false))
             .label("Item")
             .metadata(

@@ -53,7 +53,7 @@ public class PipelinerCreateTaskAction {
                 .required(true),
             string("owner_id").label("Owner Id")
                 .required(true))
-            .label("Item")
+            .label("Task")
             .required(true)
             .metadata(
                 Map.of(

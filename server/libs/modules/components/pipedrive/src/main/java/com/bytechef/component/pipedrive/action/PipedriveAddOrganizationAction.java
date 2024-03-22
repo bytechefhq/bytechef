@@ -62,7 +62,7 @@ public class PipedriveAddOrganizationAction {
                 .description(
                     "The ID of the user who will be marked as the owner of this organization. When omitted, the authorized user ID will be used.")
                 .required(false))
-            .label("Item")
+            .label("Add Organization Request")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))

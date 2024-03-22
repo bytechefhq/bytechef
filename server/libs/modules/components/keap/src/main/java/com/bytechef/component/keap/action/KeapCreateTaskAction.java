@@ -56,7 +56,7 @@ public class KeapCreateTaskAction {
                     .required(false),
                 string("last_name").label("Last Name")
                     .required(false))
-                .label("Contact")
+                .label("Basic Contact")
                 .required(false),
             dateTime("creation_date").label("Creation Date")
                 .required(false),
@@ -84,7 +84,7 @@ public class KeapCreateTaskAction {
                 .required(false),
             integer("user_id").label("User Id")
                 .required(false))
-            .label("Item")
+            .label("Task")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))

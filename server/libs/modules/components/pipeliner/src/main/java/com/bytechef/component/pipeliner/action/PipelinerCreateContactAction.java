@@ -51,7 +51,7 @@ public class PipelinerCreateContactAction {
             string("last_name").label("Last Name")
                 .description("The lastname of the contact.")
                 .required(true))
-            .label("Item")
+            .label("Contact")
             .required(true)
             .metadata(
                 Map.of(

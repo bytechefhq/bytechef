@@ -105,7 +105,7 @@ public class PipedriveAddDealAction {
                 .options(option("Open", "open"), option("Won", "won"), option("Lost", "lost"),
                     option("Deleted", "deleted"))
                 .required(false))
-            .label("Item")
+            .label("Add Deal Request")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))

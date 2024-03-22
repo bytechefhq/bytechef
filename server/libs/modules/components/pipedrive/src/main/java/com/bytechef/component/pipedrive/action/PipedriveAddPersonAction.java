@@ -107,7 +107,7 @@ public class PipedriveAddPersonAction {
                 .description(
                     "An email address as a string or an array of email objects related to the person. The structure of the array is as follows: `[{ \"value\": \"mail@example.com\", \"primary\": \"true\", \"label\": \"main\" }]`. Please note that only `value` is required.")
                 .required(false))
-            .label("Item")
+            .label("Add Person Request")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))

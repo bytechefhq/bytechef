@@ -81,7 +81,7 @@ public class KeapCreateContactAction {
                 .required(false),
             object("company").properties(integer("id").label("Id")
                 .required(false))
-                .label("Company")
+                .label("Request Company Reference")
                 .required(false),
             string("contact_type").label("Contact Type")
                 .required(false),
@@ -124,7 +124,7 @@ public class KeapCreateContactAction {
                 .required(false),
             object("origin").properties(string("ip_address").label("Ip Address")
                 .required(true))
-                .label("Origin")
+                .label("Create Contact Origin")
                 .required(false),
             integer("owner_id").label("Owner Id")
                 .required(false),
@@ -173,7 +173,7 @@ public class KeapCreateContactAction {
                 .required(false),
             string("website").label("Website")
                 .required(false))
-            .label("Item")
+            .label("Create Or Patch Contact")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
