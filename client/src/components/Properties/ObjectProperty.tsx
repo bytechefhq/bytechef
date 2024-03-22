@@ -22,7 +22,6 @@ interface ObjectPropertyProps {
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
-    handleDeleteProperty?: (arg1: string, arg2: string) => void;
     property: PropertyType;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
@@ -34,7 +33,6 @@ const ObjectProperty = ({
     currentComponent,
     currentComponentData,
     dataPills,
-    handleDeleteProperty,
     property,
     updateWorkflowMutation,
 }: ObjectPropertyProps) => {
@@ -60,20 +58,6 @@ const ObjectProperty = ({
         setSubProperties([...subProperties, newItem]);
 
         setNewPropertyName('');
-    };
-
-    const handleDeletePropertyClick = (subPropertyName: string, propertyName: string) => {
-        if (!subPropertyName || !propertyName) {
-            return;
-        }
-
-        if (handleDeleteProperty) {
-            handleDeleteProperty(subPropertyName, propertyName);
-        }
-
-        setSubProperties((subProperties) =>
-            subProperties.filter((subProperty) => subProperty.name !== subPropertyName)
-        );
     };
 
     // on initial render, set subProperties if there are matching parameters
@@ -150,13 +134,23 @@ const ObjectProperty = ({
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
 
-                            {subProperty.custom && name && subProperty.name && (
-                                <DeletePropertyButton
-                                    handleDeletePropertyClick={handleDeletePropertyClick}
-                                    propertyName={name}
-                                    subPropertyName={subProperty.name}
-                                />
-                            )}
+                            {subProperty.custom &&
+                                name &&
+                                subProperty.name &&
+                                currentComponentData &&
+                                updateWorkflowMutation && (
+                                    <DeletePropertyButton
+                                        currentComponentData={currentComponentData}
+                                        handleDeletePropertyClick={() =>
+                                            setSubProperties((subProperties) =>
+                                                subProperties.filter((property) => property.name !== subProperty.name)
+                                            )
+                                        }
+                                        propertyName={name}
+                                        subPropertyName={subProperty.name}
+                                        updateWorkflowMutation={updateWorkflowMutation}
+                                    />
+                                )}
                         </div>
                     );
                 })}

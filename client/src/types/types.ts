@@ -124,6 +124,12 @@ export type WorkflowConnectionType = {
     componentVersion: number;
 };
 
+export type ArrayPropertyType = PropertyModel & {
+    controlType?: ControlTypeModel;
+    custom?: boolean;
+    defaultValue?: string;
+};
+
 type PropertyTypeAllType = ArrayPropertyModel &
     BooleanPropertyModel &
     DatePropertyModel &
