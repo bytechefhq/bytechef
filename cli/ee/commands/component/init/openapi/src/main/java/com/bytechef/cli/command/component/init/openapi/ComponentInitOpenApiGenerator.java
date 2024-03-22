@@ -33,6 +33,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -307,7 +308,7 @@ public class ComponentInitOpenApiGenerator {
         javacOpts.add(sourcePath.getParent() + "/Abstract" + simpleClassName + ".java");
         javacOpts.add(sourcePath.getParent() + "/" + simpleClassName + ".java");
         javacOpts.add(
-            sourcePath.getParent() + "/connection/" + StringUtils.capitalize(componentName) + "Connection.java");
+            sourcePath.getParent() + "/connection/" + getComponentClassName(componentName) + "Connection.java");
 
         javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
 
@@ -457,7 +458,7 @@ public class ComponentInitOpenApiGenerator {
 
                 ClassName className = ClassName.get(
                     getPackageName() + ".action",
-                    StringUtils.capitalize(componentName) + StringUtils.capitalize(operationItem.getOperationId()) +
+                    getComponentClassName(componentName) + StringUtils.capitalize(operationItem.getOperationId()) +
                         "Action");
 
                 writeComponentActionSource(className, actionCodeBlock, componentHandlerDirPath);
@@ -821,7 +822,7 @@ public class ComponentInitOpenApiGenerator {
             builder.add("null");
         } else {
             if (servers.size() == 1) {
-                Server server = servers.get(0);
+                Server server = servers.getFirst();
 
                 if (!StringUtils.isEmpty(server.getUrl()) && !Objects.equals(server.getUrl(), "/")) {
                     builder.add(".baseUri((connectionParameters, context) -> $S)", server.getUrl());
@@ -844,7 +845,7 @@ public class ComponentInitOpenApiGenerator {
                     codeBlocks.stream()
                         .collect(CodeBlock.joining(",")));
 
-                Server server = servers.get(0);
+                Server server = servers.getFirst();
 
                 builder.add(".defaultValue($S)", server.getUrl());
                 builder.add(")");
@@ -857,6 +858,8 @@ public class ComponentInitOpenApiGenerator {
     private CodeBlock getComponentCodeBlock(Path componentHandlerDirPath) throws IOException {
         CodeBlock.Builder builder = CodeBlock.builder();
 
+        Info info = openAPI.getInfo();
+
         builder.add(
             """
                 modifyComponent(
@@ -866,10 +869,7 @@ public class ComponentInitOpenApiGenerator {
                     )
                     .actions(modifyActions($L))
                 """,
-            componentName,
-            StringUtils.capitalize(componentName),
-            openAPI.getInfo()
-                .getDescription(),
+            componentName, getComponentClassName(componentName), info.getDescription(),
             getActionsCodeBlock(componentHandlerDirPath, openAPI));
 
         CodeBlock codeBlock = getConnectionCodeBlock(openAPI, componentHandlerDirPath);
@@ -883,8 +883,16 @@ public class ComponentInitOpenApiGenerator {
         return builder.build();
     }
 
+    private String getComponentClassName(String componentName) {
+        String[] items = componentName.split("-");
+
+        return Arrays.stream(items)
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining());
+    }
+
     private String getComponentHandlerClassName(String componentName) {
-        return StringUtils.capitalize(componentName) + "ComponentHandler";
+        return getComponentClassName(componentName) + "ComponentHandler";
     }
 
     private CodeBlock getConnectionCodeBlock(OpenAPI openAPI, Path componentHandlerDirPath) throws IOException {
@@ -908,7 +916,7 @@ public class ComponentInitOpenApiGenerator {
                     getAuthorizationsCodeBlock(securitySchemeMap));
 
                 ClassName className = ClassName.get(
-                    getPackageName() + ".connection", StringUtils.capitalize(componentName) + "Connection");
+                    getPackageName() + ".connection", getComponentClassName(componentName) + "Connection");
 
                 writeComponentConnectionSource(className, connectionCodeBlock, componentHandlerDirPath);
 
@@ -1079,7 +1087,7 @@ public class ComponentInitOpenApiGenerator {
             String tag = "unnamed";
 
             if (tags != null && !tags.isEmpty()) {
-                tag = tags.get(0);
+                tag = tags.getFirst();
             }
 
             operationItemsMap.compute(tag, (key, tagOperationItems) -> {
@@ -1135,7 +1143,7 @@ public class ComponentInitOpenApiGenerator {
     private CodeBlock getOutputSchemaCodeBlock(String mimeType, MediaType mediaType) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        Schema schema = mediaType.getSchema();
+        Schema<?> schema = mediaType.getSchema();
 
         builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
 
@@ -1462,7 +1470,7 @@ public class ComponentInitOpenApiGenerator {
                     """
                         .additionalProperties(
                             array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                            """);
+                        """);
             }
         } else {
             Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
@@ -1547,7 +1555,7 @@ public class ComponentInitOpenApiGenerator {
 
     private ClassName getPropertiesClassName(String schemaName) {
         return ClassName.get(
-            getPackageName() + ".property", StringUtils.capitalize(componentName) + schemaName + "Properties");
+            getPackageName() + ".property", getComponentClassName(componentName) + schemaName + "Properties");
     }
 
     @SuppressWarnings({
