@@ -203,6 +203,7 @@ include("server:libs:modules:components:xlsx-file")
 include("server:libs:modules:components:xml-file")
 include("server:libs:modules:components:xml-helper")
 include("server:libs:modules:components:webhook")
+include("server:libs:modules:components:zendesk-sell")
 
 include("server:libs:modules:task-dispatchers:branch")
 include("server:libs:modules:task-dispatchers:condition")

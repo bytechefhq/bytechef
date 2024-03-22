@@ -97,6 +97,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:xml-helper"))
     implementation(project(":server:libs:modules:components:webhook"))
     implementation(project(":server:libs:modules:components:sendgrid"))
+    implementation(project(":server:libs:modules:components:zendesk-sell"))
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-amqp")
     runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
