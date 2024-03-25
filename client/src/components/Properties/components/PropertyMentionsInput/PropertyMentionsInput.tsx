@@ -16,6 +16,7 @@ import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/typ
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
+import {useDebouncedCallback} from 'use-debounce';
 
 import PropertyMentionsInputBlot from './PropertyMentionsInputBlot';
 
@@ -182,7 +183,7 @@ const PropertyMentionsInput = forwardRef(
 
         const isFocused = focusedInput?.props.id === elementId;
 
-        const handleOnBlur = () => {
+        const saveInputValue = useDebouncedCallback(() => {
             if (!currentComponentData || !workflow || !updateWorkflowMutation) {
                 return;
             }
@@ -263,7 +264,7 @@ const PropertyMentionsInput = forwardRef(
                     updateWorkflowMutation
                 );
             }
-        };
+        }, 200);
 
         const handleOnChange = (value: string) => {
             if (setValue) {
@@ -277,6 +278,8 @@ const PropertyMentionsInput = forwardRef(
             }
 
             setMentionOccurences(value.match(/property-mention/g)?.length || 0);
+
+            saveInputValue();
         };
 
         const handleOnFocus = () => {
@@ -388,7 +391,6 @@ const PropertyMentionsInput = forwardRef(
                         key={elementId}
                         // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                         modules={useMemo(() => modules, [])}
-                        onBlur={handleOnBlur}
                         onChange={handleOnChange}
                         onFocus={handleOnFocus}
                         onKeyDown={handleOnKeyDown}
