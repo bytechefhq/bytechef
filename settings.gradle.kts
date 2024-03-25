@@ -143,6 +143,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service")
 
 include("server:libs:modules:components:accelo")
+include("server:libs:modules:components:active-campaign")
 include("server:libs:modules:components:affinity")
 include("server:libs:modules:components:airtable")
 include("server:libs:modules:components:aws:aws-s3")
