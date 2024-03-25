@@ -1,0 +1,182 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Active Campaign API"
+  description: "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools."
+  version: "v0"
+servers:
+  - url: "https://{youraccountname}.api-us1.com/api/3"
+paths:
+  /accounts:
+    post:
+      tags:
+        - "Accounts"
+      summary: "Create account"
+      description: "Creates a new account"
+      operationId: "createAccount"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Account"
+              type: "object"
+              properties:
+                account:
+                  type: "object"
+                  required:
+                    - "name"
+                  properties:
+                    name:
+                      type: "string"
+                      description: "Account's name"
+                    accountUrl:
+                      type: "string"
+                      description: "Account's website"
+
+      responses:
+        201:
+          description: "Successful operation. Returns created Account"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      account:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                          accountUrl:
+                            type: "string"
+  /contacts:
+    post:
+      tags:
+        - "Contacts"
+      summary: "Create contact"
+      description: "Creates a new contact"
+      operationId: "createContact"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Contact"
+              properties:
+                contact:
+                  type: "object"
+                  required:
+                    - "email"
+                  properties:
+                    email:
+                      type: "string"
+                      format: "email"
+                      description: "Email address of the new contact."
+                      example: "test@example.com"
+                    firstName:
+                        type: "string"
+                        description: "First name of the new contact."
+                    lastName:
+                        type: "string"
+                        description: "Last name of the new contact."
+                    phone:
+                        type: "string"
+                        description: "Phone number of the contact."
+      responses:
+        201:
+          description: "Successful operation. Returns created Contact"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      contact:
+                        type: "object"
+                        properties:
+                          email:
+                            type: "string"
+                            format: "email"
+                          firstName:
+                            type: "string"
+                          lastName:
+                            type: "string"
+                          phone:
+                            type: "string"
+  /dealTasks:
+    post:
+      tags:
+        - "Tasks"
+      summary: "Creates a task"
+      description: "Creates a new task"
+      operationId: "createTask"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Task"
+              properties:
+                dealTask:
+                  type: "object"
+                  required:
+                    - "relid"
+                    - "duedate"
+                    - "dealTasktype"
+                  properties:
+                    title:
+                      title: "Title"
+                      description: "The title to be assigned to the task"
+                      type: "string"
+                    relid:
+                      title: "Assigned to"
+                      description: "The id of the relational object for this task"
+                      type: "integer"
+                      format: "int32"
+                    duedate:
+                      title: "Due date"
+                      description: "Due date of the task"
+                      type: "string"
+                      format: "date"
+                    dealTasktype:
+                      title: "Task type"
+                      description: "The type of the task based on the available Task Types in the account"
+                      type: "integer"
+                      format: "int32"
+      responses:
+        201:
+          description: "Successful operation. Returns created Task"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      dealTask:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          title:
+                            type: "string"
+                          relid:
+                            type: "integer"
+                            format: "int32"
+                          duedate:
+                            type: "string"
+                            format: "date"
+                          dealTasktype:
+                            type: "integer"
+                            format: "int32"
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: "apiKey"
+      in: "header"
+      name: "Api-Token"
