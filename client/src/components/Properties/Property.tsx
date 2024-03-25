@@ -331,7 +331,7 @@ const Property = ({
         }
     };
 
-    const handleInputBlur = () => {
+    const saveInputValue = useDebouncedCallback(() => {
         if (isNumericalInput) {
             const valueTooLow = minValue && parseFloat(numericValue) < minValue;
             const valueTooHigh = maxValue && parseFloat(numericValue) > maxValue;
@@ -390,7 +390,7 @@ const Property = ({
         }
 
         saveProperty(data);
-    };
+    }, 200);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (isNumericalInput) {
@@ -410,6 +410,8 @@ const Property = ({
 
             setInputValue(event.target.value);
         }
+
+        saveInputValue();
     };
 
     const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -669,7 +671,6 @@ const Property = ({
                                 min={minValue}
                                 minLength={minLength}
                                 name={name || `${arrayName}_0`}
-                                onBlur={handleInputBlur}
                                 onChange={handleInputChange}
                                 placeholder={
                                     isNumericalInput && minValue && maxValue ? `From ${minValue} to ${maxValue}` : ''
