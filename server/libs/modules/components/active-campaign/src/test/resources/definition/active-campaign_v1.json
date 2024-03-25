@@ -801,13 +801,32 @@
     },
     "perform": null
   } ],
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
       "description": null,
       "name": "api_key",
       "properties": [ {
+        "advancedOption": null,
+        "description": "Your account name, e.g. https://{youraccountname}.api-us1.com",
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "username",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Account name",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -839,7 +858,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Value",
+        "label": "API Key",
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
@@ -868,5 +887,6 @@
     "authorizationRequired": null,
     "baseUri": { },
     "test": null
-  }
+  },
+  "triggers": [ ]
 }
