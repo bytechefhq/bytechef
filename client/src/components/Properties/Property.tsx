@@ -707,7 +707,7 @@ const Property = ({
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependency={loadOptionsDependency}
-                                name={name}
+                                name={objectName ? `${objectName}.${name}` : name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
@@ -722,7 +722,7 @@ const Property = ({
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependency={loadOptionsDependency}
-                                name={name}
+                                name={objectName ? `${objectName}.${name}` : name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
