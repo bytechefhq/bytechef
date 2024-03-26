@@ -75,9 +75,10 @@ const PropertyComboBox = ({
             workflowNodeName: currentNode.name!,
         },
         !!optionsDataSource &&
-            loadDependencyValues.reduce((enabled: boolean, loadDependencyValue: string) => {
-                return loadDependencyValue !== undefined;
-            }, true)
+            loadDependencyValues.reduce(
+                (enabled: boolean, loadDependencyValue: string) => enabled && loadDependencyValue !== undefined,
+                true
+            )
     );
 
     if (optionsData) {
@@ -88,11 +89,11 @@ const PropertyComboBox = ({
         }));
     }
 
-    const items = options as Array<ComboBoxItemType>;
+    const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
-    const item = items?.find((item) => item.value === value);
-
-    placeholder = loadDependencyValues?.length ? `Depends on ${Object.keys(loadDependency)}` : placeholder;
+    if (loadDependencyValues?.length) {
+        placeholder = `Depends on ${Object.keys(loadDependency)}`;
+    }
 
     useEffect(() => {
         if (loadDependency && typeof loadDependency === 'object') {
@@ -145,7 +146,7 @@ const PropertyComboBox = ({
                             </div>
                         )}
 
-                        {optionsDataSource && loadDependency && isRefetching && !item?.label && (
+                        {optionsDataSource && loadDependency && isRefetching && !currentOption?.label && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Refetching...
                             </span>
@@ -167,9 +168,11 @@ const PropertyComboBox = ({
                             <>
                                 {value ? (
                                     <span className={twMerge('flex w-full items-center', leadingIcon && 'ml-9')}>
-                                        {item?.icon && <InlineSVG className="mr-2 size-6 flex-none" src={item?.icon} />}
+                                        {currentOption?.icon && (
+                                            <InlineSVG className="mr-2 size-6 flex-none" src={currentOption?.icon} />
+                                        )}
 
-                                        {item?.label}
+                                        {currentOption?.label}
                                     </span>
                                 ) : (
                                     <span className={twMerge(leadingIcon && 'ml-9')}>{placeholder}</span>
@@ -189,38 +192,38 @@ const PropertyComboBox = ({
 
                         <CommandGroup>
                             <ScrollArea className="h-72 w-full">
-                                {items?.map((comboBoxItem) => (
+                                {(options as Array<ComboBoxItemType>)?.map((option) => (
                                     <CommandItem
-                                        key={comboBoxItem.value}
+                                        key={option.value}
                                         onSelect={() => {
                                             setOpen(false);
 
                                             if (onValueChange) {
-                                                onValueChange(comboBoxItem.value);
+                                                onValueChange(option.value);
                                             }
                                         }}
-                                        value={comboBoxItem.value}
+                                        value={option.value}
                                     >
-                                        {comboBoxItem.icon && (
-                                            <InlineSVG className="mr-2 size-6 flex-none" src={comboBoxItem.icon} />
+                                        {option.icon && (
+                                            <InlineSVG className="mr-2 size-6 flex-none" src={option.icon} />
                                         )}
 
-                                        {comboBoxItem.description ? (
+                                        {option.description ? (
                                             <div className="flex flex-col gap-1">
-                                                <div>{comboBoxItem.label}</div>
+                                                <div>{option.label}</div>
 
                                                 <div className="text-xs text-muted-foreground">
-                                                    {comboBoxItem.description}
+                                                    {option.description}
                                                 </div>
                                             </div>
                                         ) : (
-                                            <span>{comboBoxItem.label}</span>
+                                            <span>{option.label}</span>
                                         )}
 
                                         <CheckIcon
                                             className={cn(
                                                 'ml-auto size-4',
-                                                comboBoxItem.value === value ? 'opacity-100' : 'opacity-0'
+                                                option.value === value ? 'opacity-100' : 'opacity-0'
                                             )}
                                         />
                                     </CommandItem>
