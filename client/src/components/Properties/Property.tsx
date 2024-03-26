@@ -595,7 +595,7 @@ const Property = ({
                                     </span>
                                 )}
 
-                                {label && <Label>{label}</Label>}
+                                {label && <Label className="leading-normal">{label}</Label>}
 
                                 {description && (
                                     <Tooltip>

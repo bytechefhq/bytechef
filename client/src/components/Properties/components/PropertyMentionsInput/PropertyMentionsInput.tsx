@@ -351,7 +351,7 @@ const PropertyMentionsInput = forwardRef(
             <fieldset className="w-full space-y-2">
                 {label && (
                     <div className="flex items-center">
-                        <Label className={twMerge(description && 'mr-1')} htmlFor={elementId}>
+                        <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>
                             {label}
 
                             {required && <span className="leading-3 text-red-500">*</span>}
