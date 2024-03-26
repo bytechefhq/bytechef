@@ -420,6 +420,8 @@ const Property = ({
         handlePropertyChange(event.target.name, event.target.value);
 
         setInputValue(event.target.value);
+
+        saveInputValue();
     };
 
     // set default mentionInput state
@@ -755,6 +757,7 @@ const Property = ({
                                 name={name!}
                                 onChange={handleTextAreaChange}
                                 required={required}
+                                value={inputValue}
                             />
                         )}
 
