@@ -111,7 +111,7 @@ const PropertyComboBox = ({
         <fieldset className="w-full space-y-2">
             {label && (
                 <div className="flex items-center">
-                    <Label className={twMerge(description && 'mr-1')} htmlFor={name}>
+                    <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                         {label}
 
                         {required && <span className="leading-3 text-red-500">*</span>}
