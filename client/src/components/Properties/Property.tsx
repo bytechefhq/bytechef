@@ -362,9 +362,11 @@ const Property = ({
             return;
         }
 
+        const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
+
         let data = {
             ...parameters,
-            [name as string]: isNumericalInput ? numericValue : inputValue,
+            [name as string]: isNumericalInput ? numericValueToSave : inputValue,
         };
 
         if (arrayName && arrayIndex !== undefined) {
@@ -374,7 +376,7 @@ const Property = ({
                     ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
                     {
                         ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                        [name]: isNumericalInput ? numericValue : inputValue,
+                        [name]: isNumericalInput ? numericValueToSave : inputValue,
                     },
                     ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
                 ],
@@ -384,7 +386,7 @@ const Property = ({
                 ...parameters,
                 [objectName]: {
                     ...parameters?.[objectName],
-                    [name!]: isNumericalInput ? numericValue : inputValue,
+                    [name!]: isNumericalInput ? numericValueToSave : inputValue,
                 },
             };
         }
