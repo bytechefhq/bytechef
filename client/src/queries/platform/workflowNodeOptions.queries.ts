@@ -19,4 +19,5 @@ export const useGetWorkflowNodeOptionsQuery = (request: GetWorkflowNodeOptionsRe
         queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(request),
         queryFn: () => new WorkflowNodeOptionApi().getWorkflowNodeOptions(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: 60 * 1000,
     });
