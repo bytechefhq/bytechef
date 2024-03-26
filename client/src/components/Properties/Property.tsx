@@ -760,15 +760,19 @@ const Property = ({
 
                         {type === 'NULL' && <span>NULL</span>}
 
-                        {type === 'DYNAMIC_PROPERTIES' && currentComponent && currentComponentData && (
-                            <PropertyDynamicProperties
-                                currentComponent={currentComponent}
-                                currentComponentData={currentComponentData}
-                                loadDependency={loadPropertiesDependency}
-                                name={name}
-                                propertiesDataSource={property.propertiesDataSource}
-                            />
-                        )}
+                        {type === 'DYNAMIC_PROPERTIES' &&
+                            currentComponent &&
+                            currentComponentData &&
+                            updateWorkflowMutation && (
+                                <PropertyDynamicProperties
+                                    currentComponent={currentComponent}
+                                    currentComponentData={currentComponentData}
+                                    loadDependency={loadPropertiesDependency}
+                                    name={name}
+                                    propertiesDataSource={property.propertiesDataSource}
+                                    updateWorkflowMutation={updateWorkflowMutation}
+                                />
+                            )}
                     </>
                 )}
 
