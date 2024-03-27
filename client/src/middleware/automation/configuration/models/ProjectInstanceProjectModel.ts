@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ProjectStatusModel } from './ProjectStatusModel';
+import {
+    ProjectStatusModelFromJSON,
+    ProjectStatusModelFromJSONTyped,
+    ProjectStatusModelToJSON,
+} from './ProjectStatusModel';
+
 /**
  * 
  * @export
@@ -72,25 +79,14 @@ export interface ProjectInstanceProjectModel {
      * @type {number}
      * @memberof ProjectInstanceProjectModel
      */
-    projectVersion?: number;
+    readonly projectVersion?: number;
     /**
-     * The status of a project.
-     * @type {string}
+     * 
+     * @type {ProjectStatusModel}
      * @memberof ProjectInstanceProjectModel
      */
-    status?: ProjectInstanceProjectModelStatusEnum;
+    status?: ProjectStatusModel;
 }
-
-
-/**
- * @export
- */
-export const ProjectInstanceProjectModelStatusEnum = {
-    Published: 'PUBLISHED',
-    Unpublished: 'UNPUBLISHED'
-} as const;
-export type ProjectInstanceProjectModelStatusEnum = typeof ProjectInstanceProjectModelStatusEnum[keyof typeof ProjectInstanceProjectModelStatusEnum];
-
 
 /**
  * Check if a given object implements the ProjectInstanceProjectModel interface.
@@ -121,7 +117,7 @@ export function ProjectInstanceProjectModelFromJSONTyped(json: any, ignoreDiscri
         'name': json['name'],
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'status': !exists(json, 'status') ? undefined : ProjectStatusModelFromJSON(json['status']),
     };
 }
 
@@ -137,8 +133,7 @@ export function ProjectInstanceProjectModelToJSON(value?: ProjectInstanceProject
         'description': value.description,
         'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
-        'projectVersion': value.projectVersion,
-        'status': value.status,
+        'status': ProjectStatusModelToJSON(value.status),
     };
 }
 

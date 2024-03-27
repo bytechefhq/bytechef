@@ -1,10 +1,10 @@
+.openapi-generator-ignore
 apis/WorkflowTestApi.ts
 apis/index.ts
 index.ts
 models/ComponentDefinitionBasicModel.ts
 models/DataStreamComponentModel.ts
 models/ExecutionErrorModel.ts
-models/JobBasicModel.ts
 models/JobModel.ts
 models/TaskExecutionModel.ts
 models/TriggerExecutionModel.ts

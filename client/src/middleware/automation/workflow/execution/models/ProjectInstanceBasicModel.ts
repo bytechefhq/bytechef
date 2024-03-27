@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { EnvironmentModel } from './EnvironmentModel';
+import {
+    EnvironmentModelFromJSON,
+    EnvironmentModelFromJSONTyped,
+    EnvironmentModelToJSON,
+} from './EnvironmentModel';
+
 /**
  * Contains configurations and connections required for the execution of project workflows.
  * @export
@@ -37,6 +44,18 @@ export interface ProjectInstanceBasicModel {
      * @memberof ProjectInstanceBasicModel
      */
     readonly createdDate?: Date;
+    /**
+     * If a project instance is enabled or not.
+     * @type {boolean}
+     * @memberof ProjectInstanceBasicModel
+     */
+    enabled?: boolean;
+    /**
+     * 
+     * @type {EnvironmentModel}
+     * @memberof ProjectInstanceBasicModel
+     */
+    environment?: EnvironmentModel;
     /**
      * The id of a project instance.
      * @type {number}
@@ -68,17 +87,17 @@ export interface ProjectInstanceBasicModel {
      */
     name: string;
     /**
-     * Th id of a project.
+     * The id of a project.
      * @type {number}
      * @memberof ProjectInstanceBasicModel
      */
     projectId?: number;
     /**
-     * If a project instance is enabled or not.
-     * @type {boolean}
+     * The version of a project.
+     * @type {number}
      * @memberof ProjectInstanceBasicModel
      */
-    enabled?: boolean;
+    projectVersion?: number;
 }
 
 /**
@@ -104,13 +123,15 @@ export function ProjectInstanceBasicModelFromJSONTyped(json: any, ignoreDiscrimi
         'description': !exists(json, 'description') ? undefined : json['description'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
+        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
+        'environment': !exists(json, 'environment') ? undefined : EnvironmentModelFromJSON(json['environment']),
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
         'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
-        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
+        'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
     };
 }
 
@@ -124,9 +145,11 @@ export function ProjectInstanceBasicModelToJSON(value?: ProjectInstanceBasicMode
     return {
         
         'description': value.description,
+        'enabled': value.enabled,
+        'environment': EnvironmentModelToJSON(value.environment),
         'name': value.name,
         'projectId': value.projectId,
-        'enabled': value.enabled,
+        'projectVersion': value.projectVersion,
     };
 }
 

@@ -1,8 +1,10 @@
+.openapi-generator-ignore
 apis/DefaultApi.ts
 apis/index.ts
 index.ts
 models/ConnectionModel.ts
 models/CredentialStatusModel.ts
+models/EnvironmentModel.ts
 models/TagModel.ts
 models/UpdateTagsRequestModel.ts
 models/index.ts

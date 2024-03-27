@@ -19,6 +19,12 @@ import {
     CredentialStatusModelFromJSONTyped,
     CredentialStatusModelToJSON,
 } from './CredentialStatusModel';
+import type { EnvironmentModel } from './EnvironmentModel';
+import {
+    EnvironmentModelFromJSON,
+    EnvironmentModelFromJSONTyped,
+    EnvironmentModelToJSON,
+} from './EnvironmentModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -74,6 +80,12 @@ export interface ConnectionModel {
      * @memberof ConnectionModel
      */
     credentialStatus?: CredentialStatusModel;
+    /**
+     * 
+     * @type {EnvironmentModel}
+     * @memberof ConnectionModel
+     */
+    environment?: EnvironmentModel;
     /**
      * The name of a connection.
      * @type {string}
@@ -147,6 +159,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': !exists(json, 'credentialStatus') ? undefined : CredentialStatusModelFromJSON(json['credentialStatus']),
+        'environment': !exists(json, 'environment') ? undefined : EnvironmentModelFromJSON(json['environment']),
         'name': json['name'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
@@ -170,6 +183,7 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
         'componentName': value.componentName,
         'connectionVersion': value.connectionVersion,
         'credentialStatus': CredentialStatusModelToJSON(value.credentialStatus),
+        'environment': EnvironmentModelToJSON(value.environment),
         'name': value.name,
         'parameters': value.parameters,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
