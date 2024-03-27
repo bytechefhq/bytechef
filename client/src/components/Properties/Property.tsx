@@ -217,132 +217,6 @@ const Property = ({
         );
     };
 
-    const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponentData || !updateWorkflowMutation || !name) {
-            return;
-        }
-
-        saveProperty({...currentComponentData.parameters, [name]: value});
-    }, 200);
-
-    const handlePropertyChange = useDebouncedCallback((name: string, value: string) => {
-        if (currentComponentData) {
-            const {parameters} = currentComponentData;
-
-            let data = {
-                ...parameters,
-                [name]: value,
-            };
-
-            if (arrayName && arrayIndex !== undefined) {
-                data = {
-                    ...parameters,
-                    [arrayName]: [
-                        ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                        {
-                            ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                            [name]: value,
-                        },
-                        ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                    ],
-                };
-            } else if (objectName) {
-                data = {
-                    ...parameters,
-                    [objectName]: {
-                        ...parameters?.[objectName],
-                        [name]: value,
-                    },
-                };
-            }
-
-            setComponentData([
-                ...otherComponentData,
-                {
-                    ...currentComponentData,
-                    parameters: data,
-                },
-            ]);
-        }
-    }, 200);
-
-    const handleSelectChange = (value: string, name?: string) => {
-        if (currentComponentData) {
-            const {actionName, parameters} = currentComponentData;
-
-            if (actionName) {
-                if (!workflow || !updateWorkflowMutation) {
-                    return;
-                }
-
-                let data = {
-                    ...parameters,
-                    [name as string]: value,
-                };
-
-                if (arrayName && arrayIndex !== undefined) {
-                    data = {
-                        ...parameters,
-                        [arrayName]: [
-                            ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                            {
-                                ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                                [name!]: value,
-                            },
-                            ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                        ],
-                    };
-                } else if (objectName) {
-                    data = {
-                        ...parameters,
-                        [objectName]: {
-                            ...parameters?.[objectName],
-                            [name!]: value,
-                        },
-                    };
-                }
-
-                setSelectValue(value);
-
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        parameters: data,
-                        workflowNodeName: currentNode.name,
-                    },
-                ]);
-
-                saveProperty(data);
-            }
-        }
-    };
-
-    const handleInputTypeSwitchButtonClick = () => {
-        setMentionInput(!mentionInput);
-        setNumericValue('');
-        setInputValue('');
-        setMentionInputValue('');
-
-        if (mentionInput) {
-            setTimeout(() => {
-                if (inputRef.current) {
-                    inputRef.current.value = '';
-
-                    inputRef.current.focus();
-                }
-            }, 50);
-        } else {
-            setTimeout(() => {
-                setFocusedInput(editorRef.current);
-
-                editorRef.current?.focus();
-
-                setDataPillPanelOpen(true);
-            }, 50);
-        }
-    };
-
     const saveInputValue = useDebouncedCallback(() => {
         if (isNumericalInput) {
             const valueTooLow = minValue && parseFloat(numericValue) < minValue;
@@ -423,6 +297,128 @@ const Property = ({
             },
         ]);
     }, 200);
+
+    const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
+        if (!currentComponentData || !updateWorkflowMutation || !name) {
+            return;
+        }
+
+        saveProperty({...currentComponentData.parameters, [name]: value});
+    }, 200);
+
+    const handlePropertyChange = useDebouncedCallback((name: string, value: string) => {
+        if (currentComponentData) {
+            const {parameters} = currentComponentData;
+
+            let data = {
+                ...parameters,
+                [name]: value,
+            };
+
+            if (arrayName && arrayIndex !== undefined) {
+                data = {
+                    ...parameters,
+                    [arrayName]: [
+                        ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                        {
+                            ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                            [name]: value,
+                        },
+                        ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                    ],
+                };
+            } else if (objectName) {
+                data = {
+                    ...parameters,
+                    [objectName]: {
+                        ...parameters?.[objectName],
+                        [name]: value,
+                    },
+                };
+            }
+
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    parameters: data,
+                },
+            ]);
+        }
+    }, 200);
+
+    const handleSelectChange = (value: string, name: string) => {
+        if (!currentComponentData || !workflow || !updateWorkflowMutation) {
+            return;
+        }
+
+        const {parameters} = currentComponentData;
+
+        let data = {
+            ...parameters,
+            [name as string]: value,
+        };
+
+        if (arrayName && arrayIndex !== undefined) {
+            data = {
+                ...parameters,
+                [arrayName]: [
+                    ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                    {
+                        ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                        [name!]: value,
+                    },
+                    ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                ],
+            };
+        } else if (objectName) {
+            data = {
+                ...parameters,
+                [objectName]: {
+                    ...parameters?.[objectName],
+                    [name!]: value,
+                },
+            };
+        }
+
+        setSelectValue(value);
+
+        setComponentData([
+            ...otherComponentData,
+            {
+                ...currentComponentData,
+                parameters: data,
+                workflowNodeName: currentNode.name,
+            },
+        ]);
+
+        saveProperty(data);
+    };
+
+    const handleInputTypeSwitchButtonClick = () => {
+        setMentionInput(!mentionInput);
+        setNumericValue('');
+        setInputValue('');
+        setMentionInputValue('');
+
+        if (mentionInput) {
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.value = '';
+
+                    inputRef.current.focus();
+                }
+            }, 50);
+        } else {
+            setTimeout(() => {
+                setFocusedInput(editorRef.current);
+
+                editorRef.current?.focus();
+
+                setDataPillPanelOpen(true);
+            }, 50);
+        }
+    };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (isNumericalInput) {
