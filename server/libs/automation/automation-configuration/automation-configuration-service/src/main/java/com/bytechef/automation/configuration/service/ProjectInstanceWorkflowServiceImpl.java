@@ -18,12 +18,12 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.automation.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
 import com.bytechef.automation.configuration.repository.ProjectInstanceWorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -36,15 +36,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkflowService {
 
-    private final ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository;
     private final ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowServiceImpl(
-        ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository,
         ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository) {
 
-        this.projectInstanceWorkflowConnectionRepository = projectInstanceWorkflowConnectionRepository;
         this.projectInstanceWorkflowRepository = projectInstanceWorkflowRepository;
     }
 
@@ -68,9 +65,13 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
         long projectInstanceId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
-        return projectInstanceWorkflowConnectionRepository
-            .findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
-                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey);
+        return getProjectInstanceWorkflow(projectInstanceId, workflowId)
+            .getConnections()
+            .stream()
+            .filter(projectInstanceWorkflowConnection -> Objects
+                .equals(projectInstanceWorkflowConnection.getWorkflowNodeName(), workflowNodeName) &&
+                Objects.equals(projectInstanceWorkflowConnection.getKey(), workflowConnectionKey))
+            .findFirst();
     }
 
     @Override
@@ -78,8 +79,13 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
         long projectInstanceId, String workflowId, String workflowNodeName) {
 
-        return projectInstanceWorkflowConnectionRepository.findAllByProjectInstanceIdAndWorkflowIdAndWorkflowNodeName(
-            projectInstanceId, workflowId, workflowNodeName);
+        return getProjectInstanceWorkflow(projectInstanceId, workflowId)
+            .getConnections()
+            .stream()
+            .filter(
+                projectInstanceWorkflowConnection -> Objects.equals(
+                    projectInstanceWorkflowConnection.getWorkflowNodeName(), workflowNodeName))
+            .toList();
     }
 
     @Override
@@ -108,8 +114,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     @Transactional(readOnly = true)
     public boolean isConnectionUsed(long connectionId) {
-        return !projectInstanceWorkflowConnectionRepository
-            .findByConnectionId(connectionId)
+        return !projectInstanceWorkflowRepository.findProjectInstanceWorkflowConnectionIdsByConnectionId(connectionId)
             .isEmpty();
     }
 
