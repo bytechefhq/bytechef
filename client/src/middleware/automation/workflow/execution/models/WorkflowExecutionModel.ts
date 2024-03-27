@@ -19,18 +19,18 @@ import {
     JobModelFromJSONTyped,
     JobModelToJSON,
 } from './JobModel';
-import type { ProjectInstanceModel } from './ProjectInstanceModel';
+import type { ProjectBasicModel } from './ProjectBasicModel';
 import {
-    ProjectInstanceModelFromJSON,
-    ProjectInstanceModelFromJSONTyped,
-    ProjectInstanceModelToJSON,
-} from './ProjectInstanceModel';
-import type { ProjectModel } from './ProjectModel';
+    ProjectBasicModelFromJSON,
+    ProjectBasicModelFromJSONTyped,
+    ProjectBasicModelToJSON,
+} from './ProjectBasicModel';
+import type { ProjectInstanceBasicModel } from './ProjectInstanceBasicModel';
 import {
-    ProjectModelFromJSON,
-    ProjectModelFromJSONTyped,
-    ProjectModelToJSON,
-} from './ProjectModel';
+    ProjectInstanceBasicModelFromJSON,
+    ProjectInstanceBasicModelFromJSONTyped,
+    ProjectInstanceBasicModelToJSON,
+} from './ProjectInstanceBasicModel';
 import type { TriggerExecutionModel } from './TriggerExecutionModel';
 import {
     TriggerExecutionModelFromJSON,
@@ -64,16 +64,16 @@ export interface WorkflowExecutionModel {
     job?: JobModel;
     /**
      * 
-     * @type {ProjectModel}
+     * @type {ProjectBasicModel}
      * @memberof WorkflowExecutionModel
      */
-    project?: ProjectModel;
+    project?: ProjectBasicModel;
     /**
      * 
-     * @type {ProjectInstanceModel}
+     * @type {ProjectInstanceBasicModel}
      * @memberof WorkflowExecutionModel
      */
-    projectInstance?: ProjectInstanceModel;
+    projectInstance?: ProjectInstanceBasicModel;
     /**
      * 
      * @type {TriggerExecutionModel}
@@ -109,8 +109,8 @@ export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminat
         
         'id': !exists(json, 'id') ? undefined : json['id'],
         'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
-        'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
-        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceModelFromJSON(json['projectInstance']),
+        'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
+        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceBasicModelFromJSON(json['projectInstance']),
         'triggerExecution': !exists(json, 'triggerExecution') ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
         'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
@@ -126,8 +126,8 @@ export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | nu
     return {
         
         'job': JobModelToJSON(value.job),
-        'project': ProjectModelToJSON(value.project),
-        'projectInstance': ProjectInstanceModelToJSON(value.projectInstance),
+        'project': ProjectBasicModelToJSON(value.project),
+        'projectInstance': ProjectInstanceBasicModelToJSON(value.projectInstance),
         'triggerExecution': TriggerExecutionModelToJSON(value.triggerExecution),
         'workflow': WorkflowBasicModelToJSON(value.workflow),
     };

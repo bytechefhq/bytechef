@@ -79,7 +79,7 @@ export interface ProjectBasicModel {
      * @type {number}
      * @memberof ProjectBasicModel
      */
-    projectVersion?: number;
+    readonly projectVersion?: number;
     /**
      * 
      * @type {ProjectStatusModel}
@@ -133,7 +133,6 @@ export function ProjectBasicModelToJSON(value?: ProjectBasicModel | null): any {
         'description': value.description,
         'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
-        'projectVersion': value.projectVersion,
         'status': ProjectStatusModelToJSON(value.status),
     };
 }

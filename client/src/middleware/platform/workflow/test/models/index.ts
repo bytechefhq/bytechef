@@ -3,7 +3,6 @@
 export * from './ComponentDefinitionBasicModel';
 export * from './DataStreamComponentModel';
 export * from './ExecutionErrorModel';
-export * from './JobBasicModel';
 export * from './JobModel';
 export * from './TaskExecutionModel';
 export * from './TriggerExecutionModel';
