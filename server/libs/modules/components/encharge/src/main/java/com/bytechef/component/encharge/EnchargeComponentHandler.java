@@ -16,13 +16,15 @@
 
 package com.bytechef.component.encharge;
 
+import static com.bytechef.component.encharge.constant.EnchargeConstants.EMAIL;
+
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.encharge.util.EnchargeUtils;
 import com.bytechef.definition.BaseProperty;
@@ -53,9 +55,9 @@ public class EnchargeComponentHandler extends AbstractEnchargeComponentHandler {
                 ((ModifiableObjectProperty) modifiableProperty).getProperties();
 
             for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "email")) {
-                    ((ModifiableStringProperty) baseProperty).options(
-                        (OptionsDataSource.ActionOptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
+                if (Objects.equals(baseProperty.getName(), EMAIL)) {
+                    ((ModifiableStringProperty) baseProperty)
+                        .options((ActionOptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
                 }
             }
         }
