@@ -1,5 +1,5 @@
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/workflows.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {ProjectInstanceModel} from 'middleware/automation/configuration';
 import {Control, UseFormGetValues, UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
@@ -19,7 +19,7 @@ const ProjectInstanceDialogWorkflowsStep = ({
     register,
     setValue,
 }: ProjectInstanceDialogWorkflowsStepProps) => {
-    const {data: workflows} = useGetProjectWorkflowsQuery(getValues().projectId!);
+    const {data: workflows} = useGetProjectVersionWorkflowsQuery(getValues().projectId!, getValues().projectVersion!);
 
     return (
         <ul className="h-full space-y-4">

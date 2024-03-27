@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectInstanceModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
+import {ProjectInstanceModel, TagModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectInstanceTagsMutation} from '@/mutations/automation/projectInstanceTags.mutations';
 import {
     useDeleteProjectInstanceMutation,
@@ -39,10 +39,9 @@ import ProjectInstanceDialog from './ProjectInstanceDialog';
 interface ProjectInstanceListItemProps {
     projectInstance: ProjectInstanceModel;
     remainingTags?: TagModel[];
-    project: ProjectModel;
 }
 
-const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: ProjectInstanceListItemProps) => {
+const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstanceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const setProjectInstanceEnabled = useProjectInstancesEnabledStore(
@@ -114,6 +113,8 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                                 <span className="text-base font-semibold">{projectInstance.name}</span>
                             )}
 
+                            <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
+
                             <span className="text-xs uppercase text-gray-700">{projectInstance?.environment}</span>
                         </div>
                     </div>
@@ -122,9 +123,9 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                         <div className="flex items-center">
                             <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
                                 <span className="mr-1">
-                                    {project.workflowIds?.length === 1
+                                    {projectInstance.projectInstanceWorkflows?.length === 1
                                         ? `1 workflow`
-                                        : `${project.workflowIds?.length} workflows`}
+                                        : `${projectInstance.projectInstanceWorkflows?.length} workflows`}
                                 </span>
 
                                 <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
