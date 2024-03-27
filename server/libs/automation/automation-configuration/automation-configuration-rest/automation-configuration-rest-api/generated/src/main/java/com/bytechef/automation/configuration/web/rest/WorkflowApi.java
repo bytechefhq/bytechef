@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T13:38:03.397533+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {
@@ -106,11 +106,54 @@ public interface WorkflowApi {
 
 
     /**
+     * GET /projects/{id}/{projectVersion}/workflows : Get workflows for particular project version.
+     * Get workflows for particular project version.
+     *
+     * @param id The id of a project. (required)
+     * @param projectVersion The version of a project. (required)
+     * @return The array of project workflows. (status code 200)
+     */
+    @Operation(
+        operationId = "getProjectVersionWorkflows",
+        summary = "Get workflows for particular project version.",
+        description = "Get workflows for particular project version.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The array of project workflows.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/projects/{id}/{projectVersion}/workflows",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel>> getProjectVersionWorkflows(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "projectVersion", description = "The version of a project.", required = true, in = ParameterIn.PATH) @PathVariable("projectVersion") Integer projectVersion
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"workflowTaskComponentNames\" : [ \"workflowTaskComponentNames\", \"workflowTaskComponentNames\" ], \"label\" : \"label\", \"inputsCount\" : 6, \"connectionsCount\" : 0, \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"manualTrigger\" : true, \"workflowTriggerComponentNames\" : [ \"workflowTriggerComponentNames\", \"workflowTriggerComponentNames\" ], \"id\" : \"id\" }, { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"workflowTaskComponentNames\" : [ \"workflowTaskComponentNames\", \"workflowTaskComponentNames\" ], \"label\" : \"label\", \"inputsCount\" : 6, \"connectionsCount\" : 0, \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"manualTrigger\" : true, \"workflowTriggerComponentNames\" : [ \"workflowTriggerComponentNames\", \"workflowTriggerComponentNames\" ], \"id\" : \"id\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * GET /projects/{id}/workflows : Get workflows for particular project.
      * Get workflows for particular project.
      *
      * @param id The id of a project. (required)
-     * @return The updated project object. (status code 200)
+     * @return The array project workflows. (status code 200)
      */
     @Operation(
         operationId = "getProjectWorkflows",
@@ -118,7 +161,7 @@ public interface WorkflowApi {
         description = "Get workflows for particular project.",
         tags = { "workflow" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
+            @ApiResponse(responseCode = "200", description = "The array project workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel.class)))
             })
         }

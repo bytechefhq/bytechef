@@ -3,6 +3,7 @@ package com.bytechef.platform.connection.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.connection.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -31,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-26T05:59:09.258428+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-27T05:52:57.501451+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   private Boolean active;
@@ -48,6 +49,8 @@ public class ConnectionModel {
   private LocalDateTime createdDate;
 
   private CredentialStatusModel credentialStatus;
+
+  private EnvironmentModel environment;
 
   private String name;
 
@@ -217,6 +220,26 @@ public class ConnectionModel {
 
   public void setCredentialStatus(CredentialStatusModel credentialStatus) {
     this.credentialStatus = credentialStatus;
+  }
+
+  public ConnectionModel environment(EnvironmentModel environment) {
+    this.environment = environment;
+    return this;
+  }
+
+  /**
+   * Get environment
+   * @return environment
+  */
+  @Valid 
+  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environment")
+  public EnvironmentModel getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(EnvironmentModel environment) {
+    this.environment = environment;
   }
 
   public ConnectionModel name(String name) {
@@ -391,6 +414,7 @@ public class ConnectionModel {
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
         Objects.equals(this.credentialStatus, connection.credentialStatus) &&
+        Objects.equals(this.environment, connection.environment) &&
         Objects.equals(this.name, connection.name) &&
         Objects.equals(this.id, connection.id) &&
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
@@ -402,7 +426,7 @@ public class ConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
+    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus, environment, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
   }
 
   @Override
@@ -416,6 +440,7 @@ public class ConnectionModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
+    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");

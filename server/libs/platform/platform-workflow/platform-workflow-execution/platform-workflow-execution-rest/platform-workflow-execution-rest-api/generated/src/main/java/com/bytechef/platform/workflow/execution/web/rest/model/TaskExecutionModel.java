@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T06:11:29.846980+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:44.878410+01:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component;
