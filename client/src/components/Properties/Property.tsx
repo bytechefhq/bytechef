@@ -301,47 +301,6 @@ const Property = ({
         saveProperty({...currentComponentData.parameters, [name]: value});
     }, 200);
 
-    const handlePropertyChange = useDebouncedCallback((name: string, value: string) => {
-        if (currentComponentData) {
-            const {parameters} = currentComponentData;
-
-            let data = {
-                ...parameters,
-                [name]: value,
-            };
-
-            if (arrayName && arrayIndex !== undefined) {
-                data = {
-                    ...parameters,
-                    [arrayName]: [
-                        ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                        {
-                            ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                            [name]: value,
-                        },
-                        ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                    ],
-                };
-            } else if (objectName) {
-                data = {
-                    ...parameters,
-                    [objectName]: {
-                        ...parameters?.[objectName],
-                        [name]: value,
-                    },
-                };
-            }
-
-            setComponentData([
-                ...otherComponentData,
-                {
-                    ...currentComponentData,
-                    parameters: data,
-                },
-            ]);
-        }
-    }, 200);
-
     const handleSelectChange = (value: string, name: string) => {
         if (!currentComponentData || !workflow || !updateWorkflowMutation) {
             return;
@@ -590,7 +549,6 @@ const Property = ({
                         leadingIcon={typeIcon}
                         name={name || `${arrayName}_0`}
                         objectName={objectName}
-                        onChange={(event) => handlePropertyChange(event.target.name, event.target.value)}
                         onKeyPress={(event: KeyboardEvent) => {
                             if (isNumericalInput || type === 'BOOLEAN') {
                                 event.key !== '{' && event.preventDefault();

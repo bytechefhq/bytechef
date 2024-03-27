@@ -271,12 +271,6 @@ const PropertyMentionsInput = forwardRef(
                 setValue(value);
             }
 
-            if (onChange) {
-                onChange({
-                    target: {name, value},
-                } as ChangeEvent<HTMLInputElement>);
-            }
-
             setMentionOccurences(value.match(/property-mention/g)?.length || 0);
 
             saveInputValue();
