@@ -7,7 +7,7 @@ import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/comp
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionsTestOutputHeader = ({
@@ -81,6 +81,16 @@ const WorkflowExecutionsTestOutput = ({
 
     const job = workflowTestExecution?.job as JobModel;
     const triggerExecution = workflowTestExecution?.triggerExecution as TriggerExecutionModel;
+
+    useEffect(() => {
+        setContent(
+            workflowTestExecution?.triggerExecution
+                ? (workflowTestExecution.triggerExecution as TriggerExecutionModel)
+                : workflowTestExecution?.job?.taskExecutions
+                  ? (workflowTestExecution.job?.taskExecutions[0] as TaskExecutionModel)
+                  : undefined
+        );
+    }, [workflowTestExecution]);
 
     return (
         <div className="flex size-full flex-col">
