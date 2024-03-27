@@ -14,6 +14,9 @@
             <column name="component_name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
             <column name="connection_version" type="INT">
                 <constraints nullable="false"/>
             </column>
@@ -47,9 +50,6 @@
         </createTable>
 
         <createTable tableName="connection_tag">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="connection_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -57,6 +57,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addPrimaryKey tableName="connection_tag" columnNames="connection_id,tag_id"/>
 
         <addUniqueConstraint constraintName="uk_connection_name" tableName="connection" columnNames="name" />
 
