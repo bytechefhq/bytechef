@@ -417,35 +417,6 @@ const Project = () => {
                     <header className="flex items-center border-b px-3 py-2">
                         <div className="mr-2 flex flex-1 items-center space-x-1">
                             <h1>{project?.name}</h1>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="hover:bg-gray-200" size="icon" variant="ghost">
-                                        <ChevronDownIcon />
-                                    </Button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
-                                        Edit
-                                    </DropdownMenuItem>
-
-                                    {project && (
-                                        <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
-                                            Duplicate
-                                        </DropdownMenuItem>
-                                    )}
-
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuItem
-                                        className="text-red-600"
-                                        onClick={() => setShowDeleteProjectAlertDialog(true)}
-                                    >
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </div>
 
                         <div className="flex items-center space-x-4">
@@ -586,7 +557,7 @@ const Project = () => {
                                             size="icon"
                                             variant="ghost"
                                         >
-                                            <SquareTerminalIcon className="h-5" />
+                                            <SquareChevronRightIcon className="h-5" />
                                         </Button>
                                     </TooltipTrigger>
 
@@ -594,26 +565,47 @@ const Project = () => {
                                 </Tooltip>
                             </div>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        className="hover:bg-gray-200"
-                                        disabled={!!project?.publishedDate}
-                                        onClick={() =>
-                                            publishProjectMutation.mutate({
-                                                id: +projectId!,
-                                            })
-                                        }
-                                        variant="ghost"
-                                    >
-                                        <CircleDotIcon className="h-5" /> Publish
-                                    </Button>
-                                </TooltipTrigger>
+                            <div className="flex space-x-1">
+                                {project && <PublishPopover project={project} />}
 
-                                <TooltipContent>
-                                    {project?.publishedDate ? `The project is published` : `Publish the project.`}
-                                </TooltipContent>
-                            </Tooltip>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <div>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                                        <SettingsIcon className="h-5" />
+                                                    </Button>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Project Settings</TooltipContent>
+                                            </Tooltip>
+                                        </div>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
+                                            Edit
+                                        </DropdownMenuItem>
+
+                                        {project && (
+                                            <DropdownMenuItem
+                                                onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                            >
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                        )}
+
+                                        <DropdownMenuSeparator />
+
+                                        <DropdownMenuItem
+                                            className="text-red-600"
+                                            onClick={() => setShowDeleteProjectAlertDialog(true)}
+                                        >
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                         </div>
                     </header>
                 }
