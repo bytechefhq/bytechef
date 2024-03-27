@@ -18,8 +18,6 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
 import java.util.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -28,10 +26,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("workflow_test_configuration_connection")
-public class WorkflowTestConfigurationConnection implements Persistable<Long> {
-
-    @Id
-    private Long id;
+public class WorkflowTestConfigurationConnection {
 
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
@@ -71,12 +66,7 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public Long getId() {
-        return id;
+        return Objects.hash(connectionId, workflowConnectionKey, workflowNodeName);
     }
 
     public Long getConnectionId() {
@@ -92,15 +82,9 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
     }
 
     @Override
-    public boolean isNew() {
-        return id == null;
-    }
-
-    @Override
     public String toString() {
         return "WorkflowTestConfigurationConnection{" +
-            "id=" + id +
-            ", connectionId=" + connectionId +
+            "connectionId=" + connectionId +
             ", workflowConnectionKey='" + workflowConnectionKey + '\'' +
             ", workflowNodeName='" + workflowNodeName + '\'' +
             '}';

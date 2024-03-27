@@ -17,21 +17,17 @@
 package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.tag.domain.Tag;
-import java.util.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @Table("project_tag")
-public final class ProjectTag implements Persistable<Long> {
-
-    @Id
-    private Long id;
+public final class ProjectTag {
 
     @Column("tag_id")
     private AggregateReference<Tag, Long> tagId;
@@ -39,32 +35,26 @@ public final class ProjectTag implements Persistable<Long> {
     public ProjectTag() {
     }
 
-    public ProjectTag(Long tagId) {
-        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+
+        if (!(o instanceof ProjectTag that)) {
             return false;
         }
 
-        ProjectTag that = (ProjectTag) o;
-
-        return Objects.equals(id, that.id) && Objects.equals(tagId, that.tagId);
+        return Objects.equals(tagId, that.tagId);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(tagId);
     }
 
-    @Override
-    public Long getId() {
-        return id;
+    public ProjectTag(Long tagId) {
+        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }
 
     public Long getTagId() {
@@ -72,14 +62,9 @@ public final class ProjectTag implements Persistable<Long> {
     }
 
     @Override
-    public boolean isNew() {
-        return id == null;
-    }
-
-    @Override
     public String toString() {
-        return "ProjectTag{id='"
-            + id + '\'' + ", tagId='"
-            + getTagId() + '\'' + '}';
+        return "ProjectTag{" +
+            "tagId=" + tagId +
+            '}';
     }
 }
