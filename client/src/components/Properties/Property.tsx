@@ -374,7 +374,7 @@ const Property = ({
         }
     };
 
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         if (isNumericalInput) {
             const {value} = event.target;
 
@@ -388,12 +388,6 @@ const Property = ({
         } else {
             setInputValue(event.target.value);
         }
-
-        saveInputValue();
-    };
-
-    const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        setInputValue(event.target.value);
 
         saveInputValue();
     };
@@ -734,7 +728,7 @@ const Property = ({
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name!}
-                                onChange={handleTextAreaChange}
+                                onChange={handleInputChange}
                                 required={required}
                                 value={inputValue}
                             />
