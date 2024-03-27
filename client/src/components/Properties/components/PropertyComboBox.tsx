@@ -220,12 +220,7 @@ const PropertyComboBox = ({
                                             <span>{option.label}</span>
                                         )}
 
-                                        <CheckIcon
-                                            className={cn(
-                                                'ml-auto size-4',
-                                                option.value === value ? 'opacity-100' : 'opacity-0'
-                                            )}
-                                        />
+                                        {option.value === value && <CheckIcon className="ml-auto size-4" />}
                                     </CommandItem>
                                 ))}
                             </ScrollArea>

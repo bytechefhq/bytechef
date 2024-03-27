@@ -349,6 +349,24 @@ const Property = ({
         saveProperty(data);
     };
 
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
+        if (isNumericalInput) {
+            const {value} = event.target;
+
+            const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
+
+            if (onlyNumericValue === undefined) {
+                return;
+            }
+
+            setNumericValue(onlyNumericValue);
+        } else {
+            setInputValue(event.target.value);
+        }
+
+        saveInputValue();
+    };
+
     const handleInputTypeSwitchButtonClick = () => {
         setMentionInput(!mentionInput);
         setNumericValue('');
@@ -372,24 +390,6 @@ const Property = ({
                 setDataPillPanelOpen(true);
             }, 50);
         }
-    };
-
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
-        if (isNumericalInput) {
-            const {value} = event.target;
-
-            const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
-
-            if (onlyNumericValue === undefined) {
-                return;
-            }
-
-            setNumericValue(onlyNumericValue);
-        } else {
-            setInputValue(event.target.value);
-        }
-
-        saveInputValue();
     };
 
     // set default mentionInput state
