@@ -30,7 +30,7 @@ import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
 } from 'middleware/platform/configuration';
-import {ConnectionModel, TagModel} from 'middleware/platform/connection';
+import {ConnectionModel, EnvironmentModel, TagModel} from 'middleware/platform/connection';
 import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
 import {
     useGetConnectionDefinitionQuery,
@@ -61,6 +61,7 @@ interface ConnectionDialogProps {
 
 export interface ConnectionDialogFormProps {
     authorizationName: string;
+    environment: EnvironmentModel;
     componentName: string;
     name: string;
     parameters: {[key: string]: object};
@@ -93,6 +94,7 @@ const ConnectionDialog = ({
         defaultValues: {
             authorizationName: '',
             componentName: componentDefinition?.name,
+            environment: connection?.environment || EnvironmentModel.Development,
             name: connection?.name || '',
             tags:
                 connection?.tags?.map((tag) => ({
@@ -257,13 +259,14 @@ const ConnectionDialog = ({
     }
 
     function getNewConnection(additionalParameters?: object) {
-        const {componentName, name, parameters, tags} = getValues();
+        const {componentName, environment, name, parameters, tags} = getValues();
 
         return {
             authorizationName: authorizationName,
             componentName,
             connectionVersion: 1,
-            name: name,
+            environment,
+            name,
             parameters: {
                 ...parameters,
                 ...additionalParameters,
@@ -490,6 +493,41 @@ const ConnectionDialog = ({
                                     )}
                                     rules={{required: true}}
                                 />
+
+                                {!connection?.id && (
+                                    <FormField
+                                        control={control}
+                                        name="environment"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Environment</FormLabel>
+
+                                                <FormControl>
+                                                    <Select
+                                                        defaultValue={field.value}
+                                                        onValueChange={(value) => field.onChange(value)}
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select environment" />
+                                                        </SelectTrigger>
+
+                                                        <SelectContent>
+                                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
+
+                                                            <SelectItem value="STAGING">Staging</SelectItem>
+
+                                                            <SelectItem value="PRODUCTION">Production</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        rules={{required: true}}
+                                        shouldUnregister={false}
+                                    />
+                                )}
 
                                 {showConnectionProperties && !!connectionDefinition.properties && (
                                     <Properties
