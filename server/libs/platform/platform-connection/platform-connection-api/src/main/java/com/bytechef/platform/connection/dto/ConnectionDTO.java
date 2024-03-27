@@ -18,6 +18,7 @@ package com.bytechef.platform.connection.dto;
 
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -30,15 +31,17 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
-    LocalDateTime createdDate, CredentialStatus credentialStatus, Long id, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
+    LocalDateTime createdDate, CredentialStatus credentialStatus, Environment environment,  Long id,
+    String lastModifiedBy, LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags,
+    int version) {
 
     public ConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         this(
             active, connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion(),
             connection.getCreatedBy(), connection.getCreatedDate(), connection.getCredentialStatus(),
-            connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
-            connection.getParameters(), tags, connection.getVersion());
+            connection.getEnvironment(), connection.getId(), connection.getLastModifiedBy(),
+            connection.getLastModifiedDate(), connection.getName(), connection.getParameters(), tags,
+            connection.getVersion());
     }
 
     public Connection toConnection() {
@@ -69,6 +72,7 @@ public record ConnectionDTO(
         private String createdBy;
         private LocalDateTime createdDate;
         private CredentialStatus credentialStatus;
+        private Environment environment;
         private Long id;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
@@ -121,6 +125,12 @@ public record ConnectionDTO(
             return this;
         }
 
+        public Builder environment(Environment environment) {
+            this.environment = environment;
+
+            return this;
+        }
+
         public Builder id(Long id) {
             this.id = id;
 
@@ -165,7 +175,7 @@ public record ConnectionDTO(
         public ConnectionDTO build() {
             return new ConnectionDTO(
                 active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus,
-                id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+                environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
         }
     }
 }
