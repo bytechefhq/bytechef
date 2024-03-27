@@ -59,6 +59,7 @@ interface PropertyProps {
     property: PropertyType;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
+    taskParameterValue?: any;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
@@ -76,6 +77,7 @@ const Property = ({
     path = 'parameters',
     property,
     register,
+    taskParameterValue,
     updateWorkflowMutation,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -151,7 +153,21 @@ const Property = ({
 
     const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
 
-    let taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+    if (!taskParameterValue) {
+        taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+    }
+
+    if (controlType === 'OBJECT_BUILDER' && name) {
+        taskParameterValue = `${path}.${name}`
+            .split('.')
+            .reduce((acc: {[key: string]: any} | undefined, key: string) => {
+                if (acc && acc[key] === undefined) {
+                    acc[key] = {};
+                }
+
+                return acc && acc[key];
+            }, currentWorkflowTask?.parameters);
+    }
 
     if (currentWorkflowTask?.parameters && name && arrayName && arrayIndex !== undefined) {
         taskParameterValue = (currentWorkflowTask?.parameters[arrayName] as {[key: string]: any})?.[arrayIndex]?.[name];
@@ -159,10 +175,6 @@ const Property = ({
 
     if (name && name.endsWith('_0') && defaultValue) {
         taskParameterValue = defaultValue;
-    }
-
-    if (objectName && name) {
-        taskParameterValue = currentComponentData?.parameters?.[objectName]?.[name];
     }
 
     const otherComponentData = componentData.filter((component) => {
@@ -364,10 +376,7 @@ const Property = ({
 
         const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
 
-        let data = {
-            ...parameters,
-            [name as string]: isNumericalInput ? numericValueToSave : inputValue,
-        };
+        let data = parameters;
 
         if (arrayName && arrayIndex !== undefined) {
             data = {
@@ -382,16 +391,37 @@ const Property = ({
                 ],
             };
         } else if (objectName) {
+            const matchingObject = path.split('.').reduce((acc, key) => {
+                if (acc && acc[key] === undefined) {
+                    acc[key] = {};
+                }
+
+                return acc && acc[key];
+            }, data);
+
+            if (matchingObject) {
+                matchingObject[name as string] = isNumericalInput ? numericValueToSave : inputValue;
+            }
+        } else {
             data = {
                 ...parameters,
-                [objectName]: {
-                    ...parameters?.[objectName],
-                    [name!]: isNumericalInput ? numericValueToSave : inputValue,
-                },
+                [name as string]: isNumericalInput ? numericValueToSave : inputValue,
             };
         }
 
+        if (!data) {
+            return;
+        }
+
         saveProperty(data);
+
+        setComponentData([
+            ...otherComponentData,
+            {
+                ...currentComponentData,
+                parameters: data,
+            },
+        ]);
     }, 200);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -404,12 +434,8 @@ const Property = ({
                 return;
             }
 
-            handlePropertyChange(event.target.name, event.target.value);
-
             setNumericValue(onlyNumericValue);
         } else {
-            handlePropertyChange(event.target.name, event.target.value);
-
             setInputValue(event.target.value);
         }
 
@@ -417,8 +443,6 @@ const Property = ({
     };
 
     const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        handlePropertyChange(event.target.name, event.target.value);
-
         setInputValue(event.target.value);
 
         saveInputValue();
@@ -629,7 +653,9 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
+                                path={path}
                                 property={property}
+                                taskParameterValue={taskParameterValue}
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
                         )}
@@ -674,7 +700,7 @@ const Property = ({
                                 maxLength={maxLength}
                                 min={minValue}
                                 minLength={minLength}
-                                name={name || `${arrayName}_0`}
+                                name={`${path}.${name}` || name || `${arrayName}_0`}
                                 onChange={handleInputChange}
                                 placeholder={
                                     isNumericalInput && minValue && maxValue ? `From ${minValue} to ${maxValue}` : ''
@@ -768,11 +794,13 @@ const Property = ({
                             currentComponentData &&
                             updateWorkflowMutation && (
                                 <PropertyDynamicProperties
+                                    currentActionName={actionName}
                                     currentComponent={currentComponent}
                                     currentComponentData={currentComponentData}
                                     loadDependency={loadPropertiesDependency}
                                     name={name}
                                     propertiesDataSource={property.propertiesDataSource}
+                                    taskParameterValue={taskParameterValue}
                                     updateWorkflowMutation={updateWorkflowMutation}
                                 />
                             )}

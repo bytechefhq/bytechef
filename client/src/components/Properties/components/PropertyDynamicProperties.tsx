@@ -1,5 +1,4 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import Properties from '@/components/Properties/Properties';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {PropertiesDataSourceModel, WorkflowModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
@@ -9,21 +8,28 @@ import {ComponentDataType, CurrentComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 
+import Property from '../Property';
+
 interface PropertyDynamicPropertiesProps {
+    currentActionName?: string;
     currentComponent: CurrentComponentType;
     currentComponentData: ComponentDataType;
     loadDependency?: {[key: string]: string};
     name?: string;
     propertiesDataSource?: PropertiesDataSourceModel;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    taskParameterValue?: any;
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
 const PropertyDynamicProperties = ({
+    currentActionName,
     currentComponent,
     currentComponentData,
     loadDependency,
     name,
     propertiesDataSource,
+    taskParameterValue,
     updateWorkflowMutation,
 }: PropertyDynamicPropertiesProps) => {
     const [loadDependencyValues, setLoadDependencyValues] = useState<Array<string>>(
@@ -72,12 +78,25 @@ const PropertyDynamicProperties = ({
     }
 
     return properties ? (
-        <Properties
-            currentComponent={currentComponent}
-            currentComponentData={currentComponentData}
-            properties={properties}
-            updateWorkflowMutation={updateWorkflowMutation}
-        />
+        <ul>
+            {properties.map((property, index) => {
+                const propertyDefaultValue = property.name ? taskParameterValue?.[property.name] : '';
+
+                return (
+                    <Property
+                        actionName={currentActionName}
+                        currentComponent={currentComponent}
+                        currentComponentData={currentComponentData}
+                        key={`${property.name}_${index}`}
+                        objectName={name}
+                        path={name}
+                        property={property}
+                        taskParameterValue={propertyDefaultValue}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                    />
+                );
+            })}
+        </ul>
     ) : (
         <></>
     );
