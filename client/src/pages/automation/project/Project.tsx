@@ -332,6 +332,7 @@ const Project = () => {
                 })
                 .catch(() => {
                     setWorkflowIsRunning(false);
+                    setWorkflowTestExecution(undefined);
 
                     queryClient.invalidateQueries({
                         queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId!)),

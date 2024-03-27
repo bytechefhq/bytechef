@@ -72,6 +72,7 @@ const WorkflowCodeEditorSheet = ({
                 })
                 .catch(() => {
                     setWorkflowIsRunning(false);
+                    setWorkflowTestExecution(undefined);
 
                     queryClient.invalidateQueries({
                         queryKey: WorkflowKeys.workflow(workflow.id!),
