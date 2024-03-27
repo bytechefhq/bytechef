@@ -2,7 +2,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItem';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/workflows.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
 
@@ -11,11 +11,13 @@ const ProjectInstanceWorkflowList = ({
     projectInstanceEnabled,
     projectInstanceId,
     projectInstanceWorkflows,
+    projectVersion,
 }: {
     projectId: number;
     projectInstanceId: number;
     projectInstanceEnabled: boolean;
     projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
+    projectVersion: number;
 }) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
@@ -25,7 +27,10 @@ const ProjectInstanceWorkflowList = ({
     const {data: taskDispatcherDefinitions, isLoading: isTaskDispatcherDefinitionsLoading} =
         useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectWorkflowsQuery(projectId);
+    const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectVersionWorkflowsQuery(
+        projectId,
+        projectVersion
+    );
 
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;

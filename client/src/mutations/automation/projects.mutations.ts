@@ -48,7 +48,7 @@ export const useDuplicateProjectMutation = (mutationProps?: DuplicateProjectMuta
     });
 
 interface PublishProjectMutationProps {
-    onSuccess?: (result: ProjectModel, variables: PublishProjectRequest) => void;
+    onSuccess?: (result: void, variables: PublishProjectRequest) => void;
     onError?: (error: Error, variables: PublishProjectRequest) => void;
 }
 
