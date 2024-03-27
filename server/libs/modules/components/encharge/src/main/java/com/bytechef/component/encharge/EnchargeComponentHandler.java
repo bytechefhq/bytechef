@@ -17,8 +17,16 @@
 package com.bytechef.component.encharge;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.encharge.util.EnchargeUtils;
+import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.Objects;
 
 /**
  * @author Monika Domiter
@@ -31,5 +39,21 @@ public class EnchargeComponentHandler extends AbstractEnchargeComponentHandler {
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/encharge.svg");
+    }
+
+    @Override
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+
+        if (Objects.equals(actionDefinition.getName(), "addTag")) {
+            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
+                .get()) {
+                if (Objects.equals(baseProperty.getName(), "email")) {
+                    ((ModifiableStringProperty) baseProperty)
+                        .options((OptionsDataSource.ActionOptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
+                }
+            }
+        }
+        return modifiableProperty;
     }
 }
