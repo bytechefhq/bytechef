@@ -93,6 +93,8 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                                 {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
 
                                 <span className="text-base font-semibold">{connection.name}</span>
+
+                                <span className="text-xs uppercase text-gray-700">{connection.environment}</span>
                             </div>
                         </div>
 
