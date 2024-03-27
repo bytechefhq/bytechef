@@ -147,10 +147,13 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Badge variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}>
-                            {project.status === ProjectStatusModel.Published
-                                ? `Published V${project.projectVersion}`
-                                : 'Not Published'}
+                        <Badge
+                            className="flex space-x-1"
+                            variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}
+                        >
+                            <span>V{project.projectVersion}</span>
+
+                            <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
                         </Badge>
 
                         <Tooltip>
