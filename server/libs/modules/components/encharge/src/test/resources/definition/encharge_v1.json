@@ -772,12 +772,15 @@
         "exampleValue": null,
         "label": "Email",
         "placeholder": null,
-        "controlType": "TEXT",
+        "controlType": "SELECT",
         "languageId": null,
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "optionsDataSource": null
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
@@ -787,7 +790,6 @@
     "output": null,
     "perform": null
   } ],
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -854,5 +856,6 @@
     "authorizationRequired": null,
     "baseUri": { },
     "test": null
-  }
+  },
+  "triggers": [ ]
 }
