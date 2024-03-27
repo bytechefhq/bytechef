@@ -97,8 +97,6 @@ const Property = ({
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentData, componentDefinitions, setComponentData, workflow} = useWorkflowDataStore();
 
-    let {name} = property;
-
     const defaultValue = property.defaultValue || '';
 
     const {
@@ -111,6 +109,7 @@ const Property = ({
         maxValue,
         minLength,
         minValue,
+        name,
         options,
         optionsDataSource,
         properties,
@@ -118,10 +117,6 @@ const Property = ({
         required,
         type,
     } = property;
-
-    if (!name) {
-        controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER' ? (name = 'item') : <></>;
-    }
 
     const formattedOptions = options
         ?.map((option) => {
@@ -537,6 +532,10 @@ const Property = ({
     }, [currentComponentData?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
     if (displayCondition === false || (property.displayCondition && isDisplayConditionLoading)) {
+        return <></>;
+    }
+
+    if (!name) {
         return <></>;
     }
 
