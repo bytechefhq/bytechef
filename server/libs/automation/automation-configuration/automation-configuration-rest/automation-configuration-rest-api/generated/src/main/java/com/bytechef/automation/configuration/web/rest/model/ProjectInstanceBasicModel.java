@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T13:38:03.397533+01:00[Europe/Zagreb]")
 public class ProjectInstanceBasicModel {
 
   private String description;
@@ -34,6 +34,8 @@ public class ProjectInstanceBasicModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  private Boolean enabled;
 
   private EnvironmentModel environment;
 
@@ -51,7 +53,7 @@ public class ProjectInstanceBasicModel {
 
   private Long projectId;
 
-  private Boolean enabled;
+  private Integer projectVersion;
 
   public ProjectInstanceBasicModel() {
     super();
@@ -122,6 +124,26 @@ public class ProjectInstanceBasicModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public ProjectInstanceBasicModel enabled(Boolean enabled) {
+    this.enabled = enabled;
+    return this;
+  }
+
+  /**
+   * If a project instance is enabled or not.
+   * @return enabled
+  */
+  
+  @Schema(name = "enabled", description = "If a project instance is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
   public ProjectInstanceBasicModel environment(EnvironmentModel environment) {
@@ -250,11 +272,11 @@ public class ProjectInstanceBasicModel {
   }
 
   /**
-   * Th id of a project.
+   * The id of a project.
    * @return projectId
   */
   
-  @Schema(name = "projectId", description = "Th id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "projectId", description = "The id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectId")
   public Long getProjectId() {
     return projectId;
@@ -264,24 +286,24 @@ public class ProjectInstanceBasicModel {
     this.projectId = projectId;
   }
 
-  public ProjectInstanceBasicModel enabled(Boolean enabled) {
-    this.enabled = enabled;
+  public ProjectInstanceBasicModel projectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
     return this;
   }
 
   /**
-   * If a project instance is enabled or not.
-   * @return enabled
+   * The version of a project.
+   * @return projectVersion
   */
   
-  @Schema(name = "enabled", description = "If a project instance is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("enabled")
-  public Boolean getEnabled() {
-    return enabled;
+  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectVersion")
+  public Integer getProjectVersion() {
+    return projectVersion;
   }
 
-  public void setEnabled(Boolean enabled) {
-    this.enabled = enabled;
+  public void setProjectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
   }
 
   @Override
@@ -296,6 +318,7 @@ public class ProjectInstanceBasicModel {
     return Objects.equals(this.description, projectInstanceBasic.description) &&
         Objects.equals(this.createdBy, projectInstanceBasic.createdBy) &&
         Objects.equals(this.createdDate, projectInstanceBasic.createdDate) &&
+        Objects.equals(this.enabled, projectInstanceBasic.enabled) &&
         Objects.equals(this.environment, projectInstanceBasic.environment) &&
         Objects.equals(this.id, projectInstanceBasic.id) &&
         Objects.equals(this.lastExecutionDate, projectInstanceBasic.lastExecutionDate) &&
@@ -303,12 +326,12 @@ public class ProjectInstanceBasicModel {
         Objects.equals(this.lastModifiedDate, projectInstanceBasic.lastModifiedDate) &&
         Objects.equals(this.name, projectInstanceBasic.name) &&
         Objects.equals(this.projectId, projectInstanceBasic.projectId) &&
-        Objects.equals(this.enabled, projectInstanceBasic.enabled);
+        Objects.equals(this.projectVersion, projectInstanceBasic.projectVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, enabled);
+    return Objects.hash(description, createdBy, createdDate, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion);
   }
 
   @Override
@@ -318,6 +341,7 @@ public class ProjectInstanceBasicModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
@@ -325,7 +349,7 @@ public class ProjectInstanceBasicModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
-    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }

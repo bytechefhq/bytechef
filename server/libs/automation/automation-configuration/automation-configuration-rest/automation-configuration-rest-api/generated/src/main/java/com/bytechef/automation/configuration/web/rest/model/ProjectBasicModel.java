@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
 @JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T13:38:03.397533+01:00[Europe/Zagreb]")
 public class ProjectBasicModel {
 
   private String createdBy;
@@ -232,7 +232,7 @@ public class ProjectBasicModel {
    * @return projectVersion
   */
   
-  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "projectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectVersion")
   public Integer getProjectVersion() {
     return projectVersion;

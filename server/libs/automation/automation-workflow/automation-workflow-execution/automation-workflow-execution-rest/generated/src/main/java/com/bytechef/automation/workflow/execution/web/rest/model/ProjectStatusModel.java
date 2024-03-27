@@ -1,4 +1,4 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.automation.workflow.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,43 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A type of property.
+ * The status of a project.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:43.755734+01:00[Europe/Zagreb]")
-public enum PropertyTypeModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:42.815081+01:00[Europe/Zagreb]")
+public enum ProjectStatusModel {
   
-  ANY("ANY"),
+  DRAFT("DRAFT"),
   
-  ARRAY("ARRAY"),
-  
-  BOOLEAN("BOOLEAN"),
-  
-  DATE("DATE"),
-  
-  DATE_TIME("DATE_TIME"),
-  
-  DYNAMIC_PROPERTIES("DYNAMIC_PROPERTIES"),
-  
-  FILE_ENTRY("FILE_ENTRY"),
-  
-  INTEGER("INTEGER"),
-  
-  NULL("NULL"),
-  
-  NUMBER("NUMBER"),
-  
-  STRING("STRING"),
-  
-  OBJECT("OBJECT"),
-  
-  TASK("TASK"),
-  
-  TIME("TIME");
+  PUBLISHED("PUBLISHED");
 
   private String value;
 
-  PropertyTypeModel(String value) {
+  ProjectStatusModel(String value) {
     this.value = value;
   }
 
@@ -68,8 +44,8 @@ public enum PropertyTypeModel {
   }
 
   @JsonCreator
-  public static PropertyTypeModel fromValue(String value) {
-    for (PropertyTypeModel b : PropertyTypeModel.values()) {
+  public static ProjectStatusModel fromValue(String value) {
+    for (ProjectStatusModel b : ProjectStatusModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

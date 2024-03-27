@@ -1,4 +1,4 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.platform.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,43 +17,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A type of property.
+ * The environment of a connection.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:43.755734+01:00[Europe/Zagreb]")
-public enum PropertyTypeModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-27T05:52:57.501451+01:00[Europe/Zagreb]")
+public enum EnvironmentModel {
   
-  ANY("ANY"),
+  DEVELOPMENT("DEVELOPMENT"),
   
-  ARRAY("ARRAY"),
+  STAGING("STAGING"),
   
-  BOOLEAN("BOOLEAN"),
-  
-  DATE("DATE"),
-  
-  DATE_TIME("DATE_TIME"),
-  
-  DYNAMIC_PROPERTIES("DYNAMIC_PROPERTIES"),
-  
-  FILE_ENTRY("FILE_ENTRY"),
-  
-  INTEGER("INTEGER"),
-  
-  NULL("NULL"),
-  
-  NUMBER("NUMBER"),
-  
-  STRING("STRING"),
-  
-  OBJECT("OBJECT"),
-  
-  TASK("TASK"),
-  
-  TIME("TIME");
+  PRODUCTION("PRODUCTION");
 
   private String value;
 
-  PropertyTypeModel(String value) {
+  EnvironmentModel(String value) {
     this.value = value;
   }
 
@@ -68,8 +46,8 @@ public enum PropertyTypeModel {
   }
 
   @JsonCreator
-  public static PropertyTypeModel fromValue(String value) {
-    for (PropertyTypeModel b : PropertyTypeModel.values()) {
+  public static EnvironmentModel fromValue(String value) {
+    for (EnvironmentModel b : EnvironmentModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

@@ -1,4 +1,4 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -16,26 +16,26 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * GetWorkflowNodeDescription200ResponseModel
+ * PublishProjectRequestModel
  */
 
-@JsonTypeName("getWorkflowNodeDescription_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:43.755734+01:00[Europe/Zagreb]")
-public class GetWorkflowNodeDescription200ResponseModel {
+@JsonTypeName("publishProject_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T13:38:03.397533+01:00[Europe/Zagreb]")
+public class PublishProjectRequestModel {
 
   private String description;
 
-  public GetWorkflowNodeDescription200ResponseModel description(String description) {
+  public PublishProjectRequestModel description(String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * Get description
+   * The description of a project version.
    * @return description
   */
   
-  @Schema(name = "description", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a project version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -53,8 +53,8 @@ public class GetWorkflowNodeDescription200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    GetWorkflowNodeDescription200ResponseModel getWorkflowNodeDescription200Response = (GetWorkflowNodeDescription200ResponseModel) o;
-    return Objects.equals(this.description, getWorkflowNodeDescription200Response.description);
+    PublishProjectRequestModel publishProjectRequest = (PublishProjectRequestModel) o;
+    return Objects.equals(this.description, publishProjectRequest.description);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class GetWorkflowNodeDescription200ResponseModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class GetWorkflowNodeDescription200ResponseModel {\n");
+    sb.append("class PublishProjectRequestModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("}");
     return sb.toString();
