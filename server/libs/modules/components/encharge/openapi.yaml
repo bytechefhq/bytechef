@@ -1,0 +1,167 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Encharge API"
+  description: "Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns."
+  version: "v1"
+servers:
+  - url: "https://api.encharge.io/v1"
+paths:
+  /emails:
+    post:
+      tags:
+        - "Emails"
+      summary: "Create email template"
+      description: "Create email template"
+      operationId: "createEmail"
+      requestBody:
+        description: "data of new email template"
+        required: true
+        content:
+          application/json:
+            schema:
+              title: "Email template"
+              type: "object"
+              required:
+                - "name"
+                - "subject"
+                - "fromEmail"
+              properties:
+                name:
+                  description: "Name of the email template"
+                  type: "string"
+                subject:
+                  description: "Subject of the email"
+                  type: "string"
+                fromEmail:
+                  description: "From address to send the email from"
+                  type: "string"
+                replyEmail:
+                  description: "Address that recipients will reply to by default."
+                  type: "string"
+      responses:
+        200:
+          description: "Creation confirmation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      email:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "integer"
+                          name:
+                            type: "string"
+                          subject:
+                            type: "string"
+                          fromEmail:
+                            type: "string"
+                          replyEmail:
+                            type: "string"
+  /people:
+    post:
+      tags:
+        - "People"
+      summary: "Create people"
+      description: "Creates new People"
+      operationId: "createPeople"
+      requestBody:
+        description: "data of new People"
+        required: true
+        content:
+          application/json:
+            schema:
+              title: "People"
+              type: "array"
+              items:
+                type: "object"
+                required:
+                  - "email"
+                properties:
+                  email:
+                    type: "string"
+                    description: "The person's email address."
+                  firstName:
+                    type: "string"
+                    description: "The first name of the person."
+                  lastName:
+                    type: "string"
+                    description: "The last name of the person."
+                  website:
+                    type: "string"
+                    description: "The person's website."
+                  title:
+                    type: "string"
+                    description: "Title of the person"
+                  phone:
+                    type: "string"
+                    description: "The person's phone number"
+      responses:
+        200:
+          description: "Creation confirmation. Returns created people"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      users:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            email:
+                              type: "string"
+                            firstName:
+                              type: "string"
+                            lastName:
+                              type: "string"
+                            website:
+                              type: "string"
+                            title:
+                              type: "string"
+                            id:
+                              type: "string"
+                            phone:
+                              type: "string"
+  /tags:
+    post:
+      tags:
+        - "Tags"
+      summary: "Add tag"
+      description: "Add tag(s) to an existing user."
+      operationId: "addTag"
+      requestBody:
+        description: "data of new Tag"
+        required: true
+        content:
+          application/json:
+            schema:
+              title: "Tag"
+              type: "object"
+              required:
+                - "tag"
+                - "email"
+              properties:
+                tag:
+                  description: "Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2"
+                  type: "string"
+                email:
+                  description: "Email of the person."
+                  type: "string"
+      responses:
+        201:
+          description: "Tag(s) added to user"
+components:
+  securitySchemes:
+    apiKey:
+      type: "apiKey"
+      in: "header"
+      name: "X-Encharge-Token"

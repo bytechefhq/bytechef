@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:dropbox"))
     implementation(project(":server:libs:modules:components:file-storage"))
     implementation(project(":server:libs:modules:components:email"))
+    implementation(project(":server:libs:modules:components:encharge"))
     implementation(project(":server:libs:modules:components:example"))
     implementation(project(":server:libs:modules:components:http-client"))
     implementation(project(":server:libs:modules:components:hubspot"))
