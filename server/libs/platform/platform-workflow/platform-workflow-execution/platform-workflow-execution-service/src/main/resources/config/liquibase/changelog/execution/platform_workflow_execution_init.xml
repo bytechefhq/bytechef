@@ -77,9 +77,6 @@
         </createTable>
 
         <createTable tableName="trigger_execution_job">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="trigger_execution_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -114,6 +111,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addPrimaryKey tableName="trigger_execution_job" columnNames="trigger_execution_id,job_id"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="job_id"

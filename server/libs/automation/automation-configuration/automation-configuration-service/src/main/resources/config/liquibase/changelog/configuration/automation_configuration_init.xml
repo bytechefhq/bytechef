@@ -70,9 +70,6 @@
         </createTable>
 
         <createTable tableName="project_instance_tag">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="project_instance_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -115,9 +112,6 @@
         </createTable>
 
         <createTable tableName="project_instance_workflow_connection">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="project_instance_workflow_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -133,9 +127,6 @@
         </createTable>
 
         <createTable tableName="project_tag">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="project_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -155,6 +146,12 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addPrimaryKey tableName="project_instance_tag" columnNames="project_instance_id,tag_id"/>
+        <addPrimaryKey tableName="project_instance_workflow_connection" columnNames="project_instance_workflow_id,workflow_node_name,key"/>
+        <addPrimaryKey tableName="project_tag" columnNames="project_id,tag_id"/>
+        <addPrimaryKey tableName="project_version" columnNames="project_id,version"/>
+        <addPrimaryKey tableName="project_workflow" columnNames="project_id,workflow_id"/>
 
         <addUniqueConstraint
             tableName="project_workflow"

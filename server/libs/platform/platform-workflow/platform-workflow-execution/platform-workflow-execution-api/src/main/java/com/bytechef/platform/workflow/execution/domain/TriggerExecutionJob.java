@@ -17,21 +17,17 @@
 package com.bytechef.platform.workflow.execution.domain;
 
 import com.bytechef.atlas.execution.domain.Job;
-import java.util.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @Table("trigger_execution_job")
-public class TriggerExecutionJob implements Persistable<Long> {
-
-    @Id
-    private Long id;
+public class TriggerExecutionJob {
 
     @Column("job_id")
     private AggregateReference<Job, Long> jobId;
@@ -48,23 +44,17 @@ public class TriggerExecutionJob implements Persistable<Long> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+
+        if (!(o instanceof TriggerExecutionJob that)) {
             return false;
         }
 
-        TriggerExecutionJob that = (TriggerExecutionJob) o;
-
-        return Objects.equals(id, that.id) && Objects.equals(jobId, that.jobId);
+        return Objects.equals(jobId, that.jobId);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public Long getId() {
-        return id;
+        return Objects.hash(jobId);
     }
 
     public Long getJobId() {
@@ -72,14 +62,9 @@ public class TriggerExecutionJob implements Persistable<Long> {
     }
 
     @Override
-    public boolean isNew() {
-        return id == null;
-    }
-
-    @Override
     public String toString() {
-        return "TriggerJob{" + ", id='"
-            + id + '\'' + ", jobId='"
-            + jobId + '\'' + '}';
+        return "TriggerExecutionJob{" +
+            "jobId=" + jobId +
+            '}';
     }
 }
