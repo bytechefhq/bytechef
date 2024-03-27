@@ -11,12 +11,14 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectBasicModel.java
-src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceAllOfProjectModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceBasicModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceProjectModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceWorkflowConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceWorkflowModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectStatusModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectVersionModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/PublishProjectRequestModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateTagsRequestModel.java

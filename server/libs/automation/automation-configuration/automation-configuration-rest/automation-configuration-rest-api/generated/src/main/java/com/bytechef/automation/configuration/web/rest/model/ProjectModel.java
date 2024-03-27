@@ -30,8 +30,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-19T14:45:51.354164+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T13:38:03.397533+01:00[Europe/Zagreb]")
 public class ProjectModel {
+
+  private CategoryModel category;
 
   private String createdBy;
 
@@ -56,8 +58,6 @@ public class ProjectModel {
 
   private ProjectStatusModel status;
 
-  private CategoryModel category;
-
   @Valid
   private List<@Valid TagModel> tags;
 
@@ -75,6 +75,26 @@ public class ProjectModel {
    */
   public ProjectModel(String name) {
     this.name = name;
+  }
+
+  public ProjectModel category(CategoryModel category) {
+    this.category = category;
+    return this;
+  }
+
+  /**
+   * Get category
+   * @return category
+  */
+  @Valid 
+  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("category")
+  public CategoryModel getCategory() {
+    return category;
+  }
+
+  public void setCategory(CategoryModel category) {
+    this.category = category;
   }
 
   public ProjectModel createdBy(String createdBy) {
@@ -247,7 +267,7 @@ public class ProjectModel {
    * @return projectVersion
   */
   
-  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "projectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectVersion")
   public Integer getProjectVersion() {
     return projectVersion;
@@ -275,26 +295,6 @@ public class ProjectModel {
 
   public void setStatus(ProjectStatusModel status) {
     this.status = status;
-  }
-
-  public ProjectModel category(CategoryModel category) {
-    this.category = category;
-    return this;
-  }
-
-  /**
-   * Get category
-   * @return category
-  */
-  @Valid 
-  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("category")
-  public CategoryModel getCategory() {
-    return category;
-  }
-
-  public void setCategory(CategoryModel category) {
-    this.category = category;
   }
 
   public ProjectModel tags(List<@Valid TagModel> tags) {
@@ -382,7 +382,8 @@ public class ProjectModel {
       return false;
     }
     ProjectModel project = (ProjectModel) o;
-    return Objects.equals(this.createdBy, project.createdBy) &&
+    return Objects.equals(this.category, project.category) &&
+        Objects.equals(this.createdBy, project.createdBy) &&
         Objects.equals(this.createdDate, project.createdDate) &&
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.id, project.id) &&
@@ -392,7 +393,6 @@ public class ProjectModel {
         Objects.equals(this.publishedDate, project.publishedDate) &&
         Objects.equals(this.projectVersion, project.projectVersion) &&
         Objects.equals(this.status, project.status) &&
-        Objects.equals(this.category, project.category) &&
         Objects.equals(this.tags, project.tags) &&
         Objects.equals(this.workflowIds, project.workflowIds) &&
         Objects.equals(this.version, project.version);
@@ -400,13 +400,14 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, status, category, tags, workflowIds, version);
+    return Objects.hash(category, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, status, tags, workflowIds, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectModel {\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -417,7 +418,6 @@ public class ProjectModel {
     sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workflowIds: ").append(toIndentedString(workflowIds)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");

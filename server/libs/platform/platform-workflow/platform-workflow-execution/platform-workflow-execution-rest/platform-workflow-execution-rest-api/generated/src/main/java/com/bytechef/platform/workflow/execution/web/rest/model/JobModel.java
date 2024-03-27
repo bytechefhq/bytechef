@@ -27,11 +27,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * JobModel
+ * Represents an execution of a workflow.
  */
 
+@Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-06T06:11:29.846980+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:44.878410+01:00[Europe/Zagreb]")
 public class JobModel {
 
   private String createdBy;
@@ -39,10 +40,17 @@ public class JobModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
+  private Integer currentTask;
+
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime endDate;
 
+  private ExecutionErrorModel error;
+
   private String id;
+
+  @Valid
+  private Map<String, Object> inputs = new HashMap<>();
 
   private String label;
 
@@ -50,6 +58,11 @@ public class JobModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  @Valid
+  private Map<String, Object> outputs = new HashMap<>();
+
+  private Long parentTaskExecutionId;
 
   private Integer priority;
 
@@ -99,25 +112,13 @@ public class JobModel {
 
   private StatusEnum status;
 
-  private String workflowId;
-
-  private Integer currentTask;
-
-  private ExecutionErrorModel error;
-
-  @Valid
-  private Map<String, Object> inputs = new HashMap<>();
-
-  @Valid
-  private Map<String, Object> outputs = new HashMap<>();
-
-  private Long parentTaskExecutionId;
-
   @Valid
   private List<@Valid TaskExecutionModel> taskExecutions;
 
   @Valid
   private List<@Valid WebhookModel> webhooks;
+
+  private String workflowId;
 
   public JobModel() {
     super();
@@ -172,6 +173,26 @@ public class JobModel {
     this.createdDate = createdDate;
   }
 
+  public JobModel currentTask(Integer currentTask) {
+    this.currentTask = currentTask;
+    return this;
+  }
+
+  /**
+   * The index of the step on the job's workflow on which the job is working on right now.
+   * @return currentTask
+  */
+  
+  @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("currentTask")
+  public Integer getCurrentTask() {
+    return currentTask;
+  }
+
+  public void setCurrentTask(Integer currentTask) {
+    this.currentTask = currentTask;
+  }
+
   public JobModel endDate(LocalDateTime endDate) {
     this.endDate = endDate;
     return this;
@@ -192,6 +213,26 @@ public class JobModel {
     this.endDate = endDate;
   }
 
+  public JobModel error(ExecutionErrorModel error) {
+    this.error = error;
+    return this;
+  }
+
+  /**
+   * Get error
+   * @return error
+  */
+  @Valid 
+  @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("error")
+  public ExecutionErrorModel getError() {
+    return error;
+  }
+
+  public void setError(ExecutionErrorModel error) {
+    this.error = error;
+  }
+
   public JobModel id(String id) {
     this.id = id;
     return this;
@@ -210,6 +251,34 @@ public class JobModel {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public JobModel inputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public JobModel putInputsItem(String key, Object inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new HashMap<>();
+    }
+    this.inputs.put(key, inputsItem);
+    return this;
+  }
+
+  /**
+   * The key-value map of the inputs passed to the job when it was created.
+   * @return inputs
+  */
+  
+  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the inputs passed to the job when it was created.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public Map<String, Object> getInputs() {
+    return inputs;
+  }
+
+  public void setInputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
   }
 
   public JobModel label(String label) {
@@ -272,6 +341,54 @@ public class JobModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public JobModel outputs(Map<String, Object> outputs) {
+    this.outputs = outputs;
+    return this;
+  }
+
+  public JobModel putOutputsItem(String key, Object outputsItem) {
+    if (this.outputs == null) {
+      this.outputs = new HashMap<>();
+    }
+    this.outputs.put(key, outputsItem);
+    return this;
+  }
+
+  /**
+   * The key-value map of the outputs returned.
+   * @return outputs
+  */
+  
+  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the outputs returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputs")
+  public Map<String, Object> getOutputs() {
+    return outputs;
+  }
+
+  public void setOutputs(Map<String, Object> outputs) {
+    this.outputs = outputs;
+  }
+
+  public JobModel parentTaskExecutionId(Long parentTaskExecutionId) {
+    this.parentTaskExecutionId = parentTaskExecutionId;
+    return this;
+  }
+
+  /**
+   * The id of the parent task that created this job. Required for sub-flows.
+   * @return parentTaskExecutionId
+  */
+  
+  @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("parentTaskExecutionId")
+  public Long getParentTaskExecutionId() {
+    return parentTaskExecutionId;
+  }
+
+  public void setParentTaskExecutionId(Long parentTaskExecutionId) {
+    this.parentTaskExecutionId = parentTaskExecutionId;
+  }
+
   public JobModel priority(Integer priority) {
     this.priority = priority;
     return this;
@@ -332,142 +449,6 @@ public class JobModel {
     this.status = status;
   }
 
-  public JobModel workflowId(String workflowId) {
-    this.workflowId = workflowId;
-    return this;
-  }
-
-  /**
-   * Get workflowId
-   * @return workflowId
-  */
-  
-  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowId")
-  public String getWorkflowId() {
-    return workflowId;
-  }
-
-  public void setWorkflowId(String workflowId) {
-    this.workflowId = workflowId;
-  }
-
-  public JobModel currentTask(Integer currentTask) {
-    this.currentTask = currentTask;
-    return this;
-  }
-
-  /**
-   * The index of the step on the job's workflow on which the job is working on right now.
-   * @return currentTask
-  */
-  
-  @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("currentTask")
-  public Integer getCurrentTask() {
-    return currentTask;
-  }
-
-  public void setCurrentTask(Integer currentTask) {
-    this.currentTask = currentTask;
-  }
-
-  public JobModel error(ExecutionErrorModel error) {
-    this.error = error;
-    return this;
-  }
-
-  /**
-   * Get error
-   * @return error
-  */
-  @Valid 
-  @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("error")
-  public ExecutionErrorModel getError() {
-    return error;
-  }
-
-  public void setError(ExecutionErrorModel error) {
-    this.error = error;
-  }
-
-  public JobModel inputs(Map<String, Object> inputs) {
-    this.inputs = inputs;
-    return this;
-  }
-
-  public JobModel putInputsItem(String key, Object inputsItem) {
-    if (this.inputs == null) {
-      this.inputs = new HashMap<>();
-    }
-    this.inputs.put(key, inputsItem);
-    return this;
-  }
-
-  /**
-   * The key-value map of the inputs passed to the job when it was created.
-   * @return inputs
-  */
-  
-  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the inputs passed to the job when it was created.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("inputs")
-  public Map<String, Object> getInputs() {
-    return inputs;
-  }
-
-  public void setInputs(Map<String, Object> inputs) {
-    this.inputs = inputs;
-  }
-
-  public JobModel outputs(Map<String, Object> outputs) {
-    this.outputs = outputs;
-    return this;
-  }
-
-  public JobModel putOutputsItem(String key, Object outputsItem) {
-    if (this.outputs == null) {
-      this.outputs = new HashMap<>();
-    }
-    this.outputs.put(key, outputsItem);
-    return this;
-  }
-
-  /**
-   * The key-value map of the outputs returned.
-   * @return outputs
-  */
-  
-  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the outputs returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("outputs")
-  public Map<String, Object> getOutputs() {
-    return outputs;
-  }
-
-  public void setOutputs(Map<String, Object> outputs) {
-    this.outputs = outputs;
-  }
-
-  public JobModel parentTaskExecutionId(Long parentTaskExecutionId) {
-    this.parentTaskExecutionId = parentTaskExecutionId;
-    return this;
-  }
-
-  /**
-   * The id of the parent task that created this job. Required for sub-flows.
-   * @return parentTaskExecutionId
-  */
-  
-  @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("parentTaskExecutionId")
-  public Long getParentTaskExecutionId() {
-    return parentTaskExecutionId;
-  }
-
-  public void setParentTaskExecutionId(Long parentTaskExecutionId) {
-    this.parentTaskExecutionId = parentTaskExecutionId;
-  }
-
   public JobModel taskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
     return this;
@@ -524,6 +505,26 @@ public class JobModel {
     this.webhooks = webhooks;
   }
 
+  public JobModel workflowId(String workflowId) {
+    this.workflowId = workflowId;
+    return this;
+  }
+
+  /**
+   * Get workflowId
+   * @return workflowId
+  */
+  
+  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowId")
+  public String getWorkflowId() {
+    return workflowId;
+  }
+
+  public void setWorkflowId(String workflowId) {
+    this.workflowId = workflowId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -535,27 +536,27 @@ public class JobModel {
     JobModel job = (JobModel) o;
     return Objects.equals(this.createdBy, job.createdBy) &&
         Objects.equals(this.createdDate, job.createdDate) &&
+        Objects.equals(this.currentTask, job.currentTask) &&
         Objects.equals(this.endDate, job.endDate) &&
+        Objects.equals(this.error, job.error) &&
         Objects.equals(this.id, job.id) &&
+        Objects.equals(this.inputs, job.inputs) &&
         Objects.equals(this.label, job.label) &&
         Objects.equals(this.lastModifiedBy, job.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, job.lastModifiedDate) &&
+        Objects.equals(this.outputs, job.outputs) &&
+        Objects.equals(this.parentTaskExecutionId, job.parentTaskExecutionId) &&
         Objects.equals(this.priority, job.priority) &&
         Objects.equals(this.startDate, job.startDate) &&
         Objects.equals(this.status, job.status) &&
-        Objects.equals(this.workflowId, job.workflowId) &&
-        Objects.equals(this.currentTask, job.currentTask) &&
-        Objects.equals(this.error, job.error) &&
-        Objects.equals(this.inputs, job.inputs) &&
-        Objects.equals(this.outputs, job.outputs) &&
-        Objects.equals(this.parentTaskExecutionId, job.parentTaskExecutionId) &&
         Objects.equals(this.taskExecutions, job.taskExecutions) &&
-        Objects.equals(this.webhooks, job.webhooks);
+        Objects.equals(this.webhooks, job.webhooks) &&
+        Objects.equals(this.workflowId, job.workflowId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, id, label, lastModifiedBy, lastModifiedDate, priority, startDate, status, workflowId, currentTask, error, inputs, outputs, parentTaskExecutionId, taskExecutions, webhooks);
+    return Objects.hash(createdBy, createdDate, currentTask, endDate, error, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, parentTaskExecutionId, priority, startDate, status, taskExecutions, webhooks, workflowId);
   }
 
   @Override
@@ -564,22 +565,22 @@ public class JobModel {
     sb.append("class JobModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    currentTask: ").append(toIndentedString(currentTask)).append("\n");
     sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
+    sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
+    sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-    sb.append("    currentTask: ").append(toIndentedString(currentTask)).append("\n");
-    sb.append("    error: ").append(toIndentedString(error)).append("\n");
-    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
-    sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
-    sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    taskExecutions: ").append(toIndentedString(taskExecutions)).append("\n");
     sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
+    sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("}");
     return sb.toString();
   }
