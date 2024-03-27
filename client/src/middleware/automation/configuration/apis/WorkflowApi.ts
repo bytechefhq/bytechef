@@ -35,6 +35,11 @@ export interface DuplicateWorkflowRequest {
     workflowId: string;
 }
 
+export interface GetProjectVersionWorkflowsRequest {
+    id: number;
+    projectVersion: number;
+}
+
 export interface GetProjectWorkflowsRequest {
     id: number;
 }
@@ -125,6 +130,42 @@ export class WorkflowApi extends runtime.BaseAPI {
      */
     async duplicateWorkflow(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.duplicateWorkflowRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get workflows for particular project version.
+     * Get workflows for particular project version.
+     */
+    async getProjectVersionWorkflowsRaw(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowBasicModel>>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectVersionWorkflows.');
+        }
+
+        if (requestParameters.projectVersion === null || requestParameters.projectVersion === undefined) {
+            throw new runtime.RequiredError('projectVersion','Required parameter requestParameters.projectVersion was null or undefined when calling getProjectVersionWorkflows.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/projects/{id}/{projectVersion}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"projectVersion"}}`, encodeURIComponent(String(requestParameters.projectVersion))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowBasicModelFromJSON));
+    }
+
+    /**
+     * Get workflows for particular project version.
+     * Get workflows for particular project version.
+     */
+    async getProjectVersionWorkflows(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowBasicModel>> {
+        const response = await this.getProjectVersionWorkflowsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

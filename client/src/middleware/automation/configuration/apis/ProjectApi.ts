@@ -17,6 +17,8 @@ import * as runtime from '../runtime';
 import type {
   ProjectModel,
   ProjectStatusModel,
+  ProjectVersionModel,
+  PublishProjectRequestModel,
   WorkflowModel,
 } from '../models/index';
 import {
@@ -24,6 +26,10 @@ import {
     ProjectModelToJSON,
     ProjectStatusModelFromJSON,
     ProjectStatusModelToJSON,
+    ProjectVersionModelFromJSON,
+    ProjectVersionModelToJSON,
+    PublishProjectRequestModelFromJSON,
+    PublishProjectRequestModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models/index';
@@ -49,6 +55,10 @@ export interface GetProjectRequest {
     id: number;
 }
 
+export interface GetProjectVersionsRequest {
+    id: number;
+}
+
 export interface GetProjectsRequest {
     categoryId?: number;
     projectInstances?: boolean;
@@ -58,6 +68,7 @@ export interface GetProjectsRequest {
 
 export interface PublishProjectRequest {
     id: number;
+    publishProjectRequestModel?: PublishProjectRequestModel;
 }
 
 export interface UpdateProjectRequest {
@@ -240,6 +251,38 @@ export class ProjectApi extends runtime.BaseAPI {
     }
 
     /**
+     * Get a project versions.
+     * Get a project versions.
+     */
+    async getProjectVersionsRaw(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectVersionModel>>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectVersions.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/projects/{id}/versions`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectVersionModelFromJSON));
+    }
+
+    /**
+     * Get a project versions.
+     * Get a project versions.
+     */
+    async getProjectVersions(requestParameters: GetProjectVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectVersionModel>> {
+        const response = await this.getProjectVersionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get projects.
      * Get projects.
      */
@@ -287,7 +330,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Publishes existing project.
      * Publishes existing project.
      */
-    async publishProjectRaw(requestParameters: PublishProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
+    async publishProjectRaw(requestParameters: PublishProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling publishProject.');
         }
@@ -296,23 +339,25 @@ export class ProjectApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        headerParameters['Content-Type'] = 'application/json';
+
         const response = await this.request({
             path: `/projects/{id}/publish`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: PublishProjectRequestModelToJSON(requestParameters.publishProjectRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectModelFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Publishes existing project.
      * Publishes existing project.
      */
-    async publishProject(requestParameters: PublishProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
-        const response = await this.publishProjectRaw(requestParameters, initOverrides);
-        return await response.value();
+    async publishProject(requestParameters: PublishProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.publishProjectRaw(requestParameters, initOverrides);
     }
 
     /**
