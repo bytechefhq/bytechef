@@ -22,7 +22,10 @@ interface ObjectPropertyProps {
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
+    path?: string;
     property: PropertyType;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    taskParameterValue?: any;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
@@ -33,7 +36,9 @@ const ObjectProperty = ({
     currentComponent,
     currentComponentData,
     dataPills,
+    path,
     property,
+    taskParameterValue,
     updateWorkflowMutation,
 }: ObjectPropertyProps) => {
     const [subProperties, setSubProperties] = useState<Array<PropertyType>>(
@@ -115,6 +120,8 @@ const ObjectProperty = ({
                         return <></>;
                     }
 
+                    const subPropertyDefaultValue = subProperty.name ? taskParameterValue?.[subProperty.name] : '';
+
                     return (
                         <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
@@ -127,10 +134,12 @@ const ObjectProperty = ({
                                 dataPills={dataPills}
                                 mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
                                 objectName={name}
+                                path={`${path}.${name}`}
                                 property={{
                                     ...subProperty,
                                     name: subProperty.name,
                                 }}
+                                taskParameterValue={subPropertyDefaultValue}
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />
 
