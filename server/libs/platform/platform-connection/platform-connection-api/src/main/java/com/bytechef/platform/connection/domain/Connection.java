@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.domain;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -51,6 +52,9 @@ public final class Connection implements Persistable<Long> {
 
     @Column("authorization_name")
     private String authorizationName;
+
+    @Column
+    private int environment;
 
     @Column("component_name")
     private String componentName;
@@ -165,6 +169,10 @@ public final class Connection implements Persistable<Long> {
         return CredentialStatus.values()[credentialStatus];
     }
 
+    public Environment getEnvironment() {
+        return Environment.values()[environment];
+    }
+
     /**
      * Return the ID of the connection.
      */
@@ -242,6 +250,10 @@ public final class Connection implements Persistable<Long> {
 
     public void setCredentialStatus(CredentialStatus credentialStatus) {
         this.credentialStatus = credentialStatus.ordinal();
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment.ordinal();
     }
 
     public void setId(Long id) {
