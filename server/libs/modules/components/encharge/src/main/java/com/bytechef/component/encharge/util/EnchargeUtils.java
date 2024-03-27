@@ -17,6 +17,7 @@
 package com.bytechef.component.encharge.util;
 
 import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.encharge.constant.EnchargeConstants.EMAIL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -48,7 +49,9 @@ public class EnchargeUtils {
         if (body.get("people") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("email"), (String) map.get("email")));
+                    String email = (String) map.get(EMAIL);
+
+                    options.add(option(email, email));
                 }
             }
         }
