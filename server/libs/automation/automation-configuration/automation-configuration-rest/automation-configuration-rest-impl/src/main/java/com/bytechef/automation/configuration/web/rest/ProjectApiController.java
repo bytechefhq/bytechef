@@ -16,11 +16,14 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
+import com.bytechef.automation.configuration.web.rest.model.PublishProjectRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,11 +44,15 @@ public class ProjectApiController implements ProjectApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
+    private final ProjectService projectService;
 
     @SuppressFBWarnings("EI2")
-    public ProjectApiController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectApiController(
+        ConversionService conversionService, ProjectFacade projectFacade, ProjectService projectService) {
+
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
+        this.projectService = projectService;
     }
 
     @Override
@@ -62,7 +69,7 @@ public class ProjectApiController implements ProjectApi {
     public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                projectFacade.addProjectWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
+                projectFacade.addWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
     }
 
     @Override
@@ -85,22 +92,34 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
+    public ResponseEntity<List<ProjectVersionModel>> getProjectVersions(Long id) {
+        return ResponseEntity.ok(
+            projectService.getProjectVersions(id)
+                .stream()
+                .map(projectVersion -> conversionService.convert(projectVersion, ProjectVersionModel.class))
+                .toList());
+    }
+
+    @Override
     public ResponseEntity<List<ProjectModel>> getProjects(
         Long categoryId, Boolean projectInstances, Long tagId, ProjectStatusModel status) {
 
         return ResponseEntity.ok(
             projectFacade
                 .getProjects(
-                    categoryId, projectInstances != null, tagId,
-                    status == null ? null : Project.Status.valueOf(status.name()))
+                    categoryId, projectInstances != null, tagId, status == null ? null : Status.valueOf(status.name()))
                 .stream()
                 .map(project -> conversionService.convert(project, ProjectModel.class))
                 .toList());
     }
 
     @Override
-    public ResponseEntity<ProjectModel> publishProject(Long id) {
-        return ResponseEntity.ok(conversionService.convert(projectFacade.publishProject(id), ProjectModel.class));
+    public ResponseEntity<Void> publishProject(Long id, PublishProjectRequestModel publishProjectRequestModel) {
+        projectService.publishProject(
+            id, publishProjectRequestModel == null ? null : publishProjectRequestModel.getDescription());
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

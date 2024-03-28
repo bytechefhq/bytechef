@@ -69,7 +69,6 @@ public class DemoProjectConfiguration {
                 Project project = projectService.create(
                     Project.builder()
                         .name("Demo")
-                        .status(Project.Status.PUBLISHED)
                         .tagIds(
                             tagService.save(List.of(new Tag("demo")))
                                 .stream()

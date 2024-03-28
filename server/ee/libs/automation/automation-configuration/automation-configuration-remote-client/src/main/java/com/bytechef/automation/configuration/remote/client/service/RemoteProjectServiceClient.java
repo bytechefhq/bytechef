@@ -8,7 +8,8 @@
 package com.bytechef.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.Project.Status;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,6 +34,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     @SuppressFBWarnings("EI")
     public RemoteProjectServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
+    }
+
+    @Override
+    public Project addVersion(long id, List<String> versionWorkflowIds) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -61,11 +67,6 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public boolean isProjectEnabled(long projectId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Project getProjectInstanceProject(long projectInstanceId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -83,6 +84,11 @@ public class RemoteProjectServiceClient implements ProjectService {
                 .path(PROJECT_SERVICE + "/get-project/{id}")
                 .build(id),
             Project.class);
+    }
+
+    @Override
+    public List<ProjectVersion> getProjectVersions(Long id) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -116,7 +122,7 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public Project publish(long id) {
+    public Project publishProject(long id, String description) {
         throw new UnsupportedOperationException();
     }
 

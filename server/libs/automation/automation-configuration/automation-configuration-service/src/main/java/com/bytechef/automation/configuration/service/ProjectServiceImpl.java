@@ -17,12 +17,12 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.Project.Status;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.exception.ApplicationException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -41,6 +41,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     public ProjectServiceImpl(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
+    }
+
+    @Override
+    public Project addVersion(long id, List<String> versionWorkflowIds) {
+        Project project = getProject(id);
+
+        project.addVersion(versionWorkflowIds);
+
+        return projectRepository.save(project);
     }
 
     @Override
@@ -65,9 +74,6 @@ public class ProjectServiceImpl implements ProjectService {
         Validate.isTrue(project.getId() == null, "'id' must be null");
         Validate.notNull(project.getName(), "'name' must not be null");
 
-        project.setProjectVersion(1);
-        project.setStatus(Status.UNPUBLISHED);
-
         return projectRepository.save(project);
     }
 
@@ -84,14 +90,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isProjectEnabled(long projectId) {
-        Project project = getProject(projectId);
-
-        return project.getPublishedDate() != null;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Project getProjectInstanceProject(long projectInstanceId) {
         return projectRepository.findByProjectInstanceId(projectInstanceId);
     }
@@ -100,6 +98,16 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
+    }
+
+    @Override
+    public List<ProjectVersion> getProjectVersions(Long id) {
+        Project project = getProject(id);
+
+        return project.getProjectVersions()
+            .stream()
+            .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
+            .toList();
     }
 
     @Override
@@ -127,27 +135,26 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project publish(long id) {
-        Project curProject = getProject(id);
+    public Project publishProject(long id, String description) {
+        Project project = getProject(id);
 
-        curProject.setPublishedDate(LocalDateTime.now());
-        curProject.setStatus(Status.PUBLISHED);
+        project.publish(description);
 
-        return projectRepository.save(curProject);
+        return projectRepository.save(project);
     }
 
     @Override
     public void removeWorkflow(long id, String workflowId) {
         Project project = getProject(id);
 
-        if (CollectionUtils.count(project.getWorkflowIds()) == 1) {
+        if (CollectionUtils.count(project.getWorkflowIds(project.getLastVersion())) == 1) {
             throw new ApplicationException(
                 "The last workflow id=%s cannot be deleted".formatted(workflowId), Project.class, 102);
         }
 
         project.removeWorkflow(workflowId);
 
-        update(project);
+        projectRepository.save(project);
     }
 
     @Override
@@ -169,7 +176,6 @@ public class ProjectServiceImpl implements ProjectService {
         curProject.setDescription(project.getDescription());
         curProject.setName(Validate.notNull(project.getName(), "name"));
         curProject.setTagIds(project.getTagIds());
-        curProject.setWorkflowIds(project.getWorkflowIds());
 
         return projectRepository.save(curProject);
     }

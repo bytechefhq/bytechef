@@ -46,13 +46,13 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    public List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
-        return projectInstanceWorkflowRepository.saveAll(projectInstanceWorkflows);
+    public ProjectInstanceWorkflow create(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        return projectInstanceWorkflowRepository.save(projectInstanceWorkflow);
     }
 
     @Override
-    public ProjectInstanceWorkflow create(ProjectInstanceWorkflow projectInstanceWorkflow) {
-        return projectInstanceWorkflowRepository.save(projectInstanceWorkflow);
+    public List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+        return projectInstanceWorkflowRepository.saveAll(projectInstanceWorkflows);
     }
 
     @Override

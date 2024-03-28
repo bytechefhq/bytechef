@@ -26,8 +26,8 @@ import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -77,7 +77,7 @@ public class ProjectServiceIntTest {
 
         project = projectService.addWorkflow(Validate.notNull(project.getId(), "id"), "workflow2");
 
-        assertThat(project.getWorkflowIds()).contains("workflow2");
+        assertThat(project.getWorkflowIds(project.getLastVersion())).contains("workflow2");
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")))
-            .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow1"));
+            .hasFieldOrPropertyWithValue("allWorkflowIds", Map.of(1, List.of("workflow1")));
     }
 
     @Test
@@ -155,7 +155,7 @@ public class ProjectServiceIntTest {
         project.setDescription("description2");
         project.setName("name2");
         project.setTagIds(List.of(tag.getId()));
-        project.setWorkflowIds(List.of("workflow2"));
+        project.addWorkflowId("workflow2");
 
         project = projectService.update(project);
 
@@ -165,7 +165,7 @@ public class ProjectServiceIntTest {
         project.setDescription("description2");
         project.setName("name2");
         project.setTagIds(List.of(tag.getId()));
-        project.setWorkflowIds(List.of("workflow2"));
+        project.addWorkflowId("workflow2");
 
         project = projectService.update(project);
 
@@ -174,7 +174,7 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
             .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
-            .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow2"));
+            .hasFieldOrPropertyWithValue("allWorkflowIds", Map.of(1, List.of("workflow1")));
     }
 
     private Project getProject() {
@@ -182,9 +182,6 @@ public class ProjectServiceIntTest {
             .categoryId(category.getId())
             .description("description")
             .name("name")
-            .projectVersion(1)
-            .publishedDate(LocalDateTime.now())
-            .status(Project.Status.UNPUBLISHED)
             .workflowIds(List.of("workflow1"))
             .build();
     }

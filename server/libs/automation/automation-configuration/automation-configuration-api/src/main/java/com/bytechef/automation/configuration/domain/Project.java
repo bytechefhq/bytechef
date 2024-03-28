@@ -16,15 +16,20 @@
 
 package com.bytechef.automation.configuration.domain;
 
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.category.domain.Category;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -44,11 +49,6 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table
 public final class Project implements Persistable<Long> {
-
-    public enum Status {
-
-        UNPUBLISHED, PUBLISHED
-    }
 
     @Column("category_id")
     private AggregateReference<Category, Long> categoryId;
@@ -81,39 +81,32 @@ public final class Project implements Persistable<Long> {
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectTag> projectTags = new HashSet<>();
 
-    @Column
-    private int projectVersion;
+    @MappedCollection(idColumn = "project_id")
+    private Set<ProjectVersion> projectVersions = new HashSet<>();
 
     @MappedCollection(idColumn = "project_id")
-    private Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
-
-    @Column("published_date")
-    private LocalDateTime publishedDate;
-
-    @Column
-    private int status;
+    private final Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
 
     @Version
     private int version;
 
     public Project() {
+        projectVersions.add(new ProjectVersion(1));
     }
 
     @PersistenceCreator
     public Project(
         AggregateReference<Category, Long> categoryId, String description, Long id, String name,
-        Set<ProjectTag> projectTags, int projectVersion, Set<ProjectWorkflow> projectWorkflows,
-        LocalDateTime publishedDate, Status status, int version) {
+        Set<ProjectTag> projectTags, Set<ProjectVersion> projectVersions, Set<ProjectWorkflow> projectWorkflows,
+        int version) {
 
         this.categoryId = categoryId;
         this.description = description;
         this.id = id;
         this.name = name;
         this.projectTags.addAll(projectTags);
-        this.projectVersion = projectVersion;
+        this.projectVersions.addAll(projectVersions);
         this.projectWorkflows.addAll(projectWorkflows);
-        this.publishedDate = publishedDate;
-        this.status = status.ordinal();
         this.version = version;
     }
 
@@ -121,8 +114,30 @@ public final class Project implements Persistable<Long> {
         return new Builder();
     }
 
+    public void addVersion(List<String> versionWorkflowIds) {
+        ProjectVersion projectVersion = getLastProjectVersion();
+
+        int newVersion = projectVersion.getVersion() + 1;
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            if (projectWorkflow.getProjectVersion() == projectVersion.getVersion()) {
+                projectWorkflow.setProjectVersion(newVersion);
+            }
+        }
+
+        projectVersions.add(new ProjectVersion(newVersion));
+
+        for (String workflowId : versionWorkflowIds) {
+            addWorkflowId(workflowId, projectVersion.getVersion());
+        }
+    }
+
     public void addWorkflowId(String workflowId) {
-        projectWorkflows.add(new ProjectWorkflow(workflowId));
+        projectWorkflows.add(new ProjectWorkflow(workflowId, getLastVersion()));
+    }
+
+    public void addWorkflowId(String workflowId, int projectVersion) {
+        projectWorkflows.add(new ProjectWorkflow(workflowId, projectVersion));
     }
 
     @Override
@@ -143,6 +158,14 @@ public final class Project implements Persistable<Long> {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    public Map<Integer, List<String>> getAllWorkflowIds() {
+        return projectWorkflows.stream()
+            .collect(Collectors.groupingBy(
+                ProjectWorkflow::getProjectVersion,
+                Collectors.collectingAndThen(
+                    Collectors.toList(), list -> CollectionUtils.map(list, ProjectWorkflow::getWorkflowId))));
     }
 
     public Long getCategoryId() {
@@ -178,16 +201,26 @@ public final class Project implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public int getProjectVersion() {
-        return projectVersion;
+    public ProjectVersion getLastProjectVersion() {
+        return projectVersions.stream()
+            .max(Comparator.comparingInt(ProjectVersion::getVersion))
+            .orElseThrow();
     }
 
-    public LocalDateTime getPublishedDate() {
-        return publishedDate;
+    public LocalDateTime getLastPublishedDate() {
+        return getLastProjectVersion().getPublishedDate();
     }
 
-    public Status getStatus() {
-        return Status.values()[status];
+    public Status getLastStatus() {
+        return getLastProjectVersion().getStatus();
+    }
+
+    public int getLastVersion() {
+        return getLastProjectVersion().getVersion();
+    }
+
+    public List<ProjectVersion> getProjectVersions() {
+        return new ArrayList<>(projectVersions);
     }
 
     public List<Long> getTagIds() {
@@ -197,12 +230,18 @@ public final class Project implements Persistable<Long> {
             .toList();
     }
 
-    public List<String> getWorkflowIds() {
-        return CollectionUtils.map(projectWorkflows, ProjectWorkflow::getWorkflowId);
-    }
-
     public int getVersion() {
         return version;
+    }
+
+    public List<String> getWorkflowIds(int projectVersion) {
+        Map<Integer, List<String>> workflowIdMap = getAllWorkflowIds();
+
+        if (workflowIdMap.containsKey(projectVersion)) {
+            return workflowIdMap.get(projectVersion);
+        } else {
+            return List.of();
+        }
     }
 
     @Override
@@ -210,14 +249,20 @@ public final class Project implements Persistable<Long> {
         return id == null;
     }
 
-    public void removeWorkflow(String workflowId) {
-        projectWorkflows.stream()
-            .filter(integrationWorkflow -> Objects.equals(integrationWorkflow.getWorkflowId(), workflowId))
-            .findFirst()
-            .ifPresent(projectWorkflows::remove);
+    public boolean isPublished() {
+        return projectVersions.stream()
+            .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
     }
 
-    public void removeWorkflowId(String workflowId) {
+    public void publish(String description) {
+        ProjectVersion projectVersion = getLastProjectVersion();
+
+        projectVersion.setDescription(description);
+        projectVersion.setPublishedDate(LocalDateTime.now());
+        projectVersion.setStatus(Status.PUBLISHED);
+    }
+
+    public void removeWorkflow(String workflowId) {
         projectWorkflows.stream()
             .filter(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId))
             .findFirst()
@@ -246,18 +291,8 @@ public final class Project implements Persistable<Long> {
         this.name = name;
     }
 
-    public void setProjectVersion(int projectVersion) {
-        this.projectVersion = projectVersion;
-    }
-
-    public void setPublishedDate(LocalDateTime publishedDate) {
-        this.publishedDate = publishedDate;
-    }
-
-    public void setStatus(Status status) {
-        Validate.notNull(status, "'status' must not be null");
-
-        this.status = status.ordinal();
+    public void setProjectVersions(List<ProjectVersion> projectVersions) {
+        this.projectVersions = new HashSet<>(projectVersions);
     }
 
     public void setTagIds(List<Long> tagIds) {
@@ -280,28 +315,14 @@ public final class Project implements Persistable<Long> {
         this.version = version;
     }
 
-    public void setWorkflowIds(List<String> workflowIds) {
-        projectWorkflows = new HashSet<>();
-
-        if (!CollectionUtils.isEmpty(workflowIds)) {
-            for (String workflowId : workflowIds) {
-                addWorkflowId(workflowId);
-            }
-        }
-    }
-
     @Override
     public String toString() {
         return "Project{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", projectVersion='" + projectVersion + '\'' +
-            ", status='" + status + '\'' +
-            ", lastPublishedDate='" + publishedDate + '\'' +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", projectTags=" + projectTags +
-            ", projectWorkflows=" + projectWorkflows +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
@@ -316,12 +337,9 @@ public final class Project implements Persistable<Long> {
         private String description;
         private Long id;
         private String name;
-        private LocalDateTime publishedDate;
-        private int projectVersion;
-        private Status status;
         private List<Long> tagIds;
         private int version;
-        private List<String> workflowIds;
+        private List<String> workflowIds = List.of();
 
         private Builder() {
         }
@@ -343,21 +361,6 @@ public final class Project implements Persistable<Long> {
 
         public Builder name(String name) {
             this.name = name;
-            return this;
-        }
-
-        public Builder publishedDate(LocalDateTime publishedDate) {
-            this.publishedDate = publishedDate;
-            return this;
-        }
-
-        public Builder projectVersion(int projectVersion) {
-            this.projectVersion = projectVersion;
-            return this;
-        }
-
-        public Builder status(Status status) {
-            this.status = status;
             return this;
         }
 
@@ -387,12 +390,10 @@ public final class Project implements Persistable<Long> {
             project.setDescription(description);
             project.setId(id);
             project.setName(name);
-            project.setPublishedDate(publishedDate);
-            project.setProjectVersion(projectVersion);
-            project.setStatus(status);
             project.setTagIds(tagIds);
             project.setVersion(version);
-            project.setWorkflowIds(workflowIds);
+
+            workflowIds.forEach(project::addWorkflowId);
 
             return project;
         }

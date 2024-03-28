@@ -77,31 +77,12 @@ public class ProjectRepositoryIntTest {
         Project resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
 
         assertThat(resultProject).isEqualTo(project);
-
-        projectRepository.deleteById(Validate.notNull(project.getId(), "id"));
-
-        project = getProject(List.of("workflowId"));
-
-        project = projectRepository.save(project);
-
-        resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
-
-        assertThat(resultProject.getWorkflowIds()).isEqualTo(project.getWorkflowIds());
-
-        resultProject.removeWorkflowId("workflowId");
-
-        projectRepository.save(resultProject);
-
-        resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
-
-        assertThat(resultProject.getWorkflowIds()).isEmpty();
     }
 
     @Test
     public void testUpdate() {
         Project project = projectRepository.save(getProject(List.of("workflow1")));
 
-        project.addWorkflowId("workflow2");
         project.setName("name2");
 
         projectRepository.save(project);
@@ -114,8 +95,6 @@ public class ProjectRepositoryIntTest {
         return Project.builder()
             .description("description")
             .name("name")
-            .projectVersion(1)
-            .status(Project.Status.UNPUBLISHED)
             .workflowIds(workflowIds)
             .build();
     }

@@ -12,13 +12,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT"/>
-            <column name="project_version" type="INTEGER">
-                <constraints nullable="false"/>
-            </column>
-            <column name="status" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="published_date" type="TIMESTAMP"/>
             <column name="category_id" type="BIGINT"/>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
@@ -41,7 +34,12 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="project_id" type="BIGINT"/>
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
             <column name="name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
@@ -135,14 +133,30 @@
             </column>
         </createTable>
 
-        <createTable tableName="project_workflow">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
+        <createTable tableName="project_version">
+            <column name="project_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_date" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="VARCHAR(256)"/>
+        </createTable>
+
+        <createTable tableName="project_workflow">
             <column name="project_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
             <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_version" type="INT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -212,6 +226,13 @@
             baseColumnNames="tag_id"
             constraintName="fk_project_tag_tag"
             referencedTableName="tag"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_version"
+            baseColumnNames="project_id"
+            constraintName="fk_project_version_project"
+            referencedTableName="project"
             referencedColumnNames="id"/>
 
         <addForeignKeyConstraint

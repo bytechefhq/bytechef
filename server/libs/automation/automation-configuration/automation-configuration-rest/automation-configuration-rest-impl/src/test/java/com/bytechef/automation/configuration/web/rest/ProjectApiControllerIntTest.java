@@ -304,7 +304,7 @@ public class ProjectApiControllerIntTest {
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
         Workflow workflow = new Workflow("id", definition, Format.JSON, 0);
 
-        when(projectFacade.addProjectWorkflow(anyLong(), any()))
+        when(projectFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);
 
         try {
@@ -331,7 +331,7 @@ public class ProjectApiControllerIntTest {
         ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(projectFacade).addProjectWorkflow(
+        verify(projectFacade).addWorkflow(
             anyLong(), isNull());
 
         Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());

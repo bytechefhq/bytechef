@@ -16,10 +16,9 @@
 
 package com.bytechef.automation.configuration.domain;
 
+import java.util.Objects;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic

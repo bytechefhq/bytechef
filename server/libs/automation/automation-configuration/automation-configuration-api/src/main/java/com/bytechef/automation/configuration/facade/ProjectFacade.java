@@ -17,9 +17,10 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.automation.configuration.domain.Project.Status;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.category.domain.Category;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import java.util.List;
 import org.springframework.lang.NonNull;
@@ -29,7 +30,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ProjectFacade {
 
-    Workflow addProjectWorkflow(long id, @NonNull String definition);
+    Workflow addWorkflow(long id, @NonNull String definition);
 
     ProjectDTO createProject(@NonNull ProjectDTO projectDTO);
 
@@ -49,11 +50,13 @@ public interface ProjectFacade {
 
     List<Workflow> getProjectWorkflows(long id);
 
-    List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
+    List<Workflow> getProjectVersionWorkflows(long id, int projectVersion);
 
-    ProjectDTO publishProject(long id);
+    List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
 
     ProjectDTO updateProject(@NonNull ProjectDTO projectDTO);
 
     void updateProjectTags(long id, @NonNull List<Tag> tags);
+
+    WorkflowDTO updateWorkflow(String id, String definition, Integer version);
 }
