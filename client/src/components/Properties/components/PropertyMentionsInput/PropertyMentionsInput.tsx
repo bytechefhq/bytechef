@@ -77,7 +77,6 @@ const PropertyMentionsInput = forwardRef(
             leadingIcon,
             name,
             objectName,
-            onChange,
             onKeyPress,
             placeholder = "Show data pills using '{'",
             required,
