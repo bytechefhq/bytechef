@@ -86,128 +86,130 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 py-5 hover:bg-gray-50">
-                <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                        <div className="relative flex items-center gap-2">
-                            <Link
-                                className="flex gap-2"
-                                to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
-                            >
-                                {project.description ? (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span className="text-base font-semibold">{project.name}</span>
-                                        </TooltipTrigger>
+            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
+                <div className="flex flex-1 items-center border-b border-muted py-5">
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                            <div className="relative flex items-center gap-2">
+                                <Link
+                                    className="flex gap-2"
+                                    to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
+                                >
+                                    {project.description ? (
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <span className="text-base font-semibold">{project.name}</span>
+                                            </TooltipTrigger>
 
-                                        <TooltipContent>{project.description}</TooltipContent>
-                                    </Tooltip>
-                                ) : (
-                                    <span className="text-base font-semibold">{project.name}</span>
-                                )}
-                            </Link>
+                                            <TooltipContent>{project.description}</TooltipContent>
+                                        </Tooltip>
+                                    ) : (
+                                        <span className="text-base font-semibold">{project.name}</span>
+                                    )}
+                                </Link>
 
-                            {project.category && (
-                                <span className="text-xs uppercase text-gray-700">{project.category.name}</span>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                        <div className="flex items-center">
-                            <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
-                                <div className="mr-1">
-                                    {project.workflowIds?.length === 1
-                                        ? `${project.workflowIds?.length} workflow`
-                                        : `${project.workflowIds?.length} workflows`}
-                                </div>
-
-                                <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
-                            </CollapsibleTrigger>
-
-                            <div onClick={(event) => event.preventDefault()}>
-                                {project.tags && (
-                                    <TagList
-                                        getRequest={(id, tags) => ({
-                                            id: id!,
-                                            updateTagsRequestModel: {
-                                                tags: tags || [],
-                                            },
-                                        })}
-                                        id={project.id!}
-                                        remainingTags={remainingTags}
-                                        tags={project.tags}
-                                        updateTagsMutation={updateProjectTagsMutation}
-                                    />
+                                {project.category && (
+                                    <span className="text-xs uppercase text-gray-700">{project.category.name}</span>
                                 )}
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div className="flex items-center justify-end gap-x-6">
-                    <div className="flex flex-col items-end gap-y-4">
-                        <Badge
-                            className="flex space-x-1"
-                            variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}
-                        >
-                            <span>V{project.projectVersion}</span>
+                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
+                            <div className="flex items-center">
+                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
+                                    <div className="mr-1">
+                                        {project.workflowIds?.length === 1
+                                            ? `${project.workflowIds?.length} workflow`
+                                            : `${project.workflowIds?.length} workflows`}
+                                    </div>
 
-                            <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
-                        </Badge>
+                                    <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
+                                </CollapsibleTrigger>
 
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <div className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                    {project.status === ProjectStatusModel.Published ? (
-                                        <span>
-                                            {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    ) : (
-                                        '-'
+                                <div onClick={(event) => event.preventDefault()}>
+                                    {project.tags && (
+                                        <TagList
+                                            getRequest={(id, tags) => ({
+                                                id: id!,
+                                                updateTagsRequestModel: {
+                                                    tags: tags || [],
+                                                },
+                                            })}
+                                            id={project.id!}
+                                            remainingTags={remainingTags}
+                                            tags={project.tags}
+                                            updateTagsMutation={updateProjectTagsMutation}
+                                        />
                                     )}
                                 </div>
-                            </TooltipTrigger>
-
-                            <TooltipContent>Last Published Date</TooltipContent>
-                        </Tooltip>
+                            </div>
+                        </div>
                     </div>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button size="icon" variant="ghost">
-                                <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                            </Button>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    navigate(
-                                        `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
-                                    )
-                                }
+                    <div className="flex items-center justify-end gap-x-6">
+                        <div className="flex flex-col items-end gap-y-4">
+                            <Badge
+                                className="flex space-x-1"
+                                variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}
                             >
-                                View Workflows
-                            </DropdownMenuItem>
+                                <span>V{project.projectVersion}</span>
 
-                            <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
-                                Duplicate
-                            </DropdownMenuItem>
+                                <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
+                            </Badge>
 
-                            <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                                New Workflow
-                            </DropdownMenuItem>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <div className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                        {project.status === ProjectStatusModel.Published ? (
+                                            <span>
+                                                {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
+                                            </span>
+                                        ) : (
+                                            '-'
+                                        )}
+                                    </div>
+                                </TooltipTrigger>
 
-                            <DropdownMenuSeparator />
+                                <TooltipContent>Last Published Date</TooltipContent>
+                            </Tooltip>
+                        </div>
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        navigate(
+                                            `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
+                                        )
+                                    }
+                                >
+                                    View Workflows
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
+                                    Duplicate
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
+                                    New Workflow
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             </div>
 
