@@ -32,9 +32,12 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -71,8 +74,9 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
                             string(VALUE)
                                 .label("API Key")
                                 .required(true)))
-            .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME)
-                + ".api-us1.com/api/3");
+            .baseUri(
+                (connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME) +
+                    ".api-us1.com/api/3");
     }
 
     @Override
@@ -84,11 +88,13 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
                 .get()) {
 
                 if (Objects.equals(baseProperty.getName(), "task")) {
-                    for (BaseProperty baseProperty2 : ((ModifiableObjectProperty) baseProperty).getProperties()
-                        .get()) {
+                    Optional<List<? extends ValueProperty<?>>> propertiesOptional =
+                        ((ModifiableObjectProperty) baseProperty).getProperties();
+
+                    for (BaseProperty baseProperty2 : propertiesOptional.get()) {
                         if (Objects.equals(baseProperty2.getName(), "relid")) {
-                            ((ModifiableIntegerProperty) baseProperty2)
-                                .options((ActionOptionsFunction<String>) ActiveCampaignUtils::getContactIdOptions);
+                            ((ModifiableIntegerProperty) baseProperty2).options(
+                                (ActionOptionsFunction<String>) ActiveCampaignUtils::getContactIdOptions);
                         } else if (Objects.equals(baseProperty2.getName(), "dealTasktype")) {
                             ((ModifiableIntegerProperty) baseProperty2)
                                 .options((ActionOptionsFunction<String>) ActiveCampaignUtils::getTaskTypeIdOptions);
