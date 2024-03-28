@@ -23,10 +23,13 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.encharge.util.EnchargeUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -46,11 +49,13 @@ public class EnchargeComponentHandler extends AbstractEnchargeComponentHandler {
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(actionDefinition.getName(), "addTag")) {
-            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
-                .get()) {
+            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
+                ((ModifiableObjectProperty) modifiableProperty).getProperties();
+
+            for (BaseProperty baseProperty : propertiesOptional.get()) {
                 if (Objects.equals(baseProperty.getName(), "email")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((OptionsDataSource.ActionOptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
+                    ((ModifiableStringProperty) baseProperty).options(
+                        (OptionsDataSource.ActionOptionsFunction<String>) EnchargeUtils::getUserEmailOptions);
                 }
             }
         }

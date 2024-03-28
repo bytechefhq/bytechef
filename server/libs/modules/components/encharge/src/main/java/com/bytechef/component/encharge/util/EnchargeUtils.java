@@ -38,8 +38,7 @@ public class EnchargeUtils {
     public static List<Option<String>> getUserEmailOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get("https://api.encharge.io/v1/people/all"))
+        Map<String, ?> body = context.http(http -> http.get("https://api.encharge.io/v1/people/all"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
