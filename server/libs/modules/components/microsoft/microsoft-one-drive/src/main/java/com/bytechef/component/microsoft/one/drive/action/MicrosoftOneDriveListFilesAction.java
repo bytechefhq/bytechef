@@ -74,6 +74,7 @@ public class MicrosoftOneDriveListFilesAction {
                 }
             }
         }
+
         return files;
     }
 }
