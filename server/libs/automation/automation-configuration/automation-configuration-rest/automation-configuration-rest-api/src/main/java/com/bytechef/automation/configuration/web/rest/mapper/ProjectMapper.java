@@ -34,16 +34,10 @@ public class ProjectMapper {
     public interface ProjectToProjectBasicModelMapper extends Converter<Project, ProjectBasicModel> {
 
         @Override
+        @Mapping(target = "projectVersion", source = "lastVersion")
+        @Mapping(target = "publishedDate", source = "lastPublishedDate")
+        @Mapping(target = "status", source = "lastStatus")
         ProjectBasicModel convert(Project project);
-    }
-
-    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
-    public interface ProjectToProjectModelMapper extends Converter<Project, ProjectModel> {
-
-        @Mapping(target = "category", ignore = true)
-        @Mapping(target = "tags", ignore = true)
-        @Override
-        ProjectModel convert(Project project);
     }
 
     @Mapper(config = AutomationConfigurationMapperSpringConfig.class)

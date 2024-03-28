@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
@@ -71,6 +72,9 @@ public class WorkflowApiControllerIntTest {
 
     @MockBean
     private ProjectFacade projectFacade;
+
+    @MockBean
+    private ProjectService projectService;
 
     private WebTestClient webTestClient;
 
@@ -136,7 +140,7 @@ public class WorkflowApiControllerIntTest {
 
         WorkflowDTO workflowDTO = getWorkflowDTO();
 
-        when(workflowFacade.update("1", DEFINITION, 0))
+        when(projectFacade.updateWorkflow("1", DEFINITION, 0))
             .thenReturn(workflowDTO);
 
         Workflow.Format format = workflowDTO.format();

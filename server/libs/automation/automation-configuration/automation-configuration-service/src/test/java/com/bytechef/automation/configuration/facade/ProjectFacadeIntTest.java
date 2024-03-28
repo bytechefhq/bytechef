@@ -34,7 +34,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -87,11 +86,10 @@ public class ProjectFacadeIntTest {
         Project project = new Project();
 
         project.setName("name");
-        project.setStatus(Project.Status.UNPUBLISHED);
 
         project = projectRepository.save(project);
 
-        Workflow workflow = projectFacade.addProjectWorkflow(
+        Workflow workflow = projectFacade.addWorkflow(
             Validate.notNull(project.getId(), "id"),
             "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
@@ -107,7 +105,6 @@ public class ProjectFacadeIntTest {
             .category(category)
             .description("description")
             .name("name1")
-            .status(Project.Status.UNPUBLISHED)
             .tags(List.of(new Tag("tag1")))
             .build();
 
@@ -126,7 +123,6 @@ public class ProjectFacadeIntTest {
             .category(new Category("name"))
             .description("description")
             .name("name2")
-            .status(Project.Status.UNPUBLISHED)
             .tags(List.of(new Tag("tag1")))
             .workflowIds(List.of("workflow2"))
             .build();
@@ -141,7 +137,6 @@ public class ProjectFacadeIntTest {
     public void testDelete() {
         ProjectDTO projectDTO1 = ProjectDTO.builder()
             .name("name1")
-            .status(Project.Status.UNPUBLISHED)
             .tags(List.of(new Tag("tag1")))
             .build();
 
@@ -149,7 +144,6 @@ public class ProjectFacadeIntTest {
 
         ProjectDTO projectDTO2 = ProjectDTO.builder()
             .name("name2")
-            .status(Project.Status.UNPUBLISHED)
             .tags(List.of(new Tag("tag1")))
             .build();
 
@@ -176,7 +170,6 @@ public class ProjectFacadeIntTest {
 
         project.setCategory(category);
         project.setName("name");
-        project.setStatus(Project.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -189,7 +182,6 @@ public class ProjectFacadeIntTest {
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("id", Validate.notNull(project.getId(), "id"))
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("status", Project.Status.UNPUBLISHED)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 
@@ -201,8 +193,6 @@ public class ProjectFacadeIntTest {
 
         project.setCategory(category);
         project.setName("name");
-        project.setPublishedDate(LocalDateTime.now());
-        project.setStatus(Project.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -232,7 +222,6 @@ public class ProjectFacadeIntTest {
         Tag tag2 = tagRepository.save(new Tag("tag2"));
 
         project.setName("name");
-        project.setStatus(Project.Status.UNPUBLISHED);
         project.setTags(List.of(tag1, tag2));
 
         projectRepository.save(project);
@@ -245,7 +234,6 @@ public class ProjectFacadeIntTest {
         project = new Project();
 
         project.setName("name2");
-        project.setStatus(Project.Status.UNPUBLISHED);
 
         tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
@@ -277,8 +265,7 @@ public class ProjectFacadeIntTest {
         Project project = new Project();
 
         project.setName("name");
-        project.setStatus(Project.Status.UNPUBLISHED);
-        project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
+        project.addWorkflowId(Validate.notNull(workflow.getId(), "id"));
 
         project = projectRepository.save(project);
 
@@ -295,7 +282,6 @@ public class ProjectFacadeIntTest {
     public void testUpdate() {
         ProjectDTO projectDTO = ProjectDTO.builder()
             .name("name")
-            .status(Project.Status.UNPUBLISHED)
             .tags(List.of(new Tag("tag1"), tagRepository.save(new Tag("tag2"))))
             .build();
 
@@ -307,7 +293,6 @@ public class ProjectFacadeIntTest {
         projectDTO = ProjectDTO.builder()
             .id(projectDTO.id())
             .name("name")
-            .status(Project.Status.UNPUBLISHED)
             .tags(List.of(new Tag("tag1")))
             .workflowIds(projectDTO.workflowIds())
             .build();

@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -37,7 +38,9 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
     @Override
     public List<Project> findAllProjects(Long categoryId, List<Long> ids, Long tagId, Integer status) {
         List<Object> arguments = new ArrayList<>();
-        String query = "SELECT project.* FROM project ";
+        String query = "SELECT DISTINCT project.* FROM project ";
+
+        query += "JOIN project_version ON project.id = project_version.project_id ";
 
         if (tagId != null) {
             query += "JOIN project_tag ON project.id = project_tag.project_id ";
@@ -90,10 +93,10 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
                 query += "AND ";
             }
 
-            query += "status = ? ";
+            query += "project_version.status = ? ";
         }
 
-        query += "ORDER BY project.name ASC, project.status DESC";
+        query += "ORDER BY project.name ASC";
 
         List<Project> projects = jdbcClient.sql(query)
             .params(arguments)
@@ -108,15 +111,36 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
                     .param(project.getId())
                     .query(Long.class)
                     .list());
-            project.setWorkflowIds(
+
+            project.setProjectVersions(
                 jdbcClient
                     .sql(
-                        "SELECT project_workflow.workflow_id FROM project_workflow WHERE project_id = ?")
+                        "SELECT project_version.version, project_version.status, project_version.published_date, project_version.description FROM project_version WHERE project_id = ?")
                     .param(project.getId())
-                    .query(String.class)
-                    .list());
+                    .query(ProjectVersion.class)
+                    .list()
+                    .stream()
+                    .map(projectVersion -> new com.bytechef.automation.configuration.domain.ProjectVersion(
+                        projectVersion.version, projectVersion.status, projectVersion.publishedDate,
+                        projectVersion.description))
+                    .toList());
+
+            jdbcClient
+                .sql(
+                    "SELECT project_workflow.workflow_id, project_workflow.project_version FROM project_workflow WHERE project_id = ?")
+                .param(project.getId())
+                .query(ProjectWorkflow.class)
+                .list()
+                .forEach(projectVersion -> project.addWorkflowId(
+                    projectVersion.workflow_id, projectVersion.project_version));
         }
 
         return projects;
+    }
+
+    private record ProjectVersion(int version, int status, LocalDateTime publishedDate, String description) {
+    }
+
+    private record ProjectWorkflow(String workflow_id, int project_version) {
     }
 }

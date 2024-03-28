@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
@@ -135,7 +136,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         } else if (projectId != null) {
             Project project = projectService.getProject(projectId);
 
-            workflowIds.addAll(project.getWorkflowIds());
+            workflowIds.addAll(project.getWorkflowIds(getProjectVersion(project.getLastVersion(), projectInstanceId)));
         } else {
             workflowIds.addAll(
                 CollectionUtils.map(workflowService.getWorkflows(Type.AUTOMATION.ordinal()), Workflow::getId));
@@ -166,7 +167,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             workflowExecutionPage = jobsPage.map(job -> new WorkflowExecution(
                 Validate.notNull(job.getId(), "id"),
                 CollectionUtils.getFirst(
-                    projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
+                    projects,
+                    project -> CollectionUtils.contains(
+                        project.getWorkflowIds(getProjectVersion(project.getLastVersion(), projectInstanceId)),
+                        job.getWorkflowId())),
                 OptionalUtils.map(
                     instanceJobService.fetchJobInstanceId(job.getId(), Type.AUTOMATION),
                     projectInstanceService::getProjectInstance),
@@ -204,6 +208,16 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                         ? null
                         : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
             });
+    }
+
+    private int getProjectVersion(int lastProjectVersion, Long projectInstanceId) {
+        ProjectInstance projectInstance = null;
+
+        if (projectInstanceId != null) {
+            projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
+        }
+
+        return projectInstance == null ? lastProjectVersion : projectInstance.getProjectVersion();
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

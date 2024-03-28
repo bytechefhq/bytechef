@@ -22,9 +22,9 @@ import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.Project.Status;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
@@ -33,7 +33,9 @@ import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.exception.ApplicationException;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
@@ -74,13 +77,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
+    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        TagService tagService, WorkflowService workflowService) {
+        TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
         this.jobService = jobService;
@@ -88,11 +92,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.projectService = projectService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
+        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
     }
 
     @Override
-    public Workflow addProjectWorkflow(long id, @NonNull String definition) {
+    public Workflow addWorkflow(long id, @NonNull String definition) {
+        checkProjectStatus(id);
+
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC, Type.AUTOMATION.ordinal());
 
         projectService.addWorkflow(id, workflow.getId());
@@ -127,7 +134,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             Workflow workflow = workflowService.create(
                 WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, Type.AUTOMATION.ordinal());
 
-            project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
+            project.addWorkflowId(Validate.notNull(workflow.getId(), "id"));
         }
 
         List<Tag> tags = checkTags(projectDTO.tags());
@@ -136,7 +143,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             project.setTags(tags);
         }
 
-        return new ProjectDTO(projectService.create(project), category, tags);
+        return new ProjectDTO(category, projectService.create(project), tags);
     }
 
     @Override
@@ -148,8 +155,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         Project project = projectService.getProject(id);
 
-        for (String workflowId : project.getWorkflowIds()) {
-            workflowService.delete(workflowId);
+        Map<Integer, List<String>> workflowIdMap = project.getAllWorkflowIds();
+
+        for (List<String> workflowIds : workflowIdMap.values()) {
+            for (String workflowId : workflowIds) {
+                workflowService.delete(workflowId);
+            }
         }
 
         projectService.delete(id);
@@ -161,7 +172,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void deleteWorkflow(long id, @NonNull String workflowId) {
-        projectService.removeWorkflow(id, workflowId);
+        checkProjectStatus(id);
 
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
 
@@ -188,6 +199,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
+        projectService.removeWorkflow(id, workflowId);
+
         workflowService.delete(workflowId);
     }
 
@@ -195,20 +208,23 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
 
-        project.setId(null);
-        project.setName(generateName(project.getName()));
-        project.setPublishedDate(null);
-        project.setVersion(0);
-        project.setTagIds(project.getTagIds());
-        project.setWorkflowIds(copyWorkflowIds(project.getWorkflowIds()));
+        Project newProject = new Project();
 
-        project = projectService.create(project);
+        newProject.setName(generateName(project.getName()));
+        newProject.setTagIds(project.getTagIds());
 
-        return getProjectDTO(project);
+        copyWorkflowIds(project.getWorkflowIds(project.getLastVersion()))
+            .forEach(newProject::addWorkflowId);
+
+        newProject = projectService.create(newProject);
+
+        return getProjectDTO(newProject);
     }
 
     @Override
     public String duplicateWorkflow(long id, @NonNull String workflowId) {
+        checkProjectStatus(id);
+
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
 
         projectService.addWorkflow(id, workflow.getId());
@@ -251,7 +267,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return CollectionUtils.map(
             projects,
             project -> new ProjectDTO(
-                project,
                 CollectionUtils.findFirstFilterOrElse(
                     categoryService.getCategories(
                         projects
@@ -261,19 +276,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
                             .toList()),
                     category -> Objects.equals(project.getCategoryId(), category.getId()),
                     null),
+                project,
                 CollectionUtils.filter(
                     tagService.getTags(
-                        projects
-                            .stream()
+                        projects.stream()
                             .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
                             .filter(Objects::nonNull)
                             .toList()),
                     tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
-    }
-
-    @Override
-    public ProjectDTO publishProject(long id) {
-        return getProjectDTO(projectService.publish(id));
     }
 
     @Override
@@ -295,7 +305,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<Workflow> getProjectWorkflows(long id) {
         Project project = projectService.getProject(id);
 
-        return workflowService.getWorkflows(project.getWorkflowIds());
+        return workflowService.getWorkflows(project.getWorkflowIds(project.getLastVersion()));
+    }
+
+    @Override
+    public List<Workflow> getProjectVersionWorkflows(long id, int projectVersion) {
+        Project project = projectService.getProject(id);
+
+        return workflowService.getWorkflows(project.getWorkflowIds(projectVersion));
     }
 
     @Override
@@ -307,7 +324,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         project.setTags(tags);
 
-        return new ProjectDTO(projectService.update(project), category, tags);
+        return new ProjectDTO(category, projectService.update(project), tags);
     }
 
     @Override
@@ -317,8 +334,33 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         new ProjectDTO(
-            project, project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
+            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()), project,
             tags);
+    }
+
+    @Override
+    public WorkflowDTO updateWorkflow(String id, String definition, Integer version) {
+        Project project = projectService.getWorkflowProject(id);
+
+        checkProjectStatus(Validate.notNull(project.getId(), "id"));
+
+        return workflowFacade.update(id, definition, version);
+    }
+
+    private void checkProjectStatus(long id) {
+        Project project = projectService.getProject(id);
+
+        if (project.getLastStatus() == Status.PUBLISHED) {
+            List<String> versionWorkflowIds = new ArrayList<>();
+
+            for (String workflowId : project.getWorkflowIds(project.getLastVersion())) {
+                Workflow workflow = workflowService.duplicateWorkflow(workflowId);
+
+                versionWorkflowIds.add(workflow.getId());
+            }
+
+            projectService.addVersion(id, versionWorkflowIds);
+        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -357,7 +399,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private ProjectDTO getProjectDTO(Project project) {
         return new ProjectDTO(
-            project, project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
-            tagService.getTags(project.getTagIds()));
+            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
+            project, tagService.getTags(project.getTagIds()));
     }
 }

@@ -17,7 +17,8 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.Project.Status;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,8 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface ProjectService {
+
+    Project addVersion(long id, List<String> versionWorkflowIds);
 
     Project addWorkflow(long id, String workflowId);
 
@@ -35,8 +38,6 @@ public interface ProjectService {
     void delete(long id);
 
     Optional<Project> fetchProject(String name);
-
-    boolean isProjectEnabled(long projectId);
 
     Project getProjectInstanceProject(long projectInstanceId);
 
@@ -50,11 +51,13 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
-    Project publish(long id);
+    Project publishProject(long id, String description);
 
     void removeWorkflow(long id, String workflowId);
 
     Project update(long id, List<Long> tagIds);
 
     Project update(Project project);
+
+    List<ProjectVersion> getProjectVersions(Long id);
 }

@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.dto;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.category.domain.Category;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.tag.domain.Tag;
@@ -31,14 +32,14 @@ import java.util.List;
 public record ProjectDTO(
     Category category, String createdBy, LocalDateTime createdDate, String description, Long id, String name,
     String lastModifiedBy, LocalDateTime lastModifiedDate, int projectVersion, LocalDateTime publishedDate,
-    Project.Status status, List<Tag> tags, int version, List<String> workflowIds) {
+    Status status, List<Tag> tags, int version, List<String> workflowIds) {
 
-    public ProjectDTO(Project project, Category category, List<Tag> tags) {
+    public ProjectDTO(Category category, Project project, List<Tag> tags) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
-            project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(), project.getProjectVersion(),
-            project.getPublishedDate(), project.getStatus(), tags, project.getVersion(),
-            CollectionUtils.sort(project.getWorkflowIds()));
+            project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
+            project.getLastVersion(), project.getLastPublishedDate(), project.getLastStatus(), tags,
+            project.getVersion(), CollectionUtils.sort(project.getWorkflowIds(project.getLastVersion())));
     }
 
     public static Builder builder() {
@@ -52,12 +53,11 @@ public record ProjectDTO(
         project.setDescription(description);
         project.setId(id);
         project.setName(name);
-        project.setProjectVersion(projectVersion);
-        project.setPublishedDate(publishedDate);
-        project.setStatus(status == null ? Project.Status.UNPUBLISHED : status);
-        project.setTags(tags);
         project.setVersion(version);
-        project.setWorkflowIds(workflowIds);
+
+        if (workflowIds != null) {
+            workflowIds.forEach(project::addWorkflowId);
+        }
 
         return project;
     }
@@ -74,7 +74,7 @@ public record ProjectDTO(
         private LocalDateTime lastModifiedDate;
         private int projectVersion;
         private LocalDateTime publishedDate;
-        private Project.Status status = Project.Status.UNPUBLISHED;
+        private Status status = Status.DRAFT;
         private List<Tag> tags;
         private int version;
         private List<String> workflowIds;
@@ -142,7 +142,7 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder status(Project.Status status) {
+        public Builder status(Status status) {
             this.status = status;
 
             return this;
@@ -162,6 +162,7 @@ public record ProjectDTO(
 
         public Builder workflowIds(List<String> workflowIds) {
             this.workflowIds = workflowIds;
+
             return this;
         }
 
