@@ -24,10 +24,10 @@ export function DesktopSidebar({
                             </div>
                         </Link>
 
-                        <nav aria-label="Sidebar" className="flex flex-col items-center overflow-y-auto py-3">
+                        <nav aria-label="Sidebar" className="flex flex-col items-center overflow-y-auto">
                             {navigation.map((item) => (
                                 <Link
-                                    className="flex items-center rounded-lg py-3 hover:text-blue-600"
+                                    className="flex items-center rounded-lg p-3 hover:text-blue-600"
                                     key={item.name}
                                     to={item.href}
                                 >
