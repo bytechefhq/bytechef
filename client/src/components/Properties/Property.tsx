@@ -221,26 +221,6 @@ const Property = ({
     };
 
     const saveInputValue = useDebouncedCallback(() => {
-        if (isNumericalInput) {
-            const valueTooLow = minValue && parseFloat(numericValue) < minValue;
-            const valueTooHigh = maxValue && parseFloat(numericValue) > maxValue;
-
-            if (valueTooLow || valueTooHigh) {
-                setHasError(true);
-
-                setErrorMessage('Incorrect value');
-            } else {
-                setHasError(false);
-            }
-        } else {
-            const valueTooShort = minLength && inputValue.length < minLength;
-            const valueTooLong = maxLength && inputValue.length > maxLength;
-
-            setHasError(!!valueTooShort || !!valueTooLong);
-
-            setErrorMessage('Incorrect value');
-        }
-
         if (!currentComponentData || !workflow || !updateWorkflowMutation) {
             return;
         }
@@ -351,6 +331,26 @@ const Property = ({
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
+        if (isNumericalInput) {
+            const valueTooLow = minValue && parseFloat(numericValue) < minValue;
+            const valueTooHigh = maxValue && parseFloat(numericValue) > maxValue;
+
+            if (valueTooLow || valueTooHigh) {
+                setHasError(true);
+
+                setErrorMessage('Incorrect value');
+            } else {
+                setHasError(false);
+            }
+        } else {
+            const valueTooShort = minLength && inputValue.length < minLength;
+            const valueTooLong = maxLength && inputValue.length > maxLength;
+
+            setHasError(!!valueTooShort || !!valueTooLong);
+
+            setErrorMessage('Incorrect value');
+        }
+
         if (isNumericalInput) {
             const {value} = event.target;
 
