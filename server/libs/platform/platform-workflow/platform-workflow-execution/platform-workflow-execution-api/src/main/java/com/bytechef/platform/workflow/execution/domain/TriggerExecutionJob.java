@@ -17,11 +17,10 @@
 package com.bytechef.platform.workflow.execution.domain;
 
 import com.bytechef.atlas.execution.domain.Job;
+import java.util.Objects;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
