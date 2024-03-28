@@ -94,7 +94,7 @@ const WorkflowExecutionsTestOutput = ({
 
     return (
         <div className="flex size-full flex-col">
-            <div className="flex items-center justify-between border-b-2 border-b-muted px-3 py-1">
+            <div className="flex items-center justify-between border-b border-b-muted px-3 py-1">
                 {workflowTestExecution ? (
                     <WorkflowExecutionsTestOutputHeader job={job} triggerExecution={triggerExecution} />
                 ) : (

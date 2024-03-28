@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ProjectStatusModel } from './ProjectStatusModel';
+import {
+    ProjectStatusModelFromJSON,
+    ProjectStatusModelFromJSONTyped,
+    ProjectStatusModelToJSON,
+} from './ProjectStatusModel';
+
 /**
  * A group of workflows that make one logical project.
  * @export
@@ -72,25 +79,14 @@ export interface ProjectBasicModel {
      * @type {number}
      * @memberof ProjectBasicModel
      */
-    projectVersion?: number;
+    readonly projectVersion?: number;
     /**
-     * The status of a project.
-     * @type {string}
+     * 
+     * @type {ProjectStatusModel}
      * @memberof ProjectBasicModel
      */
-    status?: ProjectBasicModelStatusEnum;
+    status?: ProjectStatusModel;
 }
-
-
-/**
- * @export
- */
-export const ProjectBasicModelStatusEnum = {
-    Published: 'PUBLISHED',
-    Unpublished: 'UNPUBLISHED'
-} as const;
-export type ProjectBasicModelStatusEnum = typeof ProjectBasicModelStatusEnum[keyof typeof ProjectBasicModelStatusEnum];
-
 
 /**
  * Check if a given object implements the ProjectBasicModel interface.
@@ -121,7 +117,7 @@ export function ProjectBasicModelFromJSONTyped(json: any, ignoreDiscriminator: b
         'name': json['name'],
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'status': !exists(json, 'status') ? undefined : ProjectStatusModelFromJSON(json['status']),
     };
 }
 
@@ -137,8 +133,7 @@ export function ProjectBasicModelToJSON(value?: ProjectBasicModel | null): any {
         'description': value.description,
         'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
-        'projectVersion': value.projectVersion,
-        'status': value.status,
+        'status': ProjectStatusModelToJSON(value.status),
     };
 }
 

@@ -18,8 +18,8 @@
  * @export
  */
 export const ProjectStatusModel = {
-    Published: 'PUBLISHED',
-    Unpublished: 'UNPUBLISHED'
+    Draft: 'DRAFT',
+    Published: 'PUBLISHED'
 } as const;
 export type ProjectStatusModel = typeof ProjectStatusModel[keyof typeof ProjectStatusModel];
 

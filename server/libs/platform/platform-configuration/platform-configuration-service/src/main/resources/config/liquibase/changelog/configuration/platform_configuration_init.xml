@@ -74,9 +74,6 @@
         </createTable>
 
         <createTable tableName="workflow_test_configuration_connection">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="workflow_test_configuration_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -90,6 +87,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addPrimaryKey tableName="workflow_test_configuration_connection" columnNames="workflow_test_configuration_id,workflow_node_name,workflow_connection_key"/>
 
         <addForeignKeyConstraint
             baseTableName="workflow_test_configuration_connection"

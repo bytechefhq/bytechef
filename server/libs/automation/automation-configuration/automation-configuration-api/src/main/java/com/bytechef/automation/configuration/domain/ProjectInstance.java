@@ -77,6 +77,9 @@ public class ProjectInstance implements Persistable<Long> {
     @Column("project_id")
     private AggregateReference<Project, Long> projectId;
 
+    @Column("project_version")
+    private int projectVersion;
+
     @MappedCollection(idColumn = "project_instance_id")
     private Set<ProjectInstanceTag> projectInstanceTags = Collections.emptySet();
 
@@ -147,6 +150,10 @@ public class ProjectInstance implements Persistable<Long> {
         return projectId == null ? null : projectId.getId();
     }
 
+    public int getProjectVersion() {
+        return projectVersion;
+    }
+
     public List<Long> getTagIds() {
         return projectInstanceTags
             .stream()
@@ -185,6 +192,10 @@ public class ProjectInstance implements Persistable<Long> {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId == null ? null : AggregateReference.to(projectId);
+    }
+
+    public void setProjectVersion(int projectVersion) {
+        this.projectVersion = projectVersion;
     }
 
     public void setTagIds(List<Long> tagIds) {

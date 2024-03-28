@@ -19,7 +19,7 @@ import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
 } from 'mutations/automation/projectInstances.mutations';
-import {MouseEvent, ReactNode, useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -35,25 +35,26 @@ interface ProjectInstanceDialogProps {
 const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectInstanceDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(!triggerNode);
+    const [projectId, setProjectId] = useState<number | undefined>(projectInstance?.projectId);
 
     const form = useForm<ProjectInstanceModel>({
         defaultValues: {
-            description: projectInstance?.description || '',
+            description: projectInstance?.description || undefined,
             enabled: projectInstance?.enabled || false,
             environment: projectInstance?.environment || EnvironmentModel.Development,
-            name: projectInstance?.name || '',
-            project: projectInstance?.project || null,
-            projectId: projectInstance?.id || undefined,
+            name: projectInstance?.name || undefined,
+            projectId: projectInstance?.projectId || undefined,
             projectInstanceWorkflows: [],
+            projectVersion: projectInstance?.projectVersion || undefined,
             tags:
                 projectInstance?.tags?.map((tag) => ({
                     ...tag,
                     label: tag.name,
                 })) || [],
-        } as ProjectInstanceModel,
+        },
     });
 
-    const {control, formState, getValues, handleSubmit, register, reset, setValue, trigger} = form;
+    const {control, formState, getValues, handleSubmit, register, reset, setValue} = form;
 
     const queryClient = useQueryClient();
 
@@ -87,11 +88,12 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
                     control={control}
                     errors={formState.errors}
                     getValues={getValues}
+                    projectId={projectId}
                     projectInstance={projectInstance}
                     register={register}
+                    setProjectId={setProjectId}
                     setValue={setValue}
                     touchedFields={formState.touchedFields}
-                    trigger={trigger}
                 />
             ),
             name: 'Basic',
@@ -111,55 +113,48 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
     ];
 
     function closeDialog() {
-        reset({});
-
-        setActiveStepIndex(0);
         setIsOpen(false);
 
-        if (onClose) {
-            onClose();
-        }
+        setTimeout(() => {
+            reset();
+
+            setActiveStepIndex(0);
+
+            if (onClose) {
+                onClose();
+            }
+        }, 300);
     }
 
-    function saveProjectInstance() {
-        let projectInstanceFormData = getValues();
-
-        if (!projectInstanceFormData) {
+    function saveProjectInstance(projectInstance: ProjectInstanceModel) {
+        if (!projectInstance) {
             return;
         }
 
-        projectInstanceFormData = {
-            ...projectInstanceFormData,
-            projectInstanceWorkflows: projectInstanceFormData.projectInstanceWorkflows?.map(
-                (projectInstanceWorkflow) => {
-                    return {
-                        ...projectInstanceWorkflow,
-                        connections: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.connections : [],
-                        inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
-                    };
-                }
-            ),
+        projectInstance = {
+            ...projectInstance,
+            projectInstanceWorkflows: projectInstance.projectInstanceWorkflows?.map((projectInstanceWorkflow) => {
+                return {
+                    ...projectInstanceWorkflow,
+                    connections: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.connections : [],
+                    inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
+                };
+            }),
         };
 
         if (projectInstance?.id) {
             updateProjectInstanceMutation.mutate({
                 ...projectInstance,
-                ...projectInstanceFormData,
-                projectId: projectInstanceFormData?.project?.id || 0,
+                ...projectInstance,
+                projectId: projectInstance?.project?.id || 0,
             } as ProjectInstanceModel);
         } else {
-            createProjectInstanceMutation.mutate(projectInstanceFormData);
+            createProjectInstanceMutation.mutate(projectInstance);
         }
     }
 
-    function handleNextClick(event: MouseEvent) {
-        trigger();
-
-        if (!formState.isValid) {
-            event.preventDefault();
-        } else {
-            setActiveStepIndex(activeStepIndex + 1);
-        }
+    function handleNextClick() {
+        setActiveStepIndex(activeStepIndex + 1);
     }
 
     return (
@@ -221,7 +216,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
 
-                                {!projectInstance?.id && <Button onClick={handleNextClick}>Next</Button>}
+                                {!projectInstance?.id && <Button onClick={handleSubmit(handleNextClick)}>Next</Button>}
                             </>
                         )}
 

@@ -21,16 +21,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-14T08:44:10.522436+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-26T05:52:42.815081+01:00[Europe/Zagreb]")
 public class WorkflowExecutionModel {
 
   private Long id;
 
   private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectModel project;
+  private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel projectInstance;
+  private com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
 
   private com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
@@ -76,7 +76,7 @@ public class WorkflowExecutionModel {
     this.job = job;
   }
 
-  public WorkflowExecutionModel project(com.bytechef.automation.configuration.web.rest.model.ProjectModel project) {
+  public WorkflowExecutionModel project(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
     return this;
   }
@@ -88,15 +88,15 @@ public class WorkflowExecutionModel {
   @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectModel getProject() {
+  public com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel getProject() {
     return project;
   }
 
-  public void setProject(com.bytechef.automation.configuration.web.rest.model.ProjectModel project) {
+  public void setProject(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
   }
 
-  public WorkflowExecutionModel projectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel projectInstance) {
+  public WorkflowExecutionModel projectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
     this.projectInstance = projectInstance;
     return this;
   }
@@ -108,11 +108,11 @@ public class WorkflowExecutionModel {
   @Valid 
   @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstance")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel getProjectInstance() {
+  public com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
     return projectInstance;
   }
 
-  public void setProjectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel projectInstance) {
+  public void setProjectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
     this.projectInstance = projectInstance;
   }
 

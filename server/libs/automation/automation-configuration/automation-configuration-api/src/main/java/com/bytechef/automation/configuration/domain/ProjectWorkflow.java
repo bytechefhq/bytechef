@@ -17,8 +17,6 @@
 package com.bytechef.automation.configuration.domain;
 
 import java.util.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -26,10 +24,10 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("project_workflow")
-public final class ProjectWorkflow implements Persistable<Long> {
+public final class ProjectWorkflow {
 
-    @Id
-    private Long id;
+    @Column("project_version")
+    private int projectVersion;
 
     @Column("workflow_id")
     private String workflowId;
@@ -37,8 +35,9 @@ public final class ProjectWorkflow implements Persistable<Long> {
     public ProjectWorkflow() {
     }
 
-    public ProjectWorkflow(String workflowId) {
+    public ProjectWorkflow(String workflowId, int projectVersion) {
         this.workflowId = workflowId;
+        this.projectVersion = projectVersion;
     }
 
     @Override
@@ -47,38 +46,35 @@ public final class ProjectWorkflow implements Persistable<Long> {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof ProjectWorkflow that)) {
             return false;
         }
 
-        ProjectWorkflow projectWorkflow = (ProjectWorkflow) o;
-
-        return Objects.equals(id, projectWorkflow.id) && Objects.equals(workflowId, projectWorkflow.workflowId);
+        return projectVersion == that.projectVersion && Objects.equals(workflowId, that.workflowId);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public Long getId() {
-        return id;
+        return Objects.hash(projectVersion, workflowId);
     }
 
     public String getWorkflowId() {
         return workflowId;
     }
 
-    @Override
-    public boolean isNew() {
-        return id == null;
+    public int getProjectVersion() {
+        return projectVersion;
+    }
+
+    public void setProjectVersion(int projectVersion) {
+        this.projectVersion = projectVersion;
     }
 
     @Override
     public String toString() {
-        return "ProjectWorkflow{" + ", id='"
-            + id + '\'' + ", workflowId='"
-            + workflowId + "'}";
+        return "ProjectWorkflow{" +
+            "projectVersion=" + projectVersion +
+            ", workflowId='" + workflowId + '\'' +
+            '}';
     }
 }

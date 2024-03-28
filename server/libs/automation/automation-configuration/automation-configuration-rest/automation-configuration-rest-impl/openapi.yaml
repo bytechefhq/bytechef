@@ -503,13 +503,42 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  description: The description of a project version.
+                  type: "string"
       responses:
         "200":
-          description: "The published project object."
+          description: "Successful operation."
+  /projects/{id}/versions:
+    get:
+      description: "Get a project versions."
+      summary: "Get a project versions."
+      tags:
+        - "project"
+      operationId: "getProjectVersions"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of project version objects."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProjectVersion"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -551,7 +580,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The updated project object."
+          description: "The array project workflows."
           content:
             application/json:
               schema:
@@ -637,6 +666,36 @@ paths:
             application/json:
               schema:
                 type: string
+  /projects/{id}/{projectVersion}/workflows:
+    get:
+      description: "Get workflows for particular project version."
+      summary: "Get workflows for particular project version."
+      tags:
+        - "workflow"
+      operationId: "getProjectVersionWorkflows"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "The array of project workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
   /workflows:
     get:
       description: "Get workflow definitions."
@@ -745,24 +804,61 @@ components:
     Project:
       description: "A group of workflows that make one logical project."
       type: "object"
-      allOf:
-        - $ref: "#/components/schemas/ProjectBasic"
-        - type: "object"
-          properties:
-            category:
-              $ref: "#/components/schemas/Category"
-            tags:
-              type: "array"
-              items:
-                $ref: "#/components/schemas/Tag"
-            workflowIds:
-              description: "The workflow ids belonging to this project."
-              type: "array"
-              items:
-                type: "string"
-                readOnly: true
-            __version:
-              type: "integer"
+      required:
+        - "name"
+      properties:
+        category:
+          $ref: "#/components/schemas/Category"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of a project."
+          type: "string"
+        id:
+          description: "The id of a project."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a project."
+          type: "string"
+        publishedDate:
+          description: "The published date."
+          type: "string"
+          format: "date-time"
+        projectVersion:
+          description: "The version of a project."
+          type: "integer"
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/ProjectStatus'
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        workflowIds:
+          description: "The workflow ids belonging to this project."
+          type: "array"
+          items:
+            type: "string"
+        __version:
+          type: "integer"
     ProjectBasic:
       description: "A group of workflows that make one logical project."
       type: "object"
@@ -805,31 +901,78 @@ components:
         projectVersion:
           description: "The version of a project."
           type: "integer"
+          readOnly: true
         status:
           $ref: '#/components/schemas/ProjectStatus'
     ProjectInstance:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
       type: "object"
-      allOf:
-        - $ref: "#/components/schemas/ProjectInstanceBasic"
-        - type: "object"
-          properties:
-            project:
-              type: "object"
-              allOf:
-              - $ref: "#/components/schemas/ProjectBasic"
-              readOnly: true
-            projectInstanceWorkflows:
-              type: "array"
-              items:
-                $ref: "#/components/schemas/ProjectInstanceWorkflow"
-            tags:
-              type: "array"
-              items:
-                $ref: "#/components/schemas/Tag"
-            __version:
-              type: "integer"
+      required:
+        - "name"
+      properties:
+        description:
+          description: "The description of a project instance."
+          type: "string"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        enabled:
+          description: "If a project instance is enabled or not."
+          type: "boolean"
+        environment:
+          $ref: '#/components/schemas/Environment'
+        id:
+          description: "The id of a project instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a project instance."
+          type: "string"
+        project:
+          type: "object"
+          allOf:
+            - $ref: "#/components/schemas/ProjectBasic"
+          readOnly: true
+        projectId:
+          description: "The id of a project."
+          type: "integer"
+          format: "int64"
+          writeOnly: true
+        projectInstanceWorkflows:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ProjectInstanceWorkflow"
+        projectVersion:
+          description: "The version of a project."
+          type: "integer"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        __version:
+          type: "integer"
     ProjectInstanceBasic:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
@@ -849,6 +992,9 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        enabled:
+          description: "If a project instance is enabled or not."
+          type: "boolean"
         environment:
           $ref: '#/components/schemas/Environment'
         id:
@@ -874,13 +1020,12 @@ components:
           description: "The name of a project instance."
           type: "string"
         projectId:
-          description: "Th id of a project."
+          description: "The id of a project."
           type: "integer"
           format: "int64"
-          writeOnly: true
-        enabled:
-          description: "If a project instance is enabled or not."
-          type: "boolean"
+        projectVersion:
+          description: "The version of a project."
+          type: "integer"
     ProjectInstanceWorkflow:
       description: "Contains configuration and connections required for the execution\
         \ of a particular project workflow."
@@ -964,8 +1109,25 @@ components:
       description: "The status of a project."
       type: "string"
       enum:
+        - "DRAFT"
         - "PUBLISHED"
-        - "UNPUBLISHED"
+    ProjectVersion:
+      description: "The project version."
+      type: "object"
+      properties:
+        description:
+          description: "The description of a project version"
+          type: "string"
+        publishedDate:
+          description: "The published date."
+          type: "string"
+          format: "date-time"
+        version:
+          description: "The version of a project."
+          type: "integer"
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/ProjectStatus'
     Tag:
       description: "A tag."
       required:

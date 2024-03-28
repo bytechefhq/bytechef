@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/JobApi.ts
 apis/TriggerExecutionApi.ts
 apis/index.ts

@@ -19,9 +19,7 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
             <div className="flex w-full items-center justify-between p-4">
                 <h3>
                     {workflow?.label
-                        ? `${project?.name ? project.name + ' / ' : ''}${
-                              projectInstance?.name ? projectInstance.name + ' / ' : ''
-                          }${workflow?.label}`
+                        ? `${project?.name}/${projectInstance?.environment}/${workflow?.label}`
                         : 'No data to show'}
                 </h3>
 

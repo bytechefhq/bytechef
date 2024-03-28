@@ -18,8 +18,6 @@ package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
 import java.util.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -28,10 +26,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("project_instance_workflow_connection")
-public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
-
-    @Id
-    private Long id;
+public class ProjectInstanceWorkflowConnection {
 
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
@@ -57,24 +52,18 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+
+        if (!(o instanceof ProjectInstanceWorkflowConnection that)) {
             return false;
         }
 
-        ProjectInstanceWorkflowConnection that = (ProjectInstanceWorkflowConnection) o;
-
-        return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId) &&
-            Objects.equals(key, that.key) && Objects.equals(workflowNodeName, that.workflowNodeName);
+        return Objects.equals(connectionId, that.connectionId) && Objects.equals(key, that.key)
+            && Objects.equals(workflowNodeName, that.workflowNodeName);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public Long getId() {
-        return id;
+        return Objects.hash(connectionId, key, workflowNodeName);
     }
 
     public Long getConnectionId() {
@@ -90,15 +79,9 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     }
 
     @Override
-    public boolean isNew() {
-        return id == null;
-    }
-
-    @Override
     public String toString() {
         return "ProjectInstanceWorkflowConnection{" +
-            "id=" + id +
-            ", connectionId=" + connectionId +
+            "connectionId=" + connectionId +
             ", key='" + key + '\'' +
             ", workflowNodeName='" + workflowNodeName + '\'' +
             '}';

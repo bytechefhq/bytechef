@@ -19,7 +19,9 @@ package com.bytechef.automation.configuration.repository;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -33,4 +35,10 @@ public interface ProjectInstanceWorkflowRepository extends ListCrudRepository<Pr
     List<ProjectInstanceWorkflow> findAllByProjectInstanceIdIn(List<Long> projectInstanceIds);
 
     Optional<ProjectInstanceWorkflow> findByProjectInstanceIdAndWorkflowId(long projectInstanceId, String workflowId);
+
+    @Query("""
+            SELECT project_instance_workflow_connection.connection_id FROM project_instance_workflow_connection
+            WHERE connection_id = :connectionId
+        """)
+    List<Long> findProjectInstanceWorkflowConnectionIdsByConnectionId(@Param("connectionId") long connectionId);
 }

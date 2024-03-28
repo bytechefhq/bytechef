@@ -8,6 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -16,6 +17,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {Label} from '@/components/ui/label';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {
     Select,
@@ -26,10 +29,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
-import {ProjectModel} from '@/middleware/automation/configuration';
+import {ProjectModel, ProjectStatusModel} from '@/middleware/automation/configuration';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {
@@ -42,6 +46,7 @@ import {
     useDuplicateWorkflowMutation,
     useUpdateWorkflowMutation,
 } from '@/mutations/automation/workflows.mutations';
+import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
 import WorkflowExecutionsTestOutput from '@/pages/automation/project/components/WorkflowExecutionsTestOutput';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
@@ -60,16 +65,18 @@ import {
     WorkflowTestConfigurationKeys,
     useGetWorkflowTestConfigurationQuery,
 } from '@/queries/platform/workflowTestConfigurations.queries';
-import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
+import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CircleDotIcon,
     Code2Icon,
+    HistoryIcon,
     PlayIcon,
     PuzzleIcon,
+    SettingsIcon,
     SlidersIcon,
+    SquareChevronRightIcon,
     SquareIcon,
-    SquareTerminalIcon,
 } from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
@@ -82,12 +89,79 @@ import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 
 const workflowTestApi = new WorkflowTestApi();
 
+const PublishPopover = ({project}: {project: ProjectModel}) => {
+    const [open, setOpen] = useState(false);
+    const [description, setDescription] = useState<string | undefined>(undefined);
+
+    const {toast} = useToast();
+
+    const queryClient = useQueryClient();
+
+    const publishProjectMutation = usePublishProjectMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
+            toast({
+                description: 'The project is published.',
+            });
+
+            setOpen(false);
+        },
+    });
+
+    return (
+        <Popover onOpenChange={setOpen} open={open}>
+            <PopoverTrigger asChild>
+                <Button className="hover:bg-gray-200" disabled={!!project?.publishedDate} size="icon" variant="ghost">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <CircleDotIcon className="h-5" />
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            {project?.publishedDate ? `The project is published` : `Publish the project`}
+                        </TooltipContent>
+                    </Tooltip>
+                </Button>
+            </PopoverTrigger>
+
+            <PopoverContent align="end" className="flex h-full w-96 flex-col justify-between space-y-4">
+                <h3 className="font-semibold">Publish Project</h3>
+
+                <div className="flex-1">
+                    <Label>Description</Label>
+
+                    <Textarea className="h-28" onChange={(event) => setDescription(event.target.value)}></Textarea>
+                </div>
+
+                <div className="flex justify-end">
+                    <Button
+                        disabled={!!project?.publishedDate}
+                        onClick={() =>
+                            publishProjectMutation.mutate({
+                                id: project.id!,
+                                publishProjectRequestModel: {
+                                    description,
+                                },
+                            })
+                        }
+                        size="sm"
+                    >
+                        Publish
+                    </Button>
+                </div>
+            </PopoverContent>
+        </Popover>
+    );
+};
+
 const Project = () => {
     const [showBottomPanelOpen, setShowBottomPanelOpen] = useState(false);
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
     const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
@@ -103,8 +177,6 @@ const Project = () => {
 
     const {componentNames, nodeNames} = workflow;
 
-    const {toast} = useToast();
-
     const {projectId, workflowId} = useParams();
     const navigate = useNavigate();
 
@@ -113,6 +185,13 @@ const Project = () => {
         icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
         onClick?: () => void;
     }[] = [
+        {
+            icon: HistoryIcon,
+            name: 'Project Version History',
+            onClick: () => {
+                setShowProjectVersionHistorySheet(true);
+            },
+        },
         {
             icon: PuzzleIcon,
             name: 'Components & Flow Controls',
@@ -134,7 +213,11 @@ const Project = () => {
         },
     ];
 
-    const {data: project} = useGetProjectQuery(parseInt(projectId!), useLoaderData() as ProjectModel);
+    const {data: project} = useGetProjectQuery(
+        parseInt(projectId!),
+        useLoaderData() as ProjectModel,
+        !showDeleteProjectAlertDialog
+    );
 
     const {
         data: componentDefinitions,
@@ -155,7 +238,7 @@ const Project = () => {
         data: projectWorkflows,
         error: projectWorkflowsError,
         isLoading: projectWorkflowsLoading,
-    } = useGetProjectWorkflowsQuery(project?.id as number);
+    } = useGetProjectWorkflowsQuery(project?.id as number, !showDeleteProjectAlertDialog);
 
     const {data: projectWorkflow} = useGetWorkflowQuery(workflowId!);
 
@@ -255,18 +338,10 @@ const Project = () => {
         },
     });
 
-    const publishProjectMutation = usePublishProjectMutation({
-        onSuccess: (project) => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-
-            toast({
-                description: `The project ${project.name} is published.`,
-            });
-        },
-    });
-
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: (workflow) => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.project(+projectId!)});
+
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.projectWorkflows(+projectId!),
             });
@@ -332,6 +407,7 @@ const Project = () => {
                 })
                 .catch(() => {
                     setWorkflowIsRunning(false);
+                    setWorkflowTestExecution(undefined);
 
                     queryClient.invalidateQueries({
                         queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId!)),
@@ -413,41 +489,25 @@ const Project = () => {
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
                 rightToolbarOpen={true}
                 topHeader={
-                    <header className="flex items-center border-b px-3 py-2">
-                        <div className="mr-2 flex flex-1 items-center space-x-1">
+                    <header className="flex items-center border-b py-2 pl-3 pr-2.5">
+                        <div className="flex flex-1 items-center space-x-2">
                             <h1>{project?.name}</h1>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className="hover:bg-gray-200" size="icon" variant="ghost">
-                                        <ChevronDownIcon />
-                                    </Button>
-                                </DropdownMenuTrigger>
+                            {project && (
+                                <Badge
+                                    className="flex space-x-1"
+                                    variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}
+                                >
+                                    <span>V{project.projectVersion}</span>
 
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
-                                        Edit
-                                    </DropdownMenuItem>
-
-                                    {project && (
-                                        <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
-                                            Duplicate
-                                        </DropdownMenuItem>
-                                    )}
-
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuItem
-                                        className="text-red-600"
-                                        onClick={() => setShowDeleteProjectAlertDialog(true)}
-                                    >
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                    <span>
+                                        {project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}
+                                    </span>
+                                </Badge>
+                            )}
                         </div>
 
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-6">
                             <div className="flex space-x-1">
                                 {workflow && !!projectWorkflows && (
                                     <Select
@@ -476,12 +536,20 @@ const Project = () => {
 
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button className="hover:bg-gray-200" size="icon" variant="ghost">
-                                            <DotsVerticalIcon />
-                                        </Button>
+                                        <div>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                                        <DotsVerticalIcon />
+                                                    </Button>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Workflow Settings</TooltipContent>
+                                            </Tooltip>
+                                        </div>
                                     </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent>
+                                    <DropdownMenuContent align="end">
                                         <DropdownMenuItem
                                             onClick={() => {
                                                 setShowEditWorkflowDialog(true);
@@ -585,7 +653,7 @@ const Project = () => {
                                             size="icon"
                                             variant="ghost"
                                         >
-                                            <SquareTerminalIcon className="h-5" />
+                                            <SquareChevronRightIcon className="h-5" />
                                         </Button>
                                     </TooltipTrigger>
 
@@ -593,26 +661,48 @@ const Project = () => {
                                 </Tooltip>
                             </div>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        className="hover:bg-gray-200"
-                                        disabled={!!project?.publishedDate}
-                                        onClick={() =>
-                                            publishProjectMutation.mutate({
-                                                id: +projectId!,
-                                            })
-                                        }
-                                        variant="ghost"
-                                    >
-                                        <CircleDotIcon className="h-5" /> Publish
-                                    </Button>
-                                </TooltipTrigger>
+                            <div className="flex space-x-1">
+                                {project && <PublishPopover project={project} />}
 
-                                <TooltipContent>
-                                    {project?.publishedDate ? `The project is published` : `Publish the project.`}
-                                </TooltipContent>
-                            </Tooltip>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <div>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                                        <SettingsIcon className="h-5" />
+                                                    </Button>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Project Settings</TooltipContent>
+                                            </Tooltip>
+                                        </div>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
+                                            Edit
+                                        </DropdownMenuItem>
+
+                                        {project && (
+                                            <DropdownMenuItem
+                                                onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                            >
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                        )}
+
+                                        <DropdownMenuSeparator />
+
+                                        <DropdownMenuItem
+                                            className="text-red-600"
+                                            onClick={() => setShowDeleteProjectAlertDialog(true)}
+                                        >
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </header>
                 }
@@ -709,6 +799,15 @@ const Project = () => {
 
             {workflow && (
                 <>
+                    {showProjectVersionHistorySheet && (
+                        <ProjectVersionHistorySheet
+                            onClose={() => {
+                                setShowProjectVersionHistorySheet(false);
+                            }}
+                            projectId={+projectId!}
+                        />
+                    )}
+
                     {showWorkflowCodeEditorSheet && (
                         <WorkflowCodeEditorSheet
                             onClose={() => {

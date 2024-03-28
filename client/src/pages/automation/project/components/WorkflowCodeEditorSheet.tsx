@@ -72,6 +72,7 @@ const WorkflowCodeEditorSheet = ({
                 })
                 .catch(() => {
                     setWorkflowIsRunning(false);
+                    setWorkflowTestExecution(undefined);
 
                     queryClient.invalidateQueries({
                         queryKey: WorkflowKeys.workflow(workflow.id!),
@@ -109,7 +110,7 @@ const WorkflowCodeEditorSheet = ({
 
     return (
         <>
-            <Sheet onOpenChange={handleOpenChange} open={true}>
+            <Sheet onOpenChange={handleOpenChange} open>
                 <SheetContent
                     className="flex w-11/12 flex-col gap-2 p-0 sm:max-w-screen-lg"
                     onFocusOutside={(event) => event.preventDefault()}

@@ -11,11 +11,12 @@ export const ProjectKeys = {
     projects: ['projects'] as const,
 };
 
-export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
+export const useGetProjectQuery = (id: number, initialData?: ProjectModel, enabled?: boolean) =>
     useQuery<ProjectModel, Error>({
         queryKey: ProjectKeys.project(id),
         queryFn: () => new ProjectApi().getProject({id}),
         initialData,
+        enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetProjectsQuery = (filters?: {

@@ -32,8 +32,8 @@ import java.util.List;
 public record ProjectInstanceDTO(
     String createdBy, LocalDateTime createdDate, String description, boolean enabled, Environment environment, Long id,
     String name, LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    Project project, Long projectId, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, List<Tag> tags,
-    int version) {
+    Project project, long projectId, int projectVersion, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows,
+    List<Tag> tags, int version) {
 
     public ProjectInstanceDTO(
         ProjectInstance projectInstance, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, Project project,
@@ -44,7 +44,8 @@ public record ProjectInstanceDTO(
             projectInstance.isEnabled(), projectInstance.getEnvironment(), projectInstance.getId(),
             projectInstance.getName(), lastExecutionDate, projectInstance.getLastModifiedBy(),
             projectInstance.getLastModifiedDate(), project, projectInstance.getProjectId(),
-            CollectionUtils.sort(projectInstanceWorkflows), tags, projectInstance.getVersion());
+            projectInstance.getProjectVersion(), CollectionUtils.sort(projectInstanceWorkflows), tags,
+            projectInstance.getVersion());
     }
 
     public static Builder builder() {
@@ -60,6 +61,7 @@ public record ProjectInstanceDTO(
         projectInstance.setId(id);
         projectInstance.setName(name);
         projectInstance.setProjectId(projectId);
+        projectInstance.setProjectVersion(projectVersion);
         projectInstance.setTags(tags);
         projectInstance.setVersion(version);
 
@@ -78,7 +80,8 @@ public record ProjectInstanceDTO(
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
         private Project project;
-        private Long projectId;
+        private long projectId;
+        private Integer projectVersion;
         private List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows;
         private List<Tag> tags;
         private int version;
@@ -152,8 +155,14 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder projectId(Long projectId) {
+        public Builder projectId(long projectId) {
             this.projectId = projectId;
+
+            return this;
+        }
+
+        public Builder projectVersion(int projectVersion) {
+            this.projectVersion = projectVersion;
 
             return this;
         }
@@ -179,7 +188,7 @@ public record ProjectInstanceDTO(
         public ProjectInstanceDTO build() {
             return new ProjectInstanceDTO(
                 createdBy, createdDate, description, enabled, environment, id, name, lastExecutionDate, lastModifiedBy,
-                lastModifiedDate, project, projectId, projectInstanceWorkflows, tags, version);
+                lastModifiedDate, project, projectId, projectVersion, projectInstanceWorkflows, tags, version);
         }
     }
 }

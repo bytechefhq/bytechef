@@ -55,6 +55,12 @@ export interface ComponentDefinitionBasicModel {
      * @memberof ComponentDefinitionBasicModel
      */
     triggersCount?: number;
+    /**
+     * The version of a component.
+     * @type {number}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    version: number;
 }
 
 /**
@@ -63,6 +69,7 @@ export interface ComponentDefinitionBasicModel {
 export function instanceOfComponentDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
@@ -83,6 +90,7 @@ export function ComponentDefinitionBasicModelFromJSONTyped(json: any, ignoreDisc
         'name': json['name'],
         'title': !exists(json, 'title') ? undefined : json['title'],
         'triggersCount': !exists(json, 'triggersCount') ? undefined : json['triggersCount'],
+        'version': json['version'],
     };
 }
 
@@ -101,6 +109,7 @@ export function ComponentDefinitionBasicModelToJSON(value?: ComponentDefinitionB
         'name': value.name,
         'title': value.title,
         'triggersCount': value.triggersCount,
+        'version': value.version,
     };
 }
 

@@ -19,7 +19,7 @@ const ProjectInstanceList = ({
     return (
         <>
             {projectInstances.length > 0 && (
-                <div className="w-full divide-y divide-gray-100">
+                <div className="w-full">
                     {projectInstances.map((projectInstance) => {
                         const projectTagIds = projectInstance.tags?.map((tag) => tag.id);
 
@@ -31,7 +31,6 @@ const ProjectInstanceList = ({
                             <Collapsible key={projectInstance.id}>
                                 <ProjectInstanceListItem
                                     key={projectInstance.id}
-                                    project={project}
                                     projectInstance={projectInstance}
                                     remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
                                 />
@@ -46,6 +45,7 @@ const ProjectInstanceList = ({
                                         }
                                         projectInstanceId={projectInstance.id!}
                                         projectInstanceWorkflows={projectInstance.projectInstanceWorkflows}
+                                        projectVersion={projectInstance.projectVersion!}
                                     />
                                 </CollapsibleContent>
                             </Collapsible>
