@@ -49,6 +49,8 @@ components:
           readOnly: true
         credentialStatus:
           $ref: "#/components/schemas/CredentialStatus"
+        environment:
+          $ref: '#/components/schemas/Environment'
         name:
           description: "The name of a connection."
           type: "string"
@@ -92,6 +94,13 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
+    Environment:
+      description: "The environment of a connection."
+      type: "string"
+      enum:
+        - "DEVELOPMENT"
+        - "STAGING"
+        - "PRODUCTION"
     Tag:
       description: "A tag."
       required:
