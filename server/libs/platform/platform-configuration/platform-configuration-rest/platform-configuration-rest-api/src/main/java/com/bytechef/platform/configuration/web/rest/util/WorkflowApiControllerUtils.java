@@ -31,12 +31,4 @@ public class WorkflowApiControllerUtils {
 
         return ResponseEntity.ok(conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class));
     }
-
-    public static ResponseEntity<WorkflowModel> updateWorkflow(
-        String id, WorkflowModel workflowModel, ConversionService conversionService, WorkflowFacade workflowFacade) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workflowFacade.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),
-                WorkflowModel.class));
-    }
 }

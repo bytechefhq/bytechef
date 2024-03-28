@@ -108,7 +108,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
 
-        if (!projectService.isProjectEnabled(projectId)) {
+        Project project = projectService.getProject(Validate.notNull(projectInstance.getProjectId(), "projectId"));
+
+        if (!project.isPublished()) {
             throw new ApplicationException(
                 "Project id=%s is not published".formatted(projectId), ProjectInstance.class, 100);
         }

@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
 import org.mapstruct.Mapper;
@@ -25,10 +26,21 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
-public interface ProjectInstanceWorkflowModelMapper
-    extends Converter<ProjectInstanceWorkflowModel, ProjectInstanceWorkflow> {
+public interface ProjectInstanceWorkflowModelMapper {
 
-    @Override
-    ProjectInstanceWorkflow convert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+    interface ProjectInstanceWorkflowModeToProjectInstanceWorkflowMapper
+        extends Converter<ProjectInstanceWorkflowModel, ProjectInstanceWorkflow> {
+
+        @Override
+        ProjectInstanceWorkflow convert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+    }
+
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+    interface ProjectInstanceWorkflowModeToProjectInstanceWorkflowDTOMapper
+        extends Converter<ProjectInstanceWorkflowModel, ProjectInstanceWorkflowDTO> {
+
+        @Override
+        ProjectInstanceWorkflowDTO convert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+    }
 }

@@ -26,9 +26,9 @@ import java.util.Optional;
  */
 public interface ProjectInstanceWorkflowService {
 
-    List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
-
     ProjectInstanceWorkflow create(ProjectInstanceWorkflow projectInstanceWorkflow);
+
+    List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
     void delete(Long id);
 

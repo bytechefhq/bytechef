@@ -30,6 +30,7 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +70,12 @@ public class ProjectOrphanFilesystemWorkflowChecker {
         List<Workflow> workflows = workflowService.getWorkflows(Type.AUTOMATION.ordinal());
 
         List<Workflow> orphanWorkflows = new ArrayList<>();
-        List<String> projectWorkflowIds = CollectionUtils.flatMap(projects, Project::getWorkflowIds);
+        List<String> projectWorkflowIds = CollectionUtils.flatMap(
+            projects, project -> project.getAllWorkflowIds()
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .toList());
 
         for (Workflow workflow : workflows) {
             String workflowId = workflow.getId();
@@ -101,7 +107,6 @@ public class ProjectOrphanFilesystemWorkflowChecker {
                     .orElseGet(() -> projectService.create(
                         Project.builder()
                             .name(projectName)
-                            .status(Project.Status.PUBLISHED)
                             .tagIds(getTagIds(workflow.getSourceType()))
                             .build()));
 

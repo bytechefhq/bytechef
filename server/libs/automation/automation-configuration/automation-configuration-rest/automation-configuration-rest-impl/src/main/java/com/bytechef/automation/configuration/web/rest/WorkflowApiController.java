@@ -78,6 +78,14 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
+    public ResponseEntity<List<WorkflowBasicModel>> getProjectVersionWorkflows(Long id, Integer projectVersion) {
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                projectFacade.getProjectVersionWorkflows(id, projectVersion),
+                workflow -> conversionService.convert(workflow, WorkflowBasicModel.class)));
+    }
+
+    @Override
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowFacade);
     }
@@ -94,6 +102,9 @@ public class WorkflowApiController implements WorkflowApi {
 
     @Override
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
-        return WorkflowApiControllerUtils.updateWorkflow(id, workflowModel, conversionService, workflowFacade);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.updateWorkflow(id, workflowModel.getDefinition(), workflowModel.getVersion()),
+                WorkflowModel.class));
     }
 }
