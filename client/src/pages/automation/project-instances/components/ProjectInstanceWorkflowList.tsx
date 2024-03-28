@@ -61,7 +61,7 @@ const ProjectInstanceWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="border-b border-b-gray-100 pl-4">
+        <div className="border-b border-b-gray-100 py-3 pl-4">
             <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-gray-400">Workflows</h3>
 
             <ul>
@@ -98,7 +98,7 @@ const ProjectInstanceWorkflowList = ({
 
                             return (
                                 <li
-                                    className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                                    className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50"
                                     key={workflow.id}
                                 >
                                     {projectInstanceWorkflow && (

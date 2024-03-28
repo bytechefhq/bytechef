@@ -4,7 +4,7 @@ import ConnectionListItem from './ConnectionListItem';
 
 const ConnectionList = ({connections, tags}: {connections: ConnectionModel[]; tags: TagModel[]}) => {
     return (
-        <ul className="w-full divide-y divide-gray-100 px-2 3xl:mx-auto 3xl:w-4/5" role="list">
+        <ul className="w-full px-2 3xl:mx-auto 3xl:w-4/5" role="list">
             {connections.map((connection) => {
                 const connectionTagIds = connection.tags?.map((tag) => tag.id);
 

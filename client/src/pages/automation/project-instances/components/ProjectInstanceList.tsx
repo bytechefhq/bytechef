@@ -19,7 +19,7 @@ const ProjectInstanceList = ({
     return (
         <>
             {projectInstances.length > 0 && (
-                <div className="w-full divide-y divide-gray-100">
+                <div className="w-full">
                     {projectInstances.map((projectInstance) => {
                         const projectTagIds = projectInstance.tags?.map((tag) => tag.id);
 

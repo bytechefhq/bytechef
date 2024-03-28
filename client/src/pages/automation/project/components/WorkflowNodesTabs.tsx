@@ -104,7 +104,7 @@ const WorkflowNodesTabs = ({
                     )}
 
                     {!hideTaskDispatchers && (
-                        <TabsContent className="mt-0" value="taskDispatchers">
+                        <TabsContent className="mt-0 w-full" value="taskDispatchers">
                             <ul className="space-y-2" role="list">
                                 {taskDispatcherDefinitions.length ? (
                                     taskDispatcherDefinitions.map(

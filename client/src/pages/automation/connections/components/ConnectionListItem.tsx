@@ -82,78 +82,83 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
     return (
         <li key={connection.id}>
             <>
-                <div className="group flex items-center rounded-md bg-white px-2 py-5 hover:bg-gray-50">
-                    <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                            <div className="relative flex items-center gap-2">
-                                {componentDefinition?.icon && (
-                                    <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
-                                )}
+                <div className="group flex items-center rounded-md bg-white px-2 hover:bg-gray-50">
+                    <div className="flex flex-1 items-center border-b border-muted py-5">
+                        <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                                <div className="relative flex items-center gap-2">
+                                    {componentDefinition?.icon && (
+                                        <InlineSVG className="size-6 flex-none" src={componentDefinition.icon} />
+                                    )}
 
-                                {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
+                                    {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
 
-                                <span className="text-base font-semibold">{connection.name}</span>
+                                    <span className="text-base font-semibold">{connection.name}</span>
 
-                                <span className="text-xs uppercase text-gray-700">{connection.environment}</span>
+                                    <span className="text-xs uppercase text-gray-700">{connection.environment}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                                <div className="flex h-[38px] items-center" onClick={(event) => event.preventDefault()}>
+                                    {connection.tags && (
+                                        <TagList
+                                            getRequest={(id, tags) => ({
+                                                id: id!,
+                                                updateTagsRequestModel: {
+                                                    tags: tags || [],
+                                                },
+                                            })}
+                                            id={connection.id!}
+                                            remainingTags={remainingTags}
+                                            tags={connection.tags}
+                                            updateTagsMutation={updateConnectionTagsMutation}
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex h-[38px] items-center" onClick={(event) => event.preventDefault()}>
-                                {connection.tags && (
-                                    <TagList
-                                        getRequest={(id, tags) => ({
-                                            id: id!,
-                                            updateTagsRequestModel: {
-                                                tags: tags || [],
-                                            },
-                                        })}
-                                        id={connection.id!}
-                                        remainingTags={remainingTags}
-                                        tags={connection.tags}
-                                        updateTagsMutation={updateConnectionTagsMutation}
-                                    />
+                        <div className="flex items-center justify-end gap-x-6">
+                            <div className="flex flex-col items-end gap-y-4">
+                                <Badge variant={connection.active ? 'success' : 'secondary'}>
+                                    {connection.active ? 'Active' : 'Not Active'}
+                                </Badge>
+
+                                {connection.createdDate && (
+                                    <Tooltip>
+                                        <TooltipTrigger className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                            <span>
+                                                {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Created Date</TooltipContent>
+                                    </Tooltip>
                                 )}
                             </div>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button size="icon" variant="ghost">
+                                        <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+
+                                    <DropdownMenuSeparator />
+
+                                    <DropdownMenuItem
+                                        className="text-red-600"
+                                        onClick={() => setShowDeleteDialog(true)}
+                                    >
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
-                    </div>
-
-                    <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex flex-col items-end gap-y-4">
-                            <Badge variant={connection.active ? 'success' : 'secondary'}>
-                                {connection.active ? 'Active' : 'Not Active'}
-                            </Badge>
-
-                            {connection.createdDate && (
-                                <Tooltip>
-                                    <TooltipTrigger className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                        <span>
-                                            {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Created Date</TooltipContent>
-                                </Tooltip>
-                            )}
-                        </div>
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                                </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
                 </div>
 

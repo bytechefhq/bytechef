@@ -15,7 +15,7 @@ interface WorkflowInputsSheetProps {
 }
 
 const WorkflowInputsSheet = ({onClose, projectId, workflow, workflowTestConfiguration}: WorkflowInputsSheetProps) => (
-    <Sheet modal={true} onOpenChange={onClose} open>
+    <Sheet onOpenChange={onClose} open>
         <SheetContent
             className="flex flex-col p-4 sm:max-w-[700px]"
             onFocusOutside={(event) => event.preventDefault()}
