@@ -35,7 +35,7 @@ public abstract class AbstractKeapComponentHandler implements OpenApiComponentHa
         component("keap")
             .title("Keap")
             .description(
-                "Keep is a customer comprehensive customer relationship management platform designed to help small businesses streamline sales, marketing, and customer management processes in one integrated system."))
+                "Keap is a customer comprehensive customer relationship management platform designed to help small businesses streamline sales, marketing, and customer management processes in one integrated system."))
                     .actions(modifyActions(KeapCreateCompanyAction.ACTION_DEFINITION,
                         KeapCreateTaskAction.ACTION_DEFINITION, KeapCreateContactAction.ACTION_DEFINITION))
                     .connection(modifyConnection(KeapConnection.CONNECTION_DEFINITION))

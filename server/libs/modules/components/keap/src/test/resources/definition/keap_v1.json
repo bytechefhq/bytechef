@@ -4,7 +4,7 @@
   "customActionHelp": null,
   "dataStreamItemReader": null,
   "dataStreamItemWriter": null,
-  "description": "Keep is a customer comprehensive customer relationship management platform designed to help small businesses streamline sales, marketing, and customer management processes in one integrated system.",
+  "description": "Keap is a customer comprehensive customer relationship management platform designed to help small businesses streamline sales, marketing, and customer management processes in one integrated system.",
   "icon": "path:assets/keap.svg",
   "tags": null,
   "metadata": null,
@@ -4897,7 +4897,6 @@
     },
     "perform": null
   } ],
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -4964,5 +4963,6 @@
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  }
+  },
+  "triggers": [ ]
 }
