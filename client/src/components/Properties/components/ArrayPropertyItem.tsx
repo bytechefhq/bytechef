@@ -6,6 +6,18 @@ import {UseMutationResult} from '@tanstack/react-query';
 import Property from '../Property';
 import DeletePropertyButton from './DeletePropertyButton';
 
+interface ArrayPropertyItemProps {
+    arrayItem: ArrayPropertyType;
+    arrayName?: string;
+    currentComponent?: CurrentComponentType;
+    currentComponentData?: ComponentDataType;
+    dataPills?: DataPillType[];
+    index: number;
+    path?: string;
+    setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
+    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+}
+
 const ArrayPropertyItem = ({
     arrayItem,
     arrayName,
@@ -13,18 +25,10 @@ const ArrayPropertyItem = ({
     currentComponentData,
     dataPills,
     index,
+    path,
     setArrayItems,
     updateWorkflowMutation,
-}: {
-    arrayItem: ArrayPropertyType;
-    arrayName?: string;
-    currentComponent?: CurrentComponentType;
-    currentComponentData?: ComponentDataType;
-    dataPills?: DataPillType[];
-    index: number;
-    setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
-    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
-}) => (
+}: ArrayPropertyItemProps) => (
     <div className="ml-2 flex w-full border-l pb-2" key={arrayItem.name}>
         <Property
             arrayIndex={index}
@@ -34,6 +38,7 @@ const ArrayPropertyItem = ({
             customClassName="pl-2 w-full"
             dataPills={dataPills}
             mention={!!dataPills?.length}
+            path={`${path}.${arrayName}`}
             property={arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
             updateWorkflowMutation={updateWorkflowMutation}
         />
