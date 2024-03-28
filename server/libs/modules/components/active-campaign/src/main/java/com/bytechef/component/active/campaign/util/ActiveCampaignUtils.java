@@ -39,8 +39,7 @@ public class ActiveCampaignUtils {
     public static List<Option<String>> getContactIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get(getUrl(connectionParameters, "contacts")))
+        Map<String, ?> body = context.http(http -> http.get(getUrl(connectionParameters, "contacts")))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -61,8 +60,7 @@ public class ActiveCampaignUtils {
     public static List<Option<String>> getTaskTypeIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, ?> body = context
-            .http(http -> http.get(getUrl(connectionParameters, "dealTasktypes")))
+        Map<String, ?> body = context.http(http -> http.get(getUrl(connectionParameters, "dealTasktypes")))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
