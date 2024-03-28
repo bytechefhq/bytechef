@@ -59,7 +59,8 @@ public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler
                             string(USERNAME)
                                 .label("API Key")
                                 .required(true)))
-            .baseUri((connectionParameters, context) -> "https://api." + connectionParameters.getRequiredString(POD)
-                + ".insightly.com/v3.1");
+            .baseUri(
+                (connectionParameters, context) -> "https://api." + connectionParameters.getRequiredString(POD) +
+                    ".insightly.com/v3.1");
     }
 }
