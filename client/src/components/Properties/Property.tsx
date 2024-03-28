@@ -152,22 +152,6 @@ const Property = ({
         taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
     }
 
-    if (controlType === 'OBJECT_BUILDER' && name) {
-        taskParameterValue = `${path}.${name}`
-            .split('.')
-            .reduce((acc: {[key: string]: any} | undefined, key: string) => {
-                if (acc && acc[key] === undefined) {
-                    acc[key] = {};
-                }
-
-                return acc && acc[key];
-            }, currentWorkflowTask?.parameters);
-    }
-
-    if (currentWorkflowTask?.parameters && name && arrayName && arrayIndex !== undefined) {
-        taskParameterValue = (currentWorkflowTask?.parameters[arrayName] as {[key: string]: any})?.[arrayIndex]?.[name];
-    }
-
     if (name && name.endsWith('_0') && defaultValue) {
         taskParameterValue = defaultValue;
     }
@@ -236,17 +220,31 @@ const Property = ({
         let data = parameters;
 
         if (arrayName && arrayIndex !== undefined) {
-            data = {
-                ...parameters,
-                [arrayName]: [
-                    ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                    {
-                        ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                        [name]: isNumericalInput ? numericValueToSave : inputValue,
-                    },
-                    ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                ],
-            };
+            if (path.includes('parameters')) {
+                data = {
+                    ...parameters,
+                    [arrayName]: [
+                        ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                        {
+                            ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                            [name]: isNumericalInput ? numericValueToSave : inputValue,
+                        },
+                        ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                    ],
+                };
+            } else {
+                const matchingObject = path.split('.').reduce((acc, key) => {
+                    if (acc && acc[key] === undefined) {
+                        acc[key] = {};
+                    }
+
+                    return acc && acc[key];
+                }, data);
+
+                if (matchingObject) {
+                    matchingObject[name as string] = isNumericalInput ? numericValueToSave : inputValue;
+                }
+            }
         } else if (objectName) {
             const matchingObject = path.split('.').reduce((acc, key) => {
                 if (acc && acc[key] === undefined) {
@@ -588,6 +586,7 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
                                 dataPills={dataPills}
+                                path={path}
                                 property={property}
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />

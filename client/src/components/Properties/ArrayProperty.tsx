@@ -16,6 +16,7 @@ interface ArrayPropertyProps {
     currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     dataPills?: Array<DataPillType>;
+    path?: string;
     property: PropertyType;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
@@ -24,6 +25,7 @@ const ArrayProperty = ({
     currentComponent,
     currentComponentData,
     dataPills,
+    path,
     property,
     updateWorkflowMutation,
 }: ArrayPropertyProps) => {
@@ -132,6 +134,7 @@ const ArrayProperty = ({
                             dataPills={dataPills}
                             index={index}
                             key={subItem.name}
+                            path={path}
                             setArrayItems={setArrayItems}
                             updateWorkflowMutation={updateWorkflowMutation}
                         />
@@ -145,6 +148,7 @@ const ArrayProperty = ({
                         dataPills={dataPills}
                         index={index}
                         key={arrayItem.name}
+                        path={path}
                         setArrayItems={setArrayItems}
                         updateWorkflowMutation={updateWorkflowMutation}
                     />
