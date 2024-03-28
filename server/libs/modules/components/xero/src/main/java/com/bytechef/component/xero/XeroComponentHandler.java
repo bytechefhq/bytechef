@@ -34,7 +34,9 @@ public class XeroComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XERO)
         .title("Xero")
-        .description("Component description.")
+        .description(
+            "Xero is an online accounting software platform designed for small businesses and accountants to manage " +
+                "finances efficiently.")
         .icon("path:assets/xero.svg")
         .connection(XeroConnection.CONNECTION_DEFINITION)
         .actions(
