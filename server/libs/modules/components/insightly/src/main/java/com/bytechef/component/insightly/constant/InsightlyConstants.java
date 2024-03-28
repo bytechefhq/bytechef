@@ -21,8 +21,8 @@ package com.bytechef.component.insightly.constant;
  */
 public class InsightlyConstants {
 
+    public static final String POD = "pod";
+
     private InsightlyConstants() {
     }
-
-    public static final String POD = "pod";
 }
