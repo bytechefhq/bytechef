@@ -4,7 +4,7 @@
   "customActionHelp": null,
   "dataStreamItemReader": null,
   "dataStreamItemWriter": null,
-  "description": "Component description.",
+  "description": "Slack is a messaging platform for teams to communicate and collaborate.",
   "icon": "path:assets/slack.svg",
   "tags": null,
   "metadata": null,
@@ -358,7 +358,6 @@
     } ],
     "title": "Send message",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -849,7 +848,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1196,7 +1196,6 @@
     } ],
     "title": "Send direct message",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1687,9 +1686,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -1741,20 +1740,21 @@
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
-      "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "clientId": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "refreshUrl": null,
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  }
+  },
+  "triggers": null
 }
