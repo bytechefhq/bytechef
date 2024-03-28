@@ -72,8 +72,7 @@ public class MicrosoftOneDriveUtils {
 
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
-        Map<String, ?> body = context
-            .http(http -> http.get(BASE_URL + "/items/root/children?$filter=" + encode))
+        Map<String, ?> body = context.http(http -> http.get(BASE_URL + "/items/root/children?$filter=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

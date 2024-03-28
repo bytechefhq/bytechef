@@ -57,8 +57,7 @@ public class MicrosoftOneDriveDownloadFileAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context
-            .http(http -> http.get(BASE_URL + "/items/" + inputParameters.getRequiredString(ID) + "/content"))
+        return context.http(http -> http.get(BASE_URL + "/items/" + inputParameters.getRequiredString(ID) + "/content"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
