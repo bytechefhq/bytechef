@@ -31,7 +31,7 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
-    LocalDateTime createdDate, CredentialStatus credentialStatus, Environment environment,  Long id,
+    LocalDateTime createdDate, CredentialStatus credentialStatus, Environment environment, Long id,
     String lastModifiedBy, LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags,
     int version) {
 
