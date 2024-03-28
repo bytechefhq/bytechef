@@ -503,13 +503,42 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  description: The description of a project version.
+                  type: "string"
       responses:
         "200":
-          description: "The published project object."
+          description: "Successful operation."
+  /projects/{id}/versions:
+    get:
+      description: "Get a project versions."
+      summary: "Get a project versions."
+      tags:
+        - "project"
+      operationId: "getProjectVersions"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of project version objects."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProjectVersion"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -551,7 +580,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The updated project object."
+          description: "The array project workflows."
           content:
             application/json:
               schema:
@@ -637,6 +666,36 @@ paths:
             application/json:
               schema:
                 type: string
+  /projects/{id}/{projectVersion}/workflows:
+    get:
+      description: "Get workflows for particular project version."
+      summary: "Get workflows for particular project version."
+      tags:
+        - "workflow"
+      operationId: "getProjectVersionWorkflows"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "The array of project workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
   /workflows:
     get:
       description: "Get workflow definitions."
@@ -964,10 +1023,9 @@ components:
           description: "The id of a project."
           type: "integer"
           format: "int64"
-          writeOnly: true
-        enabled:
-          description: "If a project instance is enabled or not."
-          type: "boolean"
+        projectVersion:
+          description: "The version of a project."
+          type: "integer"
     ProjectInstanceWorkflow:
       description: "Contains configuration and connections required for the execution\
         \ of a particular project workflow."
@@ -1051,8 +1109,25 @@ components:
       description: "The status of a project."
       type: "string"
       enum:
+        - "DRAFT"
         - "PUBLISHED"
-        - "UNPUBLISHED"
+    ProjectVersion:
+      description: "The project version."
+      type: "object"
+      properties:
+        description:
+          description: "The description of a project version"
+          type: "string"
+        publishedDate:
+          description: "The published date."
+          type: "string"
+          format: "date-time"
+        version:
+          description: "The version of a project."
+          type: "integer"
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/ProjectStatus'
     Tag:
       description: "A tag."
       required:
