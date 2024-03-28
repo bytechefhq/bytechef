@@ -67,19 +67,20 @@ public class ZendeskSellCreateContactAction {
                 .label("Email")
                 .controlType(ControlType.EMAIL)
                 .required(false))
-        .outputSchema(object()
-            .properties(
-                object(DATA)
-                    .properties(
-                        string("id"),
-                        bool(IS_ORGANIZATION),
-                        string(TITLE),
-                        string(WEBSITE),
-                        string(EMAIL)),
-                object("meta")
-                    .properties(
-                        integer("version"),
-                        string("type"))))
+        .outputSchema(
+            object()
+                .properties(
+                    object(DATA)
+                        .properties(
+                            string("id"),
+                            bool(IS_ORGANIZATION),
+                            string(TITLE),
+                            string(WEBSITE),
+                            string(EMAIL)),
+                    object("meta")
+                        .properties(
+                            integer("version"),
+                            string("type"))))
         .perform(ZendeskSellCreateContactAction::perform);
 
     private ZendeskSellCreateContactAction() {
