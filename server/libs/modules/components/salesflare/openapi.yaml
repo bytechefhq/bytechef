@@ -1,0 +1,158 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Salesflare API"
+  description: "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently."
+  version: "v1"
+servers:
+  - url: "https://api.salesflare.com"
+paths:
+  /accounts:
+    post:
+      tags:
+        - "Accounts"
+      summary: "Create account"
+      description: "Creates new account"
+      operationId: "createAccount"
+      requestBody:
+        description: "data of new Account"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Account"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "Account name"
+                website:
+                  description: "Account website"
+                  type: "string"
+                description:
+                  description: "Account description"
+                  type: "string"
+                email:
+                  type: "string"
+                  maxLength: "1000"
+                phone_number:
+                  type: "string"
+                social_profiles:
+                  type: "array"
+                  description: "Social profile URL"
+                  items:
+                    type: "string"
+      responses:
+        default:
+          description: "Creation confirmation"
+  /contacts:
+    post:
+      tags:
+        - "Contacts"
+      summary: "Create contacts"
+      description: "Creates new contacts"
+      operationId: "createContacts"
+      requestBody:
+        description: "data of new Contacts"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              title: "Contacts"
+              items:
+                type: "object"
+                title: "Contact"
+                required:
+                  - "email"
+                properties:
+                  email:
+                    type: "string"
+                    description: "Email address of the contact."
+                    maxLength: "1000"
+                  firstname:
+                    title: "First name"
+                    description: "The first name of the contact."
+                    type: "string"
+                  lastname:
+                    title: "Last name"
+                    description: "The last name of the contact."
+                    type: "string"
+                  phone_number:
+                    title: "Work phone number"
+                    type: "string"
+                  mobile_phone_number:
+                    type: "string"
+                  home_phone_number:
+                    type: "string"
+                  fax_number:
+                    type: "string"
+                  social_profiles:
+                    type: "array"
+                    description: "Social profile URL"
+                    items:
+                      type: "string"
+      responses:
+        200:
+          description: "Creation confirmation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+  /tasks:
+    post:
+      tags:
+        - "Tasks"
+      summary: "Create tasks"
+      description: "Creates new tasks"
+      operationId: "createTasks"
+      requestBody:
+        description: "data of new Tasks"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              title: "Tasks"
+              items:
+                type: "object"
+                title: "Task"
+                required:
+                  - "description"
+                properties:
+                  description:
+                    type: "string"
+                    description: "Description of new task"
+                  reminder_date:
+                    type: "string"
+                    format: "date"
+      responses:
+        200:
+          description: "Creation confirmation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
