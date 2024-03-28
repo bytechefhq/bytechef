@@ -25,7 +25,7 @@ const ArrayPropertyItem = ({
     setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }) => (
-    <div className="ml-2 flex w-full border-l pb-2" key={arrayItem.name || `${name}_0`}>
+    <div className="ml-2 flex w-full border-l pb-2" key={arrayItem.name}>
         <Property
             arrayIndex={index}
             arrayName={arrayName}
