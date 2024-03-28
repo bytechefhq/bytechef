@@ -207,47 +207,104 @@ components:
           items:
             type: "string"
     Job:
-      allOf:
-        - $ref: "#/components/schemas/JobBasic"
-        - type: "object"
-          properties:
-            currentTask:
-              description: "The index of the step on the job's workflow on which the job\
-              \ is working on right now."
-              type: "integer"
-              format: "int32"
-              readOnly: true
-            error:
-              $ref: "#/components/schemas/ExecutionError"
-            inputs:
-              description: "The key-value map of the inputs passed to the job when it\
-              \ was created."
-              type: "object"
-              additionalProperties:
-                type: "object"
-              readOnly: true
-            outputs:
-              description: "The key-value map of the outputs returned."
-              type: "object"
-              additionalProperties:
-                type: "object"
-              readOnly: true
-            parentTaskExecutionId:
-              description: "The id of the parent task that created this job. Required\
-              \ for sub-flows."
-              type: "integer"
-              format: "int64"
-              readOnly: true
-            taskExecutions:
-              type: "array"
-              items:
-                $ref: "#/components/schemas/TaskExecution"
-            webhooks:
-              description: "The list of the webhooks configured."
-              type: "array"
-              items:
-                $ref: "#/components/schemas/Webhook"
-              readOnly: true
+      description: "Represents an execution of a workflow."
+      type: "object"
+      required:
+        - "priority"
+        - "startDate"
+        - "status"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        currentTask:
+          description: "The index of the step on the job's workflow on which the job\
+          \ is working on right now."
+          type: "integer"
+          format: "int32"
+          readOnly: true
+        endDate:
+          description: "The time execution entered end status COMPLETED, STOPPED,\
+            \ FAILED"
+          type: "string"
+          format: "date-time"
+        error:
+          $ref: "#/components/schemas/ExecutionError"
+        id:
+          description: "The id of a job."
+          type: "string"
+          readOnly: true
+        inputs:
+          description: "The key-value map of the inputs passed to the job when it\
+          \ was created."
+          type: "object"
+          additionalProperties:
+            type: "object"
+          readOnly: true
+        label:
+          description: "The job's human-readable name."
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        outputs:
+          description: "The key-value map of the outputs returned."
+          type: "object"
+          additionalProperties:
+            type: "object"
+          readOnly: true
+        parentTaskExecutionId:
+          description: "The id of the parent task that created this job. Required\
+          \ for sub-flows."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        priority:
+          description: "The priority value."
+          type: "integer"
+          format: "int32"
+          readOnly: true
+        startDate:
+          description: "The time of when the job began."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        status:
+          description: "The job's status."
+          type: "string"
+          enum:
+            - "CREATED"
+            - "STARTED"
+            - "STOPPED"
+            - "FAILED"
+            - "COMPLETED"
+          readOnly: true
+        taskExecutions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskExecution"
+        webhooks:
+          description: "The list of the webhooks configured."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Webhook"
+          readOnly: true
+        workflowId:
+          type: "string"
+          readOnly: true
     JobBasic:
       description: "Represents an execution of a workflow."
       type: "object"
