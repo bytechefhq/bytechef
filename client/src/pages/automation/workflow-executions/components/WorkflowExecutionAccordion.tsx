@@ -7,7 +7,7 @@ import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/c
 import {AccordionContent, AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowExecutionDetailsAccordion = ({
+const WorkflowExecutionAccordion = ({
     job,
     triggerExecution,
 }: {
@@ -90,4 +90,4 @@ const WorkflowExecutionDetailsAccordion = ({
     );
 };
 
-export default WorkflowExecutionDetailsAccordion;
+export default WorkflowExecutionAccordion;

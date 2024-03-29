@@ -21,7 +21,7 @@ import {useGetProjectsQuery} from 'queries/automation/projects.queries';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
-import WorkflowExecutionDetailsSheet from './components/WorkflowExecutionDetailsSheet';
+import WorkflowExecutionSheet from './components/WorkflowExecutionSheet';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 
 const jobStatusOptions = [
@@ -361,12 +361,12 @@ export const WorkflowExecutions = () => {
                     <EmptyList
                         icon={<ActivityIcon className="size-12 text-gray-400" />}
                         message={emptyListMessage}
-                        title="No executed workflows"
+                        title="No Executed Workflows"
                     />
                 )}
             </PageLoader>
 
-            <WorkflowExecutionDetailsSheet />
+            <WorkflowExecutionSheet />
         </LayoutContainer>
     );
 };

@@ -192,7 +192,7 @@ const ProjectInstances = () => {
                         button={<ProjectInstanceDialog triggerNode={<Button>Create Instance</Button>} />}
                         icon={<Layers3Icon className="size-12 text-gray-400" />}
                         message="Get started by creating a new project instance."
-                        title="No instances of projects"
+                        title="No Project Instances"
                     />
                 )}
             </PageLoader>

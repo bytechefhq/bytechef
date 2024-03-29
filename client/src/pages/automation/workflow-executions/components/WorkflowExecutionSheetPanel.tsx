@@ -5,11 +5,7 @@ import {PencilIcon} from 'lucide-react';
 import {WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 import {useNavigate} from 'react-router-dom';
 
-const WorkflowExecutionDetailsSheetWorkflowView = ({
-    workflowExecution,
-}: {
-    workflowExecution: WorkflowExecutionModel;
-}) => {
+const WorkflowExecutionSheetPanel = ({workflowExecution}: {workflowExecution: WorkflowExecutionModel}) => {
     const {project, projectInstance, workflow} = workflowExecution;
 
     const navigate = useNavigate();
@@ -44,4 +40,4 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
     );
 };
 
-export default WorkflowExecutionDetailsSheetWorkflowView;
+export default WorkflowExecutionSheetPanel;

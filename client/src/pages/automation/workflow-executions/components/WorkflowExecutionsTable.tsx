@@ -3,7 +3,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {JobBasicModel, WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 
-import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
+import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
 const getDuration = (info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>) => {
     const infoValue = info.getValue();
@@ -71,7 +71,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const {setWorkflowExecutionDetailsDialogOpen, setWorkflowExecutionId} = useWorkflowExecutionDetailsDialogStore();
+    const {setWorkflowExecutionDetailsSheetOpen, setWorkflowExecutionId} = useWorkflowExecutionSheetStore();
 
     const headerGroups = reactTable.getHeaderGroups();
     const rows = reactTable.getRowModel().rows;
@@ -80,7 +80,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
         if (data[index].id) {
             setWorkflowExecutionId(data[index].id!);
 
-            setWorkflowExecutionDetailsDialogOpen(true);
+            setWorkflowExecutionDetailsSheetOpen(true);
         }
     };
 
