@@ -210,7 +210,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const hasOutputData = currentActionDefinition?.outputDefined || currentActionDefinition?.outputFunctionDefined;
 
-    const {data: workflowNodeOutput} = useGetWorkflowNodeOutputQuery(
+    const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
             id: workflow.id!,
             workflowNodeName: currentNode.name,
@@ -385,6 +385,11 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentComponentDefinition?.name]);
+
+    // Update outputSchema to match the current action definition
+    useEffect(() => {
+        refetchWorkflowNodeOutput();
+    }, [currentActionName, refetchWorkflowNodeOutput]);
 
     return (
         <>
