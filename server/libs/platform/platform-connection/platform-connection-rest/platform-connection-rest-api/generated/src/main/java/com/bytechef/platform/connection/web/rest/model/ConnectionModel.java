@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-29T14:33:25.790123+01:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-29T14:38:00.497267+01:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class ConnectionModel {
 
   private Boolean active;
@@ -52,14 +52,14 @@ public class ConnectionModel {
 
   private EnvironmentModel environment;
 
-  private String name;
-
   private Long id;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  private String name;
 
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
@@ -242,26 +242,6 @@ public class ConnectionModel {
     this.environment = environment;
   }
 
-  public ConnectionModel name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * The name of a connection.
-   * @return name
-  */
-  @NotNull 
-  @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("name")
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public ConnectionModel id(Long id) {
     this.id = id;
     return this;
@@ -320,6 +300,26 @@ public class ConnectionModel {
 
   public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
+  }
+
+  public ConnectionModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of a connection.
+   * @return name
+  */
+  @NotNull 
+  @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public ConnectionModel parameters(Map<String, Object> parameters) {
@@ -415,10 +415,10 @@ public class ConnectionModel {
         Objects.equals(this.createdDate, connection.createdDate) &&
         Objects.equals(this.credentialStatus, connection.credentialStatus) &&
         Objects.equals(this.environment, connection.environment) &&
-        Objects.equals(this.name, connection.name) &&
         Objects.equals(this.id, connection.id) &&
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
+        Objects.equals(this.name, connection.name) &&
         Objects.equals(this.parameters, connection.parameters) &&
         Objects.equals(this.tags, connection.tags) &&
         Objects.equals(this.version, connection.version);
@@ -426,7 +426,7 @@ public class ConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus, environment, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
+    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
   }
 
   @Override
@@ -441,10 +441,10 @@ public class ConnectionModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
