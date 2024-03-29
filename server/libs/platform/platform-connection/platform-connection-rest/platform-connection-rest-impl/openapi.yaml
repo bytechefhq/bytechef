@@ -51,9 +51,6 @@ components:
           $ref: "#/components/schemas/CredentialStatus"
         environment:
           $ref: '#/components/schemas/Environment'
-        name:
-          description: "The name of a connection."
-          type: "string"
         id:
           description: "The id of a connection."
           type: "integer"
@@ -68,6 +65,9 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        name:
+          description: "The name of a connection."
+          type: "string"
         parameters:
           description: "The parameters of a connection."
           type: "object"
