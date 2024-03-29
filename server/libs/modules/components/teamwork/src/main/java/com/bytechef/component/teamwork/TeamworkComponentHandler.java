@@ -57,7 +57,7 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
                     .title("Basic Auth")
                     .properties(
                         string(SITE_NAME)
-                            .label("Your site name")
+                            .label("Your site name1")
                             .description("e.g. https://{yourSiteName}.teamwork.com")
                             .required(true),
                         string(USERNAME)
