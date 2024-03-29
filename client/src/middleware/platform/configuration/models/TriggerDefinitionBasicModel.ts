@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { HelpModel } from './HelpModel';
 import {
     HelpModelFromJSON,
@@ -68,11 +68,9 @@ export interface TriggerDefinitionBasicModel {
  * Check if a given object implements the TriggerDefinitionBasicModel interface.
  */
 export function instanceOfTriggerDefinitionBasicModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "type" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('type' in value)) return false;
+    return true;
 }
 
 export function TriggerDefinitionBasicModelFromJSON(json: any): TriggerDefinitionBasicModel {
@@ -80,33 +78,30 @@ export function TriggerDefinitionBasicModelFromJSON(json: any): TriggerDefinitio
 }
 
 export function TriggerDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerDefinitionBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
+        'description': json['description'] == null ? undefined : json['description'],
+        'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'title': !exists(json, 'title') ? undefined : json['title'],
+        'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
     };
 }
 
 export function TriggerDefinitionBasicModelToJSON(value?: TriggerDefinitionBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'help': HelpModelToJSON(value.help),
-        'name': value.name,
-        'title': value.title,
-        'type': TriggerTypeModelToJSON(value.type),
+        'description': value['description'],
+        'help': HelpModelToJSON(value['help']),
+        'name': value['name'],
+        'title': value['title'],
+        'type': TriggerTypeModelToJSON(value['type']),
     };
 }
 

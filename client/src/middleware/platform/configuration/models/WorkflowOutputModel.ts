@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,11 +37,9 @@ export interface WorkflowOutputModel {
  * Check if a given object implements the WorkflowOutputModel interface.
  */
 export function instanceOfWorkflowOutputModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "value" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('value' in value)) return false;
+    return true;
 }
 
 export function WorkflowOutputModelFromJSON(json: any): WorkflowOutputModel {
@@ -49,7 +47,7 @@ export function WorkflowOutputModelFromJSON(json: any): WorkflowOutputModel {
 }
 
 export function WorkflowOutputModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowOutputModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -60,16 +58,13 @@ export function WorkflowOutputModelFromJSONTyped(json: any, ignoreDiscriminator:
 }
 
 export function WorkflowOutputModelToJSON(value?: WorkflowOutputModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'name': value.name,
-        'value': value.value,
+        'name': value['name'],
+        'value': value['value'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -92,9 +92,7 @@ export interface IntegerPropertyModel extends ValuePropertyModel {
  * Check if a given object implements the IntegerPropertyModel interface.
  */
 export function instanceOfIntegerPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function IntegerPropertyModelFromJSON(json: any): IntegerPropertyModel {
@@ -102,35 +100,32 @@ export function IntegerPropertyModelFromJSON(json: any): IntegerPropertyModel {
 }
 
 export function IntegerPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): IntegerPropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
-        'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
-        'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
-        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
+        'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
+        'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
+        'maxValue': json['maxValue'] == null ? undefined : json['maxValue'],
+        'minValue': json['minValue'] == null ? undefined : json['minValue'],
+        'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
 export function IntegerPropertyModelToJSON(value?: IntegerPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'defaultValue': value.defaultValue,
-        'exampleValue': value.exampleValue,
-        'maxValue': value.maxValue,
-        'minValue': value.minValue,
-        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
+        'defaultValue': value['defaultValue'],
+        'exampleValue': value['exampleValue'],
+        'maxValue': value['maxValue'],
+        'minValue': value['minValue'],
+        'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': OptionsDataSourceModelToJSON(value['optionsDataSource']),
     };
 }
 

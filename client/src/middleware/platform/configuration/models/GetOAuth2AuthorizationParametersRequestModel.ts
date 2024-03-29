@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Contains all required information to open a connection to a service defined by componentName parameter.
  * @export
@@ -49,11 +49,9 @@ export interface GetOAuth2AuthorizationParametersRequestModel {
  * Check if a given object implements the GetOAuth2AuthorizationParametersRequestModel interface.
  */
 export function instanceOfGetOAuth2AuthorizationParametersRequestModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "parameters" in value;
-
-    return isInstance;
+    if (!('componentName' in value)) return false;
+    if (!('parameters' in value)) return false;
+    return true;
 }
 
 export function GetOAuth2AuthorizationParametersRequestModelFromJSON(json: any): GetOAuth2AuthorizationParametersRequestModel {
@@ -61,31 +59,28 @@ export function GetOAuth2AuthorizationParametersRequestModelFromJSON(json: any):
 }
 
 export function GetOAuth2AuthorizationParametersRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetOAuth2AuthorizationParametersRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
+        'authorizationName': json['authorizationName'] == null ? undefined : json['authorizationName'],
         'componentName': json['componentName'],
-        'connectionVersion': !exists(json, 'connectionVersion') ? undefined : json['connectionVersion'],
+        'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
         'parameters': json['parameters'],
     };
 }
 
 export function GetOAuth2AuthorizationParametersRequestModelToJSON(value?: GetOAuth2AuthorizationParametersRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'authorizationName': value.authorizationName,
-        'componentName': value.componentName,
-        'connectionVersion': value.connectionVersion,
-        'parameters': value.parameters,
+        'authorizationName': value['authorizationName'],
+        'componentName': value['componentName'],
+        'connectionVersion': value['connectionVersion'],
+        'parameters': value['parameters'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ExecutionErrorModel } from './ExecutionErrorModel';
 import {
     ExecutionErrorModelFromJSON,
@@ -44,9 +44,7 @@ export interface ScriptTestExecutionModel {
  * Check if a given object implements the ScriptTestExecutionModel interface.
  */
 export function instanceOfScriptTestExecutionModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function ScriptTestExecutionModelFromJSON(json: any): ScriptTestExecutionModel {
@@ -54,27 +52,24 @@ export function ScriptTestExecutionModelFromJSON(json: any): ScriptTestExecution
 }
 
 export function ScriptTestExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ScriptTestExecutionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
-        'output': !exists(json, 'output') ? undefined : json['output'],
+        'error': json['error'] == null ? undefined : ExecutionErrorModelFromJSON(json['error']),
+        'output': json['output'] == null ? undefined : json['output'],
     };
 }
 
 export function ScriptTestExecutionModelToJSON(value?: ScriptTestExecutionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'error': ExecutionErrorModelToJSON(value.error),
-        'output': value.output,
+        'error': ExecutionErrorModelToJSON(value['error']),
+        'output': value['output'],
     };
 }
 

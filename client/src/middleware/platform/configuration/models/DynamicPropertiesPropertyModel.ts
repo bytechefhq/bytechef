@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PropertiesDataSourceModel } from './PropertiesDataSourceModel';
 import {
     PropertiesDataSourceModelFromJSON,
@@ -56,9 +56,7 @@ export interface DynamicPropertiesPropertyModel extends PropertyModel {
  * Check if a given object implements the DynamicPropertiesPropertyModel interface.
  */
 export function instanceOfDynamicPropertiesPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function DynamicPropertiesPropertyModelFromJSON(json: any): DynamicPropertiesPropertyModel {
@@ -66,27 +64,24 @@ export function DynamicPropertiesPropertyModelFromJSON(json: any): DynamicProper
 }
 
 export function DynamicPropertiesPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DynamicPropertiesPropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'header': !exists(json, 'header') ? undefined : json['header'],
-        'propertiesDataSource': !exists(json, 'propertiesDataSource') ? undefined : PropertiesDataSourceModelFromJSON(json['propertiesDataSource']),
+        'header': json['header'] == null ? undefined : json['header'],
+        'propertiesDataSource': json['propertiesDataSource'] == null ? undefined : PropertiesDataSourceModelFromJSON(json['propertiesDataSource']),
     };
 }
 
 export function DynamicPropertiesPropertyModelToJSON(value?: DynamicPropertiesPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...PropertyModelToJSON(value),
-        'header': value.header,
-        'propertiesDataSource': PropertiesDataSourceModelToJSON(value.propertiesDataSource),
+        'header': value['header'],
+        'propertiesDataSource': PropertiesDataSourceModelToJSON(value['propertiesDataSource']),
     };
 }
 

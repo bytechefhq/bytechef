@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JobModel } from './JobModel';
 import {
     JobModelFromJSON,
@@ -50,9 +50,7 @@ export interface WorkflowTestExecutionModel {
  * Check if a given object implements the WorkflowTestExecutionModel interface.
  */
 export function instanceOfWorkflowTestExecutionModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WorkflowTestExecutionModelFromJSON(json: any): WorkflowTestExecutionModel {
@@ -60,27 +58,24 @@ export function WorkflowTestExecutionModelFromJSON(json: any): WorkflowTestExecu
 }
 
 export function WorkflowTestExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowTestExecutionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
-        'triggerExecution': !exists(json, 'triggerExecution') ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
+        'job': json['job'] == null ? undefined : JobModelFromJSON(json['job']),
+        'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
     };
 }
 
 export function WorkflowTestExecutionModelToJSON(value?: WorkflowTestExecutionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'job': JobModelToJSON(value.job),
-        'triggerExecution': TriggerExecutionModelToJSON(value.triggerExecution),
+        'job': JobModelToJSON(value['job']),
+        'triggerExecution': TriggerExecutionModelToJSON(value['triggerExecution']),
     };
 }
 

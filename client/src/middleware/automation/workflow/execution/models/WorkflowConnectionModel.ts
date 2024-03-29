@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -55,14 +55,12 @@ export interface WorkflowConnectionModel {
  * Check if a given object implements the WorkflowConnectionModel interface.
  */
 export function instanceOfWorkflowConnectionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "componentVersion" in value;
-    isInstance = isInstance && "key" in value;
-    isInstance = isInstance && "required" in value;
-    isInstance = isInstance && "workflowNodeName" in value;
-
-    return isInstance;
+    if (!('componentName' in value)) return false;
+    if (!('componentVersion' in value)) return false;
+    if (!('key' in value)) return false;
+    if (!('required' in value)) return false;
+    if (!('workflowNodeName' in value)) return false;
+    return true;
 }
 
 export function WorkflowConnectionModelFromJSON(json: any): WorkflowConnectionModel {
@@ -70,7 +68,7 @@ export function WorkflowConnectionModelFromJSON(json: any): WorkflowConnectionMo
 }
 
 export function WorkflowConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowConnectionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -84,19 +82,16 @@ export function WorkflowConnectionModelFromJSONTyped(json: any, ignoreDiscrimina
 }
 
 export function WorkflowConnectionModelToJSON(value?: WorkflowConnectionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'componentName': value.componentName,
-        'componentVersion': value.componentVersion,
-        'key': value.key,
-        'required': value.required,
-        'workflowNodeName': value.workflowNodeName,
+        'componentName': value['componentName'],
+        'componentVersion': value['componentVersion'],
+        'key': value['key'],
+        'required': value['required'],
+        'workflowNodeName': value['workflowNodeName'],
     };
 }
 

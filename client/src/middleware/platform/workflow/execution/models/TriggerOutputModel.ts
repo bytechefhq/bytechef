@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The trigger output.
  * @export
@@ -37,9 +37,7 @@ export interface TriggerOutputModel {
  * Check if a given object implements the TriggerOutputModel interface.
  */
 export function instanceOfTriggerOutputModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function TriggerOutputModelFromJSON(json: any): TriggerOutputModel {
@@ -47,27 +45,24 @@ export function TriggerOutputModelFromJSON(json: any): TriggerOutputModel {
 }
 
 export function TriggerOutputModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerOutputModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'value': !exists(json, 'value') ? undefined : json['value'],
-        'triggerName': !exists(json, 'triggerName') ? undefined : json['triggerName'],
+        'value': json['value'] == null ? undefined : json['value'],
+        'triggerName': json['triggerName'] == null ? undefined : json['triggerName'],
     };
 }
 
 export function TriggerOutputModelToJSON(value?: TriggerOutputModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'value': value.value,
-        'triggerName': value.triggerName,
+        'value': value['value'],
+        'triggerName': value['triggerName'],
     };
 }
 

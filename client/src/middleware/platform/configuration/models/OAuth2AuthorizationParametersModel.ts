@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -43,9 +43,7 @@ export interface OAuth2AuthorizationParametersModel {
  * Check if a given object implements the OAuth2AuthorizationParametersModel interface.
  */
 export function instanceOfOAuth2AuthorizationParametersModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function OAuth2AuthorizationParametersModelFromJSON(json: any): OAuth2AuthorizationParametersModel {
@@ -53,29 +51,26 @@ export function OAuth2AuthorizationParametersModelFromJSON(json: any): OAuth2Aut
 }
 
 export function OAuth2AuthorizationParametersModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OAuth2AuthorizationParametersModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'authorizationUrl': !exists(json, 'authorizationUrl') ? undefined : json['authorizationUrl'],
-        'clientId': !exists(json, 'clientId') ? undefined : json['clientId'],
-        'scopes': !exists(json, 'scopes') ? undefined : json['scopes'],
+        'authorizationUrl': json['authorizationUrl'] == null ? undefined : json['authorizationUrl'],
+        'clientId': json['clientId'] == null ? undefined : json['clientId'],
+        'scopes': json['scopes'] == null ? undefined : json['scopes'],
     };
 }
 
 export function OAuth2AuthorizationParametersModelToJSON(value?: OAuth2AuthorizationParametersModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'authorizationUrl': value.authorizationUrl,
-        'clientId': value.clientId,
-        'scopes': value.scopes,
+        'authorizationUrl': value['authorizationUrl'],
+        'clientId': value['clientId'],
+        'scopes': value['scopes'],
     };
 }
 

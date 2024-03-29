@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ProjectInstanceWorkflowConnectionModel } from './ProjectInstanceWorkflowConnectionModel';
 import {
     ProjectInstanceWorkflowConnectionModelFromJSON,
@@ -110,9 +110,7 @@ export interface ProjectInstanceWorkflowModel {
  * Check if a given object implements the ProjectInstanceWorkflowModel interface.
  */
 export function instanceOfProjectInstanceWorkflowModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function ProjectInstanceWorkflowModelFromJSON(json: any): ProjectInstanceWorkflowModel {
@@ -120,44 +118,41 @@ export function ProjectInstanceWorkflowModelFromJSON(json: any): ProjectInstance
 }
 
 export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstanceWorkflowModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ProjectInstanceWorkflowConnectionModelFromJSON)),
-        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'projectInstanceId': !exists(json, 'projectInstanceId') ? undefined : json['projectInstanceId'],
-        'staticWebhookUrl': !exists(json, 'staticWebhookUrl') ? undefined : json['staticWebhookUrl'],
-        'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'inputs': json['inputs'] == null ? undefined : json['inputs'],
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ProjectInstanceWorkflowConnectionModelFromJSON)),
+        'enabled': json['enabled'] == null ? undefined : json['enabled'],
+        'id': json['id'] == null ? undefined : json['id'],
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'projectInstanceId': json['projectInstanceId'] == null ? undefined : json['projectInstanceId'],
+        'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
+        'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkflowModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'inputs': value.inputs,
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(ProjectInstanceWorkflowConnectionModelToJSON)),
-        'enabled': value.enabled,
-        'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
-        'projectInstanceId': value.projectInstanceId,
-        'staticWebhookUrl': value.staticWebhookUrl,
-        'workflowId': value.workflowId,
-        '__version': value.version,
+        'inputs': value['inputs'],
+        'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(ProjectInstanceWorkflowConnectionModelToJSON)),
+        'enabled': value['enabled'],
+        'lastExecutionDate': value['lastExecutionDate'] == null ? undefined : ((value['lastExecutionDate']).toISOString()),
+        'projectInstanceId': value['projectInstanceId'],
+        'staticWebhookUrl': value['staticWebhookUrl'],
+        'workflowId': value['workflowId'],
+        '__version': value['version'],
     };
 }
 

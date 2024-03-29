@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,9 +37,7 @@ export interface OAuth2PropertiesModel {
  * Check if a given object implements the OAuth2PropertiesModel interface.
  */
 export function instanceOfOAuth2PropertiesModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function OAuth2PropertiesModelFromJSON(json: any): OAuth2PropertiesModel {
@@ -47,22 +45,19 @@ export function OAuth2PropertiesModelFromJSON(json: any): OAuth2PropertiesModel 
 }
 
 export function OAuth2PropertiesModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OAuth2PropertiesModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'redirectUri': !exists(json, 'redirectUri') ? undefined : json['redirectUri'],
-        'predefinedApps': !exists(json, 'predefinedApps') ? undefined : json['predefinedApps'],
+        'redirectUri': json['redirectUri'] == null ? undefined : json['redirectUri'],
+        'predefinedApps': json['predefinedApps'] == null ? undefined : json['predefinedApps'],
     };
 }
 
 export function OAuth2PropertiesModelToJSON(value?: OAuth2PropertiesModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         

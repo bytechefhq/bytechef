@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { HelpModel } from './HelpModel';
 import {
     HelpModelFromJSON,
@@ -56,10 +56,8 @@ export interface ActionDefinitionBasicModel {
  * Check if a given object implements the ActionDefinitionBasicModel interface.
  */
 export function instanceOfActionDefinitionBasicModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function ActionDefinitionBasicModelFromJSON(json: any): ActionDefinitionBasicModel {
@@ -67,31 +65,28 @@ export function ActionDefinitionBasicModelFromJSON(json: any): ActionDefinitionB
 }
 
 export function ActionDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ActionDefinitionBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
+        'description': json['description'] == null ? undefined : json['description'],
+        'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'title': !exists(json, 'title') ? undefined : json['title'],
+        'title': json['title'] == null ? undefined : json['title'],
     };
 }
 
 export function ActionDefinitionBasicModelToJSON(value?: ActionDefinitionBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'help': HelpModelToJSON(value.help),
-        'name': value.name,
-        'title': value.title,
+        'description': value['description'],
+        'help': HelpModelToJSON(value['help']),
+        'name': value['name'],
+        'title': value['title'],
     };
 }
 

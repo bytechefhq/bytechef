@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Definition of a connection to an outside service.
  * @export
@@ -49,11 +49,9 @@ export interface ConnectionDefinitionBasicModel {
  * Check if a given object implements the ConnectionDefinitionBasicModel interface.
  */
 export function instanceOfConnectionDefinitionBasicModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "version" in value;
-
-    return isInstance;
+    if (!('componentName' in value)) return false;
+    if (!('version' in value)) return false;
+    return true;
 }
 
 export function ConnectionDefinitionBasicModelFromJSON(json: any): ConnectionDefinitionBasicModel {
@@ -61,31 +59,28 @@ export function ConnectionDefinitionBasicModelFromJSON(json: any): ConnectionDef
 }
 
 export function ConnectionDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConnectionDefinitionBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'componentDescription': !exists(json, 'componentDescription') ? undefined : json['componentDescription'],
+        'componentDescription': json['componentDescription'] == null ? undefined : json['componentDescription'],
         'componentName': json['componentName'],
-        'componentTitle': !exists(json, 'componentTitle') ? undefined : json['componentTitle'],
+        'componentTitle': json['componentTitle'] == null ? undefined : json['componentTitle'],
         'version': json['version'],
     };
 }
 
 export function ConnectionDefinitionBasicModelToJSON(value?: ConnectionDefinitionBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'componentDescription': value.componentDescription,
-        'componentName': value.componentName,
-        'componentTitle': value.componentTitle,
-        'version': value.version,
+        'componentDescription': value['componentDescription'],
+        'componentName': value['componentName'],
+        'componentTitle': value['componentTitle'],
+        'version': value['version'],
     };
 }
 

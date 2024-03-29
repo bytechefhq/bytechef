@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Contains information about an error that happened during execution.
  * @export
@@ -37,9 +37,7 @@ export interface ExecutionErrorModel {
  * Check if a given object implements the ExecutionErrorModel interface.
  */
 export function instanceOfExecutionErrorModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function ExecutionErrorModelFromJSON(json: any): ExecutionErrorModel {
@@ -47,27 +45,24 @@ export function ExecutionErrorModelFromJSON(json: any): ExecutionErrorModel {
 }
 
 export function ExecutionErrorModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ExecutionErrorModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'message': !exists(json, 'message') ? undefined : json['message'],
-        'stackTrace': !exists(json, 'stackTrace') ? undefined : json['stackTrace'],
+        'message': json['message'] == null ? undefined : json['message'],
+        'stackTrace': json['stackTrace'] == null ? undefined : json['stackTrace'],
     };
 }
 
 export function ExecutionErrorModelToJSON(value?: ExecutionErrorModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'message': value.message,
-        'stackTrace': value.stackTrace,
+        'message': value['message'],
+        'stackTrace': value['stackTrace'],
     };
 }
 

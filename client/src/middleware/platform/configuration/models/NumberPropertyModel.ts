@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -110,9 +110,7 @@ export interface NumberPropertyModel extends ValuePropertyModel {
  * Check if a given object implements the NumberPropertyModel interface.
  */
 export function instanceOfNumberPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function NumberPropertyModelFromJSON(json: any): NumberPropertyModel {
@@ -120,41 +118,38 @@ export function NumberPropertyModelFromJSON(json: any): NumberPropertyModel {
 }
 
 export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): NumberPropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
-        'maxNumberPrecision': !exists(json, 'maxNumberPrecision') ? undefined : json['maxNumberPrecision'],
-        'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
-        'minNumberPrecision': !exists(json, 'minNumberPrecision') ? undefined : json['minNumberPrecision'],
-        'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
-        'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
-        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
+        'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
+        'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
+        'maxNumberPrecision': json['maxNumberPrecision'] == null ? undefined : json['maxNumberPrecision'],
+        'maxValue': json['maxValue'] == null ? undefined : json['maxValue'],
+        'minNumberPrecision': json['minNumberPrecision'] == null ? undefined : json['minNumberPrecision'],
+        'minValue': json['minValue'] == null ? undefined : json['minValue'],
+        'numberPrecision': json['numberPrecision'] == null ? undefined : json['numberPrecision'],
+        'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
 export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'defaultValue': value.defaultValue,
-        'exampleValue': value.exampleValue,
-        'maxNumberPrecision': value.maxNumberPrecision,
-        'maxValue': value.maxValue,
-        'minNumberPrecision': value.minNumberPrecision,
-        'minValue': value.minValue,
-        'numberPrecision': value.numberPrecision,
-        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
+        'defaultValue': value['defaultValue'],
+        'exampleValue': value['exampleValue'],
+        'maxNumberPrecision': value['maxNumberPrecision'],
+        'maxValue': value['maxValue'],
+        'minNumberPrecision': value['minNumberPrecision'],
+        'minValue': value['minValue'],
+        'numberPrecision': value['numberPrecision'],
+        'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': OptionsDataSourceModelToJSON(value['optionsDataSource']),
     };
 }
 

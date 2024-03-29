@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Defines valid property value.
  * @export
@@ -36,16 +36,14 @@ export interface OptionModel {
      * @type {any}
      * @memberof OptionModel
      */
-    value?: any | null;
+    value?: any;
 }
 
 /**
  * Check if a given object implements the OptionModel interface.
  */
 export function instanceOfOptionModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function OptionModelFromJSON(json: any): OptionModel {
@@ -53,29 +51,26 @@ export function OptionModelFromJSON(json: any): OptionModel {
 }
 
 export function OptionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OptionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'value': !exists(json, 'value') ? undefined : json['value'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'label': json['label'] == null ? undefined : json['label'],
+        'value': json['value'] == null ? undefined : json['value'],
     };
 }
 
 export function OptionModelToJSON(value?: OptionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'label': value.label,
-        'value': value.value,
+        'description': value['description'],
+        'label': value['label'],
+        'value': value['value'],
     };
 }
 

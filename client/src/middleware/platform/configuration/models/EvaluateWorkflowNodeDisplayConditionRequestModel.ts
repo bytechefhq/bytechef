@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface EvaluateWorkflowNodeDisplayConditionRequestModel {
  * Check if a given object implements the EvaluateWorkflowNodeDisplayConditionRequestModel interface.
  */
 export function instanceOfEvaluateWorkflowNodeDisplayConditionRequestModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "displayCondition" in value;
-
-    return isInstance;
+    if (!('displayCondition' in value)) return false;
+    return true;
 }
 
 export function EvaluateWorkflowNodeDisplayConditionRequestModelFromJSON(json: any): EvaluateWorkflowNodeDisplayConditionRequestModel {
@@ -42,7 +40,7 @@ export function EvaluateWorkflowNodeDisplayConditionRequestModelFromJSON(json: a
 }
 
 export function EvaluateWorkflowNodeDisplayConditionRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): EvaluateWorkflowNodeDisplayConditionRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function EvaluateWorkflowNodeDisplayConditionRequestModelFromJSONTyped(js
 }
 
 export function EvaluateWorkflowNodeDisplayConditionRequestModelToJSON(value?: EvaluateWorkflowNodeDisplayConditionRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'displayCondition': value.displayCondition,
+        'displayCondition': value['displayCondition'],
     };
 }
 

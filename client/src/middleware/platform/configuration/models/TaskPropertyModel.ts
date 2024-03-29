@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
@@ -44,9 +44,7 @@ export interface TaskPropertyModel extends PropertyModel {
  * Check if a given object implements the TaskPropertyModel interface.
  */
 export function instanceOfTaskPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function TaskPropertyModelFromJSON(json: any): TaskPropertyModel {
@@ -54,25 +52,22 @@ export function TaskPropertyModelFromJSON(json: any): TaskPropertyModel {
 }
 
 export function TaskPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskPropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'name': json['name'] == null ? undefined : json['name'],
     };
 }
 
 export function TaskPropertyModelToJSON(value?: TaskPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...PropertyModelToJSON(value),
-        'name': value.name,
+        'name': value['name'],
     };
 }
 

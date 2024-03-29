@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.
  * @export
@@ -61,9 +61,7 @@ export interface PageModel {
  * Check if a given object implements the PageModel interface.
  */
 export function instanceOfPageModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function PageModelFromJSON(json: any): PageModel {
@@ -71,35 +69,32 @@ export function PageModelFromJSON(json: any): PageModel {
 }
 
 export function PageModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'number': !exists(json, 'number') ? undefined : json['number'],
-        'size': !exists(json, 'size') ? undefined : json['size'],
-        'numberOfElements': !exists(json, 'numberOfElements') ? undefined : json['numberOfElements'],
-        'totalPages': !exists(json, 'totalPages') ? undefined : json['totalPages'],
-        'totalElements': !exists(json, 'totalElements') ? undefined : json['totalElements'],
-        'content': !exists(json, 'content') ? undefined : json['content'],
+        'number': json['number'] == null ? undefined : json['number'],
+        'size': json['size'] == null ? undefined : json['size'],
+        'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
+        'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
+        'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
+        'content': json['content'] == null ? undefined : json['content'],
     };
 }
 
 export function PageModelToJSON(value?: PageModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'number': value.number,
-        'size': value.size,
-        'numberOfElements': value.numberOfElements,
-        'totalPages': value.totalPages,
-        'totalElements': value.totalElements,
-        'content': value.content,
+        'number': value['number'],
+        'size': value['size'],
+        'numberOfElements': value['numberOfElements'],
+        'totalPages': value['totalPages'],
+        'totalElements': value['totalElements'],
+        'content': value['content'],
     };
 }
 

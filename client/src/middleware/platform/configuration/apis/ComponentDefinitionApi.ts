@@ -55,20 +55,23 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get a component definition
      */
     async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinitionModel>> {
-        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
-            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentDefinition.');
+        if (requestParameters['componentName'] == null) {
+            throw new runtime.RequiredError(
+                'componentName',
+                'Required parameter "componentName" was null or undefined when calling getComponentDefinition().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.componentVersion !== undefined) {
-            queryParameters['componentVersion'] = requestParameters.componentVersion;
+        if (requestParameters['componentVersion'] != null) {
+            queryParameters['componentVersion'] = requestParameters['componentVersion'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))),
+            path: `/component-definitions/{componentName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -91,8 +94,11 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all component definition versions of a component
      */
     async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
-        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
-            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentDefinitionVersions.');
+        if (requestParameters['componentName'] == null) {
+            throw new runtime.RequiredError(
+                'componentName',
+                'Required parameter "componentName" was null or undefined when calling getComponentDefinitionVersions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -100,7 +106,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))),
+            path: `/component-definitions/{componentName}/versions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -125,20 +131,20 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
         const queryParameters: any = {};
 
-        if (requestParameters.actionDefinitions !== undefined) {
-            queryParameters['actionDefinitions'] = requestParameters.actionDefinitions;
+        if (requestParameters['actionDefinitions'] != null) {
+            queryParameters['actionDefinitions'] = requestParameters['actionDefinitions'];
         }
 
-        if (requestParameters.connectionDefinitions !== undefined) {
-            queryParameters['connectionDefinitions'] = requestParameters.connectionDefinitions;
+        if (requestParameters['connectionDefinitions'] != null) {
+            queryParameters['connectionDefinitions'] = requestParameters['connectionDefinitions'];
         }
 
-        if (requestParameters.triggerDefinitions !== undefined) {
-            queryParameters['triggerDefinitions'] = requestParameters.triggerDefinitions;
+        if (requestParameters['triggerDefinitions'] != null) {
+            queryParameters['triggerDefinitions'] = requestParameters['triggerDefinitions'];
         }
 
-        if (requestParameters.include) {
-            queryParameters['include'] = requestParameters.include;
+        if (requestParameters['include'] != null) {
+            queryParameters['include'] = requestParameters['include'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -167,8 +173,11 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all compatible component definitions for a data stream component type
      */
     async getDataStreamComponentDefinitionsRaw(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
-        if (requestParameters.componentType === null || requestParameters.componentType === undefined) {
-            throw new runtime.RequiredError('componentType','Required parameter requestParameters.componentType was null or undefined when calling getDataStreamComponentDefinitions.');
+        if (requestParameters['componentType'] == null) {
+            throw new runtime.RequiredError(
+                'componentType',
+                'Required parameter "componentType" was null or undefined when calling getDataStreamComponentDefinitions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -176,7 +185,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/data-streams/{componentType}/component-definitions`.replace(`{${"componentType"}}`, encodeURIComponent(String(requestParameters.componentType))),
+            path: `/data-streams/{componentType}/component-definitions`.replace(`{${"componentType"}}`, encodeURIComponent(String(requestParameters['componentType']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

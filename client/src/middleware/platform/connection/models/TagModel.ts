@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * A tag.
  * @export
@@ -67,10 +67,8 @@ export interface TagModel {
  * Check if a given object implements the TagModel interface.
  */
 export function instanceOfTagModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function TagModelFromJSON(json: any): TagModel {
@@ -78,33 +76,30 @@ export function TagModelFromJSON(json: any): TagModel {
 }
 
 export function TagModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TagModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'id': json['id'] == null ? undefined : json['id'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function TagModelToJSON(value?: TagModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': value.id,
-        'name': value.name,
-        '__version': value.version,
+        'id': value['id'],
+        'name': value['name'],
+        '__version': value['version'],
     };
 }
 

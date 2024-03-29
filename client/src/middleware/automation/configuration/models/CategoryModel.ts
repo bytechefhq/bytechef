@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * A category.
  * @export
@@ -67,10 +67,8 @@ export interface CategoryModel {
  * Check if a given object implements the CategoryModel interface.
  */
 export function instanceOfCategoryModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function CategoryModelFromJSON(json: any): CategoryModel {
@@ -78,33 +76,30 @@ export function CategoryModelFromJSON(json: any): CategoryModel {
 }
 
 export function CategoryModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CategoryModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'id': !exists(json, 'id') ? undefined : json['id'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function CategoryModelToJSON(value?: CategoryModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': value.id,
-        'name': value.name,
-        '__version': value.version,
+        'id': value['id'],
+        'name': value['name'],
+        '__version': value['version'],
     };
 }
 

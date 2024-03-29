@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -98,9 +98,7 @@ export interface StringPropertyModel extends ValuePropertyModel {
  * Check if a given object implements the StringPropertyModel interface.
  */
 export function instanceOfStringPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function StringPropertyModelFromJSON(json: any): StringPropertyModel {
@@ -108,37 +106,34 @@ export function StringPropertyModelFromJSON(json: any): StringPropertyModel {
 }
 
 export function StringPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): StringPropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'languageId': !exists(json, 'languageId') ? undefined : json['languageId'],
-        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
-        'maxLength': !exists(json, 'maxLength') ? undefined : json['maxLength'],
-        'minLength': !exists(json, 'minLength') ? undefined : json['minLength'],
-        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
+        'languageId': json['languageId'] == null ? undefined : json['languageId'],
+        'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
+        'exampleValue': json['exampleValue'] == null ? undefined : json['exampleValue'],
+        'maxLength': json['maxLength'] == null ? undefined : json['maxLength'],
+        'minLength': json['minLength'] == null ? undefined : json['minLength'],
+        'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
 export function StringPropertyModelToJSON(value?: StringPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'languageId': value.languageId,
-        'defaultValue': value.defaultValue,
-        'exampleValue': value.exampleValue,
-        'maxLength': value.maxLength,
-        'minLength': value.minLength,
-        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
+        'languageId': value['languageId'],
+        'defaultValue': value['defaultValue'],
+        'exampleValue': value['exampleValue'],
+        'maxLength': value['maxLength'],
+        'minLength': value['minLength'],
+        'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': OptionsDataSourceModelToJSON(value['optionsDataSource']),
     };
 }
 

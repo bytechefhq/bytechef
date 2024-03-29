@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,10 +31,8 @@ export interface TaskDispatcherOperationRequestModel {
  * Check if a given object implements the TaskDispatcherOperationRequestModel interface.
  */
 export function instanceOfTaskDispatcherOperationRequestModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "parameters" in value;
-
-    return isInstance;
+    if (!('parameters' in value)) return false;
+    return true;
 }
 
 export function TaskDispatcherOperationRequestModelFromJSON(json: any): TaskDispatcherOperationRequestModel {
@@ -42,7 +40,7 @@ export function TaskDispatcherOperationRequestModelFromJSON(json: any): TaskDisp
 }
 
 export function TaskDispatcherOperationRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskDispatcherOperationRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -52,15 +50,12 @@ export function TaskDispatcherOperationRequestModelFromJSONTyped(json: any, igno
 }
 
 export function TaskDispatcherOperationRequestModelToJSON(value?: TaskDispatcherOperationRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'parameters': value.parameters,
+        'parameters': value['parameters'],
     };
 }
 

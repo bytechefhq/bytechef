@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JobModel } from './JobModel';
 import {
     JobModelFromJSON,
@@ -92,9 +92,7 @@ export interface WorkflowExecutionModel {
  * Check if a given object implements the WorkflowExecutionModel interface.
  */
 export function instanceOfWorkflowExecutionModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WorkflowExecutionModelFromJSON(json: any): WorkflowExecutionModel {
@@ -102,34 +100,31 @@ export function WorkflowExecutionModelFromJSON(json: any): WorkflowExecutionMode
 }
 
 export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowExecutionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
-        'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
-        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceBasicModelFromJSON(json['projectInstance']),
-        'triggerExecution': !exists(json, 'triggerExecution') ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
-        'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
+        'id': json['id'] == null ? undefined : json['id'],
+        'job': json['job'] == null ? undefined : JobModelFromJSON(json['job']),
+        'project': json['project'] == null ? undefined : ProjectBasicModelFromJSON(json['project']),
+        'projectInstance': json['projectInstance'] == null ? undefined : ProjectInstanceBasicModelFromJSON(json['projectInstance']),
+        'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
+        'workflow': json['workflow'] == null ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
 }
 
 export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'job': JobModelToJSON(value.job),
-        'project': ProjectBasicModelToJSON(value.project),
-        'projectInstance': ProjectInstanceBasicModelToJSON(value.projectInstance),
-        'triggerExecution': TriggerExecutionModelToJSON(value.triggerExecution),
-        'workflow': WorkflowBasicModelToJSON(value.workflow),
+        'job': JobModelToJSON(value['job']),
+        'project': ProjectBasicModelToJSON(value['project']),
+        'projectInstance': ProjectInstanceBasicModelToJSON(value['projectInstance']),
+        'triggerExecution': TriggerExecutionModelToJSON(value['triggerExecution']),
+        'workflow': WorkflowBasicModelToJSON(value['workflow']),
     };
 }
 

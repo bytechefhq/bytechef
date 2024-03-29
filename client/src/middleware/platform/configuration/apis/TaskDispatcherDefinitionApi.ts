@@ -44,12 +44,18 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      * Get a task dispatcher definition
      */
     async getTaskDispatcherDefinitionRaw(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherDefinitionModel>> {
-        if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
-            throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherDefinition.');
+        if (requestParameters['taskDispatcherName'] == null) {
+            throw new runtime.RequiredError(
+                'taskDispatcherName',
+                'Required parameter "taskDispatcherName" was null or undefined when calling getTaskDispatcherDefinition().'
+            );
         }
 
-        if (requestParameters.taskDispatcherVersion === null || requestParameters.taskDispatcherVersion === undefined) {
-            throw new runtime.RequiredError('taskDispatcherVersion','Required parameter requestParameters.taskDispatcherVersion was null or undefined when calling getTaskDispatcherDefinition.');
+        if (requestParameters['taskDispatcherVersion'] == null) {
+            throw new runtime.RequiredError(
+                'taskDispatcherVersion',
+                'Required parameter "taskDispatcherVersion" was null or undefined when calling getTaskDispatcherDefinition().'
+            );
         }
 
         const queryParameters: any = {};
@@ -57,7 +63,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))).replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters.taskDispatcherVersion))),
+            path: `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName']))).replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters['taskDispatcherVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -80,8 +86,11 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      * Get all task dispatcher definition versions of a task dispatcher
      */
     async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionBasicModel>>> {
-        if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
-            throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherDefinitionVersions.');
+        if (requestParameters['taskDispatcherName'] == null) {
+            throw new runtime.RequiredError(
+                'taskDispatcherName',
+                'Required parameter "taskDispatcherName" was null or undefined when calling getTaskDispatcherDefinitionVersions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -89,7 +98,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/task-dispatcher-definitions/{taskDispatcherName}/versions`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))),
+            path: `/task-dispatcher-definitions/{taskDispatcherName}/versions`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

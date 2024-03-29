@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The blueprint that describe the execution of a job.
  * @export
@@ -103,9 +103,7 @@ export interface WorkflowBasicModel {
  * Check if a given object implements the WorkflowBasicModel interface.
  */
 export function instanceOfWorkflowBasicModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WorkflowBasicModelFromJSON(json: any): WorkflowBasicModel {
@@ -113,38 +111,35 @@ export function WorkflowBasicModelFromJSON(json: any): WorkflowBasicModel {
 }
 
 export function WorkflowBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'connectionsCount': !exists(json, 'connectionsCount') ? undefined : json['connectionsCount'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'inputsCount': !exists(json, 'inputsCount') ? undefined : json['inputsCount'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'manualTrigger': !exists(json, 'manualTrigger') ? undefined : json['manualTrigger'],
-        'workflowTaskComponentNames': !exists(json, 'workflowTaskComponentNames') ? undefined : json['workflowTaskComponentNames'],
-        'workflowTriggerComponentNames': !exists(json, 'workflowTriggerComponentNames') ? undefined : json['workflowTriggerComponentNames'],
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'connectionsCount': json['connectionsCount'] == null ? undefined : json['connectionsCount'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'id': json['id'] == null ? undefined : json['id'],
+        'inputsCount': json['inputsCount'] == null ? undefined : json['inputsCount'],
+        'label': json['label'] == null ? undefined : json['label'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'manualTrigger': json['manualTrigger'] == null ? undefined : json['manualTrigger'],
+        'workflowTaskComponentNames': json['workflowTaskComponentNames'] == null ? undefined : json['workflowTaskComponentNames'],
+        'workflowTriggerComponentNames': json['workflowTriggerComponentNames'] == null ? undefined : json['workflowTriggerComponentNames'],
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function WorkflowBasicModelToJSON(value?: WorkflowBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        '__version': value.version,
+        'description': value['description'],
+        '__version': value['version'],
     };
 }
 

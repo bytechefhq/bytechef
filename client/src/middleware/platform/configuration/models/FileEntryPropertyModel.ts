@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -56,9 +56,7 @@ export interface FileEntryPropertyModel extends ValuePropertyModel {
  * Check if a given object implements the FileEntryPropertyModel interface.
  */
 export function instanceOfFileEntryPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function FileEntryPropertyModelFromJSON(json: any): FileEntryPropertyModel {
@@ -66,25 +64,22 @@ export function FileEntryPropertyModelFromJSON(json: any): FileEntryPropertyMode
 }
 
 export function FileEntryPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): FileEntryPropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
     };
 }
 
 export function FileEntryPropertyModelToJSON(value?: FileEntryPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
+        'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
     };
 }
 

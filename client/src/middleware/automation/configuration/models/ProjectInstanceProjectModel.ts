@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ProjectStatusModel } from './ProjectStatusModel';
 import {
     ProjectStatusModelFromJSON,
@@ -92,10 +92,8 @@ export interface ProjectInstanceProjectModel {
  * Check if a given object implements the ProjectInstanceProjectModel interface.
  */
 export function instanceOfProjectInstanceProjectModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function ProjectInstanceProjectModelFromJSON(json: any): ProjectInstanceProjectModel {
@@ -103,37 +101,34 @@ export function ProjectInstanceProjectModelFromJSON(json: any): ProjectInstanceP
 }
 
 export function ProjectInstanceProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstanceProjectModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'description': json['description'] == null ? undefined : json['description'],
+        'id': json['id'] == null ? undefined : json['id'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
-        'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'status': !exists(json, 'status') ? undefined : ProjectStatusModelFromJSON(json['status']),
+        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
+        'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'status': json['status'] == null ? undefined : ProjectStatusModelFromJSON(json['status']),
     };
 }
 
 export function ProjectInstanceProjectModelToJSON(value?: ProjectInstanceProjectModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'name': value.name,
-        'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
-        'status': ProjectStatusModelToJSON(value.status),
+        'description': value['description'],
+        'name': value['name'],
+        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
+        'status': ProjectStatusModelToJSON(value['status']),
     };
 }
 

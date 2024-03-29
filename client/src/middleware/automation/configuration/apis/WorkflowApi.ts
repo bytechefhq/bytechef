@@ -63,12 +63,18 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Delete a workflow
      */
     async deleteProjectWorkflowRaw(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteProjectWorkflow.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteProjectWorkflow().'
+            );
         }
 
-        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
-            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling deleteProjectWorkflow.');
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling deleteProjectWorkflow().'
+            );
         }
 
         const queryParameters: any = {};
@@ -76,7 +82,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/workflows/{workflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
+            path: `/projects/{id}/workflows/{workflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -98,12 +104,18 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Duplicates existing workflow.
      */
     async duplicateWorkflowRaw(requestParameters: DuplicateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling duplicateWorkflow.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling duplicateWorkflow().'
+            );
         }
 
-        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
-            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling duplicateWorkflow.');
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling duplicateWorkflow().'
+            );
         }
 
         const queryParameters: any = {};
@@ -111,7 +123,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/workflows/{workflowId}/duplicate`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
+            path: `/projects/{id}/workflows/{workflowId}/duplicate`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -138,12 +150,18 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Get workflows for particular project version.
      */
     async getProjectVersionWorkflowsRaw(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowBasicModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectVersionWorkflows.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getProjectVersionWorkflows().'
+            );
         }
 
-        if (requestParameters.projectVersion === null || requestParameters.projectVersion === undefined) {
-            throw new runtime.RequiredError('projectVersion','Required parameter requestParameters.projectVersion was null or undefined when calling getProjectVersionWorkflows.');
+        if (requestParameters['projectVersion'] == null) {
+            throw new runtime.RequiredError(
+                'projectVersion',
+                'Required parameter "projectVersion" was null or undefined when calling getProjectVersionWorkflows().'
+            );
         }
 
         const queryParameters: any = {};
@@ -151,7 +169,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/{projectVersion}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"projectVersion"}}`, encodeURIComponent(String(requestParameters.projectVersion))),
+            path: `/projects/{id}/{projectVersion}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"projectVersion"}}`, encodeURIComponent(String(requestParameters['projectVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -174,8 +192,11 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Get workflows for particular project.
      */
     async getProjectWorkflowsRaw(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowBasicModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectWorkflows.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getProjectWorkflows().'
+            );
         }
 
         const queryParameters: any = {};
@@ -183,7 +204,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -206,8 +227,11 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Get a workflow by id
      */
     async getWorkflowRaw(requestParameters: GetWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflow.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflow().'
+            );
         }
 
         const queryParameters: any = {};
@@ -215,7 +239,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -266,12 +290,18 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Update an existing workflow
      */
     async updateWorkflowRaw(requestParameters: UpdateWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateWorkflow.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateWorkflow().'
+            );
         }
 
-        if (requestParameters.workflowModel === null || requestParameters.workflowModel === undefined) {
-            throw new runtime.RequiredError('workflowModel','Required parameter requestParameters.workflowModel was null or undefined when calling updateWorkflow.');
+        if (requestParameters['workflowModel'] == null) {
+            throw new runtime.RequiredError(
+                'workflowModel',
+                'Required parameter "workflowModel" was null or undefined when calling updateWorkflow().'
+            );
         }
 
         const queryParameters: any = {};
@@ -281,11 +311,11 @@ export class WorkflowApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: WorkflowModelToJSON(requestParameters.workflowModel),
+            body: WorkflowModelToJSON(requestParameters['workflowModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));

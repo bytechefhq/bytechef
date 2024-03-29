@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { HelpModel } from './HelpModel';
 import {
     HelpModelFromJSON,
@@ -110,13 +110,11 @@ export interface TriggerDefinitionModel {
  * Check if a given object implements the TriggerDefinitionModel interface.
  */
 export function instanceOfTriggerDefinitionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "outputDefined" in value;
-    isInstance = isInstance && "outputFunctionDefined" in value;
-    isInstance = isInstance && "type" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('outputDefined' in value)) return false;
+    if (!('outputFunctionDefined' in value)) return false;
+    if (!('type' in value)) return false;
+    return true;
 }
 
 export function TriggerDefinitionModelFromJSON(json: any): TriggerDefinitionModel {
@@ -124,45 +122,42 @@ export function TriggerDefinitionModelFromJSON(json: any): TriggerDefinitionMode
 }
 
 export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerDefinitionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
-        'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'workflowNodeDescriptionDefined': !exists(json, 'workflowNodeDescriptionDefined') ? undefined : json['workflowNodeDescriptionDefined'],
-        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
+        'componentName': json['componentName'] == null ? undefined : json['componentName'],
+        'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
+        'help': json['help'] == null ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'],
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'title': !exists(json, 'title') ? undefined : json['title'],
+        'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
     };
 }
 
 export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'componentName': value.componentName,
-        'componentVersion': value.componentVersion,
-        'description': value.description,
-        'workflowNodeDescriptionDefined': value.workflowNodeDescriptionDefined,
-        'help': HelpModelToJSON(value.help),
-        'name': value.name,
-        'outputDefined': value.outputDefined,
-        'outputFunctionDefined': value.outputFunctionDefined,
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'title': value.title,
-        'type': TriggerTypeModelToJSON(value.type),
+        'componentName': value['componentName'],
+        'componentVersion': value['componentVersion'],
+        'description': value['description'],
+        'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],
+        'help': HelpModelToJSON(value['help']),
+        'name': value['name'],
+        'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
+        'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
+        'title': value['title'],
+        'type': TriggerTypeModelToJSON(value['type']),
     };
 }
 

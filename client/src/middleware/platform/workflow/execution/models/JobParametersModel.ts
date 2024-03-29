@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { JobConnectionModel } from './JobConnectionModel';
 import {
     JobConnectionModelFromJSON,
@@ -92,10 +92,8 @@ export interface JobParametersModel {
  * Check if a given object implements the JobParametersModel interface.
  */
 export function instanceOfJobParametersModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "workflowId" in value;
-
-    return isInstance;
+    if (!('workflowId' in value)) return false;
+    return true;
 }
 
 export function JobParametersModelFromJSON(json: any): JobParametersModel {
@@ -103,39 +101,36 @@ export function JobParametersModelFromJSON(json: any): JobParametersModel {
 }
 
 export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): JobParametersModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(JobConnectionModelFromJSON)),
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
-        'priority': !exists(json, 'priority') ? undefined : json['priority'],
-        'triggerOutputs': !exists(json, 'triggerOutputs') ? undefined : ((json['triggerOutputs'] as Array<any>).map(TriggerOutputModelFromJSON)),
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(JobConnectionModelFromJSON)),
+        'inputs': json['inputs'] == null ? undefined : json['inputs'],
+        'label': json['label'] == null ? undefined : json['label'],
+        'parentTaskExecutionId': json['parentTaskExecutionId'] == null ? undefined : json['parentTaskExecutionId'],
+        'priority': json['priority'] == null ? undefined : json['priority'],
+        'triggerOutputs': json['triggerOutputs'] == null ? undefined : ((json['triggerOutputs'] as Array<any>).map(TriggerOutputModelFromJSON)),
         'workflowId': json['workflowId'],
-        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
+        'webhooks': json['webhooks'] == null ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
     };
 }
 
 export function JobParametersModelToJSON(value?: JobParametersModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(JobConnectionModelToJSON)),
-        'inputs': value.inputs,
-        'label': value.label,
-        'parentTaskExecutionId': value.parentTaskExecutionId,
-        'priority': value.priority,
-        'triggerOutputs': value.triggerOutputs === undefined ? undefined : ((value.triggerOutputs as Array<any>).map(TriggerOutputModelToJSON)),
-        'workflowId': value.workflowId,
-        'webhooks': value.webhooks === undefined ? undefined : ((value.webhooks as Array<any>).map(WebhookModelToJSON)),
+        'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(JobConnectionModelToJSON)),
+        'inputs': value['inputs'],
+        'label': value['label'],
+        'parentTaskExecutionId': value['parentTaskExecutionId'],
+        'priority': value['priority'],
+        'triggerOutputs': value['triggerOutputs'] == null ? undefined : ((value['triggerOutputs'] as Array<any>).map(TriggerOutputModelToJSON)),
+        'workflowId': value['workflowId'],
+        'webhooks': value['webhooks'] == null ? undefined : ((value['webhooks'] as Array<any>).map(WebhookModelToJSON)),
     };
 }
 

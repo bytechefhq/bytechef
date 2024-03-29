@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * A set of available resources.
  * @export
@@ -31,9 +31,7 @@ export interface ResourcesModel {
  * Check if a given object implements the ResourcesModel interface.
  */
 export function instanceOfResourcesModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function ResourcesModelFromJSON(json: any): ResourcesModel {
@@ -41,25 +39,22 @@ export function ResourcesModelFromJSON(json: any): ResourcesModel {
 }
 
 export function ResourcesModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResourcesModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'documentationUrl': !exists(json, 'documentationUrl') ? undefined : json['documentationUrl'],
+        'documentationUrl': json['documentationUrl'] == null ? undefined : json['documentationUrl'],
     };
 }
 
 export function ResourcesModelToJSON(value?: ResourcesModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'documentationUrl': value.documentationUrl,
+        'documentationUrl': value['documentationUrl'],
     };
 }
 

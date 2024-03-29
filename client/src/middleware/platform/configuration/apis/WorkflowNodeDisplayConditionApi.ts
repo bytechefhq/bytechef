@@ -38,12 +38,18 @@ export class WorkflowNodeDisplayConditionApi extends runtime.BaseAPI {
      * Evaluate display condition for an action or trigger property
      */
     async evaluateWorkflowNodeDisplayConditionRaw(requestParameters: EvaluateWorkflowNodeDisplayConditionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling evaluateWorkflowNodeDisplayCondition.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling evaluateWorkflowNodeDisplayCondition().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling evaluateWorkflowNodeDisplayCondition.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling evaluateWorkflowNodeDisplayCondition().'
+            );
         }
 
         const queryParameters: any = {};
@@ -53,11 +59,11 @@ export class WorkflowNodeDisplayConditionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}/display-conditions/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            path: `/workflows/{id}/display-conditions/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EvaluateWorkflowNodeDisplayConditionRequestModelToJSON(requestParameters.evaluateWorkflowNodeDisplayConditionRequestModel),
+            body: EvaluateWorkflowNodeDisplayConditionRequestModelToJSON(requestParameters['evaluateWorkflowNodeDisplayConditionRequestModel']),
         }, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {

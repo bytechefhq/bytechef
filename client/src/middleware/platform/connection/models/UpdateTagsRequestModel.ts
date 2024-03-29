@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -38,9 +38,7 @@ export interface UpdateTagsRequestModel {
  * Check if a given object implements the UpdateTagsRequestModel interface.
  */
 export function instanceOfUpdateTagsRequestModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function UpdateTagsRequestModelFromJSON(json: any): UpdateTagsRequestModel {
@@ -48,25 +46,22 @@ export function UpdateTagsRequestModelFromJSON(json: any): UpdateTagsRequestMode
 }
 
 export function UpdateTagsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateTagsRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
+        'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
     };
 }
 
 export function UpdateTagsRequestModelToJSON(value?: UpdateTagsRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
+        'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
     };
 }
 

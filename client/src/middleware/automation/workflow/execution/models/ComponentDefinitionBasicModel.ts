@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
  * @export
@@ -67,11 +67,9 @@ export interface ComponentDefinitionBasicModel {
  * Check if a given object implements the ComponentDefinitionBasicModel interface.
  */
 export function instanceOfComponentDefinitionBasicModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "version" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('version' in value)) return false;
+    return true;
 }
 
 export function ComponentDefinitionBasicModelFromJSON(json: any): ComponentDefinitionBasicModel {
@@ -79,37 +77,34 @@ export function ComponentDefinitionBasicModelFromJSON(json: any): ComponentDefin
 }
 
 export function ComponentDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ComponentDefinitionBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'actionsCount': !exists(json, 'actionsCount') ? undefined : json['actionsCount'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'icon': !exists(json, 'icon') ? undefined : json['icon'],
+        'actionsCount': json['actionsCount'] == null ? undefined : json['actionsCount'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
-        'title': !exists(json, 'title') ? undefined : json['title'],
-        'triggersCount': !exists(json, 'triggersCount') ? undefined : json['triggersCount'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'triggersCount': json['triggersCount'] == null ? undefined : json['triggersCount'],
         'version': json['version'],
     };
 }
 
 export function ComponentDefinitionBasicModelToJSON(value?: ComponentDefinitionBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'actionsCount': value.actionsCount,
-        'description': value.description,
-        'icon': value.icon,
-        'name': value.name,
-        'title': value.title,
-        'triggersCount': value.triggersCount,
-        'version': value.version,
+        'actionsCount': value['actionsCount'],
+        'description': value['description'],
+        'icon': value['icon'],
+        'name': value['name'],
+        'title': value['title'],
+        'triggersCount': value['triggersCount'],
+        'version': value['version'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -96,9 +96,7 @@ export interface PropertyModel {
  * Check if a given object implements the PropertyModel interface.
  */
 export function instanceOfPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function PropertyModelFromJSON(json: any): PropertyModel {
@@ -106,7 +104,7 @@ export function PropertyModelFromJSON(json: any): PropertyModel {
 }
 
 export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     if (!ignoreDiscriminator) {
@@ -152,34 +150,31 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'advancedOption': !exists(json, 'advancedOption') ? undefined : json['advancedOption'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
-        'expressionEnabled': !exists(json, 'expressionEnabled') ? undefined : json['expressionEnabled'],
-        'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
-        'required': !exists(json, 'required') ? undefined : json['required'],
-        'type': !exists(json, 'type') ? undefined : PropertyTypeModelFromJSON(json['type']),
+        'advancedOption': json['advancedOption'] == null ? undefined : json['advancedOption'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'displayCondition': json['displayCondition'] == null ? undefined : json['displayCondition'],
+        'expressionEnabled': json['expressionEnabled'] == null ? undefined : json['expressionEnabled'],
+        'hidden': json['hidden'] == null ? undefined : json['hidden'],
+        'name': json['name'] == null ? undefined : json['name'],
+        'required': json['required'] == null ? undefined : json['required'],
+        'type': json['type'] == null ? undefined : PropertyTypeModelFromJSON(json['type']),
     };
 }
 
 export function PropertyModelToJSON(value?: PropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'advancedOption': value.advancedOption,
-        'description': value.description,
-        'displayCondition': value.displayCondition,
-        'expressionEnabled': value.expressionEnabled,
-        'hidden': value.hidden,
-        'name': value.name,
-        'required': value.required,
-        'type': PropertyTypeModelToJSON(value.type),
+        'advancedOption': value['advancedOption'],
+        'description': value['description'],
+        'displayCondition': value['displayCondition'],
+        'expressionEnabled': value['expressionEnabled'],
+        'hidden': value['hidden'],
+        'name': value['name'],
+        'required': value['required'],
+        'type': PropertyTypeModelToJSON(value['type']),
     };
 }
 

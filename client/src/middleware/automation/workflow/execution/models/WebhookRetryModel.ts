@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -49,9 +49,7 @@ export interface WebhookRetryModel {
  * Check if a given object implements the WebhookRetryModel interface.
  */
 export function instanceOfWebhookRetryModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WebhookRetryModelFromJSON(json: any): WebhookRetryModel {
@@ -59,31 +57,28 @@ export function WebhookRetryModelFromJSON(json: any): WebhookRetryModel {
 }
 
 export function WebhookRetryModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WebhookRetryModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'initialInterval': !exists(json, 'initialInterval') ? undefined : json['initialInterval'],
-        'maxInterval': !exists(json, 'maxInterval') ? undefined : json['maxInterval'],
-        'maxAttempts': !exists(json, 'maxAttempts') ? undefined : json['maxAttempts'],
-        'multiplier': !exists(json, 'multiplier') ? undefined : json['multiplier'],
+        'initialInterval': json['initialInterval'] == null ? undefined : json['initialInterval'],
+        'maxInterval': json['maxInterval'] == null ? undefined : json['maxInterval'],
+        'maxAttempts': json['maxAttempts'] == null ? undefined : json['maxAttempts'],
+        'multiplier': json['multiplier'] == null ? undefined : json['multiplier'],
     };
 }
 
 export function WebhookRetryModelToJSON(value?: WebhookRetryModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'initialInterval': value.initialInterval,
-        'maxInterval': value.maxInterval,
-        'maxAttempts': value.maxAttempts,
-        'multiplier': value.multiplier,
+        'initialInterval': value['initialInterval'],
+        'maxInterval': value['maxInterval'],
+        'maxAttempts': value['maxAttempts'],
+        'multiplier': value['multiplier'],
     };
 }
 

@@ -38,16 +38,25 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
      * Get dynamic properties for an action or trigger property shown in the editor
      */
     async getWorkflowNodeDynamicPropertiesRaw(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowNodeDynamicProperties.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowNodeDynamicProperties().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling getWorkflowNodeDynamicProperties.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getWorkflowNodeDynamicProperties().'
+            );
         }
 
-        if (requestParameters.propertyName === null || requestParameters.propertyName === undefined) {
-            throw new runtime.RequiredError('propertyName','Required parameter requestParameters.propertyName was null or undefined when calling getWorkflowNodeDynamicProperties.');
+        if (requestParameters['propertyName'] == null) {
+            throw new runtime.RequiredError(
+                'propertyName',
+                'Required parameter "propertyName" was null or undefined when calling getWorkflowNodeDynamicProperties().'
+            );
         }
 
         const queryParameters: any = {};
@@ -55,7 +64,7 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/dynamic-properties/{workflowNodeName}/properties/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters.propertyName))),
+            path: `/workflows/{id}/dynamic-properties/{workflowNodeName}/properties/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

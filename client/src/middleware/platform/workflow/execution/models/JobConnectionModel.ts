@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The connection used in a particular task.
  * @export
@@ -43,9 +43,7 @@ export interface JobConnectionModel {
  * Check if a given object implements the JobConnectionModel interface.
  */
 export function instanceOfJobConnectionModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function JobConnectionModelFromJSON(json: any): JobConnectionModel {
@@ -53,29 +51,26 @@ export function JobConnectionModelFromJSON(json: any): JobConnectionModel {
 }
 
 export function JobConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): JobConnectionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'key': !exists(json, 'key') ? undefined : json['key'],
-        'taskName': !exists(json, 'taskName') ? undefined : json['taskName'],
+        'id': json['id'] == null ? undefined : json['id'],
+        'key': json['key'] == null ? undefined : json['key'],
+        'taskName': json['taskName'] == null ? undefined : json['taskName'],
     };
 }
 
 export function JobConnectionModelToJSON(value?: JobConnectionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'id': value.id,
-        'key': value.key,
-        'taskName': value.taskName,
+        'id': value['id'],
+        'key': value['key'],
+        'taskName': value['taskName'],
     };
 }
 
