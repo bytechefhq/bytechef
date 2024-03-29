@@ -145,7 +145,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
             ) : (
                 <div className="flex size-full items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <div>Generate Schema</div>
+                        <span>Generate Schema</span>
 
                         <div className="inline-flex flex-col gap-3 rounded-md shadow-sm">
                             <Button
@@ -164,7 +164,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                                 {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
                             </Button>
 
-                            <div className="text-center">or</div>
+                            <span className="text-center">or</span>
 
                             <Button
                                 disabled={uploadSampleOutputRequestMutation.isPending}
