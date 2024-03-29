@@ -1,4 +1,4 @@
-package com.bytechef.automation.configuration.web.rest.model;
+package com.bytechef.automation.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,19 +17,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The status of a project.
+ * The environment of a connection.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-29T14:33:24.331772+01:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
-public enum ProjectStatusModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-29T14:33:23.983830+01:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+public enum EnvironmentModel {
   
-  DRAFT("DRAFT"),
+  DEVELOPMENT("DEVELOPMENT"),
   
-  PUBLISHED("PUBLISHED");
+  STAGING("STAGING"),
+  
+  PRODUCTION("PRODUCTION");
 
   private String value;
 
-  ProjectStatusModel(String value) {
+  EnvironmentModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +46,8 @@ public enum ProjectStatusModel {
   }
 
   @JsonCreator
-  public static ProjectStatusModel fromValue(String value) {
-    for (ProjectStatusModel b : ProjectStatusModel.values()) {
+  public static EnvironmentModel fromValue(String value) {
+    for (EnvironmentModel b : EnvironmentModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
