@@ -1,0 +1,110 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Teamwork API"
+  description: "Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently."
+  version: "v1"
+servers:
+  - url: "https://{yourSiteName}.teamwork.com/projects/api/v3"
+paths:
+  /companies.json:
+    post:
+      tags:
+        - "Companies"
+      summary: "Creates a company"
+      description: "Create a new company"
+      operationId: "createCompany"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Company"
+              properties:
+                company:
+                  properties:
+                    name:
+                      type: "string"
+                      description: "The name of the company"
+                    emailOne:
+                      type: "string"
+                      format: "email"
+                      title: "Email"
+                    phone:
+                      type: "string"
+                      description: "Phone number for the company."
+                    website:
+                      type: "string"
+                      description: "The company's website."
+      responses:
+        201:
+          description: "Response contains information about a specific company."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      name:
+                        type: "string"
+                      emailOne:
+                        type: "string"
+                      phone:
+                        type: "string"
+                      website:
+                        type: "string"
+  /tasklists/{tasklistId}/tasks.json:
+    post:
+      tags:
+        - "Tasks"
+      summary: "Creates a task"
+      description: "Create a new task"
+      operationId: "createTask"
+      parameters:
+        - name: "tasklistId"
+          description: "Task list where new task is added"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Task"
+              properties:
+                task:
+                  properties:
+                    name:
+                      type: "string"
+                      description: "Task name"
+                    description:
+                      type: "string"
+                    dueAt:
+                      type: "string"
+                      format: "date"
+      responses:
+        201:
+          description: "Response contains information about created task."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      name:
+                        type: "string"
+                      description:
+                        type: "string"
+                      dueAt:
+                        type: "string"
+components:
+  securitySchemes:
+    basicAuth:
+      type: "http"
+      scheme: "basic"
