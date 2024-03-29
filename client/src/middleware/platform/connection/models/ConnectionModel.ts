@@ -87,12 +87,6 @@ export interface ConnectionModel {
      */
     environment?: EnvironmentModel;
     /**
-     * The name of a connection.
-     * @type {string}
-     * @memberof ConnectionModel
-     */
-    name: string;
-    /**
      * The id of a connection.
      * @type {number}
      * @memberof ConnectionModel
@@ -110,6 +104,12 @@ export interface ConnectionModel {
      * @memberof ConnectionModel
      */
     readonly lastModifiedDate?: Date;
+    /**
+     * The name of a connection.
+     * @type {string}
+     * @memberof ConnectionModel
+     */
+    name: string;
     /**
      * The parameters of a connection.
      * @type {{ [key: string]: object; }}
@@ -158,10 +158,10 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusModelFromJSON(json['credentialStatus']),
         'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
-        'name': json['name'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'name': json['name'],
         'parameters': json['parameters'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
