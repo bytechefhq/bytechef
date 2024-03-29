@@ -31,7 +31,11 @@ public final class ProjectTag {
     @Column("tag_id")
     private AggregateReference<Tag, Long> tagId;
 
-    public ProjectTag() {
+    private ProjectTag() {
+    }
+
+    public ProjectTag(Long tagId) {
+        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }
 
     @Override
@@ -50,10 +54,6 @@ public final class ProjectTag {
     @Override
     public int hashCode() {
         return Objects.hash(tagId);
-    }
-
-    public ProjectTag(Long tagId) {
-        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }
 
     public Long getTagId() {
