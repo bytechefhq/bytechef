@@ -267,91 +267,88 @@ export const WorkflowExecutions = () => {
                 )
             }
             header={<PageHeader centerTitle={true} position="main" title="All Workflow Executions" />}
-            leftSidebarHeader={
-                <>
-                    <PageHeader position="sidebar" title="Execution History" />
+            leftSidebarBody={
+                <div className="space-y-4 px-4">
+                    <div className="flex flex-col space-y-2">
+                        <Label>Status</Label>
 
-                    <div className="space-y-4 px-4">
-                        <div className="flex flex-col space-y-2">
-                            <Label>Status</Label>
-
-                            <ComboBox items={jobStatusOptions} onChange={handleStatusChange} value={filterStatus} />
-                        </div>
-
-                        <div className="flex flex-col space-y-2">
-                            <Label>Start date</Label>
-
-                            <DatePicker onChange={handleStartDateChange} value={filterStartDate} />
-                        </div>
-
-                        <div className="flex flex-col space-y-2">
-                            <Label>End date</Label>
-
-                            <DatePicker onChange={handleEndDateChange} value={filterEndDate} />
-                        </div>
-
-                        <div className="flex flex-col space-y-2">
-                            <Label>Project</Label>
-
-                            <ComboBox
-                                items={
-                                    projects?.length
-                                        ? projects?.map((project) => ({
-                                              label: <ProjectLabel project={project} />,
-                                              value: project.id,
-                                          }))
-                                        : []
-                                }
-                                onChange={handleProjectChange}
-                                value={filterProjectId}
-                            />
-                        </div>
-
-                        <div className="flex flex-col space-y-2">
-                            <Label>Instance</Label>
-
-                            <ComboBox
-                                items={
-                                    projectInstances?.length
-                                        ? projectInstances?.map((projectInstance) => ({
-                                              label: (
-                                                  <span className="flex items-center">
-                                                      <span className="mr-1 ">{projectInstance.name}</span>
-
-                                                      <span className="text-xs text-gray-500">
-                                                          {projectInstance?.tags?.map((tag) => tag.name).join(', ')}
-                                                      </span>
-                                                  </span>
-                                              ),
-                                              value: projectInstance.id,
-                                          }))
-                                        : []
-                                }
-                                onChange={handleProjectInstanceChange}
-                                value={filterProjectInstanceId}
-                            />
-                        </div>
-
-                        <div className="flex flex-col space-y-2">
-                            <Label>Workflow</Label>
-
-                            <ComboBox
-                                items={
-                                    workflows?.length
-                                        ? workflows?.map((workflow) => ({
-                                              label: workflow.label || 'undefined label',
-                                              value: workflow.id,
-                                          }))
-                                        : []
-                                }
-                                maxHeight
-                                onChange={handleWorkflowChange}
-                                value={filterWorkflowId}
-                            />
-                        </div>
+                        <ComboBox items={jobStatusOptions} onChange={handleStatusChange} value={filterStatus} />
                     </div>
-                </>
+
+                    <div className="flex flex-col space-y-2">
+                        <Label>Start date</Label>
+
+                        <DatePicker onChange={handleStartDateChange} value={filterStartDate} />
+                    </div>
+
+                    <div className="flex flex-col space-y-2">
+                        <Label>End date</Label>
+
+                        <DatePicker onChange={handleEndDateChange} value={filterEndDate} />
+                    </div>
+
+                    <div className="flex flex-col space-y-2">
+                        <Label>Project</Label>
+
+                        <ComboBox
+                            items={
+                                projects?.length
+                                    ? projects?.map((project) => ({
+                                          label: <ProjectLabel project={project} />,
+                                          value: project.id,
+                                      }))
+                                    : []
+                            }
+                            onChange={handleProjectChange}
+                            value={filterProjectId}
+                        />
+                    </div>
+
+                    <div className="flex flex-col space-y-2">
+                        <Label>Instance</Label>
+
+                        <ComboBox
+                            items={
+                                projectInstances?.length
+                                    ? projectInstances?.map((projectInstance) => ({
+                                          label: (
+                                              <span className="flex items-center">
+                                                  <span className="mr-1 ">{projectInstance.name}</span>
+
+                                                  <span className="text-xs text-gray-500">
+                                                      {projectInstance?.tags?.map((tag) => tag.name).join(', ')}
+                                                  </span>
+                                              </span>
+                                          ),
+                                          value: projectInstance.id,
+                                      }))
+                                    : []
+                            }
+                            onChange={handleProjectInstanceChange}
+                            value={filterProjectInstanceId}
+                        />
+                    </div>
+
+                    <div className="flex flex-col space-y-2">
+                        <Label>Workflow</Label>
+
+                        <ComboBox
+                            items={
+                                workflows?.length
+                                    ? workflows?.map((workflow) => ({
+                                          label: workflow.label || 'undefined label',
+                                          value: workflow.id,
+                                      }))
+                                    : []
+                            }
+                            maxHeight
+                            onChange={handleWorkflowChange}
+                            value={filterWorkflowId}
+                        />
+                    </div>
+                </div>
             }
+            leftSidebarHeader={<PageHeader position="sidebar" title="Execution History" />}
             leftSidebarWidth="72"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
