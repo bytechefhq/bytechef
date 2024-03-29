@@ -311,8 +311,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "controlType": "SELECT",
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": null,
@@ -531,17 +534,17 @@
       "name": "basic_auth",
       "properties": [ {
         "advancedOption": null,
-        "description": null,
+        "description": "e.g. https://{yourSiteName}.teamwork.com",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
         "required": true,
-        "name": "username",
+        "name": "siteName",
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Username",
+        "label": "Your site name",
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
@@ -557,11 +560,11 @@
         "hidden": null,
         "metadata": { },
         "required": true,
-        "name": "password",
+        "name": "username",
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Password",
+        "label": "API Key",
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
