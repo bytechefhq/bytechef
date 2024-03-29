@@ -1,5 +1,5 @@
 [versions]
-ch-qos-logback = "1.5.1"
+ch-qos-logback = "1.5.3"
 checkstyle = "10.12.5"
 com-google-auto-service = "1.1.1"
 graalvm = "23.1.2"
@@ -10,7 +10,7 @@ java = "21"
 jib-gradle-plugin = "3.4.0"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.1.1"
-org-springdoc = "2.3.0"
+org-springdoc = "2.4.0"
 org-springframework-cloud-dependencies = "2023.0.1"
 pmd = "6.55.0"
 spotbugs = "4.8.3"
@@ -29,18 +29,18 @@ com-google-auto-service-auto-service-annotations = { module = "com.google.auto.s
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.20"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.20"
-jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.1.0-M1"
-org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.32.0"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.21"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.21"
+jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.1.0-M2"
+org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.33.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.5"
-org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.8.0.202311291450-r"
+org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r"
 org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref = "graalvm" }
 org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "graalvm" }
 org-graalvm-polyglot-polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvm" }
 org-graalvm-polyglot-python = { module = "org.graalvm.polyglot:python", version.ref = "graalvm" }
 org-graalvm-polyglot-ruby = { module = "org.graalvm.polyglot:ruby", version.ref = "graalvm" }
-org-json = "org.json:json:20240205"
+org-json = "org.json:json:20240303"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
@@ -48,12 +48,12 @@ org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processo
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
-org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.4.2"
+org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.5.1"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.24.13"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.25.20"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.4"
-org-openapi-generator = "org.openapi.generator:7.3.0"
 org-sonarqube = "org.sonarqube:4.2.1.3168"
+org-openapi-generator = "org.openapi.generator:7.4.0"
