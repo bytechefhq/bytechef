@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The connection used in a particular action task or trigger.
  * @export
@@ -43,12 +43,10 @@ export interface WorkflowTestConfigurationConnectionModel {
  * Check if a given object implements the WorkflowTestConfigurationConnectionModel interface.
  */
 export function instanceOfWorkflowTestConfigurationConnectionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "connectionId" in value;
-    isInstance = isInstance && "workflowConnectionKey" in value;
-    isInstance = isInstance && "workflowNodeName" in value;
-
-    return isInstance;
+    if (!('connectionId' in value)) return false;
+    if (!('workflowConnectionKey' in value)) return false;
+    if (!('workflowNodeName' in value)) return false;
+    return true;
 }
 
 export function WorkflowTestConfigurationConnectionModelFromJSON(json: any): WorkflowTestConfigurationConnectionModel {
@@ -56,7 +54,7 @@ export function WorkflowTestConfigurationConnectionModelFromJSON(json: any): Wor
 }
 
 export function WorkflowTestConfigurationConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowTestConfigurationConnectionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function WorkflowTestConfigurationConnectionModelFromJSONTyped(json: any,
 }
 
 export function WorkflowTestConfigurationConnectionModelToJSON(value?: WorkflowTestConfigurationConnectionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'connectionId': value.connectionId,
-        'workflowConnectionKey': value.workflowConnectionKey,
-        'workflowNodeName': value.workflowNodeName,
+        'connectionId': value['connectionId'],
+        'workflowConnectionKey': value['workflowConnectionKey'],
+        'workflowNodeName': value['workflowNodeName'],
     };
 }
 

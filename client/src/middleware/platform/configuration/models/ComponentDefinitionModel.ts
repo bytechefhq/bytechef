@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ActionDefinitionBasicModel } from './ActionDefinitionBasicModel';
 import {
     ActionDefinitionBasicModelFromJSON,
@@ -122,12 +122,10 @@ export interface ComponentDefinitionModel {
  * Check if a given object implements the ComponentDefinitionModel interface.
  */
 export function instanceOfComponentDefinitionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "connectionRequired" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "version" in value;
-
-    return isInstance;
+    if (!('connectionRequired' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('version' in value)) return false;
+    return true;
 }
 
 export function ComponentDefinitionModelFromJSON(json: any): ComponentDefinitionModel {
@@ -135,47 +133,44 @@ export function ComponentDefinitionModelFromJSON(json: any): ComponentDefinition
 }
 
 export function ComponentDefinitionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ComponentDefinitionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
-        'category': !exists(json, 'category') ? undefined : json['category'],
-        'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
+        'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
+        'category': json['category'] == null ? undefined : json['category'],
+        'connection': json['connection'] == null ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
         'connectionRequired': json['connectionRequired'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'icon': !exists(json, 'icon') ? undefined : json['icon'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'tags': !exists(json, 'tags') ? undefined : json['tags'],
-        'title': !exists(json, 'title') ? undefined : json['title'],
-        'triggers': !exists(json, 'triggers') ? undefined : ((json['triggers'] as Array<any>).map(TriggerDefinitionBasicModelFromJSON)),
+        'resources': json['resources'] == null ? undefined : ResourcesModelFromJSON(json['resources']),
+        'tags': json['tags'] == null ? undefined : json['tags'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'triggers': json['triggers'] == null ? undefined : ((json['triggers'] as Array<any>).map(TriggerDefinitionBasicModelFromJSON)),
         'version': json['version'],
     };
 }
 
 export function ComponentDefinitionModelToJSON(value?: ComponentDefinitionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionBasicModelToJSON)),
-        'category': value.category,
-        'connection': ConnectionDefinitionBasicModelToJSON(value.connection),
-        'connectionRequired': value.connectionRequired,
-        'description': value.description,
-        'icon': value.icon,
-        'name': value.name,
-        'resources': ResourcesModelToJSON(value.resources),
-        'tags': value.tags,
-        'title': value.title,
-        'triggers': value.triggers === undefined ? undefined : ((value.triggers as Array<any>).map(TriggerDefinitionBasicModelToJSON)),
-        'version': value.version,
+        'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicModelToJSON)),
+        'category': value['category'],
+        'connection': ConnectionDefinitionBasicModelToJSON(value['connection']),
+        'connectionRequired': value['connectionRequired'],
+        'description': value['description'],
+        'icon': value['icon'],
+        'name': value['name'],
+        'resources': ResourcesModelToJSON(value['resources']),
+        'tags': value['tags'],
+        'title': value['title'],
+        'triggers': value['triggers'] == null ? undefined : ((value['triggers'] as Array<any>).map(TriggerDefinitionBasicModelToJSON)),
+        'version': value['version'],
     };
 }
 

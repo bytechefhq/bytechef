@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Represents an execution of a workflow.
  * @export
@@ -105,12 +105,10 @@ export type JobBasicModelStatusEnum = typeof JobBasicModelStatusEnum[keyof typeo
  * Check if a given object implements the JobBasicModel interface.
  */
 export function instanceOfJobBasicModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "priority" in value;
-    isInstance = isInstance && "startDate" in value;
-    isInstance = isInstance && "status" in value;
-
-    return isInstance;
+    if (!('priority' in value)) return false;
+    if (!('startDate' in value)) return false;
+    if (!('status' in value)) return false;
+    return true;
 }
 
 export function JobBasicModelFromJSON(json: any): JobBasicModel {
@@ -118,35 +116,32 @@ export function JobBasicModelFromJSON(json: any): JobBasicModel {
 }
 
 export function JobBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): JobBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
+        'id': json['id'] == null ? undefined : json['id'],
+        'label': json['label'] == null ? undefined : json['label'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'priority': json['priority'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
+        'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
     };
 }
 
 export function JobBasicModelToJSON(value?: JobBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'endDate': value.endDate === undefined ? undefined : (value.endDate.toISOString()),
+        'endDate': value['endDate'] == null ? undefined : ((value['endDate']).toISOString()),
     };
 }
 

@@ -46,16 +46,25 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a trigger definition of a component
      */
     async getComponentTriggerDefinitionRaw(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerDefinitionModel>> {
-        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
-            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerDefinition.');
+        if (requestParameters['componentName'] == null) {
+            throw new runtime.RequiredError(
+                'componentName',
+                'Required parameter "componentName" was null or undefined when calling getComponentTriggerDefinition().'
+            );
         }
 
-        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
-            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentTriggerDefinition.');
+        if (requestParameters['componentVersion'] == null) {
+            throw new runtime.RequiredError(
+                'componentVersion',
+                'Required parameter "componentVersion" was null or undefined when calling getComponentTriggerDefinition().'
+            );
         }
 
-        if (requestParameters.triggerName === null || requestParameters.triggerName === undefined) {
-            throw new runtime.RequiredError('triggerName','Required parameter requestParameters.triggerName was null or undefined when calling getComponentTriggerDefinition.');
+        if (requestParameters['triggerName'] == null) {
+            throw new runtime.RequiredError(
+                'triggerName',
+                'Required parameter "triggerName" was null or undefined when calling getComponentTriggerDefinition().'
+            );
         }
 
         const queryParameters: any = {};
@@ -63,7 +72,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))).replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters.triggerName))),
+            path: `/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -86,12 +95,18 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a list of trigger definitionss for a component
      */
     async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasicModel>>> {
-        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
-            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerDefinitions.');
+        if (requestParameters['componentName'] == null) {
+            throw new runtime.RequiredError(
+                'componentName',
+                'Required parameter "componentName" was null or undefined when calling getComponentTriggerDefinitions().'
+            );
         }
 
-        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
-            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentTriggerDefinitions.');
+        if (requestParameters['componentVersion'] == null) {
+            throw new runtime.RequiredError(
+                'componentVersion',
+                'Required parameter "componentVersion" was null or undefined when calling getComponentTriggerDefinitions().'
+            );
         }
 
         const queryParameters: any = {};
@@ -99,7 +114,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/trigger-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))),
+            path: `/component-definitions/{componentName}/{componentVersion}/trigger-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

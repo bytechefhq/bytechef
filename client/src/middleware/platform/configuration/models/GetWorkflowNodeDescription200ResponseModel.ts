@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,9 +31,7 @@ export interface GetWorkflowNodeDescription200ResponseModel {
  * Check if a given object implements the GetWorkflowNodeDescription200ResponseModel interface.
  */
 export function instanceOfGetWorkflowNodeDescription200ResponseModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function GetWorkflowNodeDescription200ResponseModelFromJSON(json: any): GetWorkflowNodeDescription200ResponseModel {
@@ -41,25 +39,22 @@ export function GetWorkflowNodeDescription200ResponseModelFromJSON(json: any): G
 }
 
 export function GetWorkflowNodeDescription200ResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetWorkflowNodeDescription200ResponseModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
 export function GetWorkflowNodeDescription200ResponseModelToJSON(value?: GetWorkflowNodeDescription200ResponseModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
+        'description': value['description'],
     };
 }
 

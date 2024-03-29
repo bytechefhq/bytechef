@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ExecutionErrorModel } from './ExecutionErrorModel';
 import {
     ExecutionErrorModelFromJSON,
@@ -166,12 +166,10 @@ export type JobModelStatusEnum = typeof JobModelStatusEnum[keyof typeof JobModel
  * Check if a given object implements the JobModel interface.
  */
 export function instanceOfJobModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "priority" in value;
-    isInstance = isInstance && "startDate" in value;
-    isInstance = isInstance && "status" in value;
-
-    return isInstance;
+    if (!('priority' in value)) return false;
+    if (!('startDate' in value)) return false;
+    if (!('status' in value)) return false;
+    return true;
 }
 
 export function JobModelFromJSON(json: any): JobModel {
@@ -179,44 +177,41 @@ export function JobModelFromJSON(json: any): JobModel {
 }
 
 export function JobModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): JobModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'currentTask': !exists(json, 'currentTask') ? undefined : json['currentTask'],
-        'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
-        'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
-        'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'currentTask': json['currentTask'] == null ? undefined : json['currentTask'],
+        'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
+        'error': json['error'] == null ? undefined : ExecutionErrorModelFromJSON(json['error']),
+        'id': json['id'] == null ? undefined : json['id'],
+        'inputs': json['inputs'] == null ? undefined : json['inputs'],
+        'label': json['label'] == null ? undefined : json['label'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'outputs': json['outputs'] == null ? undefined : json['outputs'],
+        'parentTaskExecutionId': json['parentTaskExecutionId'] == null ? undefined : json['parentTaskExecutionId'],
         'priority': json['priority'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'taskExecutions': !exists(json, 'taskExecutions') ? undefined : ((json['taskExecutions'] as Array<any>).map(TaskExecutionModelFromJSON)),
-        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
-        'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
+        'taskExecutions': json['taskExecutions'] == null ? undefined : ((json['taskExecutions'] as Array<any>).map(TaskExecutionModelFromJSON)),
+        'webhooks': json['webhooks'] == null ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
+        'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
     };
 }
 
 export function JobModelToJSON(value?: JobModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'endDate': value.endDate === undefined ? undefined : (value.endDate.toISOString()),
-        'error': ExecutionErrorModelToJSON(value.error),
-        'taskExecutions': value.taskExecutions === undefined ? undefined : ((value.taskExecutions as Array<any>).map(TaskExecutionModelToJSON)),
+        'endDate': value['endDate'] == null ? undefined : ((value['endDate']).toISOString()),
+        'error': ExecutionErrorModelToJSON(value['error']),
+        'taskExecutions': value['taskExecutions'] == null ? undefined : ((value['taskExecutions'] as Array<any>).map(TaskExecutionModelToJSON)),
     };
 }
 

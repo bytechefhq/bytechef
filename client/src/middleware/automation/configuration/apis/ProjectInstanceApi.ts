@@ -86,8 +86,11 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Create a new project instance
      */
     async createProjectInstanceRaw(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
-        if (requestParameters.projectInstanceModel === null || requestParameters.projectInstanceModel === undefined) {
-            throw new runtime.RequiredError('projectInstanceModel','Required parameter requestParameters.projectInstanceModel was null or undefined when calling createProjectInstance.');
+        if (requestParameters['projectInstanceModel'] == null) {
+            throw new runtime.RequiredError(
+                'projectInstanceModel',
+                'Required parameter "projectInstanceModel" was null or undefined when calling createProjectInstance().'
+            );
         }
 
         const queryParameters: any = {};
@@ -101,7 +104,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectInstanceModelToJSON(requestParameters.projectInstanceModel),
+            body: ProjectInstanceModelToJSON(requestParameters['projectInstanceModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
@@ -121,12 +124,18 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Create a request for running a new job
      */
     async createProjectInstanceWorkflowJobRaw(requestParameters: CreateProjectInstanceWorkflowJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectInstanceWorkflowJob200ResponseModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createProjectInstanceWorkflowJob.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling createProjectInstanceWorkflowJob().'
+            );
         }
 
-        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
-            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling createProjectInstanceWorkflowJob.');
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling createProjectInstanceWorkflowJob().'
+            );
         }
 
         const queryParameters: any = {};
@@ -134,7 +143,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}/workflows/{workflowId}/jobs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
+            path: `/project-instances/{id}/workflows/{workflowId}/jobs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -157,8 +166,11 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Delete a project instance
      */
     async deleteProjectInstanceRaw(requestParameters: DeleteProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteProjectInstance.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteProjectInstance().'
+            );
         }
 
         const queryParameters: any = {};
@@ -166,7 +178,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -188,12 +200,18 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Enable/disable a project instance
      */
     async enableProjectInstanceRaw(requestParameters: EnableProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling enableProjectInstance.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling enableProjectInstance().'
+            );
         }
 
-        if (requestParameters.enable === null || requestParameters.enable === undefined) {
-            throw new runtime.RequiredError('enable','Required parameter requestParameters.enable was null or undefined when calling enableProjectInstance.');
+        if (requestParameters['enable'] == null) {
+            throw new runtime.RequiredError(
+                'enable',
+                'Required parameter "enable" was null or undefined when calling enableProjectInstance().'
+            );
         }
 
         const queryParameters: any = {};
@@ -201,7 +219,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters.enable))),
+            path: `/project-instances/{id}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -223,16 +241,25 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Enable/disable a workflow of a project instance
      */
     async enableProjectInstanceWorkflowRaw(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling enableProjectInstanceWorkflow.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling enableProjectInstanceWorkflow().'
+            );
         }
 
-        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
-            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling enableProjectInstanceWorkflow.');
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling enableProjectInstanceWorkflow().'
+            );
         }
 
-        if (requestParameters.enable === null || requestParameters.enable === undefined) {
-            throw new runtime.RequiredError('enable','Required parameter requestParameters.enable was null or undefined when calling enableProjectInstanceWorkflow.');
+        if (requestParameters['enable'] == null) {
+            throw new runtime.RequiredError(
+                'enable',
+                'Required parameter "enable" was null or undefined when calling enableProjectInstanceWorkflow().'
+            );
         }
 
         const queryParameters: any = {};
@@ -240,7 +267,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}/workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters.enable))),
+            path: `/project-instances/{id}/workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -262,8 +289,11 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Get a project instance by id
      */
     async getProjectInstanceRaw(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectInstance.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getProjectInstance().'
+            );
         }
 
         const queryParameters: any = {};
@@ -271,7 +301,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -296,16 +326,16 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
     async getProjectInstancesRaw(requestParameters: GetProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
         const queryParameters: any = {};
 
-        if (requestParameters.environment !== undefined) {
-            queryParameters['environment'] = requestParameters.environment;
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
         }
 
-        if (requestParameters.projectId !== undefined) {
-            queryParameters['projectId'] = requestParameters.projectId;
+        if (requestParameters['projectId'] != null) {
+            queryParameters['projectId'] = requestParameters['projectId'];
         }
 
-        if (requestParameters.tagId !== undefined) {
-            queryParameters['tagId'] = requestParameters.tagId;
+        if (requestParameters['tagId'] != null) {
+            queryParameters['tagId'] = requestParameters['tagId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -334,12 +364,18 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Update an existing project instance
      */
     async updateProjectInstanceRaw(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectInstance.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateProjectInstance().'
+            );
         }
 
-        if (requestParameters.projectInstanceModel === null || requestParameters.projectInstanceModel === undefined) {
-            throw new runtime.RequiredError('projectInstanceModel','Required parameter requestParameters.projectInstanceModel was null or undefined when calling updateProjectInstance.');
+        if (requestParameters['projectInstanceModel'] == null) {
+            throw new runtime.RequiredError(
+                'projectInstanceModel',
+                'Required parameter "projectInstanceModel" was null or undefined when calling updateProjectInstance().'
+            );
         }
 
         const queryParameters: any = {};
@@ -349,11 +385,11 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectInstanceModelToJSON(requestParameters.projectInstanceModel),
+            body: ProjectInstanceModelToJSON(requestParameters['projectInstanceModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
@@ -373,16 +409,25 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      * Update an existing project instance workflow
      */
     async updateProjectInstanceWorkflowRaw(requestParameters: UpdateProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceWorkflowModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectInstanceWorkflow.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateProjectInstanceWorkflow().'
+            );
         }
 
-        if (requestParameters.projectInstanceWorkflowId === null || requestParameters.projectInstanceWorkflowId === undefined) {
-            throw new runtime.RequiredError('projectInstanceWorkflowId','Required parameter requestParameters.projectInstanceWorkflowId was null or undefined when calling updateProjectInstanceWorkflow.');
+        if (requestParameters['projectInstanceWorkflowId'] == null) {
+            throw new runtime.RequiredError(
+                'projectInstanceWorkflowId',
+                'Required parameter "projectInstanceWorkflowId" was null or undefined when calling updateProjectInstanceWorkflow().'
+            );
         }
 
-        if (requestParameters.projectInstanceWorkflowModel === null || requestParameters.projectInstanceWorkflowModel === undefined) {
-            throw new runtime.RequiredError('projectInstanceWorkflowModel','Required parameter requestParameters.projectInstanceWorkflowModel was null or undefined when calling updateProjectInstanceWorkflow.');
+        if (requestParameters['projectInstanceWorkflowModel'] == null) {
+            throw new runtime.RequiredError(
+                'projectInstanceWorkflowModel',
+                'Required parameter "projectInstanceWorkflowModel" was null or undefined when calling updateProjectInstanceWorkflow().'
+            );
         }
 
         const queryParameters: any = {};
@@ -392,11 +437,11 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"projectInstanceWorkflowId"}}`, encodeURIComponent(String(requestParameters.projectInstanceWorkflowId))),
+            path: `/project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"projectInstanceWorkflowId"}}`, encodeURIComponent(String(requestParameters['projectInstanceWorkflowId']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ProjectInstanceWorkflowModelToJSON(requestParameters.projectInstanceWorkflowModel),
+            body: ProjectInstanceWorkflowModelToJSON(requestParameters['projectInstanceWorkflowModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceWorkflowModelFromJSON(jsonValue));

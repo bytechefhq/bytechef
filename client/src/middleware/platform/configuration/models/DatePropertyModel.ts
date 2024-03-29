@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -80,9 +80,7 @@ export interface DatePropertyModel extends ValuePropertyModel {
  * Check if a given object implements the DatePropertyModel interface.
  */
 export function instanceOfDatePropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function DatePropertyModelFromJSON(json: any): DatePropertyModel {
@@ -90,31 +88,28 @@ export function DatePropertyModelFromJSON(json: any): DatePropertyModel {
 }
 
 export function DatePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DatePropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'defaultValue': !exists(json, 'defaultValue') ? undefined : (new Date(json['defaultValue'])),
-        'exampleValue': !exists(json, 'exampleValue') ? undefined : (new Date(json['exampleValue'])),
-        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
+        'defaultValue': json['defaultValue'] == null ? undefined : (new Date(json['defaultValue'])),
+        'exampleValue': json['exampleValue'] == null ? undefined : (new Date(json['exampleValue'])),
+        'options': json['options'] == null ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': json['optionsDataSource'] == null ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
 export function DatePropertyModelToJSON(value?: DatePropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'defaultValue': value.defaultValue === undefined ? undefined : (value.defaultValue.toISOString().substring(0,10)),
-        'exampleValue': value.exampleValue === undefined ? undefined : (value.exampleValue.toISOString().substring(0,10)),
-        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
+        'defaultValue': value['defaultValue'] == null ? undefined : ((value['defaultValue']).toISOString().substring(0,10)),
+        'exampleValue': value['exampleValue'] == null ? undefined : ((value['exampleValue']).toISOString().substring(0,10)),
+        'options': value['options'] == null ? undefined : ((value['options'] as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': OptionsDataSourceModelToJSON(value['optionsDataSource']),
     };
 }
 

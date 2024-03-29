@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ComponentDefinitionBasicModel } from './ComponentDefinitionBasicModel';
 import {
     ComponentDefinitionBasicModelFromJSON,
@@ -190,12 +190,10 @@ export type TriggerExecutionModelStatusEnum = typeof TriggerExecutionModelStatus
  * Check if a given object implements the TriggerExecutionModel interface.
  */
 export function instanceOfTriggerExecutionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "priority" in value;
-    isInstance = isInstance && "startDate" in value;
-    isInstance = isInstance && "status" in value;
-
-    return isInstance;
+    if (!('priority' in value)) return false;
+    if (!('startDate' in value)) return false;
+    if (!('status' in value)) return false;
+    return true;
 }
 
 export function TriggerExecutionModelFromJSON(json: any): TriggerExecutionModel {
@@ -203,49 +201,46 @@ export function TriggerExecutionModelFromJSON(json: any): TriggerExecutionModel 
 }
 
 export function TriggerExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerExecutionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'batch': !exists(json, 'batch') ? undefined : json['batch'],
-        'component': !exists(json, 'component') ? undefined : ComponentDefinitionBasicModelFromJSON(json['component']),
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
-        'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
-        'executionTime': !exists(json, 'executionTime') ? undefined : json['executionTime'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'input': !exists(json, 'input') ? undefined : json['input'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
-        'output': !exists(json, 'output') ? undefined : json['output'],
+        'batch': json['batch'] == null ? undefined : json['batch'],
+        'component': json['component'] == null ? undefined : ComponentDefinitionBasicModelFromJSON(json['component']),
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
+        'error': json['error'] == null ? undefined : ExecutionErrorModelFromJSON(json['error']),
+        'executionTime': json['executionTime'] == null ? undefined : json['executionTime'],
+        'id': json['id'] == null ? undefined : json['id'],
+        'input': json['input'] == null ? undefined : json['input'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'maxRetries': json['maxRetries'] == null ? undefined : json['maxRetries'],
+        'output': json['output'] == null ? undefined : json['output'],
         'priority': json['priority'],
-        'retryAttempts': !exists(json, 'retryAttempts') ? undefined : json['retryAttempts'],
-        'retryDelay': !exists(json, 'retryDelay') ? undefined : json['retryDelay'],
-        'retryDelayFactor': !exists(json, 'retryDelayFactor') ? undefined : json['retryDelayFactor'],
-        'retryDelayMillis': !exists(json, 'retryDelayMillis') ? undefined : json['retryDelayMillis'],
+        'retryAttempts': json['retryAttempts'] == null ? undefined : json['retryAttempts'],
+        'retryDelay': json['retryDelay'] == null ? undefined : json['retryDelay'],
+        'retryDelayFactor': json['retryDelayFactor'] == null ? undefined : json['retryDelayFactor'],
+        'retryDelayMillis': json['retryDelayMillis'] == null ? undefined : json['retryDelayMillis'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'workflowTrigger': !exists(json, 'workflowTrigger') ? undefined : WorkflowTriggerModelFromJSON(json['workflowTrigger']),
-        'type': !exists(json, 'type') ? undefined : json['type'],
+        'workflowTrigger': json['workflowTrigger'] == null ? undefined : WorkflowTriggerModelFromJSON(json['workflowTrigger']),
+        'type': json['type'] == null ? undefined : json['type'],
     };
 }
 
 export function TriggerExecutionModelToJSON(value?: TriggerExecutionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'batch': value.batch,
-        'component': ComponentDefinitionBasicModelToJSON(value.component),
-        'error': ExecutionErrorModelToJSON(value.error),
-        'workflowTrigger': WorkflowTriggerModelToJSON(value.workflowTrigger),
+        'batch': value['batch'],
+        'component': ComponentDefinitionBasicModelToJSON(value['component']),
+        'error': ExecutionErrorModelToJSON(value['error']),
+        'workflowTrigger': WorkflowTriggerModelToJSON(value['workflowTrigger']),
     };
 }
 

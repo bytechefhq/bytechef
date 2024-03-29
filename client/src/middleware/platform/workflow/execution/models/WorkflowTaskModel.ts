@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { DataStreamComponentModel } from './DataStreamComponentModel';
 import {
     DataStreamComponentModelFromJSON,
@@ -110,11 +110,9 @@ export interface WorkflowTaskModel {
  * Check if a given object implements the WorkflowTaskModel interface.
  */
 export function instanceOfWorkflowTaskModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "type" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('type' in value)) return false;
+    return true;
 }
 
 export function WorkflowTaskModelFromJSON(json: any): WorkflowTaskModel {
@@ -122,46 +120,43 @@ export function WorkflowTaskModelFromJSON(json: any): WorkflowTaskModel {
 }
 
 export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowTaskModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
-        'destination': !exists(json, 'destination') ? undefined : DataStreamComponentModelFromJSON(json['destination']),
-        'finalize': !exists(json, 'finalize') ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskModelFromJSON)),
-        'label': !exists(json, 'label') ? undefined : json['label'],
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
+        'destination': json['destination'] == null ? undefined : DataStreamComponentModelFromJSON(json['destination']),
+        'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskModelFromJSON)),
+        'label': json['label'] == null ? undefined : json['label'],
         'name': json['name'],
-        'node': !exists(json, 'node') ? undefined : json['node'],
-        'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
-        'post': !exists(json, 'post') ? undefined : ((json['post'] as Array<any>).map(WorkflowTaskModelFromJSON)),
-        'pre': !exists(json, 'pre') ? undefined : ((json['pre'] as Array<any>).map(WorkflowTaskModelFromJSON)),
-        'source': !exists(json, 'source') ? undefined : DataStreamComponentModelFromJSON(json['source']),
-        'timeout': !exists(json, 'timeout') ? undefined : json['timeout'],
+        'node': json['node'] == null ? undefined : json['node'],
+        'parameters': json['parameters'] == null ? undefined : json['parameters'],
+        'post': json['post'] == null ? undefined : ((json['post'] as Array<any>).map(WorkflowTaskModelFromJSON)),
+        'pre': json['pre'] == null ? undefined : ((json['pre'] as Array<any>).map(WorkflowTaskModelFromJSON)),
+        'source': json['source'] == null ? undefined : DataStreamComponentModelFromJSON(json['source']),
+        'timeout': json['timeout'] == null ? undefined : json['timeout'],
         'type': json['type'],
     };
 }
 
 export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'destination': DataStreamComponentModelToJSON(value.destination),
-        'finalize': value.finalize === undefined ? undefined : ((value.finalize as Array<any>).map(WorkflowTaskModelToJSON)),
-        'label': value.label,
-        'name': value.name,
-        'node': value.node,
-        'parameters': value.parameters,
-        'post': value.post === undefined ? undefined : ((value.post as Array<any>).map(WorkflowTaskModelToJSON)),
-        'pre': value.pre === undefined ? undefined : ((value.pre as Array<any>).map(WorkflowTaskModelToJSON)),
-        'source': DataStreamComponentModelToJSON(value.source),
-        'timeout': value.timeout,
-        'type': value.type,
+        'destination': DataStreamComponentModelToJSON(value['destination']),
+        'finalize': value['finalize'] == null ? undefined : ((value['finalize'] as Array<any>).map(WorkflowTaskModelToJSON)),
+        'label': value['label'],
+        'name': value['name'],
+        'node': value['node'],
+        'parameters': value['parameters'],
+        'post': value['post'] == null ? undefined : ((value['post'] as Array<any>).map(WorkflowTaskModelToJSON)),
+        'pre': value['pre'] == null ? undefined : ((value['pre'] as Array<any>).map(WorkflowTaskModelToJSON)),
+        'source': DataStreamComponentModelToJSON(value['source']),
+        'timeout': value['timeout'],
+        'type': value['type'],
     };
 }
 

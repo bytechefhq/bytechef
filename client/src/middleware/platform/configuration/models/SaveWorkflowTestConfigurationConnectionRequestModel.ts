@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,9 +31,7 @@ export interface SaveWorkflowTestConfigurationConnectionRequestModel {
  * Check if a given object implements the SaveWorkflowTestConfigurationConnectionRequestModel interface.
  */
 export function instanceOfSaveWorkflowTestConfigurationConnectionRequestModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function SaveWorkflowTestConfigurationConnectionRequestModelFromJSON(json: any): SaveWorkflowTestConfigurationConnectionRequestModel {
@@ -41,25 +39,22 @@ export function SaveWorkflowTestConfigurationConnectionRequestModelFromJSON(json
 }
 
 export function SaveWorkflowTestConfigurationConnectionRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): SaveWorkflowTestConfigurationConnectionRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'connectionId': !exists(json, 'connectionId') ? undefined : json['connectionId'],
+        'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
     };
 }
 
 export function SaveWorkflowTestConfigurationConnectionRequestModelToJSON(value?: SaveWorkflowTestConfigurationConnectionRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'connectionId': value.connectionId,
+        'connectionId': value['connectionId'],
     };
 }
 

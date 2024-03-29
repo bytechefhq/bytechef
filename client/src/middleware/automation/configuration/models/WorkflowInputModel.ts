@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -49,10 +49,8 @@ export interface WorkflowInputModel {
  * Check if a given object implements the WorkflowInputModel interface.
  */
 export function instanceOfWorkflowInputModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function WorkflowInputModelFromJSON(json: any): WorkflowInputModel {
@@ -60,31 +58,28 @@ export function WorkflowInputModelFromJSON(json: any): WorkflowInputModel {
 }
 
 export function WorkflowInputModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowInputModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'label': !exists(json, 'label') ? undefined : json['label'],
+        'label': json['label'] == null ? undefined : json['label'],
         'name': json['name'],
-        'required': !exists(json, 'required') ? undefined : json['required'],
-        'type': !exists(json, 'type') ? undefined : json['type'],
+        'required': json['required'] == null ? undefined : json['required'],
+        'type': json['type'] == null ? undefined : json['type'],
     };
 }
 
 export function WorkflowInputModelToJSON(value?: WorkflowInputModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'label': value.label,
-        'name': value.name,
-        'required': value.required,
-        'type': value.type,
+        'label': value['label'],
+        'name': value['name'],
+        'required': value['required'],
+        'type': value['type'],
     };
 }
 

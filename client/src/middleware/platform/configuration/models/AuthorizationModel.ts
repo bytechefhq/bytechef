@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AuthorizationTypeModel } from './AuthorizationTypeModel';
 import {
     AuthorizationTypeModelFromJSON,
@@ -68,9 +68,7 @@ export interface AuthorizationModel {
  * Check if a given object implements the AuthorizationModel interface.
  */
 export function instanceOfAuthorizationModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function AuthorizationModelFromJSON(json: any): AuthorizationModel {
@@ -78,33 +76,30 @@ export function AuthorizationModelFromJSON(json: any): AuthorizationModel {
 }
 
 export function AuthorizationModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): AuthorizationModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'title': !exists(json, 'title') ? undefined : json['title'],
-        'type': !exists(json, 'type') ? undefined : AuthorizationTypeModelFromJSON(json['type']),
+        'description': json['description'] == null ? undefined : json['description'],
+        'name': json['name'] == null ? undefined : json['name'],
+        'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'title': json['title'] == null ? undefined : json['title'],
+        'type': json['type'] == null ? undefined : AuthorizationTypeModelFromJSON(json['type']),
     };
 }
 
 export function AuthorizationModelToJSON(value?: AuthorizationModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'name': value.name,
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'title': value.title,
-        'type': AuthorizationTypeModelToJSON(value.type),
+        'description': value['description'],
+        'name': value['name'],
+        'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
+        'title': value['title'],
+        'type': AuthorizationTypeModelToJSON(value['type']),
     };
 }
 

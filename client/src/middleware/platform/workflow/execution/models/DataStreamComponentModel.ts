@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The source/destination data stream component.
  * @export
@@ -37,9 +37,7 @@ export interface DataStreamComponentModel {
  * Check if a given object implements the DataStreamComponentModel interface.
  */
 export function instanceOfDataStreamComponentModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function DataStreamComponentModelFromJSON(json: any): DataStreamComponentModel {
@@ -47,27 +45,24 @@ export function DataStreamComponentModelFromJSON(json: any): DataStreamComponent
 }
 
 export function DataStreamComponentModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DataStreamComponentModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
-        'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
+        'componentName': json['componentName'] == null ? undefined : json['componentName'],
+        'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
     };
 }
 
 export function DataStreamComponentModelToJSON(value?: DataStreamComponentModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'componentName': value.componentName,
-        'componentVersion': value.componentVersion,
+        'componentName': value['componentName'],
+        'componentVersion': value['componentVersion'],
     };
 }
 

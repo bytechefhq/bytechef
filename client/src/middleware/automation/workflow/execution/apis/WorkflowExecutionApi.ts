@@ -49,8 +49,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get workflow executions by id
      */
     async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowExecution.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowExecution().'
+            );
         }
 
         const queryParameters: any = {};
@@ -58,7 +61,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -83,32 +86,32 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
     async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
-        if (requestParameters.jobStatus !== undefined) {
-            queryParameters['jobStatus'] = requestParameters.jobStatus;
+        if (requestParameters['jobStatus'] != null) {
+            queryParameters['jobStatus'] = requestParameters['jobStatus'];
         }
 
-        if (requestParameters.jobStartDate !== undefined) {
-            queryParameters['jobStartDate'] = (requestParameters.jobStartDate as any).toISOString();
+        if (requestParameters['jobStartDate'] != null) {
+            queryParameters['jobStartDate'] = (requestParameters['jobStartDate'] as any).toISOString();
         }
 
-        if (requestParameters.jobEndDate !== undefined) {
-            queryParameters['jobEndDate'] = (requestParameters.jobEndDate as any).toISOString();
+        if (requestParameters['jobEndDate'] != null) {
+            queryParameters['jobEndDate'] = (requestParameters['jobEndDate'] as any).toISOString();
         }
 
-        if (requestParameters.projectId !== undefined) {
-            queryParameters['projectId'] = requestParameters.projectId;
+        if (requestParameters['projectId'] != null) {
+            queryParameters['projectId'] = requestParameters['projectId'];
         }
 
-        if (requestParameters.projectInstanceId !== undefined) {
-            queryParameters['projectInstanceId'] = requestParameters.projectInstanceId;
+        if (requestParameters['projectInstanceId'] != null) {
+            queryParameters['projectInstanceId'] = requestParameters['projectInstanceId'];
         }
 
-        if (requestParameters.workflowId !== undefined) {
-            queryParameters['workflowId'] = requestParameters.workflowId;
+        if (requestParameters['workflowId'] != null) {
+            queryParameters['workflowId'] = requestParameters['workflowId'];
         }
 
-        if (requestParameters.pageNumber !== undefined) {
-            queryParameters['pageNumber'] = requestParameters.pageNumber;
+        if (requestParameters['pageNumber'] != null) {
+            queryParameters['pageNumber'] = requestParameters['pageNumber'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

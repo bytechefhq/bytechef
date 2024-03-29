@@ -43,8 +43,11 @@ export class TriggerExecutionApi extends runtime.BaseAPI {
      * Get a trigger execution by id
      */
     async getTriggerExecutionRaw(requestParameters: GetTriggerExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerExecutionModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getTriggerExecution.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getTriggerExecution().'
+            );
         }
 
         const queryParameters: any = {};
@@ -52,7 +55,7 @@ export class TriggerExecutionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/trigger-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/trigger-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -77,8 +80,8 @@ export class TriggerExecutionApi extends runtime.BaseAPI {
     async getTriggerExecutionsPageRaw(requestParameters: GetTriggerExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
-        if (requestParameters.pageNumber !== undefined) {
-            queryParameters['pageNumber'] = requestParameters.pageNumber;
+        if (requestParameters['pageNumber'] != null) {
+            queryParameters['pageNumber'] = requestParameters['pageNumber'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

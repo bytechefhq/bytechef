@@ -48,12 +48,18 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      * Delete existing workflow node test output
      */
     async deleteWorkflowNodeTestOutputRaw(requestParameters: DeleteWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteWorkflowNodeTestOutput.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteWorkflowNodeTestOutput().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling deleteWorkflowNodeTestOutput.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling deleteWorkflowNodeTestOutput().'
+            );
         }
 
         const queryParameters: any = {};
@@ -61,7 +67,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/test-outputs/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            path: `/workflows/{id}/test-outputs/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -83,12 +89,18 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      * Create a new or update existing workflow node test output
      */
     async saveWorkflowNodeTestOutputRaw(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutputModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling saveWorkflowNodeTestOutput.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling saveWorkflowNodeTestOutput().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling saveWorkflowNodeTestOutput.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling saveWorkflowNodeTestOutput().'
+            );
         }
 
         const queryParameters: any = {};
@@ -96,7 +108,7 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/test-outputs/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            path: `/workflows/{id}/test-outputs/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -119,16 +131,25 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      * Upload a sample output to create a new or update existing workflow node test output
      */
     async uploadWorkflowNodeSampleOutputRaw(requestParameters: UploadWorkflowNodeSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutputModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling uploadWorkflowNodeSampleOutput.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadWorkflowNodeSampleOutput().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling uploadWorkflowNodeSampleOutput.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling uploadWorkflowNodeSampleOutput().'
+            );
         }
 
-        if (requestParameters.body === null || requestParameters.body === undefined) {
-            throw new runtime.RequiredError('body','Required parameter requestParameters.body was null or undefined when calling uploadWorkflowNodeSampleOutput.');
+        if (requestParameters['body'] == null) {
+            throw new runtime.RequiredError(
+                'body',
+                'Required parameter "body" was null or undefined when calling uploadWorkflowNodeSampleOutput().'
+            );
         }
 
         const queryParameters: any = {};
@@ -138,11 +159,11 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflows/{id}/test-outputs/{workflowNodeName}/sample-output`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            path: `/workflows/{id}/test-outputs/{workflowNodeName}/sample-output`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters.body as any,
+            body: requestParameters['body'] as any,
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputModelFromJSON(jsonValue));

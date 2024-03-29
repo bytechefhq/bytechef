@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ProjectStatusModel } from './ProjectStatusModel';
 import {
     ProjectStatusModelFromJSON,
@@ -56,9 +56,7 @@ export interface ProjectVersionModel {
  * Check if a given object implements the ProjectVersionModel interface.
  */
 export function instanceOfProjectVersionModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function ProjectVersionModelFromJSON(json: any): ProjectVersionModel {
@@ -66,30 +64,27 @@ export function ProjectVersionModelFromJSON(json: any): ProjectVersionModel {
 }
 
 export function ProjectVersionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectVersionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
-        'version': !exists(json, 'version') ? undefined : json['version'],
-        'status': !exists(json, 'status') ? undefined : ProjectStatusModelFromJSON(json['status']),
+        'description': json['description'] == null ? undefined : json['description'],
+        'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
+        'version': json['version'] == null ? undefined : json['version'],
+        'status': json['status'] == null ? undefined : ProjectStatusModelFromJSON(json['status']),
     };
 }
 
 export function ProjectVersionModelToJSON(value?: ProjectVersionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
-        'status': ProjectStatusModelToJSON(value.status),
+        'description': value['description'],
+        'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
+        'status': ProjectStatusModelToJSON(value['status']),
     };
 }
 

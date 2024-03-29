@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
@@ -104,13 +104,11 @@ export interface TaskDispatcherDefinitionModel {
  * Check if a given object implements the TaskDispatcherDefinitionModel interface.
  */
 export function instanceOfTaskDispatcherDefinitionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "outputDefined" in value;
-    isInstance = isInstance && "outputFunctionDefined" in value;
-    isInstance = isInstance && "version" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('outputDefined' in value)) return false;
+    if (!('outputFunctionDefined' in value)) return false;
+    if (!('version' in value)) return false;
+    return true;
 }
 
 export function TaskDispatcherDefinitionModelFromJSON(json: any): TaskDispatcherDefinitionModel {
@@ -118,45 +116,42 @@ export function TaskDispatcherDefinitionModelFromJSON(json: any): TaskDispatcher
 }
 
 export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskDispatcherDefinitionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'icon': !exists(json, 'icon') ? undefined : json['icon'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'],
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'taskProperties': !exists(json, 'taskProperties') ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
-        'title': !exists(json, 'title') ? undefined : json['title'],
-        'variablePropertiesDefined': !exists(json, 'variablePropertiesDefined') ? undefined : json['variablePropertiesDefined'],
+        'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'resources': json['resources'] == null ? undefined : ResourcesModelFromJSON(json['resources']),
+        'taskProperties': json['taskProperties'] == null ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
+        'title': json['title'] == null ? undefined : json['title'],
+        'variablePropertiesDefined': json['variablePropertiesDefined'] == null ? undefined : json['variablePropertiesDefined'],
         'version': json['version'],
     };
 }
 
 export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefinitionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'icon': value.icon,
-        'name': value.name,
-        'outputDefined': value.outputDefined,
-        'outputFunctionDefined': value.outputFunctionDefined,
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'resources': ResourcesModelToJSON(value.resources),
-        'taskProperties': value.taskProperties === undefined ? undefined : ((value.taskProperties as Array<any>).map(PropertyModelToJSON)),
-        'title': value.title,
-        'variablePropertiesDefined': value.variablePropertiesDefined,
-        'version': value.version,
+        'description': value['description'],
+        'icon': value['icon'],
+        'name': value['name'],
+        'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
+        'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
+        'resources': ResourcesModelToJSON(value['resources']),
+        'taskProperties': value['taskProperties'] == null ? undefined : ((value['taskProperties'] as Array<any>).map(PropertyModelToJSON)),
+        'title': value['title'],
+        'variablePropertiesDefined': value['variablePropertiesDefined'],
+        'version': value['version'],
     };
 }
 

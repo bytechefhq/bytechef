@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { WorkflowTestConfigurationConnectionModel } from './WorkflowTestConfigurationConnectionModel';
 import {
     WorkflowTestConfigurationConnectionModelFromJSON,
@@ -80,9 +80,7 @@ export interface WorkflowTestConfigurationModel {
  * Check if a given object implements the WorkflowTestConfigurationModel interface.
  */
 export function instanceOfWorkflowTestConfigurationModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WorkflowTestConfigurationModelFromJSON(json: any): WorkflowTestConfigurationModel {
@@ -90,34 +88,31 @@ export function WorkflowTestConfigurationModelFromJSON(json: any): WorkflowTestC
 }
 
 export function WorkflowTestConfigurationModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowTestConfigurationModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionModelFromJSON)),
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'inputs': json['inputs'] == null ? undefined : json['inputs'],
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionModelFromJSON)),
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function WorkflowTestConfigurationModelToJSON(value?: WorkflowTestConfigurationModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'inputs': value.inputs,
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowTestConfigurationConnectionModelToJSON)),
-        '__version': value.version,
+        'inputs': value['inputs'],
+        'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionModelToJSON)),
+        '__version': value['version'],
     };
 }
 

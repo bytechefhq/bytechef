@@ -39,28 +39,37 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
      * Get an action or trigger property options shown in the editor
      */
     async getWorkflowNodeOptionsRaw(requestParameters: GetWorkflowNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OptionModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowNodeOptions.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowNodeOptions().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling getWorkflowNodeOptions.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getWorkflowNodeOptions().'
+            );
         }
 
-        if (requestParameters.propertyName === null || requestParameters.propertyName === undefined) {
-            throw new runtime.RequiredError('propertyName','Required parameter requestParameters.propertyName was null or undefined when calling getWorkflowNodeOptions.');
+        if (requestParameters['propertyName'] == null) {
+            throw new runtime.RequiredError(
+                'propertyName',
+                'Required parameter "propertyName" was null or undefined when calling getWorkflowNodeOptions().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.searchText !== undefined) {
-            queryParameters['searchText'] = requestParameters.searchText;
+        if (requestParameters['searchText'] != null) {
+            queryParameters['searchText'] = requestParameters['searchText'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/properties/{workflowNodeName}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters.propertyName))),
+            path: `/workflows/{id}/properties/{workflowNodeName}/options/{propertyName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

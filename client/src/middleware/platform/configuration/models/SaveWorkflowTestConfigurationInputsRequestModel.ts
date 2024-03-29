@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,9 +31,7 @@ export interface SaveWorkflowTestConfigurationInputsRequestModel {
  * Check if a given object implements the SaveWorkflowTestConfigurationInputsRequestModel interface.
  */
 export function instanceOfSaveWorkflowTestConfigurationInputsRequestModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function SaveWorkflowTestConfigurationInputsRequestModelFromJSON(json: any): SaveWorkflowTestConfigurationInputsRequestModel {
@@ -41,25 +39,22 @@ export function SaveWorkflowTestConfigurationInputsRequestModelFromJSON(json: an
 }
 
 export function SaveWorkflowTestConfigurationInputsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): SaveWorkflowTestConfigurationInputsRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
+        'inputs': json['inputs'] == null ? undefined : json['inputs'],
     };
 }
 
 export function SaveWorkflowTestConfigurationInputsRequestModelToJSON(value?: SaveWorkflowTestConfigurationInputsRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'inputs': value.inputs,
+        'inputs': value['inputs'],
     };
 }
 

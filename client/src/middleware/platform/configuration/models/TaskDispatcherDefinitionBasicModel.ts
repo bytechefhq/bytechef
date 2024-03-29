@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ResourcesModel } from './ResourcesModel';
 import {
     ResourcesModelFromJSON,
@@ -62,10 +62,8 @@ export interface TaskDispatcherDefinitionBasicModel {
  * Check if a given object implements the TaskDispatcherDefinitionBasicModel interface.
  */
 export function instanceOfTaskDispatcherDefinitionBasicModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function TaskDispatcherDefinitionBasicModelFromJSON(json: any): TaskDispatcherDefinitionBasicModel {
@@ -73,33 +71,30 @@ export function TaskDispatcherDefinitionBasicModelFromJSON(json: any): TaskDispa
 }
 
 export function TaskDispatcherDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskDispatcherDefinitionBasicModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'icon': !exists(json, 'icon') ? undefined : json['icon'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'title': !exists(json, 'title') ? undefined : json['title'],
+        'resources': json['resources'] == null ? undefined : ResourcesModelFromJSON(json['resources']),
+        'title': json['title'] == null ? undefined : json['title'],
     };
 }
 
 export function TaskDispatcherDefinitionBasicModelToJSON(value?: TaskDispatcherDefinitionBasicModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'icon': value.icon,
-        'name': value.name,
-        'resources': ResourcesModelToJSON(value.resources),
-        'title': value.title,
+        'description': value['description'],
+        'icon': value['icon'],
+        'name': value['name'],
+        'resources': ResourcesModelToJSON(value['resources']),
+        'title': value['title'],
     };
 }
 

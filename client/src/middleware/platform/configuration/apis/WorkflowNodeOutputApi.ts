@@ -42,12 +42,18 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
      * Get workflow node output of an action task or trigger used in a workflow
      */
     async getWorkflowNodeOutputRaw(requestParameters: GetWorkflowNodeOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeOutputModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowNodeOutput.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowNodeOutput().'
+            );
         }
 
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling getWorkflowNodeOutput.');
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getWorkflowNodeOutput().'
+            );
         }
 
         const queryParameters: any = {};
@@ -55,7 +61,7 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/outputs/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))),
+            path: `/workflows/{id}/outputs/{workflowNodeName}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -78,20 +84,23 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
      * Get all dynamic workflow node outputs used in a workflow
      */
     async getWorkflowNodeOutputsRaw(requestParameters: GetWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowNodeOutputModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowNodeOutputs.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowNodeOutputs().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.lastWorkflowNodeName !== undefined) {
-            queryParameters['lastWorkflowNodeName'] = requestParameters.lastWorkflowNodeName;
+        if (requestParameters['lastWorkflowNodeName'] != null) {
+            queryParameters['lastWorkflowNodeName'] = requestParameters['lastWorkflowNodeName'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}/outputs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflows/{id}/outputs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

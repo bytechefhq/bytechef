@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,9 +31,7 @@ export interface CreateJob200ResponseModel {
  * Check if a given object implements the CreateJob200ResponseModel interface.
  */
 export function instanceOfCreateJob200ResponseModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function CreateJob200ResponseModelFromJSON(json: any): CreateJob200ResponseModel {
@@ -41,25 +39,22 @@ export function CreateJob200ResponseModelFromJSON(json: any): CreateJob200Respon
 }
 
 export function CreateJob200ResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateJob200ResponseModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'jobId': !exists(json, 'jobId') ? undefined : json['jobId'],
+        'jobId': json['jobId'] == null ? undefined : json['jobId'],
     };
 }
 
 export function CreateJob200ResponseModelToJSON(value?: CreateJob200ResponseModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'jobId': value.jobId,
+        'jobId': value['jobId'],
     };
 }
 

@@ -64,8 +64,11 @@ export class JobApi extends runtime.BaseAPI {
      * Create a request for running a new job
      */
     async createJobRaw(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateJob200ResponseModel>> {
-        if (requestParameters.jobParametersModel === null || requestParameters.jobParametersModel === undefined) {
-            throw new runtime.RequiredError('jobParametersModel','Required parameter requestParameters.jobParametersModel was null or undefined when calling createJob.');
+        if (requestParameters['jobParametersModel'] == null) {
+            throw new runtime.RequiredError(
+                'jobParametersModel',
+                'Required parameter "jobParametersModel" was null or undefined when calling createJob().'
+            );
         }
 
         const queryParameters: any = {};
@@ -79,7 +82,7 @@ export class JobApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: JobParametersModelToJSON(requestParameters.jobParametersModel),
+            body: JobParametersModelToJSON(requestParameters['jobParametersModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CreateJob200ResponseModelFromJSON(jsonValue));
@@ -99,8 +102,11 @@ export class JobApi extends runtime.BaseAPI {
      * Get a job by id
      */
     async getJobRaw(requestParameters: GetJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getJob.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getJob().'
+            );
         }
 
         const queryParameters: any = {};
@@ -108,7 +114,7 @@ export class JobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/jobs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/jobs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -133,8 +139,8 @@ export class JobApi extends runtime.BaseAPI {
     async getJobsPageRaw(requestParameters: GetJobsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
-        if (requestParameters.pageNumber !== undefined) {
-            queryParameters['pageNumber'] = requestParameters.pageNumber;
+        if (requestParameters['pageNumber'] != null) {
+            queryParameters['pageNumber'] = requestParameters['pageNumber'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -219,8 +225,11 @@ export class JobApi extends runtime.BaseAPI {
      * Restart a job
      */
     async restartJobRaw(requestParameters: RestartJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling restartJob.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling restartJob().'
+            );
         }
 
         const queryParameters: any = {};
@@ -228,7 +237,7 @@ export class JobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/jobs/{id}/restart`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/jobs/{id}/restart`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -250,8 +259,11 @@ export class JobApi extends runtime.BaseAPI {
      * Stop a job
      */
     async stopJobRaw(requestParameters: StopJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling stopJob.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling stopJob().'
+            );
         }
 
         const queryParameters: any = {};
@@ -259,7 +271,7 @@ export class JobApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/jobs/{id}/stop`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/jobs/{id}/stop`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

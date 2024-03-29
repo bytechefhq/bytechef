@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Defines function that should load properties.
  * @export
@@ -31,9 +31,7 @@ export interface PropertiesDataSourceModel {
  * Check if a given object implements the PropertiesDataSourceModel interface.
  */
 export function instanceOfPropertiesDataSourceModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function PropertiesDataSourceModelFromJSON(json: any): PropertiesDataSourceModel {
@@ -41,25 +39,22 @@ export function PropertiesDataSourceModelFromJSON(json: any): PropertiesDataSour
 }
 
 export function PropertiesDataSourceModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PropertiesDataSourceModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'loadPropertiesDependsOn': !exists(json, 'loadPropertiesDependsOn') ? undefined : json['loadPropertiesDependsOn'],
+        'loadPropertiesDependsOn': json['loadPropertiesDependsOn'] == null ? undefined : json['loadPropertiesDependsOn'],
     };
 }
 
 export function PropertiesDataSourceModelToJSON(value?: PropertiesDataSourceModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'loadPropertiesDependsOn': value.loadPropertiesDependsOn,
+        'loadPropertiesDependsOn': value['loadPropertiesDependsOn'],
     };
 }
 

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * Defines function that should dynamically load options for the property.
  * @export
@@ -31,9 +31,7 @@ export interface OptionsDataSourceModel {
  * Check if a given object implements the OptionsDataSourceModel interface.
  */
 export function instanceOfOptionsDataSourceModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function OptionsDataSourceModelFromJSON(json: any): OptionsDataSourceModel {
@@ -41,25 +39,22 @@ export function OptionsDataSourceModelFromJSON(json: any): OptionsDataSourceMode
 }
 
 export function OptionsDataSourceModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OptionsDataSourceModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'loadOptionsDependsOn': !exists(json, 'loadOptionsDependsOn') ? undefined : json['loadOptionsDependsOn'],
+        'loadOptionsDependsOn': json['loadOptionsDependsOn'] == null ? undefined : json['loadOptionsDependsOn'],
     };
 }
 
 export function OptionsDataSourceModelToJSON(value?: OptionsDataSourceModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'loadOptionsDependsOn': value.loadOptionsDependsOn,
+        'loadOptionsDependsOn': value['loadOptionsDependsOn'],
     };
 }
 

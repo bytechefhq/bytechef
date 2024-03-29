@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ComponentDefinitionBasicModel } from './ComponentDefinitionBasicModel';
 import {
     ComponentDefinitionBasicModelFromJSON,
@@ -208,13 +208,11 @@ export type TaskExecutionModelStatusEnum = typeof TaskExecutionModelStatusEnum[k
  * Check if a given object implements the TaskExecutionModel interface.
  */
 export function instanceOfTaskExecutionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "jobId" in value;
-    isInstance = isInstance && "priority" in value;
-    isInstance = isInstance && "startDate" in value;
-    isInstance = isInstance && "status" in value;
-
-    return isInstance;
+    if (!('jobId' in value)) return false;
+    if (!('priority' in value)) return false;
+    if (!('startDate' in value)) return false;
+    if (!('status' in value)) return false;
+    return true;
 }
 
 export function TaskExecutionModelFromJSON(json: any): TaskExecutionModel {
@@ -222,51 +220,48 @@ export function TaskExecutionModelFromJSON(json: any): TaskExecutionModel {
 }
 
 export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskExecutionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'component': !exists(json, 'component') ? undefined : ComponentDefinitionBasicModelFromJSON(json['component']),
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
-        'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
-        'executionTime': !exists(json, 'executionTime') ? undefined : json['executionTime'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'input': !exists(json, 'input') ? undefined : json['input'],
+        'component': json['component'] == null ? undefined : ComponentDefinitionBasicModelFromJSON(json['component']),
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
+        'error': json['error'] == null ? undefined : ExecutionErrorModelFromJSON(json['error']),
+        'executionTime': json['executionTime'] == null ? undefined : json['executionTime'],
+        'id': json['id'] == null ? undefined : json['id'],
+        'input': json['input'] == null ? undefined : json['input'],
         'jobId': json['jobId'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
-        'output': !exists(json, 'output') ? undefined : json['output'],
-        'parentId': !exists(json, 'parentId') ? undefined : json['parentId'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'maxRetries': json['maxRetries'] == null ? undefined : json['maxRetries'],
+        'output': json['output'] == null ? undefined : json['output'],
+        'parentId': json['parentId'] == null ? undefined : json['parentId'],
         'priority': json['priority'],
-        'progress': !exists(json, 'progress') ? undefined : json['progress'],
-        'retryAttempts': !exists(json, 'retryAttempts') ? undefined : json['retryAttempts'],
-        'retryDelay': !exists(json, 'retryDelay') ? undefined : json['retryDelay'],
-        'retryDelayFactor': !exists(json, 'retryDelayFactor') ? undefined : json['retryDelayFactor'],
+        'progress': json['progress'] == null ? undefined : json['progress'],
+        'retryAttempts': json['retryAttempts'] == null ? undefined : json['retryAttempts'],
+        'retryDelay': json['retryDelay'] == null ? undefined : json['retryDelay'],
+        'retryDelayFactor': json['retryDelayFactor'] == null ? undefined : json['retryDelayFactor'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'taskNumber': !exists(json, 'taskNumber') ? undefined : json['taskNumber'],
-        'retryDelayMillis': !exists(json, 'retryDelayMillis') ? undefined : json['retryDelayMillis'],
-        'workflowTask': !exists(json, 'workflowTask') ? undefined : WorkflowTaskModelFromJSON(json['workflowTask']),
-        'type': !exists(json, 'type') ? undefined : json['type'],
+        'taskNumber': json['taskNumber'] == null ? undefined : json['taskNumber'],
+        'retryDelayMillis': json['retryDelayMillis'] == null ? undefined : json['retryDelayMillis'],
+        'workflowTask': json['workflowTask'] == null ? undefined : WorkflowTaskModelFromJSON(json['workflowTask']),
+        'type': json['type'] == null ? undefined : json['type'],
     };
 }
 
 export function TaskExecutionModelToJSON(value?: TaskExecutionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'component': ComponentDefinitionBasicModelToJSON(value.component),
-        'error': ExecutionErrorModelToJSON(value.error),
-        'workflowTask': WorkflowTaskModelToJSON(value.workflowTask),
+        'component': ComponentDefinitionBasicModelToJSON(value['component']),
+        'error': ExecutionErrorModelToJSON(value['error']),
+        'workflowTask': WorkflowTaskModelToJSON(value['workflowTask']),
     };
 }
 

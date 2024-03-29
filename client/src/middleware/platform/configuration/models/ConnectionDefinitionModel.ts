@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AuthorizationModel } from './AuthorizationModel';
 import {
     AuthorizationModelFromJSON,
@@ -86,11 +86,9 @@ export interface ConnectionDefinitionModel {
  * Check if a given object implements the ConnectionDefinitionModel interface.
  */
 export function instanceOfConnectionDefinitionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "version" in value;
-
-    return isInstance;
+    if (!('componentName' in value)) return false;
+    if (!('version' in value)) return false;
+    return true;
 }
 
 export function ConnectionDefinitionModelFromJSON(json: any): ConnectionDefinitionModel {
@@ -98,39 +96,36 @@ export function ConnectionDefinitionModelFromJSON(json: any): ConnectionDefiniti
 }
 
 export function ConnectionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConnectionDefinitionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'authorizationRequired': !exists(json, 'authorizationRequired') ? undefined : json['authorizationRequired'],
-        'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
-        'baseUri': !exists(json, 'baseUri') ? undefined : json['baseUri'],
-        'componentDescription': !exists(json, 'componentDescription') ? undefined : json['componentDescription'],
+        'authorizationRequired': json['authorizationRequired'] == null ? undefined : json['authorizationRequired'],
+        'authorizations': json['authorizations'] == null ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
+        'baseUri': json['baseUri'] == null ? undefined : json['baseUri'],
+        'componentDescription': json['componentDescription'] == null ? undefined : json['componentDescription'],
         'componentName': json['componentName'],
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'componentTitle': !exists(json, 'componentTitle') ? undefined : json['componentTitle'],
+        'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'componentTitle': json['componentTitle'] == null ? undefined : json['componentTitle'],
         'version': json['version'],
     };
 }
 
 export function ConnectionDefinitionModelToJSON(value?: ConnectionDefinitionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'authorizationRequired': value.authorizationRequired,
-        'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationModelToJSON)),
-        'baseUri': value.baseUri,
-        'componentDescription': value.componentDescription,
-        'componentName': value.componentName,
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'componentTitle': value.componentTitle,
-        'version': value.version,
+        'authorizationRequired': value['authorizationRequired'],
+        'authorizations': value['authorizations'] == null ? undefined : ((value['authorizations'] as Array<any>).map(AuthorizationModelToJSON)),
+        'baseUri': value['baseUri'],
+        'componentDescription': value['componentDescription'],
+        'componentName': value['componentName'],
+        'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyModelToJSON)),
+        'componentTitle': value['componentTitle'],
+        'version': value['version'],
     };
 }
 

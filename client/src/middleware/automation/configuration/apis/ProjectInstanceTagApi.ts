@@ -68,12 +68,18 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
      * Updates tags of an existing project instance
      */
     async updateProjectInstanceTagsRaw(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectInstanceTags.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateProjectInstanceTags().'
+            );
         }
 
-        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateProjectInstanceTags.');
+        if (requestParameters['updateTagsRequestModel'] == null) {
+            throw new runtime.RequiredError(
+                'updateTagsRequestModel',
+                'Required parameter "updateTagsRequestModel" was null or undefined when calling updateProjectInstanceTags().'
+            );
         }
 
         const queryParameters: any = {};
@@ -83,11 +89,11 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-instances/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/project-instances/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
+            body: UpdateTagsRequestModelToJSON(requestParameters['updateTagsRequestModel']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

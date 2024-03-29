@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { EnvironmentModel } from './EnvironmentModel';
 import {
     EnvironmentModelFromJSON,
@@ -146,10 +146,8 @@ export interface ProjectInstanceModel {
  * Check if a given object implements the ProjectInstanceModel interface.
  */
 export function instanceOfProjectInstanceModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    return true;
 }
 
 export function ProjectInstanceModelFromJSON(json: any): ProjectInstanceModel {
@@ -157,49 +155,46 @@ export function ProjectInstanceModelFromJSON(json: any): ProjectInstanceModel {
 }
 
 export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstanceModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
-        'environment': !exists(json, 'environment') ? undefined : EnvironmentModelFromJSON(json['environment']),
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'description': json['description'] == null ? undefined : json['description'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'enabled': json['enabled'] == null ? undefined : json['enabled'],
+        'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
+        'id': json['id'] == null ? undefined : json['id'],
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'project': !exists(json, 'project') ? undefined : ProjectInstanceProjectModelFromJSON(json['project']),
-        'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
-        'projectInstanceWorkflows': !exists(json, 'projectInstanceWorkflows') ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
-        'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'project': json['project'] == null ? undefined : ProjectInstanceProjectModelFromJSON(json['project']),
+        'projectId': json['projectId'] == null ? undefined : json['projectId'],
+        'projectInstanceWorkflows': json['projectInstanceWorkflows'] == null ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
+        'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function ProjectInstanceModelToJSON(value?: ProjectInstanceModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
-        'enabled': value.enabled,
-        'environment': EnvironmentModelToJSON(value.environment),
-        'name': value.name,
-        'project': ProjectInstanceProjectModelToJSON(value.project),
-        'projectId': value.projectId,
-        'projectInstanceWorkflows': value.projectInstanceWorkflows === undefined ? undefined : ((value.projectInstanceWorkflows as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
-        'projectVersion': value.projectVersion,
-        'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
-        '__version': value.version,
+        'description': value['description'],
+        'enabled': value['enabled'],
+        'environment': EnvironmentModelToJSON(value['environment']),
+        'name': value['name'],
+        'project': ProjectInstanceProjectModelToJSON(value['project']),
+        'projectId': value['projectId'],
+        'projectInstanceWorkflows': value['projectInstanceWorkflows'] == null ? undefined : ((value['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
+        'projectVersion': value['projectVersion'],
+        'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
+        '__version': value['version'],
     };
 }
 

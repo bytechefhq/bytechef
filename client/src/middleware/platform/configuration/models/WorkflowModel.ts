@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { WorkflowFormatModel } from './WorkflowFormatModel';
 import {
     WorkflowFormatModelFromJSON,
@@ -165,9 +165,7 @@ export type WorkflowModelSourceTypeEnum = typeof WorkflowModelSourceTypeEnum[key
  * Check if a given object implements the WorkflowModel interface.
  */
 export function instanceOfWorkflowModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WorkflowModelFromJSON(json: any): WorkflowModel {
@@ -175,44 +173,41 @@ export function WorkflowModelFromJSON(json: any): WorkflowModel {
 }
 
 export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'definition': !exists(json, 'definition') ? undefined : json['definition'],
-        'description': !exists(json, 'description') ? undefined : json['description'],
-        'format': !exists(json, 'format') ? undefined : WorkflowFormatModelFromJSON(json['format']),
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'inputs': !exists(json, 'inputs') ? undefined : ((json['inputs'] as Array<any>).map(WorkflowInputModelFromJSON)),
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'outputs': !exists(json, 'outputs') ? undefined : ((json['outputs'] as Array<any>).map(WorkflowOutputModelFromJSON)),
-        'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
-        'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
-        'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
-        'triggers': !exists(json, 'triggers') ? undefined : ((json['triggers'] as Array<any>).map(WorkflowTriggerModelFromJSON)),
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'definition': json['definition'] == null ? undefined : json['definition'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'format': json['format'] == null ? undefined : WorkflowFormatModelFromJSON(json['format']),
+        'id': json['id'] == null ? undefined : json['id'],
+        'inputs': json['inputs'] == null ? undefined : ((json['inputs'] as Array<any>).map(WorkflowInputModelFromJSON)),
+        'label': json['label'] == null ? undefined : json['label'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'outputs': json['outputs'] == null ? undefined : ((json['outputs'] as Array<any>).map(WorkflowOutputModelFromJSON)),
+        'sourceType': json['sourceType'] == null ? undefined : json['sourceType'],
+        'maxRetries': json['maxRetries'] == null ? undefined : json['maxRetries'],
+        'tasks': json['tasks'] == null ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
+        'triggers': json['triggers'] == null ? undefined : ((json['triggers'] as Array<any>).map(WorkflowTriggerModelFromJSON)),
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'definition': value.definition,
-        'description': value.description,
-        'format': WorkflowFormatModelToJSON(value.format),
-        'sourceType': value.sourceType,
-        '__version': value.version,
+        'definition': value['definition'],
+        'description': value['description'],
+        'format': WorkflowFormatModelToJSON(value['format']),
+        'sourceType': value['sourceType'],
+        '__version': value['version'],
     };
 }
 

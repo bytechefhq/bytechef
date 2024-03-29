@@ -55,8 +55,11 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Create a new connection
      */
     async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
-        if (requestParameters.connectionModel === null || requestParameters.connectionModel === undefined) {
-            throw new runtime.RequiredError('connectionModel','Required parameter requestParameters.connectionModel was null or undefined when calling createConnection.');
+        if (requestParameters['connectionModel'] == null) {
+            throw new runtime.RequiredError(
+                'connectionModel',
+                'Required parameter "connectionModel" was null or undefined when calling createConnection().'
+            );
         }
 
         const queryParameters: any = {};
@@ -70,7 +73,7 @@ export class ConnectionApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ConnectionModelToJSON(requestParameters.connectionModel),
+            body: ConnectionModelToJSON(requestParameters['connectionModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionModelFromJSON(jsonValue));
@@ -90,8 +93,11 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Delete a connection
      */
     async deleteConnectionRaw(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteConnection.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteConnection().'
+            );
         }
 
         const queryParameters: any = {};
@@ -99,7 +105,7 @@ export class ConnectionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -121,8 +127,11 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Get a connection by id
      */
     async getConnectionRaw(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getConnection.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getConnection().'
+            );
         }
 
         const queryParameters: any = {};
@@ -130,7 +139,7 @@ export class ConnectionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -155,16 +164,16 @@ export class ConnectionApi extends runtime.BaseAPI {
     async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
         const queryParameters: any = {};
 
-        if (requestParameters.componentName !== undefined) {
-            queryParameters['componentName'] = requestParameters.componentName;
+        if (requestParameters['componentName'] != null) {
+            queryParameters['componentName'] = requestParameters['componentName'];
         }
 
-        if (requestParameters.connectionVersion !== undefined) {
-            queryParameters['connectionVersion'] = requestParameters.connectionVersion;
+        if (requestParameters['connectionVersion'] != null) {
+            queryParameters['connectionVersion'] = requestParameters['connectionVersion'];
         }
 
-        if (requestParameters.tagId !== undefined) {
-            queryParameters['tagId'] = requestParameters.tagId;
+        if (requestParameters['tagId'] != null) {
+            queryParameters['tagId'] = requestParameters['tagId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -193,12 +202,18 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Update an existing connection
      */
     async updateConnectionRaw(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateConnection.');
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateConnection().'
+            );
         }
 
-        if (requestParameters.connectionModel === null || requestParameters.connectionModel === undefined) {
-            throw new runtime.RequiredError('connectionModel','Required parameter requestParameters.connectionModel was null or undefined when calling updateConnection.');
+        if (requestParameters['connectionModel'] == null) {
+            throw new runtime.RequiredError(
+                'connectionModel',
+                'Required parameter "connectionModel" was null or undefined when calling updateConnection().'
+            );
         }
 
         const queryParameters: any = {};
@@ -208,11 +223,11 @@ export class ConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ConnectionModelToJSON(requestParameters.connectionModel),
+            body: ConnectionModelToJSON(requestParameters['connectionModel']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionModelFromJSON(jsonValue));

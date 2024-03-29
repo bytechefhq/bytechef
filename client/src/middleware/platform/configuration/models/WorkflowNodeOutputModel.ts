@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ActionDefinitionModel } from './ActionDefinitionModel';
 import {
     ActionDefinitionModelFromJSON,
@@ -86,11 +86,9 @@ export interface WorkflowNodeOutputModel {
  * Check if a given object implements the WorkflowNodeOutputModel interface.
  */
 export function instanceOfWorkflowNodeOutputModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "outputSchema" in value;
-    isInstance = isInstance && "workflowNodeName" in value;
-
-    return isInstance;
+    if (!('outputSchema' in value)) return false;
+    if (!('workflowNodeName' in value)) return false;
+    return true;
 }
 
 export function WorkflowNodeOutputModelFromJSON(json: any): WorkflowNodeOutputModel {
@@ -98,35 +96,32 @@ export function WorkflowNodeOutputModelFromJSON(json: any): WorkflowNodeOutputMo
 }
 
 export function WorkflowNodeOutputModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowNodeOutputModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'actionDefinition': !exists(json, 'actionDefinition') ? undefined : ActionDefinitionModelFromJSON(json['actionDefinition']),
+        'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionModelFromJSON(json['actionDefinition']),
         'outputSchema': PropertyModelFromJSON(json['outputSchema']),
-        'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
-        'taskDispatcherDefinition': !exists(json, 'taskDispatcherDefinition') ? undefined : TaskDispatcherDefinitionModelFromJSON(json['taskDispatcherDefinition']),
-        'triggerDefinition': !exists(json, 'triggerDefinition') ? undefined : TriggerDefinitionModelFromJSON(json['triggerDefinition']),
+        'sampleOutput': json['sampleOutput'] == null ? undefined : json['sampleOutput'],
+        'taskDispatcherDefinition': json['taskDispatcherDefinition'] == null ? undefined : TaskDispatcherDefinitionModelFromJSON(json['taskDispatcherDefinition']),
+        'triggerDefinition': json['triggerDefinition'] == null ? undefined : TriggerDefinitionModelFromJSON(json['triggerDefinition']),
         'workflowNodeName': json['workflowNodeName'],
     };
 }
 
 export function WorkflowNodeOutputModelToJSON(value?: WorkflowNodeOutputModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'actionDefinition': ActionDefinitionModelToJSON(value.actionDefinition),
-        'outputSchema': PropertyModelToJSON(value.outputSchema),
-        'sampleOutput': value.sampleOutput,
-        'taskDispatcherDefinition': TaskDispatcherDefinitionModelToJSON(value.taskDispatcherDefinition),
-        'triggerDefinition': TriggerDefinitionModelToJSON(value.triggerDefinition),
-        'workflowNodeName': value.workflowNodeName,
+        'actionDefinition': ActionDefinitionModelToJSON(value['actionDefinition']),
+        'outputSchema': PropertyModelToJSON(value['outputSchema']),
+        'sampleOutput': value['sampleOutput'],
+        'taskDispatcherDefinition': TaskDispatcherDefinitionModelToJSON(value['taskDispatcherDefinition']),
+        'triggerDefinition': TriggerDefinitionModelToJSON(value['triggerDefinition']),
+        'workflowNodeName': value['workflowNodeName'],
     };
 }
 

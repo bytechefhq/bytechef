@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -31,9 +31,7 @@ export interface PublishProjectRequestModel {
  * Check if a given object implements the PublishProjectRequestModel interface.
  */
 export function instanceOfPublishProjectRequestModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function PublishProjectRequestModelFromJSON(json: any): PublishProjectRequestModel {
@@ -41,25 +39,22 @@ export function PublishProjectRequestModelFromJSON(json: any): PublishProjectReq
 }
 
 export function PublishProjectRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PublishProjectRequestModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'description': !exists(json, 'description') ? undefined : json['description'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
 export function PublishProjectRequestModelToJSON(value?: PublishProjectRequestModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'description': value.description,
+        'description': value['description'],
     };
 }
 

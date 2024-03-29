@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { CredentialStatusModel } from './CredentialStatusModel';
 import {
     CredentialStatusModelFromJSON,
@@ -134,12 +134,10 @@ export interface ConnectionModel {
  * Check if a given object implements the ConnectionModel interface.
  */
 export function instanceOfConnectionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "parameters" in value;
-
-    return isInstance;
+    if (!('componentName' in value)) return false;
+    if (!('name' in value)) return false;
+    if (!('parameters' in value)) return false;
+    return true;
 }
 
 export function ConnectionModelFromJSON(json: any): ConnectionModel {
@@ -147,47 +145,44 @@ export function ConnectionModelFromJSON(json: any): ConnectionModel {
 }
 
 export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConnectionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'active': !exists(json, 'active') ? undefined : json['active'],
-        'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
+        'active': json['active'] == null ? undefined : json['active'],
+        'authorizationName': json['authorizationName'] == null ? undefined : json['authorizationName'],
         'componentName': json['componentName'],
-        'connectionVersion': !exists(json, 'connectionVersion') ? undefined : json['connectionVersion'],
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'credentialStatus': !exists(json, 'credentialStatus') ? undefined : CredentialStatusModelFromJSON(json['credentialStatus']),
-        'environment': !exists(json, 'environment') ? undefined : EnvironmentModelFromJSON(json['environment']),
+        'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusModelFromJSON(json['credentialStatus']),
+        'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
         'name': json['name'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'id': json['id'] == null ? undefined : json['id'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'parameters': json['parameters'],
-        'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
-        'version': !exists(json, '__version') ? undefined : json['__version'],
+        'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
 export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'authorizationName': value.authorizationName,
-        'componentName': value.componentName,
-        'connectionVersion': value.connectionVersion,
-        'credentialStatus': CredentialStatusModelToJSON(value.credentialStatus),
-        'environment': EnvironmentModelToJSON(value.environment),
-        'name': value.name,
-        'parameters': value.parameters,
-        'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
-        '__version': value.version,
+        'authorizationName': value['authorizationName'],
+        'componentName': value['componentName'],
+        'connectionVersion': value['connectionVersion'],
+        'credentialStatus': CredentialStatusModelToJSON(value['credentialStatus']),
+        'environment': EnvironmentModelToJSON(value['environment']),
+        'name': value['name'],
+        'parameters': value['parameters'],
+        'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
+        '__version': value['version'],
     };
 }
 

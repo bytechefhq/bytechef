@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * The connection used in a particular action task or trigger.
  * @export
@@ -43,12 +43,10 @@ export interface ProjectInstanceWorkflowConnectionModel {
  * Check if a given object implements the ProjectInstanceWorkflowConnectionModel interface.
  */
 export function instanceOfProjectInstanceWorkflowConnectionModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "connectionId" in value;
-    isInstance = isInstance && "key" in value;
-    isInstance = isInstance && "workflowNodeName" in value;
-
-    return isInstance;
+    if (!('connectionId' in value)) return false;
+    if (!('key' in value)) return false;
+    if (!('workflowNodeName' in value)) return false;
+    return true;
 }
 
 export function ProjectInstanceWorkflowConnectionModelFromJSON(json: any): ProjectInstanceWorkflowConnectionModel {
@@ -56,7 +54,7 @@ export function ProjectInstanceWorkflowConnectionModelFromJSON(json: any): Proje
 }
 
 export function ProjectInstanceWorkflowConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstanceWorkflowConnectionModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -68,17 +66,14 @@ export function ProjectInstanceWorkflowConnectionModelFromJSONTyped(json: any, i
 }
 
 export function ProjectInstanceWorkflowConnectionModelToJSON(value?: ProjectInstanceWorkflowConnectionModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'connectionId': value.connectionId,
-        'key': value.key,
-        'workflowNodeName': value.workflowNodeName,
+        'connectionId': value['connectionId'],
+        'key': value['key'],
+        'workflowNodeName': value['workflowNodeName'],
     };
 }
 

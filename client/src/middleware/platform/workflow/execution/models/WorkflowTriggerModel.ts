@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { WorkflowConnectionModel } from './WorkflowConnectionModel';
 import {
     WorkflowConnectionModelFromJSON,
@@ -68,11 +68,9 @@ export interface WorkflowTriggerModel {
  * Check if a given object implements the WorkflowTriggerModel interface.
  */
 export function instanceOfWorkflowTriggerModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "type" in value;
-
-    return isInstance;
+    if (!('name' in value)) return false;
+    if (!('type' in value)) return false;
+    return true;
 }
 
 export function WorkflowTriggerModelFromJSON(json: any): WorkflowTriggerModel {
@@ -80,34 +78,31 @@ export function WorkflowTriggerModelFromJSON(json: any): WorkflowTriggerModel {
 }
 
 export function WorkflowTriggerModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowTriggerModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
-        'label': !exists(json, 'label') ? undefined : json['label'],
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
+        'label': json['label'] == null ? undefined : json['label'],
         'name': json['name'],
-        'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
-        'timeout': !exists(json, 'timeout') ? undefined : json['timeout'],
+        'parameters': json['parameters'] == null ? undefined : json['parameters'],
+        'timeout': json['timeout'] == null ? undefined : json['timeout'],
         'type': json['type'],
     };
 }
 
 export function WorkflowTriggerModelToJSON(value?: WorkflowTriggerModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'label': value.label,
-        'name': value.name,
-        'parameters': value.parameters,
-        'timeout': value.timeout,
-        'type': value.type,
+        'label': value['label'],
+        'name': value['name'],
+        'parameters': value['parameters'],
+        'timeout': value['timeout'],
+        'type': value['type'],
     };
 }
 

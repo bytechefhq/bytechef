@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -62,10 +62,8 @@ export interface ValuePropertyModel extends PropertyModel {
  * Check if a given object implements the ValuePropertyModel interface.
  */
 export function instanceOfValuePropertyModel(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "controlType" in value;
-
-    return isInstance;
+    if (!('controlType' in value)) return false;
+    return true;
 }
 
 export function ValuePropertyModelFromJSON(json: any): ValuePropertyModel {
@@ -73,29 +71,26 @@ export function ValuePropertyModelFromJSON(json: any): ValuePropertyModel {
 }
 
 export function ValuePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ValuePropertyModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'controlType': ControlTypeModelFromJSON(json['controlType']),
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'placeholder': !exists(json, 'placeholder') ? undefined : json['placeholder'],
+        'label': json['label'] == null ? undefined : json['label'],
+        'placeholder': json['placeholder'] == null ? undefined : json['placeholder'],
     };
 }
 
 export function ValuePropertyModelToJSON(value?: ValuePropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         ...PropertyModelToJSON(value),
-        'controlType': ControlTypeModelToJSON(value.controlType),
-        'label': value.label,
-        'placeholder': value.placeholder,
+        'controlType': ControlTypeModelToJSON(value['controlType']),
+        'label': value['label'],
+        'placeholder': value['placeholder'],
     };
 }
 

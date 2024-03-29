@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { WebhookRetryModel } from './WebhookRetryModel';
 import {
     WebhookRetryModelFromJSON,
@@ -50,9 +50,7 @@ export interface WebhookModel {
  * Check if a given object implements the WebhookModel interface.
  */
 export function instanceOfWebhookModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function WebhookModelFromJSON(json: any): WebhookModel {
@@ -60,29 +58,26 @@ export function WebhookModelFromJSON(json: any): WebhookModel {
 }
 
 export function WebhookModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WebhookModel {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'type': !exists(json, 'type') ? undefined : json['type'],
-        'url': !exists(json, 'url') ? undefined : json['url'],
-        'retry': !exists(json, 'retry') ? undefined : WebhookRetryModelFromJSON(json['retry']),
+        'type': json['type'] == null ? undefined : json['type'],
+        'url': json['url'] == null ? undefined : json['url'],
+        'retry': json['retry'] == null ? undefined : WebhookRetryModelFromJSON(json['retry']),
     };
 }
 
 export function WebhookModelToJSON(value?: WebhookModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
+    if (value == null) {
+        return value;
     }
     return {
         
-        'type': value.type,
-        'url': value.url,
-        'retry': WebhookRetryModelToJSON(value.retry),
+        'type': value['type'],
+        'url': value['url'],
+        'retry': WebhookRetryModelToJSON(value['retry']),
     };
 }
 

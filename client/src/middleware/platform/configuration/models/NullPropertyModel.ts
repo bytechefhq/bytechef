@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { ControlTypeModel } from './ControlTypeModel';
 import {
     ControlTypeModelFromJSON,
@@ -44,9 +44,7 @@ export interface NullPropertyModel extends ValuePropertyModel {
  * Check if a given object implements the NullPropertyModel interface.
  */
 export function instanceOfNullPropertyModel(value: object): boolean {
-    let isInstance = true;
-
-    return isInstance;
+    return true;
 }
 
 export function NullPropertyModelFromJSON(json: any): NullPropertyModel {
