@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-03-29T14:33:24.959619+01:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-01T22:21:38.311170+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class WorkflowModel {
 
   private String createdBy;
@@ -218,11 +218,11 @@ public class WorkflowModel {
   }
 
   /**
-   * The id of the workflow.
+   * The id of a workflow.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public String getId() {
     return id;
