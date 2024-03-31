@@ -12,31 +12,43 @@ const sidebarNavItems = [
         href: '/settings/appearance',
         title: 'Appearance',
     },
+    {
+        href: '/settings/api-keys',
+        title: 'API Keys',
+    },
+    {
+        title: 'Embedded',
+    },
+    {
+        href: '/settings/signing-keys',
+        title: 'Signing Keys',
+    }
 ];
 
 export default function Settings() {
     const location = useLocation();
 
+    const curNavItem = sidebarNavItems.find(navItem => location.pathname === navItem.href)
+
     return (
         <LayoutContainer
-            header={<PageHeader title="Account" />}
             leftSidebarBody={
                 <LeftSidebarNav
-                    body={sidebarNavItems.map((item) => (
-                        <LeftSidebarNavItem
+                    body={sidebarNavItems.map((navItem) => (
+                        navItem.href ? <LeftSidebarNavItem
                             item={{
-                                filterData: location.pathname === item.href,
-                                name: item.title,
+                                filterData: location.pathname === navItem.href,
+                                name: navItem.title,
                             }}
-                            key={item.href}
-                            toLink={item.href}
-                        />
+                            key={navItem.href}
+                            toLink={navItem.href}
+                        /> : <h3 className="py-3 px-2 font-semibold">{navItem.title}</h3>
                     ))}
                 />
             }
             leftSidebarHeader={<PageHeader position="sidebar" title="Settings" />}
         >
-            <div className="px-4">
+            <div className="size-full">
                 <Outlet />
             </div>
         </LayoutContainer>
