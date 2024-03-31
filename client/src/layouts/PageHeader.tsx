@@ -3,13 +3,14 @@ import {twMerge} from 'tailwind-merge';
 
 interface PageHeaderProps {
     centerTitle?: boolean;
+    className?: string;
     position?: 'main' | 'sidebar';
     right?: ReactNode;
     title: string;
 }
 
-const PageHeader = ({centerTitle = false, position = 'sidebar', right, title}: PageHeaderProps) => (
-    <header className={twMerge('p-4', centerTitle && '3xl:mx-auto 3xl:w-4/5')}>
+const PageHeader = ({centerTitle = false, className, position = 'sidebar', right, title}: PageHeaderProps) => (
+    <header className={twMerge('p-4', centerTitle && '3xl:mx-auto 3xl:w-4/5', className)}>
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(

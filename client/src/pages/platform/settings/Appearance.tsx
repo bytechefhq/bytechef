@@ -4,6 +4,8 @@ import {useTheme} from '@/providers/theme-provider';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import * as z from 'zod';
+import PageHeader from "@/layouts/PageHeader";
+import LayoutContainer from "@/layouts/LayoutContainer";
 
 const appearanceFormSchema = z.object({
     theme: z.enum(['light', 'dark', 'system'], {
@@ -23,9 +25,18 @@ export default function Appearance() {
         resolver: zodResolver(appearanceFormSchema),
     });
 
-    return (
+    return (<LayoutContainer
+        header={
+            <PageHeader
+                centerTitle={true}
+                position="main"
+                title="Appeearance"
+            />
+        }
+        leftSidebarOpen={false}
+    >
         <Form {...form}>
-            <form className="space-y-8">
+            <form className="space-y-8 p-4">
                 <FormField
                     control={form.control}
                     name="theme"
@@ -147,5 +158,6 @@ export default function Appearance() {
                 />
             </form>
         </Form>
+    </LayoutContainer>
     );
 }
