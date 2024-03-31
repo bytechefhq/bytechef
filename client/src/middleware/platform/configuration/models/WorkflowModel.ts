@@ -81,7 +81,7 @@ export interface WorkflowModel {
      */
     format?: WorkflowFormatModel;
     /**
-     * The id of the workflow.
+     * The id of a workflow.
      * @type {string}
      * @memberof WorkflowModel
      */
