@@ -30,7 +30,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -39,7 +38,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("workflow_test_configuration")
-public class WorkflowTestConfiguration implements Persistable<Long>, Comparable<WorkflowTestConfiguration> {
+public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfiguration> {
 
     @CreatedBy
     @Column("created_by")
@@ -124,7 +123,6 @@ public class WorkflowTestConfiguration implements Persistable<Long>, Comparable<
         return Collections.unmodifiableMap((Map<String, String>) inputs.getMap());
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -143,11 +141,6 @@ public class WorkflowTestConfiguration implements Persistable<Long>, Comparable<
 
     public String getWorkflowId() {
         return workflowId;
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     public void setConnections(List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections) {

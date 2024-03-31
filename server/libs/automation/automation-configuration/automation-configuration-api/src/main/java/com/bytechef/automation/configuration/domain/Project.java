@@ -38,7 +38,6 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -48,7 +47,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Project implements Persistable<Long> {
+public final class Project {
 
     @Column("category_id")
     private AggregateReference<Category, Long> categoryId;
@@ -184,7 +183,6 @@ public final class Project implements Persistable<Long> {
         return description;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -242,11 +240,6 @@ public final class Project implements Persistable<Long> {
         } else {
             return List.of();
         }
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     public boolean isPublished() {

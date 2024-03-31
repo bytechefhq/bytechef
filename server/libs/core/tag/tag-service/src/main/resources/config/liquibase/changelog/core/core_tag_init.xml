@@ -14,13 +14,13 @@
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_by" type="VARCHAR(256)">
+            <column name="created_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="last_modified_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_by" type="VARCHAR(256)">
+            <column name="last_modified_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="version" type="BIGINT">

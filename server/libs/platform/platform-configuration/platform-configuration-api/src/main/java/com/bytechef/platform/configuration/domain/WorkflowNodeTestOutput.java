@@ -29,7 +29,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -37,7 +36,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("workflow_node_test_output")
-public class WorkflowNodeTestOutput implements Persistable<Long> {
+public class WorkflowNodeTestOutput {
 
     @Column("component_name")
     private String componentName;
@@ -101,11 +100,6 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
         return getClass().hashCode();
     }
 
-    @Override
-    public boolean isNew() {
-        return id == null;
-    }
-
     public String getComponentName() {
         return componentName;
     }
@@ -126,7 +120,6 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
         return createdDate;
     }
 
-    @Override
     public Long getId() {
         return id;
     }

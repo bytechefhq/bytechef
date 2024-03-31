@@ -27,7 +27,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -35,7 +34,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("data_entry")
-public class DataEntry implements Persistable<Long> {
+public class DataEntry {
 
     @Column("action_name")
     private String actionName;
@@ -111,7 +110,6 @@ public class DataEntry implements Persistable<Long> {
         return createdDate;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -169,12 +167,7 @@ public class DataEntry implements Persistable<Long> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
+        return getClass().hashCode();
     }
 
     public void setValue(Object value) {

@@ -31,7 +31,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -41,7 +40,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("project_instance_workflow")
-public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<ProjectInstanceWorkflow> {
+public class ProjectInstanceWorkflow implements Comparable<ProjectInstanceWorkflow> {
 
     @CreatedBy
     @Column("created_by")
@@ -131,7 +130,6 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
         return Collections.unmodifiableMap(inputs.getMap());
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -158,11 +156,6 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     public void setConnections(List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections) {

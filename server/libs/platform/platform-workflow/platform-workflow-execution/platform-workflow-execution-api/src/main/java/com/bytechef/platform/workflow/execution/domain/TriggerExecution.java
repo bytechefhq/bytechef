@@ -47,7 +47,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -57,7 +56,7 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("trigger_execution")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>, Prioritizable, Retryable, Trigger {
+public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Retryable, Trigger {
 
     public enum Status {
         CREATED(false),
@@ -250,7 +249,6 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
      *
      * @return String the id of the task execution.
      */
-    @Override
     public Long getId() {
         return this.id;
     }
@@ -376,11 +374,6 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     public boolean isBatch() {
         return batch;
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     public TriggerExecution putMetadata(String key, Object value) {

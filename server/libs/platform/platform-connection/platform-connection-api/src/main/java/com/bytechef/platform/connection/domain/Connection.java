@@ -35,7 +35,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -44,7 +43,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Connection implements Persistable<Long> {
+public final class Connection {
 
     public enum CredentialStatus {
         INVALID, VALID
@@ -225,11 +224,6 @@ public final class Connection implements Persistable<Long> {
 
     public int getVersion() {
         return version;
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     public void putAllParameters(Map<String, ?> parameters) {
