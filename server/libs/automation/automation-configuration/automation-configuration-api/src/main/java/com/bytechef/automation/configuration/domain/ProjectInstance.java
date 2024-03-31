@@ -31,7 +31,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -41,7 +40,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("project_instance")
-public class ProjectInstance implements Persistable<Long> {
+public class ProjectInstance {
 
     @CreatedBy
     @Column("created_by")
@@ -129,7 +128,6 @@ public class ProjectInstance implements Persistable<Long> {
         return Environment.values()[environment];
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -163,11 +161,6 @@ public class ProjectInstance implements Persistable<Long> {
 
     public int getVersion() {
         return version;
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     public void setDescription(String description) {

@@ -25,7 +25,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -33,7 +32,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("trigger_state")
-public class TriggerState implements Persistable<Long> {
+public class TriggerState {
 
     @CreatedBy
     @Column("created_by")
@@ -79,7 +78,6 @@ public class TriggerState implements Persistable<Long> {
         return createdDate;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -125,12 +123,7 @@ public class TriggerState implements Persistable<Long> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
+        return getClass().hashCode();
     }
 
     public void setId(Long id) {
