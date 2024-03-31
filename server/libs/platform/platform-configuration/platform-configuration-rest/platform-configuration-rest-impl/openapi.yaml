@@ -953,8 +953,6 @@ components:
         title:
           description: "The title"
           type: "string"
-    AnyValue:
-      description: "Can be anything: string, number, array, object, etc. (except `null`)"
     ActionDefinitionBasic:
       description: "An action is a portion of reusable code that accomplish a specific\
         \ task. When building a workflow, each action is represented as a task inside\
@@ -976,6 +974,8 @@ components:
         title:
           description: "The title"
           type: "string"
+    AnyValue:
+      description: "Can be anything: string, number, array, object, etc. (except `null`)"
     ArrayProperty:
       description: "An array property type."
       type: "object"
@@ -1818,7 +1818,7 @@ components:
         format:
           $ref: "#/components/schemas/WorkflowFormat"
         id:
-          description: "The id of the workflow."
+          description: "The id of a workflow."
           type: "string"
           readOnly: true
         inputs:
@@ -1895,7 +1895,7 @@ components:
           type: "string"
           writeOnly: true
         id:
-          description: "The id of the workflow."
+          description: "The id of a workflow."
           type: "string"
           readOnly: true
         inputsCount:
