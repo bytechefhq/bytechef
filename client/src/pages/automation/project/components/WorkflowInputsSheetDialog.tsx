@@ -100,7 +100,7 @@ const WorkflowInputsSheetDialog = ({
         reset();
     }
 
-    function handleSave(input: WorkflowInputModel & {testValue?: string}) {
+    function saveWorkflowInput(input: WorkflowInputModel & {testValue?: string}) {
         delete input['testValue'];
 
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
@@ -144,7 +144,7 @@ const WorkflowInputsSheetDialog = ({
 
             <DialogContent>
                 <Form {...form}>
-                    <form onSubmit={handleSubmit(handleSave)}>
+                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkflowInput)}>
                         <DialogHeader>
                             <div className="flex items-center justify-between">
                                 <DialogTitle>{`${inputIndex === -1 ? 'Edit' : 'Create'} Input`}</DialogTitle>
@@ -157,7 +157,6 @@ const WorkflowInputsSheetDialog = ({
                             <DialogDescription>Use this to define a workflow input.</DialogDescription>
                         </DialogHeader>
 
-                        <div className="grid gap-4 py-4">
                             <FormField
                                 control={form.control}
                                 name="name"
@@ -260,11 +259,12 @@ const WorkflowInputsSheetDialog = ({
                                     </FormItem>
                                 )}
                             />
-                        </div>
 
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
+                                <Button type="button" variant="outline">
+                                    Cancel
+                                </Button>
                             </DialogClose>
 
                             <Button type="submit">Save</Button>
