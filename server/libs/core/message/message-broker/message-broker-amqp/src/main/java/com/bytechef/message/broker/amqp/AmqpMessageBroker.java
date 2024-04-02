@@ -44,7 +44,7 @@ public class AmqpMessageBroker implements MessageBroker {
                 if (message instanceof Retryable retryable) {
                     MessageProperties messageProperties = amqpMessage.getMessageProperties();
 
-                    messageProperties.setDelay((int) retryable.getRetryDelayMillis());
+                    messageProperties.setDelayLong(Long.valueOf(retryable.getRetryDelayMillis()));
                 }
 
                 if (message instanceof Prioritizable prioritizable) {
