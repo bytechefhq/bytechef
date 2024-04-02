@@ -351,15 +351,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.getProject(id);
 
         if (project.getLastStatus() == Status.PUBLISHED) {
-            List<String> versionWorkflowIds = new ArrayList<>();
+            List<String> duplicatedVersionWorkflowIds = new ArrayList<>();
 
             for (String workflowId : project.getWorkflowIds(project.getLastVersion())) {
                 Workflow workflow = workflowService.duplicateWorkflow(workflowId);
 
-                versionWorkflowIds.add(workflow.getId());
+                duplicatedVersionWorkflowIds.add(workflow.getId());
             }
 
-            projectService.addVersion(id, versionWorkflowIds);
+            projectService.addVersion(id, duplicatedVersionWorkflowIds);
         }
     }
 
