@@ -44,12 +44,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project addVersion(long id, List<String> versionWorkflowIds) {
+    public void addVersion(long id, List<String> duplicatedVersionWorkflowIds) {
         Project project = getProject(id);
 
-        project.addVersion(versionWorkflowIds);
+        project.addVersion(duplicatedVersionWorkflowIds);
 
-        return projectRepository.save(project);
+        projectRepository.save(project);
     }
 
     @Override
@@ -135,12 +135,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project publishProject(long id, String description) {
+    public void publishProject(long id, String description) {
         Project project = getProject(id);
 
         project.publish(description);
 
-        return projectRepository.save(project);
+        projectRepository.save(project);
     }
 
     @Override

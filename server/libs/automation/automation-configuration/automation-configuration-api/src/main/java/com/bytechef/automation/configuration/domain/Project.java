@@ -113,7 +113,7 @@ public final class Project {
         return new Builder();
     }
 
-    public void addVersion(List<String> versionWorkflowIds) {
+    public void addVersion(List<String> duplicatedVersionWorkflowIds) {
         ProjectVersion projectVersion = getLastProjectVersion();
 
         int newVersion = projectVersion.getVersion() + 1;
@@ -126,7 +126,7 @@ public final class Project {
 
         projectVersions.add(new ProjectVersion(newVersion));
 
-        for (String workflowId : versionWorkflowIds) {
+        for (String workflowId : duplicatedVersionWorkflowIds) {
             addWorkflowId(workflowId, projectVersion.getVersion());
         }
     }

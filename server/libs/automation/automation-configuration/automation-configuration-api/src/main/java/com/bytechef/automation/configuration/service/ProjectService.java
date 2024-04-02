@@ -27,7 +27,7 @@ import java.util.Optional;
  */
 public interface ProjectService {
 
-    Project addVersion(long id, List<String> versionWorkflowIds);
+    void addVersion(long id, List<String> duplicatedVersionWorkflowIds);
 
     Project addWorkflow(long id, String workflowId);
 
@@ -45,19 +45,19 @@ public interface ProjectService {
 
     List<Project> getProjects();
 
+    List<ProjectVersion> getProjectVersions(Long id);
+
     List<Project> getProjects(List<Long> ids);
 
     List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Status status);
 
     Project getWorkflowProject(String workflowId);
 
-    Project publishProject(long id, String description);
+    void publishProject(long id, String description);
 
     void removeWorkflow(long id, String workflowId);
 
     Project update(long id, List<Long> tagIds);
 
     Project update(Project project);
-
-    List<ProjectVersion> getProjectVersions(Long id);
 }
