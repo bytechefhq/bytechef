@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.configuration.domain.ApiKey;
-import com.bytechef.platform.configuration.repository.ApiKeyRepository;
+import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.repository.ApiKeyRepository;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
@@ -32,10 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ApiKeyServiceImpl implements ApiKeyService {
 
-    private final ApiKeyRepository signingKeyRepository;
+    private final ApiKeyRepository apiKeyRepository;
 
-    public ApiKeyServiceImpl(ApiKeyRepository signingKeyRepository) {
-        this.signingKeyRepository = signingKeyRepository;
+    public ApiKeyServiceImpl(ApiKeyRepository apiKeyRepository) {
+        this.apiKeyRepository = apiKeyRepository;
     }
 
     @Override
@@ -45,22 +45,22 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.notNull(apiKey.getSecretKey(), "'secretKey' must not be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
 
-        return signingKeyRepository.save(apiKey);
+        return apiKeyRepository.save(apiKey);
     }
 
     @Override
     public void delete(long id) {
-        signingKeyRepository.deleteById(id);
+        apiKeyRepository.deleteById(id);
     }
 
     @Override
     public ApiKey getApiKey(long id) {
-        return OptionalUtils.get(signingKeyRepository.findById(id));
+        return OptionalUtils.get(apiKeyRepository.findById(id));
     }
 
     @Override
     public List<ApiKey> getApiKeys() {
-        return signingKeyRepository.findAll();
+        return apiKeyRepository.findAll();
     }
 
     @Override
@@ -71,6 +71,6 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
         curApiKey.setName(Validate.notNull(apiKey.getName(), "name"));
 
-        return signingKeyRepository.save(curApiKey);
+        return apiKeyRepository.save(curApiKey);
     }
 }

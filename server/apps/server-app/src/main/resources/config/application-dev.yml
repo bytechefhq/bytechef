@@ -27,3 +27,6 @@ bytechef:
 #    url: jdbc:h2:file:~/.bytechef/bytechef;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
 #    username: sa
 #    password:
+  security:
+    remember-me:
+      key: e48612ba1fd46fa7089fe9f5085d8d164b53ffb2

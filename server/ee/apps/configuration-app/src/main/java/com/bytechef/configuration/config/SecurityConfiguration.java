@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.repository;
+package com.bytechef.configuration.config;
 
-import com.bytechef.platform.configuration.domain.ApiKey;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 
 /**
  * @author Ivica Cardic
  */
-@Repository
-public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
+@Configuration
+public class SecurityConfiguration {
+
+    @Bean
+    AuditorAware<String> springSecurityAuditorAware() {
+        return () -> Optional.of("system");
+    }
 }

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest.mapper;
+package com.bytechef.platform.user.web.rest.mapper;
 
-import com.bytechef.platform.configuration.domain.ApiKey;
-import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
-import com.bytechef.platform.configuration.web.rest.model.ApiKeyModel;
+import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.web.rest.mapper.config.PlatformUserMapperSpringConfig;
+import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface ApiKeyModelMapper extends Converter<ApiKeyModel, ApiKey> {
+@Mapper(config = PlatformUserMapperSpringConfig.class)
+public interface ApiKeyMapper extends Converter<ApiKey, ApiKeyModel> {
 
     @Override
-    ApiKey convert(ApiKeyModel apiKeyModel);
+    ApiKeyModel convert(ApiKey apiKey);
 }
