@@ -1,0 +1,208 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Shopify API"
+  description: "Shopify is an e-commerce platform that allows businesses to create online stores and sell products."
+  version: "v1"
+servers:
+  - url: "https://${shopName}.myshopify.com/admin/api/2024-04"
+paths:
+  /orders.json:
+    post:
+      summary: "Create an order"
+      description: "Adds an order into a Shopify store."
+      operationId: "createOrder"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Order"
+              type: "object"
+              properties:
+                order:
+                  type: "object"
+                  properties:
+                    line_items:
+                      description: "A list of line item objects, each containing information about an item in the order."
+                      type: "array"
+                      items:
+                        type: "object"
+                        title: "Item"
+                        properties:
+                          fulfillment_status:
+                            description: "How far along an order is in terms line items fulfilled."
+                            type: "string"
+                            enum:
+                              - "null"
+                              - "fulfilled"
+                              - "partial"
+                              - "not_eligible"
+                          grams:
+                            type: "string"
+                            description: "The weight of the item in grams."
+                          price:
+                            description: "The price of the item before discounts have been applied in the shop currency."
+                            type: "number"
+                            format: "double"
+                          product_id:
+                            type: "integer"
+                            description: "The ID of the product that the line item belongs to."
+                          variant_id:
+                            type: "integer"
+                            description: "The ID of the product variant."
+                          quantity:
+                            type: "integer"
+                            description: "The number of items that were purchased."
+                          title:
+                            type: "string"
+                            description: "The title of the product."
+                    total_tax:
+                      description: "The sum of all the taxes applied to the order in the shop currency. Must be positive."
+                      type: "string"
+                    currency:
+                      description: "The three-letter code (ISO 4217 format) for the shop currency"
+                      type: "string"
+      responses:
+        201:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Order"
+  /orders/{orderId}.json:
+    delete:
+      summary: "Delete an order"
+      description: "Deletes an order. Orders that interact with an online gateway can't be deleted."
+      operationId: "deleteOrder"
+      parameters:
+        - name: "orderId"
+          description: "The order id."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+    get:
+      summary: "Cancel an order"
+      description: "Cancels an order. Orders that are paid and have fulfillments can't be canceled."
+      operationId: "cancelOrder"
+      parameters:
+        - name: "orderId"
+          description: "The order id."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+    put:
+      summary: "Update an order"
+      description: "Update an existing order."
+      operationId: "updateOrder"
+      parameters:
+        - name: "orderId"
+          description: "The order id."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Order"
+              type: "object"
+              properties:
+                order:
+                  type: "object"
+                  properties:
+                    note:
+                      type: "string"
+                      description: "An optional note that a shop owner can attach to the order."
+                    email:
+                      type: "string"
+                      format: "email"
+                      description: "The customer's email address."
+                    phone:
+                      type: "string"
+                      description: "The customer's phone number for receiving SMS notifications."
+                    tags:
+                      type: "string"
+                      description: "Tags attached to the order, formatted as a string of comma-separated values."
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Order"
+  /orders/{orderId}/close.json:
+    post:
+      summary: "Close an order"
+      description: "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded."
+      operationId: "closeOrder"
+      parameters:
+        - name: "orderId"
+          description: "The order id."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+components:
+  schemas:
+    Order:
+      properties:
+        id:
+          type: "integer"
+        currency:
+          type: "string"
+        note:
+          type: "string"
+        email:
+          type: "string"
+        name:
+          type: "string"
+        phone:
+          type: "string"
+        tags:
+          type: "string"
+        line_items:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              fulfillment_status:
+                type: "string"
+              grams:
+                type: "string"
+              price:
+                type: "number"
+                format: "double"
+              product_id:
+                type: "integer"
+              variant_id:
+                type: "integer"
+              quantity:
+                type: "integer"
+              title:
+                type: "string"
+  securitySchemes:
+    admin_api_key:
+      type: "apiKey"
+      in: "header"
+      name: "X-Shopify-Access-Token"
+
