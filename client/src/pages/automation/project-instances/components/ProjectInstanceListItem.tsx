@@ -185,6 +185,17 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        enableProjectInstanceMutation.mutate({
+                                            enable: !projectInstance.enabled,
+                                            id: projectInstance.id!,
+                                        })
+                                    }
+                                >
+                                    {projectInstance.enabled ? 'Disable' : 'Enable'}
+                                </DropdownMenuItem>
+
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
