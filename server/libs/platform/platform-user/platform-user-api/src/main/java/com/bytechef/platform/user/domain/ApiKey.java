@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.domain;
+package com.bytechef.platform.user.domain;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

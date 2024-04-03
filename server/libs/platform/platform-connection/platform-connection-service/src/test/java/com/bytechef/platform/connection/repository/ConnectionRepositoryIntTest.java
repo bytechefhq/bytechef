@@ -103,7 +103,6 @@ public class ConnectionRepositoryIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"))
             .type(Type.AUTOMATION)
-            .version(1)
             .build();
     }
 }

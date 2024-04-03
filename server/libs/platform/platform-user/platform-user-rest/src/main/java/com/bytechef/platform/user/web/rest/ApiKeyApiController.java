@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.platform.user.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.configuration.domain.ApiKey;
-import com.bytechef.platform.configuration.service.ApiKeyService;
-import com.bytechef.platform.configuration.web.rest.model.ApiKeyModel;
+import com.bytechef.platform.user.domain.ApiKey;
+import com.bytechef.platform.user.service.ApiKeyService;
+import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -46,12 +46,11 @@ public class ApiKeyApiController implements ApiKeyApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiKeyModel> createApiKey(ApiKeyModel appEventModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                apiKeyService.create(
-                    conversionService.convert(appEventModel, ApiKey.class)),
-                ApiKeyModel.class));
+                apiKeyService.create(conversionService.convert(appEventModel, ApiKey.class)), ApiKeyModel.class));
     }
 
     @Override
@@ -71,11 +70,11 @@ public class ApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiKeyService.getApiKeys(), signingKey -> conversionService.convert(
-                    signingKey, ApiKeyModel.class)));
+                apiKeyService.getApiKeys(), signingKey -> conversionService.convert(signingKey, ApiKeyModel.class)));
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiKeyModel> updateApiKey(Long id, ApiKeyModel appEventModel) {
         return ResponseEntity.ok(
             conversionService.convert(

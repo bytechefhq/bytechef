@@ -10,6 +10,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
@@ -62,6 +63,9 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
+    implementation(project(":server:libs:platform:platform-swagger"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-rest"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service"))
@@ -70,7 +74,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
-    implementation(project(":server:libs:platform:platform-swagger"))
 
     implementation(project(":server:libs:modules:components:accelo"))
     implementation(project(":server:libs:modules:components:active-campaign"))
@@ -161,6 +164,7 @@ dependencies {
     runtimeOnly("org.springframework.boot:spring-boot-starter-artemis")
     runtimeOnly("org.springframework.boot:spring-boot-starter-cache")
     runtimeOnly("org.springframework.boot:spring-boot-starter-quartz")
+    runtimeOnly("org.springframework.boot:spring-boot-starter-mail")
     runtimeOnly("org.springframework.kafka:spring-kafka")
 
     testImplementation(project(":server:libs:test:test-int-support"))

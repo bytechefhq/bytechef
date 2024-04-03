@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.platform.user.service;
 
-import com.bytechef.platform.configuration.domain.ApiKey;
+import com.bytechef.platform.user.domain.ApiKey;
 import java.util.List;
 import org.springframework.lang.NonNull;
 

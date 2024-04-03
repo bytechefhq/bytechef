@@ -27,6 +27,7 @@ com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotat
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
+commons-validator = "commons-validator:commons-validator:1.8.0"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.21"

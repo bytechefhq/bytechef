@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest.mapper;
+package com.bytechef.platform.user.repository;
 
-import com.bytechef.platform.configuration.domain.ApiKey;
-import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
-import com.bytechef.platform.configuration.web.rest.model.ApiKeyModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.platform.user.domain.PersistentToken;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface ApiKeyMapper extends Converter<ApiKey, ApiKeyModel> {
+@Repository
+public interface PersistentTokenRepository extends ListCrudRepository<PersistentToken, String> {
 
-    @Override
-    ApiKeyModel convert(ApiKey apiKey);
+    List<PersistentToken> findAllByUserId(long userId);
+
+    List<PersistentToken> findAllByTokenDateBefore(LocalDate localDate);
 }

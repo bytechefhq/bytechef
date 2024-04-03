@@ -31,6 +31,70 @@
             </column>
         </createTable>
 
+        <createTable tableName="authority">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="persistent_token">
+            <column name="series" type="VARCHAR(20)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="token_value" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="token_date" type="DATE"/>
+            <column name="ip_address" type="VARCHAR(39)"/>
+            <column name="user_agent" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createTable tableName="user">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="VARCHAR(50)">
+                <constraints unique="true" nullable="false" uniqueConstraintName="ux_user_login"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(50)"/>
+            <column name="last_name" type="VARCHAR(50)"/>
+            <column name="email" type="VARCHAR(191)">
+                <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_email"/>
+            </column>
+            <column name="image_url" type="VARCHAR(256)"/>
+            <column name="activated" type="BOOLEAN" valueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+            <column name="lang_key" type="VARCHAR(10)"/>
+            <column name="activation_key" type="VARCHAR(20)"/>
+            <column name="reset_key" type="VARCHAR(20)"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="reset_date" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <createTable tableName="user_authority">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <createTable tableName="workflow_node_test_output">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -115,7 +179,29 @@
             </column>
         </createTable>
 
+        <addPrimaryKey columnNames="user_id, authority_id" tableName="user_authority"/>
         <addPrimaryKey tableName="workflow_test_configuration_connection" columnNames="workflow_test_configuration_id,workflow_node_name,workflow_connection_key"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="user_id"
+            baseTableName="persistent_token"
+            constraintName="fk_persistent_token_user"
+            referencedColumnNames="id"
+            referencedTableName="user"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="authority_id"
+            baseTableName="user_authority"
+            constraintName="fk_user_authority_authority"
+            referencedColumnNames="id"
+            referencedTableName="authority"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="user_id"
+            baseTableName="user_authority"
+            constraintName="fk_user_authority_user"
+            referencedColumnNames="id"
+            referencedTableName="user"/>
 
         <addForeignKeyConstraint
             baseTableName="workflow_test_configuration_connection"

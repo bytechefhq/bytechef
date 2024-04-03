@@ -1,0 +1,4 @@
+bytechef:
+  security:
+    remember-me:
+      key: test
