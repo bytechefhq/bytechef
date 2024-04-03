@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         working-directory: cli
-        run: ../gradlew build jacocoTestReport sonar --warn
+        run: ../gradlew build jacocoTestReport sonar --quiet
 
   client:
     needs: changes
@@ -132,4 +132,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       working-directory: server
-      run: ../gradlew build jacocoTestReport sonar --warn
+      run: ../gradlew build jacocoTestReport sonar --quiet
