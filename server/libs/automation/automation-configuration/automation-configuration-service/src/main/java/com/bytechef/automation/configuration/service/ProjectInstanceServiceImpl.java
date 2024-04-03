@@ -107,7 +107,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     public ProjectInstance update(ProjectInstance projectInstance) {
         Validate.notNull(projectInstance, "'projectInstance' must not be null");
         Validate.notNull(projectInstance.getProjectId(), "'projectId' must not be null");
-        Validate.notNull(projectInstance.getName(), "'projectId' must not be null");
+        Validate.notNull(projectInstance.getName(), "'name' must not be null");
 
         ProjectInstance curProjectInstance = getProjectInstance(Validate.notNull(projectInstance.getId(), "id"));
 
