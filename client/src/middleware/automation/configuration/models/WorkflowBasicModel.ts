@@ -44,7 +44,7 @@ export interface WorkflowBasicModel {
      */
     description?: string;
     /**
-     * The id of the workflow.
+     * The id of a workflow.
      * @type {string}
      * @memberof WorkflowBasicModel
      */
