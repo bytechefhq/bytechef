@@ -157,108 +157,108 @@ const WorkflowInputsSheetDialog = ({
                             <DialogDescription>Use this to define a workflow input.</DialogDescription>
                         </DialogHeader>
 
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Name</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
 
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                rules={{required: true}}
-                            />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            rules={{required: true}}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="label"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Label</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="label"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Label</FormLabel>
 
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                rules={{required: true}}
-                            />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            rules={{required: true}}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="type"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Type</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="type"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Type</FormLabel>
 
-                                        <FormControl>
-                                            <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select input type" />
-                                                </SelectTrigger>
+                                    <FormControl>
+                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select input type" />
+                                            </SelectTrigger>
 
-                                                <SelectContent>
-                                                    <SelectItem value="boolean">Boolean</SelectItem>
+                                            <SelectContent>
+                                                <SelectItem value="boolean">Boolean</SelectItem>
 
-                                                    <SelectItem value="date">Date</SelectItem>
+                                                <SelectItem value="date">Date</SelectItem>
 
-                                                    <SelectItem value="date_time">Date Time</SelectItem>
+                                                <SelectItem value="date_time">Date Time</SelectItem>
 
-                                                    <SelectItem value="integer">Integer</SelectItem>
+                                                <SelectItem value="integer">Integer</SelectItem>
 
-                                                    <SelectItem value="number">Number</SelectItem>
+                                                <SelectItem value="number">Number</SelectItem>
 
-                                                    <SelectItem value="string">String</SelectItem>
+                                                <SelectItem value="string">String</SelectItem>
 
-                                                    <SelectItem value="time">Time</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
+                                                <SelectItem value="time">Time</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                rules={{required: true}}
-                            />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            rules={{required: true}}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="required"
-                                render={({field}) => (
-                                    <FormItem className="flex flex-col space-y-2">
-                                        <FormLabel>Required</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="required"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col space-y-2">
+                                    <FormLabel>Required</FormLabel>
 
-                                        <FormControl>
-                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
+                                    <FormControl>
+                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                    </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="testValue"
-                                render={({field}) => (
-                                    <FormItem className="flex flex-col space-y-2">
-                                        <FormLabel>Test Value</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="testValue"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col space-y-2">
+                                    <FormLabel>Test Value</FormLabel>
 
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         <DialogFooter>
                             <DialogClose asChild>
