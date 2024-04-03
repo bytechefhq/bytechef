@@ -1,0 +1,184 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Freshdesk API"
+  description: "Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently."
+  version: "v1"
+servers:
+  - url: "https://{domain}.freshdesk.com/api/v2"
+paths:
+  /companies:
+    post:
+      tags:
+        - "Companies"
+      summary: "Create company"
+      description: "Creates a new company"
+      operationId: "createCompany"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Company"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "Name of the company"
+                description:
+                  type: "string"
+                  description: "Description of the company"
+                note:
+                  type: "string"
+                  description: "Any specific note about the company"
+      responses:
+        201:
+          description: "Successful operation. Returns created Contact"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "number"
+                      name:
+                        type: "string"
+                      description:
+                        type: "string"
+                      note:
+                        type: "string"
+  /contacts:
+    post:
+      tags:
+        - "Contacts"
+      summary: "Create contact"
+      description: "Creates a new contact"
+      operationId: "createContact"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Contact"
+              type: "object"
+              required:
+                - "name"
+                - "email"
+              properties:
+                name:
+                  type: "string"
+                  description: "Full name of the contact"
+                email:
+                  type: "string"
+                  format: "email"
+                  description: "Primary email address of the contact."
+                phone:
+                  type: "string"
+                  title: "Work phone"
+                  description: "Telephone number of the contact"
+                mobile:
+                  type: "string"
+                  description: "Mobile number of the contact"
+                description:
+                  type: "string"
+                  description: "A small description of the contact"
+                job_title:
+                  type: "string"
+                  description: "Job title of the contact"
+      responses:
+        201:
+          description: "Successful operation. Returns created Contact"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      description:
+                        type: "string"
+                      email:
+                        type: "string"
+                      id:
+                        type: "number"
+                      job_title:
+                        type: "string"
+
+  /tickets:
+    post:
+      tags:
+        - "Tickets"
+      summary: "Create ticket"
+      description: "Creates a new ticket"
+      operationId: "createTicket"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Ticket"
+              type: "object"
+              required:
+                - "subject"
+                - "email"
+                - "description"
+              properties:
+                subject:
+                  type: "string"
+                  description: "Subject of the ticket."
+                email:
+                  type: "string"
+                  description: "Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact."
+                  format: "email"
+                description:
+                  type: "string"
+                  description: "HTML content of the ticket."
+                priority:
+                  type: "integer"
+                  description: "Priority of the ticket."
+                  default: "1"
+                  enum:
+                    - "1"
+                    - "2"
+                    - "3"
+                    - "4"
+                status:
+                  type: "integer"
+                  description: "Status of the ticket."
+                  default: "2"
+                  enum:
+                    - "2"
+                    - "3"
+                    - "4"
+                    - "5"
+      responses:
+        201:
+          description: "Successful operation. Returns created Contact"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      subject:
+                        type: "string"
+                      email:
+                        type: "string"
+                        format: "email"
+                      description:
+                        type: "string"
+                      priority:
+                        type: "integer"
+                        description: "Priority of the ticket."
+                      status:
+                        type: "integer"
+components:
+  securitySchemes:
+    basicAuth:
+      type: "http"
+      scheme: "basic"

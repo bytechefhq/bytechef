@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:keap"))
     implementation(project(":server:libs:modules:components:logger"))
     implementation(project(":server:libs:modules:components:filesystem"))
+    implementation(project(":server:libs:modules:components:freshdesk"))
     implementation(project(":server:libs:modules:components:freshsales"))
     implementation(project(":server:libs:modules:components:google:google-calendar"))
     implementation(project(":server:libs:modules:components:google:google-contacts"))
