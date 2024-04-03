@@ -631,7 +631,7 @@
         "required": false,
         "name": "priority",
         "type": "INTEGER",
-        "defaultValue": null,
+        "defaultValue": 1,
         "exampleValue": null,
         "label": "Priority",
         "placeholder": null,
@@ -639,19 +639,19 @@
         "minValue": null,
         "options": [ {
           "description": null,
-          "label": "1",
+          "label": "Low",
           "value": 1
         }, {
           "description": null,
-          "label": "2",
+          "label": "Medium",
           "value": 2
         }, {
           "description": null,
-          "label": "3",
+          "label": "High",
           "value": 3
         }, {
           "description": null,
-          "label": "4",
+          "label": "Urgent",
           "value": 4
         } ],
         "controlType": "SELECT",
@@ -666,7 +666,7 @@
         "required": false,
         "name": "status",
         "type": "INTEGER",
-        "defaultValue": null,
+        "defaultValue": 2,
         "exampleValue": null,
         "label": "Status",
         "placeholder": null,
@@ -674,19 +674,19 @@
         "minValue": null,
         "options": [ {
           "description": null,
-          "label": "2",
+          "label": "Open",
           "value": 2
         }, {
           "description": null,
-          "label": "3",
+          "label": "Pending",
           "value": 3
         }, {
           "description": null,
-          "label": "4",
+          "label": "Resolved",
           "value": 4
         }, {
           "description": null,
-          "label": "5",
+          "label": "Closed",
           "value": 5
         } ],
         "controlType": "SELECT",
@@ -851,17 +851,17 @@
       "name": "basic_auth",
       "properties": [ {
         "advancedOption": null,
-        "description": null,
+        "description": "Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
         "required": true,
-        "name": "username",
+        "name": "domain",
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Username",
+        "label": "Domain",
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
@@ -877,11 +877,11 @@
         "hidden": null,
         "metadata": { },
         "required": true,
-        "name": "password",
+        "name": "username",
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Password",
+        "label": "API key",
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
