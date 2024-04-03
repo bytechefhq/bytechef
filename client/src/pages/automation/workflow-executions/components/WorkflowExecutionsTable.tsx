@@ -104,7 +104,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
                             {row.getVisibleCells().map((cell) => (
-                                <TableCell className="px-3 py-4" key={cell.id}>
+                                <TableCell className="whitespace-nowrap p-3" key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}
