@@ -30,9 +30,12 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.Property;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -70,13 +73,14 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
     }
 
     @Override
-    public ModifiableProperty<?>
-        modifyProperty(ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(actionDefinition.getName(), "createTicket")) {
+            Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
+                ((ModifiableObjectProperty) modifiableProperty).getProperties();
 
-            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
-                .get()) {
+            for (BaseProperty baseProperty : propertiesOptional.get()) {
                 if (Objects.equals(baseProperty.getName(), "priority")) {
                     ((ModifiableIntegerProperty) baseProperty)
                         .options(
