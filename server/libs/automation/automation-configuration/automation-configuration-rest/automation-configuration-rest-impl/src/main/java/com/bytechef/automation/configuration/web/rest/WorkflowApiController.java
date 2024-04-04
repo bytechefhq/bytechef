@@ -93,8 +93,7 @@ public class WorkflowApiController implements WorkflowApi {
     @Override
     public ResponseEntity<List<WorkflowBasicModel>> getWorkflows() {
         return ResponseEntity.ok(
-            workflowService
-                .getWorkflows(Type.AUTOMATION.ordinal())
+            workflowService.getWorkflows(Type.AUTOMATION.ordinal())
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, WorkflowBasicModel.class))
                 .toList());

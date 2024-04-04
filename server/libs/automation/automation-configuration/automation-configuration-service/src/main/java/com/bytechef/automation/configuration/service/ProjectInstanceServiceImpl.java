@@ -57,13 +57,6 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
-    public boolean isProjectInstanceEnabled(long projectInstanceId) {
-        ProjectInstance projectInstance = getProjectInstance(projectInstanceId);
-
-        return projectInstance.isEnabled();
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public ProjectInstance getProjectInstance(long id) {
         return OptionalUtils.get(projectInstanceRepository.findById(id));
@@ -92,6 +85,14 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     public List<ProjectInstance> getProjectInstances(Environment environment, Long projectId, Long tagId) {
         return projectInstanceRepository.findAllProjectInstances(
             environment == null ? null : environment.ordinal(), projectId, tagId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isProjectInstanceEnabled(long projectInstanceId) {
+        ProjectInstance projectInstance = getProjectInstance(projectInstanceId);
+
+        return projectInstance.isEnabled();
     }
 
     @Override

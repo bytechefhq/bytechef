@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,20 +169,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) == null) {
-            workflows = filteredWorkflowRepositories
-                .stream()
-                .flatMap(workflowRepository -> CollectionUtils.stream(workflowRepository.findAll(type))
-                    .filter(Objects::nonNull)
-                    .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType())))
-                .sorted((a, b) -> {
-                    if (a.getLabel() == null || b.getLabel() == null) {
-                        return -1;
-                    }
-
-                    String label = a.getLabel();
-
-                    return label.compareTo(b.getLabel());
-                })
+            workflows = filteredWorkflowRepositories.stream()
+                .flatMap(workflowRepository -> stream(type, workflowRepository))
+                .sorted(WorkflowServiceImpl::compare)
                 .collect(Collectors.toList());
 
             cacheAll.put(CACHE_ALL, workflows);
@@ -280,6 +270,23 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowCrudRepositories,
             workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)),
             workflowCrudRepository -> update(definition, version, workflow, workflowCrudRepository));
+    }
+
+    private static int compare(Workflow a, Workflow b) {
+        if (a.getLabel() == null || b.getLabel() == null) {
+            return -1;
+        }
+
+        String label = a.getLabel();
+
+        return label.compareTo(b.getLabel());
+    }
+
+    private static Stream<Workflow> stream(int type, WorkflowRepository workflowRepository) {
+        return workflowRepository.findAll(type)
+            .stream()
+            .filter(Objects::nonNull)
+            .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()));
     }
 
     private Workflow update(
