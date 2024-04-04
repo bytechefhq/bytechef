@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.automation.user.web.rest.mapper.config;
 
-import com.bytechef.platform.constant.Type;
-import com.bytechef.platform.user.domain.ApiKey;
-import java.util.List;
-import org.springframework.lang.NonNull;
+import com.bytechef.platform.user.web.rest.adapter.PlatformUserConversionServiceAdapter;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApiKeyService {
-
-    ApiKey create(@NonNull ApiKey apiKey);
-
-    void delete(long id);
-
-    ApiKey getApiKey(long id);
-
-    List<ApiKey> getApiKeys(Type type);
-
-    ApiKey update(@NonNull ApiKey apiKey);
+@MapperConfig(componentModel = "spring", uses = PlatformUserConversionServiceAdapter.class)
+@SpringMapperConfig(
+    conversionServiceAdapterPackage = "com.bytechef.platform.user.web.rest.adapter",
+    conversionServiceAdapterClassName = "PlatformUserConversionServiceAdapter")
+public interface AutomationUserMapperSpringConfig {
 }

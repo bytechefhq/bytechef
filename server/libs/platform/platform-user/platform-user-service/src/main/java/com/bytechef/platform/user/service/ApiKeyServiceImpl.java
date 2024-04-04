@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
 import java.util.List;
@@ -59,8 +60,8 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public List<ApiKey> getApiKeys() {
-        return apiKeyRepository.findAll();
+    public List<ApiKey> getApiKeys(Type type) {
+        return apiKeyRepository.findAllByType(type.ordinal());
     }
 
     @Override

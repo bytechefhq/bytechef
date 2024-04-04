@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
-
-import com.bytechef.platform.constant.Type;
-import com.bytechef.platform.user.domain.ApiKey;
-import java.util.List;
-import org.springframework.lang.NonNull;
+package com.bytechef.web.rest.error.constant;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApiKeyService {
+public final class ErrorConstants {
 
-    ApiKey create(@NonNull ApiKey apiKey);
+    public static final String ERR_CONCURRENCY_FAILURE = "error.concurrencyFailure";
+    public static final String ERR_VALIDATION = "error.validation";
+    public static final String PROBLEM_BASE_URL = "https://www.bytechef.io/problem";
 
-    void delete(long id);
-
-    ApiKey getApiKey(long id);
-
-    List<ApiKey> getApiKeys(Type type);
-
-    ApiKey update(@NonNull ApiKey apiKey);
+    private ErrorConstants() {
+    }
 }

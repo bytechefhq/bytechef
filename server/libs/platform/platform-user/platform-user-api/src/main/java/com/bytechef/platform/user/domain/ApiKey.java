@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.user.domain;
 
+import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.Type;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -43,6 +45,9 @@ public class ApiKey {
     @CreatedDate
     private LocalDateTime createdDate;
 
+    @Column
+    private int environment;
+
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -59,6 +64,9 @@ public class ApiKey {
 
     @Column("secret_key")
     private String secretKey;
+
+    @Column
+    private int type;
 
     public ApiKey() {
     }
@@ -79,6 +87,10 @@ public class ApiKey {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    public Environment getEnvironment() {
+        return Environment.values()[environment];
     }
 
     public Long getId() {
@@ -113,8 +125,8 @@ public class ApiKey {
         return secretKey;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Type getType() {
+        return Type.values()[type];
     }
 
     public void setCreatedBy(String createdBy) {
@@ -123,6 +135,14 @@ public class ApiKey {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment.ordinal();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setLastUsedDate(LocalDateTime lastUsedDate) {
@@ -137,6 +157,10 @@ public class ApiKey {
         this.secretKey = secretKey;
     }
 
+    public void setType(Type type) {
+        this.type = type.ordinal();
+    }
+
     @Override
     public String toString() {
         return "APIKey{" +
@@ -146,6 +170,7 @@ public class ApiKey {
             ", secretKey='" + secretKey + '\'' +
             ", lastUsedDate=" + lastUsedDate +
             ", name='" + name + '\'' +
+            ", type=" + type +
             '}';
     }
 }

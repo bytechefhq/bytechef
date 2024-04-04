@@ -7,10 +7,9 @@
 
 package com.bytechef.embedded.configuration.remote.client.facade;
 
-import static com.bytechef.embedded.configuration.domain.IntegrationVersion.*;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
+import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;

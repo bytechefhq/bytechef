@@ -7,7 +7,10 @@ dependencies {
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.data:spring-data-commons")
+    implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:rest:rest-api"))
+
+    compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     testImplementation("jakarta.validation:jakarta.validation-api")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
