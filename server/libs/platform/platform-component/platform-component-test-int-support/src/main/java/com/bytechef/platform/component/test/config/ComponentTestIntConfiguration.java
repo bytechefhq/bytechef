@@ -18,7 +18,6 @@ package com.bytechef.platform.component.test.config;
 
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
-import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -101,9 +100,7 @@ public class ComponentTestIntConfiguration {
     ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
         ResourcePatternResolver resourcePatternResolver) {
 
-        return new ClassPathResourceWorkflowRepository(
-            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
-                Map.of(0, "workflows/**/*.{json|yml|yaml}"), "classpath"));
+        return new ClassPathResourceWorkflowRepository("workflows/**/*.{json|yml|yaml}", resourcePatternResolver);
     }
 
     @Bean

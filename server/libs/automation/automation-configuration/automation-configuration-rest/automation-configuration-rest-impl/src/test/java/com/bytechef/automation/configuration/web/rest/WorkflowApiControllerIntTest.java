@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -115,7 +114,7 @@ public class WorkflowApiControllerIntTest {
 
     @Test
     public void testGetWorkflows() {
-        when(workflowService.getWorkflows(anyInt()))
+        when(projectFacade.getProjectWorkflows())
             .thenReturn(List.of(getWorkflow()));
 
         try {
@@ -174,11 +173,11 @@ public class WorkflowApiControllerIntTest {
     }
 
     private Workflow getWorkflow() {
-        return new Workflow("1", DEFINITION, Workflow.Format.JSON, 0);
+        return new Workflow("1", DEFINITION, Workflow.Format.JSON);
     }
 
     private WorkflowDTO getWorkflowDTO() {
-        Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON, 0);
+        Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON);
 
         return new WorkflowDTO(
             workflow, List.of(new WorkflowTaskDTO(workflow.getTasks()

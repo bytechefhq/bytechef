@@ -48,6 +48,8 @@ public interface ProjectFacade {
 
     List<Tag> getProjectTags();
 
+    List<Workflow> getProjectWorkflows();
+
     List<Workflow> getProjectWorkflows(long id);
 
     List<Workflow> getProjectVersionWorkflows(long id, int projectVersion);

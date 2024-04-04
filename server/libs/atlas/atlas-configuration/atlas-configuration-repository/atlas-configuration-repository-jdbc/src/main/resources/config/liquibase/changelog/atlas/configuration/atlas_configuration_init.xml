@@ -26,9 +26,6 @@
             <column name="last_modified_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="type" type="INT">
-                <constraints nullable="false"/>
-            </column>
             <column name="version" type="BIGINT">
                 <constraints nullable="false"/>
             </column>

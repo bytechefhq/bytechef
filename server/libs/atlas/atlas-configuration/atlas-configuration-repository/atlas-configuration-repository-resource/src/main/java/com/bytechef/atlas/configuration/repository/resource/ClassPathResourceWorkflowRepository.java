@@ -17,7 +17,6 @@
 package com.bytechef.atlas.configuration.repository.resource;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
@@ -26,10 +25,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class ClassPathResourceWorkflowRepository extends AbstractResourceWorkflowRepository {
 
     public ClassPathResourceWorkflowRepository(
-        ResourcePatternResolver resourcePatternResolver,
-        ResourceWorkflowRepositoryProperties resourceWorkflowRepositoryProperties) {
+        String locationPattern, ResourcePatternResolver resourcePatternResolver) {
 
-        super(resourcePatternResolver, resourceWorkflowRepositoryProperties);
+        super(locationPattern, "classpath", resourcePatternResolver);
     }
 
     @Override

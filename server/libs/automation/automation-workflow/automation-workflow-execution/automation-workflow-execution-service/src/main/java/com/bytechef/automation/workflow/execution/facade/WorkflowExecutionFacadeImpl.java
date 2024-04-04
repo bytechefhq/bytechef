@@ -29,6 +29,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -68,6 +69,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ContextService contextService;
     private final JobService jobService;
     private final InstanceJobService instanceJobService;
+    private final ProjectFacade projectFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
@@ -80,9 +82,9 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     @SuppressFBWarnings("EI")
     public WorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        JobService jobService, InstanceJobService instanceJobService, ProjectInstanceService projectInstanceService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+        JobService jobService, InstanceJobService instanceJobService, ProjectFacade projectFacade,
+        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectService projectService, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         WorkflowService workflowService) {
 
@@ -90,6 +92,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.contextService = contextService;
         this.jobService = jobService;
         this.instanceJobService = instanceJobService;
+        this.projectFacade = projectFacade;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
@@ -139,7 +142,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             workflowIds.addAll(project.getWorkflowIds(getProjectVersion(project.getLastVersion(), projectInstanceId)));
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(workflowService.getWorkflows(Type.AUTOMATION.ordinal()), Workflow::getId));
+                CollectionUtils.map(projectFacade.getProjectWorkflows(), Workflow::getId));
         }
 
         Page<WorkflowExecution> workflowExecutionPage;

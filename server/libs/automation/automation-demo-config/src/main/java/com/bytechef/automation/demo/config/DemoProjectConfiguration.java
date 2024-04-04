@@ -22,7 +22,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -78,8 +77,7 @@ public class DemoProjectConfiguration {
 
                 for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.json")) {
                     Workflow workflow = workflowService.create(
-                        resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.JSON, SourceType.JDBC,
-                        Type.AUTOMATION.ordinal());
+                        resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.JSON, SourceType.JDBC);
 
                     projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
                 }

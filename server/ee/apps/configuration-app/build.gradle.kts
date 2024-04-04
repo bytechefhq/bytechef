@@ -19,7 +19,6 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
-    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))

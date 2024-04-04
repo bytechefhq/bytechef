@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
@@ -24,7 +23,6 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.util.WorkflowApiControllerUtils;
-import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -43,17 +41,14 @@ public class WorkflowApiController implements WorkflowApi {
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
     private final WorkflowFacade workflowFacade;
-    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
-        ConversionService conversionService, ProjectFacade projectFacade, WorkflowFacade workflowFacade,
-        WorkflowService workflowService) {
+        ConversionService conversionService, ProjectFacade projectFacade, WorkflowFacade workflowFacade) {
 
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
         this.workflowFacade = workflowFacade;
-        this.workflowService = workflowService;
     }
 
     @Override
@@ -93,7 +88,7 @@ public class WorkflowApiController implements WorkflowApi {
     @Override
     public ResponseEntity<List<WorkflowBasicModel>> getWorkflows() {
         return ResponseEntity.ok(
-            workflowService.getWorkflows(Type.AUTOMATION.ordinal())
+            projectFacade.getProjectWorkflows()
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, WorkflowBasicModel.class))
                 .toList());

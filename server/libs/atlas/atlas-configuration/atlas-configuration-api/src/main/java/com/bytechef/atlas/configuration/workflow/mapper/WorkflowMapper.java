@@ -24,7 +24,7 @@ import java.util.Map;
  */
 interface WorkflowMapper {
 
-    Workflow readWorkflow(WorkflowResource workflowResource, int type) throws Exception;
+    Workflow readWorkflow(WorkflowResource workflowResource) throws Exception;
 
     Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws Exception;
 

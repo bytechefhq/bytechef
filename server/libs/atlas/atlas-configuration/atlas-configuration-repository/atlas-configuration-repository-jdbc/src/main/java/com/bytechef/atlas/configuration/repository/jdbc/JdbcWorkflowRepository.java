@@ -23,9 +23,8 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryJdbc;
 import java.util.List;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -35,13 +34,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnWorkflowRepositoryJdbc
 public interface JdbcWorkflowRepository
-    extends ListPagingAndSortingRepository<Workflow, String>, WorkflowRepository, WorkflowCrudRepository {
+    extends ListCrudRepository<Workflow, String>, ListPagingAndSortingRepository<Workflow, String>, WorkflowRepository,
+    WorkflowCrudRepository {
 
     @Override
     void deleteById(String id);
 
-    @Query("SELECT * FROM workflow WHERE type = :type")
-    List<Workflow> findAll(@Param("type") int type);
+    @Override
+    List<Workflow> findAll();
 
     @Override
     default SourceType getSourceType() {

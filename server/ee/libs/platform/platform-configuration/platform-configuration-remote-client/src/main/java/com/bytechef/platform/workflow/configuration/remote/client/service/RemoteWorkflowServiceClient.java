@@ -36,8 +36,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
 
     @Override
     public Workflow create(
-        @NonNull String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType,
-        int type) {
+        @NonNull String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType) {
 
         throw new UnsupportedOperationException();
     }
@@ -53,6 +52,11 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
+    public List<Workflow> getWorkflows() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Workflow getWorkflow(@NonNull String id) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -60,16 +64,6 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
                 .path(WORKFLOW_SERVICE + "/get-workflow/{id}")
                 .build(id),
             Workflow.class);
-    }
-
-    @Override
-    public List<Workflow> getWorkflows(int type) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(WORKFLOW_SERVICE + "/get-workflows/{type}")
-                .build(type),
-            new ParameterizedTypeReference<>() {});
     }
 
     @Override

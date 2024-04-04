@@ -8,13 +8,10 @@
 package com.bytechef.atlas.configuration.repository.git.config;
 
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryGit;
-import com.bytechef.atlas.configuration.repository.config.contributor.GitWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -25,6 +22,7 @@ import org.springframework.core.annotation.Order;
  * @author Ivica Cardic
  */
 @Configuration
+@EnableConfigurationProperties(GitWorkflowRepositoryProperties.class)
 @ConditionalOnWorkflowRepositoryGit
 public class GitWorkflowRepositoryConfiguration {
 
@@ -38,21 +36,7 @@ public class GitWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(4)
-    GitWorkflowRepository gitWorkflowRepository(List<GitWorkflowRepositoryPropertiesContributor> contributors) {
-        Map<Integer, GitWorkflowRepositoryProperties> gitWorkflowRepositoryPropertiesMap = new HashMap<>();
-
-        for (GitWorkflowRepositoryPropertiesContributor contributor : contributors) {
-            GitWorkflowRepositoryPropertiesContributor.GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties =
-                contributor.getGitWorkflowRepositoryProperties();
-
-            gitWorkflowRepositoryPropertiesMap.put(
-                contributor.getType(),
-                new GitWorkflowRepositoryProperties(
-                    gitWorkflowRepositoryProperties.branch(), gitWorkflowRepositoryProperties.password(),
-                    gitWorkflowRepositoryProperties.searchPaths(), gitWorkflowRepositoryProperties.url(),
-                    gitWorkflowRepositoryProperties.username()));
-        }
-
-        return new GitWorkflowRepository(gitWorkflowRepositoryPropertiesMap);
+    GitWorkflowRepository gitWorkflowRepository(GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties) {
+        return new GitWorkflowRepository(gitWorkflowRepositoryProperties);
     }
 }

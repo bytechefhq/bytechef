@@ -18,15 +18,11 @@ package com.bytechef.atlas.configuration.repository.resource.config;
 
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryClasspath;
 import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryFilesystem;
-import com.bytechef.atlas.configuration.repository.config.contributor.ClasspathResourceWorkflowRepositoryPropertiesContributor;
-import com.bytechef.atlas.configuration.repository.config.contributor.FilesystemResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.FilesystemResourceWorkflowRepository;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -50,40 +46,25 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Order(1)
     @ConditionalOnWorkflowRepositoryClasspath
     ClassPathResourceWorkflowRepository classpathBasedWorkflowRepository(
-        List<ClasspathResourceWorkflowRepositoryPropertiesContributor> contributors) {
+        @Value("${bytechef.workflow.repository.classpath.location-pattern:workflows/**/*.{json,yml,yaml}}") String locationPattern) {
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow repository type enabled: classpath");
         }
 
-        Map<Integer, String> propertiesMap = new HashMap<>();
-
-        for (ClasspathResourceWorkflowRepositoryPropertiesContributor contributor : contributors) {
-            propertiesMap.put(contributor.getType(), contributor.getLocationPattern());
-        }
-
-        return new ClassPathResourceWorkflowRepository(
-            resourcePatternResolver,
-            new ResourceWorkflowRepositoryProperties(propertiesMap, "classpath"));
+        return new ClassPathResourceWorkflowRepository(locationPattern, resourcePatternResolver);
     }
 
     @Bean
     @Order(2)
     @ConditionalOnWorkflowRepositoryFilesystem
     FilesystemResourceWorkflowRepository filesystemResourceWorkflowRepository(
-        List<FilesystemResourceWorkflowRepositoryPropertiesContributor> contributors) {
+        @Value("${bytechef.workflow.repository.filesystem.location-pattern:${user.home}/bytechef/data/workflows/**/*.{json,yml,yaml}}") String locationPattern) {
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow repository type enabled: filesystem");
         }
 
-        Map<Integer, String> propertiesMap = new HashMap<>();
-
-        for (FilesystemResourceWorkflowRepositoryPropertiesContributor contributor : contributors) {
-            propertiesMap.put(contributor.getType(), contributor.getLocationPattern());
-        }
-
-        return new FilesystemResourceWorkflowRepository(
-            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(propertiesMap, "file"));
+        return new FilesystemResourceWorkflowRepository(locationPattern, resourcePatternResolver);
     }
 }

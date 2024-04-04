@@ -131,23 +131,20 @@ public final class Workflow implements Persistable<String>, Serializable {
     @Transient
     private List<WorkflowTask> tasks = Collections.emptyList();
 
-    @Column
-    private int type;
-
     @Version
     private int version;
 
-    public Workflow(String definition, Format format, int type) {
-        this(null, definition, format, type, null, Map.of());
+    public Workflow(String definition, Format format) {
+        this(null, definition, format, null, Map.of());
     }
 
-    public Workflow(String id, String definition, Format format, int type) {
-        this(id, definition, format, type, null, Map.of());
+    public Workflow(String id, String definition, Format format) {
+        this(id, definition, format, null, Map.of());
     }
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String id, String definition, Format format, int type, LocalDateTime lastModifiedDate,
+        String id, String definition, Format format, LocalDateTime lastModifiedDate,
         Map<String, Object> metadata) {
 
         Validate.notNull(definition, "'definition' must not be null");
@@ -159,7 +156,6 @@ public final class Workflow implements Persistable<String>, Serializable {
         this.id = id;
         this.lastModifiedDate = lastModifiedDate;
         this.metadata = new HashMap<>(metadata);
-        this.type = type;
 
         Map<String, ?> sourceMap = readWorkflowMap(definition, id, format);
 
@@ -195,10 +191,10 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     @PersistenceCreator
-    public Workflow(String id, String definition, Format format, LocalDateTime lastModifiedDate, int type)
+    public Workflow(String id, String definition, Format format, LocalDateTime lastModifiedDate)
         throws Exception {
 
-        this(id, definition, format, type, lastModifiedDate, Map.of());
+        this(id, definition, format, lastModifiedDate, Map.of());
     }
 
     private Workflow() {
@@ -322,10 +318,6 @@ public final class Workflow implements Persistable<String>, Serializable {
     /** Returns the steps that make up the workflow. */
     public List<WorkflowTask> getTasks() {
         return Collections.unmodifiableList(tasks);
-    }
-
-    public int getType() {
-        return type;
     }
 
     public int getVersion() {

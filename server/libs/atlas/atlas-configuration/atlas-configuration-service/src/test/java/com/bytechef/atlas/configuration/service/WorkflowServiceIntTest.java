@@ -19,7 +19,6 @@ package com.bytechef.atlas.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -63,7 +62,7 @@ public class WorkflowServiceIntTest {
         Workflow workflow = getWorkflow();
 
         workflow = workflowService.create(
-            workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC, 0);
+            workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC);
 
         Assertions.assertEquals(workflow, OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
     }
@@ -85,17 +84,6 @@ public class WorkflowServiceIntTest {
     }
 
     @Test
-    public void testGetWorkflows() {
-        for (Workflow workflow : workflowCrudRepository.findAll(0)) {
-            workflowCrudRepository.deleteById(workflow.getId());
-        }
-
-        workflowCrudRepository.save(getWorkflow());
-
-        Assertions.assertEquals(1, CollectionUtils.size(workflowService.getWorkflows(0)));
-    }
-
-    @Test
     public void testUpdate() {
         String definition = "{\"label\": \"Label\",\"tasks\": []}";
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
@@ -107,7 +95,7 @@ public class WorkflowServiceIntTest {
     }
 
     private static Workflow getWorkflow() {
-        Workflow workflow = new Workflow("{\"tasks\": []}", Workflow.Format.JSON, 0);
+        Workflow workflow = new Workflow("{\"tasks\": []}", Workflow.Format.JSON);
 
         workflow.setNew(true);
 

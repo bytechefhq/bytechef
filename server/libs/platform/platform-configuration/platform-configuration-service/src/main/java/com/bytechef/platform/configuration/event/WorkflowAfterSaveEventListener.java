@@ -46,8 +46,7 @@ public class WorkflowAfterSaveEventListener extends AbstractRelationalEventListe
 
         // refresh definition
         workflow = new Workflow(
-            Validate.notNull(workflow.getId(), "id"), workflow.getDefinition(), workflow.getFormat(),
-            workflow.getType());
+            Validate.notNull(workflow.getId(), "id"), workflow.getDefinition(), workflow.getFormat());
 
         workflowTestConfigurationFacade.removeUnusedWorkflowTestConfigurationConnections(workflow);
         workflowNodeTestOutputService.removeUnusedNodeTestOutputs(workflow);

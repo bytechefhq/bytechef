@@ -27,16 +27,15 @@ import org.springframework.lang.NonNull;
  */
 public interface WorkflowService {
 
-    Workflow create(
-        @NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType, int type);
+    Workflow create(@NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType);
 
     void delete(@NonNull String id);
 
     Workflow duplicateWorkflow(@NonNull String id);
 
-    Workflow getWorkflow(@NonNull String id);
+    List<Workflow> getWorkflows();
 
-    List<Workflow> getWorkflows(int type);
+    Workflow getWorkflow(@NonNull String id);
 
     List<Workflow> getWorkflows(@NonNull List<String> workflowIds);
 

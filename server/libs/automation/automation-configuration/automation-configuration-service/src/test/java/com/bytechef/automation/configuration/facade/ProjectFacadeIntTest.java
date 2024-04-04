@@ -256,7 +256,7 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testGetProjectWorkflows() {
-        Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON, 0);
+        Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
 
         workflow.setNew(true);
 

@@ -28,10 +28,10 @@ public class WorkflowReader {
     private static final List<WorkflowMapper> workflowMapperResolvers = List.of(
         new JsonWorkflowMapper(), new YamlWorkflowMapper());
 
-    public static Workflow readWorkflow(WorkflowResource workflowResource, int type) throws Exception {
+    public static Workflow readWorkflow(WorkflowResource workflowResource) throws Exception {
         WorkflowMapper workflowMapper = getWorkflowMapper(workflowResource);
 
-        return workflowMapper.readWorkflow(workflowResource, type);
+        return workflowMapper.readWorkflow(workflowResource);
     }
 
     public static Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws Exception {

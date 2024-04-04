@@ -36,7 +36,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -100,7 +99,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public Workflow addWorkflow(long id, @NonNull String definition) {
         checkProjectStatus(id);
 
-        Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC, Type.AUTOMATION.ordinal());
+        Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         projectService.addWorkflow(id, workflow.getId());
 
@@ -132,7 +131,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
-                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, Type.AUTOMATION.ordinal());
+                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC);
 
             project.addWorkflowId(Validate.notNull(workflow.getId(), "id"));
         }
@@ -302,6 +301,16 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Workflow> getProjectWorkflows() {
+        return workflowService.getWorkflows(
+            projectService.getProjects()
+                .stream()
+                .flatMap(project -> CollectionUtils.stream(project.getWorkflowIds(project.getLastVersion())))
+                .toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Workflow> getProjectWorkflows(long id) {
         Project project = projectService.getProject(id);
 
@@ -374,7 +383,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
             workflow = workflowService.create(
-                workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), Type.AUTOMATION.ordinal());
+                workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
 
             newWorkflowIds.add(workflow.getId());
         }

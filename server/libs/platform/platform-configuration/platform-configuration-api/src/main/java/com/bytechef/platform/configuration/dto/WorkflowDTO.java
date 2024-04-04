@@ -29,14 +29,13 @@ public record WorkflowDTO(
     String createdBy, LocalDateTime createdDate, String definition, String description, Workflow.Format format,
     String id, List<Workflow.Input> inputs, String label, String lastModifiedBy, LocalDateTime lastModifiedDate,
     List<Workflow.Output> outputs, Workflow.SourceType sourceType, int maxRetries, List<WorkflowTaskDTO> tasks,
-    List<WorkflowTriggerDTO> triggers, int type, int version) {
+    List<WorkflowTriggerDTO> triggers, int version) {
 
     public WorkflowDTO(Workflow workflow, List<WorkflowTaskDTO> tasks, List<WorkflowTriggerDTO> triggers) {
         this(
             workflow.getCreatedBy(), workflow.getCreatedDate(), workflow.getDefinition(), workflow.getDescription(),
             workflow.getFormat(), workflow.getId(), workflow.getInputs(), workflow.getLabel(),
             workflow.getLastModifiedBy(), workflow.getLastModifiedDate(), workflow.getOutputs(),
-            workflow.getSourceType(), workflow.getMaxRetries(), tasks, triggers, workflow.getType(),
-            workflow.getVersion());
+            workflow.getSourceType(), workflow.getMaxRetries(), tasks, triggers, workflow.getVersion());
     }
 }

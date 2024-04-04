@@ -67,7 +67,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public Workflow create(
-        @NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType, int type) {
+        @NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType) {
 
         Validate.notNull(definition, "'definition' must not be null");
         Validate.notNull(format, "'format' must not be null");
@@ -75,7 +75,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         // TODO Validate definition considering format value
 
-        final Workflow workflow = new Workflow(definition, format, type);
+        final Workflow workflow = new Workflow(definition, format);
 
         workflow.setNew(true);
         workflow.setSourceType(sourceType);
@@ -103,8 +103,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     public Workflow duplicateWorkflow(@NonNull String id) {
         Workflow workflow = getWorkflow(id);
 
-        return create(
-            workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), workflow.getType());
+        return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
     }
 
     @Override
@@ -157,9 +156,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public List<Workflow> getWorkflows(int type) {
+    @SuppressWarnings("unchecked")
+    public List<Workflow> getWorkflows() {
         List<Workflow> workflows;
         List<SourceType> sourceTypes = Arrays.asList(SourceType.values());
 
@@ -170,7 +169,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = filteredWorkflowRepositories.stream()
-                .flatMap(workflowRepository -> stream(type, workflowRepository))
+                .flatMap(WorkflowServiceImpl::stream)
                 .sorted(WorkflowServiceImpl::compare)
                 .collect(Collectors.toList());
 
@@ -178,8 +177,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         } else {
             Cache.ValueWrapper valueWrapper = Validate.notNull(cacheAll.get(CACHE_ALL), "valueWrapper");
 
-            workflows = CollectionUtils.filter(
-                (List<Workflow>) valueWrapper.get(), workflow -> workflow.getType() == type);
+            workflows = (List<Workflow>) valueWrapper.get();
         }
 
         return workflows;
@@ -282,8 +280,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         return label.compareTo(b.getLabel());
     }
 
-    private static Stream<Workflow> stream(int type, WorkflowRepository workflowRepository) {
-        return workflowRepository.findAll(type)
+    private static Stream<Workflow> stream(WorkflowRepository workflowRepository) {
+        return workflowRepository.findAll()
             .stream()
             .filter(Objects::nonNull)
             .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()));

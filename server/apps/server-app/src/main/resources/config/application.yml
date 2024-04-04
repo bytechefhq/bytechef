@@ -167,29 +167,5 @@ bytechef:
       # Output storage provider for workflow output data (base64 | filesystem) default: base64
       provider: base64
     repository:
-      classpath:
-        # Enable classpath based workflow repository
-        enabled: false
-        projects:
-          location-pattern: workflows/projects/**/*.{json,yml,yaml}
-      filesystem:
-        # Enable filesystem based workflow repository
-        enabled: true
-        projects:
-          # Location of workflows on the file system
-          location-pattern: ${user.home}/bytechef/data/workflows/projects/**/*.{json,yml,yaml}
-        watch: true
-      git:
-        # Enable a git-based workflow repository
-        enabled: false
-        projects:
-          # The URL to the Git Repo
-          url: https://github.com/bytechefhq/bytechef-workflows.git
-          branch: master
-          username:
-          password:
-          # Folders within the git repo that are scanned for workflows
-          search-paths:
-            - projects
       jdbc:
         enabled: true

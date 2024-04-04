@@ -8,6 +8,7 @@
 package com.bytechef.atlas.configuration.repository.git.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @version ee
@@ -16,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
+@ConfigurationProperties(prefix = "bytechef.workflow.repository.git")
 public record GitWorkflowRepositoryProperties(
     String branch, String password, String[] searchPaths, String url, String username) {
 }

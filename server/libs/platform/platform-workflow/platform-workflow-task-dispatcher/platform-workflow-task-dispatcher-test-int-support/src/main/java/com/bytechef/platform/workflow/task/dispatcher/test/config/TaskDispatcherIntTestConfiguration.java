@@ -18,7 +18,6 @@ package com.bytechef.platform.workflow.task.dispatcher.test.config;
 
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
-import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -48,7 +47,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -74,9 +72,7 @@ public class TaskDispatcherIntTestConfiguration {
     ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
         ResourcePatternResolver resourcePatternResolver) {
 
-        return new ClassPathResourceWorkflowRepository(
-            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
-                Map.of(0, "workflows/**/*.{json|yml|yaml}"), "classpath"));
+        return new ClassPathResourceWorkflowRepository("workflows/**/*.{json|yml|yaml}", resourcePatternResolver);
     }
 
     @Bean

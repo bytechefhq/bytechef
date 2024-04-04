@@ -46,9 +46,9 @@ public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {
-        GitWorkflowRepository workflowRepository = new GitWorkflowRepository(0, new DummyGitWorkflowOperations());
+        GitWorkflowRepository workflowRepository = new GitWorkflowRepository(new DummyGitWorkflowOperations());
 
-        Iterable<Workflow> iterable = workflowRepository.findAll(0);
+        Iterable<Workflow> iterable = workflowRepository.findAll();
 
         Iterator<Workflow> iterator = iterable.iterator();
 
@@ -63,8 +63,9 @@ public class GitWorkflowRepositoryTest {
 
         @Override
         public List<WorkflowResource> getHeadFiles() {
-            return List.of(new WorkflowResource(
-                "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML));
+            return List.of(
+                new WorkflowResource(
+                    "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML));
         }
 
         @Override

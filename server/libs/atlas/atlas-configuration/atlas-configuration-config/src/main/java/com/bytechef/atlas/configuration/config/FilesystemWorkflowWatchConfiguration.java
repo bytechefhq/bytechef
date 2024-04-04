@@ -38,7 +38,7 @@ public class FilesystemWorkflowWatchConfiguration {
 
     @Bean
     FilesystemWorkflowWatcher filesystemWorkflowWatcher(
-        @Value("${bytechef.workflow.repository.filesystem.projects.location-pattern:}") String locationPattern,
+        @Value("${bytechef.workflow.repository.filesystem.location-pattern:${user.home}/bytechef/data/workflows/**/*.{json,yml,yaml}}") String locationPattern,
         TaskExecutor taskExecutor, WorkflowService workflowService) throws IOException {
 
         return new FilesystemWorkflowWatcher(locationPattern, taskExecutor, workflowService);

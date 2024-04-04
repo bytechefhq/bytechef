@@ -49,16 +49,6 @@ public class RemoteWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-workflows/{type}",
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<List<Workflow>> getWorkflows(@PathVariable int type) {
-        return ResponseEntity.ok(workflowService.getWorkflows(type));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.GET,
         value = "/get-workflows-by-ids/{workflowIds}",
         produces = {
             "application/json"
