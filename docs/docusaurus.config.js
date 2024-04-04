@@ -77,51 +77,51 @@ const config = {
           },
         ],
       },
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Introduction',
-                to: '/',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              // {
-              //   label: 'Stack Overflow',
-              //   href: 'https://stackoverflow.com/questions/tagged/bytechef',
-              // },
-              {
-                label: 'Discussions',
-                href: 'https://github.com/bytechefhq/bytechef/discussions',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discord.gg/PybnUM3Y',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/bytechefhq',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/bytechefhq/bytechef',
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} ByteChef Inc.`,
-      },
+      // footer: {
+      //   style: 'dark',
+      //   links: [
+      //     {
+      //       title: 'Docs',
+      //       items: [
+      //         {
+      //           label: 'Introduction',
+      //           to: '/',
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       title: 'Community',
+      //       items: [
+      //         // {
+      //         //   label: 'Stack Overflow',
+      //         //   href: 'https://stackoverflow.com/questions/tagged/bytechef',
+      //         // },
+      //         {
+      //           label: 'Discussions',
+      //           href: 'https://github.com/bytechefhq/bytechef/discussions',
+      //         },
+      //         {
+      //           label: 'Discord',
+      //           href: 'https://discord.gg/PybnUM3Y',
+      //         },
+      //         {
+      //           label: 'Twitter',
+      //           href: 'https://twitter.com/bytechefhq',
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       title: 'More',
+      //       items: [
+      //         {
+      //           label: 'GitHub',
+      //           href: 'https://github.com/bytechefhq/bytechef',
+      //         },
+      //       ],
+      //     },
+      //   ],
+      //   copyright: `Copyright © ${new Date().getFullYear()} ByteChef Inc.`,
+      // },
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
