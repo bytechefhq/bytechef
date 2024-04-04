@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.platform.user.web.rest;
+package com.bytechef.automation.user.web.rest;
 
-import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
+import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-03T19:49:16.730011+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T13:09:33.477889+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
-@Tag(name = "api-key", description = "The Platform API Key API")
+@Tag(name = "api-key", description = "The Automation API Key API")
 public interface ApiKeyApi {
 
     default Optional<NativeWebRequest> getRequest() {
