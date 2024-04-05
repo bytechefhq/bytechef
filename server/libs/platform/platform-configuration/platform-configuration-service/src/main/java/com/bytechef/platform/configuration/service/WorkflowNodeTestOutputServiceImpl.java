@@ -28,7 +28,6 @@ import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepo
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;

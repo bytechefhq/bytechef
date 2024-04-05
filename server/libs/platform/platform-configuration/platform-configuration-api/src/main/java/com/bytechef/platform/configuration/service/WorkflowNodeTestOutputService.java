@@ -20,9 +20,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import org.springframework.lang.NonNull;
-
 import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
