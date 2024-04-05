@@ -34,9 +34,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("api_key")
 public class ApiKey {
 
-    @Id
-    private Long id;
-
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -47,6 +44,9 @@ public class ApiKey {
 
     @Column
     private int environment;
+
+    @Id
+    private Long id;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -137,12 +137,12 @@ public class ApiKey {
         this.createdDate = createdDate;
     }
 
-    public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment.ordinal();
     }
 
     public void setLastUsedDate(LocalDateTime lastUsedDate) {
