@@ -1,0 +1,3 @@
+bytechef:
+  resources:
+    web: file:///Volumes/dev-bp/bytechef/client/dist/

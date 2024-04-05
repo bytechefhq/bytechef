@@ -121,6 +121,7 @@ springdoc:
   swagger-ui:
     operationsSorter: method
     tags-sorter: alpha
+    enabled: false
 
 #####
 
@@ -147,6 +148,8 @@ bytechef:
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
   public-url: http://127.0.0.1:5173
+  resources:
+    web: file:///opt/bytechef/client
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
     remember-me:
