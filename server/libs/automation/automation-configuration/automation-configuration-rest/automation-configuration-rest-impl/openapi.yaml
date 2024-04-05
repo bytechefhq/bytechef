@@ -159,7 +159,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProjectInstance"
   /project-instances/{id}/enable/{enable}:
-    put:
+    patch:
       description: "Enable/disable a project instance."
       summary: "Enable/disable a project instance"
       tags:
@@ -207,7 +207,7 @@ paths:
         "200":
           description: "Successful operation."
   /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
-    put:
+    patch:
       description: "Enable/disable a workflow of a project instance."
       summary: "Enable/disable a workflow of a project instance"
       tags:
