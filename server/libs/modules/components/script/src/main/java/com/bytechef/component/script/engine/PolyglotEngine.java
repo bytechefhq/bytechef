@@ -72,13 +72,11 @@ public class PolyglotEngine {
         String languageId, Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
         ActionContext actionContext) {
 
-        try (Context polyglotContext = Context
-            .newBuilder()
+        try (Context polyglotContext = Context.newBuilder()
             .engine(engine)
             .build()) {
 
-            polyglotContext
-                .getBindings(languageId)
+            polyglotContext.getBindings(languageId)
                 .putMember(
                     "component",
                     new ComponentProxyObject(actionContext, applicationContext, languageId, parameterConnections));
@@ -92,8 +90,7 @@ public class PolyglotEngine {
                 default -> throw new IllegalArgumentException("languageId=%s does not exist".formatted(languageId));
             }));
 
-            Value value = polyglotContext
-                .getBindings(languageId)
+            Value value = polyglotContext.getBindings(languageId)
                 .getMember("perform")
                 .execute(copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId));
 
@@ -250,11 +247,9 @@ public class PolyglotEngine {
                 ActionDefinitionService actionDefinitionService = applicationContext.getBean(
                     ActionDefinitionService.class);
 
-                // TODO latest version should be used
-
                 Object result = actionDefinitionService.executePerform(
-                    componentDefinition.getName(), 1, actionName, (Map) copyFromPolyglotContext(inputParameters),
-                    connections, actionContext);
+                    componentDefinition.getName(), componentDefinition.getVersion(), actionName,
+                    (Map) copyFromPolyglotContext(inputParameters), connections, actionContext);
 
                 if (result == null) {
                     return null;
@@ -347,9 +342,8 @@ public class PolyglotEngine {
             ComponentDefinitionService componentDefinitionService = applicationContext.getBean(
                 ComponentDefinitionService.class);
 
-            // TODO latest version should be used
             componentDefinitionMap.computeIfAbsent(
-                componentName, key -> componentDefinitionService.getComponentDefinition(key, 1));
+                componentName, key -> componentDefinitionService.getComponentDefinition(key, null));
 
             return componentDefinitionMap.containsKey(componentName);
         }
