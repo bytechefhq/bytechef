@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T13:09:33.837511+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T08:43:39.475441+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "project-instance", description = "The Automation Project Instance API")
 public interface ProjectInstanceApi {
@@ -159,7 +159,7 @@ public interface ProjectInstanceApi {
 
 
     /**
-     * PUT /project-instances/{id}/enable/{enable} : Enable/disable a project instance
+     * PATCH /project-instances/{id}/enable/{enable} : Enable/disable a project instance
      * Enable/disable a project instance.
      *
      * @param id The id of a project instance. (required)
@@ -176,7 +176,7 @@ public interface ProjectInstanceApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.PUT,
+        method = RequestMethod.PATCH,
         value = "/project-instances/{id}/enable/{enable}"
     )
     
@@ -190,7 +190,7 @@ public interface ProjectInstanceApi {
 
 
     /**
-     * PUT /project-instances/{id}/workflows/{workflowId}/enable/{enable} : Enable/disable a workflow of a project instance
+     * PATCH /project-instances/{id}/workflows/{workflowId}/enable/{enable} : Enable/disable a workflow of a project instance
      * Enable/disable a workflow of a project instance.
      *
      * @param id The id of a project instance. (required)
@@ -208,7 +208,7 @@ public interface ProjectInstanceApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.PUT,
+        method = RequestMethod.PATCH,
         value = "/project-instances/{id}/workflows/{workflowId}/enable/{enable}"
     )
     
