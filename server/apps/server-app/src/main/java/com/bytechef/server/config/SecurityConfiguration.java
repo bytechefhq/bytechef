@@ -21,6 +21,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 import com.bytechef.platform.user.config.SecurityProperties;
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
+import com.bytechef.web.rest.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -72,7 +74,7 @@ public class SecurityConfiguration {
 //                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //                // See https://stackoverflow.com/q/74447118/65681
 //                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
-//            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
 //            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
             .csrf(AbstractHttpConfigurer::disable)
             .headers(
