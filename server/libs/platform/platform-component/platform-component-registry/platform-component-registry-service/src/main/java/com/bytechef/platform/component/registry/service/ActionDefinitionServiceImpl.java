@@ -126,6 +126,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 default -> throw new IllegalStateException();
             };
 
+            if (output == null) {
+                return null;
+            }
+
             return SchemaUtils.toOutput(
                 output,
                 (property, sampleOutput) -> new Output(

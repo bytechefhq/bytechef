@@ -28,8 +28,10 @@ import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepo
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,7 +91,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Object sampleOutput) {
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Object sampleOutput) {
 
         Property outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
@@ -100,7 +102,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Output output) {
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Output output) {
 
         return save(
             workflowId, workflowNodeName, workflowNodeType, output.getOutputSchema(), output.getSampleOutput());

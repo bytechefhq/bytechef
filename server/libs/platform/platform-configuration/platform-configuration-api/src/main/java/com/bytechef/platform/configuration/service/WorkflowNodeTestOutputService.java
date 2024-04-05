@@ -20,6 +20,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import org.springframework.lang.NonNull;
+
 import java.util.Optional;
 
 /**
@@ -34,8 +36,8 @@ public interface WorkflowNodeTestOutputService {
     void removeUnusedNodeTestOutputs(Workflow workflow);
 
     WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Object sampleOutput);
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Object sampleOutput);
 
     WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Output output);
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Output output);
 }
