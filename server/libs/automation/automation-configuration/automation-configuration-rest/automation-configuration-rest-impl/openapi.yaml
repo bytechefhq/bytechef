@@ -4,7 +4,7 @@ info:
   title: "The Automation Configuration API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api/automation"
+- url: "/api/automation"
 tags:
 - name: "category"
   description: "The Automation Category API"

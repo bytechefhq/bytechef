@@ -4,7 +4,7 @@ info:
   title: "The Automation Execution API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api/automation"
+- url: "/api/automation"
 tags:
 - name: "workflow-execution"
   description: "The Automation Workflow Execution API"

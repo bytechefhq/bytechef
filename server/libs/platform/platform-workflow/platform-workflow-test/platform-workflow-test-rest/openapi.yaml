@@ -4,7 +4,7 @@ info:
   title: "The Platform Workflow Test API"
   version: "1"
 servers:
-  - url: "http://localhost:5173/api/platform"
+  - url: "/api/platform"
 tags:
   - name: "workflow-test"
     description: "The Platform Workflow Test API"

@@ -4,7 +4,7 @@ info:
   title: "The Automation Connection API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api/automation"
+- url: "/api/automation"
 tags:
 - name: "connection-tag"
   description: "The Automation Connection Tag API"
