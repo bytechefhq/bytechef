@@ -494,6 +494,10 @@ public class ContextImpl implements Context {
 
         @Override
         public com.bytechef.component.definition.Output get(Object value) {
+            if (value == null) {
+                return null;
+            }
+
             return new com.bytechef.component.definition.Output(
                 (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value)),
                 value);

@@ -74,8 +74,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        return WorkflowTrigger
-            .fetch(workflow, workflowNodeName)
+        return WorkflowTrigger.fetch(workflow, workflowNodeName)
             .map(workflowTrigger -> saveTriggerWorkflowNodeTestOutput(
                 workflowId, workflowNodeName, workflowTrigger,
                 workflowTestConfigurationService
@@ -113,12 +112,20 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName(), inputParameters, connectionIds);
 
+            if (output == null) {
+                return null;
+            }
+
             return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
         } else {
             Object sampleOutput = actionDefinitionFacade.executePerform(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName(), Type.AUTOMATION, null, workflowId, null, inputParameters,
                 connectionIds);
+
+            if (sampleOutput == null) {
+                return null;
+            }
 
             return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
         }
