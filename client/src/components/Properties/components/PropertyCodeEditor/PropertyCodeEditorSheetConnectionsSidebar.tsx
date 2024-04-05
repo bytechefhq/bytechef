@@ -1,5 +1,4 @@
 import ComboBox from '@/components/ComboBox';
-import EmptyList from '@/components/EmptyList';
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
@@ -38,7 +37,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useQueryClient} from '@tanstack/react-query';
 import {LinkIcon, PlusIcon} from 'lucide-react';
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
@@ -55,11 +54,9 @@ const connectionFormSchema = z.object({
 const ConnectionLabel = ({
     onRemoveClick,
     workflowConnection,
-    workflowConnectionsCount,
 }: {
     onRemoveClick: () => void;
     workflowConnection: WorkflowConnectionModel;
-    workflowConnectionsCount: number;
 }) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
@@ -77,15 +74,13 @@ const ConnectionLabel = ({
                     </Label>
                 )}
 
-                {workflowConnectionsCount > 1 && (
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
-                        </TooltipTrigger>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
+                    </TooltipTrigger>
 
-                        <TooltipContent>Workflow Connection Key</TooltipContent>
-                    </Tooltip>
-                )}
+                    <TooltipContent>Workflow Connection Key</TooltipContent>
+                </Tooltip>
             </div>
 
             <Button className="text-destructive" onClick={onRemoveClick} size="sm" variant="link">
@@ -95,7 +90,13 @@ const ConnectionLabel = ({
     );
 };
 
-const ConnectionPopover = ({onSubmit}: {onSubmit: (values: z.infer<typeof connectionFormSchema>) => void}) => {
+const ComponentPopover = ({
+    onSubmit,
+    triggerNode,
+}: {
+    onSubmit: (values: z.infer<typeof connectionFormSchema>) => void;
+    triggerNode?: ReactNode;
+}) => {
     const [open, setOpen] = useState(false);
 
     const form = useForm<z.infer<typeof connectionFormSchema>>({
@@ -111,16 +112,18 @@ const ConnectionPopover = ({onSubmit}: {onSubmit: (values: z.infer<typeof connec
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                <Button size="sm" variant="secondary">
-                    Add Connection
-                </Button>
+                {triggerNode ? (
+                    triggerNode
+                ) : (
+                    <Button size="sm" variant="secondary">
+                        Add Component
+                    </Button>
+                )}
             </PopoverTrigger>
 
             <PopoverContent align="end" className="min-w-[400px]">
-                {form.formState.errors.componentVersion?.message}
-
                 <header className="flex items-center justify-between">
-                    <span className="font-medium">Add Connection</span>
+                    <span className="font-medium">Add Component</span>
 
                     <PopoverClose asChild onClick={() => form.reset()}>
                         <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
@@ -440,7 +443,6 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
                                 <ConnectionLabel
                                     onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
                                     workflowConnection={workflowConnection}
-                                    workflowConnectionsCount={workflowConnections.length}
                                 />
 
                                 <ConnectionSelect
@@ -454,21 +456,31 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
                     })}
 
                     <div className="flex justify-end">
-                        <ConnectionPopover onSubmit={handleOnSubmit} />
+                        <ComponentPopover onSubmit={handleOnSubmit} />
                     </div>
                 </>
             ) : (
-                <div className="flex flex-1 flex-col items-center justify-center">
-                    <EmptyList
-                        button={
-                            <Button onClick={() => setShowNewConnectionDialog(true)} title="Create a new connection">
-                                Create a connection
-                            </Button>
-                        }
-                        icon={<LinkIcon className="size-6 text-gray-400" />}
-                        message="You have not created any connections for this component yet."
-                        title="No Connections"
-                    />
+                <div className="flex flex-1 flex-col items-center">
+                    <div className="mt-16 w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
+                        <div className="text-center">
+                            <span className="mx-auto inline-block">
+                                <LinkIcon className="size-6 text-gray-400" />
+                            </span>
+
+                            <h3 className="mt-2 text-sm font-semibold">No defined components</h3>
+
+                            <p className="mt-1 text-sm text-gray-500">
+                                You have not defined any component and its connection to use inside this script yet.
+                            </p>
+
+                            <div className="mt-6">
+                                <ComponentPopover
+                                    onSubmit={handleOnSubmit}
+                                    triggerNode={<Button>Add Component</Button>}
+                                />
+                            </div>
+                        </div>
+                    </div>
 
                     {showConnectionNote && (
                         <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">

@@ -133,7 +133,7 @@ const PropertyCodeEditorSheet = ({
                                 />
                             </ResizablePanel>
 
-                            <ResizableHandle withHandle />
+                            <ResizableHandle />
 
                             <ResizablePanel defaultSize={25}>
                                 <div className="relative size-full overflow-y-auto p-4">
