@@ -92,7 +92,7 @@ public class PolyglotEngine {
 
             Value value = polyglotContext.getBindings(languageId)
                 .getMember("perform")
-                .execute(copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId));
+                .execute(copyToGuestValue(inputParameters.get(INPUT, Object.class), languageId));
 
             return copyFromPolyglotContext(copyToJavaValue(value));
         }
