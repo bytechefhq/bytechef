@@ -84,7 +84,7 @@ public final class Project {
     private Set<ProjectVersion> projectVersions = new HashSet<>();
 
     @MappedCollection(idColumn = "project_id")
-    private final Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
+    private Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
 
     @Version
     private int version;
@@ -127,16 +127,12 @@ public final class Project {
         projectVersions.add(new ProjectVersion(newVersion));
 
         for (String workflowId : duplicatedVersionWorkflowIds) {
-            addWorkflowId(workflowId, projectVersion.getVersion());
+            projectWorkflows.add(new ProjectWorkflow(workflowId, projectVersion.getVersion()));
         }
     }
 
     public void addWorkflowId(String workflowId) {
         projectWorkflows.add(new ProjectWorkflow(workflowId, getLastVersion()));
-    }
-
-    public void addWorkflowId(String workflowId, int projectVersion) {
-        projectWorkflows.add(new ProjectWorkflow(workflowId, projectVersion));
     }
 
     @Override
@@ -286,6 +282,10 @@ public final class Project {
 
     public void setProjectVersions(List<ProjectVersion> projectVersions) {
         this.projectVersions = new HashSet<>(projectVersions);
+    }
+
+    public void setProjectWorkflows(Set<ProjectWorkflow> projectWorkflows) {
+        this.projectWorkflows = new HashSet<>(projectWorkflows);
     }
 
     public void setTagIds(List<Long> tagIds) {
