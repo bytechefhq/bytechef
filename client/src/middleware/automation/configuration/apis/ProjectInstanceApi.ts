@@ -220,7 +220,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
 
         const response = await this.request({
             path: `/project-instances/{id}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable']))),
-            method: 'PUT',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -268,7 +268,7 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
 
         const response = await this.request({
             path: `/project-instances/{id}/workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable']))),
-            method: 'PUT',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
