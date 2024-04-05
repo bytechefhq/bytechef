@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeTestOutput", description = "Contains test output of a workflow node.")
 @JsonTypeName("WorkflowNodeTestOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-03T19:49:17.788410+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T15:47:20.085572+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class WorkflowNodeTestOutputModel {
 
   private Long id;

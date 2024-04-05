@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-03T19:49:19.162438+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T15:47:21.186646+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "trigger-execution", description = "The Platform Workflow Trigger Execution API")
 public interface TriggerExecutionApi {
