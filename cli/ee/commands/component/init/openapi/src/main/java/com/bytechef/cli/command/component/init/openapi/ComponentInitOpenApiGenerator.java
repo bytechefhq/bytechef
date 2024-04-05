@@ -169,8 +169,8 @@ public class ComponentInitOpenApiGenerator {
                 Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "java")));
 
             writeAbstractComponentHandlerTest(sourceTestJavaDirPath);
-            writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
             writeComponentHandlerTest(sourceTestJavaDirPath);
+            writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
         }
     }
 
@@ -1770,29 +1770,30 @@ public class ComponentInitOpenApiGenerator {
     }
 
     private Path writeAbstractComponentHandlerSource(Path sourceDirPath) throws IOException {
-        JavaFile javaFile = addStaticImport(JavaFile.builder(
-            getPackageName(),
-            TypeSpec.classBuilder("Abstract" + getComponentHandlerClassName(componentName))
-                .addJavadoc("""
-                    Provides the base implementation for the REST based component.
+        JavaFile javaFile = addStaticImport(
+            JavaFile.builder(
+                getPackageName(),
+                TypeSpec.classBuilder("Abstract" + getComponentHandlerClassName(componentName))
+                    .addJavadoc("""
+                        Provides the base implementation for the REST based component.
 
-                    @generated
-                    """)
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addSuperinterface(
-                    ClassName.get(COM_BYTECHEF_COMPONENT_PACKAGE, "OpenApiComponentHandler"))
-                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
-                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                    .initializer(getComponentCodeBlock(sourceDirPath))
-                    .build())
-                .addMethod(MethodSpec.methodBuilder("getDefinition")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(COMPONENT_DEFINITION_CLASS_NAME)
-                    .addStatement("return componentDefinition")
-                    .build())
-                .build()))
-                    .build();
+                        @generated
+                        """)
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addSuperinterface(
+                        ClassName.get(COM_BYTECHEF_COMPONENT_PACKAGE, "OpenApiComponentHandler"))
+                    .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
+                        .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                        .initializer(getComponentCodeBlock(sourceDirPath))
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder("getDefinition")
+                        .addAnnotation(Override.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(COMPONENT_DEFINITION_CLASS_NAME)
+                        .addStatement("return componentDefinition")
+                        .build())
+                    .build()))
+                        .build();
 
         return javaFile.writeToPath(sourceDirPath);
     }
@@ -1834,6 +1835,10 @@ public class ComponentInitOpenApiGenerator {
 
                     @generated
                     """)
+                .addMethod(
+                    MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PRIVATE)
+                        .build())
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ClassName.get(
@@ -1843,6 +1848,7 @@ public class ComponentInitOpenApiGenerator {
                     "ACTION_DEFINITION")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(actionsCodeBlock)
+
                     .build())
                 .build()))
                     .build();
@@ -1853,26 +1859,31 @@ public class ComponentInitOpenApiGenerator {
     private void writeComponentConnectionSource(
         ClassName className, CodeBlock connectionCodeBlock, Path componentHandlerDirPath) throws IOException {
 
-        JavaFile javaFile = addStaticImport(JavaFile.builder(
-            className.packageName(),
-            TypeSpec.classBuilder(className.simpleName())
-                .addJavadoc("""
-                    Provides the component connection definition.
+        JavaFile javaFile = addStaticImport(
+            JavaFile.builder(
+                className.packageName(),
+                TypeSpec.classBuilder(className.simpleName())
+                    .addJavadoc("""
+                        Provides the component connection definition.
 
-                    @generated
-                    """)
-                .addModifiers(Modifier.PUBLIC)
-                .addField(FieldSpec.builder(
-                    ClassName.get(
-                        "com.bytechef.component.definition",
-                        "ComponentDSL",
-                        "ModifiableConnectionDefinition"),
-                    "CONNECTION_DEFINITION")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                    .initializer(connectionCodeBlock)
-                    .build())
-                .build()))
-                    .build();
+                        @generated
+                        """)
+                    .addMethod(
+                        MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PRIVATE)
+                            .build())
+                    .addModifiers(Modifier.PUBLIC)
+                    .addField(FieldSpec.builder(
+                        ClassName.get(
+                            "com.bytechef.component.definition",
+                            "ComponentDSL",
+                            "ModifiableConnectionDefinition"),
+                        "CONNECTION_DEFINITION")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer(connectionCodeBlock)
+                        .build())
+                    .build()))
+                        .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1897,11 +1908,11 @@ public class ComponentInitOpenApiGenerator {
                                 ClassName.get("com.bytechef.component", "OpenApiComponentHandler"))
                             .build())
                     .addModifiers(Modifier.PUBLIC)
-                    .superclass(ClassName.get(
-                        getPackageName(),
-                        "Abstract" + getComponentHandlerClassName(componentName)))
+                    .superclass(
+                        ClassName.get(getPackageName(), "Abstract" + getComponentHandlerClassName(componentName)))
                     .build())
                 .build();
+
             javaFile.writeToPath(sourceDirPath);
         }
     }
@@ -1916,18 +1927,18 @@ public class ComponentInitOpenApiGenerator {
             .resolve(componentHandlerTestClassname + ".java")
             .toFile()
             .getAbsolutePath();
-
+        System.out.println(filename);
+        System.out.println(new File(filename).exists());
         if (!new File(filename).exists()) {
             JavaFile javaFile = JavaFile.builder(
                 getPackageName(),
                 TypeSpec.classBuilder(componentHandlerTestClassname)
                     .addJavadoc("@generated")
                     .addModifiers(Modifier.PUBLIC)
-                    .superclass(ClassName.get(
-                        getPackageName(),
-                        "Abstract" + componentHandlerTestClassname))
+                    .superclass(ClassName.get(getPackageName(), "Abstract" + componentHandlerTestClassname))
                     .build())
                 .build();
+
             javaFile.writeToPath(testDirPath);
         }
     }
@@ -1957,28 +1968,29 @@ public class ComponentInitOpenApiGenerator {
     private void writeComponentSchemaSource(
         ClassName className, CodeBlock componentSchemaCodeBlock, Path componentHandlerDirPath) throws IOException {
 
-        JavaFile javaFile = addStaticImport(JavaFile.builder(
-            className.packageName(),
-            TypeSpec.classBuilder(className.simpleName())
-                .addJavadoc("""
-                    Provides properties definition built from OpenAPI schema.
+        JavaFile javaFile = addStaticImport(
+            JavaFile.builder(
+                className.packageName(),
+                TypeSpec.classBuilder(className.simpleName())
+                    .addJavadoc("""
+                        Provides properties definition built from OpenAPI schema.
 
-                    @generated
-                    """)
-                .addModifiers(Modifier.PUBLIC)
-                .addField(FieldSpec.builder(
-                    ParameterizedTypeName.get(
-                        ClassName.get("java.util", "List"),
+                        @generated
+                        """)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addField(FieldSpec.builder(
                         ParameterizedTypeName.get(
-                            ClassName.get(
-                                "com.bytechef.component.definition", "ComponentDSL", "ModifiableValueProperty"),
-                            WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))),
-                    "PROPERTIES")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                    .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
-                    .build())
-                .build()))
-                    .build();
+                            ClassName.get("java.util", "List"),
+                            ParameterizedTypeName.get(
+                                ClassName.get(
+                                    "com.bytechef.component.definition", "ComponentDSL", "ModifiableValueProperty"),
+                                WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))),
+                        "PROPERTIES")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
+                        .build())
+                    .build()))
+                        .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
