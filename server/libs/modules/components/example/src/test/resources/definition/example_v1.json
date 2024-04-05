@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Example",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -49,7 +51,5 @@
       "sampleOutput": null
     },
     "perform": { }
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

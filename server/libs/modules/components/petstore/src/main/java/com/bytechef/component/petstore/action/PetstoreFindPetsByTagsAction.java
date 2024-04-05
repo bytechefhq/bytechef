@@ -54,4 +54,7 @@ public class PetstoreFindPetsByTagsAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreFindPetsByTagsAction() {
+    }
 }

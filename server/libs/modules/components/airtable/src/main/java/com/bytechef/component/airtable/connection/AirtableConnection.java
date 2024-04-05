@@ -39,4 +39,7 @@ public class AirtableConnection {
                     string(TOKEN)
                         .label("Token")
                         .required(true)));
+
+    private AirtableConnection() {
+    }
 }

@@ -12,6 +12,114 @@
   "resources": null,
   "version": 1,
   "title": "PostgreSQL",
+  "triggers": null,
+  "connection": {
+    "authorizations": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "host",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Host",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "port",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Port",
+      "placeholder": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "controlType": "INTEGER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "database",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Database",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "username",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Username",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "password",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Password",
+      "placeholder": null,
+      "controlType": "PASSWORD",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    } ],
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -94,8 +202,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -116,8 +224,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -142,8 +250,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Query",
     "workflowNodeDescriptionFunction": null,
@@ -237,8 +345,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "List of rows.",
@@ -286,8 +394,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -327,8 +435,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -344,8 +452,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -363,8 +471,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -400,8 +508,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -420,8 +528,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -457,21 +565,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Insert",
     "workflowNodeDescriptionFunction": null,
@@ -565,8 +673,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The name of the property which decides which rows in the database should be updated.",
@@ -634,8 +742,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -675,8 +783,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -692,8 +800,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -711,8 +819,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -748,8 +856,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -768,8 +876,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -805,21 +913,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Update",
     "workflowNodeDescriptionFunction": null,
@@ -941,8 +1049,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -982,8 +1090,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -999,8 +1107,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1018,8 +1126,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1055,8 +1163,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1075,8 +1183,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1112,21 +1220,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Delete",
     "workflowNodeDescriptionFunction": null,
@@ -1208,8 +1316,8 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1249,8 +1357,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE"
+          "controlType": "DATE",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1266,8 +1374,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1285,8 +1393,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1322,8 +1430,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1342,8 +1450,8 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1379,21 +1487,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "TIME"
+          "controlType": "TIME",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The list of properties which should be used as parameters.",
@@ -1447,8 +1555,8 @@
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1469,8 +1577,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1495,120 +1603,12 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "title": "Execute",
     "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
-  } ],
-  "triggers": null,
-  "connection": {
-    "authorizations": null,
-    "properties": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "host",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Host",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "port",
-      "type": "INTEGER",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Port",
-      "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
-      "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "database",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Database",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "username",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Username",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": true,
-      "name": "password",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Password",
-      "placeholder": null,
-      "controlType": "PASSWORD",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    } ],
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  }
+  } ]
 }

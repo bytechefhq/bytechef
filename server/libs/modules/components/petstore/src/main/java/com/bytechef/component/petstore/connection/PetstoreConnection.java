@@ -62,4 +62,7 @@ public class PetstoreConnection {
                             .required(true)
 
                     ));
+
+    private PetstoreConnection() {
+    }
 }

@@ -68,4 +68,7 @@ public class PipedriveConnection {
                             "leads:read", "leads:full", "contacts:read", "deals:read"))
                         .tokenUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token")
                         .refreshUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token"));
+
+    private PipedriveConnection() {
+    }
 }

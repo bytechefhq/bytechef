@@ -44,4 +44,7 @@ public class PetstoreGetInventoryAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreGetInventoryAction() {
+    }
 }

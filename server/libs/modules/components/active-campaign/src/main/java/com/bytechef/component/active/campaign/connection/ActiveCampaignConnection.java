@@ -47,4 +47,7 @@ public class ActiveCampaignConnection {
                         .required(true)
 
                 ));
+
+    private ActiveCampaignConnection() {
+    }
 }

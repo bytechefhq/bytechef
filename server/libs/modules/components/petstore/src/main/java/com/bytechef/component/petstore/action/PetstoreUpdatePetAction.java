@@ -51,4 +51,7 @@ public class PetstoreUpdatePetAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreUpdatePetAction() {
+    }
 }

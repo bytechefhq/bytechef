@@ -64,4 +64,7 @@ public class PetstoreUploadFileAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreUploadFileAction() {
+    }
 }

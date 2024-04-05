@@ -51,4 +51,7 @@ public class PetstoreGetUserByNameAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreGetUserByNameAction() {
+    }
 }

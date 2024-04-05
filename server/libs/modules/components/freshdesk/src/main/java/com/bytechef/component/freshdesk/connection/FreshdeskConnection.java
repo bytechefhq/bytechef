@@ -43,4 +43,7 @@ public class FreshdeskConnection {
                     string(PASSWORD)
                         .label("Password")
                         .required(true)));
+
+    private FreshdeskConnection() {
+    }
 }

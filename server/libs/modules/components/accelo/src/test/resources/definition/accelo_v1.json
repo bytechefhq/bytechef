@@ -12,6 +12,94 @@
   "resources": null,
   "version": 1,
   "title": "Accelo",
+  "triggers": null,
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": "Actual deployment identifier or name to target a specific deployment within the Accelo platform.",
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "deployment",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Deployment",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": { },
+      "tokenUrl": { },
+      "acquire": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -104,6 +192,7 @@
     } ],
     "title": "Create company",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -267,8 +356,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -404,6 +492,7 @@
     } ],
     "title": "Create contact",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -607,8 +696,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -709,6 +797,7 @@
     } ],
     "title": "Create task",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -872,95 +961,6 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
-  } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": "Actual deployment identifier or name to target a specific deployment within the Accelo platform.",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "deployment",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Deployment",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": { },
-      "refreshUrl": null,
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
-  "triggers": null
+    }
+  } ]
 }

@@ -60,4 +60,7 @@ public class HubspotUpdateContactAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private HubspotUpdateContactAction() {
+    }
 }

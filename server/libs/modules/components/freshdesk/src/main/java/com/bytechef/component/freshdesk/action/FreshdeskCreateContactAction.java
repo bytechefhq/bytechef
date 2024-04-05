@@ -72,4 +72,7 @@ public class FreshdeskCreateContactAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private FreshdeskCreateContactAction() {
+    }
 }

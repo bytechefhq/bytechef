@@ -215,4 +215,7 @@ public class PipedriveSearchLeadsAction {
                             Map.entry("more_items_in_collection",
                                 Map.<String, Object>ofEntries(Map.entry("type", "boolean"), Map.entry("description",
                                     "If there are more list items in the collection than displayed or not")))))))));
+
+    private PipedriveSearchLeadsAction() {
+    }
 }

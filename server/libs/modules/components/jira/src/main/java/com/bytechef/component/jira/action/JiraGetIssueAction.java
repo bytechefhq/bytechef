@@ -301,4 +301,7 @@ public class JiraGetIssueAction {
                             Map.entry("remainingEstimate", "3m"), Map.entry("timeSpent", "6m"),
                             Map.entry("originalEstimateSeconds", 600), Map.entry("remainingEstimateSeconds", 200),
                             Map.entry("timeSpentSeconds", 400)))))));
+
+    private JiraGetIssueAction() {
+    }
 }

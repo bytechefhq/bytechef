@@ -70,4 +70,7 @@ public class EnchargeCreateEmailAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private EnchargeCreateEmailAction() {
+    }
 }

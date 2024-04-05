@@ -55,4 +55,7 @@ public class HubspotCreateContactAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private HubspotCreateContactAction() {
+    }
 }

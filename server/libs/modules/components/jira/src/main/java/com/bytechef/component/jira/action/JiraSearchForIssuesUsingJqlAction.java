@@ -317,4 +317,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                             Map.entry("originalEstimateSeconds", 600), Map.entry("remainingEstimateSeconds", 200),
                             Map.entry("timeSpentSeconds", 400)))))))),
             Map.entry("warningMessages", List.of("The value 'bar' does not exist for the field 'foo'."))));
+
+    private JiraSearchForIssuesUsingJqlAction() {
+    }
 }

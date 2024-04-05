@@ -52,4 +52,7 @@ public class PetstoreCreateUsersWithListInputAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreCreateUsersWithListInputAction() {
+    }
 }

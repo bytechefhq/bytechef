@@ -76,4 +76,7 @@ public class SalesflareCreateContactsAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private SalesflareCreateContactsAction() {
+    }
 }

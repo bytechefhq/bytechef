@@ -66,4 +66,7 @@ public class TeamworkCreateCompanyAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private TeamworkCreateCompanyAction() {
+    }
 }

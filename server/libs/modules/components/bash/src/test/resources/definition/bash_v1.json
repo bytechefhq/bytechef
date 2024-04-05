@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Bash",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -44,7 +46,6 @@
     } ],
     "title": "Execute",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -68,8 +69,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": "Sample result"
-    }
-  } ],
-  "triggers": null,
-  "connection": null
+    },
+    "perform": { }
+  } ]
 }

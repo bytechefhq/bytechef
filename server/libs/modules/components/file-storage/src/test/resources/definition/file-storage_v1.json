@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "File Storage",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -120,7 +122,6 @@
     } ],
     "title": "Read from file as string",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -144,7 +145,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "Sample content"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -197,7 +199,6 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -297,7 +298,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -350,7 +352,6 @@
     } ],
     "title": "Download file",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -450,8 +451,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
-  } ],
-  "triggers": null,
-  "connection": null
+    },
+    "perform": { }
+  } ]
 }

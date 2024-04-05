@@ -71,4 +71,7 @@ public class TeamworkCreateTaskAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private TeamworkCreateTaskAction() {
+    }
 }

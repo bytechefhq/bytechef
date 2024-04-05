@@ -62,4 +62,7 @@ public class PipelinerCreateAccountAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PipelinerCreateAccountAction() {
+    }
 }

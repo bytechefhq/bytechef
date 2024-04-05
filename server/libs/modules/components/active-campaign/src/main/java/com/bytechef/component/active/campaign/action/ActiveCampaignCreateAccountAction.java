@@ -62,4 +62,7 @@ public class ActiveCampaignCreateAccountAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ActiveCampaignCreateAccountAction() {
+    }
 }

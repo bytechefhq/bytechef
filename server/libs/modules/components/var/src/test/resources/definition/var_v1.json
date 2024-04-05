@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Var",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -469,7 +471,5 @@
     "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": null
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

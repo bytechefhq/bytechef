@@ -351,4 +351,7 @@ public class PipedriveAddPersonAction {
                 Map.<String, Object>ofEntries(Map.entry("123", Map.<String, Object>ofEntries(Map.entry("id", 123),
                     Map.entry("name", "Jane Doe"), Map.entry("email", "jane@pipedrive.com"), Map.entry("has_pic", 1),
                     Map.entry("pic_hash", "2611ace8ac6a3afe2f69ed56f9e08c6b"), Map.entry("active_flag", true)))))))));
+
+    private PipedriveAddPersonAction() {
+    }
 }

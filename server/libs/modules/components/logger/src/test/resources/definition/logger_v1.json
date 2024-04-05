@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Logger",
+  "connection": null,
+  "triggers": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -44,8 +46,8 @@
     } ],
     "title": "Debug",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -78,8 +80,8 @@
     } ],
     "title": "Error",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -112,8 +114,8 @@
     } ],
     "title": "Info",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -146,9 +148,7 @@
     } ],
     "title": "Warn",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
-  } ],
-  "triggers": null,
-  "connection": null
+    "perform": { },
+    "output": null
+  } ]
 }

@@ -68,4 +68,7 @@ public class PipelinerCreateTaskAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PipelinerCreateTaskAction() {
+    }
 }

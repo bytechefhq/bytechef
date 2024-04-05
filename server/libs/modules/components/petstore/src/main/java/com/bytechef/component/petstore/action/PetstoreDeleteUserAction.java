@@ -44,4 +44,7 @@ public class PetstoreDeleteUserAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)));
+
+    private PetstoreDeleteUserAction() {
+    }
 }

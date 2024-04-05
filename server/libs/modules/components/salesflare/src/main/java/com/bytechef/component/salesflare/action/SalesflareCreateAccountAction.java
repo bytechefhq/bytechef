@@ -64,4 +64,7 @@ public class SalesflareCreateAccountAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)));
+
+    private SalesflareCreateAccountAction() {
+    }
 }

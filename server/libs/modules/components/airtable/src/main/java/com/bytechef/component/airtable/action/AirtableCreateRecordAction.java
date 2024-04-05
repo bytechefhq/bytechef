@@ -72,4 +72,7 @@ public class AirtableCreateRecordAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private AirtableCreateRecordAction() {
+    }
 }

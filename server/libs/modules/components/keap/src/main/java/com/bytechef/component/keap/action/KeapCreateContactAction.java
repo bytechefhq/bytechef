@@ -268,4 +268,7 @@ public class KeapCreateContactAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private KeapCreateContactAction() {
+    }
 }

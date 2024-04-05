@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "ODS File",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -597,7 +599,5 @@
       },
       "sampleOutput": null
     }
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

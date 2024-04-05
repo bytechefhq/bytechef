@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Data Mapper",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2316,7 +2318,5 @@
     "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

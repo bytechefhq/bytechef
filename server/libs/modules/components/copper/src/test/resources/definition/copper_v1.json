@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "Copper",
+  "triggers": null,
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "api_key",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "username",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Email address",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "key",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Key",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "API Key",
+      "type": "API_KEY",
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "acquire": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -151,6 +219,7 @@
     } ],
     "title": "Create activity",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -334,8 +403,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -921,6 +989,7 @@
     } ],
     "title": "Create company",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1468,8 +1537,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2171,6 +2239,7 @@
     } ],
     "title": "Create person",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2819,75 +2888,6 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
-  } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "api_key",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Email address",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "key",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Key",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "API Key",
-      "type": "API_KEY",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "pkce": null,
-      "clientSecret": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
-  "triggers": null
+    }
+  } ]
 }

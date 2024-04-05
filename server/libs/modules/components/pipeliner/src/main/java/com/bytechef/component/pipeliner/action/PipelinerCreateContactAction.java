@@ -65,4 +65,7 @@ public class PipelinerCreateContactAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PipelinerCreateContactAction() {
+    }
 }

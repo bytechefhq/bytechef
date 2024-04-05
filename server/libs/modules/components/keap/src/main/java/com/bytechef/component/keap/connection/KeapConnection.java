@@ -45,4 +45,7 @@ public class KeapConnection {
                 .authorizationUrl(
                     (connectionParameters, context) -> "https://accounts.infusionsoft.com/app/oauth/authorize")
                 .tokenUrl((connectionParameters, context) -> "https://api.infusionsoft.com/token"));
+
+    private KeapConnection() {
+    }
 }

@@ -47,4 +47,7 @@ public class EnchargeConnection {
                         .required(true)
 
                 ));
+
+    private EnchargeConnection() {
+    }
 }

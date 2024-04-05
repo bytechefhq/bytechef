@@ -57,4 +57,7 @@ public class PetstoreUpdatePetWithFormAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)));
+
+    private PetstoreUpdatePetWithFormAction() {
+    }
 }

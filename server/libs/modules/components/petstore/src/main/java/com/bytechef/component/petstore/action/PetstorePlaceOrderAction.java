@@ -50,4 +50,7 @@ public class PetstorePlaceOrderAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstorePlaceOrderAction() {
+    }
 }

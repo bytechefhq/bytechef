@@ -39,4 +39,7 @@ public class SalesflareConnection {
                     string(TOKEN)
                         .label("Token")
                         .required(true)));
+
+    private SalesflareConnection() {
+    }
 }

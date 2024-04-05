@@ -70,4 +70,7 @@ public class ActiveCampaignCreateContactAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ActiveCampaignCreateContactAction() {
+    }
 }

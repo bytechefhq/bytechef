@@ -12,6 +12,130 @@
   "resources": null,
   "version": 1,
   "title": "Pipeliner",
+  "triggers": [ ],
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "basic_auth",
+      "properties": [ {
+        "advancedOption": null,
+        "description": "Your Space ID",
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "spaceId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Space Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "serverUrl",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Server URL",
+        "placeholder": null,
+        "controlType": "SELECT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": [ {
+          "description": null,
+          "label": "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/"
+        }, {
+          "description": null,
+          "label": "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/"
+        }, {
+          "description": null,
+          "label": "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/"
+        }, {
+          "description": null,
+          "label": "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/",
+          "value": "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/"
+        } ],
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "username",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Username",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "password",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Password",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Basic Auth",
+      "type": "BASIC_AUTH",
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "acquire": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -94,6 +218,7 @@
     } ],
     "title": "Create account",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -223,8 +348,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -327,6 +451,7 @@
     } ],
     "title": "Create contact",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -476,8 +601,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -606,6 +730,7 @@
     } ],
     "title": "Create task",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -775,131 +900,6 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
-  } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "basic_auth",
-      "properties": [ {
-        "advancedOption": null,
-        "description": "Your Space ID",
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "spaceId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Space Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "serverUrl",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Server URL",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "label": "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/",
-          "value": "https://us-east.api.pipelinersales.com/api/v100/rest/spaces/"
-        }, {
-          "description": null,
-          "label": "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/",
-          "value": "https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/"
-        }, {
-          "description": null,
-          "label": "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/",
-          "value": "https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/"
-        }, {
-          "description": null,
-          "label": "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/",
-          "value": "https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/"
-        } ],
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Username",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "password",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Password",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Basic Auth",
-      "type": "BASIC_AUTH",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
-  "triggers": [ ]
+    }
+  } ]
 }

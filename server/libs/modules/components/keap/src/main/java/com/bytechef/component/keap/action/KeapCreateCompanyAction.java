@@ -134,4 +134,7 @@ public class KeapCreateCompanyAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private KeapCreateCompanyAction() {
+    }
 }

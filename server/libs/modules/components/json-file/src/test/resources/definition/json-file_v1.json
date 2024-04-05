@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "JSON File",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -206,8 +208,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -225,8 +227,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Read from file",
     "workflowNodeDescriptionFunction": null,
@@ -294,8 +296,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -314,8 +316,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The array to write to the file.",
@@ -335,8 +337,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
@@ -461,7 +463,5 @@
       "sampleOutput": null
     },
     "perform": { }
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

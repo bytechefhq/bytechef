@@ -45,4 +45,7 @@ public class PipelinerConnection {
                     string(PASSWORD)
                         .label("Password")
                         .required(true)));
+
+    private PipelinerConnection() {
+    }
 }

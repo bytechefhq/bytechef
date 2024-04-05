@@ -47,4 +47,7 @@ public class HubspotConnection {
                 .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
                 .scopes((connection, context) -> List.of("crm.objects.contacts.write"))
                 .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
+
+    private HubspotConnection() {
+    }
 }

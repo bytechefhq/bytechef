@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Delay",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -45,7 +47,5 @@
     "workflowNodeDescriptionFunction": null,
     "perform": { },
     "output": null
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

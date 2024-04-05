@@ -393,4 +393,7 @@ public class PipedriveGetOrganizationsAction {
                                 "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg"),
                                 Map.entry("512",
                                     "https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg")))))))))));
+
+    private PipedriveGetOrganizationsAction() {
+    }
 }

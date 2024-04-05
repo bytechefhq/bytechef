@@ -12,6 +12,54 @@
   "resources": null,
   "version": 1,
   "title": "OpenAI",
+  "triggers": null,
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "bearer_token",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "token",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Bearer Token",
+      "type": "BEARER_TOKEN",
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "acquire": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -590,6 +638,7 @@
     } ],
     "title": "Ask ChatGPT",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -989,8 +1038,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1337,6 +1385,7 @@
     } ],
     "title": "Create assistant",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1701,8 +1750,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1885,6 +1933,7 @@
     } ],
     "title": "Create image",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2028,8 +2077,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2192,6 +2240,7 @@
     } ],
     "title": "Create speech",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2291,8 +2340,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2755,6 +2803,7 @@
     } ],
     "title": "Create transcriptions",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3155,8 +3204,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -3371,6 +3419,7 @@
     } ],
     "title": "Create translation",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3771,8 +3820,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -4452,6 +4500,7 @@
     } ],
     "title": "Vision Prompt",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -4851,55 +4900,6 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
-  } ],
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "bearer_token",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "token",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Bearer Token",
-      "type": "BEARER_TOKEN",
-      "acquire": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
-      "authorizationCallback": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  }
+    }
+  } ]
 }

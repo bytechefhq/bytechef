@@ -43,4 +43,7 @@ public class InsightlyConnection {
                     string(PASSWORD)
                         .label("Password")
                         .required(true)));
+
+    private InsightlyConnection() {
+    }
 }

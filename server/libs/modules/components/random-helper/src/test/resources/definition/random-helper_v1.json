@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Random Helper",
+  "connection": null,
+  "triggers": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -163,7 +165,5 @@
       },
       "sampleOutput": null
     }
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

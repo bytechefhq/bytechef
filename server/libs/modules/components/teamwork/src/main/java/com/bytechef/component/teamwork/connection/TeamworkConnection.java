@@ -43,4 +43,7 @@ public class TeamworkConnection {
                     string(PASSWORD)
                         .label("Password")
                         .required(true)));
+
+    private TeamworkConnection() {
+    }
 }

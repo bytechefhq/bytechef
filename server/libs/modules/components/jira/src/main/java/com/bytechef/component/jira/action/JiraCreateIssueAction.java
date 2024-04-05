@@ -92,4 +92,7 @@ public class JiraCreateIssueAction {
                 Map.<String, Object>ofEntries(Map.entry("status", 200),
                     Map.entry("errorCollection", Map.<String, Object>ofEntries(Map.entry("errorMessages", List.of()),
                         Map.entry("errors", Map.<String, Object>ofEntries())))))));
+
+    private JiraCreateIssueAction() {
+    }
 }

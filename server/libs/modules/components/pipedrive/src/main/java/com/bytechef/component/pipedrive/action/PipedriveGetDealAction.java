@@ -482,4 +482,7 @@ public class PipedriveGetDealAction {
                                 Map.entry("url_title", "Pipeline"), Map.entry("order_nr", 0), Map.entry("active", true),
                                 Map.entry("deal_probability", true), Map.entry("add_time", "2015-12-08 10:00:24"),
                                 Map.entry("update_time", "2015-12-08 10:00:24")))))))));
+
+    private PipedriveGetDealAction() {
+    }
 }

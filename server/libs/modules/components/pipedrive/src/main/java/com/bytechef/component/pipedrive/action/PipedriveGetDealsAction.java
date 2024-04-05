@@ -504,4 +504,7 @@ public class PipedriveGetDealsAction {
                 Map.<String, Object>ofEntries(Map.entry("pagination",
                     Map.<String, Object>ofEntries(Map.entry("start", 0), Map.entry("limit", 100),
                         Map.entry("more_items_in_collection", false), Map.entry("next_start", 1)))))));
+
+    private PipedriveGetDealsAction() {
+    }
 }

@@ -75,4 +75,7 @@ public class FreshdeskCreateTicketAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private FreshdeskCreateTicketAction() {
+    }
 }

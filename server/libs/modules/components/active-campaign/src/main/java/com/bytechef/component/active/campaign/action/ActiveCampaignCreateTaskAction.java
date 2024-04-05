@@ -72,4 +72,7 @@ public class ActiveCampaignCreateTaskAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ActiveCampaignCreateTaskAction() {
+    }
 }

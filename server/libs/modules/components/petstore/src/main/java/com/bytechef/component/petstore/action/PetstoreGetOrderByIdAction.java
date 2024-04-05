@@ -52,4 +52,7 @@ public class PetstoreGetOrderByIdAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreGetOrderByIdAction() {
+    }
 }

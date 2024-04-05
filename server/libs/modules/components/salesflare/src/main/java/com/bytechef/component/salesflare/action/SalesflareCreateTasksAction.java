@@ -60,4 +60,7 @@ public class SalesflareCreateTasksAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private SalesflareCreateTasksAction() {
+    }
 }

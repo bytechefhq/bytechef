@@ -310,4 +310,7 @@ public class MailchimpAddMemberToListAction {
             Map.entry("_links",
                 List.of(Map.<String, Object>ofEntries(Map.entry("rel", "string"), Map.entry("href", "string"),
                     Map.entry("method", "GET"), Map.entry("targetSchema", "string"), Map.entry("schema", "string"))))));
+
+    private MailchimpAddMemberToListAction() {
+    }
 }

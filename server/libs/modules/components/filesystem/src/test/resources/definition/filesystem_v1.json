@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Filesystem",
+  "triggers": null,
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -44,7 +46,6 @@
     } ],
     "title": "Read from file",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -144,7 +145,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -273,7 +275,6 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -318,7 +319,8 @@
       "sampleOutput": {
         "bytes": 1024
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -331,7 +333,6 @@
     "properties": null,
     "title": "Create Temp Directory",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -355,7 +356,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_tmp_dir"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -388,7 +390,6 @@
     } ],
     "title": "File Path",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -412,7 +413,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -469,7 +471,6 @@
     } ],
     "title": "List",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -573,7 +574,8 @@
         "controlType": "ARRAY_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -606,7 +608,6 @@
     } ],
     "title": "Create",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -630,7 +631,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -663,7 +665,6 @@
     } ],
     "title": "Remove",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -691,8 +692,7 @@
         "controlType": "SELECT"
       },
       "sampleOutput": true
-    }
-  } ],
-  "triggers": null,
-  "connection": null
+    },
+    "perform": { }
+  } ]
 }

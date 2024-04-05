@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "XML Helper",
+  "connection": null,
+  "triggers": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -174,7 +176,5 @@
       "sampleOutput": null
     },
     "perform": { }
-  } ],
-  "triggers": null,
-  "connection": null
+  } ]
 }

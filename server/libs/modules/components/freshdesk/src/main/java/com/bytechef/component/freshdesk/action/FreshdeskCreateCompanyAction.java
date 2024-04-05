@@ -63,4 +63,7 @@ public class FreshdeskCreateCompanyAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private FreshdeskCreateCompanyAction() {
+    }
 }

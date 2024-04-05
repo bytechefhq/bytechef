@@ -43,14 +43,14 @@ public class InsightlyCreateTaskAction {
                 "path", "/Tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("TITLE").label("TITLE")
+        .properties(object("__item").properties(string("TITLE").label("Title")
             .required(true),
-            string("STATUS").label("STATUS")
+            string("STATUS").label("Status")
                 .description("Task status")
                 .options(option("Not Started", "Not Started"), option("In Progress", "In Progress"),
                     option("Completed", "Completed"), option("Deferred", "Deferred"), option("Waiting", "Waiting"))
                 .required(false))
-            .label("Item")
+            .label("Task")
             .required(true)
             .metadata(
                 Map.of(
@@ -61,4 +61,7 @@ public class InsightlyCreateTaskAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private InsightlyCreateTaskAction() {
+    }
 }

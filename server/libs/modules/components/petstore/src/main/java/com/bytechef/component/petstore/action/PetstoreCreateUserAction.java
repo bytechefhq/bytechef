@@ -50,4 +50,7 @@ public class PetstoreCreateUserAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private PetstoreCreateUserAction() {
+    }
 }

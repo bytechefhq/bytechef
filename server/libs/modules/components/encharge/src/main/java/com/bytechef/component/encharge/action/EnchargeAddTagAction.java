@@ -51,4 +51,7 @@ public class EnchargeAddTagAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)));
+
+    private EnchargeAddTagAction() {
+    }
 }

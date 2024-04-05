@@ -77,4 +77,7 @@ public class EnchargeCreatePeopleAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private EnchargeCreatePeopleAction() {
+    }
 }

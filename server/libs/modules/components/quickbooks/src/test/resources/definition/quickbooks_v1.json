@@ -12,6 +12,74 @@
   "resources": null,
   "version": 1,
   "title": "QuickBooks",
+  "triggers": null,
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "oauth2_authorization_code",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Id",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Client Secret",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "OAuth2 Authorization Code",
+      "type": "OAUTH2_AUTHORIZATION_CODE",
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": { },
+      "tokenUrl": { },
+      "acquire": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -144,6 +212,7 @@
     } ],
     "title": "Create customer",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -320,8 +389,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -460,8 +529,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -556,8 +625,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -575,8 +644,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -637,11 +706,11 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -662,8 +731,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -705,12 +774,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -853,8 +921,8 @@
       "label": "Inventory start date",
       "placeholder": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Expense account id",
@@ -881,6 +949,7 @@
     } ],
     "title": "Create item",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -979,15 +1048,14 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1023,6 +1091,7 @@
     } ],
     "title": "Download customer pdf",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1122,75 +1191,6 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
-  } ],
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "oauth2_authorization_code",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientId",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Id",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "clientSecret",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Client Secret",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "OAuth2 Authorization Code",
-      "type": "OAUTH2_AUTHORIZATION_CODE",
-      "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
-      "apply": null,
-      "clientId": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": { },
-      "tokenUrl": { }
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  }
+    }
+  } ]
 }

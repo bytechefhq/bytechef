@@ -160,4 +160,7 @@ public class PipedriveAddLeadAction {
                     Map.entry("add_time", LocalDateTime.of(2020, 10, 14, 11, 30, 36)),
                     Map.entry("update_time", LocalDateTime.of(2020, 10, 14, 11, 30, 36)), Map.entry("visible_to", 3.0),
                     Map.entry("cc_email", "company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com")))));
+
+    private PipedriveAddLeadAction() {
+    }
 }

@@ -107,4 +107,7 @@ public class KeapCreateTaskAction {
                 .metadata(
                     Map.of(
                         "responseType", ResponseType.JSON)));
+
+    private KeapCreateTaskAction() {
+    }
 }
