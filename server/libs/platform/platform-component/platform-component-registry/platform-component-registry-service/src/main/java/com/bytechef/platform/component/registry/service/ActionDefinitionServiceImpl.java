@@ -35,6 +35,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.registry.constant.ActionDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
@@ -78,7 +79,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
                 .toList();
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 100);
+            throw new ComponentExecutionException(
+                e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
         }
     }
 
@@ -100,7 +102,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .map(Option::new)
                 .toList();
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 102);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         }
     }
 
@@ -135,7 +137,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 (property, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 103);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
         }
     }
 
@@ -165,7 +167,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         default -> throw new IllegalStateException();
                     };
                 } catch (Exception e) {
-                    throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 104);
+                    throw new ComponentExecutionException(
+                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
                 }
             })
             .orElse(null);
@@ -182,7 +185,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 101);
+            throw new ComponentExecutionException(
+                e, inputParameters, ActionDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
         }
     }
 

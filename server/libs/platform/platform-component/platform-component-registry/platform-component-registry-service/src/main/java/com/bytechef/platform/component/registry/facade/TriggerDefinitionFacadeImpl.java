@@ -121,7 +121,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
-        triggerDefinitionService.executeOnEnableListener(
+        triggerDefinitionService.executeListenerEnable(
             componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }

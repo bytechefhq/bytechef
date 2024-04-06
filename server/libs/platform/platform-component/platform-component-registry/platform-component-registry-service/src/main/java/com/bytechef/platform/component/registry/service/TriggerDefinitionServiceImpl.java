@@ -39,6 +39,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.registry.constant.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.registry.definition.HttpParametersImpl;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
@@ -98,7 +99,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     connection == null ? null : new ParametersImpl(connection.parameters()), context),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 100);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
         }
     }
 
@@ -117,7 +119,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 connection == null ? null : new ParametersImpl(connection.parameters()),
                 new ParametersImpl(outputParameters), workflowExecutionId, context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 110);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_DISABLE);
         }
     }
 
@@ -136,7 +139,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 connection == null ? null : new ParametersImpl(connection.parameters()),
                 webhookUrl, workflowExecutionId, context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 109);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_ENABLE);
         }
     }
 
@@ -167,12 +171,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 connection == null ? null : new ParametersImpl(connection.parameters()), workflowExecutionId,
                 context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 102);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_LISTENER_DISABLE);
         }
     }
 
     @Override
-    public void executeOnEnableListener(
+    public void executeListenerEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
         @NonNull TriggerContext context) {
@@ -191,7 +196,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                             WorkflowExecutionId.parse(workflowExecutionId), LocalDateTime.now(), output))),
                 context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 103);
+            throw new ComponentExecutionException(e, inputParameters,
+                TriggerDefinitionErrorType.EXECUTE_LISTENER_ENABLE);
         }
     }
 
@@ -211,7 +217,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context),
                 Option::new);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 104);
+            throw new ComponentExecutionException(e, inputParameters, TriggerDefinitionErrorType.EXECUTE_OPTIONS);
         }
     }
 
@@ -293,7 +299,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             return workflowNodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 101);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
         }
     }
 
@@ -341,7 +348,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 output, triggerContext);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 105);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_DYNAMIC_WEBHOOK_TRIGGER);
         }
 
         return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));
@@ -358,7 +366,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             pollOutput = pollFunction.apply(
                 new ParametersImpl(inputParameters), new ParametersImpl(closureParameters), triggerContext);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 106);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
         }
 
         List<Object> records = new ArrayList<>(
@@ -370,7 +379,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     new ParametersImpl(inputParameters), new ParametersImpl(pollOutput.closureParameters()),
                     triggerContext);
             } catch (Exception e) {
-                throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 107);
+                throw new ComponentExecutionException(
+                    e, inputParameters, TriggerDefinitionErrorType.EXECUTE_POLLING_TRIGGER);
             }
 
             records.addAll(pollOutput.records());
@@ -393,7 +403,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 triggerContext);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 108);
+            throw new ComponentExecutionException(
+                e, inputParameters, TriggerDefinitionErrorType.EXECUTE_STATIC_WEBHOOK_ERROR_TYPE);
         }
 
         return new TriggerOutput(webhookOutput, null, OptionalUtils.orElse(triggerDefinition.getBatch(), false));

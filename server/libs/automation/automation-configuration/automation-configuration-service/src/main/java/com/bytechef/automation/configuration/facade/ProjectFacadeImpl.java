@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.constant.ProjectErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
@@ -149,7 +150,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public void deleteProject(long id) {
         if (!CollectionUtils.isEmpty(projectInstanceService.getProjectInstances(id))) {
             throw new ApplicationException(
-                "Project id=%s cannot be deleted".formatted(id), Project.class, 100);
+                "Project id=%s cannot be deleted".formatted(id), ProjectErrorType.CREATE_PROJECT);
         }
 
         Project project = projectService.getProject(id);
@@ -185,7 +186,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
                 if (OptionalUtils.isPresent(jobService.fetchLastWorkflowJob(workflowId))) {
                     throw new ApplicationException(
-                        "Workflow id=%s is in use".formatted(workflowId), Project.class, 101);
+                        "Workflow id=%s is in use".formatted(workflowId), ProjectErrorType.DELETE_WORKFLOW);
                 }
 
                 projectInstanceWorkflows.stream()
