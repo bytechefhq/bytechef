@@ -5,6 +5,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ComponentDefinitionBasicModel,
@@ -33,6 +34,7 @@ import {
 } from '@/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/types/types';
 import {zodResolver} from '@hookform/resolvers/zod';
+import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useQueryClient} from '@tanstack/react-query';
@@ -314,11 +316,13 @@ const ConnectionSelect = ({
     );
 };
 
-const PropertyCodeEditorSheetConnectionsSidebar = ({
+const PropertyCodeEditorSheetConnectionsSheet = ({
+    onCLose,
     workflow,
     workflowConnections,
     workflowNodeName,
 }: {
+    onCLose: () => void;
     workflowConnections: WorkflowConnectionModel[];
     workflow: WorkflowModel;
     workflowNodeName: string;
@@ -418,102 +422,112 @@ const PropertyCodeEditorSheetConnectionsSidebar = ({
     };
 
     return (
-        <div className="flex h-full flex-col gap-4 overflow-auto p-4 pt-3.5">
-            <div className="flex items-center font-semibold">
-                <span>Connections</span>
-            </div>
+        <Sheet onOpenChange={onCLose} open>
+            <SheetContent className="flex h-full flex-col gap-4 overflow-auto p-4 pt-3.5">
+                <SheetHeader>
+                    <SheetTitle>
+                        <div className="flex items-center justify-between">
+                            <span>Connections</span>
 
-            {workflowConnections?.length ? (
-                <>
-                    {workflowConnections.map((workflowConnection) => {
-                        const workflowTestConfigurationConnection =
-                            workflowTestConfigurationConnections &&
-                            workflowTestConfigurationConnections.length > 0 &&
-                            workflowTestConfigurationConnections
-                                ? workflowTestConfigurationConnections.filter(
-                                      (workflowTestConfigurationConnection) =>
-                                          workflowTestConfigurationConnection.workflowConnectionKey ===
-                                          workflowConnection.key
-                                  )[0]
-                                : undefined;
+                            <SheetPrimitive.Close asChild>
+                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
+                            </SheetPrimitive.Close>
+                        </div>
+                    </SheetTitle>
+                </SheetHeader>
 
-                        return (
-                            <fieldset className="space-y-2" key={workflowConnection.key}>
-                                <ConnectionLabel
-                                    onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
-                                    workflowConnection={workflowConnection}
-                                />
+                {workflowConnections?.length ? (
+                    <>
+                        {workflowConnections.map((workflowConnection) => {
+                            const workflowTestConfigurationConnection =
+                                workflowTestConfigurationConnections &&
+                                workflowTestConfigurationConnections.length > 0 &&
+                                workflowTestConfigurationConnections
+                                    ? workflowTestConfigurationConnections.filter(
+                                          (workflowTestConfigurationConnection) =>
+                                              workflowTestConfigurationConnection.workflowConnectionKey ===
+                                              workflowConnection.key
+                                      )[0]
+                                    : undefined;
 
-                                <ConnectionSelect
-                                    workflowConnection={workflowConnection}
-                                    workflowId={workflow.id!}
-                                    workflowNodeName={workflowNodeName}
-                                    workflowTestConfigurationConnection={workflowTestConfigurationConnection}
-                                />
-                            </fieldset>
-                        );
-                    })}
+                            return (
+                                <fieldset className="space-y-2" key={workflowConnection.key}>
+                                    <ConnectionLabel
+                                        onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
+                                        workflowConnection={workflowConnection}
+                                    />
 
-                    <div className="flex justify-end">
-                        <ComponentPopover onSubmit={handleOnSubmit} />
-                    </div>
-                </>
-            ) : (
-                <div className="flex flex-1 flex-col items-center">
-                    <div className="mt-16 w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
-                        <div className="text-center">
-                            <span className="mx-auto inline-block">
-                                <LinkIcon className="size-6 text-gray-400" />
-                            </span>
+                                    <ConnectionSelect
+                                        workflowConnection={workflowConnection}
+                                        workflowId={workflow.id!}
+                                        workflowNodeName={workflowNodeName}
+                                        workflowTestConfigurationConnection={workflowTestConfigurationConnection}
+                                    />
+                                </fieldset>
+                            );
+                        })}
 
-                            <h3 className="mt-2 text-sm font-semibold">No defined components</h3>
+                        <div className="flex justify-end">
+                            <ComponentPopover onSubmit={handleOnSubmit} />
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex flex-1 flex-col items-center">
+                        <div className="mt-16 w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
+                            <div className="text-center">
+                                <span className="mx-auto inline-block">
+                                    <LinkIcon className="size-6 text-gray-400" />
+                                </span>
 
-                            <p className="mt-1 text-sm text-gray-500">
-                                You have not defined any component and its connection to use inside this script yet.
-                            </p>
+                                <h3 className="mt-2 text-sm font-semibold">No defined components</h3>
 
-                            <div className="mt-6">
-                                <ComponentPopover
-                                    onSubmit={handleOnSubmit}
-                                    triggerNode={<Button>Add Component</Button>}
-                                />
+                                <p className="mt-1 text-sm text-gray-500">
+                                    You have not defined any component and its connection to use inside this script yet.
+                                </p>
+
+                                <div className="mt-6">
+                                    <ComponentPopover
+                                        onSubmit={handleOnSubmit}
+                                        triggerNode={<Button>Add Component</Button>}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {showConnectionNote && (
-                        <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
-                            <div className="flex items-center pb-2">
-                                <span className="font-medium">Note</span>
+                        {showConnectionNote && (
+                            <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
+                                <div className="flex items-center pb-2">
+                                    <span className="font-medium">Note</span>
 
-                                <button
-                                    className="ml-auto p-0"
-                                    onClick={() => setShowConnectionNote(false)}
-                                    title="Close the note"
-                                >
-                                    <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                                </button>
+                                    <button
+                                        className="ml-auto p-0"
+                                        onClick={() => setShowConnectionNote(false)}
+                                        title="Close the note"
+                                    >
+                                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                                    </button>
+                                </div>
+
+                                <p className="text-sm text-gray-800">
+                                    The selected connections are used for testing purposes only.
+                                </p>
                             </div>
+                        )}
+                    </div>
+                )}
 
-                            <p className="text-sm text-gray-800">
-                                The selected connections are used for testing purposes only.
-                            </p>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {showNewConnectionDialog && (
-                <ConnectionDialog
-                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                    connectionsQueryKey={ConnectionKeys.connections}
-                    onClose={() => setShowNewConnectionDialog(false)}
-                    useCreateConnectionMutation={useCreateConnectionMutation}
-                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                />
-            )}
-        </div>
+                {showNewConnectionDialog && (
+                    <ConnectionDialog
+                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                        connectionsQueryKey={ConnectionKeys.connections}
+                        onClose={() => setShowNewConnectionDialog(false)}
+                        useCreateConnectionMutation={useCreateConnectionMutation}
+                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                    />
+                )}
+            </SheetContent>
+        </Sheet>
     );
 };
 
-export default PropertyCodeEditorSheetConnectionsSidebar;
+export default PropertyCodeEditorSheetConnectionsSheet;
