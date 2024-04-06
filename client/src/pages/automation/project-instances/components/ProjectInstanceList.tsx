@@ -28,7 +28,7 @@ const ProjectInstanceList = ({
                         }
 
                         return (
-                            <Collapsible key={projectInstance.id}>
+                            <Collapsible className="group" key={projectInstance.id}>
                                 <ProjectInstanceListItem
                                     key={projectInstance.id}
                                     projectInstance={projectInstance}

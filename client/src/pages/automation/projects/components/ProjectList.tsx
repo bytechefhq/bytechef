@@ -11,7 +11,7 @@ const ProjectList = ({projects, tags}: {projects: ProjectModel[]; tags: TagModel
                 const projectTagIds = project.tags?.map((tag) => tag.id);
 
                 return (
-                    <Collapsible key={project.id}>
+                    <Collapsible className="group" key={project.id}>
                         <ProjectListItem
                             key={project.id}
                             project={project}
