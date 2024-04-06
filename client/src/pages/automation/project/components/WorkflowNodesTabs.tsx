@@ -55,10 +55,10 @@ const WorkflowNodesTabs = ({
 
             <div className="relative flex flex-1">
                 <div
-                    className={twMerge('overflow-y-auto flex absolute', popover && 'h-80 w-full', !popover && 'h-full')}
+                    className={twMerge('overflow-y-auto flex absolute w-full', popover && 'h-80', !popover && 'h-full')}
                 >
                     {!hideTriggerComponents && (
-                        <TabsContent className="mt-0" value="triggers">
+                        <TabsContent className="mt-0 w-full" value="triggers">
                             <ul className="space-y-2" role="list">
                                 {triggerComponentDefinitions.length ? (
                                     triggerComponentDefinitions.map(
