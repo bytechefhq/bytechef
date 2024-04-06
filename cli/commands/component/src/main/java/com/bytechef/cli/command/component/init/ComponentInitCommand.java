@@ -96,8 +96,8 @@ public class ComponentInitCommand implements Callable<Integer> {
                 commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
         }
 
-        new ComponentInitOpenApiGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
-            openApiPath, outputPath)
+        new ComponentInitOpenApiGenerator(
+            basePackageName, componentName.toLowerCase(), version, internalComponent, openApiPath, outputPath)
                 .generate();
     }
 }
