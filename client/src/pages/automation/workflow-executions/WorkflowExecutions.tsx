@@ -341,7 +341,6 @@ export const WorkflowExecutions = () => {
                                       }))
                                     : []
                             }
-                            maxHeight
                             onChange={handleWorkflowChange}
                             value={filterWorkflowId}
                         />

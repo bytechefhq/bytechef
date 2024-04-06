@@ -1,9 +1,8 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem} from '@/components/ui/command';
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ScrollArea} from '@/components/ui/scroll-area';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -187,10 +186,10 @@ const PropertyComboBox = ({
                     <Command>
                         <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
-                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandList>
+                            <CommandEmpty>No item found.</CommandEmpty>
 
-                        <CommandGroup>
-                            <ScrollArea className="h-72 w-full">
+                            <CommandGroup>
                                 {(options as Array<ComboBoxItemType>)?.map((option) => (
                                     <CommandItem
                                         key={option.value}
@@ -222,8 +221,8 @@ const PropertyComboBox = ({
                                         {option.value === value && <CheckIcon className="ml-auto size-4" />}
                                     </CommandItem>
                                 ))}
-                            </ScrollArea>
-                        </CommandGroup>
+                            </CommandGroup>
+                        </CommandList>
                     </Command>
                 </PopoverContent>
             </Popover>

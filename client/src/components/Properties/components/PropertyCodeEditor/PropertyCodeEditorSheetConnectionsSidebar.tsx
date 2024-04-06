@@ -172,7 +172,6 @@ const ComponentPopover = ({
                                                         label: componentDefinition.title!,
                                                         value: componentDefinition.name,
                                                     }))}
-                                                    maxHeight={true}
                                                     name="componentName"
                                                     onBlur={field.onBlur}
                                                     onChange={(item) => {
