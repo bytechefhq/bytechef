@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.exception;
 
 import com.bytechef.platform.exception.AbstractException;
+import com.bytechef.platform.exception.ErrorType;
 import java.util.Collections;
 import java.util.Map;
 
@@ -27,38 +28,38 @@ public class ComponentExecutionException extends AbstractException {
 
     private Map<String, ?> inputParameters;
 
-    public ComponentExecutionException(String message, Class<?> entityClass, int errorKey) {
-        super(message, entityClass, errorKey);
+    public ComponentExecutionException(String message, ErrorType errorType) {
+        super(message, errorType);
     }
 
     public ComponentExecutionException(
-        String message, Map<String, ?> inputParameters, Class<?> entityClass, int errorKey) {
+        String message, Map<String, ?> inputParameters, ErrorType errorType) {
 
-        super(message, entityClass, errorKey);
+        super(message, errorType);
 
         this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
-    public ComponentExecutionException(Throwable cause, Class<?> entityClass, int errorKey) {
-        super(cause, entityClass, errorKey);
+    public ComponentExecutionException(Throwable cause, ErrorType errorType) {
+        super(cause, errorType);
     }
 
     public ComponentExecutionException(
-        Throwable cause, Map<String, ?> inputParameters, Class<?> entityClass, int errorKey) {
+        Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
 
-        super(cause, entityClass, errorKey);
+        super(cause, errorType);
 
         this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
-    public ComponentExecutionException(String message, Throwable cause, Class<?> entityClass, int errorKey) {
-        super(message, cause, entityClass, errorKey);
+    public ComponentExecutionException(String message, Throwable cause, ErrorType errorType) {
+        super(message, cause, errorType);
     }
 
     public ComponentExecutionException(
-        String message, Throwable cause, Map<String, ?> inputParameters, Class<?> entityClass, int errorKey) {
+        String message, Throwable cause, Map<String, ?> inputParameters, ErrorType errorType) {
 
-        super(message, cause, entityClass, errorKey);
+        super(message, cause, errorType);
 
         this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }

@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.constant.ProjectInstanceErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
@@ -112,7 +113,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         if (!project.isPublished()) {
             throw new ApplicationException(
-                "Project id=%s is not published".formatted(projectId), ProjectInstance.class, 100);
+                "Project id=%s is not published".formatted(projectId),
+                ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
 
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
@@ -174,14 +176,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
             throw new ApplicationException(
-                "ProjectInstance id=%s has executed workflows".formatted(id), ProjectInstance.class, 101);
+                "ProjectInstance id=%s has executed workflows".formatted(id),
+                ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
         }
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             if (projectInstanceWorkflow.isEnabled()) {
                 throw new ApplicationException(
                     "ProjectInstanceWorkflow id=%s must be disabled".formatted(projectInstanceWorkflow.getId()),
-                    ProjectInstance.class, 102);
+                    ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
             }
 
             projectInstanceWorkflowService.delete(projectInstanceWorkflow.getId());

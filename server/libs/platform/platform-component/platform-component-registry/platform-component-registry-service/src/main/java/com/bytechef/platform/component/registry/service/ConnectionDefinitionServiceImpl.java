@@ -43,6 +43,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.registry.constant.ConnectionDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
@@ -91,7 +92,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return applyFunction.apply(new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinition.class, 102);
+            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
         }
     }
 
@@ -114,7 +115,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             try {
                 pkce = pkceFunction.apply(null, null, "SHA256", context);
             } catch (Exception e) {
-                throw new ComponentExecutionException(e, ConnectionDefinition.class, 103);
+                throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
             }
 
             verifier = pkce.verifier();
@@ -141,7 +142,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 new ParametersImpl(connection.parameters()), MapUtils.getString(connection.parameters(), CODE),
                 redirectUri, verifier, context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinition.class, 104);
+            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
         }
     }
 
@@ -211,7 +212,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 clientIdFunction.apply(connectionParameters, context),
                 scopesFunction.apply(connectionParameters, context));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ConnectionDefinition.class, 105);
+            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
         }
     }
 
@@ -330,11 +331,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() != 200) {
-                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
+                    throw new ComponentExecutionException(
+                        "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
                 if (httpResponse.body() == null) {
-                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
+                    throw new ComponentExecutionException(
+                        "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
                 return new AuthorizationCallbackResponse(JsonUtils.read(httpResponse.body(), new TypeReference<>() {}));
@@ -376,13 +379,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 try {
                     refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
                 } catch (Exception e) {
-                    throw new ComponentExecutionException(e, ConnectionDefinition.class, 101);
+                    throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
                 }
             } else {
                 try {
                     refreshUrl = refreshUrlFunction.apply(connectionParameters, context);
                 } catch (Exception e) {
-                    throw new ComponentExecutionException(e, ConnectionDefinition.class, 101);
+                    throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
                 }
             }
         }

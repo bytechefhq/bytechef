@@ -66,7 +66,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    void executeOnEnableListener(
+    void executeListenerEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);

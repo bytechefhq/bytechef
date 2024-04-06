@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.constant.ProjectErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
@@ -149,7 +150,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (CollectionUtils.count(project.getWorkflowIds(project.getLastVersion())) == 1) {
             throw new ApplicationException(
-                "The last workflow id=%s cannot be deleted".formatted(workflowId), Project.class, 102);
+                "The last workflow id=%s cannot be deleted".formatted(workflowId), ProjectErrorType.REMOVE_WORKFLOW);
         }
 
         project.removeWorkflow(workflowId);

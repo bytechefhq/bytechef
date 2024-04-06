@@ -91,7 +91,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public void executeOnEnableListener(
+    public void executeListenerEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
         @NonNull TriggerContext context) {

@@ -29,52 +29,52 @@ public abstract class AbstractException extends RuntimeException {
     private final int errorKey;
     private List<?> errorMessageArguments;
 
-    public AbstractException(String message, Class<?> entityClass, int errorKey) {
+    public AbstractException(String message, ErrorType errorType) {
         super(message);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        this.entityClass = errorType.getErrorClass();
+        this.errorKey = errorType.getErrorKey();
     }
 
-    public AbstractException(String message, Class<?> entityClass, int errorKey, List<?> errorMessageArguments) {
+    public AbstractException(String message, ErrorType errorType, List<?> errorMessageArguments) {
         super(message);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        this.entityClass = errorType.getErrorClass();
+        this.errorKey = errorType.getErrorKey();
         this.errorMessageArguments = Collections.unmodifiableList(errorMessageArguments);
     }
 
-    public AbstractException(Throwable cause, Class<?> entityClass, int errorKey) {
+    public AbstractException(Throwable cause, ErrorType errorType) {
         super(cause);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        this.entityClass = errorType.getErrorClass();
+        this.errorKey = errorType.getErrorKey();
     }
 
-    public AbstractException(String message, Throwable cause, Class<?> entityClass, int errorKey) {
+    public AbstractException(String message, Throwable cause, ErrorType errorType) {
         super(message, cause);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        this.entityClass = errorType.getErrorClass();
+        this.errorKey = errorType.getErrorKey();
     }
 
     public AbstractException(
-        Throwable cause, Class<?> entityClass, int errorKey, List<?> errorMessageArguments) {
+        Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
 
         super(cause);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        this.entityClass = errorType.getErrorClass();
+        this.errorKey = errorType.getErrorKey();
         this.errorMessageArguments = Collections.unmodifiableList(errorMessageArguments);
     }
 
     public AbstractException(
-        String message, Throwable cause, Class<?> entityClass, int errorKey, List<?> errorMessageArguments) {
+        String message, Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
 
         super(message, cause);
 
-        this.entityClass = entityClass;
-        this.errorKey = errorKey;
+        this.entityClass = errorType.getErrorClass();
+        this.errorKey = errorType.getErrorKey();
         this.errorMessageArguments = Collections.unmodifiableList(errorMessageArguments);
     }
 

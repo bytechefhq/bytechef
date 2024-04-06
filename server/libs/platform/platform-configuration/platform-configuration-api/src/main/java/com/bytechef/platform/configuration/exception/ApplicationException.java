@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.exception;
 
 import com.bytechef.platform.exception.AbstractException;
+import com.bytechef.platform.exception.ErrorType;
 import java.util.List;
 
 /**
@@ -24,29 +25,29 @@ import java.util.List;
  */
 public class ApplicationException extends AbstractException {
 
-    public ApplicationException(String message, Class<?> entityClass, int errorKey) {
-        super(message, entityClass, errorKey);
+    public ApplicationException(String message, ErrorType errorType) {
+        super(message, errorType);
     }
 
-    public ApplicationException(String message, Class<?> entityClass, int errorKey, List<?> errorMessageArguments) {
-        super(message, entityClass, errorKey, errorMessageArguments);
+    public ApplicationException(String message, ErrorType errorType, List<?> errorMessageArguments) {
+        super(message, errorType, errorMessageArguments);
     }
 
-    public ApplicationException(Throwable cause, Class<?> entityClass, int errorKey) {
-        super(cause, entityClass, errorKey);
+    public ApplicationException(Throwable cause, ErrorType errorType) {
+        super(cause, errorType);
     }
 
-    public ApplicationException(Throwable cause, Class<?> entityClass, int errorKey, List<?> errorMessageArguments) {
-        super(cause, entityClass, errorKey, errorMessageArguments);
+    public ApplicationException(Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
+        super(cause, errorType, errorMessageArguments);
     }
 
-    public ApplicationException(String message, Throwable cause, Class<?> entityClass, int errorKey) {
-        super(message, cause, entityClass, errorKey);
+    public ApplicationException(String message, Throwable cause, ErrorType errorType) {
+        super(message, cause, errorType);
     }
 
     public ApplicationException(
-        String message, Throwable cause, Class<?> entityClass, int errorKey, List<?> errorMessageArguments) {
+        String message, Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
 
-        super(message, cause, entityClass, errorKey, errorMessageArguments);
+        super(message, cause, errorType, errorMessageArguments);
     }
 }
