@@ -149,30 +149,30 @@ const PropertyCodeEditorSheet = ({
                                                 ) : (
                                                     <pre className="mt-2 text-xs">{scriptTestExecution.output}</pre>
                                                 )
-                                            ) : (
-                                                scriptTestExecution.error && (
-                                                    <div className="space-y-4 text-sm">
-                                                        <div className="space-y-2">
-                                                            <div className="font-semibold">Error</div>
+                                            ) : scriptTestExecution.error ? (
+                                                <div className="space-y-4 text-sm">
+                                                    <div className="space-y-2">
+                                                        <div className="font-semibold">Error</div>
 
-                                                            <div>{scriptTestExecution.error.message}</div>
-                                                        </div>
-
-                                                        {scriptTestExecution.error.stackTrace && (
-                                                            <div className="space-y-2">
-                                                                <div className="font-semibold">Stack Trace</div>
-
-                                                                <div>
-                                                                    {scriptTestExecution.error.stackTrace.map(
-                                                                        (stackTrace, index) => (
-                                                                            <div key={index}>{stackTrace}</div>
-                                                                        )
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        )}
+                                                        <div>{scriptTestExecution.error.message}</div>
                                                     </div>
-                                                )
+
+                                                    {scriptTestExecution.error.stackTrace && (
+                                                        <div className="space-y-2">
+                                                            <div className="font-semibold">Stack Trace</div>
+
+                                                            <div>
+                                                                {scriptTestExecution.error.stackTrace.map(
+                                                                    (stackTrace, index) => (
+                                                                        <div key={index}>{stackTrace}</div>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted-foreground">No defined output.</span>
                                             )
                                         ) : (
                                             <div className="flex items-center gap-x-1 text-muted-foreground">
