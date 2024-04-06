@@ -99,4 +99,7 @@ public class ShopifyCreateOrderAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ShopifyCreateOrderAction() {
+    }
 }

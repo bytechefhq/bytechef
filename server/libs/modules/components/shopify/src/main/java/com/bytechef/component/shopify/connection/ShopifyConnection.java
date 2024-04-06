@@ -47,4 +47,7 @@ public class ShopifyConnection {
                         .required(true)
 
                 ));
+
+    private ShopifyConnection() {
+    }
 }

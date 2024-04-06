@@ -52,4 +52,7 @@ public class ShopifyCloseOrderAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ShopifyCloseOrderAction() {
+    }
 }
