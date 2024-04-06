@@ -1,9 +1,12 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import * as React from 'react';
+import {twMerge} from 'tailwind-merge';
 
 export function RightSidebar({
+    className,
     navigation,
 }: {
+    className?: string;
     navigation: {
         name: string;
         icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
@@ -11,7 +14,7 @@ export function RightSidebar({
     }[];
 }) {
     return (
-        <aside className="hidden bg-muted lg:flex lg:shrink-0">
+        <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
             <div className="flex w-[56px]">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                     <div className="flex-1">

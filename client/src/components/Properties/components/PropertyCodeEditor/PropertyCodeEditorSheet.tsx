@@ -1,4 +1,4 @@
-import PropertyCodeEditorSheetConnectionsSidebar from '@/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSidebar';
+import PropertyCodeEditorSheetConnectionsSheet from '@/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSheet';
 import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
@@ -192,18 +192,9 @@ const PropertyCodeEditorSheet = ({
                             </ResizablePanel>
                         </ResizablePanelGroup>
 
-                        {showConnections && (
-                            <div className="w-80 border-l">
-                                <PropertyCodeEditorSheetConnectionsSidebar
-                                    workflow={workflow}
-                                    workflowConnections={currentWorkflowTask?.connections || []}
-                                    workflowNodeName={workflowNodeName}
-                                />
-                            </div>
-                        )}
-
                         <div className="flex border-l">
                             <RightSidebar
+                                className="bg-transparent"
                                 navigation={[
                                     {
                                         icon: Link2Icon,
@@ -214,6 +205,17 @@ const PropertyCodeEditorSheet = ({
                             />
                         </div>
                     </div>
+
+                    {showConnections && (
+                        <div className="w-80 border-l">
+                            <PropertyCodeEditorSheetConnectionsSheet
+                                onCLose={() => setShowConnections(false)}
+                                workflow={workflow}
+                                workflowConnections={currentWorkflowTask?.connections || []}
+                                workflowNodeName={workflowNodeName}
+                            />
+                        </div>
+                    )}
                 </SheetContent>
             </Sheet>
         </>
