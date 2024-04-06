@@ -410,7 +410,6 @@ const ConnectionDialog = ({
                                                                         value: componentDefinition.name,
                                                                     })
                                                                 )}
-                                                                maxHeight
                                                                 name="component"
                                                                 onBlur={field.onBlur}
                                                                 onChange={(item) =>
