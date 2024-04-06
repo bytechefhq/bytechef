@@ -72,4 +72,7 @@ public class ShopifyUpdateOrderAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ShopifyUpdateOrderAction() {
+    }
 }

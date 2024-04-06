@@ -44,4 +44,7 @@ public class ShopifyDeleteOrderAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)));
+
+    private ShopifyDeleteOrderAction() {
+    }
 }

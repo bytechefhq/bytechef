@@ -51,4 +51,7 @@ public class ShopifyCancelOrderAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON)));
+
+    private ShopifyCancelOrderAction() {
+    }
 }
