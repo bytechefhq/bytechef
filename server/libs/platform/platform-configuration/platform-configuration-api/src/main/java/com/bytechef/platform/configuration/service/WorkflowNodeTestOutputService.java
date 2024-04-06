@@ -35,8 +35,10 @@ public interface WorkflowNodeTestOutputService {
     void removeUnusedNodeTestOutputs(Workflow workflow);
 
     WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Object sampleOutput);
+        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
+        @NonNull Object sampleOutput);
 
     WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Output output);
+        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
+        @NonNull Output output);
 }

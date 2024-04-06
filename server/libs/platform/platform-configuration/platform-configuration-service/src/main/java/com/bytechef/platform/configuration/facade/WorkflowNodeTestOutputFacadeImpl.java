@@ -75,7 +75,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(workflowTrigger -> saveTriggerWorkflowNodeTestOutput(
+            .map(workflowTrigger -> executeTriggerWorkflowNodeTestOutput(
                 workflowId, workflowNodeName, workflowTrigger,
                 workflowTestConfigurationService
                     .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
@@ -131,7 +131,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
     }
 
-    private WorkflowNodeTestOutput saveTriggerWorkflowNodeTestOutput(
+    @SuppressFBWarnings("NP")
+    private WorkflowNodeTestOutput executeTriggerWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, WorkflowTrigger workflowTrigger, Long connectionId) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());

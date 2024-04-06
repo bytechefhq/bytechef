@@ -90,7 +90,8 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Object sampleOutput) {
+        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
+        @NonNull Object sampleOutput) {
 
         Property outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
@@ -101,7 +102,8 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, @NonNull Output output) {
+        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
+        @NonNull Output output) {
 
         return save(
             workflowId, workflowNodeName, workflowNodeType, output.getOutputSchema(), output.getSampleOutput());
