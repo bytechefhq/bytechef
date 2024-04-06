@@ -50,10 +50,12 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,6 +74,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.lang.model.element.Modifier;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -109,7 +112,7 @@ public class ComponentInitOpenApiGenerator {
         }
     };
     private static final String[] COMPONENT_DIR_NAMES = {
-        "action", "connection", "property", "trigger", "util"
+        "action", "constant", "connection", "property", "trigger", "util"
     };
 
     private final String basePackageName;
@@ -263,14 +266,20 @@ public class ComponentInitOpenApiGenerator {
         }
     }
 
-    private Path compileComponentHandlerSource(Path sourcePath) {
+    private Path compileComponentHandlerSource(Path sourcePath) throws IOException {
         JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
         List<String> javacOpts = new ArrayList<>();
 
         javacOpts.add("-classpath");
-        javacOpts.add(
-            "libs/auto-service-annotations-1.1.1.jar:libs/hermes-component-api-1.0.jar:" +
-                "libs/hermes-definition-api-1.0.jar");
+
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of("libs/"))) {
+            javacOpts.add(
+                StreamSupport.stream(directoryStream.spliterator(), false)
+                    .map(Path::toAbsolutePath)
+                    .map(Path::toString)
+                    .filter(path -> path.endsWith(".jar"))
+                    .collect(Collectors.joining(File.pathSeparator)));
+        }
 
         Path parentPath = sourcePath.getParent();
 
@@ -295,7 +304,7 @@ public class ComponentInitOpenApiGenerator {
         Path tempDirPath;
 
         try {
-            tempDirPath = Files.createTempDirectory("rest_component");
+            tempDirPath = Files.createTempDirectory("openapi_component_classes");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -1762,11 +1771,12 @@ public class ComponentInitOpenApiGenerator {
         URLClassLoader classLoader = URLClassLoader.newInstance(classUrls);
 
         @SuppressWarnings("unchecked")
-        Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(className, true,
-            classLoader);
+        Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(
+            className, true, classLoader);
 
-        return clazz.getDeclaredConstructor()
-            .newInstance();
+        Constructor<OpenApiComponentHandler> declaredConstructor = clazz.getDeclaredConstructor();
+
+        return declaredConstructor.newInstance();
     }
 
     private Path writeAbstractComponentHandlerSource(Path sourceDirPath) throws IOException {
@@ -1927,8 +1937,7 @@ public class ComponentInitOpenApiGenerator {
             .resolve(componentHandlerTestClassname + ".java")
             .toFile()
             .getAbsolutePath();
-        System.out.println(filename);
-        System.out.println(new File(filename).exists());
+
         if (!new File(filename).exists()) {
             JavaFile javaFile = JavaFile.builder(
                 getPackageName(),
@@ -2010,7 +2019,7 @@ public class ComponentInitOpenApiGenerator {
 
                     Schema schema = entry.getValue();
 
-                    if (!Objects.equals(schema.getType(), "object")) {
+                    if (schema.getType() != null && !Objects.equals(schema.getType(), "object")) {
                         continue;
                     }
 
