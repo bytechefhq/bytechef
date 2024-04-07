@@ -135,6 +135,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
         curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
         curProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
         curProjectInstanceWorkflow.setVersion(projectInstanceWorkflow.getVersion());
+        curProjectInstanceWorkflow.setWorkflowId(projectInstanceWorkflow.getWorkflowId());
 
         return projectInstanceWorkflowRepository.save(curProjectInstanceWorkflow);
     }

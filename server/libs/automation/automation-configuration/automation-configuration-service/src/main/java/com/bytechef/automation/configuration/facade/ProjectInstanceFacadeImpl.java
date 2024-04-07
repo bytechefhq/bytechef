@@ -241,10 +241,16 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     public ProjectInstanceDTO getProjectInstance(long id) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
+        Project project = projectService.getProject(projectInstance.getProjectId());
+
+        List<String> workflowIds = project.getWorkflowIds(projectInstance.getProjectVersion());
+
         return new ProjectInstanceDTO(
             projectInstance,
             CollectionUtils.map(
-                projectInstanceWorkflowService.getProjectInstanceWorkflows(id),
+                CollectionUtils.filter(
+                    projectInstanceWorkflowService.getProjectInstanceWorkflows(id),
+                    projectInstanceWorkflow -> workflowIds.contains(projectInstanceWorkflow.getWorkflowId())),
                 projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
                     projectInstanceWorkflow,
                     getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
@@ -281,22 +287,29 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         return CollectionUtils.map(
             projectInstances,
-            projectInstance -> new ProjectInstanceDTO(
-                projectInstance,
-                CollectionUtils.map(
-                    CollectionUtils.filter(
-                        projectInstanceWorkflows,
-                        projectInstanceWorkflow -> Objects.equals(
-                            projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId())),
-                    projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
-                        projectInstanceWorkflow,
-                        getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
-                        getStaticWebhookUrl(
-                            projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()))),
-                CollectionUtils.getFirst(
-                    projects, project -> Objects.equals(project.getId(), projectInstance.getProjectId())),
-                getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
-                filterTags(tags, projectInstance)));
+            projectInstance -> {
+                Project project = CollectionUtils.getFirst(
+                    projects, curProject -> Objects.equals(curProject.getId(), projectInstance.getProjectId()));
+
+                List<String> workflowIds = project.getWorkflowIds(projectInstance.getProjectVersion());
+
+                return new ProjectInstanceDTO(
+                    projectInstance,
+                    CollectionUtils.map(
+                        CollectionUtils.filter(
+                            projectInstanceWorkflows,
+                            projectInstanceWorkflow -> Objects.equals(
+                                projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId()) &&
+                                workflowIds.contains(projectInstanceWorkflow.getWorkflowId())),
+                        projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
+                            projectInstanceWorkflow,
+                            getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
+                            getStaticWebhookUrl(
+                                projectInstanceWorkflow.getProjectInstanceId(),
+                                projectInstanceWorkflow.getWorkflowId()))),
+                    project, getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
+                    filterTags(tags, projectInstance));
+            });
     }
 
     @Override

@@ -344,7 +344,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         new ProjectDTO(
-            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()), project,
+            getCategory(project), project,
             tags);
     }
 
@@ -364,9 +364,24 @@ public class ProjectFacadeImpl implements ProjectFacade {
             List<String> duplicatedVersionWorkflowIds = new ArrayList<>();
 
             for (String workflowId : project.getWorkflowIds(project.getLastVersion())) {
-                Workflow workflow = workflowService.duplicateWorkflow(workflowId);
+                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(workflowId);
 
-                duplicatedVersionWorkflowIds.add(workflow.getId());
+                duplicatedVersionWorkflowIds.add(duplicatedWorkflow.getId());
+
+                List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
+
+                for (ProjectInstance projectInstance : projectInstances) {
+                    List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+                        .getProjectInstanceWorkflows(projectInstance.getId());
+
+                    for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+                        if (Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId)) {
+                            projectInstanceWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+                            projectInstanceWorkflowService.update(projectInstanceWorkflow);
+                        }
+                    }
+                }
             }
 
             projectService.addVersion(id, duplicatedVersionWorkflowIds);
@@ -407,9 +422,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return oldName + " (%s)".formatted(addendum);
     }
 
+    private Category getCategory(Project project) {
+        return project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId());
+    }
+
     private ProjectDTO getProjectDTO(Project project) {
-        return new ProjectDTO(
-            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
-            project, tagService.getTags(project.getTagIds()));
+        return new ProjectDTO(getCategory(project), project, tagService.getTags(project.getTagIds()));
     }
 }
