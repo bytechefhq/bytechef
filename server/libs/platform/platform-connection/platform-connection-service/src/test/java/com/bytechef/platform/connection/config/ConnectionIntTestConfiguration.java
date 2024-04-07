@@ -52,7 +52,7 @@ public class ConnectionIntTestConfiguration {
     }
 
     @EnableJdbcRepositories(basePackages = {
-        "com.bytechef.platform.connection.repository", "com.bytechef.tag.repository"
+        "com.bytechef.platform.connection.repository", "com.bytechef.platform.tag.repository"
     })
     public static class ConnectionIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 

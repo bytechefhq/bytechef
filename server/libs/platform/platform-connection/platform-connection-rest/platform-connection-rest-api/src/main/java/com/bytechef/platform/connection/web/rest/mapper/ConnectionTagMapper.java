@@ -18,7 +18,7 @@ package com.bytechef.platform.connection.web.rest.mapper;
 
 import com.bytechef.platform.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

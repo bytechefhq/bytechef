@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.connection.domain;
 
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.Objects;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;

@@ -47,7 +47,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     basePackages = {
         "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category",
         "com.bytechef.automation.configuration", "com.bytechef.platform.connection", "com.bytechef.liquibase.config",
-        "com.bytechef.tag"
+        "com.bytechef.platform.tag"
     })
 @EnableAutoConfiguration
 @EnableCaching
@@ -101,6 +101,8 @@ public class ProjectIntTestConfiguration {
 
     @EnableJdbcRepositories(
         basePackages = {
+            "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category.repository",
+            "com.bytechef.automation.configuration.repository", "com.bytechef.platform.tag.repository"
         })
     public static class ProjectIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
     }

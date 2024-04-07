@@ -30,8 +30,8 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.repository.TagRepository;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -254,7 +254,7 @@ public class ConnectionFacadeIntTest {
     }
 
     @ComponentScan(basePackages = {
-        "com.bytechef.platform.configuration.instance.accessor", "com.bytechef.tag"
+        "com.bytechef.platform.configuration.instance.accessor", "com.bytechef.platform.tag"
     })
     @TestConfiguration
     public static class ConnectionFacadeIntTestConfiguration {

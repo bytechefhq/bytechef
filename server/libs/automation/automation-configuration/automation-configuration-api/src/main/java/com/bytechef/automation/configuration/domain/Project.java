@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.domain;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

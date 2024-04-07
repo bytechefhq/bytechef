@@ -1,8 +1,8 @@
 dependencies {
     api("org.springframework.data:spring-data-commons")
-    api(project(":server:libs:core:tag:tag-api"))
     api(project(":server:libs:platform:platform-category:platform-category-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    api(project(":server:libs:platform:platform-tag:platform-tag-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.data:spring-data-jdbc")

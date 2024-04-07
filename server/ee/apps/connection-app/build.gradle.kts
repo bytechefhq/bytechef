@@ -24,12 +24,12 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
-    implementation(project(":server:libs:core:tag:tag-service"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-impl"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
+    implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
 
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))

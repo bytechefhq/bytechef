@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
 /**

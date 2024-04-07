@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;

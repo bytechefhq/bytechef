@@ -36,7 +36,7 @@ import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestMod
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;

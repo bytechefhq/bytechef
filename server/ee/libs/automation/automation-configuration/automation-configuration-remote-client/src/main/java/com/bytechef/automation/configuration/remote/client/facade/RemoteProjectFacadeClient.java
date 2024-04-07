@@ -13,7 +13,7 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

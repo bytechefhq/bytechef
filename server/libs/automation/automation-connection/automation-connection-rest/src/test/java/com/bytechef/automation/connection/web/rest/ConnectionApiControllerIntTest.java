@@ -29,7 +29,7 @@ import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.constant.Type;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
