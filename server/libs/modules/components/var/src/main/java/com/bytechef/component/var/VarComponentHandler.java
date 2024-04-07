@@ -20,7 +20,16 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.var.action.VarSetAction;
+import com.bytechef.component.var.action.VarSetArrayAction;
+import com.bytechef.component.var.action.VarSetBooleanAction;
+import com.bytechef.component.var.action.VarSetDateAction;
+import com.bytechef.component.var.action.VarSetDateTimeAction;
+import com.bytechef.component.var.action.VarSetIntegerAction;
+import com.bytechef.component.var.action.VarSetNullableAction;
+import com.bytechef.component.var.action.VarSetNumberAction;
+import com.bytechef.component.var.action.VarSetObjectAction;
+import com.bytechef.component.var.action.VarSetStringAction;
+import com.bytechef.component.var.action.VarSetTimeAction;
 import com.bytechef.component.var.constant.VarConstants;
 import com.google.auto.service.AutoService;
 
@@ -34,7 +43,12 @@ public class VarComponentHandler implements ComponentHandler {
         .title("Var")
         .description("Sets a value which can then be referenced in other tasks.")
         .icon("path:assets/var.svg")
-        .actions(VarSetAction.ACTION_DEFINITION);
+        .actions(
+            VarSetArrayAction.ACTION_DEFINITION, VarSetBooleanAction.ACTION_DEFINITION,
+            VarSetDateAction.ACTION_DEFINITION, VarSetDateTimeAction.ACTION_DEFINITION,
+            VarSetIntegerAction.ACTION_DEFINITION, VarSetNullableAction.ACTION_DEFINITION,
+            VarSetNumberAction.ACTION_DEFINITION, VarSetObjectAction.ACTION_DEFINITION,
+            VarSetStringAction.ACTION_DEFINITION, VarSetTimeAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

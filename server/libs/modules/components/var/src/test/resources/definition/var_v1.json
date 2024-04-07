@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Var",
-  "triggers": null,
   "connection": null,
   "actions": [ {
     "batch": null,
@@ -21,71 +20,12 @@
     "description": "Assign value to a variable that can be used in the following steps.",
     "help": null,
     "metadata": null,
-    "name": "set",
+    "name": "setArray",
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
-      "description": "The value type.",
+      "description": "Value of array type to set.",
       "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": null,
-      "name": "type",
-      "type": "INTEGER",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Type",
-      "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
-      "options": [ {
-        "description": null,
-        "label": "Array",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Boolean",
-        "value": 2
-      }, {
-        "description": null,
-        "label": "Date",
-        "value": 3
-      }, {
-        "description": null,
-        "label": "Date Time",
-        "value": 4
-      }, {
-        "description": null,
-        "label": "Integer",
-        "value": 5
-      }, {
-        "description": null,
-        "label": "Nullable",
-        "value": 6
-      }, {
-        "description": null,
-        "label": "Number",
-        "value": 7
-      }, {
-        "description": null,
-        "label": "Object",
-        "value": 8
-      }, {
-        "description": null,
-        "label": "String",
-        "value": 9
-      }, {
-        "description": null,
-        "label": "Time",
-        "value": 10
-      } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 1",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -103,10 +43,24 @@
       "options": null,
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set array value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setBoolean",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 2",
+      "description": "Value of boolean type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -127,10 +81,24 @@
         "value": false
       } ],
       "controlType": "SELECT"
-    }, {
+    } ],
+    "title": "Set boolean value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setDate",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 3",
+      "description": "Value of date type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -144,10 +112,24 @@
       "options": null,
       "controlType": "DATE",
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set date value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setDateTime",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 4",
+      "description": "Value of date-time type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -161,10 +143,24 @@
       "options": null,
       "controlType": "DATE_TIME",
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set date-time value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setInteger",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 5",
+      "description": "Value of integer type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -180,10 +176,24 @@
       "options": null,
       "controlType": "INTEGER",
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set integer value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setNullable",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 6",
+      "description": "Value of nullable type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -195,10 +205,24 @@
       "label": "Value",
       "placeholder": null,
       "controlType": null
-    }, {
+    } ],
+    "title": "Set null value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setNumber",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 7",
+      "description": "Value of number type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -217,10 +241,24 @@
       "options": null,
       "controlType": "NUMBER",
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set number value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setObject",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 8",
+      "description": "Value of object type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -429,10 +467,24 @@
       "properties": null,
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set object value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setString",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 9",
+      "description": "Value of string type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -449,10 +501,24 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": null
-    }, {
+    } ],
+    "title": "Set string value",
+    "workflowNodeDescriptionFunction": null,
+    "output": null,
+    "perform": { }
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Assign value to a variable that can be used in the following steps.",
+    "help": null,
+    "metadata": null,
+    "name": "setTime",
+    "outputFunction": null,
+    "properties": [ {
       "advancedOption": null,
-      "description": "Value of any type to set.",
-      "displayCondition": "type == 10",
+      "description": "Value of time type to set.",
+      "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -467,9 +533,10 @@
       "controlType": "TIME",
       "optionsDataSource": null
     } ],
-    "title": "Set value",
+    "title": "Set time value",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
-  } ]
+    "output": null,
+    "perform": { }
+  } ],
+  "triggers": null
 }

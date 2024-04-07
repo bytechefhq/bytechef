@@ -21,7 +21,15 @@ package com.bytechef.component.var.constant;
  */
 public class VarConstants {
     public static final String VAR = "var";
-    public static final String SET = "set";
+    public static final String SET_ARRAY = "setArray";
+    public static final String SET_BOOLEAN = "setBoolean";
+    public static final String SET_DATE = "setDate";
+    public static final String SET_DATE_TIME = "setDateTime";
+    public static final String SET_INTEGER = "setInteger";
+    public static final String SET_NULLABLE = "setNullable";
+    public static final String SET_NUMBER = "setNumber";
+    public static final String SET_OBJECT = "setObject";
+    public static final String SET_STRING = "setString";
+    public static final String SET_TIME = "setTime";
     public static final String VALUE = "value";
-    public static final String TYPE = "type";
 }
