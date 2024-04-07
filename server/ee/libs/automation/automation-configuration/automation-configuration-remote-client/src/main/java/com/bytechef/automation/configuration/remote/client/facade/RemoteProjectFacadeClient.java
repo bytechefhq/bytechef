@@ -11,7 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.category.domain.Category;
+import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import java.util.List;

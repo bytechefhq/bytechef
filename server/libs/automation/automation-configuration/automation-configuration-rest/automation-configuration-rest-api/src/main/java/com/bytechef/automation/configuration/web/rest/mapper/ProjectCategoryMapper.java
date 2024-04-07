@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
-import com.bytechef.category.domain.Category;
+import com.bytechef.platform.category.domain.Category;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

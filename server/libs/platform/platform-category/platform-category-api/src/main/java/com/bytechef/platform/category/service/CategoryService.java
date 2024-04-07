@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.rest.mapper;
+package com.bytechef.platform.category.service;
 
-import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
-import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
 import com.bytechef.platform.category.domain.Category;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import java.util.List;
 
-/**
- * @author Ivica Cardic
- */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
-public interface ProjectCategoryModelMapper extends Converter<CategoryModel, Category> {
+public interface CategoryService {
 
-    Category convert(CategoryModel categoryModel);
+    Category create(Category category);
+
+    void delete(long id);
+
+    List<Category> getCategories();
+
+    Category getCategory(long id);
+
+    List<Category> getCategories(List<Long> ids);
+
+    Category save(Category category);
+
+    Category update(Category category);
 }

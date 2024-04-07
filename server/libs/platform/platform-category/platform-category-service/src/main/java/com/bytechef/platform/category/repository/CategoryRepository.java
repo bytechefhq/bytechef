@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.rest.mapper;
+package com.bytechef.platform.category.repository;
 
-import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
-import com.bytechef.automation.configuration.web.rest.model.CategoryModel;
 import com.bytechef.platform.category.domain.Category;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import java.util.Optional;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
-public interface ProjectCategoryModelMapper extends Converter<CategoryModel, Category> {
+@Repository
+public interface CategoryRepository
+    extends ListPagingAndSortingRepository<Category, Long>, ListCrudRepository<Category, Long> {
 
-    Category convert(CategoryModel categoryModel);
+    Optional<Category> findByName(String name);
 }
