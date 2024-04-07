@@ -7,10 +7,10 @@ outputs:
   value: "${intNumber}"
 tasks:
 - name: "stringNumber"
-  type: "var/v1/set"
+  type: "var/v1/setNumber"
   parameters:
     value: "1234"
 - name: "intNumber"
-  type: "var/v1/set"
+  type: "var/v1/setInteger"
   parameters:
     value: "${int(stringNumber)}"
