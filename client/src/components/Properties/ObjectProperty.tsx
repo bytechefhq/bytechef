@@ -4,7 +4,6 @@ import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {ControlTypeModel} from '@/middleware/platform/configuration';
-import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
@@ -14,6 +13,19 @@ import {twMerge} from 'tailwind-merge';
 
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
+
+const PROPERTY_CONTROL_TYPES = {
+    ARRAY: 'ARRAY_BUILDER',
+    BOOLEAN: 'BOOLEAN',
+    DATE: 'DATE',
+    DATE_TIME: 'DATE_TIME',
+    INTEGER: 'INTEGER',
+    NULL: 'NULL',
+    NUMBER: 'NUMBER',
+    OBJECT: 'OBJECT_BUILDER',
+    STRING: 'TEXT',
+    TIME: 'TIME',
+};
 
 interface ObjectPropertyProps {
     actionName?: string;
