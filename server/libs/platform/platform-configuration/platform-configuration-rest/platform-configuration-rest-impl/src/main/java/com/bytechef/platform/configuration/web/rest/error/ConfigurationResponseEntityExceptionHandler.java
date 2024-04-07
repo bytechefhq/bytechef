@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.rest.error;
 
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.configuration.exception.ApplicationException;
-import com.bytechef.web.rest.error.constant.ErrorConstants;
+import com.bytechef.platform.web.rest.error.constant.ErrorConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.util.List;

@@ -21,7 +21,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 import com.bytechef.platform.user.config.SecurityProperties;
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
-import com.bytechef.web.rest.filter.SpaWebFilter;
+import com.bytechef.platform.web.rest.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
