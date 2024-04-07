@@ -54,7 +54,8 @@ public class ScriptJavaScriptAction {
                         .description("Initialize parameter values used in the custom code.")
                         .additionalProperties(
                             array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
-                            time()),
+                            time())
+                        .expressionEnabled(false),
                     string(SCRIPT)
                         .label("JavaScript code")
                         .description("Add your JavaScript custom logic here.")

@@ -54,7 +54,8 @@ public class ScriptPythonAction {
                         .description("Initialize parameter values used in the custom code.")
                         .additionalProperties(
                             array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
-                            time()),
+                            time())
+                        .expressionEnabled(false),
                     string(SCRIPT)
                         .label("Python code")
                         .description("Add your Python custom logic here.")

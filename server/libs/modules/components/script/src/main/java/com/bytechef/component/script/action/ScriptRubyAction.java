@@ -54,7 +54,8 @@ public class ScriptRubyAction {
                         .description("Initialize parameter values used in the custom code.")
                         .additionalProperties(
                             array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
-                            time()),
+                            time())
+                        .expressionEnabled(false),
                     string(SCRIPT)
                         .label("Ruby code")
                         .description("Add your Ruby custom logic here.")

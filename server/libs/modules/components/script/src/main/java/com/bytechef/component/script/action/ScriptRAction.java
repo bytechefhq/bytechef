@@ -54,7 +54,8 @@ public class ScriptRAction {
                         .description("Initialize parameter values used in the custom code.")
                         .additionalProperties(
                             array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
-                            time()),
+                            time())
+                        .expressionEnabled(false),
                     string(SCRIPT)
                         .label("R code")
                         .description("Add your R custom logic here.")
