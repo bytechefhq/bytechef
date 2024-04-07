@@ -81,7 +81,7 @@ const WorkflowNodesTabs = ({
                     )}
 
                     {!hideActionComponents && (
-                        <TabsContent className="mt-0" value="components">
+                        <TabsContent className="mt-0 w-full" value="components">
                             <ul className="space-y-2" role="list">
                                 {actionComponentDefinitions.length ? (
                                     actionComponentDefinitions.map(
