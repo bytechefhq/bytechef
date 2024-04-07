@@ -42,7 +42,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
-import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -60,6 +59,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;

@@ -9,8 +9,8 @@ package com.bytechef.data.storage.db.remote.web.rest.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
-import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;

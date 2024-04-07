@@ -5,5 +5,5 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:core:data-storage:data-storage-db:data-storage-db-api"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-api"))
 }

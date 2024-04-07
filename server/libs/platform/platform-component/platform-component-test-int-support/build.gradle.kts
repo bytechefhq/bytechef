@@ -18,6 +18,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
-    implementation(project(":server:libs:core:data-storage:data-storage-api"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
 }
