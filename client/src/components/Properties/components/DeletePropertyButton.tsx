@@ -1,4 +1,3 @@
-import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
@@ -6,10 +5,12 @@ import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflo
 import {ComponentDataType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 
 interface DeletePropertyButtonProps {
     currentComponentData: ComponentDataType;
     handleDeletePropertyClick: () => void;
+    objectProperty?: boolean;
     propertyName: string;
     subPropertyIndex?: number;
     subPropertyName?: string;
@@ -19,6 +20,7 @@ interface DeletePropertyButtonProps {
 const DeletePropertyButton = ({
     currentComponentData,
     handleDeletePropertyClick,
+    objectProperty = true,
     propertyName,
     subPropertyIndex,
     subPropertyName,
@@ -61,17 +63,20 @@ const DeletePropertyButton = ({
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button
-                    className="ml-1 self-center"
-                    onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}
-                    size="icon"
-                    variant="ghost"
+                <div
+                    className={twMerge(
+                        'flex items-center justify-center',
+                        objectProperty && 'pl-2 pr-1',
+                        !objectProperty && 'px-2.5'
+                    )}
                 >
-                    <XIcon className="size-8 cursor-pointer p-2 hover:text-red-500" />
-                </Button>
+                    <button onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}>
+                        <XIcon className="size-[16px] cursor-pointer hover:text-red-500" />
+                    </button>
+                </div>
             </TooltipTrigger>
 
-            <TooltipContent>Delete property</TooltipContent>
+            <TooltipContent>{`Delete ${objectProperty ? 'property' : 'item'}`}</TooltipContent>
         </Tooltip>
     );
 };

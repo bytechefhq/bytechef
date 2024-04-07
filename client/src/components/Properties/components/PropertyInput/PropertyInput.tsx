@@ -1,3 +1,4 @@
+import InputTypeSwitchButton from '@/components/Properties/components/InputTypeSwitchButton';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -9,11 +10,13 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     description?: string;
     error?: boolean;
     errorMessage?: string;
+    handleInputTypeSwitchButtonClick?: () => void;
     key?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+    showInputTypeSwitchButton?: boolean;
     type?: string;
     value?: string;
 }
@@ -26,6 +29,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             disabled,
             error,
             errorMessage,
+            handleInputTypeSwitchButtonClick,
             id,
             key,
             label,
@@ -33,6 +37,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             name,
             onChange,
             required,
+            showInputTypeSwitchButton,
             title,
             type = 'text',
             value,
@@ -41,25 +46,34 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         ref
     ) => (
         <fieldset className="w-full space-y-2">
-            {label && type !== 'hidden' && (
-                <div className="flex items-center">
-                    <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
-                        {label}
+            <div className="flex w-full items-center justify-between">
+                {label && type !== 'hidden' && (
+                    <div className="flex items-center">
+                        <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
+                            {label}
 
-                        {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
-                    </Label>
+                            {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                        </Label>
 
-                    {description && (
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <QuestionMarkCircledIcon />
-                            </TooltipTrigger>
+                        {description && (
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon />
+                                </TooltipTrigger>
 
-                            <TooltipContent>{description}</TooltipContent>
-                        </Tooltip>
-                    )}
-                </div>
-            )}
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
+                )}
+
+                {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                    <InputTypeSwitchButton
+                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                        mentionInput={false}
+                    />
+                )}
+            </div>
 
             <div className={twMerge([label && type !== 'hidden' && 'mt-1', leadingIcon && 'relative'])} title={title}>
                 <div className={twMerge(leadingIcon && 'relative rounded-md', type === 'hidden' && 'border-0')}>

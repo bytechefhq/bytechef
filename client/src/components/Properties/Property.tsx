@@ -1,3 +1,4 @@
+import InputTypeSwitchButton from '@/components/Properties/components/InputTypeSwitchButton';
 import PropertyCodeEditor from '@/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
 import PropertyComboBox from '@/components/Properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/components/Properties/components/PropertyDynamicProperties';
@@ -82,7 +83,7 @@ const Property = ({
     const [loadOptionsDependency, setLoadOptionsDependency] = useState({});
     const [loadPropertiesDependency, setLoadPropertiesDependency] = useState({});
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
-    const [mentionInput, setMentionInput] = useState(mention && property.controlType !== 'SELECT');
+    const [mentionInput, setMentionInput] = useState(!formState && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
 
@@ -496,35 +497,7 @@ const Property = ({
                 customClassName
             )}
         >
-            <div className="relative w-full">
-                {showInputTypeSwitchButton && (
-                    <Button
-                        className="absolute right-0 top-0 z-50 size-auto p-0.5"
-                        onClick={handleInputTypeSwitchButtonClick}
-                        size="icon"
-                        title="Switch input type"
-                        variant="ghost"
-                    >
-                        {mentionInput ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <FormInputIcon className="size-5 text-gray-800" />
-                                </TooltipTrigger>
-
-                                <TooltipContent>Switch to constant value</TooltipContent>
-                            </Tooltip>
-                        ) : (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <FunctionSquareIcon className="size-5 text-gray-800" />
-                                </TooltipTrigger>
-
-                                <TooltipContent>Switch to dynamic value</TooltipContent>
-                            </Tooltip>
-                        )}
-                    </Button>
-                )}
-
+            <div className=" w-full">
                 {showMentionInput && currentComponent && currentComponentData && controlType !== 'CODE_EDITOR' && (
                     <PropertyMentionsInput
                         arrayName={arrayName}
@@ -534,6 +507,7 @@ const Property = ({
                         dataPills={dataPills}
                         defaultValue={defaultValue}
                         description={description}
+                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                         label={label || (arrayName ? undefined : name)}
                         leadingIcon={typeIcon}
                         name={name || `${arrayName}_0`}
@@ -546,6 +520,7 @@ const Property = ({
                         ref={editorRef}
                         required={required}
                         setValue={setMentionInputValue}
+                        showInputTypeSwitchButton={showInputTypeSwitchButton!}
                         singleMention={controlType !== 'TEXT'}
                         updateWorkflowMutation={updateWorkflowMutation}
                         value={mentionInputValue}
@@ -556,23 +531,36 @@ const Property = ({
                 {!showMentionInput && (
                     <>
                         {(controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER') && (
-                            <div className="flex items-center py-2">
+                            <div className="flex items-center pb-2 pt-1">
                                 {typeIcon && (
                                     <span className="pr-2" title={type}>
                                         {typeIcon}
                                     </span>
                                 )}
 
-                                {label && <Label className="leading-normal">{label}</Label>}
+                                {(label || description || showInputTypeSwitchButton) && (
+                                    <div className="flex w-full items-center justify-between">
+                                        <div className="flex items-center">
+                                            {label && <Label className="leading-normal">{label}</Label>}
 
-                                {description && (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <QuestionMarkCircledIcon className="ml-1" />
-                                        </TooltipTrigger>
+                                            {description && (
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <QuestionMarkCircledIcon className="ml-1" />
+                                                    </TooltipTrigger>
 
-                                        <TooltipContent className="max-w-md">{description}</TooltipContent>
-                                    </Tooltip>
+                                                    <TooltipContent className="max-w-md">{description}</TooltipContent>
+                                                </Tooltip>
+                                            )}
+                                        </div>
+
+                                        {showInputTypeSwitchButton && (
+                                            <InputTypeSwitchButton
+                                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                                                mentionInput={mentionInput}
+                                            />
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         )}
@@ -636,6 +624,7 @@ const Property = ({
                                 description={description}
                                 error={hasError}
                                 errorMessage={errorMessage}
+                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 key={`${currentNode.name}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
@@ -650,6 +639,7 @@ const Property = ({
                                 }
                                 ref={inputRef}
                                 required={required}
+                                showInputTypeSwitchButton={showInputTypeSwitchButton}
                                 title={type}
                                 type={hidden ? 'hidden' : getInputHTMLType(controlType)}
                                 value={isNumericalInput ? numericValue : inputValue}

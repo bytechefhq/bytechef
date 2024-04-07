@@ -7,6 +7,7 @@ import ReactQuill, {Quill} from 'react-quill';
 
 import './propertyMentionsInput.css';
 
+import InputTypeSwitchButton from '@/components/Properties/components/InputTypeSwitchButton';
 import {Label} from '@/components/ui/label';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
@@ -48,6 +49,7 @@ interface PropertyMentionsInputProps {
     defaultValue?: string;
     description?: string;
     fieldsetClassName?: string;
+    handleInputTypeSwitchButtonClick: () => void;
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
@@ -58,6 +60,7 @@ interface PropertyMentionsInputProps {
     required?: boolean;
     setValue: (value: string) => void;
     singleMention?: boolean;
+    showInputTypeSwitchButton: boolean;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
     value: string;
     workflow?: WorkflowModel;
@@ -73,6 +76,7 @@ const PropertyMentionsInput = forwardRef(
             dataPills,
             defaultValue,
             description,
+            handleInputTypeSwitchButtonClick,
             label,
             leadingIcon,
             name,
@@ -81,6 +85,7 @@ const PropertyMentionsInput = forwardRef(
             placeholder = "Show data pills using '{'",
             required,
             setValue,
+            showInputTypeSwitchButton,
             singleMention,
             updateWorkflowMutation,
             value,
@@ -342,22 +347,33 @@ const PropertyMentionsInput = forwardRef(
 
         return (
             <fieldset className="w-full space-y-2">
-                {label && (
-                    <div className="flex items-center">
-                        <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>
-                            {label}
+                {(label || description || showInputTypeSwitchButton) && (
+                    <div className="flex w-full items-center justify-between">
+                        {label && (
+                            <div className="flex items-center">
+                                <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>
+                                    {label}
 
-                            {required && <span className="leading-3 text-red-500">*</span>}
-                        </Label>
+                                    {required && <span className="leading-3 text-red-500">*</span>}
+                                </Label>
 
-                        {description && (
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <QuestionMarkCircledIcon />
-                                </TooltipTrigger>
+                                {description && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <QuestionMarkCircledIcon />
+                                        </TooltipTrigger>
 
-                                <TooltipContent className="max-w-tooltip-sm">{description}</TooltipContent>
-                            </Tooltip>
+                                        <TooltipContent className="max-w-tooltip-sm">{description}</TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        )}
+
+                        {showInputTypeSwitchButton && (
+                            <InputTypeSwitchButton
+                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                                mentionInput={true}
+                            />
                         )}
                     </div>
                 )}

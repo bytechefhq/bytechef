@@ -29,7 +29,7 @@ const ArrayPropertyItem = ({
     setArrayItems,
     updateWorkflowMutation,
 }: ArrayPropertyItemProps) => (
-    <div className="ml-2 flex w-full border-l pb-2" key={arrayItem.name}>
+    <div className="ml-2 flex w-full items-center border-l pb-2 last-of-type:pb-0" key={arrayItem.name}>
         <Property
             arrayIndex={index}
             arrayName={arrayName}
@@ -50,6 +50,7 @@ const ArrayPropertyItem = ({
                         subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)
                     )
                 }
+                objectProperty={false}
                 propertyName={arrayName}
                 subPropertyIndex={index}
                 updateWorkflowMutation={updateWorkflowMutation}
