@@ -47,13 +47,14 @@ const ObjectProperty = ({
     const [newPropertyName, setNewPropertyName] = useState('');
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
 
-    const {additionalProperties, controlType, label, name} = property;
+    const {additionalProperties, label, name} = property;
 
     const handleAddItemClick = () => {
         const newItem: SubPropertyType = {
             additionalProperties,
             controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
             custom: true,
+            expressionEnabled: true,
             name: newPropertyName,
             type: (newPropertyType ||
                 additionalProperties?.[0].type ||
@@ -132,7 +133,6 @@ const ObjectProperty = ({
                                 currentComponentData={currentComponentData}
                                 customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
                                 dataPills={dataPills}
-                                mention={controlType === 'FILE_ENTRY' ? true : !!dataPills?.length}
                                 objectName={name}
                                 path={`${path}.${name}`}
                                 property={{

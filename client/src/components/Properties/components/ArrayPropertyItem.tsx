@@ -37,7 +37,6 @@ const ArrayPropertyItem = ({
             currentComponentData={currentComponentData}
             customClassName="pl-2 w-full"
             dataPills={dataPills}
-            mention={!!dataPills?.length}
             path={`${path}.${arrayName}`}
             property={arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
             updateWorkflowMutation={updateWorkflowMutation}

@@ -15,7 +15,6 @@ interface PropertiesProps {
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
-    mention?: boolean;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     properties: Array<PropertyType>;
@@ -31,7 +30,6 @@ const Properties = ({
     customClassName,
     dataPills,
     formState,
-    mention,
     path,
     properties,
     register,
@@ -46,7 +44,6 @@ const Properties = ({
                 dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}
-                mention={mention}
                 path={path}
                 property={property}
                 register={register}

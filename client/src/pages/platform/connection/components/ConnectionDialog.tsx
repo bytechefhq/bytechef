@@ -531,7 +531,6 @@ const ConnectionDialog = ({
                                 {showConnectionProperties && !!connectionDefinition.properties && (
                                     <Properties
                                         formState={formState}
-                                        mention={false}
                                         properties={connectionDefinition?.properties}
                                         register={register}
                                     />
@@ -586,7 +585,6 @@ const ConnectionDialog = ({
                                     authorizations[0]?.properties && (
                                         <Properties
                                             formState={formState}
-                                            mention={false}
                                             properties={authorizations[0]?.properties}
                                             register={register}
                                         />

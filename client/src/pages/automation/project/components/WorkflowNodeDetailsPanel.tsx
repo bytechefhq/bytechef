@@ -478,7 +478,6 @@ const WorkflowNodeDetailsPanel = ({
                                                     customClassName="p-4"
                                                     dataPills={dataPills}
                                                     key={`${currentNode.name}_properties`}
-                                                    mention={!!dataPills?.length}
                                                     properties={currentActionProperties}
                                                     updateWorkflowMutation={updateWorkflowMutation}
                                                 />

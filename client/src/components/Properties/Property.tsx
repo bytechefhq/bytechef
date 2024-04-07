@@ -5,7 +5,6 @@ import PropertyInput from '@/components/Properties/components/PropertyInput/Prop
 import PropertyMentionsInput from '@/components/Properties/components/PropertyMentionsInput/PropertyMentionsInput';
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
-import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
@@ -19,7 +18,6 @@ import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/w
 import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
-import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -53,7 +51,6 @@ interface PropertyProps {
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
-    mention?: boolean;
     objectName?: string;
     path?: string;
     property: PropertyType;
@@ -72,7 +69,6 @@ const Property = ({
     customClassName,
     dataPills,
     formState,
-    mention = true,
     objectName,
     path = 'parameters',
     property,
@@ -136,7 +132,7 @@ const Property = ({
 
     const showMentionInput = controlType === 'FILE_ENTRY' || mentionInput;
 
-    let showInputTypeSwitchButton = type !== 'STRING' && !!name;
+    let showInputTypeSwitchButton = type !== 'STRING' && !!name && property.expressionEnabled;
 
     if (controlType === 'FILE_ENTRY') {
         showInputTypeSwitchButton = false;
@@ -397,7 +393,7 @@ const Property = ({
             setMentionInput(false);
         }
 
-        if (controlType === 'OBJECT_BUILDER' && !!properties?.length) {
+        if (controlType === 'OBJECT_BUILDER') {
             setMentionInput(false);
         }
     }, [controlType, properties?.length]);
