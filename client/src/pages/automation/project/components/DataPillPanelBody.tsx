@@ -4,11 +4,12 @@ import {
     type PropertyModel,
     TriggerDefinitionModel,
 } from '@/middleware/platform/configuration';
+import DataPillPanelBodyInputsItem from '@/pages/automation/project/components/DataPillPanelBodyInputsItem';
 import getFilteredProperties from '@/pages/automation/project/utils/getFilteredProperties';
 import {PropertyType} from '@/types/types';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
-import DataPillPanelBodyItem from './DataPillPanelBodyItem';
+import DataPillPanelBodyPropertiesItem from './DataPillPanelBodyPropertiesItem';
 
 export interface ComponentActionI extends ActionDefinitionModel {
     componentDefinition: ComponentDefinitionBasicModel;
@@ -35,6 +36,10 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillP
     <div className="relative h-full overflow-y-auto">
         <div className="absolute left-0 top-0 w-full">
             <Accordion className="h-full" collapsible type="single">
+                <AccordionItem className="group" value="inputs">
+                    <DataPillPanelBodyInputsItem />
+                </AccordionItem>
+
                 {componentOperations.map((componentOperation: ComponentOperationType, index: number) => {
                     const outputSchema: PropertyType | undefined = componentOperations[index]?.outputSchema;
 
@@ -54,7 +59,7 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillP
                             value={componentOperation.workflowNodeName}
                         >
                             {componentOperations[index] && (
-                                <DataPillPanelBodyItem
+                                <DataPillPanelBodyPropertiesItem
                                     componentAction={componentOperation}
                                     filteredProperties={filteredProperties}
                                     outputSchemaExists={!!outputSchema}

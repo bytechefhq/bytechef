@@ -9,7 +9,7 @@ import InlineSVG from 'react-inlinesvg';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {ComponentActionI} from './DataPillPanelBody';
 
-const DataPillPanelBodyItem = ({
+const DataPillPanelBodyPropertiesItem = ({
     componentAction,
     filteredProperties,
     outputSchemaExists,
@@ -109,4 +109,4 @@ const DataPillPanelBodyItem = ({
     );
 };
 
-export default DataPillPanelBodyItem;
+export default DataPillPanelBodyPropertiesItem;

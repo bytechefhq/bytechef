@@ -2,6 +2,7 @@ import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
 import DataPillPanelBody, {ComponentOperationType} from '@/pages/automation/project/components/DataPillPanelBody';
+import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useState} from 'react';
 
@@ -18,6 +19,7 @@ const DataPillPanel = ({
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
+    const {workflow} = useWorkflowDataStore();
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const componentOperations: Array<ComponentOperationType> = workflowNodeOutputs
@@ -81,11 +83,14 @@ const DataPillPanel = ({
                                 />
                             </div>
 
-                            {componentOperations && (
+                            {(componentOperations && componentOperations.length > 0) ||
+                            (workflow.inputs && workflow.inputs.length > 0) ? (
                                 <DataPillPanelBody
                                     componentOperations={componentOperations}
                                     dataPillFilterQuery={dataPillFilterQuery}
                                 />
+                            ) : (
+                                <span className="p-4 text-sm text-muted-foreground">No available data pills.</span>
                             )}
                         </main>
                     </div>

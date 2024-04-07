@@ -21,7 +21,7 @@ const DataPill = ({
     property?: PropertyType;
     path?: string;
     root?: boolean;
-    sampleOutput: object;
+    sampleOutput?: object;
 }) => {
     const {focusedInput} = useWorkflowNodeDetailsPanelStore();
 
