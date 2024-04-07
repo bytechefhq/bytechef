@@ -7,6 +7,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")
-    testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

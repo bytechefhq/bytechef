@@ -11,6 +11,6 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

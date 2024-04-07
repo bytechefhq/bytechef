@@ -11,7 +11,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     testImplementation(project(":server:libs:core:category:category-service"))
-    testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:tag:tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

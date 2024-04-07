@@ -26,7 +26,7 @@ dependencies {
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:tag:tag-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))

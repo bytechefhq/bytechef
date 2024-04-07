@@ -8,6 +8,6 @@ dependencies {
     implementation(project(":server:libs:core:evaluator"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
 
-    testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

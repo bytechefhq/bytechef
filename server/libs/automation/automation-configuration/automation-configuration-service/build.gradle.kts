@@ -19,6 +19,6 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
-    testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
