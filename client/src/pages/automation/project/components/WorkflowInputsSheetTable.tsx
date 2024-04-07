@@ -127,7 +127,7 @@ const WorkflowInputsSheetTable = ({
                                             : undefined}
                                     </TableCell>
 
-                                    <TableCell className="px-3 py-4">
+                                    <TableCell className="flex justify-end px-3 py-4">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
