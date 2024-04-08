@@ -114,9 +114,6 @@ const WorkflowOutputsSheetPopup = ({
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                                rules={{
-                                    required: true,
-                                }}
                             />
 
                             <FormField
@@ -133,9 +130,6 @@ const WorkflowOutputsSheetPopup = ({
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                                rules={{
-                                    required: true,
-                                }}
                             />
 
                             <div className="flex justify-end space-x-1">
