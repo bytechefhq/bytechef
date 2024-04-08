@@ -181,9 +181,10 @@ const Project = () => {
     const navigate = useNavigate();
 
     const rightSidebarNavigation: {
-        name: string;
-        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
+        name?: string;
+        icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
         onClick?: () => void;
+        separator?: boolean;
     }[] = [
         {
             icon: HistoryIcon,
@@ -191,6 +192,9 @@ const Project = () => {
             onClick: () => {
                 setShowProjectVersionHistorySheet(true);
             },
+        },
+        {
+            separator: true,
         },
         {
             icon: PuzzleIcon,
