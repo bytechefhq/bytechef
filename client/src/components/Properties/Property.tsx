@@ -52,11 +52,13 @@ interface PropertyProps {
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
+    inputTypeSwitchButtonClassName?: string;
     objectName?: string;
     path?: string;
     property: PropertyType;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
+    showDeletePropertyButton?: boolean;
     taskParameterValue?: any;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
@@ -70,10 +72,12 @@ const Property = ({
     customClassName,
     dataPills,
     formState,
+    inputTypeSwitchButtonClassName,
     objectName,
     path = 'parameters',
     property,
     register,
+    showDeletePropertyButton = false,
     taskParameterValue,
     updateWorkflowMutation,
 }: PropertyProps) => {
@@ -508,6 +512,7 @@ const Property = ({
                         defaultValue={defaultValue}
                         description={description}
                         handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                        inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                         label={label || (arrayName ? undefined : name)}
                         leadingIcon={typeIcon}
                         name={name || `${arrayName}_0`}
@@ -531,7 +536,7 @@ const Property = ({
                 {!showMentionInput && (
                     <>
                         {(controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER') && (
-                            <div className="flex items-center pb-2 pt-1">
+                            <div className="flex items-center pb-2">
                                 {typeIcon && (
                                     <span className="pr-2" title={type}>
                                         {typeIcon}
@@ -556,6 +561,11 @@ const Property = ({
 
                                         {showInputTypeSwitchButton && (
                                             <InputTypeSwitchButton
+                                                className={
+                                                    showDeletePropertyButton
+                                                        ? inputTypeSwitchButtonClassName
+                                                        : undefined
+                                                }
                                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                                 mentionInput={mentionInput}
                                             />
@@ -625,6 +635,7 @@ const Property = ({
                                 error={hasError}
                                 errorMessage={errorMessage}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                                inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                                 key={`${currentNode.name}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}

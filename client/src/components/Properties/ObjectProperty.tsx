@@ -136,7 +136,7 @@ const ObjectProperty = ({
                     const subPropertyDefaultValue = subProperty.name ? taskParameterValue?.[subProperty.name] : '';
 
                     return (
-                        <div className="flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
+                        <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
                                 actionName={actionName}
                                 arrayIndex={arrayIndex}
@@ -145,12 +145,14 @@ const ObjectProperty = ({
                                 currentComponentData={currentComponentData}
                                 customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
                                 dataPills={dataPills}
+                                inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
                                 path={`${path}.${name}`}
                                 property={{
                                     ...subProperty,
                                     name: subProperty.name,
                                 }}
+                                showDeletePropertyButton={true}
                                 taskParameterValue={subPropertyDefaultValue}
                                 updateWorkflowMutation={updateWorkflowMutation}
                             />

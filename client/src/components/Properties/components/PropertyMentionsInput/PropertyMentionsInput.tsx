@@ -50,6 +50,7 @@ interface PropertyMentionsInputProps {
     description?: string;
     fieldsetClassName?: string;
     handleInputTypeSwitchButtonClick: () => void;
+    inputTypeSwitchButtonClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
@@ -77,6 +78,7 @@ const PropertyMentionsInput = forwardRef(
             defaultValue,
             description,
             handleInputTypeSwitchButtonClick,
+            inputTypeSwitchButtonClassName,
             label,
             leadingIcon,
             name,
@@ -371,6 +373,7 @@ const PropertyMentionsInput = forwardRef(
 
                         {showInputTypeSwitchButton && (
                             <InputTypeSwitchButton
+                                className={inputTypeSwitchButtonClassName}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 mentionInput={true}
                             />

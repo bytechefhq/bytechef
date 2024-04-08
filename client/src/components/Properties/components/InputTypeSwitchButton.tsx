@@ -1,17 +1,20 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 
 const InputTypeSwitchButton = ({
+    className,
     handleInputTypeSwitchButtonClick,
     mentionInput,
 }: {
+    className?: string;
     handleInputTypeSwitchButtonClick: () => void;
     mentionInput: boolean;
 }) => {
     return (
         <Button
-            className=" right-0 top-0 z-50 size-auto p-0.5"
+            className={twMerge('z-50 size-auto p-0.5', className)}
             onClick={handleInputTypeSwitchButtonClick}
             size="icon"
             title="Switch input type"

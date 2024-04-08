@@ -66,8 +66,8 @@ const DeletePropertyButton = ({
                 <div
                     className={twMerge(
                         'flex items-center justify-center',
-                        objectProperty && 'pl-2 pr-1',
-                        !objectProperty && 'px-2.5'
+                        objectProperty && 'pl-2 pr-1 absolute right-0 top-1',
+                        !objectProperty && 'px-3'
                     )}
                 >
                     <button onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}>
