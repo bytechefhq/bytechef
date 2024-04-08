@@ -14,7 +14,7 @@ import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPi
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import saveProperty from '@/pages/automation/project/utils/saveProperty';
-import {ComponentDataType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
+import {ComponentType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
@@ -59,7 +59,7 @@ interface PropertyMentionsInputProps {
     objectName?: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
-    otherComponentData: Array<ComponentDataType>;
+    otherComponents: Array<ComponentType>;
     path?: string;
     placeholder?: string;
     required?: boolean;
@@ -88,7 +88,7 @@ const PropertyMentionsInput = forwardRef(
             name,
             objectName,
             onKeyPress,
-            otherComponentData,
+            otherComponents,
             path,
             placeholder = "Show data pills using '{'",
             required,
@@ -103,7 +103,7 @@ const PropertyMentionsInput = forwardRef(
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {copiedPropertyData, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
-        const {setComponentData, workflow} = useWorkflowDataStore();
+        const {setComponents, workflow} = useWorkflowDataStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -287,9 +287,9 @@ const PropertyMentionsInput = forwardRef(
 
             saveProperty(
                 data,
-                setComponentData,
-                currentComponentData,
-                otherComponentData,
+                setComponents,
+                currentComponent,
+                otherComponents,
                 updateWorkflowMutation,
                 name,
                 workflow
