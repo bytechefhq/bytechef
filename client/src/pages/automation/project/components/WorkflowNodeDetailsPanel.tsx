@@ -12,7 +12,7 @@ import SourceTab from '@/pages/automation/project/components/node-details-tabs/S
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {ComponentDataType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Properties from 'components/Properties/Properties';
@@ -67,7 +67,7 @@ const WorkflowNodeDetailsPanel = ({
 }) => {
     const [activeTab, setActiveTab] = useState('description');
     const [currentActionName, setCurrentActionName] = useState('');
-    const [currentComponentData, setCurrentComponentData] = useState<ComponentDataType>();
+    const [currentComponent, setCurrentComponent] = useState<ComponentType>();
 
     const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -76,7 +76,7 @@ const WorkflowNodeDetailsPanel = ({
         componentName: currentNode.componentName || currentNode.id,
     });
 
-    const {componentActions, componentData, dataPills, setComponentActions, setComponentData, setDataPills, workflow} =
+    const {componentActions, components, dataPills, setComponentActions, setComponents, setDataPills, workflow} =
         useWorkflowDataStore();
 
     let currentComponentDefinition: CurrentComponentDefinitionType | undefined;
@@ -130,8 +130,8 @@ const WorkflowNodeDetailsPanel = ({
         );
 
         if (currentComponentDefinition) {
-            setComponentData([
-                ...componentData.filter((component) => component.workflowNodeName !== currentNode.name),
+            setComponents([
+                ...components.filter((component) => component.workflowNodeName !== currentNode.name),
                 {
                     ...currentComponentDefinition,
                     actionName: value,
@@ -140,11 +140,11 @@ const WorkflowNodeDetailsPanel = ({
                 },
             ]);
 
-            if (!currentComponentData) {
+            if (!currentComponent) {
                 return;
             }
 
-            const {componentName, icon, title, workflowNodeName} = currentComponentData;
+            const {componentName, icon, title, workflowNodeName} = currentComponent;
 
             saveWorkflowDefinition(
                 {
@@ -285,7 +285,7 @@ const WorkflowNodeDetailsPanel = ({
         return true;
     });
 
-    const otherComponentData = componentData.filter((component) => {
+    const otherComponents = components.filter((component) => {
         if (component.workflowNodeName === currentComponentDefinition?.workflowNodeName) {
             return false;
         } else {
@@ -298,7 +298,7 @@ const WorkflowNodeDetailsPanel = ({
             // @ts-expect-error Backend needs to be updated to return the correct type
             const {icon, name, title, workflowNodeName} = componentDefinition;
 
-            setCurrentComponentData({
+            setCurrentComponent({
                 actionName: currentActionName,
                 componentName: name,
                 icon,
@@ -452,9 +452,9 @@ const WorkflowNodeDetailsPanel = ({
                                         {activeTab === 'description' && (
                                             <DescriptionTab
                                                 componentDefinition={currentComponentDefinition}
-                                                currentComponentData={currentComponentData}
+                                                currentComponent={currentComponent}
                                                 key={`${currentNode.name}_description`}
-                                                otherComponentData={otherComponentData}
+                                                otherComponents={otherComponents}
                                             />
                                         )}
 
@@ -476,7 +476,7 @@ const WorkflowNodeDetailsPanel = ({
                                             (currentActionProperties?.length ? (
                                                 <Properties
                                                     actionName={currentActionName}
-                                                    currentComponentData={currentComponentData}
+                                                    currentComponent={currentComponent}
                                                     currentComponentDefinition={currentComponentDefinition}
                                                     customClassName="p-4"
                                                     dataPills={dataPills}

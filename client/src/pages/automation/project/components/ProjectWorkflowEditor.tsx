@@ -20,7 +20,7 @@ const ProjectWorkflowEditor = ({
     taskDispatcherDefinitions,
     updateWorkflowMutation,
 }: WorkflowEditorProps) => {
-    const {componentActions, setComponentData, workflow} = useWorkflowDataStore();
+    const {componentActions, setComponents, workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {data: workflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
@@ -32,7 +32,7 @@ const ProjectWorkflowEditor = ({
     );
 
     useEffect(() => {
-        const workflowComponentData = workflow.tasks?.map((task) => {
+        const workflowComponents = workflow.tasks?.map((task) => {
             const {label, name, parameters, type} = task;
 
             const [componentName, actionName] = type.split('/v1/');
@@ -47,8 +47,8 @@ const ProjectWorkflowEditor = ({
             };
         });
 
-        if (workflowComponentData) {
-            setComponentData(workflowComponentData);
+        if (workflowComponents) {
+            setComponents(workflowComponents);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks]);

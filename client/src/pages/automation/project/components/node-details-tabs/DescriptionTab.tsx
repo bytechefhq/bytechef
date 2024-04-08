@@ -2,28 +2,28 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
-import {ComponentDataType} from '@/types/types';
+import {ComponentType} from '@/types/types';
 import {ComponentDefinitionModel} from 'middleware/platform/configuration';
 import {ChangeEvent} from 'react';
 
 const DescriptionTab = ({
     componentDefinition,
-    currentComponentData,
-    otherComponentData,
+    currentComponent,
+    otherComponents,
 }: {
     componentDefinition: ComponentDefinitionModel;
-    currentComponentData: ComponentDataType | undefined;
-    otherComponentData: Array<ComponentDataType>;
+    currentComponent: ComponentType | undefined;
+    otherComponents: Array<ComponentType>;
 }) => {
     const {name, title} = componentDefinition;
-    const {setComponentData} = useWorkflowDataStore();
+    const {setComponents} = useWorkflowDataStore();
 
     const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (currentComponentData) {
-            setComponentData([
-                ...otherComponentData,
+        if (currentComponent) {
+            setComponents([
+                ...otherComponents,
                 {
-                    ...currentComponentData,
+                    ...currentComponent,
                     title: event.target.value,
                 },
             ]);
@@ -31,11 +31,11 @@ const DescriptionTab = ({
     };
 
     const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (currentComponentData) {
-            setComponentData([
-                ...otherComponentData,
+        if (currentComponent) {
+            setComponents([
+                ...otherComponents,
                 {
-                    ...currentComponentData,
+                    ...currentComponent,
                     notes: event.target.value,
                 },
             ]);
@@ -48,7 +48,7 @@ const DescriptionTab = ({
                 <Label>Title</Label>
 
                 <Input
-                    defaultValue={currentComponentData?.title || title}
+                    defaultValue={currentComponent?.title || title}
                     key={`${name}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleTitleChange}
@@ -64,7 +64,7 @@ const DescriptionTab = ({
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
-                    value={currentComponentData?.notes || ''}
+                    value={currentComponent?.notes || ''}
                 />
             </div>
         </div>

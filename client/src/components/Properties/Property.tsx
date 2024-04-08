@@ -16,7 +16,7 @@ import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/store
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
-import {ComponentDataType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
@@ -48,7 +48,7 @@ interface PropertyProps {
     arrayIndex?: number;
     arrayName?: string;
     currentComponentDefinition?: CurrentComponentDefinitionType;
-    currentComponentData?: ComponentDataType;
+    currentComponent?: ComponentType;
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
@@ -67,7 +67,7 @@ const Property = ({
     actionName,
     arrayIndex,
     arrayName,
-    currentComponentData,
+    currentComponent,
     currentComponentDefinition,
     customClassName,
     dataPills,
@@ -96,7 +96,7 @@ const Property = ({
 
     const {currentNode, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentData, componentDefinitions, setComponentData, workflow} = useWorkflowDataStore();
+    const {componentDefinitions, components, setComponents, workflow} = useWorkflowDataStore();
 
     const defaultValue = property.defaultValue || '';
 
@@ -159,11 +159,11 @@ const Property = ({
         taskParameterValue = defaultValue;
     }
 
-    const otherComponentData = componentData.filter((component) => {
+    const otherComponents = components.filter((component) => {
         if (component.componentName !== currentComponentDefinition?.name) {
             return true;
         } else {
-            currentComponentData = component;
+            currentComponent = component;
 
             return false;
         }
@@ -181,16 +181,16 @@ const Property = ({
     );
 
     const saveProperty = (parameters: object) => {
-        if (!currentComponentData || !updateWorkflowMutation || !name) {
+        if (!currentComponent || !updateWorkflowMutation || !name) {
             return;
         }
 
-        const {actionName, componentName, workflowNodeName} = currentComponentData;
+        const {actionName, componentName, workflowNodeName} = currentComponent;
 
-        setComponentData([
-            ...otherComponentData,
+        setComponents([
+            ...otherComponents,
             {
-                ...currentComponentData,
+                ...currentComponent,
                 parameters,
             },
         ]);
@@ -208,11 +208,11 @@ const Property = ({
     };
 
     const saveInputValue = useDebouncedCallback(() => {
-        if (!currentComponentData || !workflow || !updateWorkflowMutation) {
+        if (!currentComponent || !workflow || !updateWorkflowMutation) {
             return;
         }
 
-        const {parameters} = currentComponentData;
+        const {parameters} = currentComponent;
 
         if (!name) {
             return;
@@ -275,19 +275,19 @@ const Property = ({
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponentData || !updateWorkflowMutation || !name) {
+        if (!currentComponent || !updateWorkflowMutation || !name) {
             return;
         }
 
-        saveProperty({...currentComponentData.parameters, [name]: value});
+        saveProperty({...currentComponent.parameters, [name]: value});
     }, 200);
 
     const handleSelectChange = (value: string, name: string) => {
-        if (!currentComponentData || !workflow || !updateWorkflowMutation || !name) {
+        if (!currentComponent || !workflow || !updateWorkflowMutation || !name) {
             return;
         }
 
-        const {parameters} = currentComponentData;
+        const {parameters} = currentComponent;
 
         let data = parameters;
 
@@ -462,7 +462,7 @@ const Property = ({
         const loadOptionsDependsOn = optionsDataSource?.loadOptionsDependsOn?.reduce(
             (acc, key) => ({
                 ...acc,
-                [key]: currentComponentData?.parameters?.[key],
+                [key]: currentComponent?.parameters?.[key],
             }),
             {}
         );
@@ -470,13 +470,13 @@ const Property = ({
         if (loadOptionsDependsOn) {
             setLoadOptionsDependency(loadOptionsDependsOn);
         }
-    }, [currentComponentData?.parameters, optionsDataSource?.loadOptionsDependsOn]);
+    }, [currentComponent?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
     useEffect(() => {
         const loadPropertiesDependsOn = propertiesDataSource?.loadPropertiesDependsOn?.reduce(
             (acc, key) => ({
                 ...acc,
-                [key]: currentComponentData?.parameters?.[key],
+                [key]: currentComponent?.parameters?.[key],
             }),
             {}
         );
@@ -484,7 +484,7 @@ const Property = ({
         if (loadPropertiesDependsOn) {
             setLoadPropertiesDependency(loadPropertiesDependsOn);
         }
-    }, [currentComponentData?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
+    }, [currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
     if (displayCondition === false || (property.displayCondition && isDisplayConditionLoading)) {
         return <></>;
@@ -506,12 +506,12 @@ const Property = ({
             <div className=" w-full">
                 {showMentionInput &&
                     currentComponentDefinition &&
-                    currentComponentData &&
+                    currentComponent &&
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
                             arrayName={arrayName}
                             controlType={controlType}
-                            currentComponentData={currentComponentData}
+                            currentComponent={currentComponent}
                             currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
                             defaultValue={defaultValue}
@@ -582,7 +582,7 @@ const Property = ({
 
                         {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
                             <ArrayProperty
-                                currentComponentData={currentComponentData}
+                                currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 path={path}
@@ -596,7 +596,7 @@ const Property = ({
                                 actionName={actionName}
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                currentComponentData={currentComponentData}
+                                currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 path={path}
@@ -609,7 +609,7 @@ const Property = ({
                         {type === 'FILE_ENTRY' && (
                             <ObjectProperty
                                 actionName={actionName}
-                                currentComponentData={currentComponentData}
+                                currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 property={property}
@@ -740,11 +740,11 @@ const Property = ({
 
                         {type === 'DYNAMIC_PROPERTIES' &&
                             currentComponentDefinition &&
-                            currentComponentData &&
+                            currentComponent &&
                             updateWorkflowMutation && (
                                 <PropertyDynamicProperties
                                     currentActionName={actionName}
-                                    currentComponentData={currentComponentData}
+                                    currentComponent={currentComponent}
                                     currentComponentDefinition={currentComponentDefinition}
                                     loadDependency={loadPropertiesDependency}
                                     name={name}

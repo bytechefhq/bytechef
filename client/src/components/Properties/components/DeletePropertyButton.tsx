@@ -2,13 +2,13 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
-import {ComponentDataType} from '@/types/types';
+import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface DeletePropertyButtonProps {
-    currentComponentData: ComponentDataType;
+    currentComponent: ComponentType;
     handleDeletePropertyClick: () => void;
     objectProperty?: boolean;
     propertyName: string;
@@ -18,7 +18,7 @@ interface DeletePropertyButtonProps {
 }
 
 const DeletePropertyButton = ({
-    currentComponentData,
+    currentComponent,
     handleDeletePropertyClick,
     objectProperty = true,
     propertyName,
@@ -37,20 +37,20 @@ const DeletePropertyButton = ({
         subPropertyName?: string;
         subPropertyIndex?: number;
     }) => {
-        if (!currentComponentData.parameters) {
+        if (!currentComponent.parameters) {
             return;
         }
 
         if (subPropertyName) {
-            delete currentComponentData.parameters[propertyName][subPropertyName];
+            delete currentComponent.parameters[propertyName][subPropertyName];
         } else if (subPropertyIndex !== undefined) {
-            currentComponentData.parameters[propertyName].splice(subPropertyIndex, 1);
+            currentComponent.parameters[propertyName].splice(subPropertyIndex, 1);
         } else {
-            delete currentComponentData.parameters[propertyName];
+            delete currentComponent.parameters[propertyName];
         }
 
         saveWorkflowDefinition(
-            {...currentComponentData, name: currentComponentData.workflowNodeName},
+            {...currentComponent, name: currentComponent.workflowNodeName},
             workflow,
             updateWorkflowMutation
         );

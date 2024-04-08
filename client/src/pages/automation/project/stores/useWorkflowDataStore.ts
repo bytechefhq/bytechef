@@ -2,7 +2,7 @@ import {WorkflowModel} from '@/middleware/automation/configuration';
 
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
-import {ComponentActionType, ComponentDataType, DataPillType} from '@/types/types';
+import {ComponentActionType, ComponentType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -16,8 +16,8 @@ interface WorkflowDataStateI {
     componentActions: Array<ComponentActionType>;
     setComponentActions: (componentActions: Array<ComponentActionType>) => void;
 
-    componentData: Array<ComponentDataType>;
-    setComponentData: (componentData: Array<ComponentDataType>) => void;
+    components: Array<ComponentType>;
+    setComponents: (components: Array<ComponentType>) => void;
 
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
     setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasicModel>) => void;
@@ -41,8 +41,8 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             componentActions: [],
             setComponentActions: (componentActions) => set((state) => ({...state, componentActions})),
 
-            componentData: [],
-            setComponentData: (componentData) => set((state) => ({...state, componentData})),
+            components: [],
+            setComponents: (components) => set((state) => ({...state, components})),
 
             componentDefinitions: [],
             setComponentDefinitions: (componentDefinitions) => set((state) => ({...state, componentDefinitions})),

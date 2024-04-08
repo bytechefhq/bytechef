@@ -2,7 +2,7 @@ import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {ControlTypeModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {
     ArrayPropertyType,
-    ComponentDataType,
+    ComponentType,
     CurrentComponentDefinitionType,
     DataPillType,
     PropertyType,
@@ -16,7 +16,7 @@ interface ArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
     arrayName?: string;
     currentComponentDefinition?: CurrentComponentDefinitionType;
-    currentComponentData?: ComponentDataType;
+    currentComponent?: ComponentType;
     dataPills?: DataPillType[];
     index: number;
     path?: string;
@@ -27,7 +27,7 @@ interface ArrayPropertyItemProps {
 const ArrayPropertyItem = ({
     arrayItem,
     arrayName,
-    currentComponentData,
+    currentComponent,
     currentComponentDefinition,
     dataPills,
     index,
@@ -39,7 +39,7 @@ const ArrayPropertyItem = ({
         <Property
             arrayIndex={index}
             arrayName={arrayName}
-            currentComponentData={currentComponentData}
+            currentComponent={currentComponent}
             currentComponentDefinition={currentComponentDefinition}
             customClassName="pl-2 w-full"
             dataPills={dataPills}
@@ -48,9 +48,9 @@ const ArrayPropertyItem = ({
             updateWorkflowMutation={updateWorkflowMutation}
         />
 
-        {arrayItem.custom && arrayName && arrayItem.name && currentComponentData && updateWorkflowMutation && (
+        {arrayItem.custom && arrayName && arrayItem.name && currentComponent && updateWorkflowMutation && (
             <DeletePropertyButton
-                currentComponentData={currentComponentData}
+                currentComponent={currentComponent}
                 handleDeletePropertyClick={() =>
                     setArrayItems((subProperties) =>
                         subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)

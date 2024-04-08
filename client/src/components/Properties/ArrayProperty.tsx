@@ -4,7 +4,7 @@ import {ControlTypeModel, ObjectPropertyModel, WorkflowModel} from '@/middleware
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {
     ArrayPropertyType,
-    ComponentDataType,
+    ComponentType,
     CurrentComponentDefinitionType,
     DataPillType,
     PropertyType,
@@ -20,7 +20,7 @@ import PropertySelect from './components/PropertySelect';
 
 interface ArrayPropertyProps {
     currentComponentDefinition?: CurrentComponentDefinitionType;
-    currentComponentData?: ComponentDataType;
+    currentComponent?: ComponentType;
     dataPills?: Array<DataPillType>;
     path?: string;
     property: PropertyType;
@@ -28,7 +28,7 @@ interface ArrayPropertyProps {
 }
 
 const ArrayProperty = ({
-    currentComponentData,
+    currentComponent,
     currentComponentDefinition,
     dataPills,
     path,
@@ -56,12 +56,12 @@ const ArrayProperty = ({
 
     // render individual array items with data gathered from parameters
     useEffect(() => {
-        if (!currentComponentData?.parameters || !Object.keys(currentComponentData?.parameters).length) {
+        if (!currentComponent?.parameters || !Object.keys(currentComponent?.parameters).length) {
             return;
         }
 
         if (items?.length && name && items[0].type === 'OBJECT') {
-            const parameterArrayItems = currentComponentData.parameters[name]?.map(
+            const parameterArrayItems = currentComponent.parameters[name]?.map(
                 (parameterItem: ArrayPropertyType, index: number) => {
                     const subProperties = Object.keys(parameterItem).map((key) => {
                         const matchingSubproperty = (items[0] as ObjectPropertyModel).properties?.find(
@@ -87,15 +87,13 @@ const ArrayProperty = ({
                 setArrayItems(parameterArrayItems);
             }
         } else if (name) {
-            const parameterArrayItems = currentComponentData.parameters[name]?.map(
-                (parameterItem: ArrayPropertyType) => ({
-                    controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
-                    custom: true,
-                    defaultValue: Object.values(parameterItem)[0],
-                    name: Object.keys(parameterItem)[0],
-                    type: newItemType,
-                })
-            );
+            const parameterArrayItems = currentComponent.parameters[name]?.map((parameterItem: ArrayPropertyType) => ({
+                controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
+                custom: true,
+                defaultValue: Object.values(parameterItem)[0],
+                name: Object.keys(parameterItem)[0],
+                type: newItemType,
+            }));
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
@@ -135,7 +133,7 @@ const ArrayProperty = ({
                         <ArrayPropertyItem
                             arrayItem={subItem}
                             arrayName={name}
-                            currentComponentData={currentComponentData}
+                            currentComponent={currentComponent}
                             currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
                             index={index}
@@ -149,7 +147,7 @@ const ArrayProperty = ({
                     <ArrayPropertyItem
                         arrayItem={arrayItem}
                         arrayName={name}
-                        currentComponentData={currentComponentData}
+                        currentComponent={currentComponent}
                         currentComponentDefinition={currentComponentDefinition}
                         dataPills={dataPills}
                         index={index}

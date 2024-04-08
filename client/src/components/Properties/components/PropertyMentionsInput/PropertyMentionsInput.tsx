@@ -13,7 +13,7 @@ import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/conf
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
-import {ComponentDataType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
+import {ComponentType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
@@ -44,7 +44,7 @@ interface PropertyMentionsInputProps {
     arrayName?: string;
     controlType?: string;
     currentComponentDefinition: CurrentComponentDefinitionType;
-    currentComponentData: ComponentDataType;
+    currentComponent: ComponentType;
     dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
@@ -72,7 +72,7 @@ const PropertyMentionsInput = forwardRef(
         {
             arrayName,
             controlType,
-            currentComponentData,
+            currentComponent,
             currentComponentDefinition,
             dataPills,
             defaultValue,
@@ -190,11 +190,11 @@ const PropertyMentionsInput = forwardRef(
         const isFocused = focusedInput?.props.id === elementId;
 
         const saveInputValue = useDebouncedCallback(() => {
-            if (!currentComponentData || !workflow || !updateWorkflowMutation) {
+            if (!currentComponent || !workflow || !updateWorkflowMutation) {
                 return;
             }
 
-            const {actionName, componentName, parameters, workflowNodeName} = currentComponentData;
+            const {actionName, componentName, parameters, workflowNodeName} = currentComponent;
 
             let strippedValue = value;
 

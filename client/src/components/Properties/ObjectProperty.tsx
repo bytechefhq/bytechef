@@ -5,7 +5,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {ControlTypeModel} from '@/middleware/platform/configuration';
 import {
-    ComponentDataType,
+    ComponentType,
     CurrentComponentDefinitionType,
     DataPillType,
     PropertyType,
@@ -38,7 +38,7 @@ interface ObjectPropertyProps {
     arrayIndex?: number;
     arrayName?: string;
     currentComponentDefinition?: CurrentComponentDefinitionType;
-    currentComponentData?: ComponentDataType;
+    currentComponent?: ComponentType;
     dataPills?: DataPillType[];
     path?: string;
     property: PropertyType;
@@ -51,7 +51,7 @@ const ObjectProperty = ({
     actionName,
     arrayIndex,
     arrayName,
-    currentComponentData,
+    currentComponent,
     currentComponentDefinition,
     dataPills,
     path,
@@ -86,18 +86,18 @@ const ObjectProperty = ({
 
     // on initial render, set subProperties if there are matching parameters
     useEffect(() => {
-        if (!name || !currentComponentData?.parameters?.[name]) {
+        if (!name || !currentComponent?.parameters?.[name]) {
             return;
         }
 
-        const objectParameters = Object.keys(currentComponentData.parameters![name]);
+        const objectParameters = Object.keys(currentComponent.parameters![name]);
 
         if (!objectParameters.length) {
             return;
         }
 
         const preexistingProperties = objectParameters.map((parameter) => {
-            const value: string = currentComponentData.parameters![parameter];
+            const value: string = currentComponent.parameters![parameter];
 
             const matchingSubProperty = subProperties.find((subProperty) => subProperty.name === parameter);
 
@@ -147,7 +147,7 @@ const ObjectProperty = ({
                                 actionName={actionName}
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                currentComponentData={currentComponentData}
+                                currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
                                 dataPills={dataPills}
@@ -166,10 +166,10 @@ const ObjectProperty = ({
                             {subProperty.custom &&
                                 name &&
                                 subProperty.name &&
-                                currentComponentData &&
+                                currentComponent &&
                                 updateWorkflowMutation && (
                                     <DeletePropertyButton
-                                        currentComponentData={currentComponentData}
+                                        currentComponent={currentComponent}
                                         handleDeletePropertyClick={() =>
                                             setSubProperties((subProperties) =>
                                                 subProperties.filter((property) => property.name !== subProperty.name)

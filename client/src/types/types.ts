@@ -34,7 +34,7 @@ export type ComponentActionType = {
     workflowNodeName?: string;
 };
 
-export type ComponentDataType = {
+export type ComponentType = {
     actionName: string;
     componentName: string;
     icon?: JSX.Element | string;
