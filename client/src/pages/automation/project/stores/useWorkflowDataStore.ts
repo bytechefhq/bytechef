@@ -6,7 +6,7 @@ import {ComponentActionType, ComponentType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-type WorkflowTaskDataType = {
+export type WorkflowTaskDataType = {
     actionNames?: Array<string>;
     componentNames: Array<string>;
     nodeNames: Array<string>;

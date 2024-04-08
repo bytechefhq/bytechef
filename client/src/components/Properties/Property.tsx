@@ -14,7 +14,7 @@ import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPi
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
-import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
+import saveProperty from '@/pages/automation/project/utils/saveProperty';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
@@ -180,33 +180,6 @@ const Property = ({
         !!property.displayCondition
     );
 
-    const saveProperty = (parameters: object) => {
-        if (!currentComponent || !updateWorkflowMutation || !name) {
-            return;
-        }
-
-        const {actionName, componentName, workflowNodeName} = currentComponent;
-
-        setComponents([
-            ...otherComponents,
-            {
-                ...currentComponent,
-                parameters,
-            },
-        ]);
-
-        saveWorkflowDefinition(
-            {
-                actionName,
-                componentName,
-                name: workflowNodeName,
-                parameters,
-            },
-            workflow,
-            updateWorkflowMutation
-        );
-    };
-
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !updateWorkflowMutation) {
             return;
@@ -271,7 +244,15 @@ const Property = ({
             return;
         }
 
-        saveProperty(data);
+        saveProperty(
+            data,
+            setComponentData,
+            currentComponent,
+            otherComponentData,
+            updateWorkflowMutation,
+            name,
+            workflow
+        );
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
@@ -279,7 +260,15 @@ const Property = ({
             return;
         }
 
-        saveProperty({...currentComponent.parameters, [name]: value});
+        saveProperty(
+            {...currentComponent.parameters, [name]: value},
+            setComponentData,
+            currentComponentData,
+            otherComponentData,
+            updateWorkflowMutation,
+            name,
+            workflow
+        );
     }, 200);
 
     const handleSelectChange = (value: string, name: string) => {
@@ -328,7 +317,15 @@ const Property = ({
 
         setSelectValue(value);
 
-        saveProperty(data);
+        saveProperty(
+            data,
+            setComponentData,
+            currentComponentData,
+            otherComponentData,
+            updateWorkflowMutation,
+            name,
+            workflow
+        );
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
@@ -504,39 +501,36 @@ const Property = ({
             )}
         >
             <div className=" w-full">
-                {showMentionInput &&
-                    currentComponentDefinition &&
-                    currentComponent &&
-                    controlType !== 'CODE_EDITOR' && (
-                        <PropertyMentionsInput
-                            arrayName={arrayName}
-                            controlType={controlType}
-                            currentComponent={currentComponent}
-                            currentComponentDefinition={currentComponentDefinition}
-                            dataPills={dataPills}
-                            defaultValue={defaultValue}
-                            description={description}
-                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                            inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                            label={label || (arrayName ? undefined : name)}
-                            leadingIcon={typeIcon}
-                            name={name || `${arrayName}_0`}
-                            objectName={objectName}
-                            onKeyPress={(event: KeyboardEvent) => {
-                                if (isNumericalInput || type === 'BOOLEAN') {
-                                    event.key !== '{' && event.preventDefault();
-                                }
-                            }}
-                            ref={editorRef}
-                            required={required}
-                            setValue={setMentionInputValue}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton!}
-                            singleMention={controlType !== 'TEXT'}
-                            updateWorkflowMutation={updateWorkflowMutation}
-                            value={mentionInputValue}
-                            workflow={workflow}
-                        />
-                    )}
+                {showMentionInput && currentComponent && currentComponentDefinition && controlType !== 'CODE_EDITOR' && (
+                    <PropertyMentionsInput
+                        arrayIndex={arrayIndex}
+                        arrayName={arrayName}
+                        controlType={controlType}
+                        currentComponent={currentComponent}
+                        currentComponentDefinition={currentComponentDefinition}
+                        dataPills={dataPills}
+                        defaultValue={defaultValue}
+                        description={description}
+                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                        label={label || (arrayName ? undefined : name)}
+                        leadingIcon={typeIcon}
+                        name={`${path}.${name}` || name || `${arrayName}_0`}
+                        objectName={objectName}
+                        onKeyPress={(event: KeyboardEvent) => {
+                            if (isNumericalInput || type === 'BOOLEAN') {
+                                event.key !== '{' && event.preventDefault();
+                            }
+                        }}
+                        otherComponentData={otherComponentData}
+                        ref={editorRef}
+                        required={required}
+                        setValue={setMentionInputValue}
+                        showInputTypeSwitchButton={showInputTypeSwitchButton!}
+                        singleMention={controlType !== 'TEXT'}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        value={mentionInputValue}
+                    />
+                )}
 
                 {!showMentionInput && (
                     <>

@@ -56,12 +56,17 @@ const ArrayProperty = ({
 
     // render individual array items with data gathered from parameters
     useEffect(() => {
-        if (!currentComponent?.parameters || !Object.keys(currentComponent?.parameters).length) {
+        if (
+            !currentComponent?.parameters ||
+            !name ||
+            !currentComponent.parameters[name] ||
+            !Object.keys(currentComponent?.parameters).length
+        ) {
             return;
         }
 
         if (items?.length && name && items[0].type === 'OBJECT') {
-            const parameterArrayItems = currentComponent.parameters[name]?.map(
+            const parameterArrayItems = currentComponent.parameters[name].map(
                 (parameterItem: ArrayPropertyType, index: number) => {
                     const subProperties = Object.keys(parameterItem).map((key) => {
                         const matchingSubproperty = (items[0] as ObjectPropertyModel).properties?.find(
@@ -87,7 +92,7 @@ const ArrayProperty = ({
                 setArrayItems(parameterArrayItems);
             }
         } else if (name) {
-            const parameterArrayItems = currentComponent.parameters[name]?.map((parameterItem: ArrayPropertyType) => ({
+            const parameterArrayItems = currentComponent.parameters[name].map((parameterItem: ArrayPropertyType) => ({
                 controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
                 custom: true,
                 defaultValue: Object.values(parameterItem)[0],
