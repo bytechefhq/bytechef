@@ -50,6 +50,7 @@ import ProjectVersionHistorySheet from '@/pages/automation/project/components/Pr
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
 import WorkflowExecutionsTestOutput from '@/pages/automation/project/components/WorkflowExecutionsTestOutput';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
+import WorkflowOutputsSheet from '@/pages/automation/project/components/WorkflowOutputsSheet';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -68,6 +69,7 @@ import {
 import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    CableIcon,
     CircleDotIcon,
     Code2Icon,
     HistoryIcon,
@@ -164,6 +166,7 @@ const Project = () => {
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
     const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
+    const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
@@ -209,6 +212,11 @@ const Project = () => {
             icon: SlidersIcon,
             name: 'Workflow Inputs',
             onClick: () => setShowWorkflowInputsSheet(true),
+        },
+        {
+            icon: CableIcon,
+            name: 'Workflow Outputs',
+            onClick: () => setShowWorkflowOutputsSheet(true),
         },
         {
             icon: Code2Icon,
@@ -830,6 +838,14 @@ const Project = () => {
                             projectId={+projectId}
                             workflow={workflow}
                             workflowTestConfiguration={workflowTestConfiguration}
+                        />
+                    )}
+
+                    {projectId && showWorkflowOutputsSheet && (
+                        <WorkflowOutputsSheet
+                            onClose={() => setShowWorkflowOutputsSheet(false)}
+                            projectId={+projectId}
+                            workflow={workflow}
                         />
                     )}
                 </>
