@@ -3,7 +3,6 @@ import {
     BooleanPropertyModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-    ConnectionDefinitionBasicModel,
     ControlTypeModel,
     DatePropertyModel,
     DateTimePropertyModel,
@@ -37,7 +36,6 @@ export type ComponentActionType = {
 
 export type ComponentDataType = {
     actionName: string;
-    connection?: object;
     componentName: string;
     icon?: JSX.Element | string;
     notes?: string;
@@ -46,18 +44,10 @@ export type ComponentDataType = {
         [key: string]: any;
     };
     title?: string;
-    type?: string;
-    version?: number;
     workflowNodeName: string;
 };
 
 export type CurrentComponentType = {
-    connection?: ConnectionDefinitionBasicModel;
-    notes?: string;
-    parameters?: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
-    };
     workflowNodeName?: string;
 } & ComponentDefinitionModel;
 
