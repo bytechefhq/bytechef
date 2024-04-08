@@ -68,15 +68,17 @@ const ArrayProperty = ({
         if (items?.length && name && items[0].type === 'OBJECT') {
             const parameterArrayItems = currentComponent.parameters[name].map(
                 (parameterItem: ArrayPropertyType, index: number) => {
-                    const subProperties = Object.keys(parameterItem).map((key) => {
-                        const matchingSubproperty = (items[0] as ObjectPropertyModel).properties?.find(
-                            (property) => property.name === key
-                        );
+                    const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) => {
+                        const matchingSubproperty = Object.keys(parameterItem).includes(
+                            property.name as keyof ArrayPropertyType
+                        )
+                            ? {
+                                  ...property,
+                                  defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              }
+                            : property;
 
-                        return {
-                            ...matchingSubproperty,
-                            defaultValue: parameterItem[key as keyof ArrayPropertyType],
-                        };
+                        return matchingSubproperty;
                     });
 
                     return {
