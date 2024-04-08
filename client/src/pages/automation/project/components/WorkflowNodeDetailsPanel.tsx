@@ -133,9 +133,10 @@ const WorkflowNodeDetailsPanel = ({
             setComponents([
                 ...components.filter((component) => component.workflowNodeName !== currentNode.name),
                 {
-                    ...currentComponentDefinition,
                     actionName: value,
                     componentName: currentNode.componentName || currentNode.id,
+                    icon: currentComponentDefinition.icon,
+                    title: currentComponentDefinition?.title,
                     workflowNodeName: currentNode.name,
                 },
             ]);
