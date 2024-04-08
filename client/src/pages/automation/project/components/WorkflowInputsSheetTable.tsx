@@ -100,17 +100,15 @@ const WorkflowInputsSheetTable = ({
                         {workflow.inputs &&
                             workflow.inputs.map((input, index) => (
                                 <TableRow key={input.name}>
-                                    <TableCell className="px-3 py-4">{input.name}</TableCell>
+                                    <TableCell className="p-3">{input.name}</TableCell>
 
-                                    <TableCell className="px-3 py-4">{input.label}</TableCell>
+                                    <TableCell className="p-3">{input.label}</TableCell>
 
-                                    <TableCell className="px-3 py-4">{input.type}</TableCell>
+                                    <TableCell className="p-3">{input.type}</TableCell>
 
-                                    <TableCell className="px-3 py-4">
-                                        {input.required === true ? 'true' : 'false'}
-                                    </TableCell>
+                                    <TableCell className="p-3">{input.required === true ? 'true' : 'false'}</TableCell>
 
-                                    <TableCell className="px-3 py-4">
+                                    <TableCell className="p-3">
                                         {workflowTestConfiguration?.inputs
                                             ? workflowTestConfiguration?.inputs[
                                                   workflow.inputs![index]?.name
@@ -118,7 +116,7 @@ const WorkflowInputsSheetTable = ({
                                             : undefined}
                                     </TableCell>
 
-                                    <TableCell className="flex justify-end px-3 py-4">
+                                    <TableCell className="flex justify-end p-3">
                                         <WorkflowInputsSheetDialog
                                             inputIndex={index}
                                             projectId={projectId}
