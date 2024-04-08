@@ -514,7 +514,7 @@ const Property = ({
                         handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                         label={label || (arrayName ? undefined : name)}
                         leadingIcon={typeIcon}
-                        name={`${path}.${name}` || name || `${arrayName}_0`}
+                        name={name || `${arrayName}_0`}
                         objectName={objectName}
                         onKeyPress={(event: KeyboardEvent) => {
                             if (isNumericalInput || type === 'BOOLEAN') {
@@ -522,6 +522,7 @@ const Property = ({
                             }
                         }}
                         otherComponentData={otherComponentData}
+                        path={path}
                         ref={editorRef}
                         required={required}
                         setValue={setMentionInputValue}
