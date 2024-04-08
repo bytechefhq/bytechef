@@ -65,13 +65,16 @@ const DeletePropertyButton = ({
             <TooltipTrigger asChild>
                 <div
                     className={twMerge(
-                        'flex items-center justify-center',
-                        objectProperty && 'pl-2 pr-1 absolute right-0 top-1',
-                        !objectProperty && 'px-3'
+                        'group flex items-center justify-center',
+                        objectProperty && 'ml-1 mr-1 absolute right-0 top-1',
+                        !objectProperty && 'mx-2'
                     )}
                 >
-                    <button onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}>
-                        <XIcon className="size-[16px] cursor-pointer hover:text-red-500" />
+                    <button
+                        className="p-2"
+                        onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}
+                    >
+                        <XIcon className="size-4 cursor-pointer group-hover:text-red-500" />
                     </button>
                 </div>
             </TooltipTrigger>
