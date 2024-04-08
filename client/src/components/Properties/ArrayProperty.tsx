@@ -2,7 +2,13 @@ import {Button} from '@/components/ui/button';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {ControlTypeModel, ObjectPropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {ArrayPropertyType, ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
+import {
+    ArrayPropertyType,
+    ComponentDataType,
+    CurrentComponentDefinitionType,
+    DataPillType,
+    PropertyType,
+} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -13,7 +19,7 @@ import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
 
 interface ArrayPropertyProps {
-    currentComponent?: CurrentComponentType;
+    currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponentData?: ComponentDataType;
     dataPills?: Array<DataPillType>;
     path?: string;
@@ -22,8 +28,8 @@ interface ArrayPropertyProps {
 }
 
 const ArrayProperty = ({
-    currentComponent,
     currentComponentData,
+    currentComponentDefinition,
     dataPills,
     path,
     property,
@@ -129,8 +135,8 @@ const ArrayProperty = ({
                         <ArrayPropertyItem
                             arrayItem={subItem}
                             arrayName={name}
-                            currentComponent={currentComponent}
                             currentComponentData={currentComponentData}
+                            currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
                             index={index}
                             key={subItem.name}
@@ -143,8 +149,8 @@ const ArrayProperty = ({
                     <ArrayPropertyItem
                         arrayItem={arrayItem}
                         arrayName={name}
-                        currentComponent={currentComponent}
                         currentComponentData={currentComponentData}
+                        currentComponentDefinition={currentComponentDefinition}
                         dataPills={dataPills}
                         index={index}
                         key={arrayItem.name}

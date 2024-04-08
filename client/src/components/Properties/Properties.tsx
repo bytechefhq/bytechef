@@ -1,5 +1,5 @@
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentDataType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
@@ -10,7 +10,7 @@ import Property from './Property';
 
 interface PropertiesProps {
     actionName?: string;
-    currentComponent?: CurrentComponentType;
+    currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponentData?: ComponentDataType;
     customClassName?: string;
     dataPills?: DataPillType[];
@@ -25,8 +25,8 @@ interface PropertiesProps {
 
 const Properties = ({
     actionName,
-    currentComponent,
     currentComponentData,
+    currentComponentDefinition,
     customClassName,
     dataPills,
     formState,
@@ -39,8 +39,8 @@ const Properties = ({
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}
-                currentComponent={currentComponent}
                 currentComponentData={currentComponentData}
+                currentComponentDefinition={currentComponentDefinition}
                 dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}

@@ -47,7 +47,7 @@ export type ComponentDataType = {
     workflowNodeName: string;
 };
 
-export type CurrentComponentType = {
+export type CurrentComponentDefinitionType = {
     workflowNodeName?: string;
 } & ComponentDefinitionModel;
 

@@ -16,7 +16,7 @@ import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/store
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
-import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentDataType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
@@ -47,7 +47,7 @@ interface PropertyProps {
     actionName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    currentComponent?: CurrentComponentType;
+    currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponentData?: ComponentDataType;
     customClassName?: string;
     dataPills?: DataPillType[];
@@ -67,8 +67,8 @@ const Property = ({
     actionName,
     arrayIndex,
     arrayName,
-    currentComponent,
     currentComponentData,
+    currentComponentDefinition,
     customClassName,
     dataPills,
     formState,
@@ -147,7 +147,9 @@ const Property = ({
         showInputTypeSwitchButton = true;
     }
 
-    const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentComponent?.workflowNodeName);
+    const currentWorkflowTask = workflow?.tasks?.find(
+        (task) => task.name === currentComponentDefinition?.workflowNodeName
+    );
 
     if (!taskParameterValue) {
         taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
@@ -158,7 +160,7 @@ const Property = ({
     }
 
     const otherComponentData = componentData.filter((component) => {
-        if (component.componentName !== currentComponent?.name) {
+        if (component.componentName !== currentComponentDefinition?.name) {
             return true;
         } else {
             currentComponentData = component;
@@ -502,36 +504,39 @@ const Property = ({
             )}
         >
             <div className=" w-full">
-                {showMentionInput && currentComponent && currentComponentData && controlType !== 'CODE_EDITOR' && (
-                    <PropertyMentionsInput
-                        arrayName={arrayName}
-                        controlType={controlType}
-                        currentComponent={currentComponent}
-                        currentComponentData={currentComponentData}
-                        dataPills={dataPills}
-                        defaultValue={defaultValue}
-                        description={description}
-                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                        inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                        label={label || (arrayName ? undefined : name)}
-                        leadingIcon={typeIcon}
-                        name={name || `${arrayName}_0`}
-                        objectName={objectName}
-                        onKeyPress={(event: KeyboardEvent) => {
-                            if (isNumericalInput || type === 'BOOLEAN') {
-                                event.key !== '{' && event.preventDefault();
-                            }
-                        }}
-                        ref={editorRef}
-                        required={required}
-                        setValue={setMentionInputValue}
-                        showInputTypeSwitchButton={showInputTypeSwitchButton!}
-                        singleMention={controlType !== 'TEXT'}
-                        updateWorkflowMutation={updateWorkflowMutation}
-                        value={mentionInputValue}
-                        workflow={workflow}
-                    />
-                )}
+                {showMentionInput &&
+                    currentComponentDefinition &&
+                    currentComponentData &&
+                    controlType !== 'CODE_EDITOR' && (
+                        <PropertyMentionsInput
+                            arrayName={arrayName}
+                            controlType={controlType}
+                            currentComponentData={currentComponentData}
+                            currentComponentDefinition={currentComponentDefinition}
+                            dataPills={dataPills}
+                            defaultValue={defaultValue}
+                            description={description}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
+                            label={label || (arrayName ? undefined : name)}
+                            leadingIcon={typeIcon}
+                            name={name || `${arrayName}_0`}
+                            objectName={objectName}
+                            onKeyPress={(event: KeyboardEvent) => {
+                                if (isNumericalInput || type === 'BOOLEAN') {
+                                    event.key !== '{' && event.preventDefault();
+                                }
+                            }}
+                            ref={editorRef}
+                            required={required}
+                            setValue={setMentionInputValue}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton!}
+                            singleMention={controlType !== 'TEXT'}
+                            updateWorkflowMutation={updateWorkflowMutation}
+                            value={mentionInputValue}
+                            workflow={workflow}
+                        />
+                    )}
 
                 {!showMentionInput && (
                     <>
@@ -577,8 +582,8 @@ const Property = ({
 
                         {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
                             <ArrayProperty
-                                currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
+                                currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 path={path}
                                 property={property}
@@ -591,8 +596,8 @@ const Property = ({
                                 actionName={actionName}
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
+                                currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 path={path}
                                 property={property}
@@ -604,8 +609,8 @@ const Property = ({
                         {type === 'FILE_ENTRY' && (
                             <ObjectProperty
                                 actionName={actionName}
-                                currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
+                                currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 property={property}
                             />
@@ -734,13 +739,13 @@ const Property = ({
                         {type === 'NULL' && <span>NULL</span>}
 
                         {type === 'DYNAMIC_PROPERTIES' &&
-                            currentComponent &&
+                            currentComponentDefinition &&
                             currentComponentData &&
                             updateWorkflowMutation && (
                                 <PropertyDynamicProperties
                                     currentActionName={actionName}
-                                    currentComponent={currentComponent}
                                     currentComponentData={currentComponentData}
+                                    currentComponentDefinition={currentComponentDefinition}
                                     loadDependency={loadPropertiesDependency}
                                     name={name}
                                     propertiesDataSource={property.propertiesDataSource}

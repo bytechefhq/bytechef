@@ -13,7 +13,7 @@ import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/conf
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
-import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
+import {ComponentDataType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
@@ -43,7 +43,7 @@ const MentionInputListItem = (item: DataPillType) => {
 interface PropertyMentionsInputProps {
     arrayName?: string;
     controlType?: string;
-    currentComponent: CurrentComponentType;
+    currentComponentDefinition: CurrentComponentDefinitionType;
     currentComponentData: ComponentDataType;
     dataPills?: Array<DataPillType>;
     defaultValue?: string;
@@ -72,8 +72,8 @@ const PropertyMentionsInput = forwardRef(
         {
             arrayName,
             controlType,
-            currentComponent,
             currentComponentData,
+            currentComponentDefinition,
             dataPills,
             defaultValue,
             description,
@@ -320,8 +320,8 @@ const PropertyMentionsInput = forwardRef(
                 event.preventDefault();
 
                 if (copiedPropertyData) {
-                    if (currentComponent?.icon) {
-                        copiedPropertyData.componentIcon = currentComponent.icon;
+                    if (currentComponentDefinition?.icon) {
+                        copiedPropertyData.componentIcon = currentComponentDefinition.icon;
                     }
 
                     const mentionInput = focusedInput?.getEditor().getModule('mention');

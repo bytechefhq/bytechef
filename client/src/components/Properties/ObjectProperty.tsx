@@ -4,7 +4,13 @@ import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {ControlTypeModel} from '@/middleware/platform/configuration';
-import {ComponentDataType, CurrentComponentType, DataPillType, PropertyType, SubPropertyType} from '@/types/types';
+import {
+    ComponentDataType,
+    CurrentComponentDefinitionType,
+    DataPillType,
+    PropertyType,
+    SubPropertyType,
+} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -31,7 +37,7 @@ interface ObjectPropertyProps {
     actionName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    currentComponent?: CurrentComponentType;
+    currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
     path?: string;
@@ -45,8 +51,8 @@ const ObjectProperty = ({
     actionName,
     arrayIndex,
     arrayName,
-    currentComponent,
     currentComponentData,
+    currentComponentDefinition,
     dataPills,
     path,
     property,
@@ -141,8 +147,8 @@ const ObjectProperty = ({
                                 actionName={actionName}
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                currentComponent={currentComponent}
                                 currentComponentData={currentComponentData}
+                                currentComponentDefinition={currentComponentDefinition}
                                 customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
                                 dataPills={dataPills}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}

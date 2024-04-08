@@ -1,6 +1,12 @@
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {ControlTypeModel, WorkflowModel} from '@/middleware/platform/configuration';
-import {ArrayPropertyType, ComponentDataType, CurrentComponentType, DataPillType, PropertyType} from '@/types/types';
+import {
+    ArrayPropertyType,
+    ComponentDataType,
+    CurrentComponentDefinitionType,
+    DataPillType,
+    PropertyType,
+} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 import Property from '../Property';
@@ -9,7 +15,7 @@ import DeletePropertyButton from './DeletePropertyButton';
 interface ArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
     arrayName?: string;
-    currentComponent?: CurrentComponentType;
+    currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponentData?: ComponentDataType;
     dataPills?: DataPillType[];
     index: number;
@@ -21,8 +27,8 @@ interface ArrayPropertyItemProps {
 const ArrayPropertyItem = ({
     arrayItem,
     arrayName,
-    currentComponent,
     currentComponentData,
+    currentComponentDefinition,
     dataPills,
     index,
     path,
@@ -33,8 +39,8 @@ const ArrayPropertyItem = ({
         <Property
             arrayIndex={index}
             arrayName={arrayName}
-            currentComponent={currentComponent}
             currentComponentData={currentComponentData}
+            currentComponentDefinition={currentComponentDefinition}
             customClassName="pl-2 w-full"
             dataPills={dataPills}
             path={`${path}.${arrayName}`}
