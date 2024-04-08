@@ -72,7 +72,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                 {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                     <InputTypeSwitchButton
                         className={inputTypeSwitchButtonClassName}
-                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                        handleClick={handleInputTypeSwitchButtonClick}
                         mentionInput={false}
                     />
                 )}

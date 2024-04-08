@@ -571,7 +571,7 @@ const Property = ({
                                                         ? inputTypeSwitchButtonClassName
                                                         : undefined
                                                 }
-                                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                                                handleClick={handleInputTypeSwitchButtonClick}
                                                 mentionInput={mentionInput}
                                             />
                                         )}

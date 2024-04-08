@@ -374,7 +374,7 @@ const PropertyMentionsInput = forwardRef(
                         {showInputTypeSwitchButton && (
                             <InputTypeSwitchButton
                                 className={inputTypeSwitchButtonClassName}
-                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                                handleClick={handleInputTypeSwitchButtonClick}
                                 mentionInput={true}
                             />
                         )}
