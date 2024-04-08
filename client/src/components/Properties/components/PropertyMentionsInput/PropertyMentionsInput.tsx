@@ -60,6 +60,7 @@ interface PropertyMentionsInputProps {
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     otherComponentData: Array<ComponentDataType>;
+    path?: string;
     placeholder?: string;
     required?: boolean;
     setValue: (value: string) => void;
@@ -88,6 +89,7 @@ const PropertyMentionsInput = forwardRef(
             objectName,
             onKeyPress,
             otherComponentData,
+            path,
             placeholder = "Show data pills using '{'",
             required,
             setValue,
@@ -200,6 +202,10 @@ const PropertyMentionsInput = forwardRef(
 
             const {parameters} = currentComponent;
 
+            if (!parameters) {
+                return;
+            }
+
             let strippedValue = value;
 
             const dataPillValue = value.match(/data-value="([^"]+)"/)?.[1];
@@ -213,9 +219,31 @@ const PropertyMentionsInput = forwardRef(
             let data = parameters;
 
             if (arrayName && arrayIndex !== undefined) {
-                const combinedArray =
-                    parameters &&
-                    Object.entries(parameters)
+                if (path?.includes('parameters')) {
+                    if (objectName) {
+                        data = {
+                            ...parameters,
+                            [arrayName]: [
+                                ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                                {
+                                    ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                                    [name]: strippedValue,
+                                },
+                                ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                            ],
+                        };
+                    } else {
+                        data = {
+                            ...parameters,
+                            [arrayName]: [
+                                ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                                strippedValue,
+                                ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                            ],
+                        };
+                    }
+                } else {
+                    const combinedArray = Object.entries(parameters)
                         .filter(([key]) => key.startsWith(`${arrayName}_`))
                         .sort((a, b) => {
                             const aIndex = parseInt(a[0].split('_')[1], 10);
@@ -225,14 +253,13 @@ const PropertyMentionsInput = forwardRef(
                         })
                         .map(([, value]) => value as string);
 
-                const combinedString = combinedArray?.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
+                    const combinedString = combinedArray?.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
 
-                data = {
-                    ...parameters,
-                    [arrayName]: combinedString,
-                };
-
-                return;
+                    data = {
+                        ...parameters,
+                        [arrayName]: combinedString,
+                    };
+                }
             } else if (objectName && parameters) {
                 if (parameters![objectName]?.[name] === strippedValue) {
                     return;
@@ -250,6 +277,12 @@ const PropertyMentionsInput = forwardRef(
                     ...parameters,
                     [name as string]: strippedValue,
                 };
+            }
+
+            console.log('saving data: ', data);
+
+            if (!data) {
+                return;
             }
 
             saveProperty(
