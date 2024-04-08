@@ -11,9 +11,10 @@ import InputTypeSwitchButton from '@/components/Properties/components/InputTypeS
 import {Label} from '@/components/ui/label';
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
+import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
-import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
-import {ComponentType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
+import saveProperty from '@/pages/automation/project/utils/saveProperty';
+import {ComponentDataType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
@@ -41,6 +42,7 @@ const MentionInputListItem = (item: DataPillType) => {
 };
 
 interface PropertyMentionsInputProps {
+    arrayIndex?: number;
     arrayName?: string;
     controlType?: string;
     currentComponentDefinition: CurrentComponentDefinitionType;
@@ -57,6 +59,7 @@ interface PropertyMentionsInputProps {
     objectName?: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
+    otherComponentData: Array<ComponentDataType>;
     placeholder?: string;
     required?: boolean;
     setValue: (value: string) => void;
@@ -64,12 +67,12 @@ interface PropertyMentionsInputProps {
     showInputTypeSwitchButton: boolean;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
     value: string;
-    workflow?: WorkflowModel;
 }
 
 const PropertyMentionsInput = forwardRef(
     (
         {
+            arrayIndex,
             arrayName,
             controlType,
             currentComponent,
@@ -84,6 +87,7 @@ const PropertyMentionsInput = forwardRef(
             name,
             objectName,
             onKeyPress,
+            otherComponentData,
             placeholder = "Show data pills using '{'",
             required,
             setValue,
@@ -91,13 +95,13 @@ const PropertyMentionsInput = forwardRef(
             singleMention,
             updateWorkflowMutation,
             value,
-            workflow,
         }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>
     ) => {
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {copiedPropertyData, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+        const {setComponentData, workflow} = useWorkflowDataStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -190,11 +194,11 @@ const PropertyMentionsInput = forwardRef(
         const isFocused = focusedInput?.props.id === elementId;
 
         const saveInputValue = useDebouncedCallback(() => {
-            if (!currentComponent || !workflow || !updateWorkflowMutation) {
+            if (!currentComponent || !workflow || !updateWorkflowMutation || !name) {
                 return;
             }
 
-            const {actionName, componentName, parameters, workflowNodeName} = currentComponent;
+            const {parameters} = currentComponent;
 
             let strippedValue = value;
 
@@ -206,70 +210,57 @@ const PropertyMentionsInput = forwardRef(
                 strippedValue = value.replace(/<[^>]*>?/gm, '');
             }
 
-            if (arrayName && parameters) {
-                const combinedArray = Object.entries(parameters)
-                    .filter(([key]) => key.startsWith(`${arrayName}_`))
-                    .sort((a, b) => {
-                        const aIndex = parseInt(a[0].split('_')[1], 10);
-                        const bIndex = parseInt(b[0].split('_')[1], 10);
+            let data = parameters;
 
-                        return aIndex - bIndex;
-                    })
-                    .map(([, value]) => value as string);
+            if (arrayName && arrayIndex !== undefined) {
+                const combinedArray =
+                    parameters &&
+                    Object.entries(parameters)
+                        .filter(([key]) => key.startsWith(`${arrayName}_`))
+                        .sort((a, b) => {
+                            const aIndex = parseInt(a[0].split('_')[1], 10);
+                            const bIndex = parseInt(b[0].split('_')[1], 10);
 
-                const combinedString = combinedArray.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
+                            return aIndex - bIndex;
+                        })
+                        .map(([, value]) => value as string);
 
-                saveWorkflowDefinition(
-                    {
-                        actionName,
-                        componentName,
-                        name: workflowNodeName,
-                        parameters: {
-                            ...parameters,
-                            [arrayName]: combinedString,
-                        },
-                    },
-                    workflow,
-                    updateWorkflowMutation
-                );
+                const combinedString = combinedArray?.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
+
+                data = {
+                    ...parameters,
+                    [arrayName]: combinedString,
+                };
 
                 return;
-            } else if (objectName && parameters && name) {
+            } else if (objectName && parameters) {
                 if (parameters![objectName]?.[name] === strippedValue) {
                     return;
                 }
 
-                saveWorkflowDefinition(
-                    {
-                        actionName,
-                        componentName,
-                        name: workflowNodeName,
-                        parameters: {
-                            ...parameters,
-                            [objectName]: {
-                                ...parameters![objectName],
-                                [name as string]: strippedValue,
-                            },
-                        },
+                data = {
+                    ...parameters,
+                    [objectName]: {
+                        ...parameters![objectName],
+                        [name as string]: strippedValue,
                     },
-                    workflow,
-                    updateWorkflowMutation
-                );
+                };
             } else {
-                saveWorkflowDefinition(
-                    {
-                        actionName,
-                        componentName,
-                        name: workflowNodeName,
-                        parameters: {
-                            ...parameters,
-                            [name as string]: strippedValue,
-                        },
-                    },
-                    workflow,
-                    updateWorkflowMutation
-                );
+                data = {
+                    ...parameters,
+                    [name as string]: strippedValue,
+                };
             }
+
+            saveProperty(
+                data,
+                setComponentData,
+                currentComponentData,
+                otherComponentData,
+                updateWorkflowMutation,
+                name,
+                workflow
+            );
         }, 200);
 
         const handleOnChange = (value: string) => {
