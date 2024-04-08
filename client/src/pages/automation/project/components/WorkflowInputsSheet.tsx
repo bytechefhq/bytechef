@@ -26,12 +26,14 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow, workflowTestConfigur
                     <SheetTitle className="flex">Workflow Inputs</SheetTitle>
 
                     <div className="flex items-center gap-2">
-                        <WorkflowInputsSheetDialog
-                            projectId={projectId}
-                            triggerNode={<Button size="sm">Add Input</Button>}
-                            workflow={workflow}
-                            workflowTestConfiguration={workflowTestConfiguration}
-                        />
+                        {workflow.inputs && workflow.inputs.length > 0 && (
+                            <WorkflowInputsSheetDialog
+                                projectId={projectId}
+                                triggerNode={<Button size="sm">New Input</Button>}
+                                workflow={workflow}
+                                workflowTestConfiguration={workflowTestConfiguration}
+                            />
+                        )}
 
                         <SheetPrimitive.Close asChild>
                             <Cross2Icon className="size-4 cursor-pointer opacity-70" />

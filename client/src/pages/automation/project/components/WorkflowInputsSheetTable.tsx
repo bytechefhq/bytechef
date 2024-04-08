@@ -9,22 +9,14 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowDefinitionType} from '@/types/types';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {AlignJustifyIcon, PlusIcon} from 'lucide-react';
+import {EditIcon, PlusIcon, SlidersIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 
 const SPACE = 4;
@@ -39,7 +31,6 @@ const WorkflowInputsSheetTable = ({
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
-    const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
@@ -128,34 +119,28 @@ const WorkflowInputsSheetTable = ({
                                     </TableCell>
 
                                     <TableCell className="flex justify-end px-3 py-4">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                                            </DropdownMenuTrigger>
+                                        <WorkflowInputsSheetDialog
+                                            inputIndex={index}
+                                            projectId={projectId}
+                                            triggerNode={
+                                                <Button size="icon" variant="ghost">
+                                                    <EditIcon className="size-4" />
+                                                </Button>
+                                            }
+                                            workflow={workflow}
+                                            workflowTestConfiguration={workflowTestConfiguration}
+                                        />
 
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    onClick={() => {
-                                                        setCurrentInputIndex(index);
-                                                        setShowEditDialog(true);
-                                                    }}
-                                                >
-                                                    Edit
-                                                </DropdownMenuItem>
-
-                                                <DropdownMenuSeparator />
-
-                                                <DropdownMenuItem
-                                                    className="text-red-600"
-                                                    onClick={() => {
-                                                        setCurrentInputIndex(index);
-                                                        setShowDeleteDialog(true);
-                                                    }}
-                                                >
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <Button
+                                            onClick={() => {
+                                                setCurrentInputIndex(index);
+                                                setShowDeleteDialog(true);
+                                            }}
+                                            size="icon"
+                                            variant="ghost"
+                                        >
+                                            <XIcon className="h-4 text-red-600" />
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -164,7 +149,7 @@ const WorkflowInputsSheetTable = ({
             ) : (
                 <div className="flex h-full flex-col justify-center">
                     <div className="flex flex-col items-center self-center align-middle">
-                        <AlignJustifyIcon className="size-24 text-gray-300" />
+                        <SlidersIcon className="size-24 text-gray-300" />
 
                         <h3 className="mt-2 text-sm font-semibold">No inputs</h3>
 
@@ -209,16 +194,6 @@ const WorkflowInputsSheetTable = ({
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-
-            {showEditDialog && (
-                <WorkflowInputsSheetDialog
-                    inputIndex={currentInputIndex}
-                    onClose={() => setShowEditDialog(false)}
-                    projectId={projectId}
-                    workflow={workflow}
-                    workflowTestConfiguration={workflowTestConfiguration}
-                />
-            )}
         </>
     );
 };
