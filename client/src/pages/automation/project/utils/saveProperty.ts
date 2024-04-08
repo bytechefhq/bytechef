@@ -1,5 +1,5 @@
 import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDataType} from '@/types/types';
+import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
@@ -7,9 +7,9 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 export default function saveProperty(
     parameters: object,
-    setComponentData: (componentData: ComponentDataType[]) => void,
-    currentComponentData: ComponentDataType,
-    otherComponentData: Array<ComponentDataType>,
+    setComponentData: (componentData: Array<ComponentType>) => void,
+    currentComponentData: ComponentType,
+    otherComponentData: Array<ComponentType>,
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
     name: string,
     workflow: WorkflowModel & WorkflowTaskDataType

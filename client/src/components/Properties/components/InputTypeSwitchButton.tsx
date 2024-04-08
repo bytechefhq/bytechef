@@ -11,21 +11,19 @@ const InputTypeSwitchButton = ({
     className?: string;
     handleClick: () => void;
     mentionInput: boolean;
-}) => {
-    return (
-        <Button
-            className={twMerge('z-50 size-auto p-0.5', className)}
-            onClick={handleClick}
-            size="icon"
-            title="Switch input type"
-            variant="ghost"
-        >
-            {mentionInput ? (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <FormInputIcon className="size-5 text-gray-800" />
-                    </TooltipTrigger>
-
+}) => (
+    <Button
+        className={twMerge('z-50 size-auto p-0.5', className)}
+        onClick={handleClick}
+        size="icon"
+        title="Switch input type"
+        variant="ghost"
+    >
+        {mentionInput ? (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <FormInputIcon className="size-5 text-gray-800" />
+                </TooltipTrigger>
 
                 <TooltipContent>Switch to constant value</TooltipContent>
             </Tooltip>
