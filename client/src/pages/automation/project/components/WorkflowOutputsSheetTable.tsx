@@ -86,11 +86,11 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
                         {workflow.outputs &&
                             workflow.outputs.map((output, index) => (
                                 <TableRow key={output.name}>
-                                    <TableCell className="px-3 py-4">{output.name}</TableCell>
+                                    <TableCell className="p-3">{output.name}</TableCell>
 
-                                    <TableCell className="px-3 py-4">{output.value.toString()}</TableCell>
+                                    <TableCell className="p-3">{output.value.toString()}</TableCell>
 
-                                    <TableCell className="flex justify-end px-3 py-4">
+                                    <TableCell className="flex justify-end p-3">
                                         <WorkflowOutputsSheetPopup
                                             align="end"
                                             output={{
