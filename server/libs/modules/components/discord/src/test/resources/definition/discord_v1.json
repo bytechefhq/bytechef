@@ -28,6 +28,29 @@
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "guildId",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Guild",
+      "placeholder": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
+    }, {
+      "advancedOption": null,
       "description": "Channel where to send the message",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -42,12 +65,15 @@
       "exampleValue": null,
       "label": "Channel",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": null,
@@ -258,12 +284,15 @@
       "exampleValue": null,
       "label": "Guild",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": null,
@@ -320,16 +349,16 @@
         "maxValue": null,
         "minValue": null,
         "options": [ {
-          "description": null,
-          "label": "0",
+          "description": "a text channel within a server",
+          "label": "GUILD_TEXT",
           "value": 0
         }, {
-          "description": null,
-          "label": "2",
+          "description": "a voice channel within a server",
+          "label": "GUILD_VOICE",
           "value": 2
         }, {
-          "description": null,
-          "label": "4",
+          "description": "an organizational category that contains up to 50 channels",
+          "label": "GUILD_CATEGORY",
           "value": 4
         } ],
         "controlType": "SELECT",
@@ -446,7 +475,175 @@
       "sampleOutput": null
     },
     "perform": null
+  }, {
+    "batch": null,
+    "defaultOutputFunction": true,
+    "deprecated": null,
+    "description": "Send direct message guild member",
+    "help": null,
+    "metadata": null,
+    "name": "sendDirectMessage",
+    "outputFunction": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "guildId",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Guild",
+      "placeholder": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
+    }, {
+      "advancedOption": null,
+      "description": "The recipient to open a DM channel with",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "recipient_id",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Recipient",
+      "placeholder": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
+    }, {
+      "advancedOption": null,
+      "description": "Message contents (up to 2000 characters)",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "content",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Message Text",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "True if this is a TTS message",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": false,
+      "name": "tts",
+      "type": "BOOLEAN",
+      "defaultValue": false,
+      "exampleValue": null,
+      "label": "Text To Speech",
+      "placeholder": null,
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "controlType": "SELECT"
+    } ],
+    "title": "Send direct message",
+    "workflowNodeDescriptionFunction": null,
+    "output": {
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "additionalProperties": null,
+        "multipleValues": null,
+        "options": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": "body",
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "options": null,
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "id",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "languageId": null,
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
+        } ],
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
+    },
+    "perform": { }
   } ],
+  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -464,7 +661,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "label": "Token",
+        "label": "Bot token",
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
@@ -477,7 +674,7 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "apply": null,
+      "apply": { },
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
@@ -493,6 +690,5 @@
     "authorizationRequired": null,
     "baseUri": { },
     "test": null
-  },
-  "triggers": [ ]
+  }
 }
