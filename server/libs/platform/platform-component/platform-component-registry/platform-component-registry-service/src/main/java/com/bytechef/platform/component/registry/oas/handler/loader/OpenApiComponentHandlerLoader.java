@@ -40,8 +40,14 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     public OpenApiComponentHandlerLoader() {
         super(
-            (componentHandler, actionDefinition) -> new ActionDefinitionWrapper(
-                actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)),
+            (componentHandler, actionDefinition) -> {
+                if (OptionalUtils.isPresent(actionDefinition.getPerform())) {
+                    return actionDefinition;
+                } else {
+                    return new ActionDefinitionWrapper(
+                        actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition));
+                }
+            },
             OpenApiComponentHandler.class);
     }
 

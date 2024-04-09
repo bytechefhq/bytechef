@@ -48,7 +48,13 @@ public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         try {
-            return openApiComponentHandler.postExecute(actionName, (Response) super.handle(taskExecution));
+            Object result = super.handle(taskExecution);
+
+            if (result instanceof Response response) {
+                return openApiComponentHandler.postExecute(actionName, response);
+            } else {
+                return result;
+            }
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
