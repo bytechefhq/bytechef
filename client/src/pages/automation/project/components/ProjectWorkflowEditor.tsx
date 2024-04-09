@@ -23,13 +23,33 @@ const ProjectWorkflowEditor = ({
     const {componentActions, setComponents, workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {data: workflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
+    const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode.name,
         },
         !!componentActions?.length
     );
+
+    const previousComponentDefinitions = workflowNodeOutputs
+        ? workflowNodeOutputs
+              .filter(
+                  (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
+              )
+              .map(
+                  (workflowNodeOutput) =>
+                      componentDefinitions.filter(
+                          (componentDefinition) =>
+                              componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName ||
+                              componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
+                      )[0]
+              )
+        : [];
+
+    // refetch workflowNodeOutputs when a new node is added
+    useEffect(() => {
+        refetchWorkflowNodeOutputs();
+    }, [workflow.tasks?.length, refetchWorkflowNodeOutputs]);
 
     useEffect(() => {
         const workflowComponents = workflow.tasks?.map((task) => {
@@ -52,21 +72,6 @@ const ProjectWorkflowEditor = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks]);
-
-    const previousComponentDefinitions = workflowNodeOutputs
-        ? workflowNodeOutputs
-              .filter(
-                  (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
-              )
-              .map(
-                  (workflowNodeOutput) =>
-                      componentDefinitions.filter(
-                          (componentDefinition) =>
-                              componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName ||
-                              componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
-                      )[0]
-              )
-        : [];
 
     return (
         <ReactFlowProvider>
