@@ -214,9 +214,9 @@ class GoogleSheetsUtilsTest {
 
         Map<String, Object> expected = new LinkedHashMap<>();
 
-        expected.put("column A", "value1");
-        expected.put("column B", "value2");
-        expected.put("column C", "value3");
+        expected.put("column_A", "value1");
+        expected.put("column_B", "value2");
+        expected.put("column_C", "value3");
 
         assertEquals(expected, result);
     }
