@@ -74,6 +74,7 @@
                     "max-w-tooltip-sm",
                     "min-w-combo-box-popper-anchor-width",
                     "nowheel",
+                    "text-muted-foreground",
                     "text-success-foreground",
                     "w-112",
                     "w-workflow-nodes-popover-menu-width"
