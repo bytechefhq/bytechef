@@ -14,7 +14,6 @@ import {useGetWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {ActivityIcon} from 'lucide-react';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
-    WorkflowExecutionModel,
     WorkflowExecutionModelFromJSON,
 } from 'middleware/automation/workflow/execution';
 import {useGetProjectsQuery} from 'queries/automation/projects.queries';
@@ -56,15 +55,8 @@ const ProjectLabel = ({project}: {project: ProjectModel}) => (
 );
 
 export const WorkflowExecutions = () => {
-    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsPageJobStatusEnum | undefined>(
-        searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsPageJobStatusEnum) : undefined
-    );
-    const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
-        searchParams.get('startDate') ? new Date(+searchParams.get('startDate')!) : undefined
-    );
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
@@ -77,7 +69,15 @@ export const WorkflowExecutions = () => {
     const [filterProjectInstanceId, setFilterProjectInstanceId] = useState<number | undefined>(
         searchParams.get('projectInstanceId') ? +searchParams.get('projectInstanceId')! : undefined
     );
+    const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsPageJobStatusEnum | undefined>(
+        searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsPageJobStatusEnum) : undefined
+    );
+    const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
+        searchParams.get('startDate') ? new Date(+searchParams.get('startDate')!) : undefined
+    );
     const [filterWorkflowId, setFilterWorkflowId] = useState<string | undefined>();
+
+    const navigate = useNavigate();
 
     const {data: projectInstances} = useGetProjectInstancesQuery({});
 
@@ -101,62 +101,57 @@ export const WorkflowExecutions = () => {
 
     const emptyListMessage =
         !filterStatus &&
-        !filterProjectId &&
-        !filterWorkflowId &&
         !filterStartDate &&
         !filterEndDate &&
+        !filterProjectId &&
         !filterProjectInstanceId &&
+        !filterWorkflowId &&
         !filterPageNumber
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecutionModel: WorkflowExecutionModel) =>
+    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecutionModel: object) =>
         WorkflowExecutionModelFromJSON(workflowExecutionModel)
     );
 
-    function search(
+    function filter(
         status?: GetWorkflowExecutionsPageJobStatusEnum,
+        startDate?: Date,
+        endDate?: Date,
         projectId?: number,
         projectInstanceId?: number,
         workflowId?: string,
-        startDate?: Date,
-        endDate?: Date,
         pageNumber?: number
     ) {
         navigate(
-            `/automation/executions?status=${status ? status : ''}&${
-                'projectId=' + (projectId ? projectId : '') + '&'
-            }projectInstanceId=${projectInstanceId ? projectInstanceId : ''}&workflowId=${
-                workflowId ? workflowId : ''
-            }&startDate=${startDate ? startDate.getTime() : ''}&endDate=${
-                endDate ? endDate.getTime() : ''
-            }&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/automation/executions?status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectInstanceId=${projectInstanceId ? projectInstanceId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
     const handleEndDateChange = (date?: Date) => {
-        search(
+        setFilterEndDate(date);
+
+        filter(
             filterStatus,
+            filterStartDate,
+            date,
             filterProjectId,
             filterProjectInstanceId,
             filterWorkflowId,
-            filterStartDate,
-            date,
             filterPageNumber
         );
-        setFilterEndDate(date);
     };
 
     const handlePaginationClick = (pageNumber: number) => {
         setFilterPageNumber(pageNumber);
 
-        search(
+        filter(
             filterStatus,
+            filterStartDate,
+            filterEndDate,
             filterProjectId,
             filterProjectInstanceId,
             filterWorkflowId,
-            filterStartDate,
-            filterEndDate,
             pageNumber
         );
     };
@@ -169,13 +164,14 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterProjectId(projectId);
-        search(
+
+        filter(
             filterStatus,
+            filterStartDate,
+            filterEndDate,
             projectId,
             filterProjectInstanceId,
             filterWorkflowId,
-            filterStartDate,
-            filterEndDate,
             filterPageNumber
         );
     };
@@ -188,13 +184,14 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterProjectInstanceId(projectInstanceId);
-        search(
+
+        filter(
             filterStatus,
+            filterStartDate,
+            filterEndDate,
             filterProjectId,
             projectInstanceId,
             filterWorkflowId,
-            filterStartDate,
-            filterEndDate,
             filterPageNumber
         );
     };
@@ -207,28 +204,30 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterStatus(status);
-        search(
+
+        filter(
             status,
+            filterStartDate,
+            filterEndDate,
             filterProjectId,
             filterProjectInstanceId,
             filterWorkflowId,
-            filterStartDate,
-            filterEndDate,
             filterPageNumber
         );
     };
 
     const handleStartDateChange = (date?: Date) => {
-        search(
+        setFilterStartDate(date);
+
+        filter(
             filterStatus,
+            date,
+            filterEndDate,
             filterProjectId,
             filterProjectInstanceId,
             filterWorkflowId,
-            date,
-            filterEndDate,
             filterPageNumber
         );
-        setFilterStartDate(date);
     };
 
     const handleWorkflowChange = (item?: ComboBoxItemType) => {
@@ -239,13 +238,14 @@ export const WorkflowExecutions = () => {
         }
 
         setFilterWorkflowId(workflowId);
-        search(
+
+        filter(
             filterStatus,
+            filterStartDate,
+            filterEndDate,
             filterProjectId,
             filterProjectInstanceId,
             workflowId,
-            filterStartDate,
-            filterEndDate,
             filterPageNumber
         );
     };
