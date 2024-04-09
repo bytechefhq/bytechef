@@ -66,12 +66,11 @@ const DeletePropertyButton = ({
                 <div
                     className={twMerge(
                         'group flex items-center justify-center',
-                        objectProperty && 'ml-1 mr-1 absolute right-0 top-1',
-                        !objectProperty && 'mx-2'
+                        objectProperty ? 'absolute right-0' : 'mx-2'
                     )}
                 >
                     <button
-                        className="p-2"
+                        className={twMerge('p-2', objectProperty && 'p-1')}
                         onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}
                     >
                         <XIcon className="size-4 cursor-pointer group-hover:text-red-500" />
