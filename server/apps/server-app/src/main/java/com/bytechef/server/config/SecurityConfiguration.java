@@ -89,9 +89,7 @@ public class SecurityConfiguration {
                             "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
             .authorizeHttpRequests(
                 authz -> authz
-                    .requestMatchers(
-                        mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"),
-                        mvc.pattern("/*.map"), mvc.pattern("/*.css"))
+                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/assets/**"))
                     .permitAll()
                     .requestMatchers(
                         mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp"))
