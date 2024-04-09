@@ -488,6 +488,7 @@ const Property = ({
                 {showMentionInput &&
                     currentComponent &&
                     currentComponentDefinition &&
+                    type !== 'DYNAMIC_PROPERTIES' &&
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
                             arrayIndex={arrayIndex}
@@ -719,24 +720,24 @@ const Property = ({
                         )}
 
                         {type === 'NULL' && <span>NULL</span>}
-
-                        {type === 'DYNAMIC_PROPERTIES' &&
-                            currentComponentDefinition &&
-                            currentComponent &&
-                            updateWorkflowMutation && (
-                                <PropertyDynamicProperties
-                                    currentActionName={actionName}
-                                    currentComponent={currentComponent}
-                                    currentComponentDefinition={currentComponentDefinition}
-                                    loadDependency={loadPropertiesDependency}
-                                    name={name}
-                                    propertiesDataSource={property.propertiesDataSource}
-                                    taskParameterValue={taskParameterValue}
-                                    updateWorkflowMutation={updateWorkflowMutation}
-                                />
-                            )}
                     </>
                 )}
+
+                {type === 'DYNAMIC_PROPERTIES' &&
+                    currentComponentDefinition &&
+                    currentComponent &&
+                    updateWorkflowMutation && (
+                        <PropertyDynamicProperties
+                            currentActionName={actionName}
+                            currentComponent={currentComponent}
+                            currentComponentDefinition={currentComponentDefinition}
+                            loadDependency={loadPropertiesDependency}
+                            name={name}
+                            propertiesDataSource={property.propertiesDataSource}
+                            taskParameterValue={taskParameterValue}
+                            updateWorkflowMutation={updateWorkflowMutation}
+                        />
+                    )}
 
                 {controlType === 'CODE_EDITOR' && (
                     <PropertyCodeEditor
