@@ -279,8 +279,6 @@ const PropertyMentionsInput = forwardRef(
                 };
             }
 
-            console.log('saving data: ', data);
-
             if (!data) {
                 return;
             }
