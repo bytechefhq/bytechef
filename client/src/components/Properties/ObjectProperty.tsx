@@ -84,38 +84,44 @@ const ObjectProperty = ({
         setNewPropertyName('');
     };
 
-    // on initial render, set subProperties if there are matching parameters
+    // render individual object items with data gathered from parameters
     useEffect(() => {
         if (!name || !currentComponent?.parameters?.[name]) {
             return;
         }
 
-        const objectParameters = Object.keys(currentComponent.parameters![name]);
+        const objectParameters = property.properties?.length
+            ? property.properties?.map((property) => property.name)
+            : Object.keys(currentComponent.parameters![name]);
 
         if (!objectParameters.length) {
             return;
         }
 
         const preexistingProperties = objectParameters.map((parameter) => {
-            const value: string = currentComponent.parameters![parameter];
+            const matchingProperty = (property.properties as Array<PropertyType>)?.find(
+                (property) => property.name === parameter
+            );
 
-            const matchingSubProperty = subProperties.find((subProperty) => subProperty.name === parameter);
-
-            return {
-                ...matchingSubProperty,
-                defaultValue: value,
-            };
+            if (matchingProperty) {
+                return {
+                    ...matchingProperty,
+                    defaultValue: currentComponent.parameters![name][parameter!],
+                };
+            } else {
+                return {
+                    controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
+                    custom: true,
+                    defaultValue: currentComponent.parameters![name][parameter!],
+                    name: parameter,
+                    type: newPropertyType,
+                };
+            }
         });
 
-        setSubProperties((subProperties) =>
-            subProperties.map((subProperty) => {
-                if (preexistingProperties.find((property) => property.name === subProperty.name)) {
-                    return {...subProperty, defaultValue: undefined};
-                } else {
-                    return subProperty;
-                }
-            })
-        );
+        if (preexistingProperties.length) {
+            setSubProperties(preexistingProperties);
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
