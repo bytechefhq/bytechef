@@ -337,6 +337,14 @@ public final class ComponentDSL {
             return this;
         }
 
+        public final <P extends Property> ModifiableActionDefinition properties(List<P> properties) {
+            if (properties != null) {
+                this.properties = Collections.unmodifiableList(properties);
+            }
+
+            return this;
+        }
+
         public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
             this.sampleOutput = sampleOutput;
 
