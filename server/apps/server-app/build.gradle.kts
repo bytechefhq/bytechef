@@ -87,6 +87,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:data-storage"))
     implementation(project(":server:libs:modules:components:data-stream"))
     implementation(project(":server:libs:modules:components:delay"))
+    implementation(project(":server:libs:modules:components:discord"))
     implementation(project(":server:libs:modules:components:dropbox"))
     implementation(project(":server:libs:modules:components:file-storage"))
     implementation(project(":server:libs:modules:components:email"))

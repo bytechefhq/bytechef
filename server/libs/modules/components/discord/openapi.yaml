@@ -1,0 +1,115 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Discord"
+  description: "Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels."
+  version: "v1"
+servers:
+  - url: "https://discord.com/api/v10"
+paths:
+  /channels/{channelId}/messages:
+    post:
+      tags:
+        - "Channel"
+      summary: "Send channel message"
+      description: "Post a new message to a specific #channel you choose."
+      operationId: "sendChannelMessage"
+      parameters:
+        - name: "channelId"
+          description: "Channel where to send the message"
+          in: "path"
+          required: true
+          schema:
+            title: "Channel"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Message"
+              required:
+                - "content"
+              properties:
+                content:
+                  type: "string"
+                  title: "Message text"
+                  description: "Message contents (up to 2000 characters)"
+                tts:
+                  type: "boolean"
+                  title: "Text to speech"
+                  description: "True if this is a TTS message"
+                  default: "false"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      content:
+                        type: "string"
+                      tts:
+                        type: "boolean"
+  /guilds/{guildId}/channels:
+    post:
+      tags:
+        - "Guild"
+      summary: "Create channel"
+      description: "Create a new channel"
+      operationId: "createChannel"
+      parameters:
+        - name: "guildId"
+          in: "path"
+          required: true
+          schema:
+            title: "Guild"
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Channel"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  description: "The name of the new channel"
+                  minLength: "1"
+                  maxLength: "100"
+                type:
+                  type: "integer"
+                  enum:
+                    - "0"
+                    - "2"
+                    - "4"
+      responses:
+        201:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      type:
+                        type: "integer"
+                      name:
+                        type: "string"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
