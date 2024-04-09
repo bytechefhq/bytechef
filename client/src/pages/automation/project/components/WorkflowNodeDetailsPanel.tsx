@@ -113,15 +113,17 @@ const WorkflowNodeDetailsPanel = ({
         },
     });
 
-    const handleActionSelectChange = (value: string) => {
-        setCurrentActionName(value);
+    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
+
+    const handleActionSelectChange = (actionName: string) => {
+        setCurrentActionName(actionName);
 
         setComponentActions(
             componentActions.map((componentAction) => {
                 if (componentAction.workflowNodeName === currentNode.name) {
                     return {
                         ...componentAction,
-                        actionName: value,
+                        actionName,
                     };
                 } else {
                     return componentAction;
@@ -133,7 +135,7 @@ const WorkflowNodeDetailsPanel = ({
             setComponents([
                 ...components.filter((component) => component.workflowNodeName !== currentNode.name),
                 {
-                    actionName: value,
+                    actionName,
                     componentName: currentNode.componentName || currentNode.id,
                     icon: currentComponentDefinition.icon,
                     title: currentComponentDefinition?.title,
@@ -147,14 +149,16 @@ const WorkflowNodeDetailsPanel = ({
 
             const {componentName, icon, title, workflowNodeName} = currentComponent;
 
+            delete currentWorkflowTask?.parameters;
+
             saveWorkflowDefinition(
                 {
-                    actionName: value,
+                    actionName,
                     componentName,
                     icon,
                     label: title,
                     name: workflowNodeName!,
-                    type: `${componentName}/v1/${value}`,
+                    type: `${componentName}/v1/${actionName}`,
                 },
                 workflow,
                 updateWorkflowMutation
@@ -217,8 +221,6 @@ const WorkflowNodeDetailsPanel = ({
         },
         hasOutputData && activeTab === 'output'
     );
-
-    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
 
     const workflowConnections: WorkflowConnectionModel[] = currentWorkflowTask?.connections || [];
 
@@ -486,7 +488,7 @@ const WorkflowNodeDetailsPanel = ({
                                                     currentComponentDefinition={currentComponentDefinition}
                                                     customClassName="p-4"
                                                     dataPills={dataPills}
-                                                    key={`${currentNode.name}_properties`}
+                                                    key={`${currentNode.name}_${currentActionName}_properties`}
                                                     properties={currentActionProperties}
                                                     updateWorkflowMutation={updateWorkflowMutation}
                                                 />
