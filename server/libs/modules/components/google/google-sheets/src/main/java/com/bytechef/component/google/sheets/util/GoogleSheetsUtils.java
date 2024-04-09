@@ -184,6 +184,6 @@ public class GoogleSheetsUtils {
             columnNumber = (columnNumber - modulo) / 26;
         }
 
-        return "column " + columnName;
+        return "column_" + columnName;
     }
 }
