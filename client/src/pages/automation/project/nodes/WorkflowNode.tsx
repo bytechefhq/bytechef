@@ -1,9 +1,13 @@
 import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
-import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import {
+    useUpdateWorkflowMutation,
+    useUpdateWorkflowNodeOutputsMutation,
+} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/queries/platform/workflowNodeDescriptions.queries';
+import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
@@ -50,6 +54,17 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
+    });
+
+    const updateWorkflowNodeOutputsMutation = useUpdateWorkflowNodeOutputsMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs({
+                    id: workflow.id!,
+                    lastWorkflowNodeName: currentNode.name,
+                }),
             });
         },
     });
@@ -129,6 +144,11 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 ),
                 version: workflow.version,
             },
+        });
+
+        updateWorkflowNodeOutputsMutation.mutate({
+            id: workflow.id!,
+            lastWorkflowNodeName: currentNode.name,
         });
     };
 

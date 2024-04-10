@@ -5,6 +5,11 @@ import {
     WorkflowApi,
     WorkflowModel,
 } from '@/middleware/automation/configuration';
+import {
+    GetWorkflowNodeOutputsRequest,
+    WorkflowNodeOutputApi,
+    WorkflowNodeOutputModel,
+} from '@/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface DeleteWorkflowMutationProps {
@@ -45,6 +50,19 @@ export const useUpdateWorkflowMutation = (mutationProps?: UpdateWorkflowMutation
         mutationFn: (request: UpdateWorkflowRequest) => {
             return new WorkflowApi().updateWorkflow(request);
         },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UpdateWorkflowNodeOutputsMutationProps {
+    onSuccess?: (result: WorkflowNodeOutputModel[]) => void;
+    onError?: (error: Error) => void;
+}
+
+export const useUpdateWorkflowNodeOutputsMutation = (mutationProps?: UpdateWorkflowNodeOutputsMutationProps) =>
+    useMutation({
+        mutationFn: (request: GetWorkflowNodeOutputsRequest) =>
+            new WorkflowNodeOutputApi().getWorkflowNodeOutputs(request),
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });
