@@ -44,13 +44,13 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
     private final Map<String, Object> mockedMap = mock(Map.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
-    private final ArgumentCaptor<Integer> sheetIdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
     void perform() throws IOException {
-        List<Object> values = List.of("abc", 123, false);
+        List<Object> values = List.of("abc", "sheetName", false);
 
         when(mockedParameters.getRequiredList(VALUES, Object.class))
             .thenReturn(values);
@@ -69,7 +69,7 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetIdArgumentCaptor.capture(), any()))
+                .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
@@ -81,7 +81,7 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
             assertEquals(mockedMap, result);
 
             assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals(123, sheetIdArgumentCaptor.getValue());
+            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
             assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
 
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();

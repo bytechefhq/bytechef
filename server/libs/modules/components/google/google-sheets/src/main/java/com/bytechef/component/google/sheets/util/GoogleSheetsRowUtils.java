@@ -28,14 +28,14 @@ public class GoogleSheetsRowUtils {
     private GoogleSheetsRowUtils() {
     }
 
-    public static List<Object> getRow(Sheets sheets, String spreadSheetId, Integer sheetId, Integer rowNumber)
+    public static List<Object> getRow(Sheets sheets, String spreadSheetId, String sheetName, Integer rowNumber)
         throws IOException {
 
         return sheets
             .spreadsheets()
             .values()
             .batchGet(spreadSheetId)
-            .setRanges(List.of(GoogleSheetsUtils.createRange(sheetId, rowNumber)))
+            .setRanges(List.of(GoogleSheetsUtils.createRange(sheetName, rowNumber)))
             .setValueRenderOption("UNFORMATTED_VALUE")
             .setDateTimeRenderOption("FORMATTED_STRING")
             .setMajorDimension("ROWS")

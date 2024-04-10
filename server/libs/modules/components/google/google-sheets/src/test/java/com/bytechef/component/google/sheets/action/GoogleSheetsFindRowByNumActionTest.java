@@ -40,7 +40,7 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
 
     private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final Map<String, Object> mockedMap = mock(Map.class);
-    private final ArgumentCaptor<Integer> sheetIdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void perform() throws IOException {
@@ -55,7 +55,7 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
                 .when(() -> GoogleSheetsRowUtils.getRow(
                     any(Sheets.class),
                     spreadsheetIdArgumentCaptor.capture(),
-                    sheetIdArgumentCaptor.capture(),
+                    sheetNameArgumentCaptor.capture(),
                     rowNumberArgumentCaptor.capture()))
                 .thenReturn(row);
 
@@ -70,7 +70,7 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
                 assertEquals(mockedMap, result);
                 assertEquals(2, rowNumberArgumentCaptor.getValue());
                 assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-                assertEquals(123, sheetIdArgumentCaptor.getValue());
+                assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
             }
         }
     }

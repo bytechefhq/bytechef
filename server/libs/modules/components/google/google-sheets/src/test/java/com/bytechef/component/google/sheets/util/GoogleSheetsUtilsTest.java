@@ -18,7 +18,7 @@ package com.bytechef.component.google.sheets.util;
 
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,27 +73,21 @@ class GoogleSheetsUtilsTest {
     private final Sheets.Spreadsheets mockedSpreadsheets = Mockito.mock(Sheets.Spreadsheets.class);
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<Integer> sheetIdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testCreateRangeForRowNumberNotNull() {
-        GoogleSheetsUtils.sheetIdMap.put(1, "Sheet1");
-        GoogleSheetsUtils.sheetIdMap.put(2, "Sheet2");
+        String actualRange = GoogleSheetsUtils.createRange("sheetName", 5);
 
-        String actualRange = GoogleSheetsUtils.createRange(1, 5);
-
-        assertEquals("Sheet1!5:5", actualRange);
+        assertEquals("sheetName!5:5", actualRange);
     }
 
     @Test
     void testCreateRangeForRowNumberNull() {
-        GoogleSheetsUtils.sheetIdMap.put(1, "Sheet1");
-        GoogleSheetsUtils.sheetIdMap.put(2, "Sheet2");
+        String actualRange = GoogleSheetsUtils.createRange("sheetName", null);
 
-        String actualRange = GoogleSheetsUtils.createRange(1, null);
-
-        assertEquals("Sheet1", actualRange);
+        assertEquals("sheetName", actualRange);
     }
 
     @Test
@@ -102,8 +96,8 @@ class GoogleSheetsUtilsTest {
             .thenReturn(true);
         when(mockedParameters.getRequiredString(SPREADSHEET_ID))
             .thenReturn("spreadsheetId");
-        when(mockedParameters.getRequiredInteger(SHEET_ID))
-            .thenReturn(123);
+        when(mockedParameters.getRequiredString(SHEET_NAME))
+            .thenReturn("sheetName");
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
@@ -113,7 +107,7 @@ class GoogleSheetsUtilsTest {
                 GoogleSheetsRowUtils.class)) {
 
                 googleSheetsRowUtilsMockedStatic
-                    .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), anyString(), anyInt(), anyInt()))
+                    .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), anyString(), anyString(), anyInt()))
                     .thenReturn(List.of("header1", "header2", "header3"));
 
                 List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
@@ -142,8 +136,8 @@ class GoogleSheetsUtilsTest {
             .thenReturn(false);
         when(mockedParameters.getRequiredString(SPREADSHEET_ID))
             .thenReturn("spreadsheetId");
-        when(mockedParameters.getRequiredInteger(SHEET_ID))
-            .thenReturn(123);
+        when(mockedParameters.getRequiredString(SHEET_NAME))
+            .thenReturn("sheetName");
 
         List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
             mockedParameters, mockedParameters, mockedContext);
@@ -170,13 +164,13 @@ class GoogleSheetsUtilsTest {
             .thenReturn(true);
         when(mockedParameters.getRequiredString(SPREADSHEET_ID))
             .thenReturn("spreadsheetId");
-        when(mockedParameters.getRequiredInteger(SHEET_ID))
-            .thenReturn(123);
+        when(mockedParameters.getRequiredString(SHEET_NAME))
+            .thenReturn("sheetName");
 
         try (MockedStatic<GoogleSheetsRowUtils> sheetsRowUtilsMockedStatic = mockStatic(GoogleSheetsRowUtils.class)) {
             sheetsRowUtilsMockedStatic
                 .when(() -> GoogleSheetsRowUtils.getRow(
-                    any(Sheets.class), spreadsheetIdArgumentCaptor.capture(), sheetIdArgumentCaptor.capture(),
+                    any(Sheets.class), spreadsheetIdArgumentCaptor.capture(), sheetNameArgumentCaptor.capture(),
                     rowNumberArgumentCaptor.capture()))
                 .thenReturn(mockedFirstRow);
 
@@ -195,7 +189,7 @@ class GoogleSheetsUtilsTest {
 
             assertEquals(expected, result);
             assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals(123, sheetIdArgumentCaptor.getValue());
+            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
             assertEquals(1, rowNumberArgumentCaptor.getValue());
         }
     }
@@ -254,6 +248,42 @@ class GoogleSheetsUtilsTest {
 
             assertEquals("Sheet 2", option.getLabel());
             assertEquals("98765432", option.getValue());
+        }
+    }
+
+    @Test
+    void testGetSheetNameOptions() throws IOException {
+        List<Sheet> sheetsList = getSheetList();
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getSheets(mockedParameters))
+                .thenReturn(mockedSheets);
+
+            when(mockedSheets.spreadsheets())
+                .thenReturn(mockedSpreadsheets);
+            when(mockedSpreadsheets.get(spreadsheetIdArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(mockedSpreadsheet);
+            when(mockedSpreadsheet.getSheets())
+                .thenReturn(sheetsList);
+
+            List<Option<String>> sheetNameOptions = GoogleSheetsUtils.getSheetNameOptions(
+                mockedParameters, mockedParameters, anyString(), mockedContext);
+
+            assertNotNull(sheetNameOptions);
+            assertEquals(2, sheetNameOptions.size());
+
+            Option<String> sheetNameOptionsFirst = sheetNameOptions.getFirst();
+
+            assertEquals("Sheet 1", sheetNameOptionsFirst.getLabel());
+            assertEquals("Sheet 1", sheetNameOptionsFirst.getValue());
+
+            Option<String> option = sheetNameOptions.get(1);
+
+            assertEquals("Sheet 2", option.getLabel());
+            assertEquals("Sheet 2", option.getValue());
         }
     }
 

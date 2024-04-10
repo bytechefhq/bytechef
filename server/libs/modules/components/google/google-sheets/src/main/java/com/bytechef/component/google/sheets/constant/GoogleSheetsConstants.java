@@ -45,6 +45,7 @@ public class GoogleSheetsConstants {
     public static final String ROW = "row";
     public static final String ROWS = "rows";
     public static final String SHEET_ID = "sheetId";
+    public static final String SHEET_NAME = "sheetName";
     public static final String SPREADSHEET_ID = "spreadsheetId";
     public static final String UPDATE_ROW = "updateRow";
     public static final String VALUES = "values";
@@ -72,6 +73,12 @@ public class GoogleSheetsConstants {
         .label("Sheet")
         .description("The name of the sheet")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetIdOptions)
+        .required(true);
+
+    public static final ModifiableStringProperty SHEET_NAME_PROPERTY = string(SHEET_NAME)
+        .label("Sheet")
+        .description("The name of the sheet")
+        .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty ROW_PROPERTY = dynamicProperties(ROW)

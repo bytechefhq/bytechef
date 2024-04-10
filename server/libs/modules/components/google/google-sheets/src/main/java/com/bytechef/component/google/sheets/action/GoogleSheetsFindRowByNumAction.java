@@ -26,8 +26,8 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils.getRow;
@@ -53,7 +53,7 @@ public class GoogleSheetsFindRowByNumAction {
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
-            SHEET_ID_PROPERTY,
+            SHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             integer(ROW_NUMBER)
                 .label("Row number")
@@ -75,7 +75,7 @@ public class GoogleSheetsFindRowByNumAction {
         List<Object> row = getRow(
             sheets,
             inputParameters.getRequiredString(SPREADSHEET_ID),
-            inputParameters.getRequiredInteger(SHEET_ID),
+            inputParameters.getRequiredString(SHEET_NAME),
             inputParameters.getRequiredInteger(ROW_NUMBER));
 
         return getMapOfValuesForRow(inputParameters, sheets, row);
