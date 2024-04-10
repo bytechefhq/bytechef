@@ -49,7 +49,7 @@ org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processo
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
-org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.5.1"
+org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.5.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
 software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.25.20"
 
