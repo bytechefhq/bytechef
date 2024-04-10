@@ -81,13 +81,16 @@ export const Connections = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        <ConnectionDialog
-                            connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                            connectionsQueryKey={ConnectionKeys.connections}
-                            triggerNode={<Button>New Connection</Button>}
-                            useCreateConnectionMutation={useCreateConnectionMutation}
-                            useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                        />
+                        connections &&
+                        connections.length > 0 && (
+                            <ConnectionDialog
+                                connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                connectionsQueryKey={ConnectionKeys.connections}
+                                triggerNode={<Button>New Connection</Button>}
+                                useCreateConnectionMutation={useCreateConnectionMutation}
+                                useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                            />
+                        )
                     }
                     title={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${pageTitle || 'All'}`}
                 />

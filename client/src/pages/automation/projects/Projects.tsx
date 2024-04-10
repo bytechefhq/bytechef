@@ -63,17 +63,20 @@ const Projects = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        <ProjectDialog
-                            onClose={(project) => {
-                                if (project) {
-                                    navigate(
-                                        `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
-                                    );
-                                }
-                            }}
-                            project={undefined}
-                            triggerNode={<Button>New Project</Button>}
-                        />
+                        projects &&
+                        projects.length > 0 && (
+                            <ProjectDialog
+                                onClose={(project) => {
+                                    if (project) {
+                                        navigate(
+                                            `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
+                                        );
+                                    }
+                                }}
+                                project={undefined}
+                                triggerNode={<Button>New Project</Button>}
+                            />
+                        )
                     }
                     title={`${searchParams.get('tagId') ? 'Tags' : 'Categories'}: ${pageTitle || 'All'}`}
                 />
