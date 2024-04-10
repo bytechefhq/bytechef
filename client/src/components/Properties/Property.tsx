@@ -669,6 +669,7 @@ const Property = ({
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
+                                required={required}
                                 value={selectValue}
                             />
                         )}
@@ -684,6 +685,7 @@ const Property = ({
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
+                                required={required}
                                 value={selectValue}
                             />
                         )}
