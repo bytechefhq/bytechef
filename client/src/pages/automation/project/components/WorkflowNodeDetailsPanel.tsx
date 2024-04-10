@@ -393,145 +393,148 @@ const WorkflowNodeDetailsPanel = ({
         refetchWorkflowNodeOutput();
     }, [currentActionName, refetchWorkflowNodeOutput]);
 
+    if (!workflowNodeDetailsPanelOpen) {
+        return <></>;
+    }
+
     return (
-        <>
-            {workflowNodeDetailsPanelOpen && (
-                <div className="absolute inset-y-4 right-4 z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg">
-                    {currentComponentDefinition ? (
-                        <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
-                            <header className="flex items-center p-4 text-lg font-medium">
-                                {currentNode.label}
+        <div
+            className="absolute inset-y-4 right-4 z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
+            key={currentNode.name}
+        >
+            {currentComponentDefinition ? (
+                <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
+                    <header className="flex items-center p-4 text-lg font-medium">
+                        {currentNode.label}
 
-                                <span className="mx-2 text-sm text-gray-500">({currentNode.name})</span>
+                        <span className="mx-2 text-sm text-gray-500">({currentNode.name})</span>
 
-                                {currentComponentDefinition?.description && (
-                                    <Tooltip delayDuration={500}>
-                                        <TooltipTrigger>
-                                            <InfoCircledIcon className="size-4" />
-                                        </TooltipTrigger>
+                        {currentComponentDefinition.description && (
+                            <Tooltip delayDuration={500}>
+                                <TooltipTrigger>
+                                    <InfoCircledIcon className="size-4" />
+                                </TooltipTrigger>
 
-                                        <TooltipContent className="max-w-md" side="bottom">
-                                            {currentComponentDefinition?.description}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                )}
+                                <TooltipContent className="max-w-md" side="bottom">
+                                    {currentComponentDefinition.description}
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
 
-                                <button
-                                    aria-label="Close the node details dialog"
-                                    className="ml-auto pr-0"
-                                    onClick={() => setWorkflowNodeDetailsPanelOpen(false)}
-                                >
-                                    <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                                </button>
-                            </header>
+                        <button
+                            aria-label="Close the node details dialog"
+                            className="ml-auto pr-0"
+                            onClick={() => setWorkflowNodeDetailsPanelOpen(false)}
+                        >
+                            <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                        </button>
+                    </header>
 
-                            <main className="flex h-full flex-col">
-                                {!!currentComponentDefinition?.actions?.length && (
-                                    <CurrentActionSelect
-                                        actions={currentComponentDefinition.actions}
-                                        description={currentActionDefinition?.description}
-                                        handleValueChange={handleActionSelectChange}
-                                        value={currentActionName}
+                    <main className="flex h-full flex-col">
+                        {!!currentComponentDefinition.actions?.length && (
+                            <CurrentActionSelect
+                                actions={currentComponentDefinition.actions}
+                                description={currentActionDefinition?.description}
+                                handleValueChange={handleActionSelectChange}
+                                value={currentActionName}
+                            />
+                        )}
+
+                        {currentActionFetched && nodeTabs.length > 1 && (
+                            <div className="flex justify-center">
+                                {nodeTabs.map((tab) => (
+                                    <Button
+                                        className={twMerge(
+                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                            activeTab === tab?.name &&
+                                                'border-blue-500 text-blue-500 hover:text-blue-500'
+                                        )}
+                                        key={tab.name}
+                                        name={tab.name}
+                                        onClick={() => setActiveTab(tab.name)}
+                                        variant="ghost"
+                                    >
+                                        {tab.label}
+                                    </Button>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="relative h-full overflow-y-scroll">
+                            <div className="absolute left-0 top-0 size-full">
+                                {activeTab === 'description' && (
+                                    <DescriptionTab
+                                        componentDefinition={currentComponentDefinition}
+                                        currentComponent={currentComponent}
+                                        key={`${currentNode.name}_description`}
+                                        otherComponents={otherComponents}
                                     />
                                 )}
 
-                                {currentActionFetched && nodeTabs.length > 1 && (
-                                    <div className="flex justify-center">
-                                        {nodeTabs.map((tab) => (
-                                            <Button
-                                                className={twMerge(
-                                                    'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                    activeTab === tab?.name &&
-                                                        'border-blue-500 text-blue-500 hover:text-blue-500'
-                                                )}
-                                                key={tab.name}
-                                                name={tab.name}
-                                                onClick={() => setActiveTab(tab.name)}
-                                                variant="ghost"
-                                            >
-                                                {tab.label}
-                                            </Button>
-                                        ))}
-                                    </div>
+                                {activeTab === 'source' && <SourceTab />}
+
+                                {activeTab === 'destination' && <DestinationTab />}
+
+                                {activeTab === 'connection' && taskConnections.length > 0 && (
+                                    <ConnectionTab
+                                        componentDefinition={currentComponentDefinition}
+                                        key={`${currentNode.name}_connection`}
+                                        taskConnections={taskConnections}
+                                        workflowId={workflow.id!}
+                                        workflowNodeName={currentNode.name}
+                                    />
                                 )}
 
-                                <div className="relative h-full overflow-y-scroll">
-                                    <div className="absolute left-0 top-0 size-full">
-                                        {activeTab === 'description' && (
-                                            <DescriptionTab
-                                                componentDefinition={currentComponentDefinition}
-                                                currentComponent={currentComponent}
-                                                key={`${currentNode.name}_description`}
-                                                otherComponents={otherComponents}
-                                            />
-                                        )}
+                                {activeTab === 'properties' &&
+                                    (currentActionProperties?.length ? (
+                                        <Properties
+                                            actionName={currentActionName}
+                                            currentComponent={currentComponent}
+                                            currentComponentDefinition={currentComponentDefinition}
+                                            customClassName="p-4"
+                                            dataPills={dataPills}
+                                            key={`${currentNode.name}_${currentActionName}_properties`}
+                                            properties={currentActionProperties}
+                                            updateWorkflowMutation={updateWorkflowMutation}
+                                        />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center text-xl">
+                                            Loading...
+                                        </div>
+                                    ))}
 
-                                        {activeTab === 'source' && <SourceTab />}
-
-                                        {activeTab === 'destination' && <DestinationTab />}
-
-                                        {activeTab === 'connection' && taskConnections.length > 0 && (
-                                            <ConnectionTab
-                                                componentDefinition={currentComponentDefinition}
-                                                key={`${currentNode.name}_connection`}
-                                                taskConnections={taskConnections}
-                                                workflowId={workflow.id!}
-                                                workflowNodeName={currentNode.name}
-                                            />
-                                        )}
-
-                                        {activeTab === 'properties' &&
-                                            (currentActionProperties?.length ? (
-                                                <Properties
-                                                    actionName={currentActionName}
-                                                    currentComponent={currentComponent}
-                                                    currentComponentDefinition={currentComponentDefinition}
-                                                    customClassName="p-4"
-                                                    dataPills={dataPills}
-                                                    key={`${currentNode.name}_${currentActionName}_properties`}
-                                                    properties={currentActionProperties}
-                                                    updateWorkflowMutation={updateWorkflowMutation}
-                                                />
-                                            ) : (
-                                                <div className="flex h-full items-center justify-center text-xl">
-                                                    Loading...
-                                                </div>
-                                            ))}
-
-                                        {activeTab === 'output' && workflowNodeOutput && (
-                                            <OutputTab
-                                                currentNode={currentNode}
-                                                key={`${currentNode.name}_output`}
-                                                outputDefined={currentActionDefinition?.outputDefined ?? false}
-                                                outputSchema={workflowNodeOutput.outputSchema}
-                                                sampleOutput={workflowNodeOutput.sampleOutput!}
-                                                workflowId={workflow.id!}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            </main>
-
-                            <footer className="z-50 mt-auto flex bg-white px-4 py-2">
-                                <Select defaultValue={currentComponentDefinition.version.toString()}>
-                                    <SelectTrigger className="w-auto border-none shadow-none">
-                                        <SelectValue placeholder="Choose version..." />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                        <SelectItem value="1">v1</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </footer>
+                                {activeTab === 'output' && workflowNodeOutput && (
+                                    <OutputTab
+                                        currentNode={currentNode}
+                                        key={`${currentNode.name}_output`}
+                                        outputDefined={currentActionDefinition?.outputDefined ?? false}
+                                        outputSchema={workflowNodeOutput.outputSchema}
+                                        sampleOutput={workflowNodeOutput.sampleOutput!}
+                                        workflowId={workflow.id!}
+                                    />
+                                )}
+                            </div>
                         </div>
-                    ) : (
-                        <div className="flex w-full justify-center p-4">
-                            <span className="text-gray-500">Something went wrong 👾</span>
-                        </div>
-                    )}
+                    </main>
+
+                    <footer className="z-50 mt-auto flex bg-white px-4 py-2">
+                        <Select defaultValue={currentComponentDefinition.version.toString()}>
+                            <SelectTrigger className="w-auto border-none shadow-none">
+                                <SelectValue placeholder="Choose version..." />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="1">v1</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </footer>
+                </div>
+            ) : (
+                <div className="flex w-full justify-center p-4">
+                    <span className="text-gray-500">Something went wrong 👾</span>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 
