@@ -28,15 +28,15 @@ import {useState} from 'react';
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
 const ConnectionLabel = ({
-    workflowConnection,
-    workflowConnectionsCount,
+    taskConnection,
+    taskConnectionsCount,
 }: {
-    workflowConnection: WorkflowConnectionModel;
-    workflowConnectionsCount: number;
+    taskConnection: WorkflowConnectionModel;
+    taskConnectionsCount: number;
 }) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: taskConnection.componentName,
+        componentVersion: taskConnection.componentVersion,
     });
 
     return (
@@ -45,24 +45,22 @@ const ConnectionLabel = ({
                 <Label>
                     {`${componentDefinition.title}`}
 
-                    {workflowConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
+                    {taskConnection.required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                 </Label>
             )}
 
-            {workflowConnectionsCount > 1 && (
-                <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
-            )}
+            {taskConnectionsCount > 1 && <Label className="text-sm text-muted-foreground">{taskConnection.key}</Label>}
         </div>
     );
 };
 
 const ConnectionSelect = ({
-    workflowConnection,
+    taskConnection,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: {
-    workflowConnection: WorkflowConnectionModel;
+    taskConnection: WorkflowConnectionModel;
     workflowId: string;
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
@@ -76,14 +74,13 @@ const ConnectionSelect = ({
     }
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: taskConnection.componentName,
+        componentVersion: taskConnection.componentVersion,
     });
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: connections} = useGetConnectionsQuery(
         {
-            componentName: componentDefinition?.name!,
+            componentName: componentDefinition?.name,
             connectionVersion: componentDefinition?.connection?.version,
         },
         !!componentDefinition
@@ -113,8 +110,8 @@ const ConnectionSelect = ({
     return (
         <>
             <Select
-                onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
-                required={workflowConnection.required}
+                onValueChange={(value) => handleValueChange(+value, taskConnection.key)}
+                required={taskConnection.required}
                 value={connectionId ? connectionId.toString() : undefined}
             >
                 <div className="flex space-x-2">
@@ -164,12 +161,12 @@ const ConnectionSelect = ({
 
 const ConnectionTab = ({
     componentDefinition,
-    workflowConnections,
+    taskConnections,
     workflowId,
     workflowNodeName,
 }: {
     componentDefinition: ComponentDefinitionModel;
-    workflowConnections: WorkflowConnectionModel[];
+    taskConnections: WorkflowConnectionModel[];
     workflowNodeName: string;
     workflowId: string;
 }) => {
@@ -184,16 +181,16 @@ const ConnectionTab = ({
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
-            {workflowConnections?.length ? (
-                workflowConnections.map((workflowConnection) => (
-                    <fieldset className="space-y-2" key={workflowConnection.key}>
+            {taskConnections?.length ? (
+                taskConnections.map((taskConnection) => (
+                    <fieldset className="space-y-2" key={taskConnection.key}>
                         <ConnectionLabel
-                            workflowConnection={workflowConnection}
-                            workflowConnectionsCount={workflowConnections.length}
+                            taskConnection={taskConnection}
+                            taskConnectionsCount={taskConnections.length}
                         />
 
                         <ConnectionSelect
-                            workflowConnection={workflowConnection}
+                            taskConnection={taskConnection}
                             workflowId={workflowId}
                             workflowNodeName={workflowNodeName}
                             workflowTestConfigurationConnection={
@@ -201,7 +198,7 @@ const ConnectionTab = ({
                                     ? workflowTestConfigurationConnections.filter(
                                           (workflowTestConfigurationConnection) =>
                                               workflowTestConfigurationConnection.workflowConnectionKey ===
-                                              workflowConnection.key
+                                              taskConnection.key
                                       )[0]
                                     : undefined
                             }
@@ -243,7 +240,7 @@ const ConnectionTab = ({
 
             {showNewConnectionDialog && (
                 <ConnectionDialog
-                    componentDefinition={workflowConnections.length === 1 ? componentDefinition : undefined}
+                    componentDefinition={taskConnections.length === 1 ? componentDefinition : undefined}
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowNewConnectionDialog(false)}
