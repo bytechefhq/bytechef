@@ -45,6 +45,7 @@ import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -213,6 +214,30 @@ class GoogleSheetsUtilsTest {
         expected.put("column_C", "value3");
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetRowValuesWhereFirstRowHeaders() {
+        Map<String, Object> rowMap = Map.of("name", "name", "email", "email");
+
+        when(mockedParameters.getRequired(VALUES))
+            .thenReturn(rowMap);
+
+        List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
+
+        assertEquals(new ArrayList<>(rowMap.values()), rowValues);
+    }
+
+    @Test
+    void testGetRowValuesWhereFirstRowNotHeaders() {
+        List rowList = List.of("name", 1233, false);
+
+        when(mockedParameters.getRequiredList(VALUES, Object.class))
+            .thenReturn(rowList);
+
+        List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
+
+        assertEquals(rowList, rowValues);
     }
 
     @Test

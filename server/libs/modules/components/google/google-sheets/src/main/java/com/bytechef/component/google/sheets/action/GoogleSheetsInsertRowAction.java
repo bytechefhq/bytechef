@@ -30,10 +30,10 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_OPTION;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRowValues;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -81,10 +81,10 @@ public class GoogleSheetsInsertRowAction {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        List<Object> values = inputParameters.getRequiredList(VALUES, Object.class);
+        List<Object> row = getRowValues(inputParameters);
 
         ValueRange valueRange = new ValueRange()
-            .setValues(List.of(values))
+            .setValues(List.of(row))
             .setMajorDimension("ROWS");
 
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
@@ -98,6 +98,7 @@ public class GoogleSheetsInsertRowAction {
             .setValueInputOption(inputParameters.getRequiredString(VALUE_INPUT_OPTION))
             .execute();
 
-        return getMapOfValuesForRow(inputParameters, sheets, values);
+        return getMapOfValuesForRow(inputParameters, sheets, row);
     }
+
 }

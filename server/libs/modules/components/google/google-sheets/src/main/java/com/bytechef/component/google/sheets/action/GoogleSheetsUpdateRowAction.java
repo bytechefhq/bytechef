@@ -31,9 +31,9 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_ROW;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRowValues;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -42,8 +42,6 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,16 +79,7 @@ public class GoogleSheetsUpdateRowAction {
         String range = createRange(
             inputParameters.getRequiredString(SHEET_NAME), inputParameters.getRequiredInteger(ROW_NUMBER));
 
-        List<Object> row;
-
-        Object rowMap = inputParameters.getRequired(VALUES);
-        Class<?> valuesClass = rowMap.getClass();
-
-        if (valuesClass.equals(LinkedHashMap.class)) {
-            row = new ArrayList<>(((LinkedHashMap<String, Object>) rowMap).values());
-        } else {
-            row = inputParameters.getRequiredList(VALUES, Object.class);
-        }
+        List<Object> row = getRowValues(inputParameters);
 
         ValueRange valueRange = new ValueRange()
             .setValues(List.of(row))

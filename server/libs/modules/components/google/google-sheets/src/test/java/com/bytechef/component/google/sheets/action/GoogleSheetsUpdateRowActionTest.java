@@ -17,7 +17,6 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,8 +28,6 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -52,22 +49,21 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
-    void testPerformWhereFirstRowNotHeader() throws IOException {
-        List<Object> values = List.of("abc", "sheetName", false);
+    void testPerform() throws IOException {
+        List<Object> row = List.of("abc", "sheetName", false);
 
         when(mockedParameters.getRequiredInteger(ROW_NUMBER))
             .thenReturn(2);
-        when(mockedParameters.getRequired(VALUES))
-            .thenReturn(List.of());
-        when(mockedParameters.getRequiredList(VALUES, Object.class))
-            .thenReturn(values);
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
+            googleSheetsUtilsMockedStatic
+                .when(() -> GoogleSheetsUtils.getRowValues(mockedParameters))
+                .thenReturn(row);
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
+                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, row))
                 .thenReturn(mockedMap);
 
             when(mockedSheets.spreadsheets())
@@ -95,60 +91,8 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
 
             List<List<Object>> valueRangeValues = valueRange.getValues();
 
-            assertEquals(values, valueRangeValues.getFirst());
+            assertEquals(row, valueRangeValues.getFirst());
         }
     }
 
-    @Test
-    void testPerformWhereFirstRowIsHeader() throws IOException {
-        LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
-
-        linkedHashMap.put("header1", "abc");
-        linkedHashMap.put("header2", 123);
-        linkedHashMap.put("header3", false);
-
-        ArrayList<Object> values = new ArrayList<>(linkedHashMap.values());
-
-        when(mockedParameters.getRequiredInteger(ROW_NUMBER))
-            .thenReturn(2);
-        when(mockedParameters.getRequired(VALUES))
-            .thenReturn(linkedHashMap);
-
-        try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
-                .thenReturn("range");
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
-                .thenReturn(mockedMap);
-
-            when(mockedSheets.spreadsheets())
-                .thenReturn(mockedSpreadsheets);
-            when(mockedSpreadsheets.values())
-                .thenReturn(mockedValues);
-            when(
-                mockedValues.update(
-                    spreadsheetIdArgumentCaptor.capture(), anyString(), valueRangeArgumentCaptor.capture()))
-                        .thenReturn(mockedUpdate);
-            when(mockedUpdate.setValueInputOption(valueInputOptionArgumentCaptor.capture()))
-                .thenReturn(mockedUpdate);
-
-            Map<String, Object> result =
-                GoogleSheetsUpdateRowAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-            assertEquals(result, mockedMap);
-            assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
-            assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
-
-            ValueRange valueRange = valueRangeArgumentCaptor.getValue();
-
-            assertEquals("ROWS", valueRange.getMajorDimension());
-
-            List<List<Object>> valueRangeValues = valueRange.getValues();
-
-            assertEquals(values, valueRangeValues.getFirst());
-
-        }
-    }
 }
