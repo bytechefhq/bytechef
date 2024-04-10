@@ -26,8 +26,8 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INSERT_ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
@@ -56,7 +56,7 @@ public class GoogleSheetsInsertRowAction {
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
-            SHEET_ID_PROPERTY,
+            SHEET_NAME_PROPERTY,
             string(VALUE_INPUT_OPTION)
                 .label("Value input option")
                 .description("How the input data should be interpreted.")
@@ -89,7 +89,7 @@ public class GoogleSheetsInsertRowAction {
 
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
 
-        String range = createRange(inputParameters.getRequiredInteger(SHEET_ID), null);
+        String range = createRange(inputParameters.getRequiredString(SHEET_NAME), null);
 
         sheets
             .spreadsheets()

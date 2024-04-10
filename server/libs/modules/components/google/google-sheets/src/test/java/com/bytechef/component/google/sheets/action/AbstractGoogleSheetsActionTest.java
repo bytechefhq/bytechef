@@ -18,6 +18,7 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -53,6 +54,8 @@ public abstract class AbstractGoogleSheetsActionTest {
             .thenReturn("spreadsheetId");
         when(mockedParameters.getRequiredInteger(SHEET_ID))
             .thenReturn(123);
+        when(mockedParameters.getRequiredString(SHEET_NAME))
+            .thenReturn("sheetName");
 
         googleServicesMockedStatic
             .when(() -> GoogleServices.getSheets(mockedParameters))

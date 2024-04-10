@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 
@@ -43,7 +43,6 @@ import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,14 +54,10 @@ import java.util.stream.IntStream;
  */
 public class GoogleSheetsUtils {
 
-    static final HashMap<Integer, String> sheetIdMap = new HashMap<>();
-
     private GoogleSheetsUtils() {
     }
 
-    public static String createRange(Integer sheetId, Integer rowNumber) {
-        String sheetName = sheetIdMap.get(sheetId);
-
+    public static String createRange(String sheetName, Integer rowNumber) {
         if (rowNumber == null) {
             return sheetName;
         }
@@ -78,7 +73,7 @@ public class GoogleSheetsUtils {
         if (isFirstRowHeader) {
             List<Object> firstRow = GoogleSheetsRowUtils.getRow(
                 GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
-                inputParameters.getRequiredInteger(SHEET_ID), 1);
+                inputParameters.getRequiredString(SHEET_NAME), 1);
 
             List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
 
@@ -109,7 +104,8 @@ public class GoogleSheetsUtils {
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
             List<Object> firstRow = GoogleSheetsRowUtils.getRow(
-                sheets, inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredInteger(SHEET_ID),
+                sheets, inputParameters.getRequiredString(SPREADSHEET_ID),
+                inputParameters.getRequiredString(SHEET_NAME),
                 1);
 
             valuesMap = IntStream
@@ -143,9 +139,31 @@ public class GoogleSheetsUtils {
         for (Sheet sheet : sheetsList) {
             SheetProperties sheetProperties = sheet.getProperties();
 
-            sheetIdMap.put(sheetProperties.getSheetId(), sheetProperties.getTitle());
-
             options.add(option(sheetProperties.getTitle(), String.valueOf(sheetProperties.getSheetId())));
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getSheetNameOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws IOException {
+
+        List<Option<String>> options = new ArrayList<>();
+        Sheets sheets = GoogleServices.getSheets(connectionParameters);
+
+        List<Sheet> sheetsList = sheets
+            .spreadsheets()
+            .get(inputParameters.getRequiredString(SPREADSHEET_ID))
+            .execute()
+            .getSheets();
+
+        for (Sheet sheet : sheetsList) {
+            SheetProperties sheetProperties = sheet.getProperties();
+
+            String sheetTitle = sheetProperties.getTitle();
+
+            options.add(option(sheetTitle, sheetTitle));
         }
 
         return options;

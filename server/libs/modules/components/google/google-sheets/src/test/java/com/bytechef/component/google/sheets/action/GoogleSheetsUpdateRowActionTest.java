@@ -47,13 +47,13 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Values.Update mockedUpdate = mock(Sheets.Spreadsheets.Values.Update.class);
     private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
-    protected ArgumentCaptor<Integer> sheetIdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    protected ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
     void testPerformWhereFirstRowNotHeader() throws IOException {
-        List<Object> values = List.of("abc", 123, false);
+        List<Object> values = List.of("abc", "sheetName", false);
 
         when(mockedParameters.getRequiredInteger(ROW_NUMBER))
             .thenReturn(2);
@@ -64,7 +64,7 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetIdArgumentCaptor.capture(), any()))
+                .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
@@ -86,7 +86,7 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
 
             assertEquals(result, mockedMap);
             assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals(123, sheetIdArgumentCaptor.getValue());
+            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
             assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
 
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();
@@ -116,7 +116,7 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetIdArgumentCaptor.capture(), any()))
+                .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
@@ -138,7 +138,7 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
 
             assertEquals(result, mockedMap);
             assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals(123, sheetIdArgumentCaptor.getValue());
+            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
             assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
 
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();

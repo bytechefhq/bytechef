@@ -26,8 +26,8 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_ROW;
@@ -58,7 +58,7 @@ public class GoogleSheetsUpdateRowAction {
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
-            SHEET_ID_PROPERTY,
+            SHEET_NAME_PROPERTY,
             integer(ROW_NUMBER)
                 .label("Row number")
                 .description("The row number to update")
@@ -79,7 +79,7 @@ public class GoogleSheetsUpdateRowAction {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
         String range = createRange(
-            inputParameters.getRequiredInteger(SHEET_ID), inputParameters.getRequiredInteger(ROW_NUMBER));
+            inputParameters.getRequiredString(SHEET_NAME), inputParameters.getRequiredInteger(ROW_NUMBER));
 
         List<Object> row;
 

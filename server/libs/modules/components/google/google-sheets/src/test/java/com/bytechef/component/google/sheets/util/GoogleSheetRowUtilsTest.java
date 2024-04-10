@@ -49,13 +49,13 @@ class GoogleSheetRowUtilsTest {
     @Test
     void testGetRow() throws IOException {
         String spreadSheetId = "spreadsheetId";
-        Integer sheetId = 1;
+        String sheetName = "sheetName";
         Integer rowNumber = 1;
         String range = "range";
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetId, rowNumber))
+                .when(() -> GoogleSheetsUtils.createRange(sheetName, rowNumber))
                 .thenReturn(range);
 
             when(mockedSheets.spreadsheets())
@@ -80,7 +80,7 @@ class GoogleSheetRowUtilsTest {
             when(mockedValueRange.getValues())
                 .thenReturn(List.of(List.of(values)));
 
-            List<Object> result = GoogleSheetsRowUtils.getRow(mockedSheets, spreadSheetId, sheetId, rowNumber);
+            List<Object> result = GoogleSheetsRowUtils.getRow(mockedSheets, spreadSheetId, sheetName, rowNumber);
 
             assertEquals(List.of(values), result);
             assertEquals("UNFORMATTED_VALUE", valueRenderOptionArgumentCaptor.getValue());
