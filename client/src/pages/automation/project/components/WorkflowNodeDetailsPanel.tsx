@@ -222,7 +222,7 @@ const WorkflowNodeDetailsPanel = ({
         hasOutputData && activeTab === 'output'
     );
 
-    const workflowConnections: WorkflowConnectionModel[] = currentWorkflowTask?.connections || [];
+    const taskConnections: WorkflowConnectionModel[] = currentWorkflowTask?.connections || [];
 
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
@@ -270,7 +270,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
-            return workflowConnections.length > 0;
+            return taskConnections.length > 0;
         }
 
         if (name === 'source' || name === 'destination') {
@@ -341,7 +341,7 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
 
-        if (activeTab === 'connection' && workflowConnections.length === 0) {
+        if (activeTab === 'connection' && taskConnections.length === 0) {
             setActiveTab('description');
         }
 
@@ -470,11 +470,11 @@ const WorkflowNodeDetailsPanel = ({
 
                                         {activeTab === 'destination' && <DestinationTab />}
 
-                                        {activeTab === 'connection' && workflowConnections.length > 0 && (
+                                        {activeTab === 'connection' && taskConnections.length > 0 && (
                                             <ConnectionTab
                                                 componentDefinition={currentComponentDefinition}
                                                 key={`${currentNode.name}_connection`}
-                                                workflowConnections={workflowConnections}
+                                                taskConnections={taskConnections}
                                                 workflowId={workflow.id!}
                                                 workflowNodeName={currentNode.name}
                                             />
