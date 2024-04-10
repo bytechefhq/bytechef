@@ -16,7 +16,6 @@
 
 package com.bytechef.component.google.sheets.action;
 
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE_INPUT_OPTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,10 +49,8 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
 
     @Test
     void perform() throws IOException {
-        List<Object> values = List.of("abc", "sheetName", false);
+        List<Object> row = List.of("abc", "sheetName", false);
 
-        when(mockedParameters.getRequiredList(VALUES, Object.class))
-            .thenReturn(values);
         when(mockedParameters.getRequiredString(VALUE_INPUT_OPTION))
             .thenReturn("USER_ENTERED");
 
@@ -69,10 +66,13 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
             googleSheetsUtilsMockedStatic
+                .when(() -> GoogleSheetsUtils.getRowValues(mockedParameters))
+                .thenReturn(row);
+            googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, values))
+                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, row))
                 .thenReturn(mockedMap);
 
             Map<String, Object> result = GoogleSheetsInsertRowAction.perform(
@@ -90,7 +90,7 @@ class GoogleSheetsInsertRowActionTest extends AbstractGoogleSheetsActionTest {
 
             List<List<Object>> valueRangeValues = valueRange.getValues();
 
-            assertEquals(values, valueRangeValues.getFirst());
+            assertEquals(row, valueRangeValues.getFirst());
         }
     }
 }

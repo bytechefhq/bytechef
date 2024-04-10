@@ -123,6 +123,19 @@ public class GoogleSheetsUtils {
         return valuesMap;
     }
 
+    public static List<Object> getRowValues(Parameters inputParameters) {
+        List<Object> row;
+
+        Object rowMap = inputParameters.getRequired(VALUES);
+
+        if (rowMap instanceof Map<?, ?> map) {
+            row = new ArrayList<>((map).values());
+        } else {
+            row = inputParameters.getRequiredList(VALUES, Object.class);
+        }
+        return row;
+    }
+
     public static List<Option<String>> getSheetIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
