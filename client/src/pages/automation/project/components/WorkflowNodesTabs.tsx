@@ -53,7 +53,7 @@ const WorkflowNodesTabs = ({
                 )}
             </TabsList>
 
-            <div className="relative flex flex-1">
+            <div className="relative mb-4 flex flex-1">
                 <div
                     className={twMerge('overflow-y-auto flex absolute w-full', popover && 'h-80', !popover && 'h-full')}
                 >

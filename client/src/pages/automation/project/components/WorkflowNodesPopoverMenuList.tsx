@@ -1,4 +1,3 @@
-import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
@@ -9,30 +8,34 @@ import {ClickedItemType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {memo, useEffect, useState} from 'react';
+import {memo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesListProps {
+    actionComponentDefinitions: Array<ComponentDefinitionBasicModel>;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     id: string;
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
+    triggerComponentDefinitions: Array<ComponentDefinitionBasicModel>;
 }
 
 const WorkflowNodesPopoverMenuList = memo(
     ({
+        actionComponentDefinitions,
         edge,
         hideActionComponents = false,
         hideTaskDispatchers = false,
         hideTriggerComponents = false,
         id,
+        taskDispatcherDefinitions,
+        triggerComponentDefinitions,
     }: WorkflowNodesListProps) => {
-        const [filter, setFilter] = useState('');
-
         const {projectId} = useWorkflowDataStore();
 
         const queryClient = useQueryClient();
@@ -47,19 +50,7 @@ const WorkflowNodesPopoverMenuList = memo(
             },
         });
 
-        const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-            Array<ComponentDefinitionBasicModel>
-        >([]);
-
-        const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
-            Array<TaskDispatcherDefinitionModel>
-        >([]);
-
-        const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-            Array<ComponentDefinitionBasicModel>
-        >([]);
-
-        const {componentDefinitions, setWorkflow, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
+        const {setWorkflow, workflow} = useWorkflowDataStore();
 
         const {componentNames} = workflow;
 
@@ -236,71 +227,19 @@ const WorkflowNodesPopoverMenuList = memo(
             }
         };
 
-        useEffect(() => {
-            if (filter) {
-                setFilter(filter.toLowerCase());
-            }
-        }, [filter]);
-
-        useEffect(() => {
-            if (taskDispatcherDefinitions) {
-                setFilteredTaskDispatcherDefinitions(
-                    taskDispatcherDefinitions.filter(
-                        ({name, title}) => name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter)
-                    )
-                );
-            }
-        }, [taskDispatcherDefinitions, filter, edge]);
-
-        useEffect(() => {
-            if (componentDefinitions) {
-                setFilteredActionComponentDefinitions(
-                    componentDefinitions.filter(
-                        ({actionsCount, name, title}) =>
-                            actionsCount &&
-                            (name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter))
-                    )
-                );
-
-                setFilteredTriggerComponentDefinitions(
-                    componentDefinitions.filter(
-                        ({name, title, triggersCount}) =>
-                            triggersCount &&
-                            (name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter))
-                    )
-                );
-            }
-        }, [componentDefinitions, filter, edge]);
-
         return (
-            <div className="nowheel">
-                {typeof componentDefinitions === 'undefined' ||
-                    (typeof taskDispatcherDefinitions === 'undefined' && (
-                        <div className="px-3 py-2 text-xs text-gray-500">Something went wrong.</div>
-                    ))}
-
-                <header className="border-b border-gray-200 p-3 text-center text-gray-600">
-                    <Input
-                        name="workflowNodeFilter"
-                        onChange={(event) => setFilter(event.target.value)}
-                        placeholder="Filter workflow nodes"
-                        value={filter}
-                    />
-                </header>
-
-                <main className="h-96 rounded-b-lg bg-gray-100">
-                    <WorkflowNodesTabs
-                        actionComponentDefinitions={filteredActionComponentDefinitions}
-                        hideActionComponents={hideActionComponents}
-                        hideTaskDispatchers={hideTaskDispatchers}
-                        hideTriggerComponents={hideTriggerComponents}
-                        onItemClick={handleItemClick}
-                        popover
-                        taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
-                        triggerComponentDefinitions={filteredTriggerComponentDefinitions}
-                    />
-                </main>
-            </div>
+            <main className="h-96 rounded-b-lg bg-gray-100">
+                <WorkflowNodesTabs
+                    actionComponentDefinitions={actionComponentDefinitions}
+                    hideActionComponents={hideActionComponents}
+                    hideTaskDispatchers={hideTaskDispatchers}
+                    hideTriggerComponents={hideTriggerComponents}
+                    onItemClick={handleItemClick}
+                    popover
+                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                    triggerComponentDefinitions={triggerComponentDefinitions}
+                />
+            </main>
         );
     }
 );
