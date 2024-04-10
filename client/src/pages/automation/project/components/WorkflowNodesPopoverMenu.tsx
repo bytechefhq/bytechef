@@ -36,16 +36,12 @@ const WorkflowNodesPopoverMenu = ({
     const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
 
     useEffect(() => {
-        if (filter) {
-            setFilter(filter.toLowerCase());
-        }
-    }, [filter]);
-
-    useEffect(() => {
         if (taskDispatcherDefinitions) {
             setFilteredTaskDispatcherDefinitions(
                 taskDispatcherDefinitions.filter(
-                    ({name, title}) => name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter)
+                    ({name, title}) =>
+                        name?.toLowerCase().includes(filter.toLowerCase()) ||
+                        title?.toLowerCase().includes(filter.toLowerCase())
                 )
             );
         }
@@ -56,14 +52,18 @@ const WorkflowNodesPopoverMenu = ({
             setFilteredActionComponentDefinitions(
                 componentDefinitions.filter(
                     ({actionsCount, name, title}) =>
-                        actionsCount && (name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter))
+                        actionsCount &&
+                        (name?.toLowerCase().includes(filter.toLowerCase()) ||
+                            title?.toLowerCase().includes(filter.toLowerCase()))
                 )
             );
 
             setFilteredTriggerComponentDefinitions(
                 componentDefinitions.filter(
                     ({name, title, triggersCount}) =>
-                        triggersCount && (name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter))
+                        triggersCount &&
+                        (name?.toLowerCase().includes(filter.toLowerCase()) ||
+                            title?.toLowerCase().includes(filter.toLowerCase()))
                 )
             );
         }
