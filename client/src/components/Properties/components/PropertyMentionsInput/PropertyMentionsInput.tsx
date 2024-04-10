@@ -211,7 +211,7 @@ const PropertyMentionsInput = forwardRef(
             const dataPillValue = value.match(/data-value="([^"]+)"/)?.[1];
 
             if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
-                strippedValue = `\${${dataPillValue}}`;
+                strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
             } else {
                 strippedValue = value.replace(/<[^>]*>?/gm, '');
             }
