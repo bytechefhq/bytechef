@@ -43,7 +43,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
             enabled: projectInstance?.enabled || false,
             environment: projectInstance?.environment || EnvironmentModel.Development,
             name: projectInstance?.name || undefined,
-            projectId: projectInstance?.projectId || undefined,
+            projectId: projectInstance?.project?.id || undefined,
             projectInstanceWorkflows: [],
             projectVersion: projectInstance?.projectVersion || undefined,
             tags:
@@ -126,30 +126,34 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
         }, 300);
     }
 
-    function saveProjectInstance(projectInstance: ProjectInstanceModel) {
-        if (!projectInstance) {
+    function saveProjectInstance(formData: ProjectInstanceModel) {
+        if (!formData) {
             return;
         }
-
-        projectInstance = {
-            ...projectInstance,
-            projectInstanceWorkflows: projectInstance.projectInstanceWorkflows?.map((projectInstanceWorkflow) => {
-                return {
-                    ...projectInstanceWorkflow,
-                    connections: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.connections : [],
-                    inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
-                };
-            }),
-        };
 
         if (projectInstance?.id) {
             updateProjectInstanceMutation.mutate({
                 ...projectInstance,
-                ...projectInstance,
-                projectId: projectInstance?.project?.id || 0,
+                ...formData,
+                projectInstanceWorkflows: formData.projectInstanceWorkflows?.map((projectInstanceWorkflow) => {
+                    return {
+                        ...projectInstanceWorkflow,
+                        connections: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.connections : [],
+                        inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
+                    };
+                }),
             } as ProjectInstanceModel);
         } else {
-            createProjectInstanceMutation.mutate(projectInstance);
+            createProjectInstanceMutation.mutate({
+                ...formData,
+                projectInstanceWorkflows: formData.projectInstanceWorkflows?.map((projectInstanceWorkflow) => {
+                    return {
+                        ...projectInstanceWorkflow,
+                        connections: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.connections : [],
+                        inputs: projectInstanceWorkflow.enabled ? projectInstanceWorkflow.inputs : {},
+                    };
+                }),
+            });
         }
     }
 
