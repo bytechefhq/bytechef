@@ -67,6 +67,7 @@ public class ApiKeyApiController implements ApiKeyApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
         ApiKeyModel apiKeyModel = conversionService.convert(apiKeyService.getApiKey(id), ApiKeyModel.class);
 
