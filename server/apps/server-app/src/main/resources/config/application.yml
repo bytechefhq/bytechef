@@ -121,7 +121,6 @@ springdoc:
   swagger-ui:
     operationsSorter: method
     tags-sorter: alpha
-    enabled: false
 
 #####
 
