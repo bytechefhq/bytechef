@@ -3,4 +3,5 @@ pom.xml
 src/main/java/com/bytechef/automation/user/web/rest/ApiKeyApi.java
 src/main/java/com/bytechef/automation/user/web/rest/ApiUtil.java
 src/main/java/com/bytechef/automation/user/web/rest/model/ApiKeyModel.java
+src/main/java/com/bytechef/automation/user/web/rest/model/CreateApiKey200ResponseModel.java
 src/main/java/com/bytechef/automation/user/web/rest/model/EnvironmentModel.java

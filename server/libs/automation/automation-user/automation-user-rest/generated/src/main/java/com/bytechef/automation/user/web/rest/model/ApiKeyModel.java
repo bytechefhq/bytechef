@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiKey", description = "Contains generated key required for calling API.")
 @JsonTypeName("ApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T15:47:19.214593+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-11T10:44:37.666147+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class ApiKeyModel {
 
   private String createdBy;
@@ -226,11 +226,11 @@ public class ApiKeyModel {
   }
 
   /**
-   * The secret API key.
+   * The preview of secret API key.
    * @return secretKey
   */
   
-  @Schema(name = "secretKey", description = "The secret API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "secretKey", description = "The preview of secret API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("secretKey")
   public String getSecretKey() {
     return secretKey;

@@ -6,6 +6,7 @@
 package com.bytechef.automation.user.web.rest;
 
 import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
+import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-05T15:47:19.214593+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-11T10:44:37.666147+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "api-key", description = "The Automation API Key API")
 public interface ApiKeyApi {
@@ -46,7 +47,7 @@ public interface ApiKeyApi {
      * Create a new API key.
      *
      * @param apiKeyModel  (required)
-     * @return The API key object. (status code 200)
+     * @return The secret API key object. (status code 200)
      */
     @Operation(
         operationId = "createApiKey",
@@ -54,8 +55,8 @@ public interface ApiKeyApi {
         description = "Create a new API key.",
         tags = { "api-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The API key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ApiKeyModel.class))
+            @ApiResponse(responseCode = "200", description = "The secret API key object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CreateApiKey200ResponseModel.class))
             })
         }
     )
@@ -66,13 +67,13 @@ public interface ApiKeyApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ApiKeyModel> createApiKey(
+    default ResponseEntity<CreateApiKey200ResponseModel> createApiKey(
         @Parameter(name = "ApiKeyModel", description = "", required = true) @Valid @RequestBody ApiKeyModel apiKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
+                    String exampleString = "{ \"secretKey\" : \"secretKey\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
