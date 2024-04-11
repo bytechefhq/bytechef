@@ -17,6 +17,7 @@
 package com.bytechef.automation.user.web.rest;
 
 import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
+import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.Type;
@@ -48,12 +49,13 @@ public class ApiKeyApiController implements ApiKeyApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ApiKeyModel> createApiKey(ApiKeyModel appEventModel) {
+    public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel appEventModel) {
         ApiKey apiKey = conversionService.convert(appEventModel, ApiKey.class);
 
         apiKey.setType(Type.AUTOMATION);
 
-        return ResponseEntity.ok(conversionService.convert(apiKeyService.create(apiKey), ApiKeyModel.class));
+        return ResponseEntity.ok(
+            new CreateApiKey200ResponseModel().secretKey(apiKeyService.create(apiKey)));
     }
 
     @Override
@@ -66,7 +68,9 @@ public class ApiKeyApiController implements ApiKeyApi {
 
     @Override
     public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
-        return ResponseEntity.ok(conversionService.convert(apiKeyService.getApiKey(id), ApiKeyModel.class));
+        ApiKeyModel apiKeyModel = conversionService.convert(apiKeyService.getApiKey(id), ApiKeyModel.class);
+
+        return ResponseEntity.ok(apiKeyModel.secretKey(abbreviateSecretKey(apiKeyModel.getSecretKey())));
     }
 
     @Override
@@ -74,7 +78,11 @@ public class ApiKeyApiController implements ApiKeyApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 apiKeyService.getApiKeys(Type.AUTOMATION),
-                apiKey -> conversionService.convert(apiKey, ApiKeyModel.class)));
+                apiKey -> {
+                    ApiKeyModel apiKeyModel = conversionService.convert(apiKey, ApiKeyModel.class);
+
+                    return apiKeyModel.secretKey(abbreviateSecretKey(apiKeyModel.getSecretKey()));
+                }));
     }
 
     @Override
@@ -82,6 +90,12 @@ public class ApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<ApiKeyModel> updateApiKey(Long id, ApiKeyModel appEventModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                apiKeyService.update(conversionService.convert(appEventModel, ApiKey.class)), ApiKeyModel.class));
+                apiKeyService.update(
+                    conversionService.convert(appEventModel.id(id), ApiKey.class)),
+                ApiKeyModel.class));
+    }
+
+    private String abbreviateSecretKey(String secretKey) {
+        return ".".repeat(28) + secretKey.substring(secretKey.length() - 4);
     }
 }

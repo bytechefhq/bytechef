@@ -20,6 +20,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
@@ -33,6 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ApiKeyServiceImpl implements ApiKeyService {
 
+    private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final ApiKeyRepository apiKeyRepository;
 
     public ApiKeyServiceImpl(ApiKeyRepository apiKeyRepository) {
@@ -40,13 +45,28 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public ApiKey create(@NonNull ApiKey apiKey) {
+    public String create(@NonNull ApiKey apiKey) {
         Validate.notNull(apiKey, "'apiKey' must not be null");
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
-        Validate.notNull(apiKey.getSecretKey(), "'secretKey' must not be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
 
-        return apiKeyRepository.save(apiKey);
+        apiKey.setSecretKey(generateSecretKey());
+
+        // TODO
+        apiKey.setUserId(1050L);
+
+        apiKey = apiKeyRepository.save(apiKey);
+
+        return apiKey.getSecretKey();
+    }
+
+    private String generateSecretKey() {
+        byte[] token = new byte[32];
+
+        SECURE_RANDOM.nextBytes(token);
+
+        return URL_ENCODER.withoutPadding()
+            .encodeToString(token);
     }
 
     @Override
@@ -55,11 +75,13 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ApiKey getApiKey(long id) {
         return OptionalUtils.get(apiKeyRepository.findById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ApiKey> getApiKeys(Type type) {
         return apiKeyRepository.findAllByType(type.ordinal());
     }

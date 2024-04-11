@@ -31,5 +31,6 @@ public interface ApiKeyModelMapper extends Converter<ApiKeyModel, ApiKey> {
 
     @Override
     @Mapping(target = "type", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     ApiKey convert(ApiKeyModel apiKeyModel);
 }

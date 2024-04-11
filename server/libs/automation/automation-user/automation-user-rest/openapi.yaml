@@ -39,11 +39,15 @@ paths:
         required: true
       responses:
         "200":
-          description: "The API key object."
+          description: "The secret API key object."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiKey"
+                type: "object"
+                properties:
+                  secretKey:
+                    description: "The secret API key."
+                    type: "string"
   /api-keys/{id}:
     delete:
       description: "Delete an API key."
@@ -153,7 +157,7 @@ components:
           description: "The name of an API key."
           type: "string"
         secretKey:
-          description: "The secret API key."
+          description: "The preview of secret API key."
           type: "string"
     Environment:
       description: "The environment of an api key."

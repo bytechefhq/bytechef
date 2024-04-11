@@ -26,7 +26,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiKeyService {
 
-    ApiKey create(@NonNull ApiKey apiKey);
+    String create(@NonNull ApiKey apiKey);
 
     void delete(long id);
 
