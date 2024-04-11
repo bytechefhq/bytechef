@@ -341,7 +341,7 @@ const PropertyMentionsInput = forwardRef(
             if (event.key === 'v' && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
 
-                if (copiedPropertyData) {
+                if (copiedPropertyData.value) {
                     if (currentComponentDefinition?.icon) {
                         copiedPropertyData.componentIcon = currentComponentDefinition.icon;
                     }
