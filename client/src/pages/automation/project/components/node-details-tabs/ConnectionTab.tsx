@@ -23,9 +23,10 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from 'queries/automation/connections.queries';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
+import {useWorkflowNodeDetailsPanelStore} from '../../stores/useWorkflowNodeDetailsPanelStore';
 
 const ConnectionLabel = ({
     taskConnection,
@@ -66,11 +67,14 @@ const ConnectionSelect = ({
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
 }) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
+    const [connectionId, setConnectionId] = useState<number | undefined>();
 
-    let connectionId: number | undefined;
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     if (workflowTestConfigurationConnection) {
-        connectionId = workflowTestConfigurationConnection.connectionId;
+        if (connectionId !== workflowTestConfigurationConnection.connectionId) {
+            setConnectionId(workflowTestConfigurationConnection.connectionId);
+        }
     }
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
@@ -105,7 +109,14 @@ const ConnectionSelect = ({
             workflowId,
             workflowNodeName,
         });
+
+        setConnectionId(connectionId);
     };
+
+    useEffect(() => {
+        setCurrentNode({...currentNode, connectionId});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connectionId]);
 
     return (
         <>

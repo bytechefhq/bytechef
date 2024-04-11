@@ -661,6 +661,7 @@ const Property = ({
 
                         {!register && (isValidControlType || isNumericalInput) && !!optionsDataSource && (
                             <PropertyComboBox
+                                currentNodeConnectionId={currentNode.connectionId}
                                 description={description}
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
@@ -677,6 +678,7 @@ const Property = ({
 
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
+                                currentNodeConnectionId={currentNode.connectionId}
                                 description={description}
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
@@ -734,6 +736,7 @@ const Property = ({
                             currentActionName={actionName}
                             currentComponent={currentComponent}
                             currentComponentDefinition={currentComponentDefinition}
+                            currentNodeConnectionId={currentNode.connectionId}
                             loadDependency={loadPropertiesDependency}
                             name={name}
                             propertiesDataSource={property.propertiesDataSource}

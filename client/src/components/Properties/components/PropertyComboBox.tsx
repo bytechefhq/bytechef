@@ -24,6 +24,7 @@ type ComboBoxItemType = {
 };
 
 interface PropertyComboBoxProps {
+    currentNodeConnectionId?: number;
     description?: string;
     label?: string;
     loadDependency?: any;
@@ -40,6 +41,7 @@ interface PropertyComboBoxProps {
 }
 
 const PropertyComboBox = ({
+    currentNodeConnectionId,
     description,
     label,
     leadingIcon,
@@ -73,10 +75,8 @@ const PropertyComboBox = ({
             workflowNodeName: currentNode.name!,
         },
         !!optionsDataSource &&
-            loadDependencyValues.reduce(
-                (enabled: boolean, loadDependencyValue: string) => enabled && loadDependencyValue !== undefined,
-                true
-            )
+            loadDependencyValues.every((loadDependencyValue) => loadDependencyValue !== undefined) &&
+            !!currentNodeConnectionId
     );
 
     if (optionsData) {
@@ -91,6 +91,8 @@ const PropertyComboBox = ({
 
     if (loadDependencyValues?.length && !options.length) {
         placeholder = `${Object.keys(loadDependency)} is not defined`;
+    } else if (!currentNodeConnectionId) {
+        placeholder = 'Connection missing...';
     }
 
     useEffect(() => {
@@ -102,10 +104,10 @@ const PropertyComboBox = ({
     const loadDependencyValuesString = loadDependencyValues.join('');
 
     useEffect(() => {
-        if (loadDependencyValuesString?.length) {
+        if (loadDependencyValuesString?.length && currentNodeConnectionId) {
             refetch();
         }
-    }, [loadDependencyValuesString, options.length, refetch]);
+    }, [loadDependencyValuesString, options.length, refetch, currentNodeConnectionId]);
 
     return (
         <fieldset className="w-full space-y-2">
@@ -177,7 +179,9 @@ const PropertyComboBox = ({
                                     <span
                                         className={twMerge(
                                             leadingIcon && 'ml-9',
-                                            loadDependencyValues?.length && !options.length && 'text-red-600'
+                                            ((loadDependencyValues?.length && !options.length) ||
+                                                !currentNodeConnectionId) &&
+                                                'text-red-600'
                                         )}
                                     >
                                         {placeholder}
