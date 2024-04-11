@@ -12,7 +12,7 @@ import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import WorkflowOutputsSheetPopup from '@/pages/automation/project/components/WorkflowOutputsSheetPopup';
+import WorkflowOutputsSheetDialog from '@/pages/automation/project/components/WorkflowOutputsSheetDialog';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -23,6 +23,7 @@ const SPACE = 4;
 
 const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; workflow: WorkflowModel}) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
+    const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
@@ -91,20 +92,16 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
                                     <TableCell className="p-3">{output.value.toString()}</TableCell>
 
                                     <TableCell className="flex justify-end p-3">
-                                        <WorkflowOutputsSheetPopup
-                                            align="end"
-                                            output={{
-                                                name: workflow.outputs![index]!.name,
-                                                value: workflow.outputs![index]!.value.toString(),
+                                        <Button
+                                            onClick={() => {
+                                                setCurrentInputIndex(index);
+                                                setShowEditDialog(true);
                                             }}
-                                            projectId={projectId}
-                                            triggerNode={
-                                                <Button size="icon" variant="ghost">
-                                                    <EditIcon className="size-4" />
-                                                </Button>
-                                            }
-                                            workflow={workflow}
-                                        />
+                                            size="icon"
+                                            variant="ghost"
+                                        >
+                                            <EditIcon className="size-4" />
+                                        </Button>
 
                                         <Button
                                             onClick={() => {
@@ -131,7 +128,7 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
                         <p className="mt-1 text-sm text-gray-500">Get started by creating a new input.</p>
 
                         <div className="mt-6">
-                            <WorkflowOutputsSheetPopup
+                            <WorkflowOutputsSheetDialog
                                 projectId={projectId}
                                 triggerNode={<Button size="sm">New Output</Button>}
                                 workflow={workflow}
@@ -139,6 +136,15 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
                         </div>
                     </div>
                 </div>
+            )}
+
+            {showEditDialog && (
+                <WorkflowOutputsSheetDialog
+                    onClose={() => setShowEditDialog(false)}
+                    outputIndex={currentInputIndex}
+                    projectId={projectId}
+                    workflow={workflow}
+                />
             )}
 
             <AlertDialog open={showDeleteDialog}>

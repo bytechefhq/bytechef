@@ -1,18 +1,16 @@
 import {Button} from '@/components/ui/button';
+import {Dialog, DialogClose, DialogContent, DialogTrigger} from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {PopoverClose} from '@radix-ui/react-popover';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {Align} from 'reactflow';
 import {z} from 'zod';
 
 const SPACE = 4;
@@ -24,23 +22,27 @@ const formSchema = z.object({
     value: z.string(),
 });
 
-const WorkflowOutputsSheetPopup = ({
-    align = 'center',
-    output,
+const WorkflowOutputsSheetDialog = ({
+    onClose,
+    outputIndex = -1,
     projectId,
     triggerNode,
     workflow,
 }: {
-    align?: Align;
-    output?: {name: string; value: string};
+    onClose?: () => void;
+    outputIndex?: number;
     projectId: number;
     triggerNode?: ReactNode;
     workflow: WorkflowModel;
 }) => {
+    const [isOpen, setIsOpen] = useState(!triggerNode);
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            name: output?.name,
-            value: output?.value,
+            ...{
+                name: workflow.outputs![outputIndex]?.name,
+                value: workflow.outputs![outputIndex]?.value.toString(),
+            },
         },
         resolver: zodResolver(formSchema),
     });
@@ -56,13 +58,31 @@ const WorkflowOutputsSheetPopup = ({
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
+
+            closeDialog();
         },
     });
+
+    function closeDialog() {
+        setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
+
+        form.reset();
+    }
 
     function saveWorkflowOutputs(output: z.infer<typeof formSchema>) {
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-        const outputs: WorkflowInputModel[] = workflowDefinition.outputs ?? [];
+        let outputs: WorkflowInputModel[] = workflowDefinition.outputs ?? [];
+
+        if (outputIndex === -1) {
+            outputs = [...(outputs || []), output];
+        } else {
+            outputs[outputIndex] = output;
+        }
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
@@ -70,7 +90,7 @@ const WorkflowOutputsSheetPopup = ({
                 definition: JSON.stringify(
                     {
                         ...workflowDefinition,
-                        outputs: [...outputs, output],
+                        outputs,
                     },
                     null,
                     SPACE
@@ -81,21 +101,32 @@ const WorkflowOutputsSheetPopup = ({
     }
 
     return (
-        <Popover>
-            {triggerNode && <PopoverTrigger asChild>{triggerNode}</PopoverTrigger>}
+        <Dialog
+            onOpenChange={(isOpen) => {
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    if (!isOpen) {
+                        closeDialog();
+                    }
+                }
+            }}
+            open={isOpen}
+        >
+            {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <PopoverContent align={align} className="w-[440px]">
+            <DialogContent className="w-[440px]">
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <h4 className="font-medium leading-none">New workflow Output</h4>
+                            <h4 className="font-medium leading-none">{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</h4>
 
-                            <PopoverClose asChild>
+                            <DialogClose asChild>
                                 <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                            </PopoverClose>
+                            </DialogClose>
                         </div>
 
-                        <p className="text-sm text-muted-foreground">Add new workflow output expression.</p>
+                        <p className="text-sm text-muted-foreground">{`${outputIndex === -1 ? 'Create' : 'Edit'} new workflow output expression.`}</p>
                     </div>
 
                     <Form {...form}>
@@ -108,7 +139,11 @@ const WorkflowOutputsSheetPopup = ({
                                         <FormLabel>Name</FormLabel>
 
                                         <FormControl>
-                                            <Input placeholder="Add new output name" {...field} />
+                                            <Input
+                                                placeholder="Add new output name"
+                                                {...field}
+                                                readOnly={outputIndex !== -1}
+                                            />
                                         </FormControl>
 
                                         <FormMessage />
@@ -133,18 +168,18 @@ const WorkflowOutputsSheetPopup = ({
                             />
 
                             <div className="flex justify-end space-x-1">
-                                <PopoverClose asChild>
+                                <DialogClose asChild>
                                     <Button variant="outline">Cancel</Button>
-                                </PopoverClose>
+                                </DialogClose>
 
                                 <Button type="submit">Save</Button>
                             </div>
                         </form>
                     </Form>
                 </div>
-            </PopoverContent>
-        </Popover>
+            </DialogContent>
+        </Dialog>
     );
 };
 
-export default WorkflowOutputsSheetPopup;
+export default WorkflowOutputsSheetDialog;

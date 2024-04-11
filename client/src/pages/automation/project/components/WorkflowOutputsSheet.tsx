@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowModel} from '@/middleware/automation/configuration';
-import WorkflowOutputsSheetPopup from '@/pages/automation/project/components/WorkflowOutputsSheetPopup';
+import WorkflowOutputsSheetDialog from '@/pages/automation/project/components/WorkflowOutputsSheetDialog';
 import WorkflowOutputsSheetTable from '@/pages/automation/project/components/WorkflowOutputsSheetTable';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
@@ -25,8 +25,7 @@ const WorkflowOutputsSheet = ({onClose, projectId, workflow}: WorkflowOutputsShe
 
                     <div className="flex items-center gap-2">
                         {workflow.outputs && workflow.outputs?.length > 0 && (
-                            <WorkflowOutputsSheetPopup
-                                align="end"
+                            <WorkflowOutputsSheetDialog
                                 projectId={projectId}
                                 triggerNode={<Button size="sm">New Output</Button>}
                                 workflow={workflow}
