@@ -260,18 +260,18 @@ const PropertyMentionsInput = forwardRef(
                         [arrayName]: combinedString,
                     };
                 }
-            } else if (objectName && parameters) {
-                if (parameters![objectName]?.[name] === strippedValue) {
-                    return;
-                }
+            } else if (objectName && parameters && path) {
+                const matchingObject = path.split('.').reduce((acc, key) => {
+                    if (acc && acc[key] === undefined) {
+                        acc[key] = {};
+                    }
 
-                data = {
-                    ...parameters,
-                    [objectName]: {
-                        ...parameters![objectName],
-                        [name as string]: strippedValue,
-                    },
-                };
+                    return acc && acc[key];
+                }, data);
+
+                if (matchingObject) {
+                    matchingObject[name as string] = strippedValue;
+                }
             } else {
                 data = {
                     ...parameters,
