@@ -117,6 +117,8 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/**"))
                     .permitAll()
 //                        .requestMatchers(mvc.pattern("/api/**")).authenticated()
+                    .requestMatchers(mvc.pattern("/webhooks/**"))
+                    .permitAll()
                     .requestMatchers(mvc.pattern("/v3/api-docs/**"))
                     .hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/management/health"))
