@@ -370,9 +370,9 @@ const PropertyMentionsInput = forwardRef(
         }, [ref]);
 
         return (
-            <fieldset className="w-full space-y-2">
+            <fieldset className={twMerge('w-full', arrayIndex === undefined && 'space-y-2')}>
                 {(label || description || showInputTypeSwitchButton) && (
-                    <div className="flex w-full items-center justify-between">
+                    <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
                             <div className="flex items-center">
                                 <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>

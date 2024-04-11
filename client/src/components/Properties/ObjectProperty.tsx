@@ -223,6 +223,7 @@ const ObjectProperty = ({
                                 name="additionalPropertyName"
                                 onChange={(event) => setNewPropertyName(event.target.value)}
                                 placeholder="Name for the additional property"
+                                required={true}
                                 value={newPropertyName}
                             />
 

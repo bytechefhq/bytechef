@@ -70,7 +70,7 @@ const DeletePropertyButton = ({
                     )}
                 >
                     <button
-                        className={twMerge('p-2', objectProperty && 'p-1')}
+                        className="p-1"
                         onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}
                     >
                         <XIcon className="size-4 cursor-pointer group-hover:text-red-500" />

@@ -500,6 +500,7 @@ const Property = ({
                             defaultValue={defaultValue}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                             label={label || (arrayName ? undefined : name)}
                             leadingIcon={typeIcon}
                             name={name || `${arrayName}_0`}
@@ -526,7 +527,7 @@ const Property = ({
                         {(controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER') && (
                             <div className="flex items-center pb-2">
                                 {typeIcon && (
-                                    <span className="pr-2" title={type}>
+                                    <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
                                         {typeIcon}
                                     </span>
                                 )}
