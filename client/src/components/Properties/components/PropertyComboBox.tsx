@@ -89,8 +89,8 @@ const PropertyComboBox = ({
 
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
-    if (loadDependencyValues?.length) {
-        placeholder = `Depends on ${Object.keys(loadDependency)}`;
+    if (loadDependencyValues?.length && !options.length) {
+        placeholder = `${Object.keys(loadDependency)} is not defined`;
     }
 
     useEffect(() => {
@@ -99,12 +99,13 @@ const PropertyComboBox = ({
         }
     }, [loadDependency]);
 
+    const loadDependencyValuesString = loadDependencyValues.join('');
+
     useEffect(() => {
-        if (loadDependencyValues?.length) {
+        if (loadDependencyValuesString?.length) {
             refetch();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loadDependencyValues]);
+    }, [loadDependencyValuesString, options.length, refetch]);
 
     return (
         <fieldset className="w-full space-y-2">
@@ -164,7 +165,7 @@ const PropertyComboBox = ({
 
                         {((optionsDataSource && !isLoading) || !optionsDataSource) && (
                             <>
-                                {value ? (
+                                {currentOption ? (
                                     <span className={twMerge('flex w-full items-center', leadingIcon && 'ml-9')}>
                                         {currentOption?.icon && (
                                             <InlineSVG className="mr-2 size-6 flex-none" src={currentOption?.icon} />
@@ -173,7 +174,14 @@ const PropertyComboBox = ({
                                         {currentOption?.label}
                                     </span>
                                 ) : (
-                                    <span className={twMerge(leadingIcon && 'ml-9')}>{placeholder}</span>
+                                    <span
+                                        className={twMerge(
+                                            leadingIcon && 'ml-9',
+                                            loadDependencyValues?.length && !options.length && 'text-red-600'
+                                        )}
+                                    >
+                                        {placeholder}
+                                    </span>
                                 )}
                             </>
                         )}
