@@ -41,8 +41,8 @@ public class DiscordUtils {
     public static List<Option<String>> getChannelIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        List<Map<String, Object>> body = context.http(http -> http.get(
-            BASE_URL + "/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/channels"))
+        List<Map<String, Object>> body = context.http(http -> http
+            .get(BASE_URL + "/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/channels"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -72,8 +72,8 @@ public class DiscordUtils {
     public static List<Option<String>> getGuildMemberIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        List<Map<String, ?>> body = context.http(http -> http.get(
-            BASE_URL + "/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))
+        List<Map<String, ?>> body = context.http(http -> http
+            .get(BASE_URL + "/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/members"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .queryParameter("limit", "1000")
             .execute()

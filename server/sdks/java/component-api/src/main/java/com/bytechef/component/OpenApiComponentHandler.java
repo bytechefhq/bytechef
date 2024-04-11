@@ -42,6 +42,10 @@ public interface OpenApiComponentHandler extends ComponentHandler {
         BODY, PATH, HEADER, QUERY
     }
 
+    /**
+     *
+     * @return
+     */
     default List<? extends ModifiableActionDefinition> getCustomActions() {
         return List.of();
     }
