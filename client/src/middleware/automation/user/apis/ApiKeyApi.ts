@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   ApiKeyModel,
+  CreateApiKey200ResponseModel,
 } from '../models/index';
 import {
     ApiKeyModelFromJSON,
     ApiKeyModelToJSON,
+    CreateApiKey200ResponseModelFromJSON,
+    CreateApiKey200ResponseModelToJSON,
 } from '../models/index';
 
 export interface CreateApiKeyRequest {
@@ -48,7 +51,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
      * Create a new API key.
      * Create a new API key
      */
-    async createApiKeyRaw(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKeyModel>> {
+    async createApiKeyRaw(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApiKey200ResponseModel>> {
         if (requestParameters['apiKeyModel'] == null) {
             throw new runtime.RequiredError(
                 'apiKeyModel',
@@ -70,14 +73,14 @@ export class ApiKeyApi extends runtime.BaseAPI {
             body: ApiKeyModelToJSON(requestParameters['apiKeyModel']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ApiKeyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateApiKey200ResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Create a new API key.
      * Create a new API key
      */
-    async createApiKey(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKeyModel> {
+    async createApiKey(requestParameters: CreateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateApiKey200ResponseModel> {
         const response = await this.createApiKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -75,7 +75,7 @@ export interface ApiKeyModel {
      */
     name: string;
     /**
-     * The secret API key.
+     * The preview of secret API key.
      * @type {string}
      * @memberof ApiKeyModel
      */
