@@ -31,6 +31,7 @@ const WorkflowInputsSheetTable = ({
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
+    const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
@@ -117,17 +118,16 @@ const WorkflowInputsSheetTable = ({
                                     </TableCell>
 
                                     <TableCell className="flex justify-end p-3">
-                                        <WorkflowInputsSheetDialog
-                                            inputIndex={index}
-                                            projectId={projectId}
-                                            triggerNode={
-                                                <Button size="icon" variant="ghost">
-                                                    <EditIcon className="size-4" />
-                                                </Button>
-                                            }
-                                            workflow={workflow}
-                                            workflowTestConfiguration={workflowTestConfiguration}
-                                        />
+                                        <Button
+                                            onClick={() => {
+                                                setCurrentInputIndex(index);
+                                                setShowEditDialog(true);
+                                            }}
+                                            size="icon"
+                                            variant="ghost"
+                                        >
+                                            <EditIcon className="size-4" />
+                                        </Button>
 
                                         <Button
                                             onClick={() => {
@@ -168,6 +168,16 @@ const WorkflowInputsSheetTable = ({
                         </div>
                     </div>
                 </div>
+            )}
+
+            {showEditDialog && (
+                <WorkflowInputsSheetDialog
+                    inputIndex={currentInputIndex}
+                    onClose={() => setShowEditDialog(false)}
+                    projectId={projectId}
+                    workflow={workflow}
+                    workflowTestConfiguration={workflowTestConfiguration}
+                />
             )}
 
             <AlertDialog open={showDeleteDialog}>

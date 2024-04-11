@@ -21,11 +21,12 @@ import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConf
 import {WorkflowDefinitionType} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 export interface WorkflowInputsSheetDialogProps {
     inputIndex?: number;
+    onClose?: () => void;
     projectId: number;
     triggerNode?: ReactNode;
     workflow: WorkflowModel;
@@ -36,11 +37,14 @@ const SPACE = 4;
 
 const WorkflowInputsSheetDialog = ({
     inputIndex = -1,
+    onClose,
     projectId,
     triggerNode,
     workflow,
     workflowTestConfiguration,
 }: WorkflowInputsSheetDialogProps) => {
+    const [isOpen, setIsOpen] = useState(!triggerNode);
+
     const form = useForm<WorkflowInputModel & {testValue: string}>({
         defaultValues: {
             ...workflow.inputs![inputIndex],
@@ -87,6 +91,12 @@ const WorkflowInputsSheetDialog = ({
     });
 
     function closeDialog() {
+        setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
+
         reset();
     }
 
@@ -122,10 +132,15 @@ const WorkflowInputsSheetDialog = ({
     return (
         <Dialog
             onOpenChange={(isOpen) => {
-                if (!isOpen) {
-                    closeDialog();
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    if (!isOpen) {
+                        closeDialog();
+                    }
                 }
             }}
+            open={isOpen}
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
@@ -134,7 +149,7 @@ const WorkflowInputsSheetDialog = ({
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkflowInputs)}>
                         <DialogHeader>
                             <div className="flex items-center justify-between">
-                                <DialogTitle>{`${inputIndex === -1 ? 'Edit' : 'Create'} Input`}</DialogTitle>
+                                <DialogTitle>{`${inputIndex === -1 ? 'Create' : 'Edit'} Input`}</DialogTitle>
 
                                 <DialogClose asChild>
                                     <Cross2Icon className="size-4 cursor-pointer opacity-70" />
@@ -152,7 +167,7 @@ const WorkflowInputsSheetDialog = ({
                                     <FormLabel>Name</FormLabel>
 
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input {...field} readOnly={inputIndex !== -1} />
                                     </FormControl>
 
                                     <FormMessage />
