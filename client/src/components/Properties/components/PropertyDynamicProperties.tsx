@@ -14,6 +14,7 @@ interface PropertyDynamicPropertiesProps {
     currentActionName?: string;
     currentComponentDefinition: CurrentComponentDefinitionType;
     currentComponent: ComponentType;
+    currentNodeConnectionId?: number;
     loadDependency?: {[key: string]: string};
     name?: string;
     propertiesDataSource?: PropertiesDataSourceModel;
@@ -26,6 +27,7 @@ const PropertyDynamicProperties = ({
     currentActionName,
     currentComponent,
     currentComponentDefinition,
+    currentNodeConnectionId,
     loadDependency,
     name,
     propertiesDataSource,
@@ -49,21 +51,17 @@ const PropertyDynamicProperties = ({
             propertyName: name!,
             workflowNodeName: currentNode.name!,
         },
-        !!propertiesDataSource &&
-            loadDependencyValues.length > 0 &&
-            loadDependencyValues.reduce((enabled: boolean, loadDependencyValue: string) => {
-                return loadDependencyValue !== undefined;
-            }, true)
+        !!propertiesDataSource && !!loadDependencyValues.length && !!currentNodeConnectionId
     );
 
     useEffect(() => {
-        if (loadDependency && typeof loadDependency === 'object') {
+        if (loadDependency && loadDependency.constructor === Object) {
             setLoadDependencyValues(Object.values(loadDependency));
         }
     }, [loadDependency]);
 
     useEffect(() => {
-        if (loadDependencyValues?.length) {
+        if (loadDependencyValues?.length && currentNodeConnectionId) {
             refetch();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

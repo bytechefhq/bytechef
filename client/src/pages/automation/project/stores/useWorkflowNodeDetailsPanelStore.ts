@@ -6,6 +6,7 @@ import {devtools} from 'zustand/middleware';
 
 type NodeType = {
     componentName?: string;
+    connectionId?: number;
     icon?: ReactNode;
     id: string;
     label?: string;
