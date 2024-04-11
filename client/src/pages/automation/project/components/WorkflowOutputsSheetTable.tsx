@@ -16,7 +16,7 @@ import WorkflowOutputsSheetPopup from '@/pages/automation/project/components/Wor
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {CableIcon, EditIcon, XIcon} from 'lucide-react';
+import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 const SPACE = 4;
@@ -114,7 +114,7 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
                                             size="icon"
                                             variant="ghost"
                                         >
-                                            <XIcon className="h-4 text-red-600" />
+                                            <Trash2Icon className="h-4 text-red-600" />
                                         </Button>
                                     </TableCell>
                                 </TableRow>
