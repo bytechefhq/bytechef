@@ -9,6 +9,7 @@ import {
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import DestinationTab from '@/pages/automation/project/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/automation/project/components/node-details-tabs/SourceTab';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
@@ -96,6 +97,7 @@ const WorkflowNodeDetailsPanel = ({
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             if (projectId) {
+                queryClient.invalidateQueries({queryKey: ProjectKeys.project(parseInt(projectId))});
                 queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId))});
             }
 
