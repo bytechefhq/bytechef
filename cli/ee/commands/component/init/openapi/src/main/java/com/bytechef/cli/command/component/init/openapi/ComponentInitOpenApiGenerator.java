@@ -1695,6 +1695,18 @@ public class ComponentInitOpenApiGenerator {
                                 builder.add("string($S)", propertyName);
                             }
                         }
+
+                        if (schema.getMinLength() != null) {
+                            Integer minLength = schema.getMinLength();
+
+                            builder.add(".minLength($L)", minLength);
+                        }
+
+                        if (schema.getMaxLength() != null) {
+                            Integer maxLength = schema.getMaxLength();
+
+                            builder.add(".maxLength($L)", maxLength);
+                        }
                     }
                     default -> throw new IllegalArgumentException(
                         "Parameter type %s is not supported.".formatted(schema.getType()));
