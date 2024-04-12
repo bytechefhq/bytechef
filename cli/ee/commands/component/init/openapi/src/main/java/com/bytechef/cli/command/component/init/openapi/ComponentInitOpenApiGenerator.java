@@ -484,6 +484,98 @@ public class ComponentInitOpenApiGenerator {
             .collect(CodeBlock.joining(","));
     }
 
+    private CodeBlock getAdditionalPropertiesCodeBlock(String propertyName, Schema<?> schema, boolean outputSchema) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        if (schema.getAdditionalProperties() instanceof Boolean additionalProperties) {
+            if (additionalProperties) {
+                builder.add(
+                    """
+                        .additionalProperties(
+                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                        """);
+            }
+        } else {
+            Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
+
+            if (StringUtils.isEmpty(additionalPropertiesSchema.get$ref())) {
+                Map<String, ?> additionalPropertiesSchemaProperties = additionalPropertiesSchema.getProperties();
+
+                if (additionalPropertiesSchemaProperties == null || additionalPropertiesSchemaProperties.isEmpty()) {
+                    builder.add(
+                        ".additionalProperties($L())", getAdditionalPropertiesItemType(additionalPropertiesSchema));
+                } else {
+                    builder.add(
+                        ".additionalProperties($L().properties($L))",
+                        getAdditionalPropertiesItemType(additionalPropertiesSchema),
+                        getObjectPropertiesCodeBlock(propertyName, additionalPropertiesSchema, outputSchema, openAPI));
+                }
+            } else {
+                String ref = additionalPropertiesSchema.get$ref();
+
+                String curSchemaName = ref.replace("#/components/schemas/", "");
+
+                schemas.add(curSchemaName);
+
+                builder.add(
+                    ".additionalProperties(object().properties($L))",
+                    CodeBlock.of("$T.PROPERTIES", getPropertiesClassName(curSchemaName)));
+            }
+        }
+
+        if (!outputSchema && propertyName != null) {
+            builder.add(".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
+        }
+
+        return builder.build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    private String getAdditionalPropertiesItemType(Schema additionalPropertiesSchema) {
+        String additionalPropertiesSchemaType = StringUtils.isEmpty(additionalPropertiesSchema.getType()) ? "object"
+            : additionalPropertiesSchema.getType();
+
+        return switch (additionalPropertiesSchemaType) {
+            case "array" -> "array";
+            case "boolean" -> "bool";
+            case "integer" -> "integer";
+            case "number" -> "number";
+            case "object" -> "object";
+            case "string" -> {
+                if (StringUtils.isEmpty(additionalPropertiesSchema.getFormat())) {
+                    yield "string";
+                } else if (Objects.equals(additionalPropertiesSchema.getFormat(), "date")) {
+                    yield "date";
+                } else if (Objects.equals(additionalPropertiesSchema.getFormat(), "date-date")) {
+                    yield "date-time";
+                } else {
+                    throw new IllegalArgumentException(
+                        "Unsupported schema type format: " + additionalPropertiesSchema.getFormat());
+                }
+            }
+            default -> throw new IllegalArgumentException(
+                "Unsupported schema type: " + additionalPropertiesSchema.getType());
+        };
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private CodeBlock getAllOfSchemaCodeBlock(
+        String name, String description, List<Schema> allOfSchemas, boolean outputSchema, OpenAPI openAPI) {
+
+        Map<String, Schema> allOfProperties = getAllOfSchemaProperties(name, description, allOfSchemas);
+        List<String> allOfRequired = new ArrayList<>();
+
+        for (Schema allOfSchema : allOfProperties.values()) {
+            if (allOfSchema.getRequired() != null) {
+                allOfRequired.addAll(allOfSchema.getRequired());
+            }
+        }
+
+        return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, outputSchema, openAPI);
+    }
+
     private CodeBlock getAuthorizationApiKeyCodeBlock(SecurityScheme securityScheme) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
@@ -599,7 +691,7 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getAuthorizationOAuth2AuthorizationCodeCodeBlock(OAuthFlow oAuthFlow) {
         CodeBlock.Builder builder = CodeBlock.builder();
-        String oAuth2Scopes = getOAUth2Scopes(oAuthFlow.getScopes());
+        String oAuth2Scopes = getOAuth2Scopes(oAuthFlow.getScopes());
 
         builder.add(
             """
@@ -627,7 +719,7 @@ public class ComponentInitOpenApiGenerator {
                 ? CodeBlock.builder()
                     .build()
                 : CodeBlock.of(
-                    ".scopes((connection, context) -> $T.of($L))", List.class, getOAUth2Scopes(oAuthFlow.getScopes())),
+                    ".scopes((connection, context) -> $T.of($L))", List.class, getOAuth2Scopes(oAuthFlow.getScopes())),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -662,7 +754,7 @@ public class ComponentInitOpenApiGenerator {
             "OAuth2 Client Secret",
             true,
             List.class,
-            getOAUth2Scopes(oAuthFlow.getScopes()),
+            getOAuth2Scopes(oAuthFlow.getScopes()),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -698,7 +790,7 @@ public class ComponentInitOpenApiGenerator {
             true,
             oAuthFlow.getAuthorizationUrl(),
             List.class,
-            getOAUth2Scopes(oAuthFlow.getScopes()));
+            getOAuth2Scopes(oAuthFlow.getScopes()));
 
         if (oAuthFlow.getRefreshUrl() != null) {
             builder.add(".refreshUrl((connectionParameters, context) -> $S)", oAuthFlow.getRefreshUrl());
@@ -733,7 +825,7 @@ public class ComponentInitOpenApiGenerator {
             true,
             List.class,
             oAuthFlow.getRefreshUrl(),
-            getOAUth2Scopes(oAuthFlow.getScopes()),
+            getOAuth2Scopes(oAuthFlow.getScopes()),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -936,27 +1028,6 @@ public class ComponentInitOpenApiGenerator {
         return builder.build();
     }
 
-    private CodeBlock getObjectPropertiesCodeBlock(
-        String name, Schema<?> schema, boolean outputSchema, OpenAPI openAPI) {
-
-        List<CodeBlock> codeBlocks = new ArrayList<>();
-
-        if (schema.getProperties() != null) {
-            codeBlocks.add(
-                getPropertiesSchemaCodeBlock(
-                    schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(),
-                    outputSchema, openAPI));
-        }
-
-        if (schema.getAllOf() != null) {
-            codeBlocks.add(
-                getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), outputSchema, openAPI));
-        }
-
-        return codeBlocks.stream()
-            .collect(CodeBlock.joining(","));
-    }
-
     private List<CodeBlock> getEnumOptionsCodeBlocks(Schema<?> schema) {
         List<?> enums = schema.getEnum()
             .stream()
@@ -1036,7 +1107,7 @@ public class ComponentInitOpenApiGenerator {
         return mimeType;
     }
 
-    private String getOAUth2Scopes(Scopes scopes) {
+    private String getOAuth2Scopes(Scopes scopes) {
         Collection<String> scopeNames;
 
         if (generatorConfig.openApi.oAuth2Scopes.isEmpty()) {
@@ -1053,6 +1124,27 @@ public class ComponentInitOpenApiGenerator {
             ",", scopeNames.stream()
                 .map(scope -> "\"" + scope + "\"")
                 .toList());
+    }
+
+    private CodeBlock getObjectPropertiesCodeBlock(
+        String name, Schema<?> schema, boolean outputSchema, OpenAPI openAPI) {
+
+        List<CodeBlock> codeBlocks = new ArrayList<>();
+
+        if (schema.getProperties() != null) {
+            codeBlocks.add(
+                getPropertiesSchemaCodeBlock(
+                    schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(),
+                    outputSchema, openAPI));
+        }
+
+        if (schema.getAllOf() != null) {
+            codeBlocks.add(
+                getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), outputSchema, openAPI));
+        }
+
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
     private Map<String, List<OperationItem>> getOperationItemsMap(io.swagger.v3.oas.models.Paths paths) {
@@ -1220,6 +1312,11 @@ public class ComponentInitOpenApiGenerator {
             .collect(CodeBlock.joining(","));
     }
 
+    private ClassName getPropertiesClassName(String schemaName) {
+        return ClassName.get(
+            getPackageName() + ".property", getComponentClassName(componentName) + schemaName + "Properties");
+    }
+
     private PropertiesEntry getPropertiesEntry(Operation operation, OpenAPI openAPI) {
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
@@ -1260,6 +1357,38 @@ public class ComponentInitOpenApiGenerator {
         builder.add(".properties($L)", propertiesCodeBlock);
 
         return builder.build();
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private CodeBlock getPropertiesSchemaCodeBlock(
+        Map<String, Schema> properties, List<String> required, boolean outputSchema, OpenAPI openAPI) {
+        List<CodeBlock> codeBlocks = new ArrayList<>();
+
+        for (Map.Entry<String, Schema> entry : properties.entrySet()) {
+            CodeBlock codeBlock;
+            Schema schema = entry.getValue();
+
+            if (schema.getAllOf() == null) {
+                codeBlock = getSchemaCodeBlock(
+                    entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, false,
+                    outputSchema, openAPI);
+            } else {
+                codeBlock = getAllOfSchemaCodeBlock(
+                    entry.getKey(), schema.getDescription(), schema.getAllOf(), outputSchema, openAPI);
+            }
+
+            if (codeBlock.isEmpty()) {
+                throw new IllegalArgumentException("Schema is not supported: %s".formatted(schema));
+            } else {
+                codeBlocks.add(codeBlock);
+            }
+        }
+
+        return codeBlocks
+            .stream()
+            .collect(CodeBlock.joining(","));
     }
 
     private CodeBlock getRefCodeBlock(
@@ -1470,135 +1599,6 @@ public class ComponentInitOpenApiGenerator {
         return builder.build();
     }
 
-    private CodeBlock getAdditionalPropertiesCodeBlock(String propertyName, Schema<?> schema, boolean outputSchema) {
-        CodeBlock.Builder builder = CodeBlock.builder();
-
-        if (schema.getAdditionalProperties() instanceof Boolean additionalProperties) {
-            if (additionalProperties) {
-                builder.add(
-                    """
-                        .additionalProperties(
-                            array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                        """);
-            }
-        } else {
-            Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
-
-            if (StringUtils.isEmpty(additionalPropertiesSchema.get$ref())) {
-                Map<String, ?> additionalPropertiesSchemaProperties = additionalPropertiesSchema.getProperties();
-
-                if (additionalPropertiesSchemaProperties == null || additionalPropertiesSchemaProperties.isEmpty()) {
-                    builder.add(
-                        ".additionalProperties($L())", getAdditionalPropertiesItemType(additionalPropertiesSchema));
-                } else {
-                    builder.add(
-                        ".additionalProperties($L().properties($L))",
-                        getAdditionalPropertiesItemType(additionalPropertiesSchema),
-                        getObjectPropertiesCodeBlock(propertyName, additionalPropertiesSchema, outputSchema, openAPI));
-                }
-            } else {
-                String ref = additionalPropertiesSchema.get$ref();
-
-                String curSchemaName = ref.replace("#/components/schemas/", "");
-
-                schemas.add(curSchemaName);
-
-                builder.add(
-                    ".additionalProperties(object().properties($L))",
-                    CodeBlock.of("$T.PROPERTIES", getPropertiesClassName(curSchemaName)));
-            }
-        }
-
-        if (!outputSchema && propertyName != null) {
-            builder.add(".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
-        }
-
-        return builder.build();
-    }
-
-    @SuppressWarnings("rawtypes")
-    private String getAdditionalPropertiesItemType(Schema additionalPropertiesSchema) {
-        String additionalPropertiesSchemaType = StringUtils.isEmpty(additionalPropertiesSchema.getType()) ? "object"
-            : additionalPropertiesSchema.getType();
-
-        return switch (additionalPropertiesSchemaType) {
-            case "array" -> "array";
-            case "boolean" -> "bool";
-            case "integer" -> "integer";
-            case "number" -> "number";
-            case "object" -> "object";
-            case "string" -> {
-                if (StringUtils.isEmpty(additionalPropertiesSchema.getFormat())) {
-                    yield "string";
-                } else if (Objects.equals(additionalPropertiesSchema.getFormat(), "date")) {
-                    yield "date";
-                } else if (Objects.equals(additionalPropertiesSchema.getFormat(), "date-date")) {
-                    yield "date-time";
-                } else {
-                    throw new IllegalArgumentException(
-                        "Unsupported schema type format: " + additionalPropertiesSchema.getFormat());
-                }
-            }
-            default -> throw new IllegalArgumentException(
-                "Unsupported schema type: " + additionalPropertiesSchema.getType());
-        };
-    }
-
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    private CodeBlock getAllOfSchemaCodeBlock(
-        String name, String description, List<Schema> allOfSchemas, boolean outputSchema, OpenAPI openAPI) {
-
-        Map<String, Schema> allOfProperties = getAllOfSchemaProperties(name, description, allOfSchemas);
-        List<String> allOfRequired = new ArrayList<>();
-
-        for (Schema allOfSchema : allOfProperties.values()) {
-            if (allOfSchema.getRequired() != null) {
-                allOfRequired.addAll(allOfSchema.getRequired());
-            }
-        }
-
-        return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, outputSchema, openAPI);
-    }
-
-    private ClassName getPropertiesClassName(String schemaName) {
-        return ClassName.get(
-            getPackageName() + ".property", getComponentClassName(componentName) + schemaName + "Properties");
-    }
-
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    private CodeBlock getPropertiesSchemaCodeBlock(
-        Map<String, Schema> properties, List<String> required, boolean outputSchema, OpenAPI openAPI) {
-        List<CodeBlock> codeBlocks = new ArrayList<>();
-
-        for (Map.Entry<String, Schema> entry : properties.entrySet()) {
-            CodeBlock codeBlock;
-            Schema schema = entry.getValue();
-
-            if (schema.getAllOf() == null) {
-                codeBlock = getSchemaCodeBlock(
-                    entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, false,
-                    outputSchema, openAPI);
-            } else {
-                codeBlock = getAllOfSchemaCodeBlock(
-                    entry.getKey(), schema.getDescription(), schema.getAllOf(), outputSchema, openAPI);
-            }
-
-            if (codeBlock.isEmpty()) {
-                throw new IllegalArgumentException("Schema is not supported: %s".formatted(schema));
-            } else {
-                codeBlocks.add(codeBlock);
-            }
-        }
-
-        return codeBlocks
-            .stream()
-            .collect(CodeBlock.joining(","));
-    }
-
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
         boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI) {
@@ -1638,11 +1638,13 @@ public class ComponentInitOpenApiGenerator {
                     case "boolean" -> builder.add("bool($S)", propertyName);
                     case "integer" -> {
                         builder.add("integer($S)", propertyName);
+
                         if (schema.getMinimum() != null) {
                             BigDecimal minimum = schema.getMinimum();
 
                             builder.add(".minValue($L)", minimum.intValue());
                         }
+
                         if (schema.getMaximum() != null) {
                             BigDecimal maximum = schema.getMaximum();
 
@@ -1651,11 +1653,13 @@ public class ComponentInitOpenApiGenerator {
                     }
                     case "number" -> {
                         builder.add("number($S)", propertyName);
+
                         if (schema.getMinimum() != null) {
                             BigDecimal minimum = schema.getMinimum();
 
                             builder.add(".minValue($L)", minimum.doubleValue());
                         }
+
                         if (schema.getMaximum() != null) {
                             BigDecimal maximum = schema.getMaximum();
 
