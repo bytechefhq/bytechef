@@ -374,7 +374,7 @@ public class HttpClientExecutor {
             if (headers.containsKey("Content-Type")) {
                 List<String> values = headers.get("Content-Type");
 
-                filename = "file" + MimeTypeUtils.getDefaultExt(values.getFirst());
+                filename = "file." + MimeTypeUtils.getDefaultExt(values.getFirst());
             } else {
                 filename = "file.txt";
             }
@@ -433,6 +433,18 @@ public class HttpClientExecutor {
                     return valueTypeRef.getType();
                 }
             });
+        }
+
+        @Override
+        public String getFirstHeader(String name) {
+            List<String> values = headers.get(name);
+
+            return values.getFirst();
+        }
+
+        @Override
+        public List<String> getHeader(String name) {
+            return headers.get(name);
         }
 
         @Override

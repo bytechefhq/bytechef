@@ -521,6 +521,18 @@ public class HttpClientExecutorTest {
         }
 
         @Override
+        public String getFirstHeader(String name) {
+            List<String> values = headers.get(name);
+
+            return values.getFirst();
+        }
+
+        @Override
+        public List<String> getHeader(String name) {
+            return headers.get(name);
+        }
+
+        @Override
         public int getStatusCode() {
             return statusCode;
         }

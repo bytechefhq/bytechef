@@ -735,6 +735,10 @@ public interface Context {
 
             <T> T getBody(TypeReference<T> valueTypeRef);
 
+            String getFirstHeader(String name);
+
+            List<String> getHeader(String name);
+
             int getStatusCode();
         }
     }
