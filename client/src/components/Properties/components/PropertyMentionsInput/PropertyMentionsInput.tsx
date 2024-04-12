@@ -262,11 +262,15 @@ const PropertyMentionsInput = forwardRef(
                 }
             } else if (objectName && parameters && path) {
                 const matchingObject = path.split('.').reduce((acc, key) => {
-                    if (acc && acc[key] === undefined) {
-                        acc[key] = {};
-                    }
+                    if (key !== 'parameters') {
+                        if (acc && acc[key] === undefined) {
+                            acc[key] = {};
+                        }
 
-                    return acc && acc[key];
+                        return acc && acc[key];
+                    } else {
+                        return acc;
+                    }
                 }, data);
 
                 if (matchingObject) {
