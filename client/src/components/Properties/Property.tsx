@@ -270,6 +270,10 @@ const Property = ({
 
         const {parameters} = currentComponent;
 
+        if (!parameters) {
+            return;
+        }
+
         let data = parameters;
 
         if (arrayName && arrayIndex !== undefined) {
@@ -286,11 +290,15 @@ const Property = ({
             };
         } else if (objectName) {
             const matchingObject = path.split('.').reduce((acc, key) => {
-                if (acc && acc[key] === undefined) {
-                    acc[key] = {};
-                }
+                if (key !== 'parameters') {
+                    if (acc && acc[key] === undefined) {
+                        acc[key] = {};
+                    }
 
-                return acc && acc[key];
+                    return acc && acc[key];
+                } else {
+                    return acc;
+                }
             }, data);
 
             if (matchingObject) {
