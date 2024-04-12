@@ -83,8 +83,8 @@ paths:
                 name:
                   type: "string"
                   description: "The name of the new channel"
-                  minLength: "1"
-                  maxLength: "100"
+                  minLength: 1
+                  maxLength: 100
                 type:
                   type: "integer"
                   enum:

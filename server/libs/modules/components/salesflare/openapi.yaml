@@ -36,7 +36,7 @@ paths:
                   type: "string"
                 email:
                   type: "string"
-                  maxLength: "1000"
+                  maxLength: 1000
                 phone_number:
                   type: "string"
                 social_profiles:
@@ -71,7 +71,7 @@ paths:
                   email:
                     type: "string"
                     description: "Email address of the contact."
-                    maxLength: "1000"
+                    maxLength: 1000
                   firstname:
                     title: "First name"
                     description: "The first name of the contact."

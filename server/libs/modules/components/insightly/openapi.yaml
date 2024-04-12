@@ -29,27 +29,27 @@ paths:
                   title: "First name"
                   description: "The first name of the contact"
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
                 LAST_NAME:
                   title: "Last name"
                   description: "The last name of the contact"
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
                 EMAIL_ADDRESS:
                   title: "Email address"
                   description: "Email address of the contact"
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
                 PHONE:
                   title: "Phone"
                   description: "Phone number of the contact"
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
                 TITLE:
                   title: "Title"
                   description: "The contact's title in company."
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
       responses:
         201:
           description: "Creation confirmation. Returns created Contact"
@@ -93,17 +93,17 @@ paths:
                   title: "Organization name"
                   description: "The name of the organization"
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
                 PHONE:
                   title: "Phone"
                   description: "A contact phone number for the organization."
                   type: "string"
-                  maxLength: "string"
+                  maxLength: 255
                 WEBSITE:
                   title: "Website"
                   description: "The organization's website."
                   type: "string"
-                  maxLength: "255"
+                  maxLength: 255
       responses:
         201:
           description: "Creation confirmation. Returns created Organization"
@@ -142,7 +142,7 @@ paths:
                 TITLE:
                   title: "Title"
                   type: "string"
-                  maxLength: "500"
+                  maxLength: 500
                 STATUS:
                   title: "Status"
                   description: "Task status"
