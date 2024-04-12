@@ -484,7 +484,7 @@ const Property = ({
                 customClassName
             )}
         >
-            <div className=" w-full">
+            <div className="w-full">
                 {showMentionInput &&
                     currentComponent &&
                     currentComponentDefinition &&
