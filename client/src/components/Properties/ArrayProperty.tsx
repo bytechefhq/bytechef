@@ -94,13 +94,15 @@ const ArrayProperty = ({
                 setArrayItems(parameterArrayItems);
             }
         } else if (name) {
-            const parameterArrayItems = currentComponent.parameters[name].map((parameterItem: ArrayPropertyType) => ({
-                controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
-                custom: true,
-                defaultValue: Object.values(parameterItem)[0],
-                name: Object.keys(parameterItem)[0],
-                type: newItemType,
-            }));
+            const parameterArrayItems = currentComponent.parameters[name].map(
+                (parameterItem: ArrayPropertyType, index: number) => ({
+                    controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
+                    custom: true,
+                    defaultValue: parameterItem,
+                    name: `${name}_${index}`,
+                    type: newItemType,
+                })
+            );
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
