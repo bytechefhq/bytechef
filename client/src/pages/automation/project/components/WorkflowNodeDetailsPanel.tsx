@@ -31,6 +31,7 @@ import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
+import InlineSVG from 'react-inlinesvg';
 
 const TABS = [
     {
@@ -407,6 +408,10 @@ const WorkflowNodeDetailsPanel = ({
             {currentComponentDefinition ? (
                 <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                     <header className="flex items-center p-4 text-lg font-medium">
+                        {currentComponentDefinition.icon && (
+                            <InlineSVG className="mr-2 size-6" src={currentComponentDefinition.icon} />
+                        )}
+
                         {currentNode.label}
 
                         <span className="mx-2 text-sm text-gray-500">({currentNode.name})</span>
