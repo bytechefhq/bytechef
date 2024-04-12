@@ -42,19 +42,24 @@ public class InsightlyCreateContactAction {
                 "path", "/Contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("FIRST_NAME").label("First   Name")
+        .properties(object("__item").properties(string("FIRST_NAME").maxLength(255)
+            .label("First   Name")
             .description("The first name of the contact")
             .required(true),
-            string("LAST_NAME").label("Last   Name")
+            string("LAST_NAME").maxLength(255)
+                .label("Last   Name")
                 .description("The last name of the contact")
                 .required(false),
-            string("EMAIL_ADDRESS").label("Email   Address")
+            string("EMAIL_ADDRESS").maxLength(255)
+                .label("Email   Address")
                 .description("Email address of the contact")
                 .required(false),
-            string("PHONE").label("Phone")
+            string("PHONE").maxLength(255)
+                .label("Phone")
                 .description("Phone number of the contact")
                 .required(false),
-            string("TITLE").label("Title")
+            string("TITLE").maxLength(255)
+                .label("Title")
                 .description("The contact's title in company.")
                 .required(false))
             .label("Contact")

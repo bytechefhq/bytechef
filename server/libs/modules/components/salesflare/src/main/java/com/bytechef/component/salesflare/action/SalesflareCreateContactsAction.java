@@ -43,7 +43,8 @@ public class SalesflareCreateContactsAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("__items").items(object().properties(string("email").label("Email")
+        .properties(array("__items").items(object().properties(string("email").maxLength(1000)
+            .label("Email")
             .description("Email address of the contact.")
             .required(true),
             string("firstname").label("First   Name")

@@ -42,13 +42,16 @@ public class InsightlyCreateOrganizationAction {
                 "path", "/Organisations", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("ORGANISATION_NAME").label("Organization   Name")
+        .properties(object("__item").properties(string("ORGANISATION_NAME").maxLength(255)
+            .label("Organization   Name")
             .description("The name of the organization")
             .required(true),
-            string("PHONE").label("Phone")
+            string("PHONE").maxLength(255)
+                .label("Phone")
                 .description("A contact phone number for the organization.")
                 .required(false),
-            string("WEBSITE").label("Website")
+            string("WEBSITE").maxLength(255)
+                .label("Website")
                 .description("The organization's website.")
                 .required(false))
             .label("Organization")

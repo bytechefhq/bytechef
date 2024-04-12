@@ -43,7 +43,8 @@ public class InsightlyCreateTaskAction {
                 "path", "/Tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("TITLE").label("Title")
+        .properties(object("__item").properties(string("TITLE").maxLength(500)
+            .label("Title")
             .required(true),
             string("STATUS").label("Status")
                 .description("Task status")

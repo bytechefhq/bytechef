@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Insightly",
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,17 +61,17 @@
       "refreshOn": null,
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
-      "apply": null,
-      "authorizationCallback": null,
+      "acquire": null,
       "authorizationUrl": null,
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "acquire": null
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -129,7 +128,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -149,7 +148,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -169,7 +168,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -189,7 +188,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -209,13 +208,13 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create contact",
     "workflowNodeDescriptionFunction": null,
@@ -257,8 +256,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -360,8 +359,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     }
@@ -414,7 +413,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -434,7 +433,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -454,13 +453,13 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 255,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create organization",
     "workflowNodeDescriptionFunction": null,
@@ -502,8 +501,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -565,8 +564,8 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     }
@@ -619,7 +618,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 500,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -664,8 +663,8 @@
         } ],
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create task",
     "workflowNodeDescriptionFunction": null,
@@ -707,8 +706,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -750,10 +749,11 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     }
-  } ]
+  } ],
+  "triggers": [ ]
 }

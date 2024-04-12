@@ -50,7 +50,8 @@ public class SalesflareCreateAccountAction {
             string("description").label("Description")
                 .description("Account description")
                 .required(false),
-            string("email").label("Email")
+            string("email").maxLength(1000)
+                .label("Email")
                 .required(false),
             string("phone_number").label("Phone Number")
                 .required(false),

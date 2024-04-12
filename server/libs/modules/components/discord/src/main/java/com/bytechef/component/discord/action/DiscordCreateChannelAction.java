@@ -49,7 +49,9 @@ public class DiscordCreateChannelAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("name").label("Name")
+            object("__item").properties(string("name").minLength(1)
+                .maxLength(100)
+                .label("Name")
                 .description("The name of the new channel")
                 .required(true),
                 integer("type").label("Type")

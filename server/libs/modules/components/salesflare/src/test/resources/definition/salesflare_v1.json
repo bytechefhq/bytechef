@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Salesflare",
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -42,17 +41,17 @@
       "refreshOn": null,
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
+      "acquire": null,
       "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "acquire": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -169,7 +168,7 @@
         "placeholder": null,
         "controlType": "TEXT",
         "languageId": null,
-        "maxLength": null,
+        "maxLength": 1000,
         "minLength": null,
         "options": null,
         "optionsDataSource": null
@@ -305,7 +304,7 @@
           "placeholder": null,
           "controlType": "TEXT",
           "languageId": null,
-          "maxLength": null,
+          "maxLength": 1000,
           "minLength": null,
           "options": null,
           "optionsDataSource": null
@@ -754,5 +753,6 @@
       "sampleOutput": null
     },
     "perform": null
-  } ]
+  } ],
+  "triggers": [ ]
 }
