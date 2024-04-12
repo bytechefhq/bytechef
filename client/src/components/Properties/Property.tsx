@@ -407,7 +407,7 @@ const Property = ({
 
     // set value to taskParameterValue only on initial render
     useEffect(() => {
-        if (mentionInput && mentionInputValue === '' && taskParameterValue) {
+        if (mentionInput && taskParameterValue) {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
             if (!mentionInputElement) {
