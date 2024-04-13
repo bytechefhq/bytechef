@@ -243,5 +243,4 @@ class AITableUtilsTest {
             expectedOptions,
             AITableUtils.getSpaceIdOptions(mockedParameters, mockedParameters, "", mockedContext));
     }
-
 }

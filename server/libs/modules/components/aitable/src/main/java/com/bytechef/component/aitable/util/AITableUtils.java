@@ -63,7 +63,6 @@ public class AITableUtils {
         List<ValueProperty<?>> list = new ArrayList<>();
 
         for (FieldTypeInfo fieldTypeInfo : datasheetFields) {
-
             ModifiableValueProperty<?, ?> propertyType = getPropertyType(fieldTypeInfo);
 
             list.add(propertyType);
@@ -72,6 +71,7 @@ public class AITableUtils {
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     private static List<FieldTypeInfo> createDatasheetFields(Parameters inputParameters, ActionContext context) {
         String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
 
@@ -87,6 +87,7 @@ public class AITableUtils {
                     if (field.get("property") instanceof Map<?, ?> propertyMap) {
                         property = (Map<String, Object>) propertyMap;
                     }
+
                     fields.add(new FieldTypeInfo((String) field.get(NAME), (String) field.get(TYPE), property));
                 }
 
@@ -175,8 +176,7 @@ public class AITableUtils {
 
         String spaceId = inputParameters.getRequiredString(SPACE_ID);
 
-        Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/spaces/" + spaceId + "/nodes"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/spaces/" + spaceId + "/nodes"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -198,8 +198,7 @@ public class AITableUtils {
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
         String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
 
-        Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/records"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/records"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -242,8 +241,7 @@ public class AITableUtils {
     public static List<Option<String>> getSpaceIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/spaces"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/spaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -262,8 +260,7 @@ public class AITableUtils {
     }
 
     private static Map<String, Object> getDatasheetFields(ActionContext context, String datasheetId) {
-        return context
-            .http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/fields"))
+        return context.http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/fields"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
