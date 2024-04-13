@@ -20,6 +20,7 @@ import Properties from 'components/Properties/Properties';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
+import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -31,7 +32,6 @@ import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
-import InlineSVG from 'react-inlinesvg';
 
 const TABS = [
     {
