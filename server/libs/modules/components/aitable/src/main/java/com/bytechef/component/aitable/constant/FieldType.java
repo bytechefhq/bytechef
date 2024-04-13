@@ -43,6 +43,7 @@ public enum FieldType {
                 return fieldType;
             }
         }
+
         return null;
     }
 
