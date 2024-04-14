@@ -504,6 +504,7 @@ const Property = ({
                             leadingIcon={typeIcon}
                             name={name || `${arrayName}_0`}
                             objectName={objectName}
+                            onChange={setMentionInputValue}
                             onKeyPress={(event: KeyboardEvent) => {
                                 if (isNumericalInput || type === 'BOOLEAN') {
                                     event.key !== '{' && event.preventDefault();
@@ -513,7 +514,6 @@ const Property = ({
                             path={path}
                             ref={editorRef}
                             required={required}
-                            setValue={setMentionInputValue}
                             showInputTypeSwitchButton={showInputTypeSwitchButton!}
                             singleMention={controlType !== 'TEXT'}
                             updateWorkflowMutation={updateWorkflowMutation}

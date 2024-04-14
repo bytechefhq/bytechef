@@ -2,7 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/utils/getRandomId';
 
 import 'quill-mention';
-import {ChangeEvent, KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
+import {KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './propertyMentionsInput.css';
@@ -57,13 +57,12 @@ interface PropertyMentionsInputProps {
     leadingIcon?: ReactNode;
     name?: string;
     objectName?: string;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+    onChange: (value: string) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     otherComponents: Array<ComponentType>;
     path?: string;
     placeholder?: string;
     required?: boolean;
-    setValue: (value: string) => void;
     singleMention?: boolean;
     showInputTypeSwitchButton: boolean;
     updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
@@ -87,12 +86,12 @@ const PropertyMentionsInput = forwardRef(
             leadingIcon,
             name,
             objectName,
+            onChange,
             onKeyPress,
             otherComponents,
             path,
             placeholder = "Show data pills using '{'",
             required,
-            setValue,
             showInputTypeSwitchButton,
             singleMention,
             updateWorkflowMutation,
@@ -299,8 +298,8 @@ const PropertyMentionsInput = forwardRef(
         }, 200);
 
         const handleOnChange = (value: string) => {
-            if (setValue) {
-                setValue(value);
+            if (onChange) {
+                onChange(value);
             }
 
             setMentionOccurences(value.match(/property-mention/g)?.length || 0);
@@ -429,7 +428,7 @@ const PropertyMentionsInput = forwardRef(
                         key={elementId}
                         // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                         modules={useMemo(() => modules, [])}
-                        onChange={handleOnChange}
+                        onChange={(newValue) => handleOnChange(newValue)}
                         onFocus={handleOnFocus}
                         onKeyDown={handleOnKeyDown}
                         onKeyPress={onKeyPress}
