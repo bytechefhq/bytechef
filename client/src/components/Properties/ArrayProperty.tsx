@@ -3,7 +3,6 @@ import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {ControlTypeModel, ObjectPropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
-import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {
     ArrayPropertyType,
     ComponentType,
@@ -19,6 +18,19 @@ import {useEffect, useState} from 'react';
 import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
+
+const PROPERTY_CONTROL_TYPES = {
+    ARRAY: 'ARRAY_BUILDER',
+    BOOLEAN: 'BOOLEAN',
+    DATE: 'DATE',
+    DATE_TIME: 'DATE_TIME',
+    INTEGER: 'INTEGER',
+    NULL: 'NULL',
+    NUMBER: 'NUMBER',
+    OBJECT: 'OBJECT_BUILDER',
+    STRING: 'TEXT',
+    TIME: 'TIME',
+};
 
 interface ArrayPropertyProps {
     currentComponentDefinition?: CurrentComponentDefinitionType;
