@@ -60,6 +60,9 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const onSuccess = (project: ProjectModel) => {
         queryClient.invalidateQueries({
+            queryKey: ProjectKeys.project(project.id!),
+        });
+        queryClient.invalidateQueries({
             queryKey: ProjectCategoryKeys.projectCategories,
         });
         queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
