@@ -14,11 +14,13 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
+import {ProjectKeys} from "@/queries/automation/projects.queries";
 
 const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
     onClose: () => void;
+    projectId: number;
     runDisabled: boolean;
     testConfigurationDisabled: boolean;
     workflow: WorkflowModel;
@@ -27,6 +29,7 @@ interface WorkflowCodeEditorSheetProps {
 
 const WorkflowCodeEditorSheet = ({
     onClose,
+    projectId,
     runDisabled,
     testConfigurationDisabled,
     workflow,
@@ -49,6 +52,10 @@ const WorkflowCodeEditorSheet = ({
             setDirty(true);
         },
         onSuccess: (workflow: WorkflowModel) => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(projectId),
+            });
+
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
