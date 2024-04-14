@@ -25,7 +25,8 @@ export default async function saveWorkflowDefinition(
     nodeData: NodeDataType,
     workflow: WorkflowModel,
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestType, unknown>,
-    index?: number
+    index?: number,
+    onSuccess?: (workflow: WorkflowModel) => void
 ) {
     const {actionName, componentName, label, name, parameters} = nodeData;
 
@@ -92,18 +93,23 @@ export default async function saveWorkflowDefinition(
         tasks = [...(workflowDefinition.tasks || []), newTask];
     }
 
-    updateWorkflowMutation.mutate({
-        id: workflow.id!,
-        workflowModel: {
-            definition: JSON.stringify(
-                {
-                    ...workflowDefinition,
-                    tasks,
-                },
-                null,
-                SPACE
-            ),
-            version: workflow.version,
+    updateWorkflowMutation.mutate(
+        {
+            id: workflow.id!,
+            workflowModel: {
+                definition: JSON.stringify(
+                    {
+                        ...workflowDefinition,
+                        tasks,
+                    },
+                    null,
+                    SPACE
+                ),
+                version: workflow.version,
+            },
         },
-    });
+        {
+            onSuccess: onSuccess,
+        }
+    );
 }

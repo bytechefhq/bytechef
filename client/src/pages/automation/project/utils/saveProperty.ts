@@ -20,14 +20,6 @@ export default function saveProperty(
 
     const {actionName, componentName, workflowNodeName} = currentComponentData;
 
-    setComponentData([
-        ...otherComponentData,
-        {
-            ...currentComponentData,
-            parameters,
-        },
-    ]);
-
     saveWorkflowDefinition(
         {
             actionName,
@@ -36,6 +28,36 @@ export default function saveProperty(
             parameters,
         },
         workflow,
-        updateWorkflowMutation
+        updateWorkflowMutation,
+        undefined,
+        (workflow) => {
+            let parameters;
+
+            for (const trigger of workflow.triggers ?? []) {
+                if (trigger.name === workflowNodeName) {
+                    parameters = trigger.parameters;
+
+                    break;
+                }
+            }
+
+            if (!parameters) {
+                for (const task of workflow.tasks ?? []) {
+                    if (task.name === workflowNodeName) {
+                        parameters = task.parameters;
+
+                        break;
+                    }
+                }
+            }
+
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    parameters,
+                },
+            ]);
+        }
     );
 }
