@@ -8,7 +8,7 @@ import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowD
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeOptionsQuery} from '@/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {FocusEventHandler, ReactNode, useEffect, useState} from 'react';
+import {FocusEventHandler, ReactNode, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -27,7 +27,7 @@ interface PropertyComboBoxProps {
     currentNodeConnectionId?: number;
     description?: string;
     label?: string;
-    loadDependency?: any;
+    loadDependsOnValues?: Array<string>;
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
@@ -45,7 +45,7 @@ const PropertyComboBox = ({
     description,
     label,
     leadingIcon,
-    loadDependency,
+    loadDependsOnValues,
     name,
     onBlur,
     onValueChange,
@@ -56,9 +56,6 @@ const PropertyComboBox = ({
     value,
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
-    const [loadDependencyValues, setLoadDependencyValues] = useState<Array<string>>(
-        Object.values(loadDependency ?? {})
-    );
 
     const {workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
@@ -67,15 +64,17 @@ const PropertyComboBox = ({
         data: optionsData,
         isLoading,
         isRefetching,
-        refetch,
     } = useGetWorkflowNodeOptionsQuery(
         {
-            id: workflow.id!,
-            propertyName: name!,
-            workflowNodeName: currentNode.name!,
+            loadDependencyValueKey: (loadDependsOnValues ?? []).join(''),
+            request: {
+                id: workflow.id!,
+                propertyName: name!,
+                workflowNodeName: currentNode.name!,
+            },
         },
         !!optionsDataSource &&
-            loadDependencyValues.every((loadDependencyValue) => loadDependencyValue !== undefined) &&
+            (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
             !!currentNodeConnectionId
     );
 
@@ -89,25 +88,11 @@ const PropertyComboBox = ({
 
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
-    if (loadDependencyValues?.length && !options.length) {
-        placeholder = `${Object.keys(loadDependency)} is not defined`;
+    if (loadDependsOnValues?.length && !options.length) {
+        placeholder = `${loadDependsOnValues} is not defined`;
     } else if (!currentNodeConnectionId) {
         placeholder = 'Connection missing...';
     }
-
-    useEffect(() => {
-        if (loadDependency && typeof loadDependency === 'object') {
-            setLoadDependencyValues(Object.values(loadDependency));
-        }
-    }, [loadDependency]);
-
-    const loadDependencyValuesString = loadDependencyValues.join('');
-
-    useEffect(() => {
-        if (loadDependencyValuesString?.length && currentNodeConnectionId) {
-            refetch();
-        }
-    }, [loadDependencyValuesString, options.length, refetch, currentNodeConnectionId]);
 
     return (
         <fieldset className="w-full space-y-2">
@@ -147,7 +132,7 @@ const PropertyComboBox = ({
                             </div>
                         )}
 
-                        {optionsDataSource && loadDependency && isRefetching && !currentOption?.label && (
+                        {optionsDataSource && loadDependsOnValues && isRefetching && !currentOption?.label && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Refetching...
                             </span>
@@ -180,7 +165,7 @@ const PropertyComboBox = ({
                                         <span
                                             className={twMerge(
                                                 leadingIcon && 'ml-9',
-                                                ((loadDependencyValues?.length && !options.length) ||
+                                                ((loadDependsOnValues?.length && !options.length) ||
                                                     !currentNodeConnectionId) &&
                                                     'text-red-600'
                                             )}

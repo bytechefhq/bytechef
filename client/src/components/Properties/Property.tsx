@@ -84,8 +84,7 @@ const Property = ({
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
-    const [loadOptionsDependency, setLoadOptionsDependency] = useState({});
-    const [loadPropertiesDependency, setLoadPropertiesDependency] = useState({});
+    const [loadDependsOnValues, setLoadDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(!formState && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
@@ -448,30 +447,22 @@ const Property = ({
     }, []);
 
     useEffect(() => {
-        const loadOptionsDependsOn = optionsDataSource?.loadOptionsDependsOn?.reduce(
-            (acc, key) => ({
-                ...acc,
-                [key]: currentComponent?.parameters?.[key],
-            }),
-            {}
-        );
+        if (optionsDataSource?.loadOptionsDependsOn) {
+            const loadDependsOnValues = optionsDataSource?.loadOptionsDependsOn.map(
+                (key) => currentComponent?.parameters?.[key]
+            );
 
-        if (loadOptionsDependsOn) {
-            setLoadOptionsDependency(loadOptionsDependsOn);
+            setLoadDependsOnValues(loadDependsOnValues);
         }
     }, [currentComponent?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
     useEffect(() => {
-        const loadPropertiesDependsOn = propertiesDataSource?.loadPropertiesDependsOn?.reduce(
-            (acc, key) => ({
-                ...acc,
-                [key]: currentComponent?.parameters?.[key],
-            }),
-            {}
-        );
+        if (propertiesDataSource?.loadPropertiesDependsOn) {
+            const loadDependsOnValues = propertiesDataSource?.loadPropertiesDependsOn.map(
+                (key) => currentComponent?.parameters?.[key]
+            );
 
-        if (loadPropertiesDependsOn) {
-            setLoadPropertiesDependency(loadPropertiesDependsOn);
+            setLoadDependsOnValues(loadDependsOnValues);
         }
     }, [currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
@@ -674,7 +665,7 @@ const Property = ({
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                loadDependency={loadOptionsDependency}
+                                loadDependsOnValues={loadDependsOnValues}
                                 name={objectName ? `${objectName}.${name}` : name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
@@ -691,7 +682,7 @@ const Property = ({
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                loadDependency={loadOptionsDependency}
+                                loadDependsOnValues={loadDependsOnValues}
                                 name={objectName ? `${objectName}.${name}` : name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
@@ -745,7 +736,7 @@ const Property = ({
                             currentComponent={currentComponent}
                             currentComponentDefinition={currentComponentDefinition}
                             currentNodeConnectionId={currentNode.connectionId}
-                            loadDependency={loadPropertiesDependency}
+                            loadDependsOnValues={loadDependsOnValues}
                             name={name}
                             propertiesDataSource={property.propertiesDataSource}
                             taskParameterValue={taskParameterValue}
