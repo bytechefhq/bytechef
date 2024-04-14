@@ -176,16 +176,18 @@ const PropertyComboBox = ({
                                         {currentOption?.label}
                                     </span>
                                 ) : (
-                                    <span
-                                        className={twMerge(
-                                            leadingIcon && 'ml-9',
-                                            ((loadDependencyValues?.length && !options.length) ||
-                                                !currentNodeConnectionId) &&
-                                                'text-red-600'
-                                        )}
-                                    >
-                                        {placeholder}
-                                    </span>
+                                    !isRefetching && (
+                                        <span
+                                            className={twMerge(
+                                                leadingIcon && 'ml-9',
+                                                ((loadDependencyValues?.length && !options.length) ||
+                                                    !currentNodeConnectionId) &&
+                                                    'text-red-600'
+                                            )}
+                                        >
+                                            {placeholder}
+                                        </span>
+                                    )
                                 )}
                             </>
                         )}
