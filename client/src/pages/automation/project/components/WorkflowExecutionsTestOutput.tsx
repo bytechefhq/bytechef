@@ -1,5 +1,5 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {JobModel, TaskExecutionModel, TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
+import {JobModel, TaskExecutionModel, TriggerExecutionModel} from '@/middleware/platform/workflow/execution';
 import {WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
 import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
