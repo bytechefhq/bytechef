@@ -8,11 +8,10 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 
 interface WorkflowOutputsSheetProps {
     onClose: () => void;
-    projectId: number;
     workflow: WorkflowModel;
 }
 
-const WorkflowOutputsSheet = ({onClose, projectId, workflow}: WorkflowOutputsSheetProps) => (
+const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) => (
     <Sheet onOpenChange={onClose} open>
         <SheetContent
             className="flex flex-col p-4 sm:max-w-[700px]"
@@ -26,7 +25,6 @@ const WorkflowOutputsSheet = ({onClose, projectId, workflow}: WorkflowOutputsShe
                     <div className="flex items-center gap-2">
                         {workflow.outputs && workflow.outputs?.length > 0 && (
                             <WorkflowOutputsSheetDialog
-                                projectId={projectId}
                                 triggerNode={<Button size="sm">New Output</Button>}
                                 workflow={workflow}
                             />
@@ -39,7 +37,7 @@ const WorkflowOutputsSheet = ({onClose, projectId, workflow}: WorkflowOutputsShe
                 </div>
             </SheetHeader>
 
-            <WorkflowOutputsSheetTable projectId={projectId} workflow={workflow} />
+            <WorkflowOutputsSheetTable workflow={workflow} />
         </SheetContent>
     </Sheet>
 );

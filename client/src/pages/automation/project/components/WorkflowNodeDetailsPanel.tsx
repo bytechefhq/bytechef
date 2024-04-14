@@ -99,7 +99,6 @@ const WorkflowNodeDetailsPanel = ({
         onSuccess: () => {
             if (projectId) {
                 queryClient.invalidateQueries({queryKey: ProjectKeys.project(parseInt(projectId))});
-                queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(parseInt(projectId))});
             }
 
             queryClient.invalidateQueries({

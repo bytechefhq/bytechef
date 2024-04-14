@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 const SPACE = 4;
 
-const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; workflow: WorkflowModel}) => {
+const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -30,10 +30,6 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.projectWorkflows(projectId),
-            });
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
@@ -129,7 +125,6 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
 
                         <div className="mt-6">
                             <WorkflowOutputsSheetDialog
-                                projectId={projectId}
                                 triggerNode={<Button size="sm">New Output</Button>}
                                 workflow={workflow}
                             />
@@ -142,7 +137,6 @@ const WorkflowOutputsSheetTable = ({projectId, workflow}: {projectId: number; wo
                 <WorkflowOutputsSheetDialog
                     onClose={() => setShowEditDialog(false)}
                     outputIndex={currentInputIndex}
-                    projectId={projectId}
                     workflow={workflow}
                 />
             )}

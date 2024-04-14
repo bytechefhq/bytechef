@@ -7,6 +7,7 @@ import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowExecutionsTestOutput from '@/pages/automation/project/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
@@ -14,7 +15,6 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
-import {ProjectKeys} from "@/queries/automation/projects.queries";
 
 const workflowTestApi = new WorkflowTestApi();
 

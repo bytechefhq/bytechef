@@ -15,7 +15,7 @@ export default function useHandleDrop(): [
     (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
     (targetEdge: Edge, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
 ] {
-    const {projectId, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore();
 
     const {componentNames} = workflow;
 
@@ -29,8 +29,6 @@ export default function useHandleDrop(): [
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId)});
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });

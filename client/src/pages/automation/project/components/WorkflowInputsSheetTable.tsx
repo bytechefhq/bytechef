@@ -22,11 +22,9 @@ import {useState} from 'react';
 const SPACE = 4;
 
 const WorkflowInputsSheetTable = ({
-    projectId,
     workflow,
     workflowTestConfiguration,
 }: {
-    projectId: number;
     workflow: WorkflowModel;
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }) => {
@@ -38,10 +36,6 @@ const WorkflowInputsSheetTable = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.projectWorkflows(projectId),
-            });
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
@@ -155,7 +149,6 @@ const WorkflowInputsSheetTable = ({
 
                         <div className="mt-6">
                             <WorkflowInputsSheetDialog
-                                projectId={projectId}
                                 triggerNode={
                                     <Button>
                                         <PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
@@ -174,7 +167,6 @@ const WorkflowInputsSheetTable = ({
                 <WorkflowInputsSheetDialog
                     inputIndex={currentInputIndex}
                     onClose={() => setShowEditDialog(false)}
-                    projectId={projectId}
                     workflow={workflow}
                     workflowTestConfiguration={workflowTestConfiguration}
                 />

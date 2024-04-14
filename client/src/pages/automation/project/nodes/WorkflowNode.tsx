@@ -28,7 +28,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const [hoveredNode, setHoveredNode] = useState<string | undefined>();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {projectId, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore();
 
     const {componentNames} = workflow;
 
@@ -50,8 +50,6 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId!)});
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });

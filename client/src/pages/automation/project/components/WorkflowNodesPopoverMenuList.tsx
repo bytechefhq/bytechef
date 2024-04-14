@@ -36,14 +36,10 @@ const WorkflowNodesPopoverMenuList = memo(
         taskDispatcherDefinitions,
         triggerComponentDefinitions,
     }: WorkflowNodesListProps) => {
-        const {projectId} = useWorkflowDataStore();
-
         const queryClient = useQueryClient();
 
         const updateWorkflowMutation = useUpdateWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({queryKey: WorkflowKeys.projectWorkflows(projectId!)});
-
                 queryClient.invalidateQueries({
                     queryKey: WorkflowKeys.workflow(workflow.id!),
                 });

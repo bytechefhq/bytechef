@@ -27,7 +27,6 @@ import {useForm} from 'react-hook-form';
 export interface WorkflowInputsSheetDialogProps {
     inputIndex?: number;
     onClose?: () => void;
-    projectId: number;
     triggerNode?: ReactNode;
     workflow: WorkflowModel;
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
@@ -38,7 +37,6 @@ const SPACE = 4;
 const WorkflowInputsSheetDialog = ({
     inputIndex = -1,
     onClose,
-    projectId,
     triggerNode,
     workflow,
     workflowTestConfiguration,
@@ -60,10 +58,6 @@ const WorkflowInputsSheetDialog = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.projectWorkflows(projectId),
-            });
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });

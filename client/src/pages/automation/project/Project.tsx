@@ -52,9 +52,9 @@ import WorkflowCodeEditorSheet from '@/pages/automation/project/components/Workf
 import WorkflowExecutionsTestOutput from '@/pages/automation/project/components/WorkflowExecutionsTestOutput';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
 import WorkflowOutputsSheet from '@/pages/automation/project/components/WorkflowOutputsSheet';
-import useWorkflowEditorStore from '@/pages/automation/project/stores/useWorkflowEditorStore';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/automation/project/stores/useWorkflowEditorStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';

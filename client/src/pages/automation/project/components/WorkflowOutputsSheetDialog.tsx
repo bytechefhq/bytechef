@@ -25,13 +25,11 @@ const formSchema = z.object({
 const WorkflowOutputsSheetDialog = ({
     onClose,
     outputIndex = -1,
-    projectId,
     triggerNode,
     workflow,
 }: {
     onClose?: () => void;
     outputIndex?: number;
-    projectId: number;
     triggerNode?: ReactNode;
     workflow: WorkflowModel;
 }) => {
@@ -51,10 +49,6 @@ const WorkflowOutputsSheetDialog = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.projectWorkflows(projectId),
-            });
-
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });

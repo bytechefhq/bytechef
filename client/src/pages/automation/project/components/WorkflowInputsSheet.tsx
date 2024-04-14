@@ -9,12 +9,11 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 
 interface WorkflowInputsSheetProps {
     onClose: () => void;
-    projectId: number;
     workflow: WorkflowModel;
     workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }
 
-const WorkflowInputsSheet = ({onClose, projectId, workflow, workflowTestConfiguration}: WorkflowInputsSheetProps) => (
+const WorkflowInputsSheet = ({onClose, workflow, workflowTestConfiguration}: WorkflowInputsSheetProps) => (
     <Sheet onOpenChange={onClose} open>
         <SheetContent
             className="flex flex-col p-4 sm:max-w-[700px]"
@@ -28,7 +27,6 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow, workflowTestConfigur
                     <div className="flex items-center gap-2">
                         {workflow.inputs && workflow.inputs.length > 0 && (
                             <WorkflowInputsSheetDialog
-                                projectId={projectId}
                                 triggerNode={<Button size="sm">New Input</Button>}
                                 workflow={workflow}
                                 workflowTestConfiguration={workflowTestConfiguration}
@@ -42,11 +40,7 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow, workflowTestConfigur
                 </div>
             </SheetHeader>
 
-            <WorkflowInputsSheetTable
-                projectId={projectId}
-                workflow={workflow}
-                workflowTestConfiguration={workflowTestConfiguration}
-            />
+            <WorkflowInputsSheetTable workflow={workflow} workflowTestConfiguration={workflowTestConfiguration} />
         </SheetContent>
     </Sheet>
 );
