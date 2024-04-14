@@ -7,19 +7,25 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeDynamicPropertyKeys = {
-    propertyWorkflowNodeDynamicProperties: (request: GetWorkflowNodeDynamicPropertiesRequest) => [
-        ...WorkflowNodeDynamicPropertyKeys.workflowNodeOptions,
-        request,
-    ],
+    propertyWorkflowNodeDynamicProperties: (
+        request: GetWorkflowNodeDynamicPropertiesRequest,
+        loadDependencyValueKey: string
+    ) => [...WorkflowNodeDynamicPropertyKeys.workflowNodeOptions, request, loadDependencyValueKey],
     workflowNodeOptions: ['workflowNodeOptions'] as const,
 };
 
 export const useGetWorkflowNodeDynamicPropertiesQuery = (
-    request: GetWorkflowNodeDynamicPropertiesRequest,
+    {
+        loadDependencyValueKey,
+        request,
+    }: {loadDependencyValueKey: string; request: GetWorkflowNodeDynamicPropertiesRequest},
     enabled?: boolean
 ) =>
     useQuery<Array<PropertyModel>, Error>({
-        queryKey: WorkflowNodeDynamicPropertyKeys.propertyWorkflowNodeDynamicProperties(request),
+        queryKey: WorkflowNodeDynamicPropertyKeys.propertyWorkflowNodeDynamicProperties(
+            request,
+            loadDependencyValueKey
+        ),
         queryFn: () => new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeDynamicProperties(request),
         enabled: enabled === undefined ? true : enabled,
     });
