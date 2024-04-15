@@ -28,24 +28,30 @@ export default async function saveWorkflowDefinition(
     index?: number,
     onSuccess?: (workflow: WorkflowModel) => void
 ) {
-    const {actionName, componentName, label, name, parameters} = nodeData;
+    const {actionName: currentActionName, componentName, label, name, parameters} = nodeData;
 
     const queryClient = new QueryClient();
 
-    const newNodeComponentDefinition = await queryClient.fetchQuery({
-        queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
-        queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
-    });
+    let actionName = currentActionName;
 
-    if (!newNodeComponentDefinition) {
-        return;
+    if (!actionName) {
+        const newNodeComponentDefinition = await queryClient.fetchQuery({
+            queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
+            queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
+        });
+
+        if (!newNodeComponentDefinition) {
+            return;
+        }
+
+        actionName = newNodeComponentDefinition.actions?.[0].name;
     }
 
     const newTask: WorkflowTaskModel = {
         label,
         name,
         parameters,
-        type: `${componentName}/v1/${actionName || newNodeComponentDefinition.actions?.[0].name}`,
+        type: `${componentName}/v1/${actionName}`,
     };
 
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
