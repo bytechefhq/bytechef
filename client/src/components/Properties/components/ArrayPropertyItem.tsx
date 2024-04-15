@@ -42,7 +42,7 @@ const ArrayPropertyItem = ({
     };
 
     return (
-        <div className="ml-2 flex w-full items-center border-l pb-2 last-of-type:pb-0" key={arrayItem.name}>
+        <div className="ml-2 flex w-full items-center" key={arrayItem.name}>
             <Property
                 arrayIndex={index}
                 arrayName={arrayName}

@@ -157,44 +157,46 @@ const ArrayProperty = ({
     }, [availableItemTypes]);
 
     return (
-        <ul className="w-full">
-            {arrayItems?.map((arrayItem, index) =>
-                Array.isArray(arrayItem) ? (
-                    arrayItem.map((subItem: ArrayPropertyType) => (
+        <>
+            <ul className="w-full space-y-4 border-l">
+                {arrayItems?.map((arrayItem, index) =>
+                    Array.isArray(arrayItem) ? (
+                        arrayItem.map((subItem: ArrayPropertyType) => (
+                            <ArrayPropertyItem
+                                arrayItem={subItem}
+                                arrayName={name}
+                                currentComponent={currentComponent}
+                                currentComponentDefinition={currentComponentDefinition}
+                                dataPills={dataPills}
+                                index={index}
+                                key={subItem.name}
+                                onDeleteClick={handleDeleteClick}
+                                path={path}
+                                setArrayItems={setArrayItems}
+                            />
+                        ))
+                    ) : (
                         <ArrayPropertyItem
-                            arrayItem={subItem}
+                            arrayItem={arrayItem}
                             arrayName={name}
                             currentComponent={currentComponent}
                             currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
                             index={index}
-                            key={subItem.name}
+                            key={arrayItem.name}
                             onDeleteClick={handleDeleteClick}
                             path={path}
                             setArrayItems={setArrayItems}
                         />
-                    ))
-                ) : (
-                    <ArrayPropertyItem
-                        arrayItem={arrayItem}
-                        arrayName={name}
-                        currentComponent={currentComponent}
-                        currentComponentDefinition={currentComponentDefinition}
-                        dataPills={dataPills}
-                        index={index}
-                        key={arrayItem.name}
-                        onDeleteClick={handleDeleteClick}
-                        path={path}
-                        setArrayItems={setArrayItems}
-                    />
-                )
-            )}
+                    )
+                )}
+            </ul>
 
             {availableItemTypes.length > 1 ? (
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
-                            className="mt-2 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                            className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
                             size="sm"
                             variant="ghost"
                         >
@@ -231,7 +233,7 @@ const ArrayProperty = ({
                 </Popover>
             ) : (
                 <Button
-                    className="mt-2 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                    className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
                     onClick={handleAddItemClick}
                     size="sm"
                     variant="ghost"
@@ -239,7 +241,7 @@ const ArrayProperty = ({
                     <PlusIcon className="size-4" /> Add item
                 </Button>
             )}
-        </ul>
+        </>
     );
 };
 
