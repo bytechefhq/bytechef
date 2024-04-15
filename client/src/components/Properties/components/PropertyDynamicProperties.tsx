@@ -1,11 +1,9 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
-import {PropertiesDataSourceModel, PropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {PropertiesDataSourceModel, PropertyModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workflowNodeDynamicProperties.queries';
 import {ComponentType, CurrentComponentDefinitionType} from '@/types/types';
-import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 
 import Property from '../Property';
@@ -20,7 +18,6 @@ interface PropertyDynamicPropertiesProps {
     propertiesDataSource?: PropertiesDataSourceModel;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     taskParameterValue?: any;
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
 const PropertyDynamicProperties = ({
@@ -32,7 +29,6 @@ const PropertyDynamicProperties = ({
     name,
     propertiesDataSource,
     taskParameterValue,
-    updateWorkflowMutation,
 }: PropertyDynamicPropertiesProps) => {
     const [subProperties, setSubProperties] = useState<PropertyModel[]>();
 
@@ -81,7 +77,6 @@ const PropertyDynamicProperties = ({
                         path={name}
                         property={property}
                         taskParameterValue={propertyDefaultValue}
-                        updateWorkflowMutation={updateWorkflowMutation}
                     />
                 );
             })}

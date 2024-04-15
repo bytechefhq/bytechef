@@ -2,7 +2,6 @@ import PropertyInput from '@/components/Properties/components/PropertyInput/Prop
 import PropertySelect from '@/components/Properties/components/PropertySelect';
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
 import {ControlTypeModel} from '@/middleware/platform/configuration';
 import {
     ComponentType,
@@ -13,7 +12,6 @@ import {
 } from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
-import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -40,11 +38,11 @@ interface ObjectPropertyProps {
     currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponent?: ComponentType;
     dataPills?: DataPillType[];
+    onDeleteClick?: (path: string, name: string) => void;
     path?: string;
     property: PropertyType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     taskParameterValue?: any;
-    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
 const ObjectProperty = ({
@@ -54,10 +52,10 @@ const ObjectProperty = ({
     currentComponent,
     currentComponentDefinition,
     dataPills,
+    onDeleteClick,
     path,
     property,
     taskParameterValue,
-    updateWorkflowMutation,
 }: ObjectPropertyProps) => {
     const [subProperties, setSubProperties] = useState<Array<PropertyType>>(
         (property.properties as Array<PropertyType>) || []
@@ -82,6 +80,14 @@ const ObjectProperty = ({
         setSubProperties([...subProperties, newItem]);
 
         setNewPropertyName('');
+    };
+
+    const handleDeleteClick = (subProperty: SubPropertyType) => {
+        setSubProperties((subProperties) => subProperties.filter((property) => property.name !== subProperty.name));
+
+        if (onDeleteClick) {
+            onDeleteClick(`${path}.${name}`, subProperty.name!);
+        }
     };
 
     // render individual object items with data gathered from parameters
@@ -166,26 +172,17 @@ const ObjectProperty = ({
                                 }}
                                 showDeletePropertyButton={true}
                                 taskParameterValue={subPropertyDefaultValue}
-                                updateWorkflowMutation={updateWorkflowMutation}
                             />
 
-                            {subProperty.custom &&
-                                name &&
-                                subProperty.name &&
-                                currentComponent &&
-                                updateWorkflowMutation && (
-                                    <DeletePropertyButton
-                                        currentComponent={currentComponent}
-                                        handleDeletePropertyClick={() =>
-                                            setSubProperties((subProperties) =>
-                                                subProperties.filter((property) => property.name !== subProperty.name)
-                                            )
-                                        }
-                                        propertyName={name}
-                                        subPropertyName={subProperty.name}
-                                        updateWorkflowMutation={updateWorkflowMutation}
-                                    />
-                                )}
+                            {subProperty.custom && name && subProperty.name && currentComponent && (
+                                <DeletePropertyButton
+                                    className="absolute right-0"
+                                    currentComponent={currentComponent}
+                                    onClick={() => handleDeleteClick(subProperty)}
+                                    propertyName={name}
+                                    subPropertyName={subProperty.name}
+                                />
+                            )}
                         </div>
                     );
                 })}

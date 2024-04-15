@@ -8,19 +8,22 @@ import PropertySelect from '@/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/components/Properties/components/PropertyTextArea';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
-import {OptionModel, WorkflowModel} from '@/middleware/platform/configuration';
-import {useUpdateWorkflowNodeParameterMutation} from '@/mutations/platform/workflowNodeParameters.mutations';
+import {OptionModel} from '@/middleware/platform/configuration';
+import {
+    useDeleteWorkflowNodeParameterMutation,
+    useUpdateWorkflowNodeParameterMutation,
+} from '@/mutations/platform/workflowNodeParameters.mutations';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
+import deleteProperty from '@/pages/automation/project/utils/deleteProperty';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveProperty from '@/pages/automation/project/utils/saveProperty';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -62,7 +65,6 @@ interface PropertyProps {
     register?: UseFormRegister<any>;
     showDeletePropertyButton?: boolean;
     taskParameterValue?: any;
-    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
 const Property = ({
@@ -81,7 +83,6 @@ const Property = ({
     register,
     showDeletePropertyButton = false,
     taskParameterValue,
-    updateWorkflowMutation,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -183,6 +184,13 @@ const Property = ({
 
     const queryClient = useQueryClient();
 
+    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
+        onSuccess: () =>
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            }),
+    });
+
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: () =>
             queryClient.invalidateQueries({
@@ -191,7 +199,7 @@ const Property = ({
     });
 
     const saveInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow || !updateWorkflowMutation) {
+        if (!currentComponent || !workflow) {
             return;
         }
 
@@ -239,9 +247,9 @@ const Property = ({
         if (arrayName && arrayIndex !== undefined) {
             if (path?.includes('parameters')) {
                 if (objectName) {
-                    currentValue = parameters[arrayName][arrayIndex][name];
+                    currentValue = parameters?.[arrayName]?.[arrayIndex]?.[name];
                 } else {
-                    currentValue = parameters[arrayName][arrayIndex];
+                    currentValue = parameters?.[arrayName]?.[arrayIndex];
                 }
             } else {
                 currentValue = parameters[arrayName];
@@ -284,7 +292,7 @@ const Property = ({
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponent || !updateWorkflowMutation || !name) {
+        if (!currentComponent || !name) {
             return;
         }
 
@@ -300,6 +308,19 @@ const Property = ({
             undefined
         );
     }, 200);
+
+    const handleDelete = (path: string, name: string, arrayIndex?: number) => {
+        deleteProperty(
+            workflow.id!,
+            path,
+            name,
+            currentComponent!,
+            otherComponents,
+            setComponents,
+            deleteWorkflowNodeParameterMutation,
+            arrayIndex
+        );
+    };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         if (isNumericalInput) {
@@ -371,7 +392,7 @@ const Property = ({
     };
 
     const handleSelectChange = (value: string, name: string) => {
-        if (!currentComponent || !workflow || !updateWorkflowMutation || !name) {
+        if (!currentComponent || !workflow || !name) {
             return;
         }
 
@@ -569,9 +590,9 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
+                                onDeleteClick={handleDelete}
                                 path={path}
                                 property={property}
-                                updateWorkflowMutation={updateWorkflowMutation}
                             />
                         )}
 
@@ -583,10 +604,10 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
+                                onDeleteClick={handleDelete}
                                 path={path}
                                 property={property}
                                 taskParameterValue={taskParameterValue}
-                                updateWorkflowMutation={updateWorkflowMutation}
                             />
                         )}
 
@@ -728,22 +749,18 @@ const Property = ({
                     </>
                 )}
 
-                {type === 'DYNAMIC_PROPERTIES' &&
-                    currentComponentDefinition &&
-                    currentComponent &&
-                    updateWorkflowMutation && (
-                        <PropertyDynamicProperties
-                            currentActionName={actionName}
-                            currentComponent={currentComponent}
-                            currentComponentDefinition={currentComponentDefinition}
-                            currentNodeConnectionId={currentNode.connectionId}
-                            loadDependsOnValues={loadDependsOnValues}
-                            name={name}
-                            propertiesDataSource={property.propertiesDataSource}
-                            taskParameterValue={taskParameterValue}
-                            updateWorkflowMutation={updateWorkflowMutation}
-                        />
-                    )}
+                {type === 'DYNAMIC_PROPERTIES' && currentComponentDefinition && currentComponent && (
+                    <PropertyDynamicProperties
+                        currentActionName={actionName}
+                        currentComponent={currentComponent}
+                        currentComponentDefinition={currentComponentDefinition}
+                        currentNodeConnectionId={currentNode.connectionId}
+                        loadDependsOnValues={loadDependsOnValues}
+                        name={name}
+                        propertiesDataSource={property.propertiesDataSource}
+                        taskParameterValue={taskParameterValue}
+                    />
+                )}
 
                 {controlType === 'CODE_EDITOR' && (
                     <PropertyCodeEditor

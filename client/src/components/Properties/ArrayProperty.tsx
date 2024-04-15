@@ -1,8 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
-import {ControlTypeModel, ObjectPropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
-import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
-import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
+import {ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
 import {
     ArrayPropertyType,
     ComponentType,
@@ -12,7 +9,6 @@ import {
 } from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
-import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 
 import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover';
@@ -36,18 +32,18 @@ interface ArrayPropertyProps {
     currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponent?: ComponentType;
     dataPills?: Array<DataPillType>;
+    onDeleteClick: (path: string, name: string, index: number) => void;
     path?: string;
     property: PropertyType;
-    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
 const ArrayProperty = ({
     currentComponent,
     currentComponentDefinition,
     dataPills,
+    onDeleteClick,
     path,
     property,
-    updateWorkflowMutation,
 }: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
@@ -57,7 +53,7 @@ const ArrayProperty = ({
     const handleAddItemClick = () => {
         const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newItemType);
 
-        if (!currentComponent || !name || !updateWorkflowMutation) {
+        if (!currentComponent || !name) {
             return;
         }
 
@@ -70,6 +66,14 @@ const ArrayProperty = ({
         };
 
         setArrayItems([...arrayItems, newItem]);
+    };
+
+    const handleDeleteClick = (path: string, name: string, index: number) => {
+        setArrayItems((subProperties) =>
+            subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)
+        );
+
+        onDeleteClick(path, name, index);
     };
 
     // render individual array items with data gathered from parameters
@@ -165,9 +169,9 @@ const ArrayProperty = ({
                             dataPills={dataPills}
                             index={index}
                             key={subItem.name}
+                            onDeleteClick={handleDeleteClick}
                             path={path}
                             setArrayItems={setArrayItems}
-                            updateWorkflowMutation={updateWorkflowMutation}
                         />
                     ))
                 ) : (
@@ -179,9 +183,9 @@ const ArrayProperty = ({
                         dataPills={dataPills}
                         index={index}
                         key={arrayItem.name}
+                        onDeleteClick={handleDeleteClick}
                         path={path}
                         setArrayItems={setArrayItems}
-                        updateWorkflowMutation={updateWorkflowMutation}
                     />
                 )
             )}

@@ -1,84 +1,29 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
-import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
-import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {ComponentType} from '@/types/types';
-import {UseMutationResult} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface DeletePropertyButtonProps {
+    className?: string;
     currentComponent: ComponentType;
-    handleDeletePropertyClick: () => void;
-    objectProperty?: boolean;
+    onClick: () => void;
     propertyName: string;
     subPropertyIndex?: number;
     subPropertyName?: string;
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }
 
-const DeletePropertyButton = ({
-    currentComponent,
-    handleDeletePropertyClick,
-    objectProperty = true,
-    propertyName,
-    subPropertyIndex,
-    subPropertyName,
-    updateWorkflowMutation,
-}: DeletePropertyButtonProps) => {
-    const {workflow} = useWorkflowDataStore();
-
-    const deleteProperty = ({
-        propertyName,
-        subPropertyIndex,
-        subPropertyName,
-    }: {
-        propertyName: string;
-        subPropertyName?: string;
-        subPropertyIndex?: number;
-    }) => {
-        if (!currentComponent.parameters) {
-            return;
-        }
-
-        if (subPropertyName) {
-            delete currentComponent.parameters[propertyName][subPropertyName];
-        } else if (subPropertyIndex !== undefined) {
-            currentComponent.parameters[propertyName].splice(subPropertyIndex, 1);
-        } else {
-            delete currentComponent.parameters[propertyName];
-        }
-
-        saveWorkflowDefinition(
-            {...currentComponent, name: currentComponent.workflowNodeName},
-            workflow,
-            updateWorkflowMutation
-        );
-
-        if (handleDeletePropertyClick) {
-            handleDeletePropertyClick();
-        }
-    };
-
+const DeletePropertyButton = ({className, onClick}: DeletePropertyButtonProps) => {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <div
-                    className={twMerge(
-                        'group flex items-center justify-center',
-                        objectProperty ? 'absolute right-0' : 'mx-2'
-                    )}
-                >
-                    <button
-                        className="p-1"
-                        onClick={() => deleteProperty({propertyName, subPropertyIndex, subPropertyName})}
-                    >
+                <div className={twMerge('group flex items-center justify-center', className)}>
+                    <button className="p-1" onClick={() => onClick()}>
                         <XIcon className="size-4 cursor-pointer group-hover:text-red-500" />
                     </button>
                 </div>
             </TooltipTrigger>
 
-            <TooltipContent>{`Delete ${objectProperty ? 'property' : 'item'}`}</TooltipContent>
+            <TooltipContent>Delete</TooltipContent>
         </Tooltip>
     );
 };

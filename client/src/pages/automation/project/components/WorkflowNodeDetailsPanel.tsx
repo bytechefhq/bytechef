@@ -502,7 +502,6 @@ const WorkflowNodeDetailsPanel = ({
                                             dataPills={dataPills}
                                             key={`${currentNode.name}_${currentActionName}_properties`}
                                             properties={currentActionProperties}
-                                            updateWorkflowMutation={updateWorkflowMutation}
                                         />
                                     ) : (
                                         <div className="flex h-full items-center justify-center text-xl">
