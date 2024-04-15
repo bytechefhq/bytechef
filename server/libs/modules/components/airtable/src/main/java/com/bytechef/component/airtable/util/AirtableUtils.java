@@ -56,9 +56,8 @@ public class AirtableUtils {
                 .execute()
                 .getBody(new Context.TypeReference<>() {});
 
-            context
-                .logger(
-                    logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
+            context.logger(
+                logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
 
             if (body.containsKey("error")) {
                 throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
