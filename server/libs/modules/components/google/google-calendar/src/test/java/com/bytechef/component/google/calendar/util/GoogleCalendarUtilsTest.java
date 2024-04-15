@@ -16,12 +16,17 @@
 
 package com.bytechef.component.google.calendar.util;
 
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OUT_OF_OFFICE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SINGLE_EVENTS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TIME;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.END_DATE_PROPERTY;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.END_DATE_TIME_PROPERTY;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.REMINDERS_PROPERTY;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.START_DATE_PROPERTY;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.START_DATE_TIME_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -36,11 +41,8 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
-import com.google.api.services.calendar.model.ColorDefinition;
-import com.google.api.services.calendar.model.Colors;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -56,28 +58,10 @@ class GoogleCalendarUtilsTest {
 
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Calendar.CalendarList mockedCalendarList = mock(Calendar.CalendarList.class);
-
-    private final Calendar.Colors mockedCalendarColors = mock(Calendar.Colors.class);
-    private final Colors mockedColors = mock(Colors.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Calendar.Colors.Get mockedGet = mock(Calendar.Colors.Get.class);
     private final Calendar.CalendarList.List mockedList = mock(Calendar.CalendarList.List.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final ArgumentCaptor<String> minAccessRoleArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-    @Test
-    void testConvertToDateViaSqlDate() {
-        LocalDate dateToConvert = LocalDate.of(2010, 11, 10);
-
-        Date date = GoogleCalendarUtils.convertToDateViaSqlDate(dateToConvert);
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
-
-        calendar.setTime(date);
-
-        assertEquals(2010, calendar.get(java.util.Calendar.YEAR));
-        assertEquals(10, calendar.get(java.util.Calendar.MONTH));
-        assertEquals(10, calendar.get(java.util.Calendar.DAY_OF_MONTH));
-    }
 
     @Test
     void testConvertToDateViaSqlTimestamp() {
@@ -96,18 +80,83 @@ class GoogleCalendarUtilsTest {
     }
 
     @Test
-    void testCreateEventDateTime() {
-        GoogleCalendarUtils.EventDateTimeCustom eventDateTimeCustom =
-            new GoogleCalendarUtils.EventDateTimeCustom(LocalDate.of(2010, 11, 10),
-                LocalDateTime.of(2010, 11, 10, 8, 20), "timeZone");
+    void testCreateEventDateTimeForAllDayEvent() {
+        when(mockedParameters.getRequiredBoolean(ALL_DAY))
+            .thenReturn(true);
+        when(mockedParameters.getMap(TIME, String.class))
+            .thenReturn(Map.of(START, "2000-11-11"));
 
-        EventDateTime eventDateTime = GoogleCalendarUtils.createEventDateTime(eventDateTimeCustom);
+        EventDateTime eventDateTime = GoogleCalendarUtils.createEventDateTime(mockedParameters, START);
 
-        assertEquals(new DateTime(GoogleCalendarUtils.convertToDateViaSqlDate(eventDateTimeCustom.date())),
-            eventDateTime.getDate());
-        assertEquals(new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(eventDateTimeCustom.dateTime())),
+        assertEquals(new DateTime("2000-11-11"), eventDateTime.getDate());
+        assertNull(eventDateTime.getDateTime());
+        assertNull(eventDateTime.getTimeZone());
+    }
+
+    @Test
+    void testCreateEventDateTimeForNotAllDayEvent() {
+        when(mockedParameters.getRequiredBoolean(ALL_DAY))
+            .thenReturn(false);
+        when(mockedParameters.getMap(TIME, String.class))
+            .thenReturn(Map.of(START, "2000-11-11T22:20"));
+
+        LocalDateTime localDateTime = LocalDateTime.of(2000, 11, 11, 22, 20);
+
+        EventDateTime eventDateTime = GoogleCalendarUtils.createEventDateTime(mockedParameters, START);
+
+        assertEquals(new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(localDateTime)),
             eventDateTime.getDateTime());
-        assertEquals("timeZone", eventDateTime.getTimeZone());
+        assertNull(eventDateTime.getDate());
+        assertNull(eventDateTime.getTimeZone());
+    }
+
+    @Test
+    void testCreateRemindersPropertiesForDefaultReminders() {
+        when(mockedParameters.getRequiredBoolean(USE_DEFAULT))
+            .thenReturn(true);
+
+        List<? extends Property.ValueProperty<?>> result =
+            GoogleCalendarUtils.createRemindersProperties(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(List.of(), result);
+    }
+
+    @Test
+    void testCreateRemindersPropertiesForCustomReminders() {
+        when(mockedParameters.getRequiredBoolean(USE_DEFAULT))
+            .thenReturn(false);
+
+        List<? extends Property.ValueProperty<?>> result =
+            GoogleCalendarUtils.createRemindersProperties(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(1, result.size());
+        assertEquals(REMINDERS_PROPERTY, result.getFirst());
+    }
+
+    @Test
+    void testCreateTimePropertiesForAllDayEvent(){
+        when(mockedParameters.getRequiredBoolean(ALL_DAY))
+            .thenReturn(true);
+
+        List<? extends Property.ValueProperty<?>> result =
+            GoogleCalendarUtils.createTimeProperties(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(2, result.size());
+        assertEquals(START_DATE_PROPERTY, result.getFirst());
+        assertEquals(END_DATE_PROPERTY, result.get(1));
+    }
+
+    @Test
+    void testCreateTimePropertiesForNotAllDayEvent(){
+        when(mockedParameters.getRequiredBoolean(ALL_DAY))
+            .thenReturn(false);
+
+        List<? extends Property.ValueProperty<?>> result =
+            GoogleCalendarUtils.createTimeProperties(mockedParameters, mockedParameters, mockedContext);
+
+        assertEquals(2, result.size());
+        assertEquals(START_DATE_TIME_PROPERTY, result.getFirst());
+        assertEquals(END_DATE_TIME_PROPERTY, result.get(1));
     }
 
     @Test
@@ -145,105 +194,4 @@ class GoogleCalendarUtilsTest {
         }
     }
 
-    @Test
-    void testGetColorOptions() throws IOException {
-
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getCalendar(mockedParameters))
-                .thenReturn(mockedCalendar);
-
-            when(mockedCalendar.colors())
-                .thenReturn(mockedCalendarColors);
-            when(mockedCalendarColors.get())
-                .thenReturn(mockedGet);
-            when(mockedGet.execute())
-                .thenReturn(
-                    new Colors().setEvent(
-                        Map.of("1", new ColorDefinition().setForeground("f")
-                            .setBackground("b"))));
-
-            List<Option<String>> result =
-                GoogleCalendarUtils.getColorOptions(mockedParameters, mockedParameters, anyString(), mockedContext);
-
-            assertEquals(1, result.size());
-
-            Option<String> firstOption = result.getFirst();
-
-            assertEquals("1", firstOption.getLabel());
-            assertEquals("1", firstOption.getValue());
-            assertEquals("Background: b, Foreground: f", firstOption.getDescription()
-                .get());
-        }
-    }
-
-    @Test
-    void testGetEventTypePropertiesForFocusTime() {
-        when(mockedParameters.getString(EVENT_TYPE))
-            .thenReturn(FOCUS_TIME);
-
-        List<? extends Property.ValueProperty<?>> focusTimeProperties =
-            GoogleCalendarUtils.getEventTypeProperties(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(1, focusTimeProperties.size());
-        assertEquals(GoogleCalendarUtils.focusTimeProperties, focusTimeProperties.getFirst());
-    }
-
-    @Test
-    void testGetEventTypePropertiesForOutOfOffice() {
-        when(mockedParameters.getString(EVENT_TYPE))
-            .thenReturn(OUT_OF_OFFICE);
-
-        List<? extends Property.ValueProperty<?>> focusTimeProperties =
-            GoogleCalendarUtils.getEventTypeProperties(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(1, focusTimeProperties.size());
-        assertEquals(GoogleCalendarUtils.outOfOfficeProperties, focusTimeProperties.getFirst());
-    }
-
-    @Test
-    void tesGetEventTypePropertiesForWorkingLocation() {
-        when(mockedParameters.getString(EVENT_TYPE))
-            .thenReturn(WORKING_LOCATION);
-
-        List<? extends Property.ValueProperty<?>> focusTimeProperties =
-            GoogleCalendarUtils.getEventTypeProperties(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(1, focusTimeProperties.size());
-        assertEquals(GoogleCalendarUtils.workingLocationProperties, focusTimeProperties.getFirst());
-    }
-
-    @Test
-    void testGetOrderByOptions() {
-        when(mockedParameters.getBoolean(SINGLE_EVENTS)).thenReturn(false);
-
-        List<Option<String>> orderByOptions =
-            GoogleCalendarUtils.getOrderByOptions(mockedParameters, mockedParameters, anyString(), mockedContext);
-
-        assertEquals(1, orderByOptions.size());
-        assertEquals("Updated", orderByOptions.getFirst().getLabel());
-        assertEquals("updated", orderByOptions.getFirst().getValue());
-        assertEquals("Order by last modification time (ascending).",
-            orderByOptions.getFirst().getDescription().get());
-    }
-
-    @Test
-    void tesGetOrderByOptionsForSingleEvents() {
-        when(mockedParameters.getBoolean(SINGLE_EVENTS)).thenReturn(true);
-
-        List<Option<String>> orderByOptions =
-            GoogleCalendarUtils.getOrderByOptions(mockedParameters, mockedParameters, anyString(), mockedContext);
-
-        assertEquals(2, orderByOptions.size());
-        assertEquals("Updated", orderByOptions.getFirst().getLabel());
-        assertEquals("updated", orderByOptions.getFirst().getValue());
-        assertEquals("Order by last modification time (ascending).",
-            orderByOptions.getFirst().getDescription().get());
-
-        assertEquals("Start time", orderByOptions.get(1).getLabel());
-        assertEquals("startTime", orderByOptions.get(1).getValue());
-        assertEquals(
-            "Order by the start date/time (ascending). This is only available when querying single events " +
-                "(i.e. the parameter singleEvents is True)", orderByOptions.get(1).getDescription().get());
-    }
 }

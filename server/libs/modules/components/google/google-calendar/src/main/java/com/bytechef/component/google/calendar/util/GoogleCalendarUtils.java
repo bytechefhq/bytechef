@@ -16,45 +16,37 @@
 
 package com.bytechef.component.google.calendar.util;
 
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.AUTO_DECLINE_MODE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.BUILDING_ID;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CHAT_STATUS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CUSTOM_LOCATION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DECLINE_MESSAGE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESK_ID;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FLOOR_ID;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FLOOR_SECTION_ID;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME_PROPERTIES;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.HOME_OFFICE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LABEL;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OFFICE_LOCATION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OUT_OF_OFFICE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OUT_OF_OFFICE_PROPERTIES;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SINGLE_EVENTS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TYPE;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION_PROPERTIES;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.METHOD;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MINUTES;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.REMINDERS;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TIME;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableDateProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableDateTimeProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarListEntry;
-import com.google.api.services.calendar.model.ColorDefinition;
-import com.google.api.services.calendar.model.Colors;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,108 +57,87 @@ import java.util.Map;
  */
 public class GoogleCalendarUtils {
 
-    public static final ComponentDSL.ModifiableObjectProperty focusTimeProperties = object(FOCUS_TIME_PROPERTIES)
-        .label("Focus time properties")
-        .description("Focus Time event data. Used if eventType is focusTime.")
-        .properties(
-            string(AUTO_DECLINE_MODE)
-                .label("Auto decline mode")
-                .required(false),
-            string(CHAT_STATUS)
-                .label("Chat status")
-                .required(false),
-            string(DECLINE_MESSAGE)
-                .label("Decline message")
-                .required(false))
+    protected static final ModifiableDateProperty END_DATE_PROPERTY = date(END)
+        .label("End date")
+        .description("The end date of the event.")
+        .required(true);
+
+    protected static final ModifiableDateTimeProperty END_DATE_TIME_PROPERTY = dateTime(END)
+        .label("End date time")
+        .description(
+            "The (exclusive) end time of the event. For a recurring event, this is the end time of the " +
+                "first instance.")
+        .required(true);
+
+    protected static final ModifiableArrayProperty REMINDERS_PROPERTY = array(REMINDERS)
+        .label("Reminders")
+        .items(
+            object()
+                .properties(
+                    string(METHOD)
+                        .label("How is reminder sent?")
+                        .options(
+                            option("Email", "email", "Reminders are sent via email."),
+                            option("Popup", "popup", "Reminders are sent via a UI popup."))
+                        .required(true),
+                    integer(MINUTES)
+                        .label("Minutes before reminder")
+                        .description(
+                            "Number of minutes before the start of the event when the reminder " +
+                                "should trigger.")
+                        .minValue(0)
+                        .maxValue(40320)
+                        .required(true)))
         .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty outOfOfficeProperties = object(OUT_OF_OFFICE_PROPERTIES)
-        .label("Out of office properties")
-        .description("Out of office event data. Used if eventType is outOfOffice.")
-        .properties(
-            string(AUTO_DECLINE_MODE)
-                .label("Auto decline mode")
-                .required(false),
-            string(DECLINE_MESSAGE)
-                .label("Decline message")
-                .required(false))
-        .required(false);
+    protected static final ModifiableDateProperty START_DATE_PROPERTY = date(START)
+        .label("Start date")
+        .description("The start date of the event.")
+        .required(true);
 
-    public static final ComponentDSL.ModifiableObjectProperty workingLocationProperties =
-        object(WORKING_LOCATION_PROPERTIES)
-            .label("Working location properties")
-            .description("Working location event data.")
-            .properties(
-                object(CUSTOM_LOCATION)
-                    .label("Custom location")
-                    .description("If present, specifies that the user is working from a custom location.")
-                    .properties(
-                        string(LABEL)
-                            .label("Label")
-                            .description("An optional extra label for additional information."))
-                    .required(false),
-                object(HOME_OFFICE)
-                    .label("Home office")
-                    .description("If present, specifies that the user is working at home.")
-                    .required(false),
-                object(OFFICE_LOCATION)
-                    .label("Office Location")
-                    .description("If present, specifies that the user is working from an office.")
-                    .properties(
-                        string(BUILDING_ID)
-                            .label("")
-                            .description(
-                                "An optional building identifier. This should reference a building ID in the " +
-                                    "organization's Resources database.")
-                            .required(false),
-                        string(DESK_ID)
-                            .label("Desk ID")
-                            .description("An optional desk identifier.")
-                            .required(false),
-                        string(FLOOR_ID)
-                            .label("Floor ID")
-                            .description("An optional floor identifier.")
-                            .required(false),
-                        string(FLOOR_SECTION_ID)
-                            .label("Floor Section ID")
-                            .description("An optional floor section identifier.")
-                            .required(false),
-                        string(LABEL)
-                            .label("Label")
-                            .description(
-                                "The office name that's displayed in Calendar Web and Mobile clients. We " +
-                                    "recommend you reference a building name in the organization's Resources " +
-                                    "database.")
-                            .required(false))
-                    .required(false),
-                string(TYPE)
-                    .label("Type")
-                    .description("Type of the working location.")
-                    .options(
-                        option("Home office", "homeOffice", "The user is working at home."),
-                        option("Office location", "officeLocation", "The user is working from an office"),
-                        option("Custom location", "customLocation",
-                            "The user is working from a custom location."))
-                    .required(true))
-            .required(false);
+    protected static final ModifiableDateTimeProperty START_DATE_TIME_PROPERTY = dateTime(START)
+        .label("Start date time")
+        .description(
+            "The (inclusive) start time of the event. For a recurring event, this is the start time of the " +
+                "first instance.")
+        .required(true);
 
-    public static EventDateTime createEventDateTime(EventDateTimeCustom eventDateTimeCustom) {
+    private GoogleCalendarUtils() {
+    }
+
+    public static Date convertToDateViaSqlTimestamp(LocalDateTime dateToConvert) {
+        return dateToConvert == null ? null : java.sql.Timestamp.valueOf(dateToConvert);
+    }
+
+    public static EventDateTime createEventDateTime(Parameters inputParameters, String time) {
         EventDateTime eventDateTime = new EventDateTime();
 
-        eventDateTime.setDate(new DateTime(GoogleCalendarUtils.convertToDateViaSqlDate(eventDateTimeCustom.date)));
-        eventDateTime.setTimeZone(eventDateTimeCustom.timeZone);
-        eventDateTime.setDateTime(
-            new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(eventDateTimeCustom.dateTime)));
+        Map<String, String> timeMap = inputParameters.getMap(TIME, String.class);
+
+        if (inputParameters.getRequiredBoolean(ALL_DAY)) {
+            eventDateTime.setDate(new DateTime(timeMap.get(time)));
+        } else {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+            eventDateTime.setDateTime(
+                new DateTime(
+                    convertToDateViaSqlTimestamp(LocalDateTime.parse(timeMap.get(time), dateTimeFormatter))));
+        }
 
         return eventDateTime;
     }
 
-    public static Date convertToDateViaSqlDate(LocalDate dateToConvert) {
-        return java.sql.Date.valueOf(dateToConvert);
+    public static List<? extends ValueProperty<?>> createRemindersProperties(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return inputParameters.getRequiredBoolean(USE_DEFAULT) ? List.of() : List.of(REMINDERS_PROPERTY);
     }
 
-    public static Date convertToDateViaSqlTimestamp(LocalDateTime dateToConvert) {
-        return java.sql.Timestamp.valueOf(dateToConvert);
+    public static List<? extends ValueProperty<?>> createTimeProperties(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return inputParameters.getRequiredBoolean(ALL_DAY) ? List.of(START_DATE_PROPERTY, END_DATE_PROPERTY)
+            : List.of(START_DATE_TIME_PROPERTY, END_DATE_TIME_PROPERTY);
     }
 
     public static List<Option<String>> getCalendarIdOptions(
@@ -190,72 +161,5 @@ public class GoogleCalendarUtils {
         }
 
         return options;
-    }
-
-    public static List<Option<String>> getColorOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
-
-        Calendar service = GoogleServices.getCalendar(connectionParameters);
-
-        Colors colors = service.colors()
-            .get()
-            .execute();
-
-        List<Option<String>> options = new ArrayList<>();
-        Map<String, ColorDefinition> colorDefinitionMap = colors.getEvent();
-
-        for (Map.Entry<String, ColorDefinition> color : colorDefinitionMap.entrySet()) {
-            ColorDefinition colorDefinition = color.getValue();
-
-            options.add(
-                option(
-                    color.getKey(), color.getKey(),
-                    "Background: " + colorDefinition.getBackground() + ", Foreground: " +
-                        colorDefinition.getForeground()));
-        }
-
-        return options;
-    }
-
-    public static List<? extends Property.ValueProperty<?>> getEventTypeProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        String eventType = inputParameters.getString(EVENT_TYPE);
-
-        if (eventType.equals(FOCUS_TIME)) {
-            return List.of(focusTimeProperties);
-        }
-
-        if (eventType.equals(OUT_OF_OFFICE)) {
-            return List.of(outOfOfficeProperties);
-        }
-
-        if (eventType.equals(WORKING_LOCATION)) {
-            return List.of(workingLocationProperties);
-        }
-
-        return List.of();
-    }
-
-    public static List<Option<String>> getOrderByOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
-        boolean singleEvents = inputParameters.getBoolean(SINGLE_EVENTS);
-
-        List<Option<String>> options = new ArrayList<>();
-
-        options.add(option("Updated", "updated", "Order by last modification time (ascending)."));
-
-        if (singleEvents) {
-            options.add(
-                option("Start time", "startTime",
-                    "Order by the start date/time (ascending). This is only available when querying " +
-                        "single events (i.e. the parameter singleEvents is True)"));
-        }
-
-        return options;
-    }
-
-    public record EventDateTimeCustom(LocalDate date, LocalDateTime dateTime, String timeZone) {
     }
 }

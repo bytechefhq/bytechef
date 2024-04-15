@@ -18,16 +18,12 @@ package com.bytechef.component.google.calendar.constant;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ComponentDSL.ModifiableDateProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableDateTimeProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -41,172 +37,68 @@ public class GoogleCalendarConstants {
     private GoogleCalendarConstants() {
     }
 
-    public static final String ACCESS_CODE = "accessCode";
     public static final String ACCESS_ROLE = "accessRole";
-    public static final String ADD_ON_PARAMETERS = "addOnParameters";
-    public static final String ADDITIONAL_GUESTS = "additionalGuests";
-    public static final String ALWAYS_INCLUDE_EMAIL = "alwaysIncludeEmail";
+    public static final String ALL_DAY = "allDay";
     public static final String ANYONE_CAN_ADD_SELF = "anyoneCanAddSelf";
     public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
-    public static final String ATTENDEES_OMMITTED = "attendeesOmitted";
     public static final String AUTO_DECLINE_MODE = "autoDeclineMode";
-    public static final String BUILDING_ID = "buildingId";
     public static final String CALENDAR_ID = "calendarId";
-    public static final String CHAT_STATUS = "chatStatus";
-    public static final String COLOR_ID = "colorId";
-    public static final String COMMENT = "comment";
-    public static final String CONFERENCE_DATA = "conferenceData";
-    public static final String CONFERENCE_DATA_VERSION = "conferenceDataVersion";
-    public static final String CONFERENCE_ID = "conferenceId";
-    public static final String CONFERENCE_SOLUTION = "conferenceSolution";
-    public static final String CONFERENCE_SOLUTION_KEY = "conferenceSolutionKey";
-    public static final String CREATED = "created";
     public static final String CREATE_EVENT = "createEvent";
-    public static final String CREATE_REQUEST = "createRequest";
     public static final String CREATE_QUICK_EVENT = "createQuickEvent";
-    public static final String CREATOR = "creator";
-    public static final String CUSTOM_LOCATION = "customLocation";
     public static final String DATE = "date";
     public static final String DATE_TIME = "dateTime";
     public static final String DECLINE_MESSAGE = "declineMessage";
     public static final String DEFAULT = "default";
     public static final String DEFAULT_REMINDERS = "defaultReminders";
     public static final String DESCRIPTION = "description";
-    public static final String DESK_ID = "deskId";
-    public static final String DISPLAY = "display";
     public static final String DISPLAY_NAME = "displayName";
     public static final String EMAIL = "email";
     public static final String END = "end";
-    public static final String END_TIME_UNSPECIFIED = "endTimeUnspecified";
-    public static final String ENTRY_POINTS = "entryPoints";
-    public static final String ENTRY_POINT_FEATURES = "entryPointFeatures";
-    public static final String ENTRY_POINT_TYPE = "entryPointType";
     public static final String ETAG = "etag";
     public static final String EVENT = "event";
     public static final String EVENT_TYPE = "eventType";
-    public static final String EVENT_TYPE_PROPERTIES = "eventTypeProperties";
-    public static final String EXTENDED_PROPERTIES = "extendedProperties";
-    public static final String FILE_ID = "fileId";
-    public static final String FILE_URL = "fileUrl";
-    public static final String FLOOR_ID = "floorId";
-    public static final String FLOOR_SECTION_ID = "floorSectionId";
-    public static final String FOCUS_TIME_PROPERTIES = "focusTimeProperties";
     public static final String FOCUS_TIME = "focusTime";
-    public static final String GADGET = "gadget";
     public static final String GET_EVENTS = "getEvents";
     public static final String GOOGLE_CALENDAR = "googleCalendar";
     public static final String GUEST_CAN_INVITE_OTHERS = "guestsCanInviteOthers";
     public static final String GUEST_CAN_MODIFY = "guestsCanModify";
     public static final String GUEST_CAN_SEE_OTHER_GUESTS = "guestsCanSeeOtherGuests";
-    public static final String HANGOUT_LINK = "hangoutLink";
-    public static final String HEIGHT = "height";
-    public static final String HOME_OFFICE = "homeOffice";
-    public static final String HTML_LINK = "htmlLink";
-    public static final String ICAL_UID = "iCalUID";
     public static final String ICON_LINK = "iconLink";
-    public static final String ICON_URI = "iconUri";
     public static final String ID = "id";
-    public static final String KEY = "key";
     public static final String KIND = "kind";
     public static final String LABEL = "label";
-    public static final String LINK = "link";
     public static final String LOCATION = "location";
-    public static final String LOCKED = "locked";
-    public static final String MAX_ATTENDEES = "maxAttendees";
     public static final String MAX_RESULTS = "maxResults";
     public static final String METHOD = "method";
-    public static final String MEETING_CODE = "meetingCode";
-    public static final String MIME_TYPE = "mimeType";
     public static final String MINUTES = "minutes";
-    public static final String NAME = "name";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String NEXT_SYNC_TOKEN = "nextSyncToken";
-    public static final String NOTES = "notes";
-    public static final String OFFICE_LOCATION = "officeLocation";
-    public static final String OPTIONAL = "optional";
-    public static final String ORIGINAL_START_TIME = "originalStartTime";
     public static final String ORGANIZER = "organizer";
     public static final String OUT_OF_OFFICE = "outOfOffice";
-    public static final String OUT_OF_OFFICE_PROPERTIES = "outOfOfficeProperties";
-    public static final String OVERRIDES = "overrides";
-    public static final String PAGE_TOKEN = "pageToken";
     public static final String PARAMETERS = "parameters";
-    public static final String PASSCODE = "passcode";
-    public static final String PASSWORD = "password";
-    public static final String PIN = "pin";
-    public static final String PREFERENCES = "preferences";
-    public static final String PRIVATE = "private";
-    public static final String PRIVATE_COPY = "privateCopy";
-    public static final String PRIVATE_EXTENDED_PROPERTY = "privateExtendedProperty";
     public static final String Q = "q";
-    public static final String ORDER_BY = "orderBy";
-    public static final String RECURRENCE = "recurrence";
-    public static final String RECURRING_EVENT_ID = "recurringEventId";
-    public static final String REGION_CODE = "regionCode";
     public static final String REMINDERS = "reminders";
-    public static final String REQUEST_ID = "requestId";
-    public static final String RESOURCE = "resource";
-    public static final String RESPONSE_STATUS = "responseStatus";
     public static final String SEND_UPDATES = "sendUpdates";
     public static final String SELF = "self";
-    public static final String SHARED = "shared";
-    public static final String SHARED_EXTENDED_PROPERTY = "sharedExtendedProperty";
-    public static final String SHOW_DELETED = "showDeleted";
-    public static final String SHOW_HIDDEN_INVITATIONS = "showHiddenInvitations";
-    public static final String SIGNATURE = "signature";
     public static final String SINGLE_EVENTS = "singleEvents";
-    public static final String SEQUENCE = "sequence";
-    public static final String SYNC_TOKEN = "syncToken";
-    public static final String SOURCE = "source";
     public static final String STATUS = "status";
-    public static final String STATUS_CODE = "statusCode";
     public static final String SUMMARY = "summary";
-    public static final String SUPPORTS_ATTACHMENTS = "supportsAttachments";
     public static final String TEXT = "text";
     public static final String TIME_MAX = "timeMax";
     public static final String TIME_MIN = "timeMin";
     public static final String TIME_ZONE = "timeZone";
-    public static final String TENTATIVE = "tentative";
     public static final String TITLE = "title";
-    public static final String TRANSPARENCY = "transparency";
+    public static final String TIME = "time";
     public static final String TYPE = "type";
     public static final String START = "start";
     public static final String UPDATED = "updated";
-    public static final String URI = "uri";
-    public static final String URL = "url";
     public static final String USE_DEFAULT = "useDefault";
-    public static final String UPDATE_MIN = "updatedMin";
-    public static final String VISIBILITY = "visibility";
-    public static final String WIDTH = "width";
-    public static final String WORKING_LOCATION = "workingLocation";
-    public static final String WORKING_LOCATION_PROPERTIES = "workingLocationProperties";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
         .label("Calendar identifier")
         .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
         .required(true);
-
-    public static final ModifiableObjectProperty CONFERENCE_SOLUTION_KEY_PROPERTY =
-        object(CONFERENCE_SOLUTION_KEY)
-            .label("Key")
-            .properties(
-                string(TYPE)
-                    .label("Type")
-                    .required(false))
-            .required(false);
-
-    public static final ModifiableDateProperty DATE_PROPERTY = date(DATE)
-        .label("Date")
-        .description("The date, in the format \"yyyy-mm-dd\", if this is an all-day event.")
-        .required(false);
-
-    public static final ModifiableDateTimeProperty DATE_TIME_PROPERTY = dateTime(DATE_TIME)
-        .label("Datetime")
-        .description(
-            "The time, as a combined date-time value (formatted according to RFC3339). A time " +
-                "zone offset is required unless a time zone is explicitly specified in timeZone.")
-        .required(false);
 
     public static final ModifiableObjectProperty EVENT_PROPERTY = object()
         .properties(
@@ -214,71 +106,71 @@ public class GoogleCalendarConstants {
             array(ATTACHMENTS)
                 .items(
                     object()
-                        .properties(string(FILE_ID),
-                            string(FILE_URL),
+                        .properties(string("fileId"),
+                            string("fileUrl"),
                             string(ICON_LINK),
-                            string(MIME_TYPE),
+                            string("mimeType"),
                             string(TITLE))),
             array(ATTENDEES)
                 .items(
                     object()
                         .properties(
-                            integer(ADDITIONAL_GUESTS),
-                            string(COMMENT),
+                            integer("additionalGuests"),
+                            string("comment"),
                             string(DISPLAY_NAME),
                             string(EMAIL),
                             string(ID),
-                            bool(OPTIONAL),
+                            bool("optional"),
                             bool(ORGANIZER),
-                            bool(RESOURCE),
-                            string(RESPONSE_STATUS),
+                            bool("resource"),
+                            string("responseStatus"),
                             bool(SELF))),
-            bool(ATTENDEES_OMMITTED),
-            string(COLOR_ID),
-            object(CONFERENCE_DATA)
+            bool("attendeesOmitted"),
+            string("colorId"),
+            object("conferenceData")
                 .properties(
-                    string(CONFERENCE_ID),
-                    object(CONFERENCE_SOLUTION)
+                    string("conferenceId"),
+                    object("conferenceSolution")
                         .properties(
-                            string(ICON_URI),
-                            object(KEY)
+                            string("iconUri"),
+                            object("key")
                                 .properties(
                                     string(TYPE)),
-                            string(NAME)),
-                    object(CREATE_REQUEST)
+                            string("name")),
+                    object("createRequest")
                         .properties(
-                            object(CONFERENCE_SOLUTION_KEY)
+                            object("conferenceSolutionKey")
                                 .properties(
                                     string(TYPE)),
-                            string(REQUEST_ID),
+                            string("requestId"),
                             object(STATUS)
                                 .properties(
-                                    string(STATUS_CODE))),
-                    array(ENTRY_POINTS)
+                                    string("statusCode"))),
+                    array("entryPoints")
                         .items(
                             object()
                                 .properties(
-                                    string(ACCESS_CODE),
-                                    array(ENTRY_POINT_FEATURES)
+                                    string("accessCode"),
+                                    array("entryPointFeatures")
                                         .items(string()),
-                                    string(ENTRY_POINT_TYPE),
+                                    string("entryPointType"),
                                     string(LABEL),
-                                    string(MEETING_CODE),
-                                    string(PASSCODE),
-                                    string(PASSWORD),
-                                    string(PIN),
-                                    string(REGION_CODE),
-                                    string(URI))),
-                    string(NOTES),
+                                    string("meetingCode"),
+                                    string("passcode"),
+                                    string("password"),
+                                    string("pin"),
+                                    string("regionCode"),
+                                    string("uri"))),
+                    string("notes"),
                     object(PARAMETERS)
                         .properties(
-                            object(ADD_ON_PARAMETERS)
+                            object("addOnParameters")
                                 .properties(
                                     object(PARAMETERS)
                                         .additionalProperties(string()))),
-                    string(SIGNATURE)),
-            dateTime(CREATED),
-            object(CREATOR)
+                    string("signature")),
+            dateTime("created"),
+            object("creator")
                 .properties(
                     string(DISPLAY_NAME),
                     string(EMAIL),
@@ -290,74 +182,74 @@ public class GoogleCalendarConstants {
                     dateTime(DATE),
                     dateTime(DATE_TIME),
                     string(TIME_ZONE)),
-            bool(END_TIME_UNSPECIFIED),
-            string(ETAG),
+            bool("endTimeUnspecified"),
+            string("etag"),
             string(EVENT_TYPE),
-            object(EXTENDED_PROPERTIES)
+            object("extendedProperties")
                 .properties(
-                    object(PRIVATE)
+                    object("private")
                         .additionalProperties(string()),
-                    object(SHARED)
+                    object("shared")
                         .additionalProperties(string())),
-            object(FOCUS_TIME_PROPERTIES)
+            object("focusTimeProperties")
                 .properties(
                     string(AUTO_DECLINE_MODE),
-                    string(CHAT_STATUS),
+                    string("chatStatus"),
                     string(DECLINE_MESSAGE)),
-            object(GADGET)
+            object("gadget")
                 .properties(
-                    string(DISPLAY),
-                    integer(HEIGHT),
+                    string("display"),
+                    integer("height"),
                     string(ICON_LINK),
-                    string(LINK),
-                    object(PREFERENCES)
+                    string("link"),
+                    object("preferences")
                         .additionalProperties(string()),
                     string(TITLE),
                     string(TYPE),
-                    string(WIDTH)),
+                    string("width")),
             bool(GUEST_CAN_INVITE_OTHERS),
             bool(GUEST_CAN_MODIFY),
             bool(GUEST_CAN_SEE_OTHER_GUESTS),
-            string(HANGOUT_LINK),
-            string(HTML_LINK),
-            string(ICAL_UID),
+            string("hangoutLink"),
+            string("htmlLink"),
+            string("iCalUID"),
             string(ID),
             string(KIND),
             string(LOCATION),
-            bool(LOCKED),
+            bool("locked"),
             object(ORGANIZER)
                 .properties(
                     string(DISPLAY_NAME),
                     string(EMAIL),
                     string(ID),
                     bool(SELF)),
-            object(ORIGINAL_START_TIME)
+            object("originalStartTime")
                 .properties(
                     dateTime(DATE),
                     dateTime(DATE_TIME),
                     string(TIME_ZONE)),
-            object(OUT_OF_OFFICE_PROPERTIES)
+            object("outOfOfficeProperties")
                 .properties(
                     string(AUTO_DECLINE_MODE),
                     string(DECLINE_MESSAGE)),
-            bool(PRIVATE_COPY),
-            array(RECURRENCE)
+            bool("privateCopy"),
+            array("recurrence")
                 .items(string()),
-            string(RECURRING_EVENT_ID),
+            string("recurringEventId"),
             object(REMINDERS)
                 .properties(
-                    array(OVERRIDES)
+                    array("overrides")
                         .items(
                             object()
                                 .properties(
                                     string(METHOD),
                                     integer(MINUTES))),
                     bool(USE_DEFAULT)),
-            integer(SEQUENCE),
-            object(SOURCE)
+            integer("sequence"),
+            object("source")
                 .properties(
                     string(TITLE),
-                    string(URL)),
+                    string("url")),
             object(START)
                 .properties(
                     dateTime(DATE),
@@ -365,31 +257,23 @@ public class GoogleCalendarConstants {
                     string(TIME_ZONE)),
             string(STATUS),
             string(SUMMARY),
-            string(TRANSPARENCY),
+            string("transparency"),
             dateTime(UPDATED),
-            string(VISIBILITY),
-            object(WORKING_LOCATION_PROPERTIES)
+            string("visibility"),
+            object("workingLocationProperties")
                 .properties(
-                    object(CUSTOM_LOCATION)
+                    object("customLocation")
                         .properties(
                             string(LABEL)),
-                    object(HOME_OFFICE),
-                    object(OFFICE_LOCATION)
+                    object("homeOffice"),
+                    object("officeLocation")
                         .properties(
-                            string(BUILDING_ID),
-                            string(DESK_ID),
-                            string(FLOOR_ID),
-                            string(FLOOR_SECTION_ID),
+                            string("buildingId"),
+                            string("deskId"),
+                            string("floorId"),
+                            string("floorSectionId"),
                             string(LABEL)),
                     string(TYPE)));
-
-    public static final ModifiableIntegerProperty MAX_ATTENDEES_PROPERTY =
-        integer(MAX_ATTENDEES)
-            .label("Max attendees")
-            .description(
-                "The maximum number of attendees to include in the response. If there are more than the " +
-                    "specified number of attendees, only the participant is returned.")
-            .required(false);
 
     public static final ModifiableStringProperty SEND_UPDATES_PROPERTY =
         string(SEND_UPDATES)
@@ -402,14 +286,7 @@ public class GoogleCalendarConstants {
                 option("External only", "externalOnly",
                     "Notifications are sent to non-Google Calendar guests only."),
                 option("None", "none", "No notifications are sent."))
+            .defaultValue("none")
             .required(false);
 
-    public static final ModifiableStringProperty TIME_ZONE_PROPERTY = string(TIME_ZONE)
-        .label("Time zone")
-        .description(
-            "The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. " +
-                "\"Europe/Zurich\".) For recurring events this field is required and specifies the time zone in " +
-                "which the recurrence is expanded. For single events this field is optional and indicates a custom " +
-                "time zone for the event start/end.")
-        .required(false);
 }
