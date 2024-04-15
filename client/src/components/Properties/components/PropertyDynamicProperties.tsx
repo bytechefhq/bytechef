@@ -7,6 +7,7 @@ import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workf
 import {ComponentType, CurrentComponentDefinitionType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
+import {useDeepCompareEffectNoCheck} from 'use-deep-compare-effect';
 
 import Property from '../Property';
 
@@ -37,6 +38,8 @@ const PropertyDynamicProperties = ({
     const [loadDependencyValues, setLoadDependencyValues] = useState<Array<string>>(
         Object.values(loadDependency ?? {})
     );
+    const [subProperties, setSubProperties] = useState();
+    const [dependencyKey, setDependencyKey] = useState<string>();
 
     const {workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
@@ -61,11 +64,25 @@ const PropertyDynamicProperties = ({
     }, [loadDependency]);
 
     useEffect(() => {
+        if (loadDependencyValues) {
+            setDependencyKey(loadDependencyValues.join(''));
+        }
+    }, [loadDependencyValues]);
+
+    useEffect(() => {
         if (loadDependencyValues?.length && currentNodeConnectionId) {
             refetch();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadDependencyValues]);
+
+    useDeepCompareEffectNoCheck(() => {
+        if (properties) {
+            setSubProperties(properties);
+        }
+    }, [properties]);
+
+    console.log('dependencyKey: ', dependencyKey);
 
     if (isLoading) {
         return (
@@ -75,9 +92,9 @@ const PropertyDynamicProperties = ({
         );
     }
 
-    return properties ? (
-        <ul>
-            {properties.map((property, index) => {
+    return subProperties ? (
+        <ul key={dependencyKey}>
+            {subProperties.map((property, index) => {
                 const propertyDefaultValue = property.name ? taskParameterValue?.[property.name] : '';
 
                 return (
@@ -85,7 +102,7 @@ const PropertyDynamicProperties = ({
                         actionName={currentActionName}
                         currentComponent={currentComponent}
                         currentComponentDefinition={currentComponentDefinition}
-                        key={`${property.name}_${index}`}
+                        key={`${property.name}_${index}_${dependencyKey}`}
                         objectName={name}
                         path={name}
                         property={property}
