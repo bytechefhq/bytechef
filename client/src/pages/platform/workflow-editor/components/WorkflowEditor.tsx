@@ -244,6 +244,7 @@ const WorkflowEditor = ({
 
     const workflowNodes = getNodes();
 
+    // Update workflow node names when nodes change
     useEffect(() => {
         if (workflowNodes?.length) {
             const workflowNodeNames = workflowNodes.map((node) => {
@@ -260,6 +261,7 @@ const WorkflowEditor = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setWorkflow, workflowNodes?.length]);
 
+    // Set latest component name when component names change
     useEffect(() => {
         if (componentNames && previousComponentNames?.length) {
             const latestName = componentNames.find((componentName) => !previousComponentNames?.includes(componentName));
@@ -270,13 +272,16 @@ const WorkflowEditor = ({
         }
     }, [componentNames, previousComponentNames]);
 
+    // Set component actions when node actions change
     useEffect(() => {
         setComponentActions(nodeActions);
     }, [nodeActions, setComponentActions]);
 
+    // Reconstruct editor nodes on re-render
     useEffect(() => {
         if (defaultNodesWithWorkflowNodes) {
             const workflowNodes = defaultNodesWithWorkflowNodes.filter((node) => node?.data.componentName);
+
             setWorkflow({
                 ...workflow,
                 componentNames: workflowNodes.map((node) => node?.data.componentName),
@@ -288,12 +293,14 @@ const WorkflowEditor = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [defaultNodesWithWorkflowNodes, setWorkflow]);
 
+    // Reconstruct editor edges on re-render
     useEffect(() => {
         if (defaultEdgesWithWorkflowEdges) {
             setEdges(defaultEdgesWithWorkflowEdges);
         }
     }, [defaultEdgesWithWorkflowEdges]);
 
+    // Append counter to workflow node name when a new node with the same name is added
     useEffect(() => {
         if (workflowComponentWithAlias?.actions) {
             const {actions, name} = workflowComponentWithAlias;
@@ -323,6 +330,7 @@ const WorkflowEditor = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowComponentWithAlias?.workflowNodeName]);
 
+    // Set viewport width and position
     useEffect(() => {
         setViewportWidth(width);
 
