@@ -10,15 +10,17 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {OptionModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {useUpdateWorkflowNodeParameterMutation} from '@/mutations/platform/workflowNodeParameters.mutations';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveProperty from '@/pages/automation/project/utils/saveProperty';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {UseMutationResult} from '@tanstack/react-query';
+import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -179,12 +181,19 @@ const Property = ({
         !!property.displayCondition
     );
 
+    const queryClient = useQueryClient();
+
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: () =>
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            }),
+    });
+
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !updateWorkflowMutation) {
             return;
         }
-
-        const {parameters} = currentComponent;
 
         if (!name) {
             return;
@@ -192,58 +201,17 @@ const Property = ({
 
         const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
 
-        let data = parameters;
-
-        if (arrayName && arrayIndex !== undefined) {
-            if (path.includes('parameters')) {
-                data = {
-                    ...parameters,
-                    [arrayName]: [
-                        ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                        {
-                            ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                            [name]: isNumericalInput ? numericValueToSave : inputValue,
-                        },
-                        ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                    ],
-                };
-            } else {
-                const matchingObject = path.split('.').reduce((acc, key) => {
-                    if (acc && acc[key] === undefined) {
-                        acc[key] = {};
-                    }
-
-                    return acc && acc[key];
-                }, data);
-
-                if (matchingObject) {
-                    matchingObject[name as string] = isNumericalInput ? numericValueToSave : inputValue;
-                }
-            }
-        } else if (objectName) {
-            const matchingObject = path.split('.').reduce((acc, key) => {
-                if (acc && acc[key] === undefined) {
-                    acc[key] = {};
-                }
-
-                return acc && acc[key];
-            }, data);
-
-            if (matchingObject) {
-                matchingObject[name as string] = isNumericalInput ? numericValueToSave : inputValue;
-            }
-        } else {
-            data = {
-                ...parameters,
-                [name as string]: isNumericalInput ? numericValueToSave : inputValue,
-            };
-        }
-
-        if (!data) {
-            return;
-        }
-
-        saveProperty(data, setComponents, currentComponent, otherComponents, updateWorkflowMutation, name, workflow);
+        saveProperty(
+            name,
+            path,
+            currentComponent,
+            otherComponents,
+            setComponents,
+            updateWorkflowNodeParameterMutation,
+            workflow,
+            isNumericalInput ? numericValueToSave : inputValue,
+            arrayIndex
+        );
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
@@ -252,13 +220,15 @@ const Property = ({
         }
 
         saveProperty(
-            {...currentComponent.parameters, [name]: value},
-            setComponents,
+            name,
+            path,
             currentComponent,
             otherComponents,
-            updateWorkflowMutation,
-            name,
-            workflow
+            setComponents,
+            updateWorkflowNodeParameterMutation,
+            workflow,
+            value,
+            undefined
         );
     }, 200);
 
@@ -330,60 +300,19 @@ const Property = ({
             return;
         }
 
-        const {parameters} = currentComponent;
-
-        if (!parameters) {
-            return;
-        }
-
-        let data = parameters;
-
-        if (arrayName && arrayIndex !== undefined) {
-            data = {
-                ...parameters,
-                [arrayName]: [
-                    ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                    {
-                        ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                        [name]: value,
-                    },
-                    ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                ],
-            };
-        } else if (objectName) {
-            const matchingObject = path.split('.').reduce((acc, key) => {
-                if (key !== 'parameters') {
-                    if (acc && acc[key] === undefined) {
-                        acc[key] = {};
-                    }
-
-                    return acc && acc[key];
-                } else {
-                    return acc;
-                }
-            }, data);
-
-            if (matchingObject) {
-                matchingObject[name as string] = value;
-            }
-        } else {
-            data = {
-                ...parameters,
-                [name as string]: value,
-            };
-        }
-
-        if (!data) {
-            return;
-        }
-
         setSelectValue(value);
 
-        console.log(`path: ${path}`);
-        console.log(`name: ${name}`);
-        console.log(`arrayIndex: ${arrayIndex}`);
-
-        saveProperty(data, setComponents, currentComponent, otherComponents, updateWorkflowMutation, name, workflow);
+        saveProperty(
+            name,
+            path,
+            currentComponent,
+            otherComponents,
+            setComponents,
+            updateWorkflowNodeParameterMutation,
+            workflow,
+            value,
+            arrayIndex
+        );
     };
 
     // set default mentionInput state
@@ -520,7 +449,7 @@ const Property = ({
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton!}
                             singleMention={controlType !== 'TEXT'}
-                            updateWorkflowMutation={updateWorkflowMutation}
+                            updateWorkflowNodeParameterMutation={updateWorkflowNodeParameterMutation}
                             value={mentionInputValue}
                         />
                     )}

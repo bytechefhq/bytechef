@@ -1,63 +1,63 @@
-import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
+import {WorkflowModel} from '@/middleware/automation/configuration';
+import {
+    UpdateWorkflowNodeParameter200ResponseModel,
+    UpdateWorkflowNodeParameterRequest,
+} from '@/middleware/platform/configuration';
 import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
-import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 export default function saveProperty(
-    parameters: object,
-    setComponentData: (componentData: Array<ComponentType>) => void,
+    name: string,
+    path: string,
     currentComponentData: ComponentType,
     otherComponentData: Array<ComponentType>,
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
-    name: string,
-    workflow: WorkflowModel & WorkflowTaskDataType
+    setComponentData: (componentData: Array<ComponentType>) => void,
+    updateWorkflowNodeParameterMutation: UseMutationResult<
+        UpdateWorkflowNodeParameter200ResponseModel,
+        Error,
+        UpdateWorkflowNodeParameterRequest,
+        unknown
+    >,
+    workflow: WorkflowModel & WorkflowTaskDataType,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    value?: any,
+    arrayIndex?: number
 ) {
-    if (!currentComponentData || !updateWorkflowMutation || !name) {
-        return;
+    // TODO fix in Property.tsx path value, it should be without 'parameters.' prefix and should not contain '${arrayName}_${arrayIndex}' as suffix if array is updated
+
+    path = path.replace('parameters.', '').replace('parameters', '');
+
+    if (arrayIndex !== undefined && path.endsWith('_' + arrayIndex)) {
+        path = path.substring(0, path.lastIndexOf('.'));
     }
 
-    const {actionName, componentName, workflowNodeName} = currentComponentData;
+    const {workflowNodeName} = currentComponentData;
 
-    saveWorkflowDefinition(
+    updateWorkflowNodeParameterMutation.mutate(
         {
-            actionName,
-            componentName,
-            name: workflowNodeName,
-            parameters,
+            id: workflow.id!,
+            updateWorkflowNodeParameterRequestModel: {
+                arrayIndex,
+                name: name.endsWith('_' + arrayIndex) ? undefined : name,
+                path,
+                value,
+                workflowNodeName,
+            },
         },
-        workflow,
-        updateWorkflowMutation,
-        undefined,
-        (workflow) => {
-            let parameters;
+        {
+            onSuccess: (response) => {
+                const parameters = response.parameters;
 
-            for (const trigger of workflow.triggers ?? []) {
-                if (trigger.name === workflowNodeName) {
-                    parameters = trigger.parameters;
-
-                    break;
-                }
-            }
-
-            if (!parameters) {
-                for (const task of workflow.tasks ?? []) {
-                    if (task.name === workflowNodeName) {
-                        parameters = task.parameters;
-
-                        break;
-                    }
-                }
-            }
-
-            setComponentData([
-                ...otherComponentData,
-                {
-                    ...currentComponentData,
-                    parameters,
-                },
-            ]);
+                setComponentData([
+                    ...otherComponentData,
+                    {
+                        ...currentComponentData,
+                        parameters,
+                    },
+                ]);
+            },
         }
     );
 }

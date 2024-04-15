@@ -9,7 +9,10 @@ import './propertyMentionsInput.css';
 
 import InputTypeSwitchButton from '@/components/Properties/components/InputTypeSwitchButton';
 import {Label} from '@/components/ui/label';
-import {UpdateWorkflowRequest, WorkflowModel} from '@/middleware/automation/configuration';
+import {
+    UpdateWorkflowNodeParameter200ResponseModel,
+    UpdateWorkflowNodeParameterRequest,
+} from '@/middleware/platform/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -65,7 +68,12 @@ interface PropertyMentionsInputProps {
     required?: boolean;
     singleMention?: boolean;
     showInputTypeSwitchButton: boolean;
-    updateWorkflowMutation?: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    updateWorkflowNodeParameterMutation?: UseMutationResult<
+        UpdateWorkflowNodeParameter200ResponseModel,
+        Error,
+        UpdateWorkflowNodeParameterRequest,
+        unknown
+    >;
     value: string;
 }
 
@@ -94,7 +102,7 @@ const PropertyMentionsInput = forwardRef(
             required,
             showInputTypeSwitchButton,
             singleMention,
-            updateWorkflowMutation,
+            updateWorkflowNodeParameterMutation,
             value,
         }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>
@@ -195,7 +203,7 @@ const PropertyMentionsInput = forwardRef(
         const isFocused = focusedInput?.props.id === elementId;
 
         const saveInputValue = useDebouncedCallback(() => {
-            if (!currentComponent || !workflow || !updateWorkflowMutation || !name) {
+            if (!currentComponent || !workflow || !updateWorkflowNodeParameterMutation || !name) {
                 return;
             }
 
@@ -298,13 +306,16 @@ const PropertyMentionsInput = forwardRef(
             }
 
             saveProperty(
-                data,
-                setComponents,
+                name,
+                path ?? '',
+                true,
                 currentComponent,
                 otherComponents,
-                updateWorkflowMutation,
-                name,
-                workflow
+                setComponents,
+                updateWorkflowNodeParameterMutation,
+                workflow,
+                strippedValue,
+                arrayIndex
             );
         }, 200);
 
