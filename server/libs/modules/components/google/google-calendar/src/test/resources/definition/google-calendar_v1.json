@@ -6384,10 +6384,10 @@
     "batch": null,
     "defaultOutputFunction": true,
     "deprecated": null,
-    "description": "Returns events on the specified calendar.",
+    "description": "Find events in your calendar",
     "help": null,
     "metadata": null,
-    "name": "getEvents",
+    "name": "findEvents",
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -6539,7 +6539,7 @@
       "controlType": "DATE_TIME",
       "optionsDataSource": null
     } ],
-    "title": "Get events",
+    "title": "Find events",
     "workflowNodeDescriptionFunction": null,
     "output": {
       "outputSchema": {

@@ -33,8 +33,8 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FIND_EVENTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GET_EVENTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.KIND;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.METHOD;
@@ -64,11 +64,11 @@ import java.util.List;
 /**
  * @author Monika Domiter
  */
-public class GoogleCalendarGetEventsAction {
+public class GoogleCalendarFindEventsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_EVENTS)
-        .title("Get events")
-        .description("Returns events on the specified calendar.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(FIND_EVENTS)
+        .title("Find events")
+        .description("Find events in your calendar")
         .properties(
             CALENDAR_ID_PROPERTY,
             array(EVENT_TYPE)
@@ -137,9 +137,9 @@ public class GoogleCalendarGetEventsAction {
                     string(NEXT_SYNC_TOKEN),
                     array(EVENT)
                         .items(EVENT_PROPERTY)))
-        .perform(GoogleCalendarGetEventsAction::perform);
+        .perform(GoogleCalendarFindEventsAction::perform);
 
-    private GoogleCalendarGetEventsAction() {
+    private GoogleCalendarFindEventsAction() {
     }
 
     public static Events perform(
