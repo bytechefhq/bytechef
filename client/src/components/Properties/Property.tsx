@@ -262,63 +262,6 @@ const Property = ({
         );
     }, 200);
 
-    const handleSelectChange = (value: string, name: string) => {
-        if (!currentComponent || !workflow || !updateWorkflowMutation || !name) {
-            return;
-        }
-
-        const {parameters} = currentComponent;
-
-        if (!parameters) {
-            return;
-        }
-
-        let data = parameters;
-
-        if (arrayName && arrayIndex !== undefined) {
-            data = {
-                ...parameters,
-                [arrayName]: [
-                    ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                    {
-                        ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                        [name]: value,
-                    },
-                    ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                ],
-            };
-        } else if (objectName) {
-            const matchingObject = path.split('.').reduce((acc, key) => {
-                if (key !== 'parameters') {
-                    if (acc && acc[key] === undefined) {
-                        acc[key] = {};
-                    }
-
-                    return acc && acc[key];
-                } else {
-                    return acc;
-                }
-            }, data);
-
-            if (matchingObject) {
-                matchingObject[name as string] = value;
-            }
-        } else {
-            data = {
-                ...parameters,
-                [name as string]: value,
-            };
-        }
-
-        if (!data) {
-            return;
-        }
-
-        setSelectValue(value);
-
-        saveProperty(data, setComponents, currentComponent, otherComponents, updateWorkflowMutation, name, workflow);
-    };
-
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         if (isNumericalInput) {
             const valueTooLow = minValue && parseFloat(numericValue) < minValue;
@@ -380,6 +323,67 @@ const Property = ({
                 setDataPillPanelOpen(true);
             }, 50);
         }
+    };
+
+    const handleSelectChange = (value: string, name: string) => {
+        if (!currentComponent || !workflow || !updateWorkflowMutation || !name) {
+            return;
+        }
+
+        const {parameters} = currentComponent;
+
+        if (!parameters) {
+            return;
+        }
+
+        let data = parameters;
+
+        if (arrayName && arrayIndex !== undefined) {
+            data = {
+                ...parameters,
+                [arrayName]: [
+                    ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
+                    {
+                        ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
+                        [name]: value,
+                    },
+                    ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
+                ],
+            };
+        } else if (objectName) {
+            const matchingObject = path.split('.').reduce((acc, key) => {
+                if (key !== 'parameters') {
+                    if (acc && acc[key] === undefined) {
+                        acc[key] = {};
+                    }
+
+                    return acc && acc[key];
+                } else {
+                    return acc;
+                }
+            }, data);
+
+            if (matchingObject) {
+                matchingObject[name as string] = value;
+            }
+        } else {
+            data = {
+                ...parameters,
+                [name as string]: value,
+            };
+        }
+
+        if (!data) {
+            return;
+        }
+
+        setSelectValue(value);
+
+        console.log(`path: ${path}`);
+        console.log(`name: ${name}`);
+        console.log(`arrayIndex: ${arrayIndex}`);
+
+        saveProperty(data, setComponents, currentComponent, otherComponents, updateWorkflowMutation, name, workflow);
     };
 
     // set default mentionInput state
