@@ -16,55 +16,49 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface UpdateWorkflowNodeParameterRequestModel
+ * @interface DeleteWorkflowNodeParameterRequestModel
  */
-export interface UpdateWorkflowNodeParameterRequestModel {
+export interface DeleteWorkflowNodeParameterRequestModel {
     /**
      * The array index.
      * @type {number}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
+     * @memberof DeleteWorkflowNodeParameterRequestModel
      */
     arrayIndex?: number;
     /**
      * The parameter name.
      * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
+     * @memberof DeleteWorkflowNodeParameterRequestModel
      */
     name?: string;
     /**
      * The workflow node parameter path.
      * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
+     * @memberof DeleteWorkflowNodeParameterRequestModel
      */
     path: string;
     /**
-     * The value.
-     * @type {object}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
-     */
-    value?: object;
-    /**
      * The workflow node name.
      * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
+     * @memberof DeleteWorkflowNodeParameterRequestModel
      */
     workflowNodeName: string;
 }
 
 /**
- * Check if a given object implements the UpdateWorkflowNodeParameterRequestModel interface.
+ * Check if a given object implements the DeleteWorkflowNodeParameterRequestModel interface.
  */
-export function instanceOfUpdateWorkflowNodeParameterRequestModel(value: object): boolean {
+export function instanceOfDeleteWorkflowNodeParameterRequestModel(value: object): boolean {
     if (!('path' in value)) return false;
     if (!('workflowNodeName' in value)) return false;
     return true;
 }
 
-export function UpdateWorkflowNodeParameterRequestModelFromJSON(json: any): UpdateWorkflowNodeParameterRequestModel {
-    return UpdateWorkflowNodeParameterRequestModelFromJSONTyped(json, false);
+export function DeleteWorkflowNodeParameterRequestModelFromJSON(json: any): DeleteWorkflowNodeParameterRequestModel {
+    return DeleteWorkflowNodeParameterRequestModelFromJSONTyped(json, false);
 }
 
-export function UpdateWorkflowNodeParameterRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateWorkflowNodeParameterRequestModel {
+export function DeleteWorkflowNodeParameterRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DeleteWorkflowNodeParameterRequestModel {
     if (json == null) {
         return json;
     }
@@ -73,12 +67,11 @@ export function UpdateWorkflowNodeParameterRequestModelFromJSONTyped(json: any, 
         'arrayIndex': json['arrayIndex'] == null ? undefined : json['arrayIndex'],
         'name': json['name'] == null ? undefined : json['name'],
         'path': json['path'],
-        'value': json['value'] == null ? undefined : json['value'],
         'workflowNodeName': json['workflowNodeName'],
     };
 }
 
-export function UpdateWorkflowNodeParameterRequestModelToJSON(value?: UpdateWorkflowNodeParameterRequestModel | null): any {
+export function DeleteWorkflowNodeParameterRequestModelToJSON(value?: DeleteWorkflowNodeParameterRequestModel | null): any {
     if (value == null) {
         return value;
     }
@@ -87,7 +80,6 @@ export function UpdateWorkflowNodeParameterRequestModelToJSON(value?: UpdateWork
         'arrayIndex': value['arrayIndex'],
         'name': value['name'],
         'path': value['path'],
-        'value': value['value'],
         'workflowNodeName': value['workflowNodeName'],
     };
 }
