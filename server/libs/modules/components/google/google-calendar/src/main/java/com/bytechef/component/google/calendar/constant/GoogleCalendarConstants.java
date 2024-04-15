@@ -59,7 +59,7 @@ public class GoogleCalendarConstants {
     public static final String EVENT = "event";
     public static final String EVENT_TYPE = "eventType";
     public static final String FOCUS_TIME = "focusTime";
-    public static final String GET_EVENTS = "getEvents";
+    public static final String FIND_EVENTS = "findEvents";
     public static final String GOOGLE_CALENDAR = "googleCalendar";
     public static final String GUEST_CAN_INVITE_OTHERS = "guestsCanInviteOthers";
     public static final String GUEST_CAN_MODIFY = "guestsCanModify";

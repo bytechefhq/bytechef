@@ -43,7 +43,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Domiter
  */
-class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest {
+class GoogleCalendarFindEventsActionTest extends AbstractGoogleCalendarActionTest {
 
     @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> eventTypesArgumentCaptor = ArgumentCaptor.forClass(List.class);
@@ -99,7 +99,7 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
                 .when(() -> GoogleCalendarUtils.convertToDateViaSqlTimestamp(any()))
                 .thenReturn(date);
 
-            Events result = GoogleCalendarGetEventsAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Events result = GoogleCalendarFindEventsAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedEvents, result);
             assertEquals(10, maxResultsArgumentCaptor.getValue());
