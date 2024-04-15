@@ -11,6 +11,7 @@ export * from './WorkflowNodeDisplayConditionApi';
 export * from './WorkflowNodeDynamicPropertiesApi';
 export * from './WorkflowNodeOptionApi';
 export * from './WorkflowNodeOutputApi';
+export * from './WorkflowNodeParameterApi';
 export * from './WorkflowNodeScriptApi';
 export * from './WorkflowNodeTestOutputApi';
 export * from './WorkflowTestConfigurationApi';

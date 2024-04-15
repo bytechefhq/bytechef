@@ -9,6 +9,7 @@ apis/WorkflowNodeDisplayConditionApi.ts
 apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
 apis/WorkflowNodeOutputApi.ts
+apis/WorkflowNodeParameterApi.ts
 apis/WorkflowNodeScriptApi.ts
 apis/WorkflowNodeTestOutputApi.ts
 apis/WorkflowTestConfigurationApi.ts
@@ -59,6 +60,8 @@ models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
 models/TriggerTypeModel.ts
+models/UpdateWorkflowNodeParameter200ResponseModel.ts
+models/UpdateWorkflowNodeParameterRequestModel.ts
 models/ValuePropertyModel.ts
 models/WorkflowBasicModel.ts
 models/WorkflowConnectionModel.ts
