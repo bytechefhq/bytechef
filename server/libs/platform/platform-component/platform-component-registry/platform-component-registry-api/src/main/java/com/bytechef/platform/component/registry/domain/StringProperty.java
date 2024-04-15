@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class StringProperty extends ValueProperty<String> {
+public class StringProperty extends ValueProperty<String> implements OptionsDataSourceAware {
 
     private String languageId;
     private Integer maxLength;

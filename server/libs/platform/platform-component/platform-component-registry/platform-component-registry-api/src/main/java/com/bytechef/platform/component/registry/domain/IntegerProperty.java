@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class IntegerProperty extends ValueProperty<Long> {
+public class IntegerProperty extends ValueProperty<Long> implements OptionsDataSourceAware {
 
     private Long maxValue;
     private Long minValue;

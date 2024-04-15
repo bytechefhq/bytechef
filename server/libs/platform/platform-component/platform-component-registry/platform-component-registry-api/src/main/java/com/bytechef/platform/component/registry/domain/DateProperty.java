@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class DateProperty extends ValueProperty<LocalDate> {
+public class DateProperty extends ValueProperty<LocalDate> implements OptionsDataSourceAware {
 
     private List<Option> options;
     private OptionsDataSource optionsDataSource;

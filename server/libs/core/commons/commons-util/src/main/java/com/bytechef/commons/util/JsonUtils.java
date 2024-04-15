@@ -18,6 +18,8 @@ package com.bytechef.commons.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.jayway.jsonpath.Configuration;
@@ -299,6 +301,18 @@ public class JsonUtils {
     public static String write(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String writeWithDefaultPrettyPrinter(Object object) {
+        try {
+            DefaultPrettyPrinter printer = new DefaultPrettyPrinter()
+                .withObjectIndenter(new DefaultIndenter("    ", "\n"));
+
+            return objectMapper.writer(printer)
+                .writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

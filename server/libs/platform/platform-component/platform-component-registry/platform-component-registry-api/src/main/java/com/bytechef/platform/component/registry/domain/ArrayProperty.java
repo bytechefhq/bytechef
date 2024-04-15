@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class ArrayProperty extends ValueProperty<List<?>> {
+public class ArrayProperty extends ValueProperty<List<?>> implements OptionsDataSourceAware {
 
     private List<? extends Property> items;
     private Long maxItems;

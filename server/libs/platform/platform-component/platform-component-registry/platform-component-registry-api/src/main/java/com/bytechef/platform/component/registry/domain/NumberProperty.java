@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class NumberProperty extends ValueProperty<Double> {
+public class NumberProperty extends ValueProperty<Double> implements OptionsDataSourceAware {
 
     private Integer maxNumberPrecision;
     private Double maxValue;

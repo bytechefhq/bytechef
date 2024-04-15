@@ -51,7 +51,7 @@ public class OpenApiClientUtils {
 
         ValueProperty<?> outputSchema = output == null ? null : output.getOutputSchema();
 
-        return context.http(http -> http.exchange(
+        Response response = context.http(http -> http.exchange(
             createUrl(inputParameters, metadata, properties), MapUtils.get(metadata, "method", RequestMethod.class)))
             .configuration(Http.responseType(
                 outputSchema == null
@@ -64,6 +64,14 @@ public class OpenApiClientUtils {
                     MapUtils.getString(metadata, "mimeType"), inputParameters, properties))
             .queryParameters(getValuesMap(inputParameters, properties, PropertyType.QUERY))
             .execute();
+
+        if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
+            Object body = response.getBody();
+
+            throw new IllegalArgumentException(body.toString());
+        }
+
+        return response;
     }
 
     private static String createUrl(
@@ -106,6 +114,9 @@ public class OpenApiClientUtils {
                             yield Http.Body.of(
                                 MapUtils.getList(inputParameters, property.getName(), Object.class, List.of()),
                                 bodyContentType);
+                        } else if (property.getType() == Property.Type.DYNAMIC_PROPERTIES) {
+                            yield Http.Body.of(
+                                MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
                         } else if (property.getType() == Property.Type.OBJECT) {
                             yield Http.Body.of(
                                 MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);

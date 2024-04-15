@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class ObjectProperty extends ValueProperty<Map<String, ?>> {
+public class ObjectProperty extends ValueProperty<Map<String, ?>> implements OptionsDataSourceAware {
 
     private List<? extends Property> additionalProperties;
     private boolean multipleValues;
