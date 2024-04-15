@@ -52,8 +52,6 @@ const ArrayProperty = ({
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
 
-    const {workflow} = useWorkflowDataStore();
-
     const {items, name} = property;
 
     const handleAddItemClick = () => {
@@ -61,36 +59,6 @@ const ArrayProperty = ({
 
         if (!currentComponent || !name || !updateWorkflowMutation) {
             return;
-        }
-
-        if (matchingItem?.properties?.length) {
-            const defaultValues = matchingItem.properties.reduce(
-                (acc: Record<string, unknown>, property: ArrayPropertyType) => {
-                    if (!property.name) {
-                        return acc;
-                    }
-
-                    acc[property.name] = property.defaultValue || '';
-
-                    return acc;
-                },
-                {}
-            );
-
-            saveWorkflowDefinition(
-                {
-                    ...currentComponent,
-                    name: currentComponent?.workflowNodeName,
-                    parameters: {
-                        ...currentComponent.parameters,
-                        [name]: currentComponent.parameters?.[name]
-                            ? [...currentComponent.parameters[name], defaultValues]
-                            : [defaultValues],
-                    },
-                },
-                workflow,
-                updateWorkflowMutation
-            );
         }
 
         const newItem: ArrayPropertyType = {
