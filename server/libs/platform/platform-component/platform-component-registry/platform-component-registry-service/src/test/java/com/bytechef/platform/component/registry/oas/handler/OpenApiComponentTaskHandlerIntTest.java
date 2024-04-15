@@ -27,6 +27,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -34,6 +35,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
+import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
@@ -256,35 +258,6 @@ public class OpenApiComponentTaskHandlerIntTest {
         //
 
         stubFor(
-            get(urlPathEqualTo("/pet/findByStatus"))
-                .withQueryParam("status", equalTo("unknown"))
-                .willReturn(
-                    badRequest()
-                        .withJsonBody(
-                            JsonNodeFactory.instance.pojoNode(
-                                Map.of(
-                                    "code", 400,
-                                    "message", "Input error: query parameter `status value `unknown` is not in " +
-                                        "the allowable values `[available, pending, sold]`")))
-                        .withHeader("Content-Type", "application/json")));
-
-        openApiComponentTaskHandler = createOpenApiComponentHandler("findPetsByStatus");
-
-        taskExecution = getTaskExecution(Map.of("status", "unknown"));
-
-        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
-
-        Assertions.assertEquals(400, response.getStatusCode());
-        Assertions.assertEquals(
-            Map.of(
-                "code", 400,
-                "message", "Input error: query parameter `status value `unknown` is not in the allowable values " +
-                    "`[available, pending, sold]`"),
-            response.getBody(new TypeReference<Map<String, Object>>() {}));
-
-        //
-
-        stubFor(
             get(urlPathEqualTo("/pet/findByTags"))
                 .withQueryParam("tags", equalTo("tag1"))
                 .willReturn(
@@ -461,6 +434,33 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         Assertions.assertEquals(200, response.getStatusCode());
         JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
+    }
+
+    @Test
+    public void testHandleGETStatus400() {
+        OpenApiComponentTaskHandler openApiComponentTaskHandler;
+        TaskExecution taskExecution;
+
+        //
+
+        stubFor(
+            get(urlPathEqualTo("/pet/findByStatus"))
+                .withQueryParam("status", equalTo("unknown"))
+                .willReturn(
+                    badRequest()
+                        .withJsonBody(
+                            JsonNodeFactory.instance.pojoNode(
+                                Map.of(
+                                    "code", 400,
+                                    "message", "Input error: query parameter `status value `unknown` is not in " +
+                                        "the allowable values `[available, pending, sold]`")))
+                        .withHeader("Content-Type", "application/json")));
+
+        openApiComponentTaskHandler = createOpenApiComponentHandler("findPetsByStatus");
+
+        taskExecution = getTaskExecution(Map.of("status", "unknown"));
+
+        assertThrows(TaskExecutionException.class, () -> openApiComponentTaskHandler.handle(taskExecution));
     }
 
     @Test
