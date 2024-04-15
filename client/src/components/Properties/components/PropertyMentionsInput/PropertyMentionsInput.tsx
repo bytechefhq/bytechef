@@ -9,19 +9,11 @@ import './propertyMentionsInput.css';
 
 import InputTypeSwitchButton from '@/components/Properties/components/InputTypeSwitchButton';
 import {Label} from '@/components/ui/label';
-import {
-    UpdateWorkflowNodeParameter200ResponseModel,
-    UpdateWorkflowNodeParameterRequest,
-} from '@/middleware/platform/configuration';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
-import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
-import saveProperty from '@/pages/automation/project/utils/saveProperty';
-import {ComponentType, CurrentComponentDefinitionType, DataPillType} from '@/types/types';
+import {CurrentComponentDefinitionType, DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {UseMutationResult} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
-import {useDebouncedCallback} from 'use-debounce';
 
 import PropertyMentionsInputBlot from './PropertyMentionsInputBlot';
 
@@ -46,10 +38,8 @@ const MentionInputListItem = (item: DataPillType) => {
 
 interface PropertyMentionsInputProps {
     arrayIndex?: number;
-    arrayName?: string;
     controlType?: string;
     currentComponentDefinition: CurrentComponentDefinitionType;
-    currentComponent: ComponentType;
     dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
@@ -58,22 +48,12 @@ interface PropertyMentionsInputProps {
     inputTypeSwitchButtonClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
-    name?: string;
-    objectName?: string;
     onChange: (value: string) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
-    otherComponents: Array<ComponentType>;
-    path?: string;
     placeholder?: string;
     required?: boolean;
     singleMention?: boolean;
     showInputTypeSwitchButton: boolean;
-    updateWorkflowNodeParameterMutation?: UseMutationResult<
-        UpdateWorkflowNodeParameter200ResponseModel,
-        Error,
-        UpdateWorkflowNodeParameterRequest,
-        unknown
-    >;
     value: string;
 }
 
@@ -81,9 +61,7 @@ const PropertyMentionsInput = forwardRef(
     (
         {
             arrayIndex,
-            arrayName,
             controlType,
-            currentComponent,
             currentComponentDefinition,
             dataPills,
             defaultValue,
@@ -92,17 +70,12 @@ const PropertyMentionsInput = forwardRef(
             inputTypeSwitchButtonClassName,
             label,
             leadingIcon,
-            name,
-            objectName,
             onChange,
             onKeyPress,
-            otherComponents,
-            path,
             placeholder = "Show data pills using '{'",
             required,
             showInputTypeSwitchButton,
             singleMention,
-            updateWorkflowNodeParameterMutation,
             value,
         }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>
@@ -110,7 +83,6 @@ const PropertyMentionsInput = forwardRef(
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {copiedPropertyData, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
-        const {setComponents, workflow} = useWorkflowDataStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -202,131 +174,12 @@ const PropertyMentionsInput = forwardRef(
 
         const isFocused = focusedInput?.props.id === elementId;
 
-        const saveInputValue = useDebouncedCallback(() => {
-            if (!currentComponent || !workflow || !updateWorkflowNodeParameterMutation || !name) {
-                return;
-            }
-
-            const {parameters} = currentComponent;
-
-            if (!parameters) {
-                return;
-            }
-
-            let strippedValue = value;
-
-            const dataPillValue = value.match(/data-value="([^"]+)"/)?.[1];
-
-            if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
-                strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
-            } else {
-                strippedValue = value.replace(/<[^>]*>?/gm, '');
-            }
-
-            let data = parameters;
-            let currentValue;
-
-            if (arrayName && arrayIndex !== undefined) {
-                if (path?.includes('parameters')) {
-                    if (objectName) {
-                        data = {
-                            ...parameters,
-                            [arrayName]: [
-                                ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                                {
-                                    ...(parameters?.[arrayName]?.[arrayIndex] ?? {}),
-                                    [name]: strippedValue,
-                                },
-                                ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                            ],
-                        };
-                    } else {
-                        data = {
-                            ...parameters,
-                            [arrayName]: [
-                                ...(parameters?.[arrayName] ?? []).slice(0, arrayIndex),
-                                strippedValue,
-                                ...(parameters?.[arrayName] ?? []).slice(arrayIndex + 1),
-                            ],
-                        };
-                    }
-                } else {
-                    const combinedArray = Object.entries(parameters)
-                        .filter(([key]) => key.startsWith(`${arrayName}_`))
-                        .sort((a, b) => {
-                            const aIndex = parseInt(a[0].split('_')[1], 10);
-                            const bIndex = parseInt(b[0].split('_')[1], 10);
-
-                            return aIndex - bIndex;
-                        })
-                        .map(([, value]) => value as string);
-
-                    const combinedString = combinedArray?.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
-
-                    currentValue = parameters[arrayName];
-
-                    data = {
-                        ...parameters,
-                        [arrayName]: combinedString,
-                    };
-                }
-            } else if (objectName && parameters && path) {
-                const matchingObject = path.split('.').reduce((acc, key) => {
-                    if (key !== 'parameters') {
-                        if (acc && acc[key] === undefined) {
-                            acc[key] = {};
-                        }
-
-                        return acc && acc[key];
-                    } else {
-                        return acc;
-                    }
-                }, data);
-
-                if (matchingObject) {
-                    currentValue = matchingObject[name as string];
-
-                    matchingObject[name as string] = strippedValue;
-                }
-            } else {
-                currentValue = parameters[name as string];
-
-                data = {
-                    ...parameters,
-                    [name as string]: strippedValue,
-                };
-            }
-
-            if (!data) {
-                return;
-            }
-
-            if (currentValue === strippedValue) {
-                return;
-            }
-
-            saveProperty(
-                name,
-                path ?? '',
-                true,
-                currentComponent,
-                otherComponents,
-                setComponents,
-                updateWorkflowNodeParameterMutation,
-                workflow,
-                strippedValue,
-                arrayIndex
-            );
-        }, 200);
-
         const handleOnChange = (value: string) => {
             if (onChange) {
                 onChange(value);
             }
 
             setMentionOccurences(value.match(/property-mention/g)?.length || 0);
-
-            saveInputValue();
         };
 
         const handleOnFocus = () => {

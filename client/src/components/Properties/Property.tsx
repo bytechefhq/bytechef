@@ -214,6 +214,75 @@ const Property = ({
         );
     }, 200);
 
+    const saveMentionInputValue = useDebouncedCallback(() => {
+        if (!currentComponent || !workflow || !updateWorkflowNodeParameterMutation || !name) {
+            return;
+        }
+
+        const {parameters} = currentComponent;
+
+        if (!parameters) {
+            return;
+        }
+        let strippedValue = mentionInputValue;
+
+        const dataPillValue = mentionInputValue.match(/data-value="([^"]+)"/)?.[1];
+
+        if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
+            strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
+        } else {
+            strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
+        }
+
+        let currentValue;
+
+        if (arrayName && arrayIndex !== undefined) {
+            if (path?.includes('parameters')) {
+                if (objectName) {
+                    currentValue = parameters[arrayName][arrayIndex][name];
+                } else {
+                    currentValue = parameters[arrayName][arrayIndex];
+                }
+            } else {
+                currentValue = parameters[arrayName];
+            }
+        } else if (objectName && parameters && path) {
+            const matchingObject = path.split('.').reduce((acc, key) => {
+                if (key !== 'parameters') {
+                    if (acc && acc[key] === undefined) {
+                        acc[key] = {};
+                    }
+
+                    return acc && acc[key];
+                } else {
+                    return acc;
+                }
+            }, parameters);
+
+            if (matchingObject) {
+                currentValue = matchingObject[name as string];
+            }
+        } else {
+            currentValue = parameters[name as string];
+        }
+
+        if (currentValue === strippedValue) {
+            return;
+        }
+
+        saveProperty(
+            name,
+            path ?? '',
+            currentComponent,
+            otherComponents,
+            setComponents,
+            updateWorkflowNodeParameterMutation,
+            workflow,
+            strippedValue,
+            arrayIndex
+        );
+    }, 200);
+
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (!currentComponent || !updateWorkflowMutation || !name) {
             return;
@@ -268,6 +337,12 @@ const Property = ({
         }
 
         saveInputValue();
+    };
+
+    const handleMentionsInputChange = (value: string) => {
+        setMentionInputValue(value);
+
+        saveMentionInputValue();
     };
 
     const handleInputTypeSwitchButtonClick = () => {
@@ -424,9 +499,7 @@ const Property = ({
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
                             arrayIndex={arrayIndex}
-                            arrayName={arrayName}
                             controlType={controlType}
-                            currentComponent={currentComponent}
                             currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
                             defaultValue={defaultValue}
@@ -435,21 +508,16 @@ const Property = ({
                             inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                             label={label || (arrayName ? undefined : name)}
                             leadingIcon={typeIcon}
-                            name={name || `${arrayName}_0`}
-                            objectName={objectName}
-                            onChange={setMentionInputValue}
+                            onChange={handleMentionsInputChange}
                             onKeyPress={(event: KeyboardEvent) => {
                                 if (isNumericalInput || type === 'BOOLEAN') {
                                     event.key !== '{' && event.preventDefault();
                                 }
                             }}
-                            otherComponents={otherComponents}
-                            path={path}
                             ref={editorRef}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton!}
                             singleMention={controlType !== 'TEXT'}
-                            updateWorkflowNodeParameterMutation={updateWorkflowNodeParameterMutation}
                             value={mentionInputValue}
                         />
                     )}
