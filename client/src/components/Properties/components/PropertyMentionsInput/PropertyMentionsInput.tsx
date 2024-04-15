@@ -216,6 +216,7 @@ const PropertyMentionsInput = forwardRef(
             }
 
             let data = parameters;
+            let currentValue;
 
             if (arrayName && arrayIndex !== undefined) {
                 if (path?.includes('parameters')) {
@@ -254,6 +255,8 @@ const PropertyMentionsInput = forwardRef(
 
                     const combinedString = combinedArray?.map((item) => item.replace(/<[^>]*>?/gm, '')).join(', ');
 
+                    currentValue = parameters[arrayName];
+
                     data = {
                         ...parameters,
                         [arrayName]: combinedString,
@@ -273,9 +276,13 @@ const PropertyMentionsInput = forwardRef(
                 }, data);
 
                 if (matchingObject) {
+                    currentValue = matchingObject[name as string];
+
                     matchingObject[name as string] = strippedValue;
                 }
             } else {
+                currentValue = parameters[name as string];
+
                 data = {
                     ...parameters,
                     [name as string]: strippedValue,
@@ -283,6 +290,10 @@ const PropertyMentionsInput = forwardRef(
             }
 
             if (!data) {
+                return;
+            }
+
+            if (currentValue === strippedValue) {
                 return;
             }
 
