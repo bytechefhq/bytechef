@@ -222,6 +222,44 @@ public class ComponentInitOpenApiGenerator {
             .collect(Collectors.joining(" "));
     }
 
+    private void checkAdditionalProperties(
+        String propertyName, String propertyDescription, Boolean required, Schema<?> schema, boolean outputSchema,
+        String type, CodeBlock.Builder builder) {
+
+        if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
+            builder.add(
+                ".label($S)",
+                buildPropertyLabel(
+                    StringUtils.isEmpty(schema.getTitle())
+                        ? propertyName.replace("__", "") : schema.getTitle()));
+        }
+
+        if (propertyDescription != null) {
+            builder.add(".description($S)", propertyDescription);
+        }
+
+        if (schema.getEnum() != null) {
+            List<CodeBlock> codeBlocks = getEnumOptionsCodeBlocks(schema);
+
+            if (!Objects.equals(type, "boolean")) {
+                builder.add(".options($L)", codeBlocks.stream()
+                    .collect(CodeBlock.joining(",")));
+            }
+        }
+
+        if (required != null) {
+            builder.add(".required($L)", required);
+        }
+
+        if (schema.getExample() != null) {
+            if (Objects.equals(type, "string")) {
+                builder.add(".exampleValue($S)", schema.getExample());
+            } else {
+                builder.add(".exampleValue($L)", schema.getExample());
+            }
+        }
+    }
+
     @SuppressWarnings("rawtypes")
     private void checkComponentSchemaSources(Set<String> schemas) {
         Components components = openAPI.getComponents();
@@ -1716,38 +1754,8 @@ public class ComponentInitOpenApiGenerator {
                         "Parameter type %s is not supported.".formatted(schema.getType()));
                 }
 
-                if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
-                    builder.add(
-                        ".label($S)",
-                        buildPropertyLabel(
-                            StringUtils.isEmpty(schema.getTitle())
-                                ? propertyName.replace("__", "") : schema.getTitle()));
-                }
-
-                if (propertyDescription != null) {
-                    builder.add(".description($S)", propertyDescription);
-                }
-
-                if (schema.getEnum() != null) {
-                    List<CodeBlock> codeBlocks = getEnumOptionsCodeBlocks(schema);
-
-                    if (!Objects.equals(type, "boolean")) {
-                        builder.add(".options($L)", codeBlocks.stream()
-                            .collect(CodeBlock.joining(",")));
-                    }
-                }
-
-                if (required != null) {
-                    builder.add(".required($L)", required);
-                }
-
-                if (schema.getExample() != null) {
-                    if (Objects.equals(type, "string")) {
-                        builder.add(".exampleValue($S)", schema.getExample());
-                    } else {
-                        builder.add(".exampleValue($L)", schema.getExample());
-                    }
-                }
+                checkAdditionalProperties(propertyName, propertyDescription, required, schema, outputSchema, type,
+                    builder);
             } else {
                 builder.add(
                     getRefCodeBlock(propertyName, required, schema, excludePropertyNameIfEmpty, outputSchema, openAPI));
