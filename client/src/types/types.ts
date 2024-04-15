@@ -118,6 +118,7 @@ export type ArrayPropertyType = PropertyModel & {
     controlType?: ControlTypeModel;
     custom?: boolean;
     defaultValue?: string;
+    properties?: Array<PropertyType>;
 };
 
 type PropertyTypeAllType = ArrayPropertyModel &

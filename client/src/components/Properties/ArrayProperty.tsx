@@ -1,6 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {ControlTypeModel, ObjectPropertyModel, WorkflowModel} from '@/middleware/platform/configuration';
+import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
+import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {
     ArrayPropertyType,
@@ -38,10 +40,46 @@ const ArrayProperty = ({
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
 
+    const {workflow} = useWorkflowDataStore();
+
     const {items, name} = property;
 
     const handleAddItemClick = () => {
-        const matchingItem = items?.find((item) => item.type === newItemType);
+        const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newItemType);
+
+        if (!currentComponent || !name || !updateWorkflowMutation) {
+            return;
+        }
+
+        if (matchingItem?.properties?.length) {
+            const defaultValues = matchingItem.properties.reduce(
+                (acc: Record<string, unknown>, property: ArrayPropertyType) => {
+                    if (!property.name) {
+                        return acc;
+                    }
+
+                    acc[property.name] = property.defaultValue || '';
+
+                    return acc;
+                },
+                {}
+            );
+
+            saveWorkflowDefinition(
+                {
+                    ...currentComponent,
+                    name: currentComponent?.workflowNodeName,
+                    parameters: {
+                        ...currentComponent.parameters,
+                        [name]: currentComponent.parameters?.[name]
+                            ? [...currentComponent.parameters[name], defaultValues]
+                            : [defaultValues],
+                    },
+                },
+                workflow,
+                updateWorkflowMutation
+            );
+        }
 
         const newItem: ArrayPropertyType = {
             ...matchingItem,
