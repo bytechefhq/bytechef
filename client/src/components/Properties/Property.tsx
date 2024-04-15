@@ -202,13 +202,13 @@ const Property = ({
         const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
 
         saveProperty(
-            name,
+            workflow.id!,
             path,
+            name,
             currentComponent,
             otherComponents,
             setComponents,
             updateWorkflowNodeParameterMutation,
-            workflow,
             isNumericalInput ? numericValueToSave : inputValue,
             arrayIndex
         );
@@ -271,13 +271,13 @@ const Property = ({
         }
 
         saveProperty(
+            workflow.id!,
+            path,
             name,
-            path ?? '',
             currentComponent,
             otherComponents,
             setComponents,
             updateWorkflowNodeParameterMutation,
-            workflow,
             strippedValue,
             arrayIndex
         );
@@ -289,13 +289,13 @@ const Property = ({
         }
 
         saveProperty(
-            name,
+            workflow.id!,
             path,
+            name,
             currentComponent,
             otherComponents,
             setComponents,
             updateWorkflowNodeParameterMutation,
-            workflow,
             value,
             undefined
         );
@@ -378,13 +378,13 @@ const Property = ({
         setSelectValue(value);
 
         saveProperty(
-            name,
+            workflow.id!,
             path,
+            name,
             currentComponent,
             otherComponents,
             setComponents,
             updateWorkflowNodeParameterMutation,
-            workflow,
             value,
             arrayIndex
         );

@@ -1,16 +1,12 @@
-import {WorkflowModel} from '@/middleware/automation/configuration';
-import {
-    UpdateWorkflowNodeParameter200ResponseModel,
-    UpdateWorkflowNodeParameterRequest,
-} from '@/middleware/platform/configuration';
+import {UpdateWorkflowNodeParameterRequest} from '@/middleware/platform/configuration';
+import {UpdateWorkflowNodeParameter200ResponseModel} from '@/middleware/platform/configuration/models/UpdateWorkflowNodeParameter200ResponseModel';
 import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
-import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
-
 export default function saveProperty(
-    name: string,
+    workflowId: string,
     path: string,
+    name: string,
     currentComponentData: ComponentType,
     otherComponentData: Array<ComponentType>,
     setComponentData: (componentData: Array<ComponentType>) => void,
@@ -20,7 +16,6 @@ export default function saveProperty(
         UpdateWorkflowNodeParameterRequest,
         unknown
     >,
-    workflow: WorkflowModel & WorkflowTaskDataType,
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any,
     arrayIndex?: number
@@ -37,7 +32,7 @@ export default function saveProperty(
 
     updateWorkflowNodeParameterMutation.mutate(
         {
-            id: workflow.id!,
+            id: workflowId,
             updateWorkflowNodeParameterRequestModel: {
                 arrayIndex,
                 name: name.endsWith('_' + arrayIndex) ? undefined : name,
