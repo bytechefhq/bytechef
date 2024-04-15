@@ -12,6 +12,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDisplayCo
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPropertiesApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOutputApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeParameterApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeScriptApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeTestOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowTestConfigurationApi.java
@@ -60,6 +61,8 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TimePropertyMod
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerTypeModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowNodeParameter200ResponseModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ValuePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowConnectionModel.java

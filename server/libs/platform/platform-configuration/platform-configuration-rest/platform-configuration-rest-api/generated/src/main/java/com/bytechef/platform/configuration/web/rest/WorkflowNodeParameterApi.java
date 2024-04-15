@@ -5,7 +5,8 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.ScriptTestExecutionModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameter200ResponseModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,46 +35,47 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-15T15:05:25.415293+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
-@Tag(name = "workflow-node-script", description = "The Platform Workflow Node Script API")
-public interface WorkflowNodeScriptApi {
+@Tag(name = "workflow-node-parameter", description = "The Platform Workflow Node Parameter API")
+public interface WorkflowNodeParameterApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /workflows/{id}/scripts/{workflowNodeName} : Execute a script for testing purposes
-     * Execute a script for testing purposes.
+     * PATCH /workflows/{id}/parameters : Updates a workflow node parameter
+     * Updates a workflow node parameter.
      *
-     * @param id The id of a workflow. (required)
-     * @param workflowNodeName The name of a workflow node which uses the script component. (required)
-     * @return The script test execution object. (status code 200)
+     * @param id The workflow id (required)
+     * @param updateWorkflowNodeParameterRequestModel  (optional)
+     * @return The updated workflow node parameters. (status code 200)
      */
     @Operation(
-        operationId = "testWorkflowNodeScript",
-        summary = "Execute a script for testing purposes",
-        description = "Execute a script for testing purposes.",
-        tags = { "workflow-node-script" },
+        operationId = "updateWorkflowNodeParameter",
+        summary = "Updates a workflow node parameter",
+        description = "Updates a workflow node parameter.",
+        tags = { "workflow-node-parameter" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The script test execution object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ScriptTestExecutionModel.class))
+            @ApiResponse(responseCode = "200", description = "The updated workflow node parameters.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = UpdateWorkflowNodeParameter200ResponseModel.class))
             })
         }
     )
     @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workflows/{id}/scripts/{workflowNodeName}",
-        produces = { "application/json" }
+        method = RequestMethod.PATCH,
+        value = "/workflows/{id}/parameters",
+        produces = { "application/json" },
+        consumes = { "application/json" }
     )
     
-    default ResponseEntity<ScriptTestExecutionModel> testWorkflowNodeScript(
-        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of a workflow node which uses the script component.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+    default ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "UpdateWorkflowNodeParameterRequestModel", description = "") @Valid @RequestBody(required = false) UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"output\" : \"{}\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" } }";
+                    String exampleString = "{ \"parameters\" : { \"key\" : \"\" } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

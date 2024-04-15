@@ -18,42 +18,42 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * SaveWorkflowTestConfigurationInputsRequestModel
+ * UpdateWorkflowNodeParameter200ResponseModel
  */
 
-@JsonTypeName("saveWorkflowTestConfigurationInputs_request")
+@JsonTypeName("updateWorkflowNodeParameter_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-15T15:05:25.415293+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
-public class SaveWorkflowTestConfigurationInputsRequestModel {
+public class UpdateWorkflowNodeParameter200ResponseModel {
 
   @Valid
-  private Map<String, String> inputs = new HashMap<>();
+  private Map<String, Object> parameters = new HashMap<>();
 
-  public SaveWorkflowTestConfigurationInputsRequestModel inputs(Map<String, String> inputs) {
-    this.inputs = inputs;
+  public UpdateWorkflowNodeParameter200ResponseModel parameters(Map<String, Object> parameters) {
+    this.parameters = parameters;
     return this;
   }
 
-  public SaveWorkflowTestConfigurationInputsRequestModel putInputsItem(String key, String inputsItem) {
-    if (this.inputs == null) {
-      this.inputs = new HashMap<>();
+  public UpdateWorkflowNodeParameter200ResponseModel putParametersItem(String key, Object parametersItem) {
+    if (this.parameters == null) {
+      this.parameters = new HashMap<>();
     }
-    this.inputs.put(key, inputsItem);
+    this.parameters.put(key, parametersItem);
     return this;
   }
 
   /**
-   * The input parameters used as workflow input values.
-   * @return inputs
+   * Get parameters
+   * @return parameters
   */
   
-  @Schema(name = "inputs", description = "The input parameters used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("inputs")
-  public Map<String, String> getInputs() {
-    return inputs;
+  @Schema(name = "parameters", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("parameters")
+  public Map<String, Object> getParameters() {
+    return parameters;
   }
 
-  public void setInputs(Map<String, String> inputs) {
-    this.inputs = inputs;
+  public void setParameters(Map<String, Object> parameters) {
+    this.parameters = parameters;
   }
 
   @Override
@@ -64,20 +64,20 @@ public class SaveWorkflowTestConfigurationInputsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequest = (SaveWorkflowTestConfigurationInputsRequestModel) o;
-    return Objects.equals(this.inputs, saveWorkflowTestConfigurationInputsRequest.inputs);
+    UpdateWorkflowNodeParameter200ResponseModel updateWorkflowNodeParameter200Response = (UpdateWorkflowNodeParameter200ResponseModel) o;
+    return Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs);
+    return Objects.hash(parameters);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class SaveWorkflowTestConfigurationInputsRequestModel {\n");
-    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+    sb.append("class UpdateWorkflowNodeParameter200ResponseModel {\n");
+    sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("}");
     return sb.toString();
   }
