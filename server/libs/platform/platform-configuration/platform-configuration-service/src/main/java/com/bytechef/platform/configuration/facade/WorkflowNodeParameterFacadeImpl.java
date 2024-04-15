@@ -62,6 +62,27 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     @SuppressWarnings("unchecked")
+    public Map<String, ?> deleteParameter(
+        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        Result result = getParameterMapProperties(workflowNodeName, (Map<String, Object>) definitionMap);
+
+        Map<String, ?> parameterMap = result.parameterMap;
+
+        deleteParameter(path, name, arrayIndex, (Map<String, Object>) parameterMap);
+
+        workflowService.update(
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+
+        return parameterMap;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public Map<String, ?> updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
 
@@ -221,6 +242,55 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void deleteParameter(String path, String name, Integer arrayIndex, Map<String, Object> parameterMap) {
+        if (StringUtils.isEmpty(path)) {
+            if (arrayIndex == null) {
+                parameterMap.remove(name);
+            } else {
+                throw new IllegalStateException("Either path or name must be defined");
+            }
+        } else {
+            String[] pathItems = path.split("\\.");
+
+            Object subParameter = parameterMap;
+            Object parentSubParameter;
+
+            for (int i = 0; i < pathItems.length; i++) {
+                String pathItem = pathItems[i];
+
+                parentSubParameter = subParameter;
+                subParameter = ((Map<String, Object>) subParameter).get(pathItem);
+
+                if (subParameter == null) {
+                    if (arrayIndex == null || i < pathItems.length - 1) {
+                        subParameter = new HashMap<>();
+
+                        ((Map<String, Object>) parentSubParameter).put(pathItem, subParameter);
+                    } else {
+                        subParameter = new ArrayList<>();
+
+                        ((Map<String, Object>) parentSubParameter).put(pathItem, subParameter);
+                    }
+                }
+            }
+
+            if (arrayIndex == null) {
+                ((Map<String, Object>) subParameter).remove(name);
+            } else {
+                List<Object> subParameters = (List<Object>) subParameter;
+
+                if (name == null) {
+                    subParameters.remove((int) arrayIndex);
+                } else {
+                    Map<String, Object> subParameterMap = (Map<String, Object>) subParameters.get(arrayIndex);
+
+                    subParameterMap.remove(name);
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

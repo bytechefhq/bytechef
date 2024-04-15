@@ -19,8 +19,11 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
+import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,20 +38,36 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
     private final WorkflowNodeParameterFacade workflowNodeParameterFacade;
 
+    @SuppressFBWarnings("EI")
     public WorkflowNodeParameterApiController(WorkflowNodeParameterFacade workflowNodeParameterFacade) {
         this.workflowNodeParameterFacade = workflowNodeParameterFacade;
     }
 
     @Override
     @SuppressWarnings("unchecked")
+    public ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> deleteWorkflowNodeParameter(
+        String id, DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
+
+        return ResponseEntity.ok(
+            new DeleteWorkflowNodeParameter200ResponseModel().parameters(
+                (Map<String, Object>) workflowNodeParameterFacade.deleteParameter(
+                    id, deleteWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
+                    deleteWorkflowNodeParameterRequestModel.getPath(),
+                    deleteWorkflowNodeParameterRequestModel.getName(),
+                    deleteWorkflowNodeParameterRequestModel.getArrayIndex())));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
-        String id, String name, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
+        String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
         return ResponseEntity.ok(
             new DeleteWorkflowNodeParameter200ResponseModel().parameters(
                 (Map<String, Object>) workflowNodeParameterFacade.updateParameter(
                     id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-                    updateWorkflowNodeParameterRequestModel.getPath(), name,
+                    updateWorkflowNodeParameterRequestModel.getPath(),
+                    updateWorkflowNodeParameterRequestModel.getName(),
                     updateWorkflowNodeParameterRequestModel.getArrayIndex(),
                     updateWorkflowNodeParameterRequestModel.getValue())));
     }
