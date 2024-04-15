@@ -117,57 +117,6 @@ const WorkflowNodeDetailsPanel = ({
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
 
-    const handleActionSelectChange = (actionName: string) => {
-        setCurrentActionName(actionName);
-
-        setComponentActions(
-            componentActions.map((componentAction) => {
-                if (componentAction.workflowNodeName === currentNode.name) {
-                    return {
-                        ...componentAction,
-                        actionName,
-                    };
-                } else {
-                    return componentAction;
-                }
-            })
-        );
-
-        if (currentComponentDefinition) {
-            setComponents([
-                ...components.filter((component) => component.workflowNodeName !== currentNode.name),
-                {
-                    actionName,
-                    componentName: currentNode.componentName || currentNode.id,
-                    icon: currentComponentDefinition.icon,
-                    title: currentComponentDefinition?.title,
-                    workflowNodeName: currentNode.name,
-                },
-            ]);
-
-            if (!currentComponent) {
-                return;
-            }
-
-            const {componentName, icon, title, workflowNodeName} = currentComponent;
-
-            delete currentWorkflowTask?.parameters;
-
-            saveWorkflowDefinition(
-                {
-                    actionName,
-                    componentName,
-                    icon,
-                    label: title,
-                    name: workflowNodeName!,
-                    type: `${componentName}/v1/${actionName}`,
-                },
-                workflow,
-                updateWorkflowMutation
-            );
-        }
-    };
-
     const getActionName = (): string => {
         const currentComponentActionNames = currentComponentDefinition?.actions?.map((action) => action.name);
 
@@ -297,6 +246,57 @@ const WorkflowNodeDetailsPanel = ({
             return true;
         }
     });
+
+    const handleActionSelectChange = (actionName: string) => {
+        setCurrentActionName(actionName);
+
+        setComponentActions(
+            componentActions.map((componentAction) => {
+                if (componentAction.workflowNodeName === currentNode.name) {
+                    return {
+                        ...componentAction,
+                        actionName,
+                    };
+                } else {
+                    return componentAction;
+                }
+            })
+        );
+
+        if (currentComponentDefinition) {
+            setComponents([
+                ...components.filter((component) => component.workflowNodeName !== currentNode.name),
+                {
+                    actionName,
+                    componentName: currentNode.componentName || currentNode.id,
+                    icon: currentComponentDefinition.icon,
+                    title: currentComponentDefinition?.title,
+                    workflowNodeName: currentNode.name,
+                },
+            ]);
+
+            if (!currentComponent) {
+                return;
+            }
+
+            const {componentName, icon, title, workflowNodeName} = currentComponent;
+
+            delete currentWorkflowTask?.parameters;
+
+            saveWorkflowDefinition(
+                {
+                    actionName,
+                    componentName,
+                    icon,
+                    label: title,
+                    name: workflowNodeName!,
+                    type: `${componentName}/v1/${actionName}`,
+                },
+                workflow,
+                updateWorkflowMutation
+            );
+        }
+    };
 
     useEffect(() => {
         if (componentDefinition) {
@@ -501,6 +501,7 @@ const WorkflowNodeDetailsPanel = ({
                                             customClassName="p-4"
                                             dataPills={dataPills}
                                             key={`${currentNode.name}_${currentActionName}_properties`}
+                                            onChange={handlePropertiesChange}
                                             properties={currentActionProperties}
                                         />
                                     ) : (
