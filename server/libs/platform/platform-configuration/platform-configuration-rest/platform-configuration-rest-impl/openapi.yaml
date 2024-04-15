@@ -26,6 +26,8 @@ tags:
   description: "The Platform Workflow Node Option API"
 - name: "workflow-node-output"
   description: "The Platform Workflow Node Output API"
+- name: "workflow-node-parameter"
+  description: "The Platform Workflow Node Parameter API"
 - name: "workflow-node-script"
   description: "The Platform Workflow Node Script API"
 - name: "workflow-node-test-output"
@@ -759,6 +761,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
+  /workflows/{id}/parameters:
+    patch:
+      description: "Updates a workflow node parameter."
+      summary: "Updates a workflow node parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "updateWorkflowNodeParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "propertyName"
+                - "workflowNodeName"
+              properties:
+                arrayIndex:
+                  description: "The array index."
+                  type: "integer"
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+                name:
+                  description: "The parameter name."
+                  type: "string"
+                value:
+                  description: "The value."
+                  type: "object"
+                workflowNodeName:
+                  description: "The workflow node name."
+                  type: "string"
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  parameters:
+                    type: "object"
+                    additionalProperties: true
   /workflows/{id}/properties/{workflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
