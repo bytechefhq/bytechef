@@ -61,9 +61,11 @@ const TABS = [
 ];
 
 const WorkflowNodeDetailsPanel = ({
+    onPropertyChange,
     previousComponentDefinitions,
     workflowNodeOutputs,
 }: {
+    onPropertyChange?: () => void;
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
     workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
@@ -501,7 +503,7 @@ const WorkflowNodeDetailsPanel = ({
                                             customClassName="p-4"
                                             dataPills={dataPills}
                                             key={`${currentNode.name}_${currentActionName}_properties`}
-                                            onChange={handlePropertiesChange}
+                                            onChange={onPropertyChange}
                                             properties={currentActionProperties}
                                         />
                                     ) : (

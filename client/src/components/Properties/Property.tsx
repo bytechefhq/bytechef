@@ -59,6 +59,7 @@ interface PropertyProps {
     formState?: FormState<FieldValues>;
     inputTypeSwitchButtonClassName?: string;
     objectName?: string;
+    onChange?: () => void;
     path?: string;
     property: PropertyType;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -78,6 +79,7 @@ const Property = ({
     formState,
     inputTypeSwitchButtonClassName,
     objectName,
+    onChange,
     path = 'parameters',
     property,
     register,
@@ -220,6 +222,10 @@ const Property = ({
             isNumericalInput ? numericValueToSave : inputValue,
             arrayIndex
         );
+
+        if (onChange) {
+            onChange();
+        }
     }, 200);
 
     const saveMentionInputValue = useDebouncedCallback(() => {
@@ -289,6 +295,10 @@ const Property = ({
             strippedValue,
             arrayIndex
         );
+
+        if (onChange) {
+            onChange();
+        }
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
@@ -307,6 +317,10 @@ const Property = ({
             value,
             undefined
         );
+
+        if (onChange) {
+            onChange();
+        }
     }, 200);
 
     const handleDelete = (path: string, name: string, arrayIndex?: number) => {
@@ -409,6 +423,10 @@ const Property = ({
             value,
             arrayIndex
         );
+
+        if (onChange) {
+            onChange();
+        }
     };
 
     // set default mentionInput state
@@ -590,6 +608,7 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
+                                onChange={onChange}
                                 onDeleteClick={handleDelete}
                                 path={path}
                                 property={property}
@@ -604,6 +623,7 @@ const Property = ({
                                 currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
+                                onChange={onChange}
                                 onDeleteClick={handleDelete}
                                 path={path}
                                 property={property}

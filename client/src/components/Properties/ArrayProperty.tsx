@@ -32,6 +32,7 @@ interface ArrayPropertyProps {
     currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponent?: ComponentType;
     dataPills?: Array<DataPillType>;
+    onChange?: () => void;
     onDeleteClick: (path: string, name: string, index: number) => void;
     path?: string;
     property: PropertyType;
@@ -41,6 +42,7 @@ const ArrayProperty = ({
     currentComponent,
     currentComponentDefinition,
     dataPills,
+    onChange,
     onDeleteClick,
     path,
     property,
@@ -170,6 +172,7 @@ const ArrayProperty = ({
                                 dataPills={dataPills}
                                 index={index}
                                 key={subItem.name}
+                                onChange={onChange}
                                 onDeleteClick={handleDeleteClick}
                                 path={path}
                                 setArrayItems={setArrayItems}
@@ -184,6 +187,7 @@ const ArrayProperty = ({
                             dataPills={dataPills}
                             index={index}
                             key={arrayItem.name}
+                            onChange={onChange}
                             onDeleteClick={handleDeleteClick}
                             path={path}
                             setArrayItems={setArrayItems}

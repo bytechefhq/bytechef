@@ -17,6 +17,7 @@ interface ArrayPropertyItemProps {
     currentComponent?: ComponentType;
     dataPills?: DataPillType[];
     index: number;
+    onChange?: () => void;
     onDeleteClick: (path: string, name: string, index: number) => void;
     path?: string;
     setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
@@ -29,6 +30,7 @@ const ArrayPropertyItem = ({
     currentComponentDefinition,
     dataPills,
     index,
+    onChange,
     onDeleteClick,
     path,
     setArrayItems,
@@ -50,6 +52,7 @@ const ArrayPropertyItem = ({
                 currentComponentDefinition={currentComponentDefinition}
                 customClassName="pl-2 w-full"
                 dataPills={dataPills}
+                onChange={onChange}
                 path={`${path}.${arrayName}`}
                 property={arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
             />

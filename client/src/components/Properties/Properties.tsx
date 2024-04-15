@@ -1,5 +1,4 @@
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
-import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -13,7 +12,7 @@ interface PropertiesProps {
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+    onChange?: () => void;
     path?: string;
     properties: Array<PropertyType>;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -27,6 +26,7 @@ const Properties = ({
     customClassName,
     dataPills,
     formState,
+    onChange,
     path,
     properties,
     register,
@@ -40,6 +40,7 @@ const Properties = ({
                 dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}
+                onChange={onChange}
                 path={path}
                 property={property}
                 register={register}

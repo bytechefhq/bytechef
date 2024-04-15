@@ -6,7 +6,9 @@ import 'reactflow/dist/base.css';
 
 import './ProjectWorkflow.css';
 
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -46,6 +48,14 @@ const ProjectWorkflowEditor = ({
               )
         : [];
 
+    const queryClient = useQueryClient();
+
+    const handlePropertiesChange = () => {
+        queryClient.invalidateQueries({
+            queryKey: ProjectKeys.project(+projectId),
+        });
+    };
+
     // refetch workflowNodeOutputs when a new node is added
     useEffect(() => {
         refetchWorkflowNodeOutputs();
@@ -84,6 +94,7 @@ const ProjectWorkflowEditor = ({
 
             {currentNode.name && (
                 <WorkflowNodeDetailsPanel
+                    onPropertyChange={handlePropertiesChange}
                     previousComponentDefinitions={previousComponentDefinitions}
                     workflowNodeOutputs={workflowNodeOutputs ?? []}
                 />

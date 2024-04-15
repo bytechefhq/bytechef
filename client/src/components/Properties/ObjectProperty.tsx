@@ -38,6 +38,7 @@ interface ObjectPropertyProps {
     currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponent?: ComponentType;
     dataPills?: DataPillType[];
+    onChange?: () => void;
     onDeleteClick?: (path: string, name: string) => void;
     path?: string;
     property: PropertyType;
@@ -52,6 +53,7 @@ const ObjectProperty = ({
     currentComponent,
     currentComponentDefinition,
     dataPills,
+    onChange,
     onDeleteClick,
     path,
     property,
@@ -162,6 +164,7 @@ const ObjectProperty = ({
                                 dataPills={dataPills}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
+                                onChange={onChange}
                                 path={`${path}.${name}`}
                                 property={{
                                     ...subProperty,
