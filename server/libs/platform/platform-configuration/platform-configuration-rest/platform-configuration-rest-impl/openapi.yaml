@@ -762,6 +762,51 @@ paths:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
   /workflows/{id}/parameters:
+    delete:
+      description: "Deletes a workflow node parameter."
+      summary: "Deletes a workflow node parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "deleteWorkflowNodeParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "workflowNodeName"
+              properties:
+                arrayIndex:
+                  description: "The array index."
+                  type: "integer"
+                name:
+                  description: "The parameter name."
+                  type: "string"
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+                workflowNodeName:
+                  description: "The workflow node name."
+                  type: "string"
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  parameters:
+                    type: "object"
+                    additionalProperties: true
     patch:
       description: "Updates a workflow node parameter."
       summary: "Updates a workflow node parameter"
@@ -782,17 +827,16 @@ paths:
               type: "object"
               required:
                 - "path"
-                - "propertyName"
                 - "workflowNodeName"
               properties:
                 arrayIndex:
                   description: "The array index."
                   type: "integer"
-                path:
-                  description: "The workflow node parameter path."
-                  type: "string"
                 name:
                   description: "The parameter name."
+                  type: "string"
+                path:
+                  description: "The workflow node parameter path."
                   type: "string"
                 value:
                   description: "The value."
