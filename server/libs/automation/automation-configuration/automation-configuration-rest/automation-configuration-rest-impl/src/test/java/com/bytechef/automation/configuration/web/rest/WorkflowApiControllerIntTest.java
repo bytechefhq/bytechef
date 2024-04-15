@@ -139,7 +139,7 @@ public class WorkflowApiControllerIntTest {
 
         WorkflowDTO workflowDTO = getWorkflowDTO();
 
-        when(projectFacade.updateWorkflow("1", DEFINITION, 0))
+        when(workflowFacade.update("1", DEFINITION, 0))
             .thenReturn(workflowDTO);
 
         Workflow.Format format = workflowDTO.format();

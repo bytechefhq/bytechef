@@ -12,7 +12,6 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -27,6 +26,11 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public Workflow addWorkflow(long id, String definition) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void checkProjectStatus(long id) {
         throw new UnsupportedOperationException();
     }
 
@@ -97,11 +101,6 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public void updateProjectTags(long id, List<Tag> tags) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public WorkflowDTO updateWorkflow(String id, String definition, Integer version) {
         throw new UnsupportedOperationException();
     }
 }

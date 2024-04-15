@@ -34,7 +34,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
@@ -98,8 +97,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public Workflow addWorkflow(long id, @NonNull String definition) {
-        checkProjectStatus(id);
-
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         projectService.addWorkflow(id, workflow.getId());
@@ -116,6 +113,38 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         return workflow;
+    }
+
+    @Override
+    public void checkProjectStatus(long id) {
+        Project project = projectService.getProject(id);
+
+        if (project.getLastStatus() == Status.PUBLISHED) {
+            List<String> duplicatedVersionWorkflowIds = new ArrayList<>();
+
+            for (String workflowId : project.getWorkflowIds(project.getLastVersion())) {
+                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(workflowId);
+
+                duplicatedVersionWorkflowIds.add(duplicatedWorkflow.getId());
+
+                List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
+
+                for (ProjectInstance projectInstance : projectInstances) {
+                    List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+                        .getProjectInstanceWorkflows(projectInstance.getId());
+
+                    for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+                        if (Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId)) {
+                            projectInstanceWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+                            projectInstanceWorkflowService.update(projectInstanceWorkflow);
+                        }
+                    }
+                }
+            }
+
+            projectService.addVersion(id, duplicatedVersionWorkflowIds);
+        }
     }
 
     @Override
@@ -172,8 +201,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void deleteWorkflow(long id, @NonNull String workflowId) {
-        checkProjectStatus(id);
-
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
 
         for (ProjectInstance projectInstance : projectInstances) {
@@ -223,8 +250,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public String duplicateWorkflow(long id, @NonNull String workflowId) {
-        checkProjectStatus(id);
-
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
 
         projectService.addWorkflow(id, workflow.getId());
@@ -346,46 +371,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         new ProjectDTO(
             getCategory(project), project,
             tags);
-    }
-
-    @Override
-    public WorkflowDTO updateWorkflow(String id, String definition, Integer version) {
-        Project project = projectService.getWorkflowProject(id);
-
-        checkProjectStatus(Validate.notNull(project.getId(), "id"));
-
-        return workflowFacade.update(id, definition, version);
-    }
-
-    private void checkProjectStatus(long id) {
-        Project project = projectService.getProject(id);
-
-        if (project.getLastStatus() == Status.PUBLISHED) {
-            List<String> duplicatedVersionWorkflowIds = new ArrayList<>();
-
-            for (String workflowId : project.getWorkflowIds(project.getLastVersion())) {
-                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(workflowId);
-
-                duplicatedVersionWorkflowIds.add(duplicatedWorkflow.getId());
-
-                List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
-
-                for (ProjectInstance projectInstance : projectInstances) {
-                    List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-                        .getProjectInstanceWorkflows(projectInstance.getId());
-
-                    for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-                        if (Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId)) {
-                            projectInstanceWorkflow.setWorkflowId(duplicatedWorkflow.getId());
-
-                            projectInstanceWorkflowService.update(projectInstanceWorkflow);
-                        }
-                    }
-                }
-            }
-
-            projectService.addVersion(id, duplicatedVersionWorkflowIds);
-        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
