@@ -475,6 +475,7 @@ const WorkflowNodeDetailsPanel = ({
                                         currentComponent={currentComponent}
                                         key={`${currentNode.name}_description`}
                                         otherComponents={otherComponents}
+                                        updateWorkflowMutation={updateWorkflowMutation}
                                     />
                                 )}
 
