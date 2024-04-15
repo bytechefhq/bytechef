@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
-import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameter200ResponseModel;
+import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -41,15 +41,14 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
     @Override
     @SuppressWarnings("unchecked")
-    public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
-        String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
+    public ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
+        String id, String name, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
         return ResponseEntity.ok(
-            new UpdateWorkflowNodeParameter200ResponseModel().parameters(
+            new DeleteWorkflowNodeParameter200ResponseModel().parameters(
                 (Map<String, Object>) workflowNodeParameterFacade.updateParameter(
                     id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-                    updateWorkflowNodeParameterRequestModel.getPath(),
-                    updateWorkflowNodeParameterRequestModel.getName(),
+                    updateWorkflowNodeParameterRequestModel.getPath(), name,
                     updateWorkflowNodeParameterRequestModel.getArrayIndex(),
                     updateWorkflowNodeParameterRequestModel.getValue())));
     }
