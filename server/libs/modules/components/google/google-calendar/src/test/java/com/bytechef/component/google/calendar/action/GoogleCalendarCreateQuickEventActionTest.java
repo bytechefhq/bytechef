@@ -64,6 +64,5 @@ class GoogleCalendarCreateQuickEventActionTest extends AbstractGoogleCalendarAct
         assertEquals(mockedEvent, event);
         assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
         assertEquals("text", eventTextArgumentCaptor.getValue());
-
     }
 }
