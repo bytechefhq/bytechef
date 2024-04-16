@@ -64,8 +64,7 @@ public class AsanaUtils {
     public static List<Option<String>> getTagOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(BASE_URL + "/tags"))
+        Map<String, List<Map<String, String>>> body = context.http(http -> http.get(BASE_URL + "/tags"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -88,8 +87,7 @@ public class AsanaUtils {
     public static List<Option<String>> getWorkspaceIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
-        Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(BASE_URL + "/workspaces"))
+        Map<String, List<Map<String, String>>> body = context.http(http -> http.get(BASE_URL + "/workspaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
