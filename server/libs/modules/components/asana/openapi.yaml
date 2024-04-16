@@ -1,0 +1,185 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Asana API"
+  description: "Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently."
+  version: "v1"
+servers:
+  - url: "https://app.asana.com/api/1.0"
+paths:
+  /projects:
+    post:
+      tags:
+        - "Projects"
+      summary: "Create project"
+      description: "Creates a new project in a workspace or team."
+      operationId: "createProject"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Project"
+              type: "object"
+              properties:
+                data:
+                  type: "object"
+                  required:
+                    - "workspace"
+                    - "name"
+                    - "notes"
+                    - "team"
+                  properties:
+                    workspace:
+                      type: "string"
+                      description: "The workspace to create the project in."
+                    name:
+                      type: "string"
+                      description: "Name of the project."
+                    notes:
+                      type: "string"
+                      description: "Free-form textual information associated with the project (ie., its description)."
+                    team:
+                      type: "string"
+                      description: "The team that this project is shared with."
+      responses:
+        201:
+          description: "Successfully created new project"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      gid:
+                        type: "string"
+                      name:
+                        type: "string"
+                      notes:
+                        type: "string"
+                      team:
+                        type: "object"
+                        properties:
+                          gid:
+                            type: "string"
+                          name:
+                            type: "string"
+                      workspace:
+                        type: "object"
+                        properties:
+                          gid:
+                            type: "string"
+                          name:
+                            type: "string"
+  /tasks:
+    post:
+      tags:
+        - "Tasks"
+      summary: "Create a task"
+      description: "Creates a new task"
+      operationId: "createTask"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Task"
+              type: "object"
+              properties:
+                data:
+                  type: "object"
+                  required:
+                    - "workspace"
+                    - "project"
+                    - "name"
+                    - "notes"
+                  properties:
+                    workspace:
+                      type: "string"
+                      description: "The workspace to create the task in."
+                    project:
+                       type: "string"
+                       description: "Asana project to create the task in."
+                    name:
+                      type: "string"
+                      description: "Name of the task."
+                    notes:
+                      type: "string"
+                      description: "Free-form textual information associated with the task (i.e. its description)."
+                    due_on:
+                      type: "string"
+                      format: "date"
+                      description: "The date on which this task is due."
+                    tags:
+                      type: "array"
+                      items:
+                        type: "string"
+                      description: "Tags to add to the task."
+                    assignee:
+                      type: "string"
+                      description: "User to assign the task to."
+      responses:
+        201:
+          description: "Successfully created new task"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      gid:
+                        type: "string"
+                      due_on:
+                        type: "string"
+                        format: "date"
+                      notes:
+                        type: "string"
+                      name:
+                        type: "string"
+                      workspace:
+                        type: "object"
+                        properties:
+                          gid:
+                            type: "string"
+                          name:
+                            type: "string"
+                      tags:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            gid:
+                              type: "string"
+                            name:
+                              type: "string"
+                      assignee:
+                        type: "object"
+                        properties:
+                          gid:
+                            type: "string"
+                          name:
+                            type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://app.asana.com/-/oauth_authorize"
+          tokenUrl: "https://app.asana.com/-/oauth_token"
+          refreshUrl: "https://app.asana.com/-/oauth_token"
+          scopes:
+            default: >-
+              Provides access to all endpoints documented in our API reference.
+              If no scopes are requested, this scope is assumed by default.
+            openid: >-
+              Provides access to OpenID Connect ID tokens and the OpenID Connect
+              user info endpoint.
+            email: >-
+              Provides access to the user’s email through the OpenID Connect
+              user info endpoint.
+            profile: >-
+              Provides access to the user’s name and profile photo through the
+              OpenID Connect user info endpoint.
