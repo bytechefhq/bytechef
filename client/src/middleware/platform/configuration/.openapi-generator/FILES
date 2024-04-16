@@ -62,6 +62,7 @@ models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
 models/TriggerTypeModel.ts
+models/UpdateWorkflowNodeParameter200ResponseModel.ts
 models/UpdateWorkflowNodeParameterRequestModel.ts
 models/ValuePropertyModel.ts
 models/WorkflowBasicModel.ts

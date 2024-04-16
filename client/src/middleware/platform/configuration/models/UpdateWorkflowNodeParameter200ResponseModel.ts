@@ -25,6 +25,12 @@ export interface UpdateWorkflowNodeParameter200ResponseModel {
      * @memberof UpdateWorkflowNodeParameter200ResponseModel
      */
     parameters?: { [key: string]: any; };
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof UpdateWorkflowNodeParameter200ResponseModel
+     */
+    displayConditions?: { [key: string]: any; };
 }
 
 /**
@@ -45,6 +51,7 @@ export function UpdateWorkflowNodeParameter200ResponseModelFromJSONTyped(json: a
     return {
         
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
+        'displayConditions': json['displayConditions'] == null ? undefined : json['displayConditions'],
     };
 }
 
@@ -55,6 +62,7 @@ export function UpdateWorkflowNodeParameter200ResponseModelToJSON(value?: Update
     return {
         
         'parameters': value['parameters'],
+        'displayConditions': value['displayConditions'],
     };
 }
 

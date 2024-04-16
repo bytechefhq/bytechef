@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   DeleteWorkflowNodeParameter200ResponseModel,
   DeleteWorkflowNodeParameterRequestModel,
+  UpdateWorkflowNodeParameter200ResponseModel,
   UpdateWorkflowNodeParameterRequestModel,
 } from '../models/index';
 import {
@@ -24,6 +25,8 @@ import {
     DeleteWorkflowNodeParameter200ResponseModelToJSON,
     DeleteWorkflowNodeParameterRequestModelFromJSON,
     DeleteWorkflowNodeParameterRequestModelToJSON,
+    UpdateWorkflowNodeParameter200ResponseModelFromJSON,
+    UpdateWorkflowNodeParameter200ResponseModelToJSON,
     UpdateWorkflowNodeParameterRequestModelFromJSON,
     UpdateWorkflowNodeParameterRequestModelToJSON,
 } from '../models/index';
@@ -85,7 +88,7 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
      * Updates a workflow node parameter.
      * Updates a workflow node parameter
      */
-    async updateWorkflowNodeParameterRaw(requestParameters: UpdateWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteWorkflowNodeParameter200ResponseModel>> {
+    async updateWorkflowNodeParameterRaw(requestParameters: UpdateWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UpdateWorkflowNodeParameter200ResponseModel>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -107,14 +110,14 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
             body: UpdateWorkflowNodeParameterRequestModelToJSON(requestParameters['updateWorkflowNodeParameterRequestModel']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => DeleteWorkflowNodeParameter200ResponseModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => UpdateWorkflowNodeParameter200ResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Updates a workflow node parameter.
      * Updates a workflow node parameter
      */
-    async updateWorkflowNodeParameter(requestParameters: UpdateWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteWorkflowNodeParameter200ResponseModel> {
+    async updateWorkflowNodeParameter(requestParameters: UpdateWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UpdateWorkflowNodeParameter200ResponseModel> {
         const response = await this.updateWorkflowNodeParameterRaw(requestParameters, initOverrides);
         return await response.value();
     }

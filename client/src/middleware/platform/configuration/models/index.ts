@@ -47,6 +47,7 @@ export * from './TimePropertyModel';
 export * from './TriggerDefinitionBasicModel';
 export * from './TriggerDefinitionModel';
 export * from './TriggerTypeModel';
+export * from './UpdateWorkflowNodeParameter200ResponseModel';
 export * from './UpdateWorkflowNodeParameterRequestModel';
 export * from './ValuePropertyModel';
 export * from './WorkflowBasicModel';
