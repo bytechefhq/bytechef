@@ -41,6 +41,8 @@ const DataPillPanelBodyInputsItem = () => {
                         );
                     })}
                 </ul>
+
+                <p className="text-sm">No defined inputs.</p>
             </AccordionContent>
         </>
     );
