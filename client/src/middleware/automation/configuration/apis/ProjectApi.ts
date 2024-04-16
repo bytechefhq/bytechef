@@ -19,7 +19,6 @@ import type {
   ProjectStatusModel,
   ProjectVersionModel,
   PublishProjectRequestModel,
-  WorkflowModel,
 } from '../models/index';
 import {
     ProjectModelFromJSON,
@@ -30,17 +29,10 @@ import {
     ProjectVersionModelToJSON,
     PublishProjectRequestModelFromJSON,
     PublishProjectRequestModelToJSON,
-    WorkflowModelFromJSON,
-    WorkflowModelToJSON,
 } from '../models/index';
 
 export interface CreateProjectRequest {
     projectModel: ProjectModel;
-}
-
-export interface CreateProjectWorkflowRequest {
-    id: number;
-    workflowModel: WorkflowModel;
 }
 
 export interface DeleteProjectRequest {
@@ -116,51 +108,6 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async createProject(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
         const response = await this.createProjectRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Create new workflow and adds it to an existing project.
-     * Create new workflow and adds it to an existing project.
-     */
-    async createProjectWorkflowRaw(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling createProjectWorkflow().'
-            );
-        }
-
-        if (requestParameters['workflowModel'] == null) {
-            throw new runtime.RequiredError(
-                'workflowModel',
-                'Required parameter "workflowModel" was null or undefined when calling createProjectWorkflow().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/projects/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: WorkflowModelToJSON(requestParameters['workflowModel']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Create new workflow and adds it to an existing project.
-     * Create new workflow and adds it to an existing project.
-     */
-    async createProjectWorkflow(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
-        const response = await this.createProjectWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
