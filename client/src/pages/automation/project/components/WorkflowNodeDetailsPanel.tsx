@@ -1,27 +1,24 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {
     ComponentDefinitionBasicModel,
     WorkflowConnectionModel,
+    WorkflowModel,
     WorkflowNodeOutputModel,
 } from '@/middleware/platform/configuration';
-import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import DestinationTab from '@/pages/automation/project/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/automation/project/components/node-details-tabs/SourceTab';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {WorkflowKeys} from '@/queries/automation/workflows.queries';
-import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
+import {UseMutationResult} from '@tanstack/react-query';
 import Properties from 'components/Properties/Properties';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -63,10 +60,12 @@ const TABS = [
 const WorkflowNodeDetailsPanel = ({
     onPropertyChange,
     previousComponentDefinitions,
+    updateWorkflowMutation,
     workflowNodeOutputs,
 }: {
     onPropertyChange?: () => void;
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
     workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
@@ -92,30 +91,6 @@ const WorkflowNodeDetailsPanel = ({
             currentComponentDefinition.workflowNodeName = currentNode.name;
         }
     }
-
-    const {projectId} = useParams();
-
-    const queryClient = useQueryClient();
-
-    const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
-            if (projectId) {
-                queryClient.invalidateQueries({queryKey: ProjectKeys.project(parseInt(projectId))});
-            }
-
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: [
-                    ...WorkflowNodeDisplayConditionKeys.workflowNodeDisplayConditions,
-                    workflow.id!,
-                    currentNode.name,
-                ],
-            });
-        },
-    });
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
 

@@ -96,6 +96,7 @@ const ProjectWorkflowEditor = ({
                 <WorkflowNodeDetailsPanel
                     onPropertyChange={handlePropertiesChange}
                     previousComponentDefinitions={previousComponentDefinitions}
+                    updateWorkflowMutation={updateWorkflowMutation}
                     workflowNodeOutputs={workflowNodeOutputs ?? []}
                 />
             )}

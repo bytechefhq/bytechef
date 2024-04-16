@@ -64,6 +64,7 @@ import {ProjectKeys, useGetProjectQuery} from '@/queries/automation/projects.que
 import {WorkflowKeys, useGetProjectWorkflowsQuery, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
+import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {
     WorkflowTestConfigurationKeys,
     useGetWorkflowTestConfigurationQuery,
@@ -406,7 +407,7 @@ const Project = () => {
 
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
-    const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setComponentDefinitions, setProjectId, setTaskDispatcherDefinitions, setWorkflow, workflow} =
         useWorkflowDataStore();
 
@@ -523,6 +524,14 @@ const Project = () => {
 
             queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: [
+                    ...WorkflowNodeDisplayConditionKeys.workflowNodeDisplayConditions,
+                    workflow.id!,
+                    currentNode.name,
+                ],
             });
 
             setShowEditWorkflowDialog(false);
