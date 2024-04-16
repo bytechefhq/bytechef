@@ -591,7 +591,7 @@ paths:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
       tags:
-      - "project"
+      - "workflow"
       operationId: "createProjectWorkflow"
       parameters:
       - name: "id"
