@@ -79,6 +79,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:affinity"))
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aitable"))
+    implementation(project(":server:libs:modules:components:asana"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
     implementation(project(":server:libs:modules:components:bash"))
     implementation(project(":server:libs:modules:components:capsule-crm"))
