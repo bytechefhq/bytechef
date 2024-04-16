@@ -22,11 +22,14 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-15T15:05:25.415293+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-16T15:02:59.821023+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class UpdateWorkflowNodeParameter200ResponseModel {
 
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
+
+  @Valid
+  private Map<String, Object> displayConditions = new HashMap<>();
 
   public UpdateWorkflowNodeParameter200ResponseModel parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
@@ -56,6 +59,34 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
     this.parameters = parameters;
   }
 
+  public UpdateWorkflowNodeParameter200ResponseModel displayConditions(Map<String, Object> displayConditions) {
+    this.displayConditions = displayConditions;
+    return this;
+  }
+
+  public UpdateWorkflowNodeParameter200ResponseModel putDisplayConditionsItem(String key, Object displayConditionsItem) {
+    if (this.displayConditions == null) {
+      this.displayConditions = new HashMap<>();
+    }
+    this.displayConditions.put(key, displayConditionsItem);
+    return this;
+  }
+
+  /**
+   * Get displayConditions
+   * @return displayConditions
+  */
+  
+  @Schema(name = "displayConditions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("displayConditions")
+  public Map<String, Object> getDisplayConditions() {
+    return displayConditions;
+  }
+
+  public void setDisplayConditions(Map<String, Object> displayConditions) {
+    this.displayConditions = displayConditions;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -65,12 +96,13 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
       return false;
     }
     UpdateWorkflowNodeParameter200ResponseModel updateWorkflowNodeParameter200Response = (UpdateWorkflowNodeParameter200ResponseModel) o;
-    return Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters);
+    return Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters) &&
+        Objects.equals(this.displayConditions, updateWorkflowNodeParameter200Response.displayConditions);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(parameters);
+    return Objects.hash(parameters, displayConditions);
   }
 
   @Override
@@ -78,6 +110,7 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateWorkflowNodeParameter200ResponseModel {\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
+    sb.append("    displayConditions: ").append(toIndentedString(displayConditions)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-15T21:53:35.035238+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-16T15:02:59.821023+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "workflow-node-display-condition", description = "The Platform Workflow Node Display Condition API")
 public interface WorkflowNodeDisplayConditionApi {
