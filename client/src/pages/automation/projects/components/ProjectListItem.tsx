@@ -21,8 +21,8 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ProjectModel, ProjectStatusModel, TagModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/mutations/automation/projectTags.mutations';
-import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
+import {useCreateProjectWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';

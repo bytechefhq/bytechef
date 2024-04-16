@@ -36,13 +36,13 @@ import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel, ProjectStatusModel, UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {WorkflowModel} from '@/middleware/platform/configuration';
 import {WorkflowTestApi} from '@/middleware/platform/workflow/test';
-import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {
     useDeleteProjectMutation,
     useDuplicateProjectMutation,
     usePublishProjectMutation,
 } from '@/mutations/automation/projects.mutations';
 import {
+    useCreateProjectWorkflowMutation,
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
     useUpdateWorkflowMutation,
