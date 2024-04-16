@@ -76,12 +76,15 @@
           "exampleValue": null,
           "label": "Workspace",
           "placeholder": null,
-          "controlType": "TEXT",
+          "controlType": "SELECT",
           "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "optionsDataSource": null
+          "optionsDataSource": {
+            "loadOptionsDependsOn": null,
+            "options": { }
+          }
         }, {
           "advancedOption": null,
           "description": "Name of the project.",
@@ -136,22 +139,24 @@
           "exampleValue": null,
           "label": "Team",
           "placeholder": null,
-          "controlType": "TEXT",
+          "controlType": "SELECT",
           "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "optionsDataSource": null
+          "optionsDataSource": {
+            "loadOptionsDependsOn": [ "workspace" ],
+            "options": { }
+          }
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create project",
     "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -307,8 +312,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -367,17 +372,18 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -442,12 +448,15 @@
           "exampleValue": null,
           "label": "Workspace",
           "placeholder": null,
-          "controlType": "TEXT",
+          "controlType": "SELECT",
           "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "optionsDataSource": null
+          "optionsDataSource": {
+            "loadOptionsDependsOn": null,
+            "options": { }
+          }
         }, {
           "advancedOption": null,
           "description": "Asana project to create the task in.",
@@ -462,12 +471,15 @@
           "exampleValue": null,
           "label": "Project",
           "placeholder": null,
-          "controlType": "TEXT",
+          "controlType": "SELECT",
           "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "optionsDataSource": null
+          "optionsDataSource": {
+            "loadOptionsDependsOn": [ "workspace" ],
+            "options": { }
+          }
         }, {
           "advancedOption": null,
           "description": "Name of the task.",
@@ -523,8 +535,8 @@
           "label": "Due On",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": "Tags to add to the task.",
@@ -541,7 +553,7 @@
           "placeholder": "Add to Tags",
           "items": [ {
             "advancedOption": null,
-            "description": "Tags to add to the task.",
+            "description": null,
             "displayCondition": null,
             "expressionEnabled": null,
             "hidden": null,
@@ -553,19 +565,22 @@
             "exampleValue": null,
             "label": null,
             "placeholder": null,
-            "controlType": "TEXT",
+            "controlType": "SELECT",
             "languageId": null,
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "optionsDataSource": null
+            "optionsDataSource": {
+              "loadOptionsDependsOn": [ "workspace" ],
+              "options": { }
+            }
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "User to assign the task to.",
@@ -580,22 +595,24 @@
           "exampleValue": null,
           "label": "Assignee",
           "placeholder": null,
-          "controlType": "TEXT",
+          "controlType": "SELECT",
           "languageId": null,
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "optionsDataSource": null
+          "optionsDataSource": {
+            "loadOptionsDependsOn": [ "workspace" ],
+            "options": { }
+          }
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create a task",
     "workflowNodeDescriptionFunction": null,
-    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -668,8 +685,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "controlType": "DATE",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "DATE"
           }, {
             "advancedOption": null,
             "description": null,
@@ -768,8 +785,8 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -842,15 +859,15 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "controlType": "OBJECT_BUILDER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "OBJECT_BUILDER"
             } ],
             "maxItems": null,
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "controlType": "ARRAY_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "ARRAY_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -909,18 +926,20 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": null
   } ],
+  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -971,22 +990,21 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "scopes": { },
-      "authorizationUrl": { },
-      "tokenUrl": { },
-      "refreshUrl": { },
       "apply": null,
       "authorizationCallback": null,
+      "authorizationUrl": { },
+      "pkce": null,
       "clientId": null,
       "clientSecret": null,
-      "pkce": null,
-      "refresh": null
+      "refresh": null,
+      "refreshUrl": { },
+      "scopes": { },
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": { },
     "test": null
-  },
-  "triggers": [ ]
+  }
 }
