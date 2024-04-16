@@ -18,8 +18,11 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.DynamicPropertiesProperty;
 import com.bytechef.platform.component.registry.domain.OptionsDataSource;
@@ -30,6 +33,7 @@ import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -48,16 +52,21 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     private final ActionDefinitionService actionDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
+    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeParameterFacadeImpl(
         ActionDefinitionService actionDefinitionService, TriggerDefinitionService triggerDefinitionService,
-        WorkflowService workflowService) {
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowService = workflowService;
+        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -69,7 +78,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        Result result = getParameterMapProperties(workflowNodeName, (Map<String, Object>) definitionMap);
+        ParameterMapPropertiesResult result =
+            getParameterMapProperties(workflowNodeName, (Map<String, Object>) definitionMap);
 
         Map<String, ?> parameterMap = result.parameterMap;
 
@@ -83,32 +93,38 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, ?> updateParameter(
+    public UpdateParameterResult updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        Result result = getParameterMapProperties(workflowNodeName, (Map<String, Object>) definitionMap);
+        ParameterMapPropertiesResult result = getParameterMapProperties(
+            workflowNodeName, (Map<String, Object>) definitionMap);
 
         Map<String, ?> parameterMap = result.parameterMap;
+
+        Map<String, Boolean> displayConditionMap = Map.of();
 
         updateParameter(path, name, arrayIndex, value, (Map<String, Object>) parameterMap);
 
         // dependOn list should not contain paths inside arrays
 
         if (arrayIndex == null) {
-            checkDependOn(name, result.properties(), result.parameterMap());
+            checkDependOn(name, result.properties(), parameterMap);
+
+            displayConditionMap = checkDisplayConditions(
+                workflowNodeName, name, result.properties, workflow, parameterMap, result.taskParameters);
         }
 
         workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
             workflow.getVersion());
 
-        return parameterMap;
+        return new UpdateParameterResult(displayConditionMap, parameterMap);
     }
 
-    // for now only check the first, root level of properties on which other properties could depend on
+    // For now only check the first, root level of properties on which other properties could depend on
     private void checkDependOn(String name, List<? extends Property> properties, Map<String, ?> parameterMap) {
         for (Property property : properties) {
             List<String> dependOnPropertyNames = List.of();
@@ -137,8 +153,63 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
+    // For now only check the first, root level of properties on which other properties could depend on
     @SuppressWarnings("unchecked")
-    private Result getParameterMapProperties(
+    private Map<String, Boolean> checkDisplayConditions(
+        String workflowNodeName, String name, List<? extends Property> properties, Workflow workflow,
+        Map<String, ?> parameterMap, boolean taskParameters) {
+
+        Map<String, Boolean> resultMap = new HashMap<>();
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+
+        for (Property property : properties) {
+            if (property.getDisplayCondition() == null) {
+                continue;
+            }
+
+            String displayCondition = property.getDisplayCondition();
+
+            if (displayCondition != null && displayCondition.contains(name)) {
+                parameterMap.remove(property.getName());
+            }
+
+            boolean result;
+
+            if (taskParameters) {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                    workflow.getId(), workflowTask.getName());
+
+                result = evaluate(
+                    displayCondition,
+                    MapUtils.concat(
+                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs),
+                        (Map<String, Object>) parameterMap));
+            } else {
+                result = evaluate(
+                    displayCondition,
+                    MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) parameterMap));
+            }
+
+            resultMap.put(displayCondition, result);
+        }
+
+        return resultMap;
+    }
+
+    private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
+        Map<String, Object> result = Evaluator.evaluate(
+            Map.of("displayCondition", "${" + displayCondition + "}"), inputParameters);
+
+        Object displayConditionResult = result.get("displayCondition");
+
+        return !(displayConditionResult instanceof String) && (boolean) displayConditionResult;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ParameterMapPropertiesResult getParameterMapProperties(
         String workflowNodeName, Map<String, Object> definitionMap) {
 
         Map<String, ?> parameterMap;
@@ -176,7 +247,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             properties = triggerDefinition.getProperties();
         }
 
-        return new Result(parameterMap, properties);
+        return new ParameterMapPropertiesResult(parameterMap, properties, triggerMap == null);
     }
 
     @SuppressWarnings("unchecked")
@@ -356,6 +427,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
-    private record Result(Map<String, ?> parameterMap, List<? extends Property> properties) {
+    @SuppressFBWarnings("EI")
+    private record ParameterMapPropertiesResult(
+        Map<String, ?> parameterMap, List<? extends Property> properties, boolean taskParameters) {
     }
 }

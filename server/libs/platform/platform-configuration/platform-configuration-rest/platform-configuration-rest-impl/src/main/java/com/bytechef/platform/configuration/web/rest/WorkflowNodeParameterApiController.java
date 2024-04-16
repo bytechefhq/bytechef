@@ -18,8 +18,10 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
+import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade.UpdateParameterResult;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -58,16 +60,19 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
     @Override
     @SuppressWarnings("unchecked")
-    public ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
+    public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 
+        UpdateParameterResult updateParameterResult = workflowNodeParameterFacade.updateParameter(
+            id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
+            updateWorkflowNodeParameterRequestModel.getPath(),
+            updateWorkflowNodeParameterRequestModel.getName(),
+            updateWorkflowNodeParameterRequestModel.getArrayIndex(),
+            updateWorkflowNodeParameterRequestModel.getValue());
+
         return ResponseEntity.ok(
-            new DeleteWorkflowNodeParameter200ResponseModel().parameters(
-                (Map<String, Object>) workflowNodeParameterFacade.updateParameter(
-                    id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-                    updateWorkflowNodeParameterRequestModel.getPath(),
-                    updateWorkflowNodeParameterRequestModel.getName(),
-                    updateWorkflowNodeParameterRequestModel.getArrayIndex(),
-                    updateWorkflowNodeParameterRequestModel.getValue())));
+            new UpdateWorkflowNodeParameter200ResponseModel()
+                .displayConditions((Map<String, Object>) updateParameterResult.displayConditionMap())
+                .parameters((Map<String, Object>) updateParameterResult.parameterMap()));
     }
 }

@@ -26,7 +26,9 @@ public interface WorkflowNodeParameterFacade {
     Map<String, ?> deleteParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex);
 
-    Map<String, ?> updateParameter(
+    UpdateParameterResult updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
 
+    record UpdateParameterResult(Map<String, ?> displayConditionMap, Map<String, ?> parameterMap) {
+    }
 }
