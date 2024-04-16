@@ -43,6 +43,10 @@ export type ComponentType = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
+    displayConditions?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
     title?: string;
     workflowNodeName: string;
 };

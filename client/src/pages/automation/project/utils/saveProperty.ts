@@ -43,13 +43,12 @@ export default function saveProperty(
         },
         {
             onSuccess: (response) => {
-                const parameters = response.parameters;
-
                 setComponentData([
                     ...otherComponentData,
                     {
                         ...currentComponentData,
-                        parameters,
+                        displayConditions: response.displayConditions,
+                        parameters: response.parameters,
                     },
                 ]);
             },

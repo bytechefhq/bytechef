@@ -20,7 +20,6 @@ import deleteProperty from '@/pages/automation/project/utils/deleteProperty';
 import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import saveProperty from '@/pages/automation/project/utils/saveProperty';
 import {WorkflowKeys} from '@/queries/automation/workflows.queries';
-import {useEvaluateWorkflowNodeDisplayConditionQuery} from '@/queries/platform/workflowNodeDisplayConditions.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -172,17 +171,6 @@ const Property = ({
             return false;
         }
     });
-
-    const {data: displayCondition, isLoading: isDisplayConditionLoading} = useEvaluateWorkflowNodeDisplayConditionQuery(
-        {
-            evaluateWorkflowNodeDisplayConditionRequestModel: {
-                displayCondition: property.displayCondition!,
-            },
-            id: workflow.id!,
-            workflowNodeName: currentNode.name!,
-        },
-        !!property.displayCondition
-    );
 
     const queryClient = useQueryClient();
 
@@ -513,7 +501,7 @@ const Property = ({
         }
     }, [currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
-    if (displayCondition === false || (property.displayCondition && isDisplayConditionLoading)) {
+    if (property.displayCondition && !currentComponent?.displayConditions?.[property.displayCondition]) {
         return <></>;
     }
 
