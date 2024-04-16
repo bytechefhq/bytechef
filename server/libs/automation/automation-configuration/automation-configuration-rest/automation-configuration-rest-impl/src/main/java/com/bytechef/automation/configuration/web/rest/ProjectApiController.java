@@ -25,7 +25,6 @@ import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import com.bytechef.automation.configuration.web.rest.model.PublishProjectRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -63,13 +62,6 @@ public class ProjectApiController implements ProjectApi {
                 projectFacade.createProject(
                     Validate.notNull(conversionService.convert(projectModel, ProjectDTO.class), "projectDTO")),
                 ProjectModel.class));
-    }
-
-    @Override
-    public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.addWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
     }
 
     @Override

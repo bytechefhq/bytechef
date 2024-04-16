@@ -52,6 +52,13 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
+    public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.addWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
+    }
+
+    @Override
     public ResponseEntity<Void> deleteProjectWorkflow(Long id, String workflowId) {
         projectFacade.deleteWorkflow(id, workflowId);
 
