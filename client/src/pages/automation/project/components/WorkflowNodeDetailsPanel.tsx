@@ -58,12 +58,10 @@ const TABS = [
 ];
 
 const WorkflowNodeDetailsPanel = ({
-    onPropertyChange,
     previousComponentDefinitions,
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: {
-    onPropertyChange?: () => void;
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
     workflowNodeOutputs: WorkflowNodeOutputModel[];
@@ -478,7 +476,6 @@ const WorkflowNodeDetailsPanel = ({
                                             customClassName="p-4"
                                             dataPills={dataPills}
                                             key={`${currentNode.name}_${currentActionName}_properties`}
-                                            onChange={onPropertyChange}
                                             properties={currentActionProperties}
                                         />
                                     ) : (

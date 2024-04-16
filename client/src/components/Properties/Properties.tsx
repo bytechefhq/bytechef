@@ -12,7 +12,6 @@ interface PropertiesProps {
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
-    onChange?: () => void;
     path?: string;
     properties: Array<PropertyType>;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -26,7 +25,6 @@ const Properties = ({
     customClassName,
     dataPills,
     formState,
-    onChange,
     path,
     properties,
     register,
@@ -40,7 +38,6 @@ const Properties = ({
                 dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}
-                onChange={onChange}
                 path={path}
                 property={property}
                 register={register}

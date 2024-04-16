@@ -11,6 +11,7 @@ export default function deleteProperty(
     currentComponentData: ComponentType,
     otherComponentData: Array<ComponentType>,
     setComponentData: (componentData: Array<ComponentType>) => void,
+    setDirty: (dirty: boolean) => void,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteWorkflowNodeParameter200ResponseModel,
         Error,
@@ -50,6 +51,8 @@ export default function deleteProperty(
                         parameters,
                     },
                 ]);
+
+                setDirty(true);
             },
         }
     );

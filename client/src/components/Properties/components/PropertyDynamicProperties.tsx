@@ -15,7 +15,6 @@ interface PropertyDynamicPropertiesProps {
     currentNodeConnectionId?: number;
     loadDependsOnValues?: Array<string>;
     name?: string;
-    onChange?: () => void;
     propertiesDataSource?: PropertiesDataSourceModel;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     taskParameterValue?: any;
@@ -28,7 +27,6 @@ const PropertyDynamicProperties = ({
     currentNodeConnectionId,
     loadDependsOnValues,
     name,
-    onChange,
     propertiesDataSource,
     taskParameterValue,
 }: PropertyDynamicPropertiesProps) => {
@@ -76,7 +74,6 @@ const PropertyDynamicProperties = ({
                         currentComponentDefinition={currentComponentDefinition}
                         key={`${property.name}_${index}_${(loadDependsOnValues ?? []).join('')}`}
                         objectName={name}
-                        onChange={onChange}
                         path={name}
                         property={property}
                         taskParameterValue={propertyDefaultValue}

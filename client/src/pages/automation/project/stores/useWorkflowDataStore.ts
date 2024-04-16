@@ -25,6 +25,9 @@ interface WorkflowDataStateI {
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
+    dirty: boolean;
+    setDirty: (dirty: boolean) => void;
+
     projectId: number;
     setProjectId: (projectId: number) => void;
 
@@ -46,6 +49,9 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
             componentDefinitions: [],
             setComponentDefinitions: (componentDefinitions) => set((state) => ({...state, componentDefinitions})),
+
+            dirty: false,
+            setDirty: (dirty) => set((state) => ({...state, dirty})),
 
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),

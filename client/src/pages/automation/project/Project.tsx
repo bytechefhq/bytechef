@@ -408,8 +408,15 @@ const Project = () => {
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {currentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {setComponentDefinitions, setProjectId, setTaskDispatcherDefinitions, setWorkflow, workflow} =
-        useWorkflowDataStore();
+    const {
+        dirty,
+        setComponentDefinitions,
+        setDirty,
+        setProjectId,
+        setTaskDispatcherDefinitions,
+        setWorkflow,
+        workflow,
+    } = useWorkflowDataStore();
 
     const {projectId, workflowId} = useParams();
 
@@ -534,6 +541,7 @@ const Project = () => {
                 ],
             });
 
+            setDirty(true);
             setShowEditWorkflowDialog(false);
         },
     });
@@ -583,6 +591,16 @@ const Project = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectWorkflow, workflowId]);
+
+    useEffect(() => {
+        if (dirty) {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(parseInt(projectId!)),
+            });
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dirty]);
 
     return (
         <>
@@ -761,6 +779,8 @@ const PublishPopover = ({project}: {project: ProjectModel}) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState<string | undefined>(undefined);
 
+    const {setDirty} = useWorkflowDataStore();
+
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
@@ -774,6 +794,7 @@ const PublishPopover = ({project}: {project: ProjectModel}) => {
             });
 
             setOpen(false);
+            setDirty(false);
         },
     });
 

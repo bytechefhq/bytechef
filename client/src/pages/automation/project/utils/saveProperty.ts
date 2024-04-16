@@ -10,6 +10,7 @@ export default function saveProperty(
     currentComponentData: ComponentType,
     otherComponentData: Array<ComponentType>,
     setComponentData: (componentData: Array<ComponentType>) => void,
+    setDirty: (dirty: boolean) => void,
     updateWorkflowNodeParameterMutation: UseMutationResult<
         UpdateWorkflowNodeParameter200ResponseModel,
         Error,
@@ -51,6 +52,8 @@ export default function saveProperty(
                         parameters: response.parameters,
                     },
                 ]);
+
+                setDirty(true);
             },
         }
     );
