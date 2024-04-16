@@ -85,6 +85,7 @@ import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {
     CableIcon,
+    ChevronRightIcon,
     CircleDotIcon,
     Code2Icon,
     HistoryIcon,
@@ -92,7 +93,6 @@ import {
     PuzzleIcon,
     SettingsIcon,
     SlidersIcon,
-    SquareChevronRightIcon,
     SquareIcon,
 } from 'lucide-react';
 import {RefObject, useEffect, useRef, useState} from 'react';
@@ -275,10 +275,6 @@ const Header = ({
                 .catch(() => {
                     setWorkflowIsRunning(false);
                     setWorkflowTestExecution(undefined);
-
-                    // queryClient.invalidateQueries({
-                    //     queryKey: WorkflowKeys.projectWorkflows(projectId),
-                    // });
                 });
         }
     };
@@ -392,7 +388,7 @@ const OutputButton = ({bottomResizablePanelRef}: {bottomResizablePanelRef: RefOb
                     size="icon"
                     variant="ghost"
                 >
-                    <SquareChevronRightIcon className="h-5" />
+                    <ChevronRightIcon className="h-5" />
                 </Button>
             </TooltipTrigger>
 
