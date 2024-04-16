@@ -63,7 +63,7 @@ const PropertyDynamicProperties = ({
     }
 
     return subProperties ? (
-        <ul key={(loadDependsOnValues ?? []).join('')}>
+        <ul className="space-y-4" key={(loadDependsOnValues ?? []).join('')}>
             {subProperties.map((property, index) => {
                 const propertyDefaultValue = property.name ? taskParameterValue?.[property.name] : '';
 
