@@ -28,5 +28,5 @@ export const useGetWorkflowNodeDynamicPropertiesQuery = (
         ),
         queryFn: () => new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeDynamicProperties(request),
         enabled: enabled === undefined ? true : enabled,
-        staleTime: 60000
+        staleTime: 60000,
     });

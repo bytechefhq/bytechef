@@ -23,5 +23,5 @@ export const useGetWorkflowNodeOptionsQuery = (
         queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(request, loadDependencyValueKey),
         queryFn: () => new WorkflowNodeOptionApi().getWorkflowNodeOptions(request),
         enabled: enabled === undefined ? true : enabled,
-        staleTime: 60000
+        staleTime: 60000,
     });
