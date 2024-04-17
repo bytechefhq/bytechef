@@ -138,7 +138,10 @@ const ObjectProperty = ({
 
     return (
         <>
-            <ul className={twMerge('space-y-4', label && 'ml-2 border-l')} key={`${name}_${newPropertyName}`}>
+            <ul
+                className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l')}
+                key={`${name}_${newPropertyName}`}
+            >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => {
                     if (
                         subProperty.controlType === 'OBJECT_BUILDER' &&
