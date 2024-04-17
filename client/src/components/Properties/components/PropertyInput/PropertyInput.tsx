@@ -47,14 +47,14 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         },
         ref
     ) => (
-        <fieldset className="w-full space-y-2">
+        <fieldset className="w-full space-y-1">
             <div className="flex w-full items-center justify-between">
                 {label && type !== 'hidden' && (
                     <div className="flex items-center">
                         <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                             {label}
 
-                            {required && <span className="leading-3 text-red-500">*</span>}
+                            {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                         </Label>
 
                         {description && (

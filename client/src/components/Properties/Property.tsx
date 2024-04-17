@@ -551,6 +551,10 @@ const Property = ({
                                         <div className="flex items-center">
                                             {label && <Label className="leading-normal">{label}</Label>}
 
+                                            {!label && arrayIndex !== undefined && (
+                                                <Label className="leading-normal">Item</Label>
+                                            )}
+
                                             {description && (
                                                 <Tooltip>
                                                     <TooltipTrigger>

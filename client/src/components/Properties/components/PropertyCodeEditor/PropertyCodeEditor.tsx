@@ -50,7 +50,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                             <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                                 {label}
 
-                                {required && <span className="leading-3 text-red-500">*</span>}
+                                {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                             </Label>
 
                             {description && (

@@ -43,7 +43,7 @@ const PropertySelect = ({
                 <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                     <span>{label}</span>
 
-                    {required && <span className="leading-3 text-red-500">*</span>}
+                    {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                 </Label>
 
                 {description && (

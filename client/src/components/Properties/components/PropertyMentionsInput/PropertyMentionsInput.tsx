@@ -37,7 +37,6 @@ const MentionInputListItem = (item: DataPillType) => {
 };
 
 interface PropertyMentionsInputProps {
-    arrayIndex?: number;
     controlType?: string;
     currentComponentDefinition: CurrentComponentDefinitionType;
     dataPills?: Array<DataPillType>;
@@ -60,7 +59,6 @@ interface PropertyMentionsInputProps {
 const PropertyMentionsInput = forwardRef(
     (
         {
-            arrayIndex,
             controlType,
             currentComponentDefinition,
             dataPills,
@@ -248,7 +246,7 @@ const PropertyMentionsInput = forwardRef(
         }, [ref]);
 
         return (
-            <fieldset className={twMerge('w-full', arrayIndex === undefined && 'space-y-2')}>
+            <fieldset className={twMerge('w-full', label && 'space-y-1')}>
                 {(label || description || showInputTypeSwitchButton) && (
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
@@ -256,7 +254,7 @@ const PropertyMentionsInput = forwardRef(
                                 <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={elementId}>
                                     {label}
 
-                                    {required && <span className="leading-3 text-red-500">*</span>}
+                                    {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                                 </Label>
 
                                 {description && (
@@ -283,7 +281,7 @@ const PropertyMentionsInput = forwardRef(
 
                 <div
                     className={twMerge(
-                        'flex items-center shadow-sm',
+                        'mt-1 flex items-center shadow-sm',
                         isFocused && 'ring-2 ring-blue-500',
                         leadingIcon && 'relative rounded-md border'
                     )}

@@ -158,7 +158,7 @@ const ArrayProperty = ({
 
     return (
         <>
-            <ul className="w-full space-y-4 border-l">
+            <ul className="ml-2 w-full space-y-4 border-l">
                 {arrayItems?.map((arrayItem, index) =>
                     Array.isArray(arrayItem) ? (
                         arrayItem.map((subItem: ArrayPropertyType) => (
