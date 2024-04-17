@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="202308070817" author="Ivica Cardic">
+        <createTable tableName="app_event">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="schema" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="app_event_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_event_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="connected_user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)" />
+            <column name="email" type="VARCHAR(256)" />
+            <column name="external_reference_code" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="connected_user_metadata">
+            <column name="connected_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="component_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="INT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="allow_multiple_instances" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_instance">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="integration_instance_configuration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connected_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_instance_configuration">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="integration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="integration_version" type="INT"/>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_instance_configuration_tag">
+            <column name="integration_instance_configuration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_instance_configuration_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="integration_instance_configuration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inputs" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_instance_configuration_workflow_connection">
+            <column name="integration_instance_configuration_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_node_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_instance_workflow">
+            <column name="integration_instance_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="integration_instance_configuration_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inputs" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_tag">
+            <column name="integration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="integration_version">
+            <column name="integration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_date" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="VARCHAR(256)"/>
+        </createTable>
+
+        <createTable tableName="integration_workflow">
+            <column name="integration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="integration_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="connected_user_metadata" columnNames="connected_user_id,key"/>
+        <addPrimaryKey tableName="integration_instance_configuration_tag" columnNames="integration_instance_configuration_id,tag_id"/>
+        <addPrimaryKey tableName="integration_instance_configuration_workflow_connection" columnNames="integration_instance_configuration_workflow_id,workflow_node_name,key"/>
+        <addPrimaryKey tableName="integration_instance_workflow" columnNames="integration_instance_id,integration_instance_configuration_workflow_id"/>
+        <addPrimaryKey tableName="integration_tag" columnNames="integration_id,tag_id"/>
+        <addPrimaryKey tableName="integration_version" columnNames="integration_id,version"/>
+        <addPrimaryKey tableName="integration_workflow" columnNames="integration_id,workflow_id"/>
+
+        <addUniqueConstraint
+            tableName="integration"
+            columnNames="component_name"
+            constraintName="uk_integration_component_name" />
+
+        <addUniqueConstraint
+            tableName="integration_workflow"
+            columnNames="workflow_id"
+            constraintName="uk_integration_workflow_workflow_id" />
+
+        <addForeignKeyConstraint
+                baseColumnNames="app_event_id"
+                baseTableName="app_event_workflow"
+                constraintName="fk_app_event_workflow_app_event"
+                referencedColumnNames="id"
+                referencedTableName="app_event"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="category_id"
+            baseTableName="integration"
+            constraintName="fk_integration_category"
+            referencedColumnNames="id"
+            referencedTableName="category"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="connected_user_id"
+            baseTableName="connected_user_metadata"
+            constraintName="fk_connected_user_metadata_connected_user"
+            referencedColumnNames="id"
+            referencedTableName="connected_user"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance"
+            baseColumnNames="connected_user_id"
+            constraintName="fk_integration_instance_connected_user"
+            referencedTableName="connected_user"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance"
+            baseColumnNames="integration_instance_configuration_id"
+            constraintName="fk_integration_instance_integration_instance_configuration"
+            referencedTableName="integration_instance_configuration"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_configuration"
+            baseColumnNames="integration_id"
+            constraintName="fk_integration_instance_configuration_integration"
+            referencedTableName="integration"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_configuration_tag"
+            baseColumnNames="integration_instance_configuration_id"
+            constraintName="fk_integration_instance_configuration_tag_integration_instance_configuration"
+            referencedTableName="integration_instance_configuration"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_configuration_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_integration_instance_configuration_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_configuration_workflow"
+            baseColumnNames="integration_instance_configuration_id"
+            constraintName="fk_integration_instance_configuration_workflow_integration_instance_configuration"
+            referencedTableName="integration_instance_configuration"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_configuration_workflow_connection"
+            baseColumnNames="integration_instance_configuration_workflow_id"
+            constraintName="fk_integration_instance_configuration_workflow_connection_piw"
+            referencedTableName="integration_instance_configuration_workflow"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="integration_id"
+            baseTableName="integration_tag"
+            constraintName="fk_integration_tag_integration"
+            referencedColumnNames="id"
+            referencedTableName="integration"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="tag_id"
+            baseTableName="integration_tag"
+            constraintName="fk_integration_tag_tag"
+            referencedColumnNames="id"
+            referencedTableName="tag"/>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_version"
+            baseColumnNames="integration_id"
+            constraintName="fk_integration_version_project"
+            referencedTableName="integration"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="integration_id"
+            baseTableName="integration_workflow"
+            constraintName="fk_integration_workflow_integration"
+            referencedColumnNames="id"
+            referencedTableName="integration"/>
+    </changeSet>
+</databaseChangeLog>

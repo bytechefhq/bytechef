@@ -1,0 +1,563 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Embedded API"
+  version: "1"
+servers:
+- url: "/api/embedded"
+tags:
+- name: "action"
+  description: "The Embedded Connector Action API"
+- name: "connector"
+  description: "The Embedded Connector API"
+paths:
+  /connectors:
+    get:
+      description: "Returns a list with all the available connectors from the connector library."
+      summary: "Returns a list with all the available connectors from the connector library"
+      tags:
+      - "connector"
+      operationId: "getConnectors"
+      responses:
+        "200":
+          description: "The list of connector objects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Connector'
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Not Found"
+        "429":
+          description: "Limit Exceeded"
+        "500":
+          description: "Internal Error"
+  /connectors/{componentName}/versions/{componentVersion}/actions:
+    get:
+      description: "Returns a list with all the available actions for a given connector."
+      summary: "Returns a list with all the available actions for a given connector"
+      tags:
+        - "action"
+      operationId: "getConnectorActions"
+      parameters:
+        - name: "componentName"
+          description: "The component name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The component version"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "The list of connector action objects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Action'
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Not Found"
+        "429":
+          description: "Limit Exceeded"
+        "500":
+          description: "Internal Error"
+  /connectors/{componentName}/versions/{componentVersion}/actions/{actionName}:
+    post:
+      description: "Executes an action of a connector and returns the result as the response."
+      summary: "Executes an action of a connector and returns the result as the response"
+      tags:
+        - "action"
+      operationId: "executeAction"
+      parameters:
+        - name: "componentName"
+          description: "The component name."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The component version."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "actionName"
+          description: "The name of the action to call."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - input
+              properties:
+                input:
+                  description: The input parameters for the action.
+                  type: object
+                  additionalProperties: true
+#                returnOutputSchema:
+#                  type: "boolean"
+      responses:
+        "200":
+          description: "The list of connector action objects."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  output:
+                    description: The result of the action call.
+                    type: object
+                    additionalProperties: true
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Not Found"
+        "429":
+          description: "Limit Exceeded"
+        "500":
+          description: "Internal Error"
+#  /triggers:
+#    get:
+#      description: "Returns a list with all the available triggers from the connector library."
+#      summary: "Returns a list with all the available connectors from the triggers library"
+#      tags:
+#        - "trigger"
+#      operationId: "getTriggers"
+#      responses:
+#        "200":
+#          description: "The list of trigger objects."
+#          content:
+#            application/json:
+#              schema:
+#                type: "array"
+#                items:
+#                  $ref: '#/components/schemas/Trigger'
+#        "400":
+#          description: "Invalid Input"
+#        "401":
+#          description: "Unauthorized"
+#        "403":
+#          description: "Forbidden"
+#        "404":
+#          description: "Not Found"
+#        "429":
+#          description: "Limit Exceeded"
+#        "500":
+#          description: "Internal Error"
+components:
+  schemas:
+    Action:
+      type: "object"
+      required:
+        - description
+        - hasDynamicOutput
+        - name
+        - inputSchema
+        - outputSchema
+        - title
+      properties:
+        description:
+          description: The description what the action does.
+          type: "string"
+        hasDynamicOutput:
+          description: A boolean which indicates that the structure of the output depends on the input.
+          type: "boolean"
+        inputSchema:
+          description: "The list of action properties."
+          type: "array"
+          items:
+            $ref: "../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Property"
+        outputSchema:
+          $ref: "../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Property"
+        name:
+          description: The programmatic name of the action to be used as input for Call connector.
+          type: "string"
+        title:
+          description: The full title of the action.
+          type: "string"
+    Connector:
+      type: "object"
+      required:
+        - description
+        - name
+        - title
+        - version
+      properties:
+        description:
+          description: The connector description
+          type: "string"
+        name:
+          description: The programmatic name of the connector
+          type: "string"
+        title:
+          description: The title of the connector
+          type: "string"
+        version:
+          description: The version of the connector
+          type: "integer"
+    AnyValue:
+      description: "Can be anything: string, number, array, object, etc. (except `null`)"
+    ArrayProperty:
+      description: "An array property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "array"
+              items:
+                type: "object"
+            items:
+              description: "Types of the array items."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Property"
+            maxItems:
+              type: "integer"
+              format: "int64"
+            minItems:
+              type: "integer"
+              format: "int64"
+            multipleValues:
+              description: "If the array can contain multiple items."
+              type: "boolean"
+              default: true
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    BooleanProperty:
+      description: "A boolean property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "boolean"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    ControlType:
+      description: "A type of the control to show in UI."
+      type: "string"
+      enum:
+        - "ARRAY_BUILDER"
+        - "DATE"
+        - "DATE_TIME"
+        - "EMAIL"
+        - "INTEGER"
+        - "FILE_ENTRY"
+        - "OBJECT_BUILDER"
+        - "MULTI_SELECT"
+        - "NUMBER"
+        - "PASSWORD"
+        - "PHONE"
+        - "SELECT"
+        - "TEXT"
+        - "TEXT_AREA"
+        - "TIME"
+        - "URL"
+    DateProperty:
+      description: "A date property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "string"
+              format: "date"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    DateTimeProperty:
+      description: "A date-time property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "string"
+              format: "date-time"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    FileEntryProperty:
+      description: "An file entry property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            properties:
+              description: "The list of valid file entry property types."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Property"
+    DynamicPropertiesProperty:
+      description: "A dynamic properties property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/Property"
+        - type: "object"
+          properties:
+            header:
+              description: "The dynamic property header."
+              type: "string"
+#            propertiesDataSource:
+#              $ref: "#/components/schemas/PropertiesDataSource"
+    IntegerProperty:
+      description: "An integer property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "integer"
+              format: "int64"
+            maxValue:
+              description: "The maximum property value."
+              type: "integer"
+              format: "int64"
+            minValue:
+              description: "The minimum property value."
+              type: "integer"
+              format: "int64"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    NullProperty:
+      description: "A null property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+    NumberProperty:
+      description: "A number property type."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "number"
+              format: "double"
+            maxNumberPrecision:
+              description: "The number value precision."
+              type: "integer"
+              format: "int32"
+            maxValue:
+              description: "The maximum property value."
+              type: "number"
+              format: "double"
+            minNumberPrecision:
+              description: "The number value precision."
+              type: "integer"
+              format: "int32"
+            minValue:
+              description: "The minimum property value."
+              type: "number"
+              format: "double"
+            numberPrecision:
+              description: "The number value precision."
+              type: "integer"
+              format: "int32"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    Option:
+      description: "Defines valid property value."
+      type: "object"
+      properties:
+        description:
+          description: "Description of the option."
+          type: "string"
+        label:
+          description: "The label of an option."
+          type: "string"
+        value:
+          $ref: "#/components/schemas/AnyValue"
+    Property:
+      description: "A base property."
+      type: "object"
+      required:
+        - "propertyType"
+      properties:
+        advancedOption:
+          description: "If the property should be grouped under advanced options."
+          type: "boolean"
+        description:
+          description: "The property description."
+          type: "string"
+#        displayCondition:
+#          description: "Defines rules when a property should be shown or hidden."
+#          type: "string"
+#        lookup:
+#          type: "object"
+#          properties:
+#            action:
+#              type: "string"
+#            input:
+#              description: The input parameters for the action.
+#              type: object
+#              additionalProperties: true
+        name:
+          description: "The property name."
+          type: "string"
+        required:
+          description: "If the property is required or not."
+          type: "boolean"
+        type:
+          $ref: "#/components/schemas/PropertyType"
+      discriminator:
+        propertyName: "type"
+        mapping:
+          ARRAY: "#/components/schemas/ArrayProperty"
+          BOOLEAN: "#/components/schemas/BooleanProperty"
+          DATE: "#/components/schemas/DateProperty"
+          DATE_TIME: "#/components/schemas/DateTimeProperty"
+          DYNAMIC_PROPERTIES: "#/components/schemas/DynamicPropertiesProperty"
+          FILE_ENTRY: "#/components/schemas/FileEntryProperty"
+          INTEGER: "#/components/schemas/IntegerProperty"
+          "NULL": "#/components/schemas/NullProperty"
+          NUMBER: "#/components/schemas/NumberProperty"
+          OBJECT: "#/components/schemas/ObjectProperty"
+          STRING: "#/components/schemas/StringProperty"
+          TASK: "#/components/schemas/TaskProperty"
+          TIME: "#/components/schemas/TimeProperty"
+    PropertyType:
+      description: "A type of property."
+      type: "string"
+      enum:
+        - "ANY"
+        - "ARRAY"
+        - "BOOLEAN"
+        - "DATE"
+        - "DATE_TIME"
+        - "DYNAMIC_PROPERTIES"
+        - "FILE_ENTRY"
+        - "INTEGER"
+        - "NULL"
+        - "NUMBER"
+        - "STRING"
+        - "OBJECT"
+        - "TASK"
+        - "TIME"
+    StringProperty:
+      description: "A string property."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "string"
+            maxLength:
+              description: "The maximum string length."
+              type: "integer"
+              format: "int32"
+            minLength:
+              description: "The minimum string length."
+              type: "integer"
+              format: "int32"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    TimeProperty:
+      description: "A time property."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            defaultValue:
+              description: "The property default value."
+              type: "string"
+              format: "time"
+            options:
+              description: "The list of valid property options."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Option"
+    #            optionsDataSource:
+    #              $ref: "#/components/schemas/OptionsDataSource"
+    ValueProperty:
+      description: "A base property for all value based properties."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/Property"
+        - type: "object"
+          required:
+            - "controlType"
+          properties:
+            controlType:
+              $ref: "#/components/schemas/ControlType"
+            label:
+              description: "The property label."
+              type: "string"
+            placeholder:
+              description: "The property placeholder."
+              type: "string"
