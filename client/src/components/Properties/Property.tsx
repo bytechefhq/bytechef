@@ -675,16 +675,18 @@ const Property = ({
 
                         {!register && (isValidControlType || isNumericalInput) && !!optionsDataSource && (
                             <PropertyComboBox
+                                arrayIndex={arrayIndex}
                                 currentNodeConnectionId={currentNode.connectionId}
                                 description={description}
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependsOnValues={loadDependsOnValues}
-                                name={objectName ? `${objectName}.${name}` : name}
+                                name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
+                                path={path}
                                 required={required}
                                 value={selectValue}
                             />
@@ -692,16 +694,18 @@ const Property = ({
 
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
+                                arrayIndex={arrayIndex}
                                 currentNodeConnectionId={currentNode.connectionId}
                                 description={description}
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependsOnValues={loadDependsOnValues}
-                                name={objectName ? `${objectName}.${name}` : name}
+                                name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 optionsDataSource={optionsDataSource}
+                                path={path}
                                 required={required}
                                 value={selectValue}
                             />

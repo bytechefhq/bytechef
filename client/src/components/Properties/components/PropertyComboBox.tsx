@@ -24,6 +24,7 @@ type ComboBoxItemType = {
 };
 
 interface PropertyComboBoxProps {
+    arrayIndex?: number;
     currentNodeConnectionId?: number;
     description?: string;
     label?: string;
@@ -34,6 +35,7 @@ interface PropertyComboBoxProps {
     onValueChange?: (value: string) => void;
     options: Array<OptionModel>;
     optionsDataSource?: OptionsDataSourceModel;
+    path?: string;
     placeholder?: string;
     required?: boolean;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -41,6 +43,7 @@ interface PropertyComboBoxProps {
 }
 
 const PropertyComboBox = ({
+    arrayIndex,
     currentNodeConnectionId,
     description,
     label,
@@ -51,6 +54,7 @@ const PropertyComboBox = ({
     onValueChange,
     options,
     optionsDataSource,
+    path,
     placeholder = 'Select...',
     required,
     value,
@@ -59,6 +63,14 @@ const PropertyComboBox = ({
 
     const {workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
+
+    if (path) {
+        path = path.replace('parameters.', '').replace('parameters', '');
+
+        if (path.endsWith('_' + arrayIndex)) {
+            path = path.substring(0, path.lastIndexOf('.')) + '_[0]';
+        }
+    }
 
     const {
         data: optionsData,
@@ -69,7 +81,7 @@ const PropertyComboBox = ({
             loadDependencyValueKey: (loadDependsOnValues ?? []).join(''),
             request: {
                 id: workflow.id!,
-                propertyName: name!,
+                propertyName: (path ? path.replace('parameters.', '').replace('parameters', '') + '.' : '') + name!,
                 workflowNodeName: currentNode.name!,
             },
         },
@@ -101,7 +113,7 @@ const PropertyComboBox = ({
                     <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
                         {label}
 
-                        {required && <span className="leading-3 text-red-500">*</span>}
+                        {required && <span className="ml-0.5 leading-3 text-red-500">*</span>}
                     </Label>
 
                     {description && (
