@@ -13,10 +13,6 @@ const sidebarNavItems = [
         title: 'Appearance',
     },
     {
-        href: '/settings/api-keys',
-        title: 'API Keys',
-    },
-    {
         title: 'Embedded',
     },
     {
