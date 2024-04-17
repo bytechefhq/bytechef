@@ -521,6 +521,15 @@ public interface Context {
             public String getMimeType() {
                 return mimeType;
             }
+
+            @Override
+            public String toString() {
+                return "Body{" +
+                    "content=" + content +
+                    ", contentType=" + contentType +
+                    ", mimeType='" + mimeType + '\'' +
+                    '}';
+            }
         }
 
         class Configuration {

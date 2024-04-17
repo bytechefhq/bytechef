@@ -63,6 +63,8 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -70,6 +72,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class HttpClientExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientExecutor.class);
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
@@ -97,6 +101,12 @@ public class HttpClientExecutor {
 
             HttpRequest httpRequest = createHTTPRequest(
                 urlString, requestMethod, headers, queryParameters, body, componentName, connection, context);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
+                    httpRequest.uri(), requestMethod, headers, queryParameters, requestMethod);
+            }
 
             httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
         }
@@ -386,8 +396,7 @@ public class HttpClientExecutor {
 
     private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers
-                .ofString(com.bytechef.commons.util.JsonUtils.write(body.getContent())),
+            BodyPublishers.ofString(com.bytechef.commons.util.JsonUtils.write(body.getContent())),
             MediaType.APPLICATION_JSON);
     }
 
