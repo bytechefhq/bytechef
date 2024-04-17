@@ -30,7 +30,7 @@ export interface CreateProjectWorkflowRequest {
     workflowModel: WorkflowModel;
 }
 
-export interface DeleteProjectWorkflowRequest {
+export interface DeleteWorkflowRequest {
     id: number;
     workflowId: string;
 }
@@ -112,18 +112,18 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Delete a workflow.
      * Delete a workflow
      */
-    async deleteProjectWorkflowRaw(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteWorkflowRaw(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling deleteProjectWorkflow().'
+                'Required parameter "id" was null or undefined when calling deleteWorkflow().'
             );
         }
 
         if (requestParameters['workflowId'] == null) {
             throw new runtime.RequiredError(
                 'workflowId',
-                'Required parameter "workflowId" was null or undefined when calling deleteProjectWorkflow().'
+                'Required parameter "workflowId" was null or undefined when calling deleteWorkflow().'
             );
         }
 
@@ -132,7 +132,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/workflows/{workflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -145,8 +145,8 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Delete a workflow.
      * Delete a workflow
      */
-    async deleteProjectWorkflow(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteProjectWorkflowRaw(requestParameters, initOverrides);
+    async deleteWorkflow(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteWorkflowRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -304,34 +304,6 @@ export class WorkflowApi extends runtime.BaseAPI {
      */
     async getWorkflow(requestParameters: GetWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.getWorkflowRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get workflow definitions.
-     * Get workflow definitions
-     */
-    async getWorkflowsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowBasicModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/workflows`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowBasicModelFromJSON));
-    }
-
-    /**
-     * Get workflow definitions.
-     * Get workflow definitions
-     */
-    async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowBasicModel>> {
-        const response = await this.getWorkflowsRaw(initOverrides);
         return await response.value();
     }
 

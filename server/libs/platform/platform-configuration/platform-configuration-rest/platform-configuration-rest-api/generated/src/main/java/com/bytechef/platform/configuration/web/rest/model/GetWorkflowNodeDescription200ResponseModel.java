@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("getWorkflowNodeDescription_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-16T15:02:59.821023+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-17T17:52:35.553216+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class GetWorkflowNodeDescription200ResponseModel {
 
   private String description;

@@ -7,8 +7,8 @@ src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionA
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDescriptionApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDisplayConditionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPropertiesApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOutputApi.java
@@ -33,7 +33,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropert
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameter200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/EvaluateWorkflowNodeDisplayConditionRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/FileEntryPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
