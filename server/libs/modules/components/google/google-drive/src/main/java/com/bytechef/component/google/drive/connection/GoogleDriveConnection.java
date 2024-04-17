@@ -23,15 +23,16 @@ import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
 public class GoogleDriveConnection {
 
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
             AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
@@ -45,4 +46,7 @@ public class GoogleDriveConnection {
                 .authorizationUrl((connection, context) -> "https://accounts.google.com/o/oauth2/auth")
                 .scopes((connection, context) -> List.of("https://www.googleapis.com/auth/drive"))
                 .tokenUrl((connection, context) -> "https://oauth2.googleapis.com/token"));
+
+    private GoogleDriveConnection() {
+    }
 }

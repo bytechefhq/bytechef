@@ -25,30 +25,47 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
+ * @author Monika Domiter
  */
 public class GoogleDriveOptionUtils {
 
-    public static List<Option<String>> getDriveOptions(
+    private GoogleDriveOptionUtils() {
+    }
+
+    public static List<Option<String>> getFileOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        List<com.google.api.services.drive.model.Drive> drives = drive
-            .drives()
+        return drive
+            .files()
             .list()
+            .setQ("mimeType != 'application/vnd.google-apps.folder'")
             .execute()
-            .getDrives();
-
-        return drives
+            .getFiles()
             .stream()
-            .filter(curDrive -> StringUtils.isNotEmpty(searchText) &&
-                StringUtils.startsWith(curDrive.getName(), searchText))
-            .map(curDrive -> (Option<String>) option(curDrive.getName(), curDrive.getId()))
+            .map(file -> (Option<String>) option(file.getName(), file.getId()))
+            .toList();
+    }
+
+    public static List<Option<String>> getFolderOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws IOException {
+
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        return drive
+            .files()
+            .list()
+            .setQ("mimeType = 'application/vnd.google-apps.folder'")
+            .execute()
+            .getFiles()
+            .stream()
+            .map(folder -> (Option<String>) option(folder.getName(), folder.getId()))
             .toList();
     }
 }

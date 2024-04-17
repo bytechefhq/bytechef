@@ -16,40 +16,47 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
+import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
 public abstract class AbstractGoogleDriveActionTest {
 
-    protected MockedStatic<GoogleServices> mockedGoogleServices;
-    protected Drive mockedDrive = mock(Drive.class);
-    protected Drive.Files mockedFiles = mock(Drive.Files.class);
+    protected ArgumentCaptor<AbstractInputStreamContent> abstractInputStreamContentArgumentCaptor =
+        ArgumentCaptor.forClass(AbstractInputStreamContent.class);
+    protected ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
+    protected ArgumentCaptor<String> fileIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected MockedStatic<GoogleServices> googleServicesMockedStatic;
     protected ActionContext mockedContext = mock(ActionContext.class);
+    protected Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
+    protected Drive mockedDrive = mock(Drive.class);
+    protected Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
+    protected File mockedGoogleFile = mock(File.class);
+    protected Drive.Files mockedFiles = mock(Drive.Files.class);
     protected Parameters mockedParameters = mock(Parameters.class);
 
     @BeforeEach
     public void beforeEach() {
-        mockedGoogleServices = mockStatic(GoogleServices.class);
+        googleServicesMockedStatic = mockStatic(GoogleServices.class);
 
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
-        mockedGoogleServices.when(() -> GoogleServices.getDrive(mockedParameters))
+        googleServicesMockedStatic
+            .when(() -> GoogleServices.getDrive(any(Parameters.class)))
             .thenReturn(mockedDrive);
 
         when(mockedDrive.files())
@@ -58,9 +65,6 @@ public abstract class AbstractGoogleDriveActionTest {
 
     @AfterEach
     public void afterEach() {
-        verify(mockedDrive, times(1))
-            .files();
-
-        mockedGoogleServices.close();
+        googleServicesMockedStatic.close();
     }
 }

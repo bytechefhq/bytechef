@@ -17,87 +17,84 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.CREATE_NEW_TEXT_FILE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DRIVE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.IGNORE_DEFAULT_VISIBILITY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_LABELS;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.KEEP_REVISION_FOREVER;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.OCR_LANGUAGE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PROPERTY_MAP;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.SUPPORTS_ALL_DRIVES;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.USE_CONTENT_AS_INDEXABLE_TEXT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
 public final class GoogleDriveCreateNewTextFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_NEW_TEXT_FILE)
         .title("Create new text file")
-        .description("Creates a new text file in google drive.")
+        .description("Creates a new text file in Google Drive.")
         .properties(
             string(FILE_NAME)
                 .label("File name")
-                .description(
-                    "The name of the new text file.")
+                .description("The name of the new text file.")
                 .required(true),
             string(TEXT)
                 .label("Text")
-                .description(
-                    "The text content to add to file."),
+                .description("The text content to add to file.")
+                .controlType(ControlType.TEXT_AREA)
+                .required(true),
             string(MIME_TYPE)
-                .label("Content type")
-                .description(
-                    "Select file type.")
+                .label("File type")
+                .description("Select file type.")
                 .options(
                     option("Text", "plain/text"),
                     option("CSV", "text/csv"),
                     option("XML", "text/xml"))
-                .defaultValue("plain/text"),
-            PROPERTY_MAP.get(DRIVE_ID),
-            PROPERTY_MAP.get(IGNORE_DEFAULT_VISIBILITY),
-            PROPERTY_MAP.get(KEEP_REVISION_FOREVER),
-            PROPERTY_MAP.get(OCR_LANGUAGE),
-            PROPERTY_MAP.get(SUPPORTS_ALL_DRIVES),
-            PROPERTY_MAP.get(USE_CONTENT_AS_INDEXABLE_TEXT),
-            PROPERTY_MAP.get(INCLUDE_PERMISSIONS_FOR_VIEW),
-            PROPERTY_MAP.get(INCLUDE_LABELS))
-        .outputSchema(object().properties(string("id")))
-        .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
+                .defaultValue("plain/text")
+                .required(true),
+            PARENT_FOLDER_PROPERTY
+                .description(
+                    "Folder where the file should be created; if no folder is selected, the file will be created " +
+                        "in the root folder."))
+        .outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY)
+        .sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT)
         .perform(GoogleDriveCreateNewTextFileAction::perform);
 
     private GoogleDriveCreateNewTextFileAction() {
     }
 
     public static File perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        File googleFile = new File().setName(inputParameters.getRequiredString(FILE_NAME));
+        File newFile = new File()
+            .setName(inputParameters.getRequiredString(FILE_NAME))
+            .setParents(inputParameters.getString(PARENT_FOLDER) == null
+                ? null : List.of(inputParameters.getString(PARENT_FOLDER)));
 
-        String suffix = switch (inputParameters.getString(MIME_TYPE)) {
+        String mimeType = inputParameters.getRequiredString(MIME_TYPE);
+
+        String suffix = switch (mimeType) {
             case "text/csv" -> ".csv";
             case "text/xml" -> ".xml";
             default -> ".txt";
@@ -108,20 +105,12 @@ public final class GoogleDriveCreateNewTextFileAction {
         try (BufferedWriter bufferedWriter = new BufferedWriter(
             new OutputStreamWriter(
                 new FileOutputStream(file), StandardCharsets.UTF_8))) {
-            bufferedWriter.write(inputParameters.getString(TEXT));
+            bufferedWriter.write(inputParameters.getRequiredString(TEXT));
         }
 
         return drive
             .files()
-            .create(googleFile, new FileContent(inputParameters.getString(MIME_TYPE), file))
-            .setFields("id")
-            .setIgnoreDefaultVisibility(inputParameters.getBoolean("ignoreDefaultVisibility"))
-            .setKeepRevisionForever(inputParameters.getBoolean("keepRevisionForever"))
-            .setOcrLanguage(inputParameters.getString("ocrLanguage"))
-            .setSupportsAllDrives(inputParameters.getBoolean("supportsAllDrives"))
-            .setUseContentAsIndexableText(inputParameters.getBoolean("useContentAsIndexableText"))
-            .setIncludePermissionsForView(inputParameters.getString("includePermissionsForView"))
-            .setIncludeLabels(inputParameters.getString("includeLabels"))
+            .create(newFile, new FileContent(mimeType, file))
             .execute();
     }
 }

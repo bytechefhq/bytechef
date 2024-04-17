@@ -17,43 +17,52 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.FileEntry;
-import java.io.File;
+import com.google.api.services.drive.model.File;
+import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
-public class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveCreateActionTest {
+class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveActionTest {
 
+    private final java.io.File mockedFile = mock(java.io.File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final File mockedFile = mock(File.class);
 
     @Test
-    public void testPerform() throws Exception {
-        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
+    void testPerform() throws IOException {
+       when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
             .thenReturn(mockedFileEntry);
+        when(mockedParameters.getString(PARENT_FOLDER))
+            .thenReturn("parentFolder");
         when(mockedFileEntry.getName())
-            .thenReturn("fileName");
+            .thenReturn("name");
         when(mockedFileEntry.getMimeType())
             .thenReturn("mimeType");
-
         when(mockedContext.file(any()))
             .thenReturn(mockedFile);
 
-        GoogleDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        when(mockedFiles.create(fileArgumentCaptor.capture(), abstractInputStreamContentArgumentCaptor.capture()))
+            .thenReturn(mockedCreate);
+        when(mockedCreate.execute())
+            .thenReturn(mockedGoogleFile);
 
-        verify(mockedFiles, times(1))
-            .create(fileArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
+        File result = GoogleDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals("fileName", fileArgumentCaptor.getValue().getName());
-        assertEquals("mimeType", inputStreamArgumentCaptor.getValue().getType());
+        assertEquals(mockedGoogleFile, result);
+
+        File file = fileArgumentCaptor.getValue();
+
+        assertEquals("name", file.getName());
+        assertEquals(List.of("parentFolder"), file.getParents());
     }
 }
