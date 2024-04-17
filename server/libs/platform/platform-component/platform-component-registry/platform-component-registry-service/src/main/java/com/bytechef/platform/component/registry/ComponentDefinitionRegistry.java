@@ -208,14 +208,31 @@ public class ComponentDefinitionRegistry {
         if (subProperties.length == 1) {
             return CollectionUtils.getFirst(properties, property -> Objects.equals(propertyName, property.getName()));
         } else {
-            // TODO add recursion to fetch any level
-
             Property.ObjectProperty objectProperty = (Property.ObjectProperty) CollectionUtils.getFirst(
                 properties, property -> Objects.equals(property.getName(), subProperties[0]));
 
+            for (int i = 1; i < subProperties.length - 1; i++) {
+                int finalI = i;
+
+                if (subProperties[finalI].endsWith("_[0]")) {
+                    Property.ArrayProperty arrayProperty = (Property.ArrayProperty) CollectionUtils.getFirst(
+                        OptionalUtils.get(objectProperty.getProperties()),
+                        curProperty -> Objects.equals(
+                            curProperty.getName(), subProperties[finalI].replace("_[0]", "")));
+
+                    List<? extends Property> items = OptionalUtils.get(arrayProperty.getItems());
+
+                    objectProperty = (Property.ObjectProperty) items.getFirst();
+                } else {
+                    objectProperty = (Property.ObjectProperty) CollectionUtils.getFirst(
+                        OptionalUtils.get(objectProperty.getProperties()),
+                        curProperty -> Objects.equals(curProperty.getName(), subProperties[finalI]));
+                }
+            }
+
             return CollectionUtils.getFirst(
                 OptionalUtils.get(objectProperty.getProperties()),
-                property -> Objects.equals(property.getName(), subProperties[1]));
+                curProperty -> Objects.equals(curProperty.getName(), subProperties[subProperties.length - 1]));
         }
     }
 
