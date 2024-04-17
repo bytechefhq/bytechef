@@ -18,19 +18,12 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DRIVE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.IGNORE_DEFAULT_VISIBILITY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_LABELS;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.KEEP_REVISION_FOREVER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.OCR_LANGUAGE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PROPERTY_MAP;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.SUPPORTS_ALL_DRIVES;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.USE_CONTENT_AS_INDEXABLE_TEXT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -40,66 +33,51 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import java.util.Map;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
+ * @author Monika Domiter
  */
 public final class GoogleDriveUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
         .title("Upload file")
-        .description("Uploads a file to google drive.")
+        .description("Uploads a file in your Google Drive")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")
-                .description(
-                    "The object property which contains a reference to the file to upload.")
+                .description("The object property which contains a reference to the file to upload.")
                 .required(true),
-            PROPERTY_MAP.get(DRIVE_ID),
-            PROPERTY_MAP.get(IGNORE_DEFAULT_VISIBILITY),
-            PROPERTY_MAP.get(KEEP_REVISION_FOREVER),
-            PROPERTY_MAP.get(OCR_LANGUAGE),
-            PROPERTY_MAP.get(SUPPORTS_ALL_DRIVES),
-            PROPERTY_MAP.get(USE_CONTENT_AS_INDEXABLE_TEXT),
-            PROPERTY_MAP.get(INCLUDE_PERMISSIONS_FOR_VIEW),
-            PROPERTY_MAP.get(INCLUDE_LABELS))
-        .outputSchema(object().properties(string("id")))
-        .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
+            PARENT_FOLDER_PROPERTY
+                .description(
+                    "Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to " +
+                        "the root folder."))
+        .outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY)
+        .sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT)
         .perform(GoogleDriveUploadFileAction::perform);
 
     private GoogleDriveUploadFileAction() {
     }
 
     public static File perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
-        File file = new File().setName(fileEntry.getName());
-
-        if (inputParameters.containsKey("driveId")) {
-            file.setDriveId(inputParameters.getString("driveId"));
-        }
-
         return drive
             .files()
             .create(
-                file,
+                new File()
+                    .setName(fileEntry.getName())
+                    .setParents(inputParameters.getString(PARENT_FOLDER) == null
+                        ? null : List.of(inputParameters.getString(PARENT_FOLDER))),
                 new FileContent(
                     fileEntry.getMimeType(),
                     actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
-            .setFields("id")
-            .setIgnoreDefaultVisibility(inputParameters.getBoolean("ignoreDefaultVisibility"))
-            .setKeepRevisionForever(inputParameters.getBoolean("keepRevisionForever"))
-            .setOcrLanguage(inputParameters.getString("ocrLanguage"))
-            .setSupportsAllDrives(inputParameters.getBoolean("supportsAllDrives"))
-            .setUseContentAsIndexableText(inputParameters.getBoolean("useContentAsIndexableText"))
-            .setIncludePermissionsForView(inputParameters.getString("includePermissionsForView"))
-            .setIncludeLabels(inputParameters.getString("includeLabels"))
             .execute();
     }
 }

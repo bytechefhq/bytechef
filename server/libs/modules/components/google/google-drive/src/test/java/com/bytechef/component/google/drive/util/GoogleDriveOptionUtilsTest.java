@@ -16,13 +16,11 @@
 
 package com.bytechef.component.google.drive.util;
 
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -30,66 +28,78 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.DriveList;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
+ * @author Monika Domiter
  */
 class GoogleDriveOptionUtilsTest {
 
+    private final List<Option<String>> expectedOptions = List.of(option("name", "id"));
+    private final List<File> files = new ArrayList<>();
+    private MockedStatic<GoogleServices> googleServicesMockedStatic;
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Drive mockedDrive = mock(Drive.class);
+    private final FileList mockedFileList = mock(FileList.class);
+    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
+    private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+    @BeforeEach
+    void beforeEach() throws IOException {
+        googleServicesMockedStatic = mockStatic(GoogleServices.class);
+
+        googleServicesMockedStatic
+            .when(() -> GoogleServices.getDrive(any(Parameters.class)))
+            .thenReturn(mockedDrive);
+
+        files.add(
+            new File()
+                .setName("name")
+                .setId("id"));
+
+        when(mockedDrive.files())
+            .thenReturn(mockedFiles);
+        when(mockedFiles.list())
+            .thenReturn(mockedList);
+        when(mockedList.setQ(qArgumentCaptor.capture()))
+            .thenReturn(mockedList);
+        when(mockedList.execute())
+            .thenReturn(mockedFileList);
+        when(mockedFileList.getFiles())
+            .thenReturn(files);
+    }
+
+    @AfterEach
+    void afterEach() {
+        googleServicesMockedStatic.close();
+    }
+
     @Test
-    void testGetDriveOptions() throws IOException {
-        Drive mockedDrive = mock(Drive.class);
-        Drive.Drives mockedDrives = mock(Drive.Drives.class);
-        Drive.Drives.List mockedList = mock(Drive.Drives.List.class);
-        DriveList mockedDriveList = mock(DriveList.class);
-        List<com.google.api.services.drive.model.Drive> mockedSubDriveArrayList = Arrays.asList(
-            mock(com.google.api.services.drive.model.Drive.class),
-            mock(com.google.api.services.drive.model.Drive.class),
-            mock(com.google.api.services.drive.model.Drive.class),
-            mock(com.google.api.services.drive.model.Drive.class));
+    void testGetFileOptions() throws IOException {
+        assertEquals(expectedOptions,
+            GoogleDriveOptionUtils.getFileOptions(mockedParameters, mockedParameters, "", mockedContext));
 
-        try (MockedStatic<GoogleServices> mockedGoogleServices = mockStatic(GoogleServices.class)) {
-            mockedGoogleServices
-                .when(() -> GoogleServices.getDrive(any()))
-                .thenReturn(mockedDrive);
-            when(mockedDrive.drives())
-                .thenReturn(mockedDrives);
-            when(mockedDrives.list())
-                .thenReturn(mockedList);
-            when(mockedList.execute())
-                .thenReturn(mockedDriveList);
-            when(mockedDriveList.getDrives())
-                .thenReturn(mockedSubDriveArrayList);
+        assertEquals("mimeType != 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
+    }
 
-            mockedSubDriveArrayList.forEach(drive -> when(drive.getName())
-                .thenReturn("NOT searched text"));
+    @Test
+    void testGetFolderOptions() throws IOException {
+        assertEquals(expectedOptions,
+            GoogleDriveOptionUtils.getFolderOptions(mockedParameters, mockedParameters, "", mockedContext));
 
-            com.google.api.services.drive.model.Drive drive = mockedSubDriveArrayList.getFirst();
-
-            String searchText = "12345  more text";
-
-            when(drive.getName())
-                .thenReturn(searchText);
-
-            List<Option<String>> options = GoogleDriveOptionUtils.getDriveOptions(
-                mock(Parameters.class), mock(Parameters.class), searchText, mock(ActionContext.class));
-
-            verify(mockedDriveList, times(1))
-                .getDrives();
-
-            assertEquals(1, options.size());
-
-            Option<String> option = options.getFirst();
-
-            assertTrue(StringUtils.equals(option.getLabel(), searchText));
-        }
+        assertEquals("mimeType = 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
     }
 }

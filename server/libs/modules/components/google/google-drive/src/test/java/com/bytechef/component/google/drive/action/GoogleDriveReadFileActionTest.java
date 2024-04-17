@@ -16,64 +16,37 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ACKNOWLEDGE_ABUSE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.api.services.drive.Drive;
+import java.io.IOException;
+import java.io.InputStream;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
-public class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
+class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
 
-    private final Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
-    private final ArgumentCaptor<String> getArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Boolean> acknowledgeAbuseArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
-    private final ArgumentCaptor<Boolean> supportsAllDrivesArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
-    private final ArgumentCaptor<String> includePermissionsForViewArgumentCaptor =
-        ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> includeLabelsArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final InputStream mockedInputStream = mock(InputStream.class);
 
     @Test
-    public void testPerform() throws Exception {
+    void testPerform() throws IOException {
         when(mockedParameters.getRequiredString(FILE_ID))
             .thenReturn("fileId");
-        when(mockedParameters.getBoolean(ACKNOWLEDGE_ABUSE))
-            .thenReturn(true);
-        when(mockedParameters.getBoolean("supportsAllDrives"))
-            .thenReturn(true);
-        when(mockedParameters.getString("includePermissionsForView"))
-            .thenReturn("includePermissionsForViewStub");
-        when(mockedParameters.getString("includeLabels"))
-            .thenReturn("includeLabelsStub");
-        when(mockedFiles.get(getArgumentCaptor.capture()))
+
+        when(mockedFiles.get(fileIdArgumentCaptor.capture()))
             .thenReturn(mockedGet);
-        when(mockedGet.setAcknowledgeAbuse(acknowledgeAbuseArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setSupportsAllDrives(supportsAllDrivesArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setIncludePermissionsForView(includePermissionsForViewArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setIncludeLabels(includeLabelsArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
+        when(mockedGet.executeMediaAsInputStream())
+            .thenReturn(mockedInputStream);
 
         GoogleDriveReadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals("fileId", getArgumentCaptor.getValue());
-        assertEquals(true, acknowledgeAbuseArgumentCaptor.getValue());
-        assertEquals(true, supportsAllDrivesArgumentCaptor.getValue());
-        assertEquals("includePermissionsForViewStub", includePermissionsForViewArgumentCaptor.getValue());
-        assertEquals("includeLabelsStub", includeLabelsArgumentCaptor.getValue());
+        String fileId = fileIdArgumentCaptor.getValue();
 
-        verify(mockedGet, times(1))
-            .execute();
-
+        assertEquals("fileId", fileId);
     }
 }

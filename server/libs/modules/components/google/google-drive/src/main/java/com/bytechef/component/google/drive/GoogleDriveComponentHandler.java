@@ -30,6 +30,7 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
 @AutoService(ComponentHandler.class)
 public class GoogleDriveComponentHandler implements ComponentHandler {
@@ -37,8 +38,8 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_DRIVE)
         .title("Google Drive")
         .description(
-            "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows " +
-                "users to store files in the cloud, synchronize files across devices, and share files.")
+            "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and " +
+                "collaborate online.")
         .icon("path:assets/google-drive.svg")
         .connection(CONNECTION_DEFINITION)
         .actions(
