@@ -4,8 +4,8 @@ apis/ConnectionDefinitionApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
+apis/WorkflowApi.ts
 apis/WorkflowNodeDescriptionApi.ts
-apis/WorkflowNodeDisplayConditionApi.ts
 apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
 apis/WorkflowNodeOutputApi.ts
@@ -32,7 +32,6 @@ models/DateTimePropertyModel.ts
 models/DeleteWorkflowNodeParameter200ResponseModel.ts
 models/DeleteWorkflowNodeParameterRequestModel.ts
 models/DynamicPropertiesPropertyModel.ts
-models/EvaluateWorkflowNodeDisplayConditionRequestModel.ts
 models/ExecutionErrorModel.ts
 models/FileEntryPropertyModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
