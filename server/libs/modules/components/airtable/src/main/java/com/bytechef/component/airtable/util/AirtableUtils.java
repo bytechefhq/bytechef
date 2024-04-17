@@ -135,13 +135,10 @@ public class AirtableUtils {
             }
 
             return List.of(
-                object("record")
-                    .label("Record")
-                    .properties(
-                        object("fields")
-                            .label("Fields")
-                            .properties(properties)
-                            .required(false)));
+                object("fields")
+                    .label("Fields")
+                    .properties(properties)
+                    .required(false));
         };
     }
 
