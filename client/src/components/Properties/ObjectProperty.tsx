@@ -42,7 +42,7 @@ interface ObjectPropertyProps {
     path?: string;
     property: PropertyType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    taskParameterValue?: any;
+    parameterValue?: any;
 }
 
 const ObjectProperty = ({
@@ -53,9 +53,9 @@ const ObjectProperty = ({
     currentComponentDefinition,
     dataPills,
     onDeleteClick,
+    parameterValue,
     path,
     property,
-    taskParameterValue,
 }: ObjectPropertyProps) => {
     const [subProperties, setSubProperties] = useState<Array<PropertyType>>(
         (property.properties as Array<PropertyType>) || []
@@ -148,7 +148,7 @@ const ObjectProperty = ({
                         return <></>;
                     }
 
-                    const subPropertyDefaultValue = subProperty.name ? taskParameterValue?.[subProperty.name] : '';
+                    const subPropertyDefaultValue = subProperty.name ? parameterValue?.[subProperty.name] : '';
 
                     return (
                         <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
@@ -162,13 +162,13 @@ const ObjectProperty = ({
                                 dataPills={dataPills}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
+                                parameterValue={subPropertyDefaultValue}
                                 path={`${path}.${name}`}
                                 property={{
                                     ...subProperty,
                                     name: subProperty.name,
                                 }}
                                 showDeletePropertyButton={true}
-                                taskParameterValue={subPropertyDefaultValue}
                             />
 
                             {subProperty.custom && name && subProperty.name && currentComponent && (

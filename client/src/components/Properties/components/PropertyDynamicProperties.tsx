@@ -17,7 +17,7 @@ interface PropertyDynamicPropertiesProps {
     name?: string;
     propertiesDataSource?: PropertiesDataSourceModel;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    taskParameterValue?: any;
+    parameterValue?: any;
 }
 
 const PropertyDynamicProperties = ({
@@ -27,8 +27,8 @@ const PropertyDynamicProperties = ({
     currentNodeConnectionId,
     loadDependsOnValues,
     name,
+    parameterValue,
     propertiesDataSource,
-    taskParameterValue,
 }: PropertyDynamicPropertiesProps) => {
     const [subProperties, setSubProperties] = useState<PropertyModel[]>();
 
@@ -65,7 +65,7 @@ const PropertyDynamicProperties = ({
     return subProperties ? (
         <ul className="space-y-4" key={(loadDependsOnValues ?? []).join('')}>
             {subProperties.map((property, index) => {
-                const propertyDefaultValue = property.name ? taskParameterValue?.[property.name] : '';
+                const propertyDefaultValue = property.name ? parameterValue?.[property.name] : '';
 
                 return (
                     <Property
@@ -74,9 +74,9 @@ const PropertyDynamicProperties = ({
                         currentComponentDefinition={currentComponentDefinition}
                         key={`${property.name}_${index}_${(loadDependsOnValues ?? []).join('')}`}
                         objectName={name}
+                        parameterValue={propertyDefaultValue}
                         path={name}
                         property={property}
-                        taskParameterValue={propertyDefaultValue}
                     />
                 );
             })}

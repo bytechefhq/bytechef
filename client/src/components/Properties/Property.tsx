@@ -58,12 +58,12 @@ interface PropertyProps {
     formState?: FormState<FieldValues>;
     inputTypeSwitchButtonClassName?: string;
     objectName?: string;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    parameterValue?: any;
     path?: string;
     property: PropertyType;
-    /* eslint-disable @typescript-eslint/no-explicit-any */
     register?: UseFormRegister<any>;
     showDeletePropertyButton?: boolean;
-    taskParameterValue?: any;
 }
 
 const Property = ({
@@ -77,11 +77,11 @@ const Property = ({
     formState,
     inputTypeSwitchButtonClassName,
     objectName,
+    parameterValue,
     path = 'parameters',
     property,
     register,
     showDeletePropertyButton = false,
-    taskParameterValue,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
@@ -152,12 +152,12 @@ const Property = ({
         (task) => task.name === currentComponentDefinition?.workflowNodeName
     );
 
-    if (!taskParameterValue) {
-        taskParameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+    if (!parameterValue) {
+        parameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
     }
 
     if (name && name.endsWith('_0') && defaultValue) {
-        taskParameterValue = defaultValue;
+        parameterValue = defaultValue;
     }
 
     const otherComponents = components.filter((component) => {
@@ -426,17 +426,17 @@ const Property = ({
         }
     }, [formState, name, path]);
 
-    // set value to taskParameterValue only on initial render
+    // set value to parameterValue only on initial render
     useEffect(() => {
-        if (mentionInput && taskParameterValue) {
+        if (mentionInput && parameterValue) {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
             if (!mentionInputElement) {
                 return;
             }
 
-            if (typeof taskParameterValue === 'string' && taskParameterValue.startsWith('${')) {
-                const componentName = taskParameterValue.split('_')[0].replace('${', '');
+            if (typeof parameterValue === 'string' && parameterValue.startsWith('${')) {
+                const componentName = parameterValue.split('_')[0].replace('${', '');
 
                 const componentIcon =
                     componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
@@ -445,25 +445,25 @@ const Property = ({
 
                 node.className = 'property-mention';
 
-                node.dataset.value = taskParameterValue.replace(/\$\{|\}/g, '');
+                node.dataset.value = parameterValue.replace(/\$\{|\}/g, '');
                 node.dataset.componentIcon = componentIcon;
 
                 setMentionInputValue(node.outerHTML);
             } else {
-                setMentionInputValue(taskParameterValue);
+                setMentionInputValue(parameterValue);
             }
         }
 
-        if (inputValue === '' && taskParameterValue) {
-            setInputValue(taskParameterValue);
+        if (inputValue === '' && parameterValue) {
+            setInputValue(parameterValue);
         }
 
-        if (selectValue === '' && taskParameterValue) {
-            setSelectValue(taskParameterValue);
+        if (selectValue === '' && parameterValue) {
+            setSelectValue(parameterValue);
         }
 
-        if (numericValue === '' && taskParameterValue) {
-            setNumericValue(taskParameterValue);
+        if (numericValue === '' && parameterValue) {
+            setNumericValue(parameterValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -512,7 +512,6 @@ const Property = ({
                     type !== 'DYNAMIC_PROPERTIES' &&
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
-                            arrayIndex={arrayIndex}
                             controlType={controlType}
                             currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
@@ -602,9 +601,9 @@ const Property = ({
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 onDeleteClick={handleDelete}
+                                parameterValue={parameterValue}
                                 path={path}
                                 property={property}
-                                taskParameterValue={taskParameterValue}
                             />
                         )}
 
@@ -728,7 +727,7 @@ const Property = ({
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
-                                value={taskParameterValue}
+                                value={parameterValue}
                             />
                         )}
 
@@ -758,8 +757,8 @@ const Property = ({
                         currentNodeConnectionId={currentNode.connectionId}
                         loadDependsOnValues={loadDependsOnValues}
                         name={name}
+                        parameterValue={parameterValue}
                         propertiesDataSource={property.propertiesDataSource}
-                        taskParameterValue={taskParameterValue}
                     />
                 )}
 
@@ -774,7 +773,7 @@ const Property = ({
                         name={name!}
                         onChange={handleCodeEditorChange}
                         required={required}
-                        value={taskParameterValue}
+                        value={parameterValue}
                         workflow={workflow}
                         workflowNodeName={currentNode.name}
                     />
