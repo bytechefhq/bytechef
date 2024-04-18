@@ -4,7 +4,7 @@ import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automa
 import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConfiguration';
 import ProjectInstanceDialogWorkflowsStepItemConnections from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnections';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
+import {useGetWorkflowQuery} from '@/queries/platform/workflows.queries';
 import {Control, UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';

@@ -36,6 +36,7 @@ import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel, ProjectStatusModel, UpdateWorkflowRequest} from '@/middleware/automation/configuration';
 import {WorkflowModel} from '@/middleware/platform/configuration';
 import {WorkflowTestApi} from '@/middleware/platform/workflow/test';
+import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {
     useDeleteProjectMutation,
     useDuplicateProjectMutation,
@@ -45,30 +46,36 @@ import {
     useCreateProjectWorkflowMutation,
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
-    useUpdateWorkflowMutation,
 } from '@/mutations/automation/workflows.mutations';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
-import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
-import WorkflowExecutionsTestOutput from '@/pages/automation/project/components/WorkflowExecutionsTestOutput';
-import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
-import WorkflowOutputsSheet from '@/pages/automation/project/components/WorkflowOutputsSheet';
-import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
-import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
-import useWorkflowEditorStore from '@/pages/automation/project/stores/useWorkflowEditorStore';
-import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
+import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
+import WorkflowEditorLayout from '@/pages/platform/workflow-editor/components/WorkflowEditorLayout';
+import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
+import WorkflowInputsSheet from '@/pages/platform/workflow-editor/components/WorkflowInputsSheet';
+import WorkflowNodesSidebar from '@/pages/platform/workflow-editor/components/WorkflowNodesSidebar';
+import WorkflowOutputsSheet from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheet';
+import useUpdatePlatformWorkflowMutation from '@/pages/platform/workflow-editor/mutations/workflows.mutations';
+import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {
+    ConnectionKeys,
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/queries/automation/connections.queries';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
+import {ProjectWorkflowKeys, useGetProjectWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetProjectQuery} from '@/queries/automation/projects.queries';
-import {WorkflowKeys, useGetProjectWorkflowsQuery, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
-import {WorkflowNodeDisplayConditionKeys} from '@/queries/platform/workflowNodeDisplayConditions.queries';
-import {
-    WorkflowTestConfigurationKeys,
-    useGetWorkflowTestConfigurationQuery,
-} from '@/queries/platform/workflowTestConfigurations.queries';
+import {useGetWorkflowTestConfigurationQuery} from '@/queries/platform/workflowTestConfigurations.queries';
+import {useGetWorkflowQuery} from '@/queries/platform/workflows.queries';
 import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {
@@ -89,8 +96,6 @@ import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
 import PageLoader from '../../../components/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
-import ProjectWorkflowEditor from './components/ProjectWorkflowEditor';
-import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -181,7 +186,7 @@ const Header = ({
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
             queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.projectWorkflows(projectId),
+                queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
             setShowBottomPanelOpen(false);
@@ -392,31 +397,16 @@ const OutputButton = ({bottomResizablePanelRef}: {bottomResizablePanelRef: RefOb
 };
 
 const Project = () => {
-    const {
-        setShowProjectVersionHistorySheet,
-        setShowWorkflowCodeEditorSheet,
-        setShowWorkflowInputsSheet,
-        setShowWorkflowOutputsSheet,
-        showProjectVersionHistorySheet,
-        showWorkflowCodeEditorSheet,
-        showWorkflowInputsSheet,
-        showWorkflowOutputsSheet,
-        workflowIsRunning,
-        workflowTestExecution,
-    } = useWorkflowEditorStore();
+    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
+    const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
+    const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
+    const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
+    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
-    const {currentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {
-        dirty,
-        setComponentDefinitions,
-        setDirty,
-        setProjectId,
-        setTaskDispatcherDefinitions,
-        setWorkflow,
-        workflow,
-    } = useWorkflowDataStore();
+    const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {projectId, workflowId} = useParams();
 
@@ -481,7 +471,7 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: projectWorkflow} = useGetWorkflowQuery(workflowId!);
+    const {data: curWorkflow} = useGetWorkflowQuery(workflowId!);
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
@@ -521,29 +511,15 @@ const Project = () => {
 
     const queryClient = useQueryClient();
 
-    const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: (workflow) => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(+projectId!)});
-
+    const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
+        onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
+                queryKey: ProjectKeys.project(parseInt(projectId!)),
             });
 
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: [
-                    ...WorkflowNodeDisplayConditionKeys.workflowNodeDisplayConditions,
-                    workflow.id!,
-                    currentNode.name,
-                ],
-            });
-
-            setDirty(true);
             setShowEditWorkflowDialog(false);
         },
+        workflowId: workflow.id!,
     });
 
     useEffect(() => {
@@ -571,36 +547,18 @@ const Project = () => {
     }, []);
 
     useEffect(() => {
-        if (projectId) {
-            setProjectId(+projectId);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectId]);
-
-    useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowId]);
 
     useEffect(() => {
-        if (projectWorkflow) {
-            setWorkflow({...projectWorkflow, componentNames, nodeNames});
+        if (curWorkflow) {
+            setWorkflow({...curWorkflow, componentNames, nodeNames});
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectWorkflow, workflowId]);
-
-    useEffect(() => {
-        if (dirty) {
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.project(parseInt(projectId!)),
-            });
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dirty]);
+    }, [curWorkflow, workflowId]);
 
     return (
         <>
@@ -640,12 +598,26 @@ const Project = () => {
                     {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
                         <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel className="relative" defaultSize={65}>
-                                <ProjectWorkflowEditor
-                                    componentDefinitions={componentDefinitions}
-                                    projectId={+projectId!}
-                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                    updateWorkflowMutation={updateWorkflowMutation}
-                                />
+                                <ConnectionReactQueryProvider
+                                    value={{
+                                        ConnectionKeys: ConnectionKeys,
+                                        useCreateConnectionMutation: useCreateConnectionMutation,
+                                        useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                                        useGetConnectionsQuery: useGetConnectionsQuery,
+                                    }}
+                                >
+                                    <WorkflowMutationProvider
+                                        value={{
+                                            updateWorkflowMutation,
+                                        }}
+                                    >
+                                        <WorkflowEditorLayout
+                                            componentDefinitions={componentDefinitions}
+                                            taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                            updateWorkflowMutation={updateWorkflowMutation}
+                                        />
+                                    </WorkflowMutationProvider>
+                                </ConnectionReactQueryProvider>
                             </ResizablePanel>
 
                             <ResizableHandle />
@@ -680,16 +652,30 @@ const Project = () => {
                     )}
 
                     {showWorkflowCodeEditorSheet && (
-                        <WorkflowCodeEditorSheet
-                            onClose={() => {
-                                setShowWorkflowCodeEditorSheet(false);
+                        <ConnectionReactQueryProvider
+                            value={{
+                                ConnectionKeys: ConnectionKeys,
+                                useCreateConnectionMutation: useCreateConnectionMutation,
+                                useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                                useGetConnectionsQuery: useGetConnectionsQuery,
                             }}
-                            projectId={parseInt(projectId!)}
-                            runDisabled={runDisabled}
-                            testConfigurationDisabled={testConfigurationDisabled}
-                            workflow={workflow}
-                            workflowTestConfiguration={workflowTestConfiguration}
-                        />
+                        >
+                            <WorkflowMutationProvider
+                                value={{
+                                    updateWorkflowMutation,
+                                }}
+                            >
+                                <WorkflowCodeEditorSheet
+                                    onClose={() => {
+                                        setShowWorkflowCodeEditorSheet(false);
+                                    }}
+                                    runDisabled={runDisabled}
+                                    testConfigurationDisabled={testConfigurationDisabled}
+                                    workflow={workflow}
+                                    workflowTestConfiguration={workflowTestConfiguration}
+                                />
+                            </WorkflowMutationProvider>
+                        </ConnectionReactQueryProvider>
                     )}
 
                     {projectId && showWorkflowInputsSheet && (
@@ -779,22 +765,21 @@ const PublishPopover = ({project}: {project: ProjectModel}) => {
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState<string | undefined>(undefined);
 
-    const {setDirty} = useWorkflowDataStore();
-
     const {toast} = useToast();
 
     const queryClient = useQueryClient();
 
     const publishProjectMutation = usePublishProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(project.id!),
+            });
 
             toast({
                 description: 'The project is published.',
             });
 
             setOpen(false);
-            setDirty(false);
         },
     });
 

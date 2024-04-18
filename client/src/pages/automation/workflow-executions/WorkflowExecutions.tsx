@@ -9,8 +9,8 @@ import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {ProjectModel} from '@/middleware/automation/configuration';
 import {useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
+import {useGetProjectWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowExecutionsQuery} from '@/queries/automation/workflowExecutions.queries';
-import {useGetWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {ActivityIcon} from 'lucide-react';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
@@ -97,7 +97,7 @@ export const WorkflowExecutions = () => {
         workflowId: filterWorkflowId,
     });
 
-    const {data: workflows} = useGetWorkflowsQuery();
+    const {data: workflows} = useGetProjectWorkflowsQuery(filterProjectId!, !!filterProjectId);
 
     const emptyListMessage =
         !filterStatus &&

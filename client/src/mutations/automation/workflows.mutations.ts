@@ -1,16 +1,11 @@
 import {
     CreateProjectWorkflowRequest,
-    DeleteProjectWorkflowRequest,
+    DeleteWorkflowRequest,
     DuplicateWorkflowRequest,
     UpdateWorkflowRequest,
     WorkflowApi,
     WorkflowModel,
 } from '@/middleware/automation/configuration';
-import {
-    GetWorkflowNodeOutputsRequest,
-    WorkflowNodeOutputApi,
-    WorkflowNodeOutputModel,
-} from '@/middleware/platform/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateProjectWorkflowMutationProps {
@@ -29,14 +24,14 @@ export const useCreateProjectWorkflowMutation = (mutationProps?: CreateProjectWo
 };
 
 interface DeleteWorkflowMutationProps {
-    onSuccess?: (result: void, variables: DeleteProjectWorkflowRequest) => void;
-    onError?: (error: Error, variables: DeleteProjectWorkflowRequest) => void;
+    onSuccess?: (result: void, variables: DeleteWorkflowRequest) => void;
+    onError?: (error: Error, variables: DeleteWorkflowRequest) => void;
 }
 
 export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutationProps) =>
     useMutation({
-        mutationFn: (request: DeleteProjectWorkflowRequest) => {
-            return new WorkflowApi().deleteProjectWorkflow(request);
+        mutationFn: (request: DeleteWorkflowRequest) => {
+            return new WorkflowApi().deleteWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -66,19 +61,6 @@ export const useUpdateWorkflowMutation = (mutationProps?: UpdateWorkflowMutation
         mutationFn: (request: UpdateWorkflowRequest) => {
             return new WorkflowApi().updateWorkflow(request);
         },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-interface UpdateWorkflowNodeOutputsMutationProps {
-    onSuccess?: (result: WorkflowNodeOutputModel[]) => void;
-    onError?: (error: Error) => void;
-}
-
-export const useUpdateWorkflowNodeOutputsMutation = (mutationProps?: UpdateWorkflowNodeOutputsMutationProps) =>
-    useMutation({
-        mutationFn: (request: GetWorkflowNodeOutputsRequest) =>
-            new WorkflowNodeOutputApi().getWorkflowNodeOutputs(request),
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
     });

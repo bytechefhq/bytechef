@@ -13,7 +13,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/middleware/platform/configuration';
-import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
+import {useGetWorkflowQuery} from '@/queries/platform/workflows.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';

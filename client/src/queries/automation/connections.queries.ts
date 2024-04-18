@@ -10,8 +10,8 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
-    connectionTags: ['connectionTags'] as const,
-    connections: ['connections'] as const,
+    connectionTags: ['projectConnectionTags'],
+    connections: ['projectConnections'],
     filteredConnections: (filters: GetConnectionsRequest) => [...ConnectionKeys.connections, filters],
 };
 

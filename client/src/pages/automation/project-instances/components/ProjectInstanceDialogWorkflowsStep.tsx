@@ -1,5 +1,5 @@
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
-import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/workflows.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectInstanceModel} from 'middleware/automation/configuration';
 import {Control, UseFormGetValues, UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';

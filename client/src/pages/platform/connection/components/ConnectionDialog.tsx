@@ -18,11 +18,11 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
+import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/platform/oauth2.queries';
 import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ClipboardIcon} from 'lucide-react';
 import {
