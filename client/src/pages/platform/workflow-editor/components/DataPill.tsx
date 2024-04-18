@@ -29,7 +29,7 @@ const DataPill = ({
 
     const subProperties = property?.properties || property?.items;
 
-    if (!property?.name && (property?.controlType === 'OBJECT_BUILDER' || property?.controlType === 'ARRAY_BUILDER')) {
+    if (!property?.name && property?.controlType === 'ARRAY_BUILDER') {
         property.name = '[index]';
     }
 
@@ -97,14 +97,18 @@ const DataPill = ({
             {!!subProperties?.length && (
                 <ul className="mt-2 flex flex-col space-y-2 border-l border-gray-200 pl-4">
                     {subProperties?.map((subProperty, index) => {
-                        const value = getNestedObject(
+                        let value = getNestedObject(
                             sampleOutput,
                             `${getSubPropertyPath(subProperty.name).replaceAll('/', '.')}`
                         );
 
+                        if (typeof value === 'string') {
+                            value = (value as string).substring(0, 27) + ((value as string).length > 27 ? '...' : '');
+                        }
+
                         return (
                             <div
-                                className="flex items-center space-x-3"
+                                className="flex items-center space-x-2"
                                 key={`${workflowNodeName}-${subProperty.name}-${index}`}
                             >
                                 <DataPill

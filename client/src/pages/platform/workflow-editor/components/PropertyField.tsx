@@ -25,9 +25,13 @@ const PropertyField = ({
     valueToCopy,
     workflowNodeName,
 }: PropertyFieldProps) => {
-    const selector = `${parentPath ? parentPath + '.' : ''}${property.name}`.replace('/', '.');
+    const selector = `${parentPath ? parentPath + '.' : ''}${property.name || '[index]'}`.replace('/', '.');
 
-    const value = property.name && getNestedObject(sampleOutput, selector);
+    let value = getNestedObject(sampleOutput, selector);
+
+    if (typeof value === 'string') {
+        value = (value as string).substring(0, 35) + ((value as string).length > 35 ? '...' : '');
+    }
 
     valueToCopy = valueToCopy || `$\{${workflowNodeName}.${selector}}`;
 
