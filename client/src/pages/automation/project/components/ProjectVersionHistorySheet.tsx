@@ -33,111 +33,45 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                     </SheetTitle>
                 </SheetHeader>
 
-                <Accordion type="single">
-                    {projectVersions &&
-                        projectVersions.map((projectVersion) => (
-                            <AccordionItem
-                                key={projectVersion.version}
-                                value={projectVersion.version?.toString() || ''}
-                            >
-                                <AccordionTrigger>
-                                    <div className="flex w-full items-center justify-between pr-2">
-                                        <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
+                <div className="overflow-y-auto">
+                    <Accordion type="single">
+                        {projectVersions &&
+                            projectVersions.map((projectVersion) => (
+                                <AccordionItem
+                                    key={projectVersion.version}
+                                    value={projectVersion.version?.toString() || ''}
+                                >
+                                    <AccordionTrigger>
+                                        <div className="flex w-full items-center justify-between pr-2">
+                                            <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
 
-                                        <div className="flex items-center space-x-4">
-                                            {projectVersion.publishedDate && (
-                                                <span className="text-sm">
-                                                    {`${projectVersion.publishedDate?.toLocaleDateString()} ${projectVersion.publishedDate?.toLocaleTimeString()}`}
-                                                </span>
-                                            )}
+                                            <div className="flex items-center space-x-4">
+                                                {projectVersion.publishedDate && (
+                                                    <span className="text-sm">
+                                                        {`${projectVersion.publishedDate?.toLocaleDateString()} ${projectVersion.publishedDate?.toLocaleTimeString()}`}
+                                                    </span>
+                                                )}
 
-                                            <Badge
-                                                variant={
-                                                    projectVersion.status === ProjectStatusModel.Published
-                                                        ? 'success'
-                                                        : 'secondary'
-                                                }
-                                            >
-                                                {projectVersion.status === ProjectStatusModel.Published
-                                                    ? `Published`
-                                                    : 'Draft'}
-                                            </Badge>
+                                                <Badge
+                                                    variant={
+                                                        projectVersion.status === ProjectStatusModel.Published
+                                                            ? 'success'
+                                                            : 'secondary'
+                                                    }
+                                                >
+                                                    {projectVersion.status === ProjectStatusModel.Published
+                                                        ? `Published`
+                                                        : 'Draft'}
+                                                </Badge>
+                                            </div>
                                         </div>
-                                    </div>
-                                </AccordionTrigger>
+                                    </AccordionTrigger>
 
-                                <AccordionContent>{projectVersion.description}</AccordionContent>
-                            </AccordionItem>
-                        ))}
-                </Accordion>
-
-                {/*<ul className="flex flex-col divide-y divide-gray-100 overflow-y-auto">*/}
-
-                {/*    {projectVersions &&*/}
-
-                {/*        projectVersions.map((projectVersion) => (*/}
-
-                {/*            <li*/}
-
-                {/*                className="flex w-full cursor-pointer justify-between py-4"*/}
-
-                {/*                key={projectVersion.version}*/}
-
-                {/*            >*/}
-
-                {/*                <Tooltip>*/}
-
-                {/*                    <TooltipTrigger asChild>*/}
-
-                {/*                        <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>*/}
-
-                {/*                    </TooltipTrigger>*/}
-
-                {/*                    {projectVersion.description && (*/}
-
-                {/*                        <TooltipContent side="right">{projectVersion.description}</TooltipContent>*/}
-
-                {/*                    )}*/}
-
-                {/*                </Tooltip>*/}
-
-                {/*                <div className="flex items-center space-x-4">*/}
-
-                {/*                    {projectVersion.publishedDate && (*/}
-
-                {/*                        <span className="text-sm">*/}
-
-                {/*                            {`${projectVersion.publishedDate?.toLocaleDateString()} ${projectVersion.publishedDate?.toLocaleTimeString()}`}*/}
-
-                {/*                        </span>*/}
-
-                {/*                    )}*/}
-
-                {/*                    <Badge*/}
-
-                {/*                        variant={*/}
-
-                {/*                            projectVersion.status === ProjectStatusModel.Published*/}
-
-                {/*                                ? 'success'*/}
-
-                {/*                                : 'secondary'*/}
-
-                {/*                        }*/}
-
-                {/*                    >*/}
-
-                {/*                        {projectVersion.status === ProjectStatusModel.Published ? `Published` : 'Draft'}*/}
-
-                {/*                    </Badge>*/}
-
-                {/*                </div>*/}
-
-                {/*            </li>*/}
-
-                {/*        ))}*/}
-
-                {/*</ul>*/}
+                                    <AccordionContent>{projectVersion.description}</AccordionContent>
+                                </AccordionItem>
+                            ))}
+                    </Accordion>
+                </div>
             </SheetContent>
         </Sheet>
     );
