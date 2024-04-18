@@ -1,10 +1,6 @@
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {OptionModel} from '@/middleware/platform/configuration';
-import {
-    useDeleteWorkflowNodeParameterMutation,
-    useUpdateWorkflowNodeParameterMutation,
-} from '@/mutations/platform/workflowNodeParameters.mutations';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/Properties/components/PropertyComboBox';
@@ -15,16 +11,15 @@ import PropertySelect, {
     SelectOptionType,
 } from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
 import PropertyTextArea from '@/pages/platform/workflow-editor/components/Properties/components/PropertyTextArea';
+import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import {useDataPillPanelStore} from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {WorkflowKeys} from '@/queries/platform/workflows.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -171,21 +166,8 @@ const Property = ({
         }
     });
 
-    const queryClient = useQueryClient();
-
-    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
-        onSuccess: () =>
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            }),
-    });
-
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
-        onSuccess: () =>
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
-            }),
-    });
+    const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
+        useWorkflowNodeParameterMutation();
 
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow) {

@@ -47,6 +47,10 @@ import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
 } from '@/mutations/automation/workflows.mutations';
+import {
+    useDeleteWorkflowNodeParameterMutation,
+    useUpdateWorkflowNodeParameterMutation,
+} from '@/mutations/platform/workflowNodeParameters.mutations';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
@@ -58,6 +62,7 @@ import WorkflowNodesSidebar from '@/pages/platform/workflow-editor/components/Wo
 import WorkflowOutputsSheet from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheet';
 import useUpdatePlatformWorkflowMutation from '@/pages/platform/workflow-editor/mutations/workflows.mutations';
 import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -75,7 +80,7 @@ import {ProjectKeys, useGetProjectQuery} from '@/queries/automation/projects.que
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/queries/platform/workflowTestConfigurations.queries';
-import {useGetWorkflowQuery} from '@/queries/platform/workflows.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/platform/workflows.queries';
 import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {
@@ -511,6 +516,18 @@ const Project = () => {
 
     const queryClient = useQueryClient();
 
+    const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(parseInt(projectId!)),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
+    });
+
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -520,6 +537,18 @@ const Project = () => {
             setShowEditWorkflowDialog(false);
         },
         workflowId: workflow.id!,
+    });
+
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(parseInt(projectId!)),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowKeys.workflow(workflow.id!),
+            });
+        },
     });
 
     useEffect(() => {
@@ -611,11 +640,18 @@ const Project = () => {
                                             updateWorkflowMutation,
                                         }}
                                     >
-                                        <WorkflowEditorLayout
-                                            componentDefinitions={componentDefinitions}
-                                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                            updateWorkflowMutation={updateWorkflowMutation}
-                                        />
+                                        <WorkflowNodeParameterMutationProvider
+                                            value={{
+                                                deleteWorkflowNodeParameterMutation,
+                                                updateWorkflowNodeParameterMutation,
+                                            }}
+                                        >
+                                            <WorkflowEditorLayout
+                                                componentDefinitions={componentDefinitions}
+                                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                                updateWorkflowMutation={updateWorkflowMutation}
+                                            />
+                                        </WorkflowNodeParameterMutationProvider>
                                     </WorkflowMutationProvider>
                                 </ConnectionReactQueryProvider>
                             </ResizablePanel>

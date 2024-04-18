@@ -25,9 +25,6 @@ interface WorkflowDataStateI {
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
-    workflowDirty: boolean;
-    setWorkflowDirty: (dirty: boolean) => void;
-
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
 
@@ -46,9 +43,6 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
             componentDefinitions: [],
             setComponentDefinitions: (componentDefinitions) => set((state) => ({...state, componentDefinitions})),
-
-            workflowDirty: false,
-            setWorkflowDirty: (workflowDirty) => set((state) => ({...state, workflowDirty})),
 
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
