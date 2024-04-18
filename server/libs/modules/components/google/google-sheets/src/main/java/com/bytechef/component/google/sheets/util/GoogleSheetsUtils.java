@@ -35,6 +35,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
@@ -112,15 +113,28 @@ public class GoogleSheetsUtils {
                 .range(0, row.size())
                 .boxed()
                 .collect(
-                    Collectors.toMap(i -> String.valueOf(firstRow.get(i)), row::get, (a, b) -> b, LinkedHashMap::new));
+                    Collectors.toMap(i -> String.valueOf(firstRow.get(i)), i -> row.get(i)
+                        .toString(), (a, b) -> b, LinkedHashMap::new));
         } else {
             valuesMap = IntStream
                 .range(0, row.size())
                 .boxed()
-                .collect(Collectors.toMap(i -> columnToLabel(i + 1), row::get, (a, b) -> b, LinkedHashMap::new));
+                .collect(
+                    Collectors.toMap(i -> columnToLabel(i + 1), i -> row.get(i)
+                        .toString(), (a, b) -> b, LinkedHashMap::new));
         }
 
         return valuesMap;
+    }
+
+    public static List<Map<String, Object>> getMapOfValuesForRowAndColumn(
+        Parameters inputParameters, Sheets sheets, List<List<Object>> values, int currentRowNum, int newRowNum)
+        throws IOException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (int i = currentRowNum; i < newRowNum; i++) {
+            list.add(getMapOfValuesForRow(inputParameters, sheets, values.get(i)));
+        }
+        return list;
     }
 
     public static List<Object> getRowValues(Parameters inputParameters) {
@@ -181,9 +195,55 @@ public class GoogleSheetsUtils {
         return options;
     }
 
+    public static List<Option<String>> getSheetNameOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, TriggerContext context) throws IOException {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        List<Sheet> sheetsList = GoogleServices.getSheets(connectionParameters)
+            .spreadsheets()
+            .get(inputParameters.getRequiredString(SPREADSHEET_ID))
+            .execute()
+            .getSheets();
+
+        for (Sheet sheet : sheetsList) {
+            SheetProperties sheetProperties = sheet.getProperties();
+
+            String sheetTitle = sheetProperties.getTitle();
+
+            options.add(option(sheetTitle, sheetTitle));
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getSpreadsheetIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context)
+        throws IOException {
+
+        List<File> files = GoogleServices.getDrive(connectionParameters)
+            .files()
+            .list()
+            .setQ("mimeType='application/vnd.google-apps.spreadsheet'")
+            .setIncludeItemsFromAllDrives(inputParameters.getBoolean(INCLUDE_ITEMS_FROM_ALL_DRIVES))
+            .setSupportsAllDrives(true)
+            .execute()
+            .getFiles();
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (File file : files) {
+            options.add(option(file.getName(), file.getId()));
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getSpreadsheetIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, TriggerContext context)
         throws IOException {
 
         List<File> files = GoogleServices.getDrive(connectionParameters)
@@ -214,5 +274,19 @@ public class GoogleSheetsUtils {
         }
 
         return "column_" + columnName;
+    }
+
+    public static List<List<Object>> getAll(Sheets sheets, String spreadSheetId, String sheetName)
+        throws IOException {
+
+        return sheets
+            .spreadsheets()
+            .values()
+            .get(spreadSheetId, sheetName)
+            .setValueRenderOption("UNFORMATTED_VALUE")
+            .setDateTimeRenderOption("FORMATTED_STRING")
+            .setMajorDimension("ROWS")
+            .execute()
+            .getValues();
     }
 }
