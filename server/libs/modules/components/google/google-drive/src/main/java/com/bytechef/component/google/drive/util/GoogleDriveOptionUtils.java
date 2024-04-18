@@ -41,8 +41,7 @@ public class GoogleDriveOptionUtils {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        return drive
-            .files()
+        return drive.files()
             .list()
             .setQ("mimeType != 'application/vnd.google-apps.folder'")
             .execute()
@@ -58,8 +57,7 @@ public class GoogleDriveOptionUtils {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
-        return drive
-            .files()
+        return drive.files()
             .list()
             .setQ("mimeType = 'application/vnd.google-apps.folder'")
             .execute()
