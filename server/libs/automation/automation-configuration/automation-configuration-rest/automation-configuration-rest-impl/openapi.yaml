@@ -614,30 +614,6 @@ paths:
             application/json:
               schema:
                 $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
-  /projects/{id}/workflows/{workflowId}:
-    delete:
-      description: "Delete a workflow."
-      summary: "Delete a workflow"
-      tags:
-        - "workflow"
-      operationId: "deleteProjectWorkflow"
-      parameters:
-        - name: "id"
-          description: "The id of a project."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowId"
-          description: "The id of the workflow to delete."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
   /projects/{id}/workflows/{workflowId}/duplicate:
     post:
       description: "Duplicates existing workflow."
@@ -696,23 +672,30 @@ paths:
                 type: "array"
                 items:
                   $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
-  /workflows:
-    get:
-      description: "Get workflow definitions."
-      summary: "Get workflow definitions"
+  /workflows/{id}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
       tags:
         - "workflow"
-      operationId: "getWorkflows"
+      operationId: "deleteWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
       responses:
         "200":
-          description: "The list of workflows."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
-  /workflows/{id}:
+          description: "Successful operation."
     get:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
