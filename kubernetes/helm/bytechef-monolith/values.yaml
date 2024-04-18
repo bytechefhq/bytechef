@@ -105,3 +105,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Helm Variables
+# Used to set ENVIRONMENT VARIABLES for ByteChef Qube
+datasourceJdbcUrl: overrideWithQubinetsValues
+webResourceUrl: overrideWithQubinetsValues
