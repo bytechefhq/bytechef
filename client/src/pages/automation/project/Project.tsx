@@ -715,15 +715,30 @@ const Project = () => {
                     )}
 
                     {projectId && showWorkflowInputsSheet && (
-                        <WorkflowInputsSheet
-                            onClose={() => setShowWorkflowInputsSheet(false)}
-                            workflow={workflow}
-                            workflowTestConfiguration={workflowTestConfiguration}
-                        />
+                        <WorkflowMutationProvider
+                            value={{
+                                updateWorkflowMutation,
+                            }}
+                        >
+                            <WorkflowInputsSheet
+                                onClose={() => setShowWorkflowInputsSheet(false)}
+                                workflow={workflow}
+                                workflowTestConfiguration={workflowTestConfiguration}
+                            />
+                        </WorkflowMutationProvider>
                     )}
 
                     {projectId && showWorkflowOutputsSheet && (
-                        <WorkflowOutputsSheet onClose={() => setShowWorkflowOutputsSheet(false)} workflow={workflow} />
+                        <WorkflowMutationProvider
+                            value={{
+                                updateWorkflowMutation,
+                            }}
+                        >
+                            <WorkflowOutputsSheet
+                                onClose={() => setShowWorkflowOutputsSheet(false)}
+                                workflow={workflow}
+                            />
+                        </WorkflowMutationProvider>
                     )}
                 </>
             )}
