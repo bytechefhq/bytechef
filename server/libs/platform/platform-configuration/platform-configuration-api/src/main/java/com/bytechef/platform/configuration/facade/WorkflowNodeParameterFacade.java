@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -29,6 +30,7 @@ public interface WorkflowNodeParameterFacade {
     UpdateParameterResult updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
 
+    @SuppressFBWarnings("EI")
     record UpdateParameterResult(Map<String, ?> displayConditionMap, Map<String, ?> parameterMap) {
     }
 }

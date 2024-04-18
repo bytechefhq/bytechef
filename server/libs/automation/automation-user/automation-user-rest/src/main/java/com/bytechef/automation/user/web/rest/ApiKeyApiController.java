@@ -54,8 +54,7 @@ public class ApiKeyApiController implements ApiKeyApi {
 
         apiKey.setType(Type.AUTOMATION);
 
-        return ResponseEntity.ok(
-            new CreateApiKey200ResponseModel().secretKey(apiKeyService.create(apiKey)));
+        return ResponseEntity.ok(new CreateApiKey200ResponseModel().secretKey(apiKeyService.create(apiKey)));
     }
 
     @Override
@@ -91,8 +90,7 @@ public class ApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<ApiKeyModel> updateApiKey(Long id, ApiKeyModel appEventModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                apiKeyService.update(
-                    conversionService.convert(appEventModel.id(id), ApiKey.class)),
+                apiKeyService.update(conversionService.convert(appEventModel.id(id), ApiKey.class)),
                 ApiKeyModel.class));
     }
 
