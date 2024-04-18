@@ -16,10 +16,10 @@ tags:
   description: "The Platform Task Dispatcher Definition API"
 - name: "trigger-definition"
   description: "The Platform Trigger Definition API"
+- name: "workflow"
+  description: "The Platform Workflow API"
 - name: "workflow-node-description"
   description: "The Platform Workflow Node Description API"
-- name: "workflow-node-display-condition"
-  description: "The Platform Workflow Node Display Condition API"
 - name: "workflow-node-dynamic-properties"
   description: "The Platform Workflow Node Dynamic Properties API"
 - name: "workflow-node-option"
@@ -603,6 +603,53 @@ paths:
       responses:
         "200":
           description: "Successful operation."
+  /workflows/{id}:
+    get:
+      description: "Get a workflow by id."
+      summary: "Get a workflow by id"
+      tags:
+        - "workflow"
+      operationId: "getWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to get."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to update."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Workflow"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
   /workflows/{id}/descriptions/{workflowNodeName}:
     get:
       description: "Get an action description shown in the editor."
@@ -633,43 +680,6 @@ paths:
                 properties:
                   description:
                     type: string
-  /workflows/{id}/display-conditions/{workflowNodeName}:
-    post:
-      description: "Evaluate display condition for an action or trigger property."
-      summary: "Evaluate display condition for an action or trigger property"
-      tags:
-        - "workflow-node-display-condition"
-      operationId: "evaluateWorkflowNodeDisplayCondition"
-      parameters:
-        - name: "id"
-          description: "The workflow id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "workflowNodeName"
-          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              required:
-                - displayCondition
-              properties:
-                displayCondition:
-                  type: "string"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "boolean"
   /workflows/{id}/dynamic-properties/{workflowNodeName}/properties/{propertyName}:
     get:
       description: "Get dynamic properties for an action or trigger property shown in the editor."
