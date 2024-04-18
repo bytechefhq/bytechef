@@ -36,6 +36,11 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: "BYTECHEF_DATASOURCE_URL"
+              value: {{ .Values.datasourceJdbcUrl }}
+            - name: "BYTECHEF_RESOURCES_WEB"
+              value: {{ .Values.webResourceUrl }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
