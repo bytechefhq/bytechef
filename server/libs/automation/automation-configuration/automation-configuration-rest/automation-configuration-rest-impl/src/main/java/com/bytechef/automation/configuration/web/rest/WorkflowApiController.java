@@ -59,7 +59,7 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteProjectWorkflow(Long id, String workflowId) {
+    public ResponseEntity<Void> deleteWorkflow(Long id, String workflowId) {
         projectFacade.deleteWorkflow(id, workflowId);
 
         return ResponseEntity.noContent()
@@ -90,15 +90,6 @@ public class WorkflowApiController implements WorkflowApi {
     @Override
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowFacade);
-    }
-
-    @Override
-    public ResponseEntity<List<WorkflowBasicModel>> getWorkflows() {
-        return ResponseEntity.ok(
-            projectFacade.getProjectWorkflows()
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowBasicModel.class))
-                .toList());
     }
 
     @Override

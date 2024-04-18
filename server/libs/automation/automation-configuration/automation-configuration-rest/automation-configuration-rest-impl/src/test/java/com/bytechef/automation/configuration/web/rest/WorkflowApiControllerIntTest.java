@@ -28,7 +28,6 @@ import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -107,25 +106,6 @@ public class WorkflowApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(WorkflowModel.class);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetWorkflows() {
-        when(projectFacade.getProjectWorkflows())
-            .thenReturn(List.of(getWorkflow()));
-
-        try {
-            this.webTestClient
-                .get()
-                .uri("/workflows")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(WorkflowBasicModel.class)
-                .hasSize(1);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
