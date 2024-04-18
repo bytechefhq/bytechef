@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableDynamicPropertie
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 
 /**
@@ -69,6 +70,12 @@ public class GoogleSheetsConstants {
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
         .required(true);
 
+    public static final ModifiableStringProperty SPREADSHEET_ID_PROPERTY_TRIGGER = string(SPREADSHEET_ID)
+        .label("Spreadsheet")
+        .description("The spreadsheet to apply the updates to.")
+        .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
+        .required(true);
+
     public static final ModifiableIntegerProperty SHEET_ID_PROPERTY = integer(SHEET_ID)
         .label("Sheet")
         .description("The name of the sheet")
@@ -79,6 +86,12 @@ public class GoogleSheetsConstants {
         .label("Sheet")
         .description("The name of the sheet")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
+        .required(true);
+
+    public static final ModifiableStringProperty SHEET_NAME_PROPERTY_TRIGGER = string(SHEET_NAME)
+        .label("Sheet")
+        .description("The name of the sheet")
+        .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty ROW_PROPERTY = dynamicProperties(ROW)
