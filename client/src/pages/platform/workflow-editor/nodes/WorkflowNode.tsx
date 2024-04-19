@@ -153,7 +153,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                         <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers id={id}>
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                                title="Edit a trigger"
+                                title="Change trigger component"
                                 variant="outline"
                             >
                                 <PencilIcon className="size-4" />
