@@ -11,6 +11,7 @@ type NodeType = {
     id: string;
     label?: string;
     name: string;
+    trigger?: boolean;
     type: 'component' | 'flowControl';
     version: number;
 };
