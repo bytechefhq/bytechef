@@ -8,6 +8,7 @@ const defaultNodes: Node[] = [
             id: 'manual',
             label: 'Manual Trigger',
             name: 'manual',
+            trigger: true,
             type: 'trigger',
         },
         id: 'manual',
