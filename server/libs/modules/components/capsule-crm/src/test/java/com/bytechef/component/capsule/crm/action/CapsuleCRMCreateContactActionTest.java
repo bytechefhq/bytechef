@@ -21,14 +21,13 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.AD
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.EMAIL_ADDRESSES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
+import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTIES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PHONE_NUMBERS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
-import java.util.HashMap;
+import com.bytechef.component.definition.Context.Http;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -39,18 +38,12 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
+        when(mockedParameters.getMap(NAME_PROPERTIES, String.class))
+            .thenReturn(Map.of(FIRST_NAME, "fname", LAST_NAME,  "lname"));
         when(mockedParameters.getRequiredString(TYPE))
-            .thenReturn((String) propertyStubsMap.get(TYPE));
-        when(mockedParameters.getString(FIRST_NAME))
-            .thenReturn((String) propertyStubsMap.get(FIRST_NAME));
-        when(mockedParameters.getString(LAST_NAME))
-            .thenReturn((String) propertyStubsMap.get(LAST_NAME));
-        when(mockedParameters.getString(NAME))
-            .thenReturn(null);
+            .thenReturn("type");
         when(mockedParameters.getString(ABOUT))
-            .thenReturn((String) propertyStubsMap.get(ABOUT));
+            .thenReturn("about");
         when(mockedParameters.getList(EMAIL_ADDRESSES))
             .thenReturn(null);
         when(mockedParameters.getList(ADDRESSES))
@@ -62,20 +55,14 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of("party", propertyStubsMap), body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(TYPE, "type");
-        propertyStubsMap.put(FIRST_NAME, "firstName");
-        propertyStubsMap.put(LAST_NAME, "lastName");
-        propertyStubsMap.put(ABOUT, "about");
-
-        return propertyStubsMap;
+        assertEquals(Map.of("party",
+            Map.of(
+            TYPE, "type",
+            FIRST_NAME, "fname",
+            LAST_NAME, "lname",
+            ABOUT, "about")), body.getContent());
     }
 
 }
