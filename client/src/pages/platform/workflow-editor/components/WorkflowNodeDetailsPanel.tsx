@@ -29,6 +29,7 @@ import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
+import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinitions.queries';
 
 const TABS = [
     {
@@ -73,9 +74,23 @@ const WorkflowNodeDetailsPanel = ({
     const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
+    // console.log('currentNode: ', currentNode);
+
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.componentName || currentNode.id,
     });
+
+    const {data: triggerDefinition} = useGetTriggerDefinitionQuery(
+        {
+            componentName: currentNode.componentName!,
+            componentVersion: 1,
+            triggerName: componentDefinition?.triggers?.[0]?.name,
+        },
+        !!currentNode.componentName && currentNode.trigger && !!componentDefinition?.triggers?.length
+    );
+
+    // console.log('componentDefinition: ', componentDefinition);
+    console.log('triggerDefinition: ', triggerDefinition);
 
     const {componentActions, components, dataPills, setComponentActions, setComponents, setDataPills, workflow} =
         useWorkflowDataStore();
@@ -412,6 +427,8 @@ const WorkflowNodeDetailsPanel = ({
                     </header>
 
                     <main className="flex h-full flex-col">
+                        {console.log('currentComponentDefinition: ', currentComponentDefinition)}
+
                         {!!currentComponentDefinition.actions?.length && (
                             <CurrentActionSelect
                                 actions={currentComponentDefinition.actions}
