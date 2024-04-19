@@ -19,16 +19,18 @@ package com.bytechef.component.capsule.crm.util;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.BASE_URL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME_PROPERTY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME_PROPERTY;
+import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTY;
+import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PERSON;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +43,12 @@ public class CapsuleCRMUtils {
     private CapsuleCRMUtils() {
     }
 
-    public static List<Property.ValueProperty<?>> createNameProperties(
+    public static List<ValueProperty<?>> createNameProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String type = inputParameters.getRequiredString(TYPE);
 
-        if (type.equals("person")) {
+        if (type.equals(PERSON)) {
             return List.of(FIRST_NAME_PROPERTY, LAST_NAME_PROPERTY);
         } else {
             return List.of(NAME_PROPERTY);
@@ -60,12 +62,14 @@ public class CapsuleCRMUtils {
             context.http(http -> http.get(BASE_URL + "/countries"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody(new Context.TypeReference<>() {});
+                .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : body.getOrDefault("countries", List.of())) {
-            options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("name"))));
+            String name = String.valueOf(map.get(NAME));
+
+            options.add(option(name, name));
         }
 
         return options;

@@ -29,6 +29,7 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LA
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTIES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NUMBER;
+import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PERSON;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PHONE_NUMBERS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STATE;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STREET;
@@ -53,7 +54,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
@@ -70,7 +71,7 @@ public class CapsuleCRMCreateContactAction {
                 .label("Type")
                 .description("Represents if this party is a person or an organisation.")
                 .options(
-                    option("Person", "person"),
+                    option("Person", PERSON),
                     option("Organization", "organization"))
                 .required(true),
             dynamicProperties(NAME_PROPERTIES)
@@ -130,8 +131,7 @@ public class CapsuleCRMCreateContactAction {
                             string(COUNTRY)
                                 .label("Country")
                                 .description("The country of the address.")
-                                .options(
-                                    (OptionsDataSource.ActionOptionsFunction<String>) CapsuleCRMUtils::getCountryOptions)
+                                .options((ActionOptionsFunction<String>) CapsuleCRMUtils::getCountryOptions)
                                 .required(false),
                             string(ZIP)
                                 .label("Zip")
