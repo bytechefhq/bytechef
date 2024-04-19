@@ -15,7 +15,6 @@ interface PropertyDynamicPropertiesProps {
     currentNodeConnectionId?: number;
     loadDependsOnValues?: Array<string>;
     name?: string;
-    propertiesDataSource?: PropertiesDataSourceModel;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameterValue?: any;
 }
@@ -28,7 +27,6 @@ const PropertyDynamicProperties = ({
     loadDependsOnValues,
     name,
     parameterValue,
-    propertiesDataSource,
 }: PropertyDynamicPropertiesProps) => {
     const [subProperties, setSubProperties] = useState<PropertyModel[]>();
 
@@ -44,8 +42,7 @@ const PropertyDynamicProperties = ({
                 workflowNodeName: currentNode.name!,
             },
         },
-        !!propertiesDataSource &&
-            !!(loadDependsOnValues ?? []).length &&
+        !!(loadDependsOnValues ?? []).length &&
             (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
             !!currentNodeConnectionId
     );

@@ -32,7 +32,6 @@ interface PropertyComboBoxProps {
     onBlur?: FocusEventHandler;
     onValueChange?: (value: string) => void;
     options: Array<OptionModel>;
-    optionsDataSource?: OptionsDataSourceModel;
     path?: string;
     placeholder?: string;
     required?: boolean;
@@ -53,7 +52,6 @@ const PropertyComboBox = ({
     onBlur,
     onValueChange,
     options,
-    optionsDataSource,
     path,
     placeholder = 'Select...',
     required,
@@ -70,7 +68,8 @@ const PropertyComboBox = ({
             path = path.substring(0, path.lastIndexOf('.')) + '_[0]';
         }
     }
-
+    // console.log(`${path} ${name}`)
+    //     console.log(loadDependsOnValues)
     const {
         data: optionsData,
         isLoading,
@@ -84,8 +83,7 @@ const PropertyComboBox = ({
                 workflowNodeName,
             },
         },
-        !!optionsDataSource &&
-            (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
+        (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
             !!currentNodeConnectionId
     );
 
@@ -143,25 +141,25 @@ const PropertyComboBox = ({
                             </div>
                         )}
 
-                        {optionsDataSource && loadDependsOnValues && isRefetching && !currentOption?.label && (
+                        {loadDependsOnValues && isRefetching && !currentOption?.label && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Refetching...
                             </span>
                         )}
 
-                        {optionsDataSource && isLoading && (
+                        {loadDependsOnValues && isLoading && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Loading...
                             </span>
                         )}
 
-                        {!optionsDataSource && !options.length && (
+                        {!loadDependsOnValues && !options.length && (
                             <span className="rounded-md border p-2 text-sm text-muted-foreground">
                                 No options available
                             </span>
                         )}
 
-                        {((optionsDataSource && !isLoading) || !optionsDataSource) && (
+                        {((loadDependsOnValues && !isLoading) || !loadDependsOnValues) && (
                             <>
                                 {currentOption ? (
                                     <span className={twMerge('flex w-full items-center', leadingIcon && 'ml-9')}>

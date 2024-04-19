@@ -448,9 +448,14 @@ const Property = ({
 
     useEffect(() => {
         if (optionsDataSource?.loadOptionsDependsOn) {
-            const loadDependsOnValues = optionsDataSource?.loadOptionsDependsOn.map(
-                (key) => currentComponent?.parameters?.[key]
-            );
+            const loadDependsOnValues = optionsDataSource?.loadOptionsDependsOn.map((key) => {
+                return key
+                    .split('.')
+                    .reduce((acc, key) => {
+                        return acc && acc[key];
+                    }, currentComponent?.parameters ?? {})
+                    ?.toString();
+            });
 
             setLoadDependsOnValues(loadDependsOnValues);
         }
@@ -458,9 +463,14 @@ const Property = ({
 
     useEffect(() => {
         if (propertiesDataSource?.loadPropertiesDependsOn) {
-            const loadDependsOnValues = propertiesDataSource?.loadPropertiesDependsOn.map(
-                (key) => currentComponent?.parameters?.[key]
-            );
+            const loadDependsOnValues = propertiesDataSource?.loadPropertiesDependsOn.map((key) => {
+                return key
+                    .split('.')
+                    .reduce((acc, key) => {
+                        return acc && acc[key];
+                    }, currentComponent?.parameters ?? {})
+                    ?.toString();
+            });
 
             setLoadDependsOnValues(loadDependsOnValues);
         }
@@ -663,11 +673,9 @@ const Property = ({
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                loadDependsOnValues={loadDependsOnValues}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
-                                optionsDataSource={optionsDataSource}
                                 path={path}
                                 required={required}
                                 value={selectValue}
@@ -688,7 +696,6 @@ const Property = ({
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
-                                optionsDataSource={optionsDataSource}
                                 path={path}
                                 required={required}
                                 value={selectValue}
@@ -741,7 +748,6 @@ const Property = ({
                         loadDependsOnValues={loadDependsOnValues}
                         name={name}
                         parameterValue={parameterValue}
-                        propertiesDataSource={property.propertiesDataSource}
                     />
                 )}
 
