@@ -109,7 +109,7 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
                                             .options((ActionOptionsFunction<Long>) ShopifyUtils::getProductIdOptions);
                                     } else if (Objects.equals(baseProperty3.getName(), "variant_id")) {
                                         ((ModifiableIntegerProperty) baseProperty3)
-                                            .loadOptionsDependsOn(PRODUCT_ID)
+                                            .loadOptionsDependsOn("__item.order.line_items[index]." + PRODUCT_ID)
                                             .options((ActionOptionsFunction<Long>) ShopifyUtils::getVariantIdOptions);
                                     }
                                 }
