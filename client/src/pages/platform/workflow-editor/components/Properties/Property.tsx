@@ -44,7 +44,7 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
 ];
 
 interface PropertyProps {
-    actionName?: string;
+    operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
     currentComponentDefinition?: CurrentComponentDefinitionType;
@@ -63,7 +63,6 @@ interface PropertyProps {
 }
 
 const Property = ({
-    actionName,
     arrayIndex,
     arrayName,
     currentComponent,
@@ -73,6 +72,7 @@ const Property = ({
     formState,
     inputTypeSwitchButtonClassName,
     objectName,
+    operationName,
     parameterValue,
     path = 'parameters',
     property,
@@ -591,13 +591,13 @@ const Property = ({
 
                         {controlType === 'OBJECT_BUILDER' && (
                             <ObjectProperty
-                                actionName={actionName}
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
                                 currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
                                 onDeleteClick={handleDelete}
+                                operationName={operationName}
                                 parameterValue={parameterValue}
                                 path={path}
                                 property={property}
@@ -606,10 +606,10 @@ const Property = ({
 
                         {type === 'FILE_ENTRY' && (
                             <ObjectProperty
-                                actionName={actionName}
                                 currentComponent={currentComponent}
                                 currentComponentDefinition={currentComponentDefinition}
                                 dataPills={dataPills}
+                                operationName={operationName}
                                 property={property}
                             />
                         )}
@@ -733,10 +733,10 @@ const Property = ({
 
                 {type === 'DYNAMIC_PROPERTIES' && currentComponentDefinition && currentComponent && (
                     <PropertyDynamicProperties
-                        currentActionName={actionName}
                         currentComponent={currentComponent}
                         currentComponentDefinition={currentComponentDefinition}
                         currentNodeConnectionId={currentNode.connectionId}
+                        currentOperationName={operationName}
                         loadDependsOnValues={loadDependsOnValues}
                         name={name}
                         parameterValue={parameterValue}
