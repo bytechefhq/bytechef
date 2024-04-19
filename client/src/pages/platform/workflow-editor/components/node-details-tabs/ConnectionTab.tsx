@@ -53,12 +53,12 @@ const ConnectionLabel = ({
 };
 
 const ConnectionSelect = ({
-    taskConnection,
+    workflowConnection,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: {
-    taskConnection: WorkflowConnectionModel;
+    workflowConnection: WorkflowConnectionModel;
     workflowId: string;
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnectionModel;
@@ -77,10 +77,10 @@ const ConnectionSelect = ({
     }
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: taskConnection.componentName,
-        componentVersion: taskConnection.componentVersion,
+        componentName: workflowConnection.componentName,
+        componentVersion: workflowConnection.componentVersion,
     });
-
+    console.log(componentDefinition);
     const {data: connections} = useGetConnectionsQuery!(
         {
             componentName: componentDefinition?.name,
@@ -120,8 +120,8 @@ const ConnectionSelect = ({
     return (
         <>
             <Select
-                onValueChange={(value) => handleValueChange(+value, taskConnection.key)}
-                required={taskConnection.required}
+                onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
+                required={workflowConnection.required}
                 value={connectionId ? connectionId.toString() : undefined}
             >
                 <div className="flex space-x-2">
@@ -129,18 +129,20 @@ const ConnectionSelect = ({
                         <SelectValue placeholder="Choose Connection..." />
                     </SelectTrigger>
 
-                    <ConnectionDialog
-                        componentDefinition={componentDefinition}
-                        connectionTagsQueryKey={ConnectionKeys!.connectionTags}
-                        connectionsQueryKey={ConnectionKeys!.connections}
-                        triggerNode={
-                            <Button className="mt-auto p-2" title="Create a new connection" variant="outline">
-                                <PlusIcon className="size-5" />
-                            </Button>
-                        }
-                        useCreateConnectionMutation={useCreateConnectionMutation}
-                        useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
-                    />
+                    {componentDefinition && (
+                        <ConnectionDialog
+                            componentDefinition={componentDefinition}
+                            connectionTagsQueryKey={ConnectionKeys!.connectionTags}
+                            connectionsQueryKey={ConnectionKeys!.connections}
+                            triggerNode={
+                                <Button className="mt-auto p-2" title="Create a new connection" variant="outline">
+                                    <PlusIcon className="size-5" />
+                                </Button>
+                            }
+                            useCreateConnectionMutation={useCreateConnectionMutation}
+                            useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
+                        />
+                    )}
                 </div>
 
                 <SelectContent>
@@ -185,15 +187,15 @@ const ConnectionTab = ({
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
             {workflowConnections?.length ? (
-                workflowConnections.map((taskConnection) => (
-                    <fieldset className="space-y-2" key={taskConnection.key}>
+                workflowConnections.map((workflowConnection) => (
+                    <fieldset className="space-y-2" key={workflowConnection.key}>
                         <ConnectionLabel
-                            workflowConnection={taskConnection}
+                            workflowConnection={workflowConnection}
                             workflowConnectionsCount={workflowConnections.length}
                         />
 
                         <ConnectionSelect
-                            taskConnection={taskConnection}
+                            workflowConnection={workflowConnection}
                             workflowId={workflowId}
                             workflowNodeName={workflowNodeName}
                             workflowTestConfigurationConnection={
@@ -201,7 +203,7 @@ const ConnectionTab = ({
                                     ? workflowTestConfigurationConnections.filter(
                                           (workflowTestConfigurationConnection) =>
                                               workflowTestConfigurationConnection.workflowConnectionKey ===
-                                              taskConnection.key
+                                              workflowConnection.key
                                       )[0]
                                     : undefined
                             }
