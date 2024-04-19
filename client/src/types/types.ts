@@ -35,7 +35,7 @@ export type ComponentActionType = {
 };
 
 export type ComponentType = {
-    actionName: string;
+    actionName: string; // rename to operationName
     componentName: string;
     icon?: JSX.Element | string;
     notes?: string;
