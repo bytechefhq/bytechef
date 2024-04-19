@@ -45,8 +45,5 @@ export const WorkflowNodeParameterMutationProvider = ({
 export const useWorkflowNodeParameterMutation = () => {
     const context = useContext(WorkflowNodeParameterMutationProviderContext);
 
-    if (context === undefined)
-        throw new Error('useWorkflowNodeParameterMutation must be used within a WorkflowNodeParameterMutationProvider');
-
-    return context;
+    return context || {};
 };
