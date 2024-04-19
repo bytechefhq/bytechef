@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.discord.constant.DiscordConstants.BASE_URL;
 import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
+import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.SEND_DIRECT_MESSAGE;
@@ -49,6 +50,7 @@ public class DiscordSendDirectMessageAction {
             string(RECIPIENT_ID)
                 .label("Recipient")
                 .description("The recipient to open a DM channel with")
+                .loadOptionsDependsOn(GUILD_ID)
                 .options((ActionOptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions)
                 .required(true),
             string(CONTENT)
