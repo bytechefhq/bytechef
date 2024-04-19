@@ -38,14 +38,8 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
     const {data: workflow} = useGetWorkflowQuery(workflowId);
 
     const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
-        .flatMap((task) => {
-            return task.connections ?? [];
-        })
-        .concat(
-            (workflow?.triggers ?? []).flatMap((trigger) => {
-                return trigger.connections ?? [];
-            })
-        );
+        .flatMap((task) => task.connections ?? [])
+        .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
     return (
         <div>
