@@ -18,10 +18,19 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
             return;
         }
 
+        let nodeData = data;
+
+        if (currentNode.position.y === 0) {
+            nodeData = {
+                ...data,
+                trigger: true,
+            };
+        }
+
         setRightSidebarOpen(false);
 
         setWorkflowNodeDetailsPanelOpen(true);
 
-        setCurrentNode(data);
+        setCurrentNode(nodeData);
     }, [data, getNode, id, setCurrentNode, setWorkflowNodeDetailsPanelOpen, setRightSidebarOpen]);
 }
