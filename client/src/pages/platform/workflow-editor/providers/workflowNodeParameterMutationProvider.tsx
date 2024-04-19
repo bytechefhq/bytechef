@@ -5,16 +5,16 @@ import {
     UpdateWorkflowNodeParameterRequest,
 } from '@/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
-import {createContext, useContext} from 'react';
+import {ReactNode, createContext, useContext} from 'react';
 
 export interface WorkflowNodeParameterMutationStateI {
-    deleteWorkflowNodeParameterMutation: UseMutationResult<
+    deleteWorkflowNodeParameterMutation?: UseMutationResult<
         DeleteWorkflowNodeParameter200ResponseModel,
         Error,
         DeleteWorkflowNodeParameterRequest,
         unknown
     >;
-    updateWorkflowNodeParameterMutation: UseMutationResult<
+    updateWorkflowNodeParameterMutation?: UseMutationResult<
         UpdateWorkflowNodeParameter200ResponseModel,
         Error,
         UpdateWorkflowNodeParameterRequest,
@@ -23,7 +23,7 @@ export interface WorkflowNodeParameterMutationStateI {
 }
 
 export interface WorkflowNodeParameterMutationProviderProps {
-    children: React.ReactNode;
+    children: ReactNode;
     value: WorkflowNodeParameterMutationStateI;
 }
 
