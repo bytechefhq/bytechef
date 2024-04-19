@@ -67,11 +67,11 @@ const WorkflowEditorLayout = ({
         const workflowComponents = workflow.tasks?.map((task) => {
             const {label, name, parameters, type} = task;
 
-            const [componentName, actionName] = type.split('/v1/');
+            const [componentName, operationName] = type.split('/v1/');
 
             return {
-                actionName,
                 componentName,
+                operationName,
                 parameters,
                 title: label,
                 type,

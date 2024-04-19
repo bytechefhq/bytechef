@@ -9,7 +9,7 @@ import {useEffect, useState} from 'react';
 import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
-    currentActionName?: string;
+    currentOperationName?: string;
     currentComponentDefinition: CurrentComponentDefinitionType;
     currentComponent: ComponentType;
     currentNodeConnectionId?: number;
@@ -21,10 +21,10 @@ interface PropertyDynamicPropertiesProps {
 }
 
 const PropertyDynamicProperties = ({
-    currentActionName,
     currentComponent,
     currentComponentDefinition,
     currentNodeConnectionId,
+    currentOperationName,
     loadDependsOnValues,
     name,
     parameterValue,
@@ -69,11 +69,11 @@ const PropertyDynamicProperties = ({
 
                 return (
                     <Property
-                        actionName={currentActionName}
                         currentComponent={currentComponent}
                         currentComponentDefinition={currentComponentDefinition}
                         key={`${property.name}_${index}_${(loadDependsOnValues ?? []).join('')}`}
                         objectName={name}
+                        operationName={currentOperationName}
                         parameterValue={propertyDefaultValue}
                         path={name}
                         property={property}

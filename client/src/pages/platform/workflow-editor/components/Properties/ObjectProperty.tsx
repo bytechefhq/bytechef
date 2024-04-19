@@ -32,7 +32,7 @@ const PROPERTY_CONTROL_TYPES = {
 };
 
 interface ObjectPropertyProps {
-    actionName?: string;
+    operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
     currentComponentDefinition?: CurrentComponentDefinitionType;
@@ -46,13 +46,13 @@ interface ObjectPropertyProps {
 }
 
 const ObjectProperty = ({
-    actionName,
     arrayIndex,
     arrayName,
     currentComponent,
     currentComponentDefinition,
     dataPills,
     onDeleteClick,
+    operationName,
     parameterValue,
     path,
     property,
@@ -156,7 +156,6 @@ const ObjectProperty = ({
                     return (
                         <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
                             <Property
-                                actionName={actionName}
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
                                 currentComponent={currentComponent}
@@ -165,6 +164,7 @@ const ObjectProperty = ({
                                 dataPills={dataPills}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
+                                operationName={operationName}
                                 parameterValue={subPropertyDefaultValue}
                                 path={`${path}.${name}`}
                                 property={{

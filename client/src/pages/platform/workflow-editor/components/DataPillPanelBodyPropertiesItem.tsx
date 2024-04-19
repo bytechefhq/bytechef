@@ -49,7 +49,7 @@ const DataPillPanelBodyPropertiesItem = ({
                 </div>
 
                 <span className="bg-muted ml-auto mr-4 rounded px-2 py-1 text-xs">
-                    {currentComponentAction?.actionName}
+                    {currentComponentAction?.operationName}
                 </span>
 
                 <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />

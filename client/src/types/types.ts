@@ -28,22 +28,22 @@ export type DataPillType = {
     value: string;
 };
 
-export type ComponentActionType = {
-    actionName: string;
+export type ComponentOperationType = {
     componentName: string;
+    operationName: string;
     workflowNodeName?: string;
 };
 
 export type ComponentType = {
-    actionName: string; // rename to operationName
     componentName: string;
-    icon?: JSX.Element | string;
-    notes?: string;
-    parameters?: {
+    displayConditions?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
-    displayConditions?: {
+    icon?: JSX.Element | string;
+    notes?: string;
+    operationName: string;
+    parameters?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };

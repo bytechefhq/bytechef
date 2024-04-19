@@ -6,7 +6,7 @@ import {twMerge} from 'tailwind-merge';
 import Property from './Property';
 
 interface PropertiesProps {
-    actionName?: string;
+    operationName?: string;
     currentComponentDefinition?: CurrentComponentDefinitionType;
     currentComponent?: ComponentType;
     customClassName?: string;
@@ -19,12 +19,12 @@ interface PropertiesProps {
 }
 
 const Properties = ({
-    actionName,
     currentComponent,
     currentComponentDefinition,
     customClassName,
     dataPills,
     formState,
+    operationName,
     path,
     properties,
     register,
@@ -32,12 +32,12 @@ const Properties = ({
     <ul className={twMerge('space-y-4', customClassName)}>
         {properties.map((property, index) => (
             <Property
-                actionName={actionName}
                 currentComponent={currentComponent}
                 currentComponentDefinition={currentComponentDefinition}
                 dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}
+                operationName={operationName}
                 path={path}
                 property={property}
                 register={register}

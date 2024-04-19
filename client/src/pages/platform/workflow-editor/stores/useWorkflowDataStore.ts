@@ -2,7 +2,7 @@ import {WorkflowModel} from '@/middleware/automation/configuration';
 
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
-import {ComponentActionType, ComponentType, DataPillType} from '@/types/types';
+import {ComponentOperationType, ComponentType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -13,8 +13,8 @@ export type WorkflowTaskDataType = {
 };
 
 interface WorkflowDataStateI {
-    componentActions: Array<ComponentActionType>;
-    setComponentActions: (componentActions: Array<ComponentActionType>) => void;
+    componentActions: Array<ComponentOperationType>;
+    setComponentActions: (componentActions: Array<ComponentOperationType>) => void;
 
     components: Array<ComponentType>;
     setComponents: (components: Array<ComponentType>) => void;
