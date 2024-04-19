@@ -10,7 +10,7 @@ import {FocusEventHandler, ReactNode, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-import type {OptionModel, OptionsDataSourceModel} from '@/middleware/platform/configuration';
+import type {OptionModel} from '@/middleware/platform/configuration';
 
 type ComboBoxItemType = {
     description?: string;

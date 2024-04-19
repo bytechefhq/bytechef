@@ -1,5 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {PropertiesDataSourceModel, PropertyModel} from '@/middleware/platform/configuration';
+import {PropertyModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workflowNodeDynamicProperties.queries';
