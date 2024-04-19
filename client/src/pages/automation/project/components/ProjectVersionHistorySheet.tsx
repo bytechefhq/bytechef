@@ -41,7 +41,7 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                                     key={projectVersion.version}
                                     value={projectVersion.version?.toString() || ''}
                                 >
-                                    <AccordionTrigger>
+                                    <AccordionTrigger disabled={projectVersion.status === ProjectStatusModel.Draft}>
                                         <div className="flex w-full items-center justify-between pr-2">
                                             <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
 
