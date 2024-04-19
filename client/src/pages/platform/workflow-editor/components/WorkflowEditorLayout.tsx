@@ -40,7 +40,7 @@ const WorkflowEditorLayout = ({
             id: workflow.id!,
             lastWorkflowNodeName: currentNode.name,
         },
-        !!componentActions?.length
+        !!componentActions?.length && !!currentNode.name
     );
 
     const previousComponentDefinitions = workflowNodeOutputs
@@ -93,7 +93,7 @@ const WorkflowEditorLayout = ({
                 updateWorkflowMutation={updateWorkflowMutation}
             />
 
-            {currentNode.name && (
+            {currentNode?.name && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation}
