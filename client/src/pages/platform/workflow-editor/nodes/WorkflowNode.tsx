@@ -22,7 +22,7 @@ const SPACE = 4;
 
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [hoveredNode, setHoveredNode] = useState<string | undefined>();
+    const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflow, workflow} = useWorkflowDataStore();
@@ -38,9 +38,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
             id: workflow.id!,
-            workflowNodeName: hoveredNode!,
+            workflowNodeName: hoveredNodeName!,
         },
-        hoveredNode !== undefined
+        hoveredNodeName !== undefined
     );
 
     const queryClient = useQueryClient();
@@ -149,7 +149,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         >
             {isHovered && (
                 <div className="absolute left-[-40px] pr-4">
-                    {data.type === 'trigger' ? (
+                    {data.trigger ? (
                         <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers id={id}>
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
@@ -175,9 +175,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             <HoverCard
                 onOpenChange={(open) => {
                     if (open) {
-                        setHoveredNode(id);
+                        setHoveredNodeName(id);
                     } else {
-                        setHoveredNode(undefined);
+                        setHoveredNodeName(undefined);
                     }
                 }}
             >
