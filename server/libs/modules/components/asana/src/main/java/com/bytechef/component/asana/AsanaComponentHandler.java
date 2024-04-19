@@ -79,7 +79,7 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getAssigneeOptions);
                         } else if (Objects.equals(baseProperty2.getName(), TEAM)) {
                             ((ModifiableStringProperty) baseProperty2)
-                                .loadOptionsDependsOn(WORKSPACE)
+                                .loadOptionsDependsOn("__item.data." + WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getTeamOptions);
                         } else if (Objects.equals(baseProperty2.getName(), TAGS)) {
                             ((ModifiableArrayProperty) baseProperty2)

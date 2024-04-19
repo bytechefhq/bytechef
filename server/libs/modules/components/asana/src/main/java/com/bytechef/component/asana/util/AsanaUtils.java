@@ -75,8 +75,12 @@ public class AsanaUtils {
     public static List<Option<String>> getTeamOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
 
+        Map<String, Map<String, String>> item = inputParameters.getRequiredMap("__item", new TypeReference<>() {});
+
+        Map<String, String> data = item.get("data");
+
         Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(BASE_URL + "/workspaces/" + inputParameters.getRequiredString(WORKSPACE) + "/teams"))
+            .http(http -> http.get(BASE_URL + "/workspaces/" + data.get(WORKSPACE) + "/teams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
