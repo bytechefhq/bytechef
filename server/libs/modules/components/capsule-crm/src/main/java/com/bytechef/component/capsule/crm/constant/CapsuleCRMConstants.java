@@ -45,6 +45,7 @@ public class CapsuleCRMConstants {
     public static final String NAME = "name";
     public static final String NAME_PROPERTIES = "nameProperties";
     public static final String NUMBER = "number";
+    public static final String PERSON = "person";
     public static final String PHONE_NUMBERS = "phoneNumbers";
     public static final String STATE = "state";
     public static final String STREET = "street";
