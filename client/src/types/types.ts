@@ -57,6 +57,8 @@ export type CurrentComponentDefinitionType = {
 
 export type ClickedItemType = {
     componentName?: string;
+    trigger?: boolean;
+    taskDispatcher?: boolean;
 } & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
 
 export type SubPropertyType = PropertyType & {custom: boolean};

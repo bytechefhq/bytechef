@@ -65,7 +65,9 @@ const WorkflowNodesTabs = ({
                                         (componentDefinition: ComponentDefinitionBasicModel) => (
                                             <WorkflowNodesTabsItem
                                                 draggable={itemsDraggable}
-                                                handleClick={() => onItemClick && onItemClick(componentDefinition)}
+                                                handleClick={() =>
+                                                    onItemClick && onItemClick({...componentDefinition, trigger: true})
+                                                }
                                                 key={componentDefinition.name}
                                                 node={componentDefinition}
                                             />
@@ -111,7 +113,10 @@ const WorkflowNodesTabs = ({
                                         (taskDispatcherDefinition: TaskDispatcherDefinitionModel) => (
                                             <WorkflowNodesTabsItem
                                                 draggable={itemsDraggable}
-                                                handleClick={() => onItemClick && onItemClick(taskDispatcherDefinition)}
+                                                handleClick={() =>
+                                                    onItemClick &&
+                                                    onItemClick({...taskDispatcherDefinition, taskDispatcher: true})
+                                                }
                                                 key={taskDispatcherDefinition.name}
                                                 node={taskDispatcherDefinition}
                                             />
