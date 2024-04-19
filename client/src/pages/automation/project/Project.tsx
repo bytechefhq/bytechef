@@ -472,7 +472,7 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: curWorkflow} = useGetWorkflowQuery(workflowId!);
+    const {data: currentWorkflow} = useGetWorkflowQuery(workflowId!);
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
@@ -578,12 +578,12 @@ const Project = () => {
     }, [workflowId]);
 
     useEffect(() => {
-        if (curWorkflow) {
-            setWorkflow({...curWorkflow, componentNames, nodeNames});
+        if (currentWorkflow) {
+            setWorkflow({...currentWorkflow, componentNames, nodeNames});
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [curWorkflow, workflowId]);
+    }, [currentWorkflow, workflowId]);
 
     return (
         <>
