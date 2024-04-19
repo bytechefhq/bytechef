@@ -80,7 +80,7 @@ const ConnectionSelect = ({
         componentName: workflowConnection.componentName,
         componentVersion: workflowConnection.componentVersion,
     });
-    console.log(componentDefinition);
+
     const {data: connections} = useGetConnectionsQuery!(
         {
             componentName: componentDefinition?.name,

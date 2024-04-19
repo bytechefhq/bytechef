@@ -187,7 +187,7 @@ const Property = ({
             currentComponent,
             otherComponents,
             setComponents,
-            updateWorkflowNodeParameterMutation,
+            updateWorkflowNodeParameterMutation!,
             isNumericalInput ? numericValueToSave : inputValue,
             arrayIndex
         );
@@ -274,7 +274,7 @@ const Property = ({
             currentComponent,
             otherComponents,
             setComponents,
-            updateWorkflowNodeParameterMutation,
+            updateWorkflowNodeParameterMutation!,
             value,
             undefined
         );
@@ -288,7 +288,7 @@ const Property = ({
             currentComponent!,
             otherComponents,
             setComponents,
-            deleteWorkflowNodeParameterMutation,
+            deleteWorkflowNodeParameterMutation!,
             arrayIndex
         );
     };
@@ -376,7 +376,7 @@ const Property = ({
             currentComponent,
             otherComponents,
             setComponents,
-            updateWorkflowNodeParameterMutation,
+            updateWorkflowNodeParameterMutation!,
             value,
             arrayIndex
         );
