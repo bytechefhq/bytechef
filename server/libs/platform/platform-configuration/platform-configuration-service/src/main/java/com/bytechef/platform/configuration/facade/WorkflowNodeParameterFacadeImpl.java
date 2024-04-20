@@ -263,6 +263,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             Map<String, ?> parameters = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
 
+            if (parameters == null) {
+                continue;
+            }
+
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
                 if (entry.getValue() instanceof Map<?, ?> curMap) {
                     if (curMap.containsKey(WorkflowConstants.NAME)) {
@@ -276,7 +280,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                     continue;
                                 }
 
-                                return getTask(workflowNodeName, List.of((Map<String, ?>) curTask));
+                                Map<String, ?> curTaskMap =
+                                    getTask(workflowNodeName, List.of((Map<String, ?>) curTask));
+
+                                if (curTaskMap != null) {
+                                    return curTaskMap;
+                                }
                             }
                         }
                     }
@@ -290,7 +299,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                                 continue;
                             }
-                            return getTask(workflowNodeName, List.of(curTask));
+
+                            Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of(curTask));
+
+                            if (curTaskMap != null) {
+                                return curTaskMap;
+                            }
                         }
                     }
                 }
