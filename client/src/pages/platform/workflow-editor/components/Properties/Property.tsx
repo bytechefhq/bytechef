@@ -665,25 +665,6 @@ const Property = ({
                             />
                         )}
 
-                        {!register && (isValidControlType || isNumericalInput) && !!optionsDataSource && (
-                            <PropertyComboBox
-                                arrayIndex={arrayIndex}
-                                currentNodeConnectionId={currentNode.connectionId}
-                                description={description}
-                                key={`${currentNode.name}_${name}`}
-                                label={label}
-                                leadingIcon={typeIcon}
-                                name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name)}
-                                options={(formattedOptions as Array<OptionModel>) || undefined || []}
-                                path={path}
-                                required={required}
-                                value={selectValue}
-                                workflowId={workflow.id!}
-                                workflowNodeName={currentNode.name}
-                            />
-                        )}
-
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 arrayIndex={arrayIndex}
