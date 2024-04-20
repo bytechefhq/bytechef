@@ -11,6 +11,7 @@ import {
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
+import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinitions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
@@ -29,7 +30,6 @@ import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
-import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinitions.queries';
 
 const TABS = [
     {
@@ -74,23 +74,9 @@ const WorkflowNodeDetailsPanel = ({
     const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
-    // console.log('currentNode: ', currentNode);
-
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.componentName || currentNode.id,
     });
-
-    const {data: triggerDefinition} = useGetTriggerDefinitionQuery(
-        {
-            componentName: currentNode.componentName!,
-            componentVersion: 1,
-            triggerName: componentDefinition?.triggers?.[0]?.name,
-        },
-        !!currentNode.componentName && currentNode.trigger && !!componentDefinition?.triggers?.length
-    );
-
-    // console.log('componentDefinition: ', componentDefinition);
-    console.log('triggerDefinition: ', triggerDefinition);
 
     const {componentActions, components, dataPills, setComponentActions, setComponents, setDataPills, workflow} =
         useWorkflowDataStore();
@@ -98,11 +84,7 @@ const WorkflowNodeDetailsPanel = ({
     let currentComponentDefinition: CurrentComponentDefinitionType | undefined;
 
     if (componentDefinition) {
-        currentComponentDefinition = componentDefinition;
-
-        if (currentComponentDefinition) {
-            currentComponentDefinition.workflowNodeName = currentNode.name;
-        }
+        currentComponentDefinition = {...componentDefinition, workflowNodeName: currentNode.name};
     }
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
@@ -122,6 +104,23 @@ const WorkflowNodeDetailsPanel = ({
             componentVersion: currentComponentDefinition?.version as number,
         },
         !!currentComponentDefinition?.actions && !!getActionName()
+    );
+
+    const getTriggerName = (): string => {
+        const currentComponentTriggerNames = currentComponentDefinition?.triggers?.map((trigger) => trigger.name);
+
+        return currentComponentTriggerNames?.includes(currentOperationName)
+            ? currentOperationName
+            : (currentComponentDefinition?.triggers?.[0]?.name as string);
+    };
+
+    const {data: currentTriggerDefinition} = useGetTriggerDefinitionQuery(
+        {
+            componentName: componentDefinition?.name as string,
+            componentVersion: componentDefinition?.version as number,
+            triggerName: getTriggerName(),
+        },
+        !!currentNode.componentName && currentNode.trigger && !!componentDefinition
     );
 
     const {nodeNames} = workflow;
@@ -239,15 +238,15 @@ const WorkflowNodeDetailsPanel = ({
         }
     });
 
-    const handleOperationSelectChange = (actionName: string) => {
-        setCurrentOperationName(actionName);
+    const handleOperationSelectChange = (operationName: string) => {
+        setCurrentOperationName(operationName);
 
         setComponentActions(
             componentActions.map((componentAction) => {
                 if (componentAction.workflowNodeName === currentNode.name) {
                     return {
                         ...componentAction,
-                        actionName,
+                        operationName,
                     };
                 } else {
                     return componentAction;
@@ -259,9 +258,9 @@ const WorkflowNodeDetailsPanel = ({
             setComponents([
                 ...components.filter((component) => component.workflowNodeName !== currentNode.name),
                 {
-                    actionName,
                     componentName: currentNode.componentName || currentNode.id,
                     icon: currentComponentDefinition.icon,
+                    operationName,
                     title: currentComponentDefinition?.title,
                     workflowNodeName: currentNode.name,
                 },
@@ -277,12 +276,12 @@ const WorkflowNodeDetailsPanel = ({
 
             saveWorkflowDefinition(
                 {
-                    actionName,
                     componentName,
                     icon,
                     label: title,
                     name: workflowNodeName!,
-                    type: `${componentName}/v1/${actionName}`,
+                    operationName,
+                    type: `${componentName}/v1/${operationName}`,
                 },
                 workflow,
                 updateWorkflowMutation
@@ -296,16 +295,16 @@ const WorkflowNodeDetailsPanel = ({
             const {icon, name, title, workflowNodeName} = componentDefinition;
 
             setCurrentComponent({
-                actionName: currentOperationName,
                 componentName: name,
                 icon,
+                operationName: currentOperationName,
                 title,
                 workflowNodeName,
             });
         }
     }, [componentDefinition, currentOperationName]);
 
-    // Set currentOperationName depending on the currentComponentAction.actionName
+    // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
         if (componentActions?.length) {
             const currentComponentAction = componentActions.find(
@@ -313,7 +312,7 @@ const WorkflowNodeDetailsPanel = ({
             );
 
             if (currentComponentAction) {
-                setCurrentOperationName(currentComponentAction.actionName);
+                setCurrentOperationName(currentComponentAction.operationName);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -429,14 +428,15 @@ const WorkflowNodeDetailsPanel = ({
                     </header>
 
                     <main className="flex h-full flex-col">
-                        {!!currentComponentDefinition.actions?.length && (
+                        {(!!currentComponentDefinition.actions?.length ||
+                            !!currentComponentDefinition.triggers?.length) && (
                             <CurrentOperationSelect
                                 description={currentActionDefinition?.description}
                                 handleValueChange={handleOperationSelectChange}
                                 operations={
-                                    currentNode.trigger
+                                    (currentNode.trigger
                                         ? currentComponentDefinition.triggers
-                                        : currentComponentDefinition.actions
+                                        : currentComponentDefinition.actions)!
                                 }
                                 value={currentOperationName}
                             />
@@ -491,12 +491,12 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'properties' &&
                                     (currentOperationProperties?.length ? (
                                         <Properties
-                                            actionName={currentOperationName}
                                             currentComponent={currentComponent}
                                             currentComponentDefinition={currentComponentDefinition}
                                             customClassName="p-4"
                                             dataPills={dataPills}
                                             key={`${currentNode.name}_${currentOperationName}_properties`}
+                                            operationName={currentOperationName}
                                             properties={currentOperationProperties}
                                         />
                                     ) : (

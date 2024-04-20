@@ -1,11 +1,17 @@
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
+import {
+    ComponentDefinitionApi,
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionModel,
+} from '@/middleware/platform/configuration';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/WorkflowNodesTabs';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
+import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
 import {ClickedItemType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
+import {QueryClient} from '@tanstack/react-query';
 import {memo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
@@ -36,13 +42,15 @@ const WorkflowNodesPopoverMenuList = memo(
     }: WorkflowNodesListProps) => {
         const {setWorkflow, workflow} = useWorkflowDataStore();
 
-        const {componentNames} = workflow;
-
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
         const {updateWorkflowMutation} = useWorkflowMutation();
 
-        const handleItemClick = (clickedItem: ClickedItemType) => {
+        const queryClient = new QueryClient();
+
+        const {componentNames} = workflow;
+
+        const handleItemClick = async (clickedItem: ClickedItemType) => {
             if (edge) {
                 const clickedEdge = getEdge(id);
 
@@ -130,6 +138,67 @@ const WorkflowNodesPopoverMenuList = memo(
                     return;
                 }
 
+                if (clickedItem.trigger) {
+                    const clickedComponentDefinition = await queryClient.fetchQuery({
+                        queryFn: () =>
+                            new ComponentDefinitionApi().getComponentDefinition({
+                                componentName: clickedItem.name,
+                            }),
+                        queryKey: ComponentDefinitionKeys.componentDefinition({
+                            componentName: clickedItem.name,
+                        }),
+                    });
+
+                    setNodes((nodes: Node[]) =>
+                        nodes.map((node) => {
+                            if (node.id === placeholderNode.id) {
+                                setWorkflow({
+                                    ...workflow,
+                                    componentNames: [clickedItem.name, ...componentNames.slice(1)],
+                                });
+
+                                const newTriggerNode = {
+                                    ...node,
+                                    data: {
+                                        ...node.data,
+                                        componentName: clickedItem.name,
+                                        connections: [],
+                                        description: clickedItem.description,
+                                        icon: (
+                                            <>
+                                                {clickedItem.icon ? (
+                                                    <InlineSVG
+                                                        className="size-9 text-gray-700"
+                                                        src={clickedItem.icon}
+                                                    />
+                                                ) : (
+                                                    <Component1Icon className="size-9 text-gray-700" />
+                                                )}
+                                            </>
+                                        ),
+                                        id: getFormattedName(clickedItem.name!, nodes),
+                                        label: clickedItem?.title,
+                                        name: getFormattedName(clickedItem.name!, nodes),
+                                        operationName: clickedComponentDefinition.triggers?.[0].name,
+                                        trigger: true,
+                                        type: `${clickedItem.name}/v1/${clickedComponentDefinition.triggers?.[0].name}`,
+                                    },
+                                    id: getFormattedName(clickedItem.name!, nodes),
+                                    type: 'workflow',
+                                };
+
+                                saveWorkflowDefinition(newTriggerNode.data, workflow, updateWorkflowMutation);
+
+                                return newTriggerNode;
+                            }
+
+                            return node;
+                        })
+                    );
+
+                    return;
+                }
+
                 const placeholderId = placeholderNode.id;
                 const childPlaceholderId = getRandomId();
 
@@ -157,8 +226,6 @@ const WorkflowNodesPopoverMenuList = memo(
                     nodes
                         .map((node) => {
                             if (node.id === placeholderId) {
-                                const formattedNodeName = getFormattedName(clickedItem.name!, nodes);
-
                                 setWorkflow({
                                     ...workflow,
                                     componentNames: [...componentNames, clickedItem.name],
@@ -181,7 +248,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                             </>
                                         ),
                                         label: clickedItem?.title,
-                                        name: formattedNodeName,
+                                        name: getFormattedName(clickedItem.name!, nodes),
                                         type: node.data?.type,
                                     },
                                     type: 'workflow',
