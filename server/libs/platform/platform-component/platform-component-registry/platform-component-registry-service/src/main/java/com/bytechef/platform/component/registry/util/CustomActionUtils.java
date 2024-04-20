@@ -91,7 +91,10 @@ public class CustomActionUtils {
                     .label("Headers")
                     .description("Headers to send.")
                     .placeholder("Add header")
-                    .additionalProperties(string()),
+                    .additionalProperties(
+                        array()
+                            .items(
+                                string())),
 
                 //
                 // Query parameters properties
@@ -101,7 +104,10 @@ public class CustomActionUtils {
                     .label("Query Parameters")
                     .description("Query parameters to send.")
                     .placeholder("Add parameter")
-                    .additionalProperties(string()),
+                    .additionalProperties(
+                        array()
+                            .items(
+                                string())),
 
                 //
                 // Body properties
