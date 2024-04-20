@@ -4,12 +4,14 @@ import {Node} from 'reactflow';
 const defaultNodes: Node[] = [
     {
         data: {
+            componentName: 'manual',
             icon: <PlayIcon className="size-9 text-gray-700" />,
             id: 'manual',
-            label: 'Manual Trigger',
+            label: 'Manual',
             name: 'manual',
+            operationName: 'manual',
             trigger: true,
-            type: 'trigger',
+            type: 'manual/v1/manual',
         },
         id: 'manual',
         position: {x: 0, y: 0},
