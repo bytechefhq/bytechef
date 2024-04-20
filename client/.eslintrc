@@ -76,7 +76,9 @@
                     "max-w-tooltip-lg",
                     "max-w-tooltip-sm",
                     "nowheel",
+                    "text-destructive",
                     "text-muted-foreground",
+                    "text-success",
                     "text-success-foreground",
                     "w-112",
                     "w-workflow-nodes-popover-menu-width"

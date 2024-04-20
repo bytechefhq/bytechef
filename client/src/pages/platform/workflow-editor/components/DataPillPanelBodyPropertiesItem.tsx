@@ -48,7 +48,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     </span>
                 </div>
 
-                <span className="bg-muted ml-auto mr-4 rounded px-2 py-1 text-xs">
+                <span className="ml-auto mr-4 rounded bg-muted px-2 py-1 text-xs">
                     {currentComponentAction?.operationName}
                 </span>
 
@@ -83,7 +83,7 @@ const DataPillPanelBodyPropertiesItem = ({
                                         />
 
                                         {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                                            <div className="text-muted-foreground flex-1 text-xs">
+                                            <div className="flex-1 text-xs text-muted-foreground">
                                                 {value === true ? 'true' : value === false ? false : value}
                                             </div>
                                         )}
