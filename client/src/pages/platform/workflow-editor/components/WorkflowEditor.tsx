@@ -343,6 +343,13 @@ const WorkflowEditor = ({
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
+    // If no custom trigger is set, set Manual Trigger as default trigger
+    useEffect(() => {
+        if (!workflow.triggers?.length && defaultNodes[0].data) {
+            saveWorkflowDefinition(defaultNodes[0].data, workflow, updateWorkflowMutation);
+        }
+    }, []);
+
     useLayout();
 
     return (
