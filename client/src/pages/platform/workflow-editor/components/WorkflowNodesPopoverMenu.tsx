@@ -86,7 +86,7 @@ const WorkflowNodesPopoverMenu = ({
                                 <div className="px-3 py-2 text-xs text-gray-500">Something went wrong.</div>
                             ))}
 
-                        <header className="border-b border-gray-200 p-3 text-center text-gray-600">
+                        <header className="p-3 text-center text-gray-600">
                             <Input
                                 name="workflowNodeFilter"
                                 onChange={(event) => setFilter(event.target.value)}

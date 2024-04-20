@@ -81,7 +81,7 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden md:flex md:flex-col border-r bg-white',
+                        'hidden md:flex md:flex-col bg-white',
                         !topHeader && 'md:fixed md:inset-y-0',
                         topHeader && 'md:absolute md:bottom-0 md:top-14',
                         leftSidebarWidths[leftSidebarWidth][0]
@@ -107,7 +107,7 @@ const LayoutContainer = ({
                 </main>
 
                 {rightSidebarOpen && !!rightSidebarBody && (
-                    <aside className="hidden border-l lg:flex lg:shrink-0">
+                    <aside className="hidden lg:flex lg:shrink-0">
                         <div className={twMerge('flex', rightSidebarWidths[rightSidebarWidth])}>
                             <div className="flex h-full flex-1 flex-col">
                                 {rightSidebarHeader}
