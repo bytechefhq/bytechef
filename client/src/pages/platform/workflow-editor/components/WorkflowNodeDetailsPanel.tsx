@@ -438,6 +438,7 @@ const WorkflowNodeDetailsPanel = ({
                                         ? currentComponentDefinition.triggers
                                         : currentComponentDefinition.actions)!
                                 }
+                                triggerSelect={currentNode.trigger}
                                 value={currentOperationName}
                             />
                         )}

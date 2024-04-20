@@ -10,6 +10,7 @@ interface CurrentOperationSelectProps {
     description?: string;
     handleValueChange: (value: string) => void;
     operations: Array<ActionDefinitionBasicModel | TriggerDefinitionBasicModel>;
+    triggerSelect?: boolean;
     value: string;
 }
 
@@ -68,12 +69,18 @@ const OperationSelect = ({description, handleValueChange, operations, value}: Cu
     </div>
 );
 
-const CurrentOperationSelect = ({description, handleValueChange, operations, value}: CurrentOperationSelectProps) => (
+const CurrentOperationSelect = ({
+    description,
+    handleValueChange,
+    operations,
+    triggerSelect,
+    value,
+}: CurrentOperationSelectProps) => (
     <div className="flex items-end border-b border-gray-100 p-4">
         {operations?.length === 1 && !!operations[0] ? (
             <div className="flex w-full flex-col">
                 <div className="flex items-center space-x-1">
-                    <span className="text-sm font-medium leading-6">Action</span>
+                    <span className="text-sm font-medium leading-6">{triggerSelect ? 'Triggers' : 'Actions'}</span>
 
                     {description && (
                         <Tooltip>
