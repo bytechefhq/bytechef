@@ -452,14 +452,18 @@ const Property = ({
                 return key
                     .split('.')
                     .reduce((acc, key) => {
-                        return acc && acc[key];
+                        if (key.endsWith('[index]') && arrayIndex !== undefined) {
+                            return acc && acc[key.replace('[index]', '')][arrayIndex];
+                        } else {
+                            return acc && acc[key];
+                        }
                     }, currentComponent?.parameters ?? {})
                     ?.toString();
             });
 
             setLoadDependsOnValues(loadDependsOnValues);
         }
-    }, [currentComponent?.parameters, optionsDataSource?.loadOptionsDependsOn]);
+    }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.loadOptionsDependsOn]);
 
     useEffect(() => {
         if (propertiesDataSource?.loadPropertiesDependsOn) {
@@ -467,14 +471,18 @@ const Property = ({
                 return key
                     .split('.')
                     .reduce((acc, key) => {
-                        return acc && acc[key];
+                        if (key.endsWith('[index]') && arrayIndex !== undefined) {
+                            return acc && acc[key.replace('[index]', '')][arrayIndex];
+                        } else {
+                            return acc && acc[key];
+                        }
                     }, currentComponent?.parameters ?? {})
                     ?.toString();
             });
 
             setLoadDependsOnValues(loadDependsOnValues);
         }
-    }, [currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
+    }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
     if (property.displayCondition && !currentComponent?.displayConditions?.[property.displayCondition]) {
         return <></>;
@@ -673,6 +681,9 @@ const Property = ({
                                 key={`${currentNode.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                loadDependsOnPaths={optionsDataSource?.loadOptionsDependsOn?.map(
+                                    (loadOptionDependsOn) => loadOptionDependsOn.replace('[index]', `[${arrayIndex}]`)
+                                )}
                                 loadDependsOnValues={loadDependsOnValues}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}

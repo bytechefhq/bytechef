@@ -26,6 +26,7 @@ interface PropertyComboBoxProps {
     currentNodeConnectionId?: number;
     description?: string;
     label?: string;
+    loadDependsOnPaths?: Array<string>;
     loadDependsOnValues?: Array<string>;
     leadingIcon?: ReactNode;
     name?: string;
@@ -47,6 +48,7 @@ const PropertyComboBox = ({
     description,
     label,
     leadingIcon,
+    loadDependsOnPaths,
     loadDependsOnValues,
     name,
     onBlur,
@@ -65,11 +67,10 @@ const PropertyComboBox = ({
         path = path.replace('parameters.', '').replace('parameters', '');
 
         if (path.endsWith('_' + arrayIndex)) {
-            path = path.substring(0, path.lastIndexOf('.')) + '_[0]';
+            path = path.substring(0, path.lastIndexOf('.')) + `[${arrayIndex}]`;
         }
     }
-    // console.log(`${path} ${name}`)
-    //     console.log(loadDependsOnValues)
+
     const {
         data: optionsData,
         isLoading,
@@ -79,6 +80,7 @@ const PropertyComboBox = ({
             loadDependencyValueKey: (loadDependsOnValues ?? []).join(''),
             request: {
                 id: workflowId,
+                loadDependsOnPaths: loadDependsOnPaths,
                 propertyName: (path ? path.replace('parameters.', '').replace('parameters', '') + '.' : '') + name!,
                 workflowNodeName,
             },
