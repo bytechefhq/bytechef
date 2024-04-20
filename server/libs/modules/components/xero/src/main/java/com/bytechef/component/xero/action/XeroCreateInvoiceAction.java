@@ -159,7 +159,8 @@ public final class XeroCreateInvoiceAction {
     }
 
     public static List<Option<String>> getContactOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> response = context.http(http -> http.get("https://api.xero.com/api.xro/2.0/Contacts"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

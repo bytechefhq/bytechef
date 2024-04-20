@@ -41,7 +41,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
@@ -128,27 +127,27 @@ public class GoogleCalendarUtils {
     }
 
     public static List<? extends ValueProperty<?>> createRemindersProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
 
         return inputParameters.getRequiredBoolean(USE_DEFAULT) ? List.of() : List.of(REMINDERS_PROPERTY);
     }
 
     public static List<? extends ValueProperty<?>> createTimeProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
 
         return inputParameters.getRequiredBoolean(ALL_DAY) ? List.of(START_DATE_PROPERTY, END_DATE_PROPERTY)
             : List.of(START_DATE_TIME_PROPERTY, END_DATE_TIME_PROPERTY);
     }
 
     public static List<Option<String>> getCalendarIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
-
-        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<CalendarListEntry> calendarListEntries = calendar
+        List<CalendarListEntry> calendarListEntries = GoogleServices.getCalendar(connectionParameters)
             .calendarList()
             .list()
             .setMinAccessRole("writer")

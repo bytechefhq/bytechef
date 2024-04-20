@@ -56,7 +56,8 @@ public class AITableUtils {
     }
 
     public static List<? extends ValueProperty<?>> createPropertiesForRecord(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
 
         List<FieldTypeInfo> datasheetFields = createDatasheetFields(inputParameters, context);
 
@@ -172,7 +173,8 @@ public class AITableUtils {
     }
 
     public static List<Option<String>> getDatasheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         String spaceId = inputParameters.getRequiredString(SPACE_ID);
 
@@ -195,7 +197,10 @@ public class AITableUtils {
     }
 
     public static List<Option<String>> getDatasheetRecordIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText,
+        ActionContext context) {
+
         String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
 
         Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/datasheets/" + datasheetId + "/records"))
@@ -219,7 +224,8 @@ public class AITableUtils {
     }
 
     public static List<Option<String>> getFieldNamesOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         String datasheetId = inputParameters.getRequiredString(DATASHEET_ID);
 
@@ -239,7 +245,8 @@ public class AITableUtils {
     }
 
     public static List<Option<String>> getSpaceIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/spaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

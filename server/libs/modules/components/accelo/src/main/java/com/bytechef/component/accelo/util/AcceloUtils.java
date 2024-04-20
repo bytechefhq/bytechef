@@ -43,12 +43,13 @@ public class AcceloUtils {
     }
 
     public static List<Option<String>> getAgainstIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         String againstType = inputParameters.getRequiredString(AGAINST_TYPE);
 
         if (Objects.equals("company", againstType)) {
-            return getCompanyIdOptions(inputParameters, connectionParameters, searchText, context);
+            return getCompanyIdOptions(inputParameters, connectionParameters, dependencyPaths, searchText, context);
         } else {
             Map<String, ?> body = context
                 .http(http -> http.get(createUrl(connectionParameters, againstType + "s")))
@@ -71,7 +72,8 @@ public class AcceloUtils {
     }
 
     public static List<Option<String>> getCompanyIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> body = context
             .http(http -> http.get(createUrl(connectionParameters, "companies")))

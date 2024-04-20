@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,7 +48,7 @@ class TwilioUtilsTest {
             .thenReturn(MEDIA_URL);
 
         List<? extends Property.ValueProperty<?>> mediaUrlProperties =
-            TwilioUtils.getContentProperties(mockedParameters, mockedParameters, mockedContext);
+            TwilioUtils.getContentProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, mediaUrlProperties.size());
         assertEquals("Media URL", mediaUrlProperties.getFirst().getLabel().get());
@@ -68,7 +69,7 @@ class TwilioUtilsTest {
             .thenReturn(BODY);
 
         List<? extends Property.ValueProperty<?>> bodyProperties =
-            TwilioUtils.getContentProperties(mockedParameters, mockedParameters, mockedContext);
+            TwilioUtils.getContentProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, bodyProperties.size());
 
@@ -90,7 +91,7 @@ class TwilioUtilsTest {
             .thenReturn(FROM);
 
         List<? extends Property.ValueProperty<?>> fromProperties =
-            TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, mockedContext);
+            TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, fromProperties.size());
 
@@ -115,7 +116,7 @@ class TwilioUtilsTest {
             .thenReturn(MESSAGING_SERVICE_SID);
 
         List<? extends Property.ValueProperty<?>> messagingServiceSidProperties =
-            TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, mockedContext);
+            TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, messagingServiceSidProperties.size());
 
@@ -135,7 +136,7 @@ class TwilioUtilsTest {
     @Test
     void testGetZoneIdOptions() {
         List<Option<String>> zoneIdOptions = TwilioUtils.getZoneIdOptions(
-            mockedParameters, mockedParameters, "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(27, zoneIdOptions.size());
     }

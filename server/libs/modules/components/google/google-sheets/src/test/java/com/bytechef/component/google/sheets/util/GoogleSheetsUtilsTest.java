@@ -112,7 +112,7 @@ class GoogleSheetsUtilsTest {
                     .thenReturn(List.of("header1", "header2", "header3"));
 
                 List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
-                    mockedParameters, mockedParameters, mockedContext);
+                    mockedParameters, mockedParameters, Map.of(), mockedContext);
 
                 assertEquals(1, result.size());
 
@@ -141,7 +141,7 @@ class GoogleSheetsUtilsTest {
             .thenReturn("sheetName");
 
         List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, result.size());
 
@@ -259,7 +259,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(sheetsList);
 
             List<Option<String>> sheetIdOptions = GoogleSheetsUtils.getSheetIdOptions(
-                mockedParameters, mockedParameters, anyString(), mockedContext);
+                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
             assertNotNull(sheetIdOptions);
             assertEquals(2, sheetIdOptions.size());
@@ -295,7 +295,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(sheetsList);
 
             List<Option<String>> sheetNameOptions = GoogleSheetsUtils.getSheetNameOptions(
-                mockedParameters, mockedParameters, anyString(), mockedContext);
+                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
             assertNotNull(sheetNameOptions);
             assertEquals(2, sheetNameOptions.size());
@@ -347,7 +347,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(new FileList().setFiles(files));
 
             List<Option<String>> spreadsheetIdOptions = GoogleSheetsUtils.getSpreadsheetIdOptions(
-                mockedParameters, mockedParameters, anyString(), mockedContext);
+                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
             assertNotNull(spreadsheetIdOptions);
             assertEquals(2, spreadsheetIdOptions.size());

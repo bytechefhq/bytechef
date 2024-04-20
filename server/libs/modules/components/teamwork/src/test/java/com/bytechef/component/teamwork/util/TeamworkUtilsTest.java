@@ -82,6 +82,6 @@ class TeamworkUtilsTest {
 
         assertEquals(
             expectedOptions,
-            TeamworkUtils.getTaskListIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            TeamworkUtils.getTaskListIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

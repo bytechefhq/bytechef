@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.openai.action.AbstractOpenAIActionTest;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
             .thenReturn(DALL_E_2);
 
         List<Option<String>> sizeOptions = OpenAIUtils.getSizeOptions(
-            mockedParameters, mockedParameters, "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         Assertions.assertEquals(3, sizeOptions.size());
         Assertions.assertEquals("256x256", sizeOptions.get(0).getLabel());
@@ -60,7 +61,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
             .thenReturn(DALL_E_3);
 
         List<Option<String>> sizeOptions = OpenAIUtils.getSizeOptions(
-            mockedParameters, mockedParameters, "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         Assertions.assertEquals(3, sizeOptions.size());
         Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.get(0).getLabel());
@@ -77,7 +78,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
             .thenReturn(DALL_E_2);
 
         List<ValueProperty<?>> modelProperties = OpenAIUtils.getModelProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         Assertions.assertEquals(2, modelProperties.size());
 
@@ -106,7 +107,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
             .thenReturn(DALL_E_3);
 
         List<ValueProperty<?>> modelProperties = OpenAIUtils.getModelProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         Assertions.assertEquals(2, modelProperties.size());
 

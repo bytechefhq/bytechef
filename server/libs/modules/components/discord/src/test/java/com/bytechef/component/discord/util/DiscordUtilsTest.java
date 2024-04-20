@@ -72,7 +72,7 @@ class DiscordUtilsTest {
 
         assertEquals(
             expectedOptions,
-            DiscordUtils.getChannelIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            DiscordUtils.getChannelIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -125,7 +125,7 @@ class DiscordUtilsTest {
 
         assertEquals(
             expectedOptions,
-            DiscordUtils.getGuildIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            DiscordUtils.getGuildIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -158,6 +158,6 @@ class DiscordUtilsTest {
 
         assertEquals(
             expectedOptions,
-            DiscordUtils.getGuildMemberIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            DiscordUtils.getGuildMemberIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

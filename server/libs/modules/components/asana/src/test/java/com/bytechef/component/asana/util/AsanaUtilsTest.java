@@ -78,34 +78,34 @@ class AsanaUtilsTest {
     void testGetAssigneeOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getAssigneeOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AsanaUtils.getAssigneeOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
     void testGetProjectIdOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getProjectIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AsanaUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
     void testGetTagOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getTagOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AsanaUtils.getTagOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
     void testGetTeamOptionsOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getTeamOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AsanaUtils.getTeamOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
     void testGetWorkspaceIdOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AsanaUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

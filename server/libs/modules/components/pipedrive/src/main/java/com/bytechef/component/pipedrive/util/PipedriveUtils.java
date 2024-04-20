@@ -58,7 +58,7 @@ public class PipedriveUtils {
 
     @SuppressWarnings("unchecked")
     public static ActionOptionsFunction<String> getOptions(String path, String dependsOn) {
-        return (inputParameters, connectionParameters, searchText, context) -> {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             Map<String, ?> response = context
                 .http(http -> http.get(path))
                 .queryParameters(

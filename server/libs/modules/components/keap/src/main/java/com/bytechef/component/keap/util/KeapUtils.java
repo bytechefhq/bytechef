@@ -33,8 +33,9 @@ public class KeapUtils {
     private KeapUtils() {
     }
 
+    @SuppressWarnings("unchecked")
     public static OptionsDataSource.ActionOptionsFunction<String> getCompanyIdOptions() {
-        return (inputParameters, connectionParameters, searchText, context) -> {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             Map<String, ?> body = context
                 .http(http -> http.get("https://api.infusionsoft.com/crm/rest/v1/companies"))
                 .header("Content-Type", "application/json")

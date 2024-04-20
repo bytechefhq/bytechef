@@ -37,6 +37,7 @@ import com.intuit.ipp.services.QueryResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -74,7 +75,8 @@ public final class QuickbooksDownloadCustomerPdfAction {
     }
 
     private static List<ModifiableOption<String>> getAllCustomerOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws FMSException {
 
         DataService dataService = QuickbooksUtils.getDataService(connectionParameters);

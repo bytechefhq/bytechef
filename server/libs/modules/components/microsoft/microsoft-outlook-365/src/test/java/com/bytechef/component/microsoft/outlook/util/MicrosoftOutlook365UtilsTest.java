@@ -61,7 +61,7 @@ class MicrosoftOutlook365UtilsTest {
             .thenReturn(responeseMap);
 
         List<Option<String>> categoryOptions = MicrosoftOutlook365Utils.getCategoryOptions(
-            null, null, anyString(), mockedContext);
+            null, null, Map.of(), anyString(), mockedContext);
 
         assertEquals(1, categoryOptions.size());
 
@@ -91,7 +91,7 @@ class MicrosoftOutlook365UtilsTest {
             .thenReturn(responeseMap);
 
         List<Option<String>> messageIdOptions = MicrosoftOutlook365Utils.getMessageIdOptions(
-            null, null, anyString(), mockedContext);
+            null, null, Map.of(), anyString(), mockedContext);
 
         assertEquals(1, messageIdOptions.size());
 

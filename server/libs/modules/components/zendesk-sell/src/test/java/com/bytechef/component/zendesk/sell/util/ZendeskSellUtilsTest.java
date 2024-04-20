@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,7 +45,7 @@ class ZendeskSellUtilsTest {
                 .thenReturn(false);
 
         List<Property.ValueProperty<?>> nameProperties = ZendeskSellUtils.createNameProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(2, nameProperties.size());
 
@@ -58,7 +59,7 @@ class ZendeskSellUtilsTest {
             .thenReturn(true);
 
         List<Property.ValueProperty<?>> nameProperties = ZendeskSellUtils.createNameProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, nameProperties.size());
 

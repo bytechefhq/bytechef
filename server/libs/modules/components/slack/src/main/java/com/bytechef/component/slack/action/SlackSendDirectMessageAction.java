@@ -51,6 +51,7 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.methods.response.users.UsersListResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -98,22 +99,19 @@ public final class SlackSendDirectMessageAction {
     }
 
     public static List<Option<String>> getUserOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException, SlackApiException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException, SlackApiException {
 
         UsersListResponse response = new App()
             .client()
             .usersList(
-                UsersListRequest
-                    .builder()
+                UsersListRequest.builder()
                     .token(connectionParameters.getRequiredString(ACCESS_TOKEN))
                     .build());
 
-        return response
-            .getMembers()
+        return response.getMembers()
             .stream()
-            .filter(user -> StringUtils.isNotEmpty(searchText) &&
-                StringUtils.startsWith(user.getName(), searchText))
+            .filter(user -> StringUtils.isNotEmpty(searchText) && StringUtils.startsWith(user.getName(), searchText))
             .map(user -> (Option<String>) option(user.getName(), user.getId()))
             .toList();
     }

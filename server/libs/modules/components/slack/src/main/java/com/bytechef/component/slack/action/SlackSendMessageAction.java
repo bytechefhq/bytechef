@@ -51,6 +51,7 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.methods.response.conversations.ConversationsListResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -97,7 +98,8 @@ public final class SlackSendMessageAction {
     }
 
     public static List<Option<String>> getChannelOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws IOException, SlackApiException {
 
         ConversationsListResponse response = new App()
@@ -108,8 +110,7 @@ public final class SlackSendMessageAction {
                     .token(connectionParameters.getRequiredString(ACCESS_TOKEN))
                     .build());
 
-        return response
-            .getChannels()
+        return response.getChannels()
             .stream()
             .filter(channel -> StringUtils.isNotEmpty(searchText) &&
                 StringUtils.startsWith(channel.getName(), searchText))

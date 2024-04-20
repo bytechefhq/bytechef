@@ -53,7 +53,7 @@ class CapsuleCRMUtilsTest {
                 .thenReturn("person");
 
         List<Property.ValueProperty<?>> nameProperties = CapsuleCRMUtils.createNameProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(2, nameProperties.size());
 
@@ -67,7 +67,7 @@ class CapsuleCRMUtilsTest {
             .thenReturn("organization");
 
         List<Property.ValueProperty<?>> nameProperties = CapsuleCRMUtils.createNameProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, nameProperties.size());
 
@@ -103,6 +103,6 @@ class CapsuleCRMUtilsTest {
 
         assertEquals(
             expectedOptions,
-            CapsuleCRMUtils.getCountryOptions(mockedParameters, mockedParameters, "", mockedContext));
+            CapsuleCRMUtils.getCountryOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

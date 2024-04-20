@@ -36,7 +36,8 @@ public class MicrosoftOutlook365Utils {
     }
 
     public static List<Option<String>> getCategoryOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("https://graph.microsoft.com/v1.0/me/outlook/masterCategories"))
@@ -57,8 +58,10 @@ public class MicrosoftOutlook365Utils {
         return options;
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("https://graph.microsoft.com/v1.0/me/messages"))

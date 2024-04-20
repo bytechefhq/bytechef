@@ -49,7 +49,7 @@ public class AirtableUtils {
 
     @SuppressWarnings("unchecked")
     public static ActionOptionsFunction<String> getBaseIdOptions() {
-        return (inputParameters, connectionParameters, searchText, context) -> {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             Map<String, ?> body = context
                 .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
                 .configuration(Http.responseType(ResponseType.JSON))
@@ -68,7 +68,7 @@ public class AirtableUtils {
     }
 
     public static ActionPropertiesFunction getFieldsProperties() {
-        return (inputParameters, connection, context) -> {
+        return (inputParameters, connection, dependencyPaths, context) -> {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
@@ -144,7 +144,7 @@ public class AirtableUtils {
 
     @SuppressWarnings("unchecked")
     public static ActionOptionsFunction<String> getTableIdOptions() {
-        return (inputParameters, connectionParameters, searchText, context) -> {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
 

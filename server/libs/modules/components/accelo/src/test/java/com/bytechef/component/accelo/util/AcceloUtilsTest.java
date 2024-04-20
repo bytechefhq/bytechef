@@ -84,7 +84,8 @@ class AcceloUtilsTest {
         expectedOptions.add(option("title", "id"));
 
         assertEquals(
-            expectedOptions, AcceloUtils.getAgainstIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            expectedOptions,
+            AcceloUtils.getAgainstIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -114,6 +115,7 @@ class AcceloUtilsTest {
         expectedOptions.add(option("companyName", "companyId"));
 
         assertEquals(
-            expectedOptions, AcceloUtils.getCompanyIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            expectedOptions,
+            AcceloUtils.getCompanyIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

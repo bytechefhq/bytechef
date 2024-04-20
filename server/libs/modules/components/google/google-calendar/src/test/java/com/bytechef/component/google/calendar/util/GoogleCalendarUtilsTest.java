@@ -116,7 +116,7 @@ class GoogleCalendarUtilsTest {
             .thenReturn(true);
 
         List<? extends Property.ValueProperty<?>> result =
-            GoogleCalendarUtils.createRemindersProperties(mockedParameters, mockedParameters, mockedContext);
+            GoogleCalendarUtils.createRemindersProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(List.of(), result);
     }
@@ -127,7 +127,7 @@ class GoogleCalendarUtilsTest {
             .thenReturn(false);
 
         List<? extends Property.ValueProperty<?>> result =
-            GoogleCalendarUtils.createRemindersProperties(mockedParameters, mockedParameters, mockedContext);
+            GoogleCalendarUtils.createRemindersProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, result.size());
         assertEquals(REMINDERS_PROPERTY, result.getFirst());
@@ -139,7 +139,7 @@ class GoogleCalendarUtilsTest {
             .thenReturn(true);
 
         List<? extends Property.ValueProperty<?>> result =
-            GoogleCalendarUtils.createTimeProperties(mockedParameters, mockedParameters, mockedContext);
+            GoogleCalendarUtils.createTimeProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(2, result.size());
         assertEquals(START_DATE_PROPERTY, result.getFirst());
@@ -152,7 +152,7 @@ class GoogleCalendarUtilsTest {
             .thenReturn(false);
 
         List<? extends Property.ValueProperty<?>> result =
-            GoogleCalendarUtils.createTimeProperties(mockedParameters, mockedParameters, mockedContext);
+            GoogleCalendarUtils.createTimeProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(2, result.size());
         assertEquals(START_DATE_TIME_PROPERTY, result.getFirst());
@@ -180,8 +180,8 @@ class GoogleCalendarUtilsTest {
                 .thenReturn(new CalendarList().setItems(calendarListEntries));
 
             List<Option<String>> result =
-                GoogleCalendarUtils.getCalendarIdOptions(mockedParameters, mockedParameters, anyString(),
-                    mockedContext);
+                GoogleCalendarUtils.getCalendarIdOptions(
+                    mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
             assertEquals("writer", minAccessRoleArgumentCaptor.getValue());
 

@@ -38,7 +38,8 @@ public class PipelinerUtils {
     }
 
     public static List<Option<String>> getActivityTypeIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> body = context
             .http(http -> http.get(getUrl(connectionParameters, "TaskTypes")))
@@ -54,7 +55,8 @@ public class PipelinerUtils {
     }
 
     public static List<Option<String>> getOwnerIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> body = context
             .http(http -> http.get(getUrl(connectionParameters, "Clients")))
@@ -76,7 +78,8 @@ public class PipelinerUtils {
     }
 
     public static List<Option<String>> getSalesUnitsIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> body = context
             .http(http -> http.get(getUrl(connectionParameters, "SalesUnits")))

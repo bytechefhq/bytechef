@@ -33,6 +33,7 @@ import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,7 +91,7 @@ class GoogleDriveOptionUtilsTest {
     @Test
     void testGetFileOptions() throws IOException {
         assertEquals(expectedOptions,
-            GoogleDriveOptionUtils.getFileOptions(mockedParameters, mockedParameters, "", mockedContext));
+            GoogleDriveOptionUtils.getFileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
         assertEquals("mimeType != 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
     }
@@ -98,7 +99,7 @@ class GoogleDriveOptionUtilsTest {
     @Test
     void testGetFolderOptions() throws IOException {
         assertEquals(expectedOptions,
-            GoogleDriveOptionUtils.getFolderOptions(mockedParameters, mockedParameters, "", mockedContext));
+            GoogleDriveOptionUtils.getFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
         assertEquals("mimeType = 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
     }

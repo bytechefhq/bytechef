@@ -41,7 +41,8 @@ public class TeamworkUtils {
     }
 
     public static List<Option<String>> getTaskListIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> body = context.http(http -> http.get(getBaseUrl(connectionParameters) + "/tasklists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

@@ -36,7 +36,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
@@ -66,7 +65,8 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Property.ValueProperty<?>> createArrayPropertyForRow(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) throws IOException {
 
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
@@ -137,13 +137,13 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
-        Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        List<Sheet> sheetsList = sheets
+        List<Sheet> sheetsList = GoogleServices.getSheets(connectionParameters)
             .spreadsheets()
             .get(inputParameters.getRequiredString(SPREADSHEET_ID))
             .execute()
@@ -159,13 +159,12 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetNameOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
-        Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        List<Sheet> sheetsList = sheets
+        List<Sheet> sheetsList = GoogleServices.getSheets(connectionParameters)
             .spreadsheets()
             .get(inputParameters.getRequiredString(SPREADSHEET_ID))
             .execute()
@@ -183,12 +182,11 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSpreadsheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws IOException {
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        List<File> files = drive
+        List<File> files = GoogleServices.getDrive(connectionParameters)
             .files()
             .list()
             .setQ("mimeType='application/vnd.google-apps.spreadsheet'")

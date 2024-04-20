@@ -82,7 +82,7 @@ class ShopifyUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ShopifyUtils.getOrderIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            ShopifyUtils.getOrderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -113,7 +113,7 @@ class ShopifyUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ShopifyUtils.getProductIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            ShopifyUtils.getProductIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -144,6 +144,6 @@ class ShopifyUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ShopifyUtils.getVariantIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            ShopifyUtils.getVariantIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

@@ -40,7 +40,8 @@ public class MicrosoftOneDriveUtils {
     }
 
     public static List<Option<String>> getFileIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ?> body = context
             .http(http -> http.get(BASE_URL + "/items/" + getFolderId(inputParameters) + "/children"))
@@ -68,7 +69,8 @@ public class MicrosoftOneDriveUtils {
     }
 
     public static List<Option<String>> getFolderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 

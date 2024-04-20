@@ -47,6 +47,7 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
@@ -160,7 +161,8 @@ public final class QuickbooksCreateItemAction {
     }
 
     private static List<ModifiableOption<String>> getAssetAccountIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws FMSException {
 
         return getAllAccounts(connectionParameters)
@@ -171,8 +173,8 @@ public final class QuickbooksCreateItemAction {
     }
 
     private static List<ModifiableOption<String>> getExpenseAccountIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws FMSException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws FMSException {
 
         return getAllAccounts(connectionParameters)
             .stream()
@@ -182,8 +184,8 @@ public final class QuickbooksCreateItemAction {
     }
 
     private static List<ModifiableOption<String>> getIncomeAccountIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws FMSException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws FMSException {
 
         return getAllAccounts(connectionParameters)
             .stream()

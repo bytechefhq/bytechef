@@ -25,6 +25,7 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -36,8 +37,8 @@ public class GoogleDriveOptionUtils {
     }
 
     public static List<Option<String>> getFileOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
@@ -52,8 +53,8 @@ public class GoogleDriveOptionUtils {
     }
 
     public static List<Option<String>> getFolderOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 

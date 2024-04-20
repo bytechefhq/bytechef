@@ -33,6 +33,7 @@ import com.slack.api.model.User;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +79,7 @@ public final class SlackSendDirectMessageActionTest extends AbstractSlackActionT
             .thenReturn(SEARCH_TEXT + " more text");
 
         List<Option<String>> options = SlackSendDirectMessageAction.getUserOptions(
-            mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), SEARCH_TEXT, mockedContext);
 
         verify(mockedMethodsClient, times(1))
             .usersList(any(UsersListRequest.class));

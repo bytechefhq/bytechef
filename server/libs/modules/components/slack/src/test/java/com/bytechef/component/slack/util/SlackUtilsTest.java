@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +46,7 @@ public final class SlackUtilsTest {
             .thenReturn(ATTACHMENTS);
 
         List<? extends ValueProperty<?>> propertyList =
-            SlackUtils.getContentTypeProperties(mockedParameters, mockedParameters, mockedContext);
+            SlackUtils.getContentTypeProperties(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         Assertions.assertEquals(1, propertyList.size());
         Assertions.assertEquals(
@@ -63,7 +64,7 @@ public final class SlackUtilsTest {
             .thenReturn(BLOCKS);
 
         List<? extends ValueProperty<?>> propertyList = SlackUtils.getContentTypeProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         Assertions.assertEquals(1, propertyList.size());
         Assertions.assertEquals(
@@ -81,7 +82,7 @@ public final class SlackUtilsTest {
             .thenReturn(TEXT);
 
         List<? extends ValueProperty<?>> propertyList = SlackUtils.getContentTypeProperties(
-            mockedParameters, mockedParameters, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         Assertions.assertEquals(1, propertyList.size());
         Assertions.assertEquals(

@@ -38,7 +38,8 @@ public class AsanaUtils {
     }
 
     public static List<Option<String>> getAssigneeOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context
             .http(http -> http.get(BASE_URL + "/users?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
@@ -50,7 +51,8 @@ public class AsanaUtils {
     }
 
     public static List<Option<String>> getProjectIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context
             .http(http -> http.get(BASE_URL + "/projects?workspace=" + inputParameters.getRequiredString(WORKSPACE)))
@@ -62,7 +64,8 @@ public class AsanaUtils {
     }
 
     public static List<Option<String>> getTagOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context.http(http -> http.get(BASE_URL + "/tags"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -73,14 +76,13 @@ public class AsanaUtils {
     }
 
     public static List<Option<String>> getTeamOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
-
-        Map<String, Map<String, String>> item = inputParameters.getRequiredMap("__item", new TypeReference<>() {});
-
-        Map<String, String> data = item.get("data");
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context
-            .http(http -> http.get(BASE_URL + "/workspaces/" + data.get(WORKSPACE) + "/teams"))
+            .http(http -> http.get(
+                BASE_URL + "/workspaces/" + inputParameters.getRequiredFromPath("__item.data." + WORKSPACE) +
+                    "/teams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -89,7 +91,8 @@ public class AsanaUtils {
     }
 
     public static List<Option<String>> getWorkspaceIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, String>>> body = context.http(http -> http.get(BASE_URL + "/workspaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

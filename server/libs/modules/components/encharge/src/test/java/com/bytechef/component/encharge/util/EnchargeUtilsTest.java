@@ -74,6 +74,7 @@ class EnchargeUtilsTest {
         expectedOptions.add(option("email", "email"));
 
         assertEquals(
-            expectedOptions, EnchargeUtils.getUserEmailOptions(mockedParameters, mockedParameters, "", mockedContext));
+            expectedOptions,
+            EnchargeUtils.getUserEmailOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

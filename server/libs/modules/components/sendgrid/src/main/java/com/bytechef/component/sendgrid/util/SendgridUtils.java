@@ -65,8 +65,8 @@ public class SendgridUtils {
     }
 
     public static List<Option<String>> getTemplates(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
 
         Request request = new Request();
 

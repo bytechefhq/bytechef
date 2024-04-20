@@ -36,6 +36,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -73,7 +74,9 @@ public class OpenAIUtils {
     }
 
     public static List<Option<String>> getSizeOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
         String model = inputParameters.getRequiredString(MODEL);
 
         List<Option<String>> options = new ArrayList<>();
@@ -92,7 +95,9 @@ public class OpenAIUtils {
     }
 
     public static List<ValueProperty<?>> getModelProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
+
         String model = inputParameters.getRequiredString(MODEL);
 
         ModifiableStringProperty string = string(PROMPT)

@@ -22,13 +22,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -39,14 +39,13 @@ public class GoogleMailUtils {
     }
 
     public static List<Option<String>> getLabelIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws IOException {
-
-        Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Label> labels = gmail
+        List<Label> labels = GoogleServices.getMail(connectionParameters)
             .users()
             .labels()
             .list("me")
@@ -61,12 +60,11 @@ public class GoogleMailUtils {
     }
 
     public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
         throws IOException {
 
-        Gmail service = GoogleServices.getMail(connectionParameters);
-
-        List<Message> messages = service
+        List<Message> messages = GoogleServices.getMail(connectionParameters)
             .users()
             .messages()
             .list("me")
@@ -83,12 +81,10 @@ public class GoogleMailUtils {
     }
 
     public static List<Option<String>> getThreadIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) throws IOException {
 
-        Gmail gmail = GoogleServices.getMail(connectionParameters);
-
-        List<Thread> threads = gmail
+        List<Thread> threads = GoogleServices.getMail(connectionParameters)
             .users()
             .threads()
             .list("me")

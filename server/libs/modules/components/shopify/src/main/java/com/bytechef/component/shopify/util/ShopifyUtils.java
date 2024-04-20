@@ -43,7 +43,8 @@ public class ShopifyUtils {
     }
 
     public static List<Option<Long>> getOrderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get(getBaseUrl(connectionParameters) + "/orders.json?status=any"))
@@ -61,7 +62,8 @@ public class ShopifyUtils {
     }
 
     public static List<Option<Long>> getProductIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get(getBaseUrl(connectionParameters) + "/products.json"))
@@ -79,12 +81,13 @@ public class ShopifyUtils {
     }
 
     public static List<Option<Long>> getVariantIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body = context.http(
             http -> http.get(
-                getBaseUrl(connectionParameters) + "/products/" + inputParameters.getLong(PRODUCT_ID)
-                    + "/variants.json"))
+                getBaseUrl(connectionParameters) + "/products/" +
+                    inputParameters.getRequiredFromPath(dependencyPaths.get(PRODUCT_ID)) + "/variants.json"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

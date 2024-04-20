@@ -38,6 +38,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,7 +50,9 @@ public class TwilioUtils {
     }
 
     public static List<? extends Property.ValueProperty<?>> getContentProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
+
         String content = inputParameters.getString(CONTENT);
 
         if (content.equals(BODY)) {
@@ -82,10 +85,11 @@ public class TwilioUtils {
     }
 
     public static List<? extends Property.ValueProperty<?>> getSourceProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        String source = inputParameters.getString(SOURCE);
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
 
         ModifiableStringProperty stringProperty;
+        String source = inputParameters.getString(SOURCE);
 
         if (source.equals(FROM)) {
             stringProperty = string(FROM)
@@ -114,7 +118,8 @@ public class TwilioUtils {
     }
 
     public static List<Option<String>> getZoneIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         List<Option<String>> options = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();

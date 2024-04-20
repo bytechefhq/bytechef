@@ -76,7 +76,7 @@ class PipelinerUtilsTest {
 
         assertEquals(
             expectedOptions,
-            PipelinerUtils.getActivityTypeIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            PipelinerUtils.getActivityTypeIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -101,7 +101,8 @@ class PipelinerUtilsTest {
         expectedOptions.add(option("first_name last_name", "id"));
 
         assertEquals(
-            expectedOptions, PipelinerUtils.getOwnerIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            expectedOptions,
+            PipelinerUtils.getOwnerIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -126,6 +127,6 @@ class PipelinerUtilsTest {
 
         assertEquals(
             expectedOptions,
-            PipelinerUtils.getSalesUnitsIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            PipelinerUtils.getSalesUnitsIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

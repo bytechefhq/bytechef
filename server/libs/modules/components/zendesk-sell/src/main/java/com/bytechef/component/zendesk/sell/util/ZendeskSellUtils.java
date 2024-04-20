@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -35,7 +36,8 @@ public class ZendeskSellUtils {
     }
 
     public static List<Property.ValueProperty<?>> createNameProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
 
         boolean isOrganization = inputParameters.getRequiredBoolean(IS_ORGANIZATION);
 

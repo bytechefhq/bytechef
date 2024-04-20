@@ -77,7 +77,7 @@ class AITableUtilsTest {
             .thenReturn(map);
 
         List<? extends Property.ValueProperty<?>> result =
-            AITableUtils.createPropertiesForRecord(mockedParameters, mockedParameters, mockedContext);
+            AITableUtils.createPropertiesForRecord(mockedParameters, mockedParameters, Map.of(), mockedContext);
 
         assertEquals(1, result.size());
 
@@ -140,7 +140,7 @@ class AITableUtilsTest {
 
         assertEquals(
             expectedOptions,
-            AITableUtils.getDatasheetIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AITableUtils.getDatasheetIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -173,7 +173,7 @@ class AITableUtilsTest {
 
         assertEquals(
             expectedOptions,
-            AITableUtils.getDatasheetRecordIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AITableUtils.getDatasheetRecordIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -207,7 +207,7 @@ class AITableUtilsTest {
 
         assertEquals(
             expectedOptions,
-            AITableUtils.getFieldNamesOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AITableUtils.getFieldNamesOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -241,6 +241,6 @@ class AITableUtilsTest {
 
         assertEquals(
             expectedOptions,
-            AITableUtils.getSpaceIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            AITableUtils.getSpaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

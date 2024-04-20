@@ -88,7 +88,7 @@ class CopperOptionUtilsTest {
         expectedOptions.add(option("ActivityName", "ActivityId"));
 
         assertEquals(expectedOptions,
-            CopperOptionUtils.getActivityTypeOptions(mockedParameters, mockedParameters, "", mockedContext));
+            CopperOptionUtils.getActivityTypeOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -110,7 +110,7 @@ class CopperOptionUtilsTest {
         expectedOptions.add(option("companyName", "123"));
 
         assertEquals(expectedOptions,
-            CopperOptionUtils.getCompanyIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            CopperOptionUtils.getCompanyIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -132,7 +132,7 @@ class CopperOptionUtilsTest {
         expectedOptions.add(option("ContactType", "123"));
 
         assertEquals(expectedOptions,
-            CopperOptionUtils.getContactTypesOptions(mockedParameters, mockedParameters, "", mockedContext));
+            CopperOptionUtils.getContactTypesOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
 
     }
 
@@ -154,7 +154,7 @@ class CopperOptionUtilsTest {
         expectedOptions.add(option("Tag1", "Tag1"));
 
         assertEquals(expectedOptions,
-            CopperOptionUtils.getTagsOptions(mockedParameters, mockedParameters, "", mockedContext));
+            CopperOptionUtils.getTagsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -175,6 +175,6 @@ class CopperOptionUtilsTest {
         expectedOptions.add(option("ContactType", "123"));
 
         assertEquals(expectedOptions,
-            CopperOptionUtils.getUserOptions(mockedParameters, mockedParameters, "", mockedContext));
+            CopperOptionUtils.getUserOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

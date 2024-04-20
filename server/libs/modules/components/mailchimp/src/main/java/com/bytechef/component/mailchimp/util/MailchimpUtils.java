@@ -50,7 +50,7 @@ public class MailchimpUtils {
 
     @SuppressWarnings("unchecked")
     public static ActionOptionsFunction<String> getListIdOptions() {
-        return (inputParameters, connectionParameters, searchText, context) -> {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
 
             String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken, context));

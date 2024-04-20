@@ -33,6 +33,7 @@ import com.slack.api.model.Conversation;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +79,7 @@ public final class SlackSendMessageActionTest extends AbstractSlackActionTest {
             .thenReturn(SEARCH_TEXT + " more text");
 
         List<Option<String>> options = SlackSendMessageAction.getChannelOptions(
-            mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
+            mockedParameters, mockedParameters, Map.of(), SEARCH_TEXT, mockedContext);
 
         verify(mockedMethodsClient, times(1))
             .conversationsList(any(ConversationsListRequest.class));

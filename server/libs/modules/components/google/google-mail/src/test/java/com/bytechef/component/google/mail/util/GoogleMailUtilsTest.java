@@ -37,6 +37,7 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.Thread;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,7 @@ class GoogleMailUtilsTest {
             .thenReturn(new ListLabelsResponse().setLabels(labels));
 
         List<Option<String>> result = GoogleMailUtils.getLabelIdOptions(
-            mockedParameters, mockedParameters, anyString(), mockedContext);
+            mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
         assertEquals("me", userIdArgumentCaptor.getValue());
 
@@ -124,7 +125,7 @@ class GoogleMailUtilsTest {
             .thenReturn(new ListMessagesResponse().setMessages(messages));
 
         List<Option<String>> messageIdOptions = GoogleMailUtils.getMessageIdOptions(
-            mockedParameters, mockedParameters, anyString(), mockedContext);
+            mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
         assertEquals("me", userIdArgumentCaptor.getValue());
 
@@ -156,7 +157,7 @@ class GoogleMailUtilsTest {
             .thenReturn(new ListThreadsResponse().setThreads(threads));
 
         List<Option<String>> threadIdOptions = GoogleMailUtils.getThreadIdOptions(
-            mockedParameters, mockedParameters, anyString(), mockedContext);
+            mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
 
         assertEquals("me", userIdArgumentCaptor.getValue());
 

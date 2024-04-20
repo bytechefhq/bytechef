@@ -78,7 +78,7 @@ class SendgridUtilsTest extends AbstractSendgridActionTest {
         when(mockedContext.json(any())).thenReturn(map);
 
         List<Option<String>> options = SendgridUtils.getTemplates(
-            mockedParameters, connectionParameters, "searchText", mockedContext);
+            mockedParameters, connectionParameters, Map.of(), "searchText", mockedContext);
 
         assertEquals(2, options.size());
         assertEquals("1", options.get(0)

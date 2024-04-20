@@ -47,7 +47,8 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getActivityTypeOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, ArrayList<Map<String, Object>>> body =
             context
@@ -67,7 +68,8 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getCompanyIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.post(BASE_URL + "/companies/search"))
@@ -80,7 +82,8 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getContactTypesOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get(BASE_URL + "/contact_types"))
@@ -93,7 +96,8 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getTagsOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get(BASE_URL + "/tags"))
@@ -114,7 +118,8 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getUserOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context
             .http(http -> http.post(BASE_URL + "/users/search"))

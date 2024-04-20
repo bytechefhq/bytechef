@@ -82,6 +82,6 @@ class MicrosoftOneDriveUtilsTest {
 
         assertEquals(
             expectedOptions,
-            MicrosoftOneDriveUtils.getFolderIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            MicrosoftOneDriveUtils.getFolderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

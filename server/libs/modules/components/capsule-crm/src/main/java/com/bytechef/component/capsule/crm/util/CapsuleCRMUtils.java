@@ -44,7 +44,8 @@ public class CapsuleCRMUtils {
     }
 
     public static List<ValueProperty<?>> createNameProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext context) {
 
         String type = inputParameters.getRequiredString(TYPE);
 
@@ -56,7 +57,8 @@ public class CapsuleCRMUtils {
     }
 
     public static List<Option<String>> getCountryOptions(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body =
             context.http(http -> http.get(BASE_URL + "/countries"))

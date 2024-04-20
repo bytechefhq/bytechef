@@ -76,7 +76,7 @@ class ActiveCampaignUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ActiveCampaignUtils.getContactIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            ActiveCampaignUtils.getContactIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -101,6 +101,6 @@ class ActiveCampaignUtilsTest {
 
         assertEquals(
             expectedOptions,
-            ActiveCampaignUtils.getTaskTypeIdOptions(mockedParameters, mockedParameters, "", mockedContext));
+            ActiveCampaignUtils.getTaskTypeIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }
