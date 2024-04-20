@@ -11,16 +11,7 @@ import {
 } from 'middleware/platform/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import ReactFlow, {
-    Controls,
-    Edge,
-    MiniMap,
-    Node,
-    NodeChange,
-    NodeDimensionChange,
-    useReactFlow,
-    useStore,
-} from 'reactflow';
+import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
