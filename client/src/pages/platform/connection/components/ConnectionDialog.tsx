@@ -83,11 +83,9 @@ const ConnectionDialog = ({
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<'configuration_step' | 'oauth_step'>('configuration_step');
-
     const [selectedComponentDefinition, setSelectedComponentDefinition] = useState<
         ComponentDefinitionBasicModel | undefined
     >(componentDefinition);
-
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const form = useForm<ConnectionDialogFormProps>({
@@ -217,8 +215,6 @@ const ConnectionDialog = ({
         setTimeout(() => {
             formReset();
 
-            setAuthorizationName(undefined);
-            setSelectedComponentDefinition(undefined);
             setOAuth2Error(undefined);
             setWizardStep('configuration_step');
 
