@@ -706,6 +706,14 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "loadDependsOnPaths"
+          description: "The list of dependency paths."
+          required: false
+          in: "query"
+          schema:
+            type: "array"
+            items:
+              type: "string"
       responses:
         "200":
           description: "The list of options."
@@ -894,6 +902,14 @@ paths:
           in: "path"
           schema:
             type: "string"
+        - name: "loadDependsOnPaths"
+          description: "The list of dependency paths."
+          required: false
+          in: "query"
+          schema:
+            type: "array"
+            items:
+              type: "string"
         - name: "searchText"
           description: "Optional search text used to filter option items"
           in: "query"
