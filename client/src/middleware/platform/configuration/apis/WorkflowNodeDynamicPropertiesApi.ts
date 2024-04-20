@@ -26,6 +26,7 @@ export interface GetWorkflowNodeDynamicPropertiesRequest {
     id: string;
     workflowNodeName: string;
     propertyName: string;
+    loadDependsOnPaths?: Array<string>;
 }
 
 /**
@@ -60,6 +61,10 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['loadDependsOnPaths'] != null) {
+            queryParameters['loadDependsOnPaths'] = requestParameters['loadDependsOnPaths'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
