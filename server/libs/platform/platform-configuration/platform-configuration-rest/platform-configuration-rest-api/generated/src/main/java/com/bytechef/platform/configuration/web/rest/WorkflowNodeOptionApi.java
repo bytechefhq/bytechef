@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-17T17:52:35.553216+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "workflow-node-option", description = "The Platform Workflow Node Option API")
 public interface WorkflowNodeOptionApi {
@@ -48,6 +48,7 @@ public interface WorkflowNodeOptionApi {
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param propertyName The name of a property. (required)
+     * @param loadDependsOnPaths The list of dependency paths. (optional)
      * @param searchText Optional search text used to filter option items (optional)
      * @return The list of options. (status code 200)
      */
@@ -72,6 +73,7 @@ public interface WorkflowNodeOptionApi {
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "loadDependsOnPaths", description = "The list of dependency paths.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "loadDependsOnPaths", required = false) List<String> loadDependsOnPaths,
         @Parameter(name = "searchText", description = "Optional search text used to filter option items", in = ParameterIn.QUERY) @Valid @RequestParam(value = "searchText", required = false) String searchText
     ) {
         getRequest().ifPresent(request -> {
