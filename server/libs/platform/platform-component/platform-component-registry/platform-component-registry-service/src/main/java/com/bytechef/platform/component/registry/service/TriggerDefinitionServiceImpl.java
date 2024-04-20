@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -87,7 +88,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
+        List<String> loadDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
 
         PropertiesDataSource.TriggerPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
@@ -96,7 +97,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             return CollectionUtils.map(
                 propertiesFunction.apply(
                     new ParametersImpl(inputParameters),
-                    connection == null ? null : new ParametersImpl(connection.parameters()), context),
+                    connection == null ? null : new ParametersImpl(connection.parameters()),
+                    MapUtils.toMap(
+                        loadDependsOnPaths,
+                        item -> item.substring(item.lastIndexOf(".") + 1),
+                        item -> item),
+                    context),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
             throw new ComponentExecutionException(
@@ -204,8 +210,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> loadDependsOnPaths,
+        String searchText, ComponentConnection connection, @NonNull TriggerContext context) {
 
         OptionsDataSource.TriggerOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
@@ -214,7 +220,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             return CollectionUtils.map(
                 optionsFunction.apply(
                     new ParametersImpl(inputParameters),
-                    connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context),
+                    connection == null ? null : new ParametersImpl(connection.parameters()),
+                    MapUtils.toMap(
+                        loadDependsOnPaths,
+                        item -> item.substring(item.lastIndexOf(".") + 1),
+                        item -> item),
+                    searchText, context),
                 Option::new);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, TriggerDefinitionErrorType.EXECUTE_OPTIONS);

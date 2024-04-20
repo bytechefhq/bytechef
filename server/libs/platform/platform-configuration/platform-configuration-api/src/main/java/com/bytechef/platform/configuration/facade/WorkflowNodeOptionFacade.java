@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.registry.domain.Option;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -25,5 +26,6 @@ import java.util.List;
 public interface WorkflowNodeOptionFacade {
 
     List<Option> getWorkflowNodeOptions(
-        String workflowId, String workflowNodeName, String propertyName, String searchText);
+        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
+        @NonNull List<String> loadDependsOnPaths, String searchText);
 }

@@ -46,12 +46,13 @@ public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeD
 
     @Override
     public ResponseEntity<List<PropertyModel>> getWorkflowNodeDynamicProperties(
-        String workflowId, String workflowNodeName, String propertyName) {
+        String workflowId, String workflowNodeName, String propertyName, List<String> loadDependsOnPaths) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
-                    workflowId, workflowNodeName, propertyName),
+                    workflowId, workflowNodeName, propertyName,
+                    loadDependsOnPaths == null ? List.of() : loadDependsOnPaths),
                 property -> conversionService.convert(property, PropertyModel.class)));
     }
 }

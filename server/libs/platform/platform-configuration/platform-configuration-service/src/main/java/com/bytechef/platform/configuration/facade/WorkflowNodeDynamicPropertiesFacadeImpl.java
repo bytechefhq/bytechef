@@ -29,6 +29,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -59,7 +60,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     @Override
     @SuppressWarnings("unchecked")
     public List<Property> getWorkflowNodeDynamicProperties(
-        String workflowId, String workflowNodeName, String propertyName) {
+        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
+        @NonNull List<String> loadDependsOnPaths) {
 
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
@@ -75,7 +77,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 return triggerDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                     workflowNodeType.componentOperationName(), propertyName, workflowTrigger.evaluateParameters(inputs),
-                    connectionId);
+                    loadDependsOnPaths, connectionId);
             })
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -89,7 +91,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                     workflowNodeType.componentOperationName(), propertyName,
                     workflowTask.evaluateParameters(
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
-                    connectionId);
+                    loadDependsOnPaths, connectionId);
             });
     }
 }

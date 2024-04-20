@@ -18,6 +18,7 @@ package com.bytechef.commons.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Array;
 import java.time.Duration;
@@ -284,6 +285,10 @@ public class MapUtils {
 
     public static <K> float getFloat(Map<K, ?> map, K key, float defaultValue) {
         return get(map, key, Float.class, defaultValue);
+    }
+
+    public static <T> T getFromPath(Map<String, ?> map, String path) {
+        return JsonPath.read(map, path);
     }
 
     public static <K> Integer getInteger(Map<K, ?> map, K key) {
@@ -575,6 +580,14 @@ public class MapUtils {
         Float value = getFloat(map, key);
 
         Validate.notNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static <T> T getRequiredFromPath(Map<String, ?> map, String path) {
+        T value = JsonPath.read(map, path);
+
+        Validate.notNull(value, "Unknown value for : " + path);
 
         return value;
     }

@@ -42,6 +42,25 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/execute-properties",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Property>> executeDynamicProperties(
+        @Valid @RequestBody PropertiesRequest propertiesRequest) {
+
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeDynamicProperties(
+                propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.loadDependsOnPaths,
+                propertiesRequest.connectionId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = "/execute-dynamic-webhook-disable",
         consumes = {
             "application/json"
@@ -157,25 +176,8 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.triggerName,
-                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.connectionId,
-                optionsRequest.searchText));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-properties",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<List<Property>>
-        executeProperties(@Valid @RequestBody PropertiesRequest propertiesRequest) {
-        return ResponseEntity.ok(
-            triggerDefinitionFacade.executeDynamicProperties(
-                propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.connectionId));
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.loadDependsOnPaths,
+                optionsRequest.searchText, optionsRequest.connectionId));
     }
 
     @RequestMapping(
@@ -264,7 +266,8 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
+        @NotNull Map<String, ?> inputParameters, Long connectionId, List<String> loadDependsOnPaths,
+        String searchText) {
     }
 
     @SuppressFBWarnings("EI")
@@ -276,13 +279,7 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, Object> inputParameters, Long connectionId) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record SampleOutputRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> inputParameters, Long connectionId) {
+        @NotNull Map<String, Object> inputParameters, Long connectionId, List<String> loadDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")

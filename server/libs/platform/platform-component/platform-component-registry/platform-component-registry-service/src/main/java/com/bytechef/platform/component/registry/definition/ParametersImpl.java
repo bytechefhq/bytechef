@@ -164,6 +164,11 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
+    public <T> T getFromPath(String path) {
+        return MapUtils.getFromPath(map, path);
+    }
+
+    @Override
     public Integer getInteger(String key) {
         return MapUtils.getInteger(map, key);
     }
@@ -367,6 +372,11 @@ public final class ParametersImpl implements Parameters {
     @Override
     public float getRequiredFloat(String key) {
         return MapUtils.getRequiredFloat(map, key);
+    }
+
+    @Override
+    public <T> T getRequiredFromPath(String path) {
+        return MapUtils.getRequiredFromPath(map, path);
     }
 
     @Override

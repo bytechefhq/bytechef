@@ -44,7 +44,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, ?> inputParameters, Long connectionId) {
+        Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
@@ -56,13 +56,14 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options"),
             new OptionsRequest(
                 componentName, componentVersion, actionName, propertyName, inputParameters, connectionId,
-                searchText),
+                loadDependsOnPaths, searchText),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -112,7 +113,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     private record OptionsRequest(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, Long connectionId, String searchText) {
+        Map<String, ?> inputParameters, Long connectionId, List<String> loadDependsOnPaths, String searchText) {
     }
 
     private record OutputRequest(

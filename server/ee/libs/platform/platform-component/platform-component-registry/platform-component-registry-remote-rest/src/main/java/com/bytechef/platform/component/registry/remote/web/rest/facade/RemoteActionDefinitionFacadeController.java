@@ -41,6 +41,22 @@ public class RemoteActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/execute-dynamic-properties",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<List<Property>> executeDynamicProperties(
+        @Valid @RequestBody PropertiesRequest propertiesRequest) {
+
+        return ResponseEntity.ok(
+            actionDefinitionFacade.executeDynamicProperties(
+                propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.loadDependsOnPaths,
+                propertiesRequest.connectionId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = "/execute-node-description",
         consumes = {
             "application/json"
@@ -64,23 +80,8 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
-                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.connectionId,
-                optionsRequest.searchText));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-dynamic-properties",
-        consumes = {
-            "application/json"
-        })
-    public ResponseEntity<List<Property>> executeDynamicProperties(
-        @Valid @RequestBody PropertiesRequest propertiesRequest) {
-
-        return ResponseEntity.ok(
-            actionDefinitionFacade.executeDynamicProperties(
-                propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.connectionId));
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.loadDependsOnPaths,
+                optionsRequest.searchText, optionsRequest.connectionId));
     }
 
     @RequestMapping(
@@ -121,7 +122,7 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> inputParameters, Long connectionId, String searchText) {
+        Map<String, Object> inputParameters, Long connectionId, List<String> loadDependsOnPaths, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
@@ -133,7 +134,8 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        @NotNull String propertyName, Map<String, Object> inputParameters, Long connectionId) {
+        @NotNull String propertyName, Map<String, Object> inputParameters, Long connectionId,
+        List<String> loadDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")

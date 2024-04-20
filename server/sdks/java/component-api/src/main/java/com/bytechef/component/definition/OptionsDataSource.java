@@ -17,6 +17,7 @@
 package com.bytechef.component.definition;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -54,14 +55,15 @@ public interface OptionsDataSource {
          *
          * @param inputParameters
          * @param connectionParameters
+         * @param loadDependsOnPaths
          * @param searchText
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends Option<T>> apply(
-            Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-            throws Exception;
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            String searchText, ActionContext context) throws Exception;
     }
 
     /**
@@ -74,13 +76,14 @@ public interface OptionsDataSource {
          *
          * @param inputParameters
          * @param connectionParameters
+         * @param loadDependsOnPaths
          * @param searchText
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends Option<T>> apply(
-            Parameters inputParameters, Parameters connectionParameters, String searchText, TriggerContext context)
-            throws Exception;
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            String searchText, TriggerContext context) throws Exception;
     }
 }

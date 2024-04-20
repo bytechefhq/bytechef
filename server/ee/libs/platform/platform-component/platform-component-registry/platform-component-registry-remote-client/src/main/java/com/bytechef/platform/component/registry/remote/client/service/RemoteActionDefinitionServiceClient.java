@@ -45,7 +45,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths,
+        ComponentConnection connection, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -53,8 +54,8 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
-        @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        ComponentConnection connection, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

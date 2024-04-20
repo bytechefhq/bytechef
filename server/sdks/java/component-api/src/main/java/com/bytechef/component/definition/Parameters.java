@@ -65,6 +65,8 @@ public interface Parameters extends Map<String, Object> {
 
     float getFloat(String key, float defaultValue);
 
+    <T> T getFromPath(String path);
+
     Integer getInteger(String key);
 
     int getInteger(String key, int defaultValue);
@@ -134,6 +136,8 @@ public interface Parameters extends Map<String, Object> {
     FileEntry getRequiredFileEntry(String key);
 
     float getRequiredFloat(String key);
+
+    <T> T getRequiredFromPath(String path);
 
     int getRequiredInteger(String key);
 

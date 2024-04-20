@@ -18,6 +18,7 @@ package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -53,13 +54,14 @@ public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesF
          *
          * @param inputParameters
          * @param connectionParameters
+         * @param loadDependsOnPaths
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            ActionContext context) throws Exception;
     }
 
     /**
@@ -72,12 +74,13 @@ public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesF
          *
          * @param inputParameters
          * @param connectionParameters
+         * @param loadDependsOnPaths
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, TriggerContext context)
-            throws Exception;
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            TriggerContext context) throws Exception;
     }
 }

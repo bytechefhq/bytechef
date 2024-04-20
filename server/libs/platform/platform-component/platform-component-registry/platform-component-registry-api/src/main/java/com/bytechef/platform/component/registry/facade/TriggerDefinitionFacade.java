@@ -33,7 +33,7 @@ public interface TriggerDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, Long connectionId);
 
     void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
@@ -59,7 +59,8 @@ public interface TriggerDefinitionFacade {
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        Long connectionId);
 
     Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,

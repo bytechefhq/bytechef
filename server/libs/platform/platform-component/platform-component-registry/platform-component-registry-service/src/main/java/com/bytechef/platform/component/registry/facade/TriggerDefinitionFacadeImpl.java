@@ -56,12 +56,12 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, triggerName, inputParameters, propertyName,
+            componentName, componentVersion, triggerName, inputParameters, propertyName, loadDependsOnPaths,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
@@ -129,12 +129,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeOptions(
-            componentName, componentVersion, triggerName, inputParameters, propertyName, searchText,
+            componentName, componentVersion, triggerName, inputParameters, propertyName, loadDependsOnPaths, searchText,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 

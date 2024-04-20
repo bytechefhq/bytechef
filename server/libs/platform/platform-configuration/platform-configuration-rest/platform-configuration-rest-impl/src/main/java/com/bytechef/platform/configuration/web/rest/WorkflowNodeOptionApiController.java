@@ -46,11 +46,14 @@ public class WorkflowNodeOptionApiController implements WorkflowNodeOptionApi {
 
     @Override
     public ResponseEntity<List<OptionModel>> getWorkflowNodeOptions(
-        String workflowId, String workflowNodeName, String propertyName, String searchText) {
+        String workflowId, String workflowNodeName, String propertyName, List<String> loadDependsOnPaths,
+        String searchText) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowNodeOptionFacade.getWorkflowNodeOptions(workflowId, workflowNodeName, propertyName, searchText),
+                workflowNodeOptionFacade.getWorkflowNodeOptions(
+                    workflowId, workflowNodeName, propertyName,
+                    loadDependsOnPaths == null ? List.of() : loadDependsOnPaths, searchText),
                 option -> conversionService.convert(option, OptionModel.class)));
     }
 

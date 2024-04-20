@@ -214,11 +214,12 @@ public class ComponentDefinitionRegistry {
             for (int i = 1; i < subProperties.length - 1; i++) {
                 int finalI = i;
 
-                if (subProperties[finalI].endsWith("_[0]")) {
+                if (subProperties[finalI].endsWith("]")) {
                     Property.ArrayProperty arrayProperty = (Property.ArrayProperty) CollectionUtils.getFirst(
                         OptionalUtils.get(objectProperty.getProperties()),
                         curProperty -> Objects.equals(
-                            curProperty.getName(), subProperties[finalI].replace("_[0]", "")));
+                            curProperty.getName(),
+                            subProperties[finalI].substring(0, subProperties[finalI].length() - 3)));
 
                     List<? extends Property> items = OptionalUtils.get(arrayProperty.getItems());
 

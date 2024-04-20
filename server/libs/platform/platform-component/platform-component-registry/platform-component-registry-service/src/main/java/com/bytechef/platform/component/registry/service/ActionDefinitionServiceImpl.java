@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
@@ -65,7 +66,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths,
+        ComponentConnection connection, @NonNull ActionContext context) {
 
         ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, actionName, propertyName);
@@ -74,7 +76,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             return propertiesFunction
                 .apply(
                     new ParametersImpl(inputParameters),
-                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context)
+                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
+                    MapUtils.toMap(
+                        loadDependsOnPaths,
+                        item -> item.substring(item.lastIndexOf(".") + 1),
+                        item -> item),
+                    context)
                 .stream()
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
                 .toList();
@@ -87,8 +94,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
-        @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        ComponentConnection connection, @NonNull ActionContext context) {
 
         ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
@@ -97,7 +104,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             return optionsFunction
                 .apply(
                     new ParametersImpl(inputParameters),
-                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()), searchText, context)
+                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
+                    MapUtils.toMap(
+                        loadDependsOnPaths,
+                        item -> item.substring(item.lastIndexOf(".") + 1),
+                        item -> item),
+                    searchText, context)
                 .stream()
                 .map(Option::new)
                 .toList();

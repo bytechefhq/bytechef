@@ -57,12 +57,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, ?> inputParameters, Long connectionId) {
+        Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, inputParameters, componentConnection,
+            componentName, componentVersion, actionName, propertyName, inputParameters, loadDependsOnPaths,
+            componentConnection,
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, null, componentConnection));
     }
@@ -70,12 +71,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
-            componentName, componentVersion, actionName, propertyName, inputParameters, searchText,
+            componentName, componentVersion, actionName, propertyName, inputParameters, loadDependsOnPaths, searchText,
             componentConnection,
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, null, componentConnection));
