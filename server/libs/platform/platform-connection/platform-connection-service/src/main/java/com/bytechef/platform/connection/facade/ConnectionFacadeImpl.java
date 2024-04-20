@@ -91,8 +91,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             if (authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-                AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionFacade
-                    .executeAuthorizationCallback(
+                AuthorizationCallbackResponse authorizationCallbackResponse =
+                    connectionDefinitionFacade.executeAuthorizationCallback(
                         connection.getComponentName(),
                         new ComponentConnection(
                             connection.getComponentName(), connection.getConnectionVersion(),
