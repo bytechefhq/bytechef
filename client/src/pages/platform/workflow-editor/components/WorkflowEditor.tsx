@@ -1,6 +1,6 @@
 import {UpdateWorkflowRequest} from '@/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {ComponentActionType} from '@/types/types';
+import {ComponentOperationType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -11,7 +11,16 @@ import {
 } from 'middleware/platform/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
+import ReactFlow, {
+    Controls,
+    Edge,
+    MiniMap,
+    Node,
+    NodeChange,
+    NodeDimensionChange,
+    useReactFlow,
+    useStore,
+} from 'reactflow';
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
@@ -39,7 +48,7 @@ const WorkflowEditor = ({
 }: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
     const [latestComponentName, setLatestComponentName] = useState('');
-    const [nodeActions, setNodeActions] = useState<Array<ComponentActionType>>([]);
+    const [nodeOperations, setNodeOperations] = useState<Array<ComponentOperationType>>([]);
     const [nodes, setNodes] = useState(defaultNodes);
     const [viewportWidth, setViewportWidth] = useState(0);
 
@@ -122,66 +131,73 @@ const WorkflowEditor = ({
             return undefined;
         }
 
-        const workflowNodes = nodeNames.filter((nodeName) => nodeName === workflowComponent.name);
+        const sameNodeNames = nodeNames.filter((nodeName) => nodeName === workflowComponent.name);
 
         return {
             ...workflowComponent,
-            workflowNodeName: `${workflowComponent.name}_${workflowNodes.length + 1}`,
+            workflowNodeName: `${workflowComponent.name}_${sameNodeNames.length + 1}`,
         };
     }, [nodeNames, workflowComponent]);
 
-    const defaultNodesWithWorkflowNodes = useMemo(() => {
-        const workflowTasks = workflow?.tasks?.filter((task) => task.name);
+    const defaultNodesWithWorkflowNodes: Array<Node> | undefined = useMemo(() => {
+        if (!workflow || !componentDefinitions.length) {
+            return;
+        }
 
-        const workflowNodes = workflowTasks?.map((workflowTask, index) => {
-            const componentName = workflowTask.type?.split('/')[0];
-            const actionName = workflowTask.type?.split('/')[2];
+        const workflowTasks = workflow.tasks?.filter((task) => task.name);
+        const workflowTrigger = workflow.triggers?.[0] || defaultNodes[0].data;
+
+        let workflowComponents = workflowTasks;
+
+        if (workflowTrigger) {
+            workflowComponents = [workflowTrigger, ...(workflowTasks || [])];
+        }
+
+        const workflowNodes = workflowComponents?.map((workflowComponent, index) => {
+            const componentName = workflowComponent.type?.split('/')[0];
+            const operationName = workflowComponent.type?.split('/')[2];
 
             const componentDefinition = componentDefinitions.find(
                 (componentDefinition) => componentDefinition.name === componentName
-            );
+            )!;
 
-            if (componentDefinition) {
-                return {
-                    data: {
-                        ...workflowTask,
-                        actionName,
-                        componentName: componentDefinition.name,
-                        icon: (
-                            <InlineSVG
-                                className="size-9"
-                                loader={<Component1Icon className="size-9 flex-none text-gray-900" />}
-                                src={componentDefinition.icon!}
-                            />
-                        ),
-                        id: componentDefinition.name,
-                        label: componentDefinition.title,
-                        name: workflowTask.name,
-                        type: 'workflow',
-                    },
-                    id: workflowTask.name,
-                    position: {x: 0, y: 150 * (index + 1)},
+            return {
+                data: {
+                    ...workflowComponent,
+                    componentName: componentDefinition.name,
+                    icon: (
+                        <InlineSVG
+                            className="size-9"
+                            loader={<Component1Icon className="size-9 flex-none text-gray-900" />}
+                            src={componentDefinition.icon!}
+                        />
+                    ),
+                    id: componentDefinition.name,
+                    label: componentDefinition.title,
+                    name: workflowComponent.name,
+                    operationName,
+                    trigger: index === 0,
                     type: 'workflow',
-                };
-            }
+                },
+                id: workflowComponent.name,
+                position: {x: 0, y: 150 * index},
+                type: 'workflow',
+            };
         });
 
-        if (workflowNodes) {
-            setNodeActions(
+        if (workflowNodes?.length) {
+            setNodeOperations(
                 workflowNodes.map((node) => ({
-                    actionName: node!.data.actionName!,
-                    componentName: node!.data.componentName!,
-                    workflowNodeName: node?.data.name,
+                    componentName: node.data.componentName,
+                    operationName: node.data.operationName,
+                    workflowNodeName: node.data.name,
                 }))
             );
 
-            const nodes = [...defaultNodes, ...workflowNodes];
-
-            nodes.splice(1, 1);
-
-            return nodes;
+            return workflowNodes;
         }
-    }, [componentDefinitions, workflow?.tasks]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [componentDefinitions, workflow?.tasks, workflow?.triggers]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
@@ -239,6 +255,10 @@ const WorkflowEditor = ({
             return;
         }
 
+        if (workflow.triggers?.length && newNode?.data.trigger) {
+            return;
+        }
+
         saveWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutation);
     };
 
@@ -274,8 +294,8 @@ const WorkflowEditor = ({
 
     // Set component actions when node actions change
     useEffect(() => {
-        setComponentActions(nodeActions);
-    }, [nodeActions, setComponentActions]);
+        setComponentActions(nodeOperations);
+    }, [nodeOperations, setComponentActions]);
 
     // Reconstruct editor nodes on re-render
     useEffect(() => {
@@ -300,7 +320,7 @@ const WorkflowEditor = ({
         }
     }, [defaultEdgesWithWorkflowEdges]);
 
-    // Append counter to workflow node name when a new node with the same name is added
+    // Append counter to workflowNodeName when a new node with the same name is added
     useEffect(() => {
         if (workflowComponentWithAlias?.actions) {
             const {actions, name} = workflowComponentWithAlias;
@@ -314,14 +334,14 @@ const WorkflowEditor = ({
                 index++;
             }
 
-            const actionNames = componentActions.map((action) => action.actionName);
+            const operationNames = componentActions.map((action) => action.operationName);
 
-            if (!actionNames.includes(actions[0].name)) {
+            if (actions.length && !operationNames.includes(actions[0].name)) {
                 setComponentActions([
                     ...componentActions,
                     {
-                        actionName: actions[0].name,
                         componentName: name,
+                        operationName: actions[0].name,
                         workflowNodeName,
                     },
                 ]);
@@ -343,11 +363,12 @@ const WorkflowEditor = ({
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
-    // If no custom trigger is set, set Manual Trigger as default trigger
+    // If no custom trigger is set on first render, set Manual Trigger as default trigger
     useEffect(() => {
         if (!workflow.triggers?.length && defaultNodes[0].data) {
             saveWorkflowDefinition(defaultNodes[0].data, workflow, updateWorkflowMutation);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useLayout();

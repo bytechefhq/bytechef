@@ -1,4 +1,10 @@
-import {ComponentDefinitionApi, WorkflowModel, WorkflowTaskModel} from '@/middleware/platform/configuration';
+import {
+    ComponentDefinitionApi,
+    WorkflowConnectionModel,
+    WorkflowModel,
+    WorkflowTaskModel,
+    WorkflowTriggerModel,
+} from '@/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
@@ -11,13 +17,16 @@ type UpdateWorkflowRequestType = {
 };
 
 type NodeDataType = {
-    actionName?: string;
     componentName: string;
+    connections?: Array<WorkflowConnectionModel>;
+    description?: string;
     icon?: JSX.Element | string;
     label?: string;
     name: string;
+    operationName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
+    trigger?: boolean;
     type?: string;
 };
 
@@ -28,13 +37,47 @@ export default async function saveWorkflowDefinition(
     index?: number,
     onSuccess?: (workflow: WorkflowModel) => void
 ) {
-    const {actionName: currentActionName, componentName, label, name, parameters} = nodeData;
+    const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
+
+    if (nodeData.trigger) {
+        const newTrigger: WorkflowTriggerModel = {
+            connections: nodeData.connections,
+            label: nodeData.label,
+            name: nodeData.name,
+            parameters: nodeData.parameters,
+            type: `${nodeData.componentName}/v1/${nodeData.operationName}`,
+        };
+
+        updateWorkflowMutation.mutate(
+            {
+                id: workflow.id!,
+                workflowModel: {
+                    definition: JSON.stringify(
+                        {
+                            ...workflowDefinition,
+                            triggers: [newTrigger],
+                        },
+                        null,
+                        SPACE
+                    ),
+                    version: workflow.version,
+                },
+            },
+            {
+                onSuccess,
+            }
+        );
+
+        return;
+    }
+
+    const {componentName, label, name, parameters} = nodeData;
+
+    let {operationName} = nodeData;
 
     const queryClient = new QueryClient();
 
-    let actionName = currentActionName;
-
-    if (!actionName) {
+    if (!operationName) {
         const newNodeComponentDefinition = await queryClient.fetchQuery({
             queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
             queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
@@ -44,21 +87,19 @@ export default async function saveWorkflowDefinition(
             return;
         }
 
-        actionName = newNodeComponentDefinition.actions?.[0].name;
+        operationName = newNodeComponentDefinition.actions?.[0].name;
     }
 
     const newTask: WorkflowTaskModel = {
         label,
         name,
         parameters,
-        type: `${componentName}/v1/${actionName}`,
+        type: `${componentName}/v1/${operationName}`,
     };
-
-    const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
 
-    if (existingWorkflowTask && !actionName) {
+    if (existingWorkflowTask && !operationName) {
         return;
     }
 
@@ -115,7 +156,7 @@ export default async function saveWorkflowDefinition(
             },
         },
         {
-            onSuccess: onSuccess,
+            onSuccess,
         }
     );
 }

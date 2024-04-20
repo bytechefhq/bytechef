@@ -144,12 +144,14 @@ const Property = ({
         showInputTypeSwitchButton = true;
     }
 
-    const currentWorkflowTask = workflow?.tasks?.find(
-        (task) => task.name === currentComponentDefinition?.workflowNodeName
+    const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
+
+    const currentWorkflowComponent = workflowComponents?.find(
+        (component) => component.name === currentComponentDefinition?.workflowNodeName
     );
 
     if (!parameterValue) {
-        parameterValue = name ? (currentWorkflowTask?.parameters?.[name] as unknown as string) : '';
+        parameterValue = name ? (currentWorkflowComponent?.parameters?.[name] as unknown as string) : '';
     }
 
     if (name && name.endsWith('_0') && defaultValue) {
