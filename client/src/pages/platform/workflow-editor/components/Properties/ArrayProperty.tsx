@@ -42,7 +42,11 @@ const ArrayProperty = ({
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
 
-    const {items, name} = property;
+    const {items, name, options} = property;
+
+    if (options.length) {
+        console.log(name, 'options: ', options);
+    }
 
     const handleAddItemClick = () => {
         const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newItemType);
