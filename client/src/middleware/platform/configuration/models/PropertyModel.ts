@@ -55,7 +55,7 @@ export interface PropertyModel {
      */
     description?: string;
     /**
-     * Defines rules when a property should be shown or hidden.
+     * Defines rules when the property should be shown or hidden.
      * @type {string}
      * @memberof PropertyModel
      */
@@ -89,13 +89,14 @@ export interface PropertyModel {
      * @type {PropertyTypeModel}
      * @memberof PropertyModel
      */
-    type?: PropertyTypeModel;
+    type: PropertyTypeModel;
 }
 
 /**
  * Check if a given object implements the PropertyModel interface.
  */
 export function instanceOfPropertyModel(value: object): boolean {
+    if (!('type' in value)) return false;
     return true;
 }
 
@@ -157,7 +158,7 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'hidden': json['hidden'] == null ? undefined : json['hidden'],
         'name': json['name'] == null ? undefined : json['name'],
         'required': json['required'] == null ? undefined : json['required'],
-        'type': json['type'] == null ? undefined : PropertyTypeModelFromJSON(json['type']),
+        'type': PropertyTypeModelFromJSON(json['type']),
     };
 }
 
