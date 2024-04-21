@@ -11,17 +11,17 @@ import {
     useUploadSampleOutputRequestMutation,
 } from '@/mutations/platform/workflowNodeTestOutputs.mutations';
 import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
-import {PropertyType} from '@/types/types';
+import {NodeType, PropertyType} from '@/types/types';
+import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import {NodeProps} from 'reactflow';
 
 import PropertyField from '../PropertyField';
 import SchemaProperties from '../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
 interface OutputTabProps {
-    currentNode: NodeProps['data'];
+    currentNode: NodeType;
     outputDefined: boolean;
     outputSchema: PropertyModel;
     sampleOutput: object;
@@ -102,7 +102,11 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                                     )}
 
                                     {!saveWorkflowNodeTestOutputMutation.isPending &&
-                                        !uploadSampleOutputRequestMutation.isPending && <>Regenerate</>}
+                                        !uploadSampleOutputRequestMutation.isPending && (
+                                            <>
+                                                Regenerate <CaretDownIcon className="ml-0.5" />
+                                            </>
+                                        )}
                                 </Button>
                             </DropdownMenuTrigger>
 
@@ -113,7 +117,11 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                                     </DropdownMenuItem>
                                 )}
 
-                                <DropdownMenuItem onClick={handleTestComponentClick}>Test Component</DropdownMenuItem>
+                                {!currentNode.trigger && (
+                                    <DropdownMenuItem onClick={handleTestComponentClick}>
+                                        Test Component
+                                    </DropdownMenuItem>
+                                )}
 
                                 <DropdownMenuItem onClick={() => setShowUploadDialog(true)}>
                                     Upload Sample Output Data

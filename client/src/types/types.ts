@@ -19,6 +19,7 @@ import {
     TimePropertyModel,
     ValuePropertyModel,
 } from '@/middleware/platform/configuration';
+import {ReactNode} from 'react';
 
 export type DataPillType = {
     componentName?: string;
@@ -56,6 +57,18 @@ export type ClickedItemType = {
     trigger?: boolean;
     taskDispatcher?: boolean;
 } & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
+
+export type NodeType = {
+    componentName?: string;
+    connectionId?: number;
+    icon?: ReactNode;
+    id: string;
+    label?: string;
+    name: string;
+    trigger?: boolean;
+    type: 'component' | 'flowControl';
+    version: number;
+};
 
 export type SubPropertyType = PropertyType & {custom: boolean};
 

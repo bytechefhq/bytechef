@@ -1,20 +1,7 @@
 /* eslint-disable sort-keys */
-import {DataPillType} from '@/types/types';
-import {ReactNode} from 'react';
+import {DataPillType, NodeType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
-
-type NodeType = {
-    componentName?: string;
-    connectionId?: number;
-    icon?: ReactNode;
-    id: string;
-    label?: string;
-    name: string;
-    trigger?: boolean;
-    type: 'component' | 'flowControl';
-    version: number;
-};
 
 interface WorkflowNodeDetailsPanelStateI {
     copiedPropertyData: DataPillType;
