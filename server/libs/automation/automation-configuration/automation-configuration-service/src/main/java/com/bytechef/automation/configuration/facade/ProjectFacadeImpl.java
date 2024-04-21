@@ -35,7 +35,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.exception.ApplicationException;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -76,14 +75,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
-    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService) {
+        TagService tagService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
         this.jobService = jobService;
@@ -91,7 +89,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.projectService = projectService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
-        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
     }
 
@@ -200,8 +197,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(long id, @NonNull String workflowId) {
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
+    public void deleteWorkflow(@NonNull String workflowId) {
+        Project project = projectService.getWorkflowProject(workflowId);
+
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
 
         for (ProjectInstance projectInstance : projectInstances) {
             List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
@@ -226,7 +225,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
-        projectService.removeWorkflow(id, workflowId);
+        projectService.removeWorkflow(project.getId(), workflowId);
 
         workflowService.delete(workflowId);
     }

@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
-    public Workflow addWorkflow(long id, String definition) {
+    public Workflow addWorkflow(long id, @NonNull String definition) {
         throw new UnsupportedOperationException();
     }
 
@@ -35,7 +36,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO createProject(ProjectDTO projectDTO) {
+    public ProjectDTO createProject(@NonNull ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
 
@@ -45,7 +46,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(long id, String workflowId) {
+    public void deleteWorkflow(@NonNull String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -55,7 +56,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public String duplicateWorkflow(long id, String workflowId) {
+    public String duplicateWorkflow(long id, @NonNull String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -95,12 +96,12 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO updateProject(ProjectDTO projectDTO) {
+    public ProjectDTO updateProject(@NonNull ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateProjectTags(long id, List<Tag> tags) {
+    public void updateProjectTags(long id, @NonNull List<Tag> tags) {
         throw new UnsupportedOperationException();
     }
 }

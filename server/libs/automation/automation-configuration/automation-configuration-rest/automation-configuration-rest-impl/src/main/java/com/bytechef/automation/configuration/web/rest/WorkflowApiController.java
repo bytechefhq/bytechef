@@ -59,8 +59,8 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteWorkflow(Long id, String workflowId) {
-        projectFacade.deleteWorkflow(id, workflowId);
+    public ResponseEntity<Void> deleteWorkflow(String workflowId) {
+        projectFacade.deleteWorkflow(workflowId);
 
         return ResponseEntity.noContent()
             .build();
