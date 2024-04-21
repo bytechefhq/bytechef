@@ -242,6 +242,10 @@ const WorkflowNodeDetailsPanel = ({
     });
 
     const handleOperationSelectChange = (operationName: string) => {
+        if (!currentComponentDefinition || !currentComponent) {
+            return;
+        }
+
         setCurrentOperationName(operationName);
 
         setComponentActions(
@@ -257,39 +261,33 @@ const WorkflowNodeDetailsPanel = ({
             })
         );
 
-        if (currentComponentDefinition) {
-            setComponents([
-                ...components.filter((component) => component.workflowNodeName !== currentNode.name),
-                {
-                    componentName: currentNode.componentName || currentNode.id,
-                    icon: currentComponentDefinition.icon,
-                    operationName,
-                    title: currentComponentDefinition?.title,
-                    workflowNodeName: currentNode.name,
-                },
-            ]);
+        setComponents([
+            ...components.filter((component) => component.workflowNodeName !== currentNode.name),
+            {
+                componentName: currentNode.componentName || currentNode.id,
+                icon: currentComponentDefinition.icon,
+                operationName,
+                title: currentComponentDefinition?.title,
+                workflowNodeName: currentNode.name,
+            },
+        ]);
 
-            if (!currentComponent) {
-                return;
-            }
+        const {componentName, icon, title, workflowNodeName} = currentComponent;
 
-            const {componentName, icon, title, workflowNodeName} = currentComponent;
+        delete currentWorkflowTask?.parameters;
 
-            delete currentWorkflowTask?.parameters;
-
-            saveWorkflowDefinition(
-                {
-                    componentName,
-                    icon,
-                    label: title,
-                    name: workflowNodeName!,
-                    operationName,
-                    type: `${componentName}/v1/${operationName}`,
-                },
-                workflow,
-                updateWorkflowMutation
-            );
-        }
+        saveWorkflowDefinition(
+            {
+                componentName,
+                icon,
+                label: title,
+                name: workflowNodeName || currentNode.name,
+                operationName,
+                type: `${componentName}/v1/${operationName}`,
+            },
+            workflow,
+            updateWorkflowMutation
+        );
     };
 
     useEffect(() => {
