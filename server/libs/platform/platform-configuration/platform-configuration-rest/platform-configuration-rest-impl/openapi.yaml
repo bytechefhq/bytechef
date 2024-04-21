@@ -1428,8 +1428,6 @@ components:
     FileEntryProperty:
       description: "An file entry property type."
       type: "object"
-      required:
-        - "type"
       allOf:
         - $ref: "#/components/schemas/ValueProperty"
         - type: "object"
@@ -1455,8 +1453,6 @@ components:
     IntegerProperty:
       description: "An integer property type."
       type: "object"
-      required:
-      - "type"
       allOf:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
@@ -1623,30 +1619,34 @@ components:
       description: "A base property."
       type: "object"
       required:
-      - "propertyType"
+      - "type"
       properties:
         advancedOption:
           description: "If the property should be grouped under advanced options."
           type: "boolean"
+          default: false
         description:
           description: "The property description."
           type: "string"
         displayCondition:
-          description: "Defines rules when a property should be shown or hidden."
+          description: "Defines rules when the property should be shown or hidden."
           type: "string"
         expressionEnabled:
           description: "Defines if the property can contain expressions or only constant\
             \ values. Defaults to true."
           type: "boolean"
+          default: true
         hidden:
           description: "If the property should be visible or not."
           type: "boolean"
+          default: false
         name:
           description: "The property name."
           type: "string"
         required:
           description: "If the property is required or not."
           type: "boolean"
+          default: false
         type:
           $ref: "#/components/schemas/PropertyType"
       discriminator:
