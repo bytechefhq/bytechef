@@ -1,11 +1,5 @@
-import {ControlTypeModel} from '@/middleware/platform/configuration';
-import {
-    ArrayPropertyType,
-    ComponentType,
-    CurrentComponentDefinitionType,
-    DataPillType,
-    PropertyType,
-} from '@/types/types';
+import {ComponentDefinitionModel, ControlTypeModel} from '@/middleware/platform/configuration';
+import {ArrayPropertyType, ComponentType, DataPillType, PropertyType} from '@/types/types';
 
 import Property from '../Property';
 import DeletePropertyButton from './DeletePropertyButton';
@@ -13,7 +7,7 @@ import DeletePropertyButton from './DeletePropertyButton';
 interface ArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
     arrayName?: string;
-    currentComponentDefinition?: CurrentComponentDefinitionType;
+    currentComponentDefinition?: ComponentDefinitionModel;
     currentComponent?: ComponentType;
     dataPills?: DataPillType[];
     index: number;

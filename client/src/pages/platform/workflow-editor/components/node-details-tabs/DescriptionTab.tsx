@@ -4,7 +4,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {UpdateWorkflowRequest} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {ComponentType, CurrentComponentDefinitionType} from '@/types/types';
+import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ComponentDefinitionModel, WorkflowModel} from 'middleware/platform/configuration';
 import {ChangeEvent} from 'react';
@@ -25,9 +25,9 @@ const DescriptionTab = ({
     const {setComponents, workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {name, title, workflowNodeName} = componentDefinition as CurrentComponentDefinitionType;
+    const {name, title} = componentDefinition;
 
-    const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === workflowNodeName);
+    const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentNode.name);
 
     const handleLabelChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (!currentComponent) {

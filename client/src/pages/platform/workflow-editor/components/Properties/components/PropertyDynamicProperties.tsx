@@ -1,16 +1,16 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {PropertyModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionModel, PropertyModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workflowNodeDynamicProperties.queries';
-import {ComponentType, CurrentComponentDefinitionType} from '@/types/types';
+import {ComponentType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
 import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
     currentOperationName?: string;
-    currentComponentDefinition: CurrentComponentDefinitionType;
+    currentComponentDefinition: ComponentDefinitionModel;
     currentComponent: ComponentType;
     currentNodeConnectionId?: number;
     loadDependsOnValues?: Array<string>;

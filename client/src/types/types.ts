@@ -51,10 +51,6 @@ export type ComponentType = {
     workflowNodeName: string;
 };
 
-export type CurrentComponentDefinitionType = {
-    workflowNodeName?: string;
-} & ComponentDefinitionModel;
-
 export type ClickedItemType = {
     componentName?: string;
     trigger?: boolean;

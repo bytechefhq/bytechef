@@ -1,6 +1,6 @@
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {OptionModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionModel, OptionModel} from '@/middleware/platform/configuration';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/Properties/components/PropertyComboBox';
@@ -18,7 +18,7 @@ import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentType, DataPillType, PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
@@ -47,7 +47,7 @@ interface PropertyProps {
     operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    currentComponentDefinition?: CurrentComponentDefinitionType;
+    currentComponentDefinition?: ComponentDefinitionModel;
     currentComponent?: ComponentType;
     customClassName?: string;
     dataPills?: DataPillType[];
@@ -146,9 +146,7 @@ const Property = ({
 
     const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
 
-    const currentWorkflowComponent = workflowComponents?.find(
-        (component) => component.name === currentComponentDefinition?.workflowNodeName
-    );
+    const currentWorkflowComponent = workflowComponents?.find((component) => component.name === currentNode?.name);
 
     if (!parameterValue) {
         parameterValue = name ? (currentWorkflowComponent?.parameters?.[name] as unknown as string) : '';

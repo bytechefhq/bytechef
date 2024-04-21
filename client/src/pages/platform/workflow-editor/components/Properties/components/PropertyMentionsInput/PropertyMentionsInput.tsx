@@ -8,10 +8,11 @@ import ReactQuill, {Quill} from 'react-quill';
 import './propertyMentionsInput.css';
 
 import {Label} from '@/components/ui/label';
+import {ComponentDefinitionModel} from '@/middleware/platform/configuration';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import {useDataPillPanelStore} from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {CurrentComponentDefinitionType, DataPillType} from '@/types/types';
+import {DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
@@ -38,7 +39,7 @@ const MentionInputListItem = (item: DataPillType) => {
 
 interface PropertyMentionsInputProps {
     controlType?: string;
-    currentComponentDefinition: CurrentComponentDefinitionType;
+    currentComponentDefinition: ComponentDefinitionModel;
     dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;

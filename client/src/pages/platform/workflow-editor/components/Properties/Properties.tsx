@@ -1,4 +1,5 @@
-import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentDefinitionModel} from '@/middleware/platform/configuration';
+import {ComponentType, DataPillType, PropertyType} from '@/types/types';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -7,7 +8,7 @@ import Property from './Property';
 
 interface PropertiesProps {
     operationName?: string;
-    currentComponentDefinition?: CurrentComponentDefinitionType;
+    currentComponentDefinition?: ComponentDefinitionModel;
     currentComponent?: ComponentType;
     customClassName?: string;
     dataPills?: DataPillType[];

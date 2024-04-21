@@ -1,15 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ControlTypeModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionModel, ControlTypeModel} from '@/middleware/platform/configuration';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
-import {
-    ComponentType,
-    CurrentComponentDefinitionType,
-    DataPillType,
-    PropertyType,
-    SubPropertyType,
-} from '@/types/types';
+import {ComponentType, DataPillType, PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
@@ -35,7 +29,7 @@ interface ObjectPropertyProps {
     operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    currentComponentDefinition?: CurrentComponentDefinitionType;
+    currentComponentDefinition?: ComponentDefinitionModel;
     currentComponent?: ComponentType;
     dataPills?: DataPillType[];
     onDeleteClick?: (path: string, name: string) => void;

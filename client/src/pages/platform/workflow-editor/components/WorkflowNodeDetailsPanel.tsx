@@ -3,6 +3,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ComponentDefinitionBasicModel,
+    ComponentDefinitionModel,
     UpdateWorkflowRequest,
     WorkflowConnectionModel,
     WorkflowModel,
@@ -13,7 +14,7 @@ import DestinationTab from '@/pages/platform/workflow-editor/components/node-det
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
 import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinitions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {ComponentType, CurrentComponentDefinitionType, DataPillType, PropertyType} from '@/types/types';
+import {ComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
@@ -81,12 +82,13 @@ const WorkflowNodeDetailsPanel = ({
     const {componentActions, components, dataPills, setComponentActions, setComponents, setDataPills, workflow} =
         useWorkflowDataStore();
 
-    let currentComponentDefinition: CurrentComponentDefinitionType | undefined;
+    let currentComponentDefinition: ComponentDefinitionModel | undefined;
 
     if (componentDefinition) {
-        currentComponentDefinition = {...componentDefinition, workflowNodeName: currentNode.name};
+        currentComponentDefinition = {...componentDefinition};
     }
 
+    const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode.name);
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
 
     const getActionName = (): string => {
@@ -164,7 +166,8 @@ const WorkflowNodeDetailsPanel = ({
         hasOutputData && activeTab === 'output'
     );
 
-    const workflowConnections: WorkflowConnectionModel[] = currentWorkflowTask?.connections || [];
+    const workflowConnections: WorkflowConnectionModel[] =
+        currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
 
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
@@ -231,7 +234,7 @@ const WorkflowNodeDetailsPanel = ({
     });
 
     const otherComponents = components.filter((component) => {
-        if (component.workflowNodeName === currentComponentDefinition?.workflowNodeName) {
+        if (component.workflowNodeName === currentNode?.name) {
             return false;
         } else {
             return true;

@@ -1,13 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
-import {
-    ArrayPropertyType,
-    ComponentType,
-    CurrentComponentDefinitionType,
-    DataPillType,
-    PropertyType,
-} from '@/types/types';
+import {ComponentDefinitionModel, ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
+import {ArrayPropertyType, ComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
@@ -29,7 +23,7 @@ const PROPERTY_CONTROL_TYPES = {
 };
 
 interface ArrayPropertyProps {
-    currentComponentDefinition?: CurrentComponentDefinitionType;
+    currentComponentDefinition?: ComponentDefinitionModel;
     currentComponent?: ComponentType;
     dataPills?: Array<DataPillType>;
     onDeleteClick: (path: string, name: string, index: number) => void;
