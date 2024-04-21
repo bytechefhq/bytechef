@@ -69,6 +69,7 @@
                     "bg-muted",
                     "bg-success",
                     "border-input",
+                    "border-muted",
                     "line-clamp-2",
                     "max-h-select-content-available-height-1/2",
                     "min-w-combo-box-popper-anchor-width",
