@@ -141,7 +141,7 @@ const DeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; on
             </AlertDialogHeader>
 
             <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => onClose}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
 
                 <AlertDialogAction className="bg-red-600" onClick={() => onDelete()}>
                     Delete
@@ -238,8 +238,7 @@ const Header = ({
     const handleDeleteWorkflowAlertDialogClick = () => {
         if (projectId && workflow.id) {
             deleteWorkflowMutation.mutate({
-                id: projectId,
-                workflowId: workflow.id,
+                id: workflow.id!,
             });
         }
     };
