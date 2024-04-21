@@ -681,13 +681,6 @@ paths:
       operationId: "deleteWorkflow"
       parameters:
         - name: "id"
-          description: "The id of a project."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "workflowId"
           description: "The id of the workflow to delete."
           in: "path"
           required: true
