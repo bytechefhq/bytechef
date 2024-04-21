@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.575847+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:50:29.631298+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {
@@ -88,8 +88,7 @@ public interface WorkflowApi {
      * DELETE /workflows/{id} : Delete a workflow
      * Delete a workflow.
      *
-     * @param id The id of a project. (required)
-     * @param workflowId The id of the workflow to delete. (required)
+     * @param id The id of the workflow to delete. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -107,8 +106,7 @@ public interface WorkflowApi {
     )
     
     default ResponseEntity<Void> deleteWorkflow(
-        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowId", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
+        @Parameter(name = "id", description = "The id of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
