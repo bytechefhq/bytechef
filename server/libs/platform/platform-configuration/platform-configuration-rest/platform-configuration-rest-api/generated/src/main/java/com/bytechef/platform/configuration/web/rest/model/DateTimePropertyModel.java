@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateTimeProperty", description = "A date-time property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class DateTimePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -56,8 +56,8 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   /**
    * Constructor with only required parameters
    */
-  public DateTimePropertyModel(ControlTypeModel controlType) {
-    super(controlType);
+  public DateTimePropertyModel(PropertyTypeModel type, ControlTypeModel controlType) {
+    super(controlType, type);
   }
 
   public DateTimePropertyModel defaultValue(LocalDateTime defaultValue) {

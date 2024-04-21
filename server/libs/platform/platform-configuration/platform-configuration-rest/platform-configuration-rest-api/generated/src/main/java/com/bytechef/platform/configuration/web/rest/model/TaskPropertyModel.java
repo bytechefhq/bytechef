@@ -27,10 +27,21 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskProperty", description = "A task property used in task dispatchers.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class TaskPropertyModel extends PropertyModel {
 
   private String name;
+
+  public TaskPropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public TaskPropertyModel(PropertyTypeModel type) {
+    super(type);
+  }
 
   public TaskPropertyModel name(String name) {
     this.name = name;

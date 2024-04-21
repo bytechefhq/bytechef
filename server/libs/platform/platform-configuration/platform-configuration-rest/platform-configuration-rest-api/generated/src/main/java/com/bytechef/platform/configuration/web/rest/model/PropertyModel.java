@@ -47,24 +47,35 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class PropertyModel {
 
-  private Boolean advancedOption;
+  private Boolean advancedOption = false;
 
   private String description;
 
   private String displayCondition;
 
-  private Boolean expressionEnabled;
+  private Boolean expressionEnabled = true;
 
-  private Boolean hidden;
+  private Boolean hidden = false;
 
   private String name;
 
-  private Boolean required;
+  private Boolean required = false;
 
   private PropertyTypeModel type;
+
+  public PropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public PropertyModel(PropertyTypeModel type) {
+    this.type = type;
+  }
 
   public PropertyModel advancedOption(Boolean advancedOption) {
     this.advancedOption = advancedOption;
@@ -112,11 +123,11 @@ public class PropertyModel {
   }
 
   /**
-   * Defines rules when a property should be shown or hidden.
+   * Defines rules when the property should be shown or hidden.
    * @return displayCondition
   */
   
-  @Schema(name = "displayCondition", description = "Defines rules when a property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "displayCondition", description = "Defines rules when the property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("displayCondition")
   public String getDisplayCondition() {
     return displayCondition;
@@ -215,8 +226,8 @@ public class PropertyModel {
    * Get type
    * @return type
   */
-  @Valid 
-  @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
   public PropertyTypeModel getType() {
     return type;

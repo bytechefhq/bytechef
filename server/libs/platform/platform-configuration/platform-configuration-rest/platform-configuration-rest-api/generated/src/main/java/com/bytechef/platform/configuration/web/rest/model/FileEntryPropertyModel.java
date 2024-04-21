@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "FileEntryProperty", description = "An file entry property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class FileEntryPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -46,7 +46,7 @@ public class FileEntryPropertyModel extends ValuePropertyModel {
    * Constructor with only required parameters
    */
   public FileEntryPropertyModel(PropertyTypeModel type, ControlTypeModel controlType) {
-    super(controlType);
+    super(controlType, type);
   }
 
   public FileEntryPropertyModel properties(List<@Valid PropertyModel> properties) {

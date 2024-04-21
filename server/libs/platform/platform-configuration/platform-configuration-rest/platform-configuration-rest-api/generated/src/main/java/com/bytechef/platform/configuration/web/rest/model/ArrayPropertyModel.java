@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -64,8 +64,8 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   /**
    * Constructor with only required parameters
    */
-  public ArrayPropertyModel(ControlTypeModel controlType) {
-    super(controlType);
+  public ArrayPropertyModel(PropertyTypeModel type, ControlTypeModel controlType) {
+    super(controlType, type);
   }
 
   public ArrayPropertyModel defaultValue(List<Object> defaultValue) {

@@ -28,12 +28,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private String header;
 
   private PropertiesDataSourceModel propertiesDataSource;
+
+  public DynamicPropertiesPropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public DynamicPropertiesPropertyModel(PropertyTypeModel type) {
+    super(type);
+  }
 
   public DynamicPropertiesPropertyModel header(String header) {
     this.header = header;

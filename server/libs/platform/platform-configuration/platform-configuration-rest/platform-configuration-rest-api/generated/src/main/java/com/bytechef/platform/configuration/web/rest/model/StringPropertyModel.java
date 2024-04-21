@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-20T09:04:41.477936+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
   private String languageId;
@@ -58,8 +58,8 @@ public class StringPropertyModel extends ValuePropertyModel {
   /**
    * Constructor with only required parameters
    */
-  public StringPropertyModel(ControlTypeModel controlType) {
-    super(controlType);
+  public StringPropertyModel(PropertyTypeModel type, ControlTypeModel controlType) {
+    super(controlType, type);
   }
 
   public StringPropertyModel languageId(String languageId) {
