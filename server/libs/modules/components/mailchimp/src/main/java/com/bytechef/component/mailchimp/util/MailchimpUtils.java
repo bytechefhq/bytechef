@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,31 +49,29 @@ public class MailchimpUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static ActionOptionsFunction<String> getListIdOptions() {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
+    public static List<Option<String>> getListIdOptions(Parameters connectionParameters, Context context) {
+        String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
 
-            String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken, context));
+        String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken, context));
 
-            Map<String, ?> response = context
-                .http(http -> http.get(url))
-                .queryParameters(
-                    Map.of(
-                        "fields", List.of("lists.id,lists.name,total_items"),
-                        "count", List.of("1000")))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new Context.TypeReference<>() {});
+        Map<String, ?> response = context
+            .http(http -> http.get(url))
+            .queryParameters(
+                Map.of(
+                    "fields", List.of("lists.id,lists.name,total_items"),
+                    "count", List.of("1000")))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {});
 
-            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
+        context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 
-            List<Option<String>> options = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-            for (Map<?, ?> list : (List<Map<?, ?>>) response.get("lists")) {
-                options.add(option((String) list.get("name"), (String) list.get("id")));
-            }
+        for (Map<?, ?> list : (List<Map<?, ?>>) response.get("lists")) {
+            options.add(option((String) list.get("name"), (String) list.get("id")));
+        }
 
-            return options;
-        };
+        return options;
     }
 }

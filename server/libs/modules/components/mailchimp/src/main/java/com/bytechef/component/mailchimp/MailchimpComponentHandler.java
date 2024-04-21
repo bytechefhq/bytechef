@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.google.auto.service.AutoService;
@@ -63,7 +64,11 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(modifiableProperty.getName(), "listId")) {
-            ((ModifiableStringProperty) modifiableProperty).options(MailchimpUtils.getListIdOptions());
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(
+                    (OptionsDataSource.ActionOptionsFunction<String>) (
+                        inputParameters, connectionParameters, arrayIndex, searchText,
+                        context) -> MailchimpUtils.getListIdOptions(connectionParameters, context));
         }
 
         return modifiableProperty;
