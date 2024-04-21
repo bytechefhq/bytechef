@@ -40,7 +40,7 @@ const WorkflowEditorLayout = ({
             id: workflow.id!,
             lastWorkflowNodeName: currentNode.name,
         },
-        !!componentActions?.length && !!currentNode.name
+        !!componentActions?.length && !!currentNode.name && !currentNode.trigger
     );
 
     const previousComponentDefinitions = workflowNodeOutputs
@@ -101,7 +101,7 @@ const WorkflowEditorLayout = ({
                 />
             )}
 
-            {workflowNodeOutputs && previousComponentDefinitions && (
+            {(workflowNodeOutputs || (!workflowNodeOutputs && currentNode.trigger)) && previousComponentDefinitions && (
                 <DataPillPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     workflowNodeOutputs={workflowNodeOutputs ?? []}
