@@ -77,8 +77,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                     workflowNodeType.componentOperationName());
 
+                Output output = workflowNodeTestOutputService
+                    .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
+                    .map(WorkflowNodeTestOutput::getOutput)
+                    .orElse(triggerDefinition.getOutput());
+
                 workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-                    null, triggerDefinition.getOutput(), null, triggerDefinition, workflowTrigger.getName());
+                    null, output, null, triggerDefinition, workflowTrigger.getName());
 
                 break;
             }
