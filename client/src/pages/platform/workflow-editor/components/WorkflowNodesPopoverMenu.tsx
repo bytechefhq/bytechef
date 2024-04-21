@@ -77,7 +77,7 @@ const WorkflowNodesPopoverMenu = ({
                 align="start"
                 className="w-workflow-nodes-popover-menu-width rounded-lg p-0 will-change-auto"
                 side="right"
-                sideOffset={4}
+                sideOffset={-34}
             >
                 {id && (
                     <div className="nowheel">
