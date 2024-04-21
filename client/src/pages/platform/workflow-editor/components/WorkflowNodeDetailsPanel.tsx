@@ -294,18 +294,17 @@ const WorkflowNodeDetailsPanel = ({
 
     useEffect(() => {
         if (componentDefinition) {
-            // @ts-expect-error Backend needs to be updated to return the correct type
-            const {icon, name, title, workflowNodeName} = componentDefinition;
+            const {icon, name, title} = componentDefinition;
 
             setCurrentComponent({
                 componentName: name,
                 icon,
                 operationName: currentOperationName,
                 title,
-                workflowNodeName,
+                workflowNodeName: currentNode.name,
             });
         }
-    }, [componentDefinition, currentOperationName]);
+    }, [componentDefinition, currentNode.name, currentOperationName]);
 
     // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
