@@ -44,28 +44,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
 
-    private final ActionDefinitionService actionDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ActionDefinitionService actionDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
+    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
-        ActionDefinitionService actionDefinitionService, ActionDefinitionFacade actionDefinitionFacade,
+        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
-        this.actionDefinitionService = actionDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.actionDefinitionService = actionDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
+        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -87,6 +87,51 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                         workflowId, workflowNodeName),
                     WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                     WorkflowTestConfigurationConnection::getConnectionId)));
+    }
+
+    @Override
+    public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, Object sampleOutput) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .map(WorkflowTrigger::getType)
+            .orElseGet(() -> {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                return workflowTask.getType();
+            });
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
+    }
+
+    @SuppressFBWarnings("NP")
+    private WorkflowNodeTestOutput executeTriggerWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, WorkflowTrigger workflowTrigger, Long connectionId) {
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName());
+
+        if (triggerDefinition.isOutputFunctionDefined()) {
+            Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+
+            Output output = triggerDefinitionFacade.executeOutput(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
+
+            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
+        } else {
+            // TODO
+            Map<String, ?> result = null;
+
+            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -129,44 +174,5 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
             return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
         }
-    }
-
-    @SuppressFBWarnings("NP")
-    private WorkflowNodeTestOutput executeTriggerWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, WorkflowTrigger workflowTrigger, Long connectionId) {
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
-
-        if (triggerDefinition.isOutputFunctionDefined()) {
-            Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
-
-            Output output = triggerDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
-        } else {
-            // TODO
-            Map<String, ?> result = null;
-
-            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, result);
-        }
-    }
-
-    @Override
-    public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Object sampleOutput) {
-
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, sampleOutput);
     }
 }
