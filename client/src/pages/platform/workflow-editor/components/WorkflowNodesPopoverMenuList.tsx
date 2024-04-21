@@ -162,7 +162,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                     data: {
                                         ...node.data,
                                         componentName: clickedItem.name,
-                                        connections: [],
+                                        connections: undefined,
                                         description: clickedItem.description,
                                         icon: (
                                             <>
@@ -180,6 +180,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                         label: clickedItem?.title,
                                         name: getFormattedName(clickedItem.name!, nodes),
                                         operationName: clickedComponentDefinition.triggers?.[0].name,
+                                        parameters: undefined,
                                         trigger: true,
                                         type: `${clickedItem.name}/v1/${clickedComponentDefinition.triggers?.[0].name}`,
                                     },
