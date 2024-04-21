@@ -85,7 +85,6 @@ import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {
     CableIcon,
-    ChevronRightIcon,
     CircleDotIcon,
     Code2Icon,
     HistoryIcon,
@@ -93,6 +92,7 @@ import {
     PuzzleIcon,
     SettingsIcon,
     SlidersIcon,
+    SquareChevronRightIcon,
     SquareIcon,
 } from 'lucide-react';
 import {RefObject, useEffect, useRef, useState} from 'react';
@@ -388,7 +388,7 @@ const OutputButton = ({bottomResizablePanelRef}: {bottomResizablePanelRef: RefOb
                     size="icon"
                     variant="ghost"
                 >
-                    <ChevronRightIcon className="h-5" />
+                    <SquareChevronRightIcon className="h-5" />
                 </Button>
             </TooltipTrigger>
 
