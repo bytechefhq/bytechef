@@ -31,8 +31,7 @@ export interface CreateProjectWorkflowRequest {
 }
 
 export interface DeleteWorkflowRequest {
-    id: number;
-    workflowId: string;
+    id: string;
 }
 
 export interface DuplicateWorkflowRequest {
@@ -120,19 +119,12 @@ export class WorkflowApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['workflowId'] == null) {
-            throw new runtime.RequiredError(
-                'workflowId',
-                'Required parameter "workflowId" was null or undefined when calling deleteWorkflow().'
-            );
-        }
-
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId']))),
+            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
