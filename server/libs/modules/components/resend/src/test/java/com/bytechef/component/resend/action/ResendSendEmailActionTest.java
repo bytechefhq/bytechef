@@ -134,7 +134,7 @@ class ResendSendEmailActionTest {
                 assertEquals("subject", sendEmailRequest.getSubject());
                 assertEquals(bccList, sendEmailRequest.getBcc());
                 assertEquals(ccList, sendEmailRequest.getCc());
-//            assertEquals(replyToList, sendEmailRequest.getReplyTo());
+                assertEquals(replyToList, sendEmailRequest.getReplyTo());
                 assertEquals("html", sendEmailRequest.getHtml());
                 assertEquals("text", sendEmailRequest.getText());
                 assertEquals(attachments, sendEmailRequest.getAttachments());

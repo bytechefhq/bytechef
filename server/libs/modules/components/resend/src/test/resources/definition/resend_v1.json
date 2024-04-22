@@ -12,54 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Resend",
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "bearer_token",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "token",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Bearer Token",
-      "type": "BEARER_TOKEN",
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
-      "acquire": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -275,8 +227,36 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "The HTML version of the message.",
+      "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "contentType",
+      "type": "STRING",
+      "defaultValue": "html",
+      "exampleValue": null,
+      "label": "Content type",
+      "placeholder": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": [ {
+        "description": null,
+        "label": "HTML",
+        "value": "html"
+      }, {
+        "description": null,
+        "label": "Plain text",
+        "value": "text"
+      } ],
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The HTML version of the message.",
+      "displayCondition": "contentType == 'html'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -296,7 +276,7 @@
     }, {
       "advancedOption": null,
       "description": "The plain text version of the message.",
-      "displayCondition": null,
+      "displayCondition": "contentType == 'text'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -306,26 +286,6 @@
       "defaultValue": null,
       "exampleValue": null,
       "label": "Text",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "The React component used to write the message. Only available in the Node.js SDK.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "react",
-      "type": "STRING",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "React",
       "placeholder": null,
       "controlType": "TEXT",
       "languageId": null,
@@ -574,7 +534,6 @@
     } ],
     "title": "Send Email",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -618,6 +577,55 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
-  } ]
+    },
+    "perform": { }
+  } ],
+  "triggers": null,
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "bearer_token",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "token",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Bearer Token",
+      "type": "BEARER_TOKEN",
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  }
 }
