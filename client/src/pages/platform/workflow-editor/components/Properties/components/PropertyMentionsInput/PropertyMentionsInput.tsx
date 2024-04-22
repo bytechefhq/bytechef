@@ -119,7 +119,7 @@ const PropertyMentionsInput = forwardRef(
 
                     const [leaf, offset] = editor.getLeaf(selection?.index || 0);
 
-                    if (leaf) {
+                    if (leaf && singleMention && mentionOccurences) {
                         editor.deleteText(0, editor.getLength());
 
                         editor.setText(' ');
@@ -192,7 +192,7 @@ const PropertyMentionsInput = forwardRef(
         };
 
         const handleOnKeyDown = (event: KeyboardEvent<Element>) => {
-            if (mentionOccurences && isAlphaNumericalKeyCode(event)) {
+            if (mentionOccurences && isAlphaNumericalKeyCode(event) && singleMention) {
                 // @ts-expect-error Quill false positive
                 const editor = ref.current.getEditor();
 
