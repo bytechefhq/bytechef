@@ -70,8 +70,8 @@ public class MicrosoftSharePointUtils {
         ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/lists/"
-                + inputParameters.getRequiredString(LIST_ID) + "/columns"))
+            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
+                inputParameters.getRequiredString(LIST_ID) + "/columns"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -102,7 +102,6 @@ public class MicrosoftSharePointUtils {
             case DATE_TIME -> createDateTimeProperty(map);
             case TEXT -> createTextProperty(map);
         } : null;
-
     }
 
     private static ColumnType getPropertyType(Map<?, ?> map) {
@@ -119,6 +118,7 @@ public class MicrosoftSharePointUtils {
         } else if (map.get(TEXT.toString()) != null) {
             return TEXT;
         }
+
         return null;
     }
 
@@ -206,8 +206,8 @@ public class MicrosoftSharePointUtils {
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
         Map<String, ?> body = context
-            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID)
-                + "/drive/items/root/children?$filter=" + encode))
+            .http(http -> http.get(BASE_URL + "/" + inputParameters.getRequiredString(SITE_ID) +
+                "/drive/items/root/children?$filter=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -268,5 +268,4 @@ public class MicrosoftSharePointUtils {
 
         return options;
     }
-
 }
