@@ -33,8 +33,13 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
  */
 public final class OpenAIConstants {
 
-    public static final String OPENAI = "openai";
+    public static final String ASK_CHAT_GPT = "askChatGPT";
     public static final String CONTENT = "content";
+    public static final String CREATE_ASSISTANT = "createAssistant";
+    public static final String CREATE_IMAGE = "createImage";
+    public static final String CREATE_SPEECH = "createSpeech";
+    public static final String CREATE_TRANSCRIPTION = "createTranscription";
+    public static final String CREATE_TRANSLATION = "createTranslation";
     public static final String DALL_E_3 = "dall-e-3";
     public static final String DALL_E_2 = "dall-e-2";
     public static final String DEFAULT_SIZE = "1024x1024";
@@ -55,32 +60,26 @@ public final class OpenAIConstants {
     public static final String MODEL = "model";
     public static final String N = "n";
     public static final String NAME = "name";
+    public static final String OPENAI = "openai";
     public static final String PARAMETERS = "parameters";
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
     public static final String QUALITY = "quality";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String ROLE = "role";
-    public static final String SEED = "seed";
     public static final String SIZE = "size";
     public static final String SPEED = "speed";
     public static final String STOP = "stop";
     public static final String STYLE = "style";
     public static final String TEMPERATURE = "temperature";
     public static final String TOOLS = "tools";
-    public static final String TOOL_CHOICE = "toolChoice";
     public static final String TOP_P = "topP";
     public static final String TYPE = "type";
     public static final String URL = "url";
     public static final String USER = "user";
     public static final String VOICE = "voice";
     public static final String WHISPER_1 = "whisper-1";
-    public static final String ASK_CHAT_GPT = "askChatGPT";
-    public static final String CREATE_ASSISTANT = "createAssistant";
-    public static final String CREATE_IMAGE = "createImage";
-    public static final String CREATE_SPEECH = "createSpeech";
-    public static final String CREATE_TRANSCRIPTION = "createTranscription";
-    public static final String CREATE_TRANSLATION = "createTranslation";
+
     public static final String VISION_PROMPT = "visionPrompt";
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
@@ -125,22 +124,6 @@ public final class OpenAIConstants {
         .maxValue(2)
         .required(false);
 
-    public static final ModifiableObjectProperty RESPONSE_FORMAT_PROPERTY = object(RESPONSE_FORMAT)
-        .label("Response format")
-        .description(
-            "An object specifying the format that the model must output. Compatible with gpt-4-1106-preview and " +
-                "gpt-3.5-turbo-1106")
-        .required(false);
-
-    public static final ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
-        .label("Seed")
-        .description(
-            "This feature is in Beta. If specified, our system will make a best effort to sample deterministically, " +
-                "such that repeated requests with the same seed and parameters should return the same result. " +
-                "Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to " +
-                "monitor changes in the backend.")
-        .required(false);
-
     public static final ModifiableArrayProperty STOP_PROPERTY = array(STOP)
         .label("Stop")
         .description("Up to 4 sequences where the API will stop generating further tokens.")
@@ -164,45 +147,6 @@ public final class OpenAIConstants {
                 "results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top " +
                 "10% probability mass are considered.")
         .defaultValue(1)
-        .required(false);
-
-    public static final ModifiableArrayProperty TOOLS_PROPERTY = array(TOOLS)
-        .label("Tools")
-        .description(
-            "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to " +
-                "provide a list of functions the model may generate JSON inputs for.")
-        .items(
-            object().properties(
-                string(TYPE)
-                    .label("Type")
-                    .description("The type of the tool. Currently, only function is supported.")
-                    .required(true),
-                object(FUNCTION)
-                    .label("Function")
-                    .required(true)
-                    .properties(
-                        string(DESCRIPTION)
-                            .label("Description")
-                            .description(
-                                "A description of what the function does, used by the model to choose when and how " +
-                                    "to call the function.")
-                            .required(false),
-                        string(NAME)
-                            .label("Name")
-                            .description(
-                                "The name of the function to be called. Must be a-z, A-Z, 0-9, or contain " +
-                                    "underscores and dashes")
-                            .maxLength(64)
-                            .required(true),
-                        object(PARAMETERS)
-                            .label("Parameters")
-                            .description("The parameters the functions accepts, described as a JSON Schema object.")
-                            .required(false))))
-        .required(false);
-
-    public static final ModifiableObjectProperty TOOL_CHOICE_PROPERTY = object(TOOL_CHOICE)
-        .label("Tool choice")
-        .description("")
         .required(false);
 
     public static final ModifiableStringProperty USER_PROPERTY = string(USER)

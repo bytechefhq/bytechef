@@ -29,6 +29,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
@@ -60,14 +61,13 @@ public class OpenAICreateImageAction {
                 .loadPropertiesDependsOn(MODEL)
                 .properties(OpenAIUtils::getModelProperties)
                 .required(true),
-            string(MODEL)
-                .label("Model")
+            MODEL_PROPERTY
                 .description("The model to use for image generation.")
                 .options(
                     option(DALL_E_3, DALL_E_3),
                     option(DALL_E_2, DALL_E_2))
                 .defaultValue(DALL_E_2)
-                .required(false),
+                .required(true),
             string(QUALITY)
                 .label("Quality")
                 .description("The quality of the image that will be generated.")
@@ -130,7 +130,7 @@ public class OpenAICreateImageAction {
         CreateImageRequest createImageRequest = new CreateImageRequest();
 
         createImageRequest.setPrompt(inputParameters.getRequiredString(PROMPT));
-        createImageRequest.setModel(inputParameters.getString(MODEL));
+        createImageRequest.setModel(inputParameters.getRequiredString(MODEL));
         createImageRequest.setN(inputParameters.getInteger(N));
         createImageRequest.setQuality(inputParameters.getString(QUALITY));
         createImageRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));

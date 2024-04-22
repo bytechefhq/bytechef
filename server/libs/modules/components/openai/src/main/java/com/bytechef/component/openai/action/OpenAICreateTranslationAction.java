@@ -29,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_TRANSLATION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FILE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
@@ -58,12 +59,9 @@ public class OpenAICreateTranslationAction {
                     "The audio file object translate, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, " +
                         "wav, or webm.")
                 .required(true),
-            string(MODEL)
-                .label("Model")
-                .description("ID of the model to use")
+            MODEL_PROPERTY
                 .options(option(WHISPER_1, WHISPER_1))
-                .defaultValue(WHISPER_1)
-                .required(true),
+                .defaultValue(WHISPER_1),
             string(PROMPT)
                 .label("Prompt")
                 .description(

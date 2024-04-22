@@ -32,13 +32,9 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPE
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.ROLE;
-import static com.bytechef.component.openai.constant.OpenAIConstants.SEED_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STOP_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS_PROPERTY;
-import static com.bytechef.component.openai.constant.OpenAIConstants.TOOL_CHOICE_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.URL;
@@ -46,6 +42,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.USER_PROPER
 import static com.bytechef.component.openai.constant.OpenAIConstants.VISION_PROMPT;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.openai.util.OpenAIUtils;
 
 /**
@@ -100,19 +97,16 @@ public class OpenAIVisionPromptAction {
                                     "differentiate between participants of the same role.")
                             .required(false)))
                 .required(true),
-            MODEL_PROPERTY,
+            MODEL_PROPERTY
+                .options((ActionOptionsFunction<String>) OpenAIUtils::getModelOptions),
             FREQUENCY_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            SEED_PROPERTY,
             STOP_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
-            TOOLS_PROPERTY,
-            TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
         .outputSchema(OpenAIUtils.OUTPUT_SCHEMA_RESPONSE)
         .perform(OpenAIAskChatGPTAction::perform);

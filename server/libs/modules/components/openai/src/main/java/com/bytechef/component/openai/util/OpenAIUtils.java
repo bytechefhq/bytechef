@@ -16,6 +16,7 @@
 
 package com.bytechef.component.openai.util;
 
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -34,6 +35,8 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.theokanning.openai.service.OpenAiService;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +95,20 @@ public class OpenAIUtils {
         }
 
         return options;
+    }
+
+    public static List<Option<String>> getModelOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN), Duration.ZERO);
+
+        return openAiService.listModels()
+            .stream()
+            .filter(model -> model.getId()
+                .contains("gpt"))
+            .map(model -> (Option<String>) option(model.getId(), model.getId()))
+            .toList();
     }
 
     public static List<ValueProperty<?>> getModelProperties(
