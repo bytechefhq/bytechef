@@ -203,14 +203,41 @@ const Property = ({
         if (!parameters) {
             return;
         }
+
         let strippedValue = mentionInputValue;
 
-        const dataPillValue = mentionInputValue.match(/data-value="([^"]+)"/)?.[1];
+        const dataPillValues = mentionInputValue
+            .match(/data-value="([^"]+)"/g)
+            ?.map((match) => match.match(/data-value="([^"]+)"/)?.[1]);
 
-        if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
-            strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
+        if (type === 'STRING') {
+            const realValues = mentionInputValue
+                .trim()
+                .split(/<[^>]*>?/gm)
+                .filter((value) => value && (!value.startsWith('<') || !value.endsWith('>') || !value.startsWith('\\')))
+                .filter((value) => value.trim().length > 0)
+                .filter((value) => !value.startsWith('\\'))
+                .filter((value) => !value.includes('data-value'));
+
+            strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
+
+            strippedValue = realValues
+                .map((value) => {
+                    if (value.includes('/') && !value.startsWith('${') && !value.endsWith('}')) {
+                        return `\${${value.replace(/\//g, '.')}}`;
+                    } else {
+                        return value;
+                    }
+                })
+                .join('');
         } else {
-            strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
+            const dataPillValue = dataPillValues?.[0];
+
+            if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
+                strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
+            } else {
+                strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
+            }
         }
 
         let currentValue;
@@ -406,27 +433,39 @@ const Property = ({
 
     // set value to parameterValue only on initial render
     useEffect(() => {
-        if (mentionInput && parameterValue) {
+        if (mentionInput && parameterValue && mentionInputValue === '') {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
             if (!mentionInputElement) {
                 return;
             }
 
-            if (typeof parameterValue === 'string' && parameterValue.startsWith('${')) {
-                const componentName = parameterValue.split('_')[0].replace('${', '');
+            const mentionValues: Array<string> = parameterValue
+                .split(/(\$\{.*?\})/g)
+                .filter((value: string) => value !== '');
 
-                const componentIcon =
-                    componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
+            if (typeof parameterValue === 'string' && parameterValue.includes('${')) {
+                const mentionInputNodes = mentionValues.map((value) => {
+                    if (value.startsWith('${')) {
+                        const componentName = value.split('_')[0].replace('${', '');
 
-                const node = document.createElement('div');
+                        const componentIcon =
+                            componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
 
-                node.className = 'property-mention';
+                        const node = document.createElement('div');
 
-                node.dataset.value = parameterValue.replace(/\$\{|\}/g, '');
-                node.dataset.componentIcon = componentIcon;
+                        node.className = 'property-mention';
 
-                setMentionInputValue(node.outerHTML);
+                        node.dataset.value = value.replace(/\$\{|\}/g, '');
+                        node.dataset.componentIcon = componentIcon;
+
+                        return node.outerHTML;
+                    } else {
+                        return value;
+                    }
+                });
+
+                setMentionInputValue(mentionInputNodes.join(''));
             } else {
                 setMentionInputValue(parameterValue);
             }
@@ -526,7 +565,7 @@ const Property = ({
                             ref={editorRef}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton!}
-                            singleMention={controlType !== 'TEXT'}
+                            singleMention={type !== 'STRING'}
                             value={mentionInputValue}
                         />
                     )}
