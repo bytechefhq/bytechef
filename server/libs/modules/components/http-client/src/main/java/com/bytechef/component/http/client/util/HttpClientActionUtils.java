@@ -31,7 +31,8 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.http.client.constant.HttpClientConstants;
+import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
+
 import java.time.Duration;
 import java.util.*;
 
@@ -44,7 +45,7 @@ public class HttpClientActionUtils {
         List<Property> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
-            properties.add(string(HttpClientConstants.BODY_CONTENT_TYPE)
+            properties.add(string(HttpClientComponentConstants.BODY_CONTENT_TYPE)
                 .label("Body Content Type")
                 .description("Content-Type to use when sending body parameters.")
                 .options(
@@ -59,47 +60,47 @@ public class HttpClientActionUtils {
         }
 
         if (includeBodyContentProperties) {
-            properties.add(string(HttpClientConstants.BODY_CONTENT_MIME_TYPE)
+            properties.add(string(HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE)
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
                 .displayCondition(
                     "['%s', '%s'].includes('%s')".formatted(
                         Http.BodyContentType.BINARY.name(),
                         Http.BodyContentType.RAW.name(),
-                        HttpClientConstants.BODY_CONTENT_TYPE))
+                        HttpClientComponentConstants.BODY_CONTENT_TYPE))
                 .defaultValue("text/plain")
                 .placeholder("text/plain")
                 .advancedOption(true));
         }
 
         properties.addAll(List.of(
-            bool(HttpClientConstants.FULL_RESPONSE)
+            bool(HttpClientComponentConstants.FULL_RESPONSE)
                 .label("Full Response")
                 .description("Returns the full response data instead of only the body.")
                 .defaultValue(false)
                 .advancedOption(true),
-            bool(HttpClientConstants.FOLLOW_ALL_REDIRECTS)
+            bool(HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS)
                 .label("Follow All Redirects")
                 .description("Follow non-GET HTTP 3xx redirects.")
                 .defaultValue(false)
                 .advancedOption(true),
-            bool(HttpClientConstants.FOLLOW_REDIRECT)
+            bool(HttpClientComponentConstants.FOLLOW_REDIRECT)
                 .label("Follow GET Redirect")
                 .description("Follow GET HTTP 3xx redirects.")
                 .defaultValue(false)
                 .advancedOption(true),
-            bool(HttpClientConstants.IGNORE_RESPONSE_CODE)
+            bool(HttpClientComponentConstants.IGNORE_RESPONSE_CODE)
                 .label("Ignore Response Code")
                 .description("Succeeds also when the status code is not 2xx.")
                 .defaultValue(false)
                 .advancedOption(true),
-            string(HttpClientConstants.PROXY)
+            string(HttpClientComponentConstants.PROXY)
                 .label("Proxy")
                 .description("HTTP proxy to use.")
                 .placeholder("https://myproxy:3128")
                 .defaultValue("")
                 .advancedOption(true),
-            integer(HttpClientConstants.TIMEOUT)
+            integer(HttpClientComponentConstants.TIMEOUT)
                 .label("Timeout")
                 .description(
                     "Time in ms to wait for the server to send a response before aborting the request.")
@@ -116,24 +117,24 @@ public class HttpClientActionUtils {
     public static Object execute(Parameters inputParameters, RequestMethod requestMethod, Context context, Parameters connectionParameters) {
         Http.Response response =
             context
-                .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientConstants.URI), requestMethod))
+                .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientComponentConstants.URI), requestMethod))
                 .configuration(
                     Http.allowUnauthorizedCerts(
-                        inputParameters.getBoolean(HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS, false))
-                        .disableAuthorization(Objects.isNull(connectionParameters.get(HttpClientConstants.PARM_AUTHORIZATION_TYPE)))
-                        .filename(inputParameters.getString(HttpClientConstants.RESPONSE_FILENAME))
-                        .followAllRedirects(inputParameters.getBoolean(HttpClientConstants.FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(inputParameters.getBoolean(HttpClientConstants.FOLLOW_REDIRECT, false))
-                        .proxy(inputParameters.getString(HttpClientConstants.PROXY))
+                        inputParameters.getBoolean(HttpClientComponentConstants.ALLOW_UNAUTHORIZED_CERTS, false))
+                        .disableAuthorization(Objects.isNull(connectionParameters.get(HttpClientComponentConstants.PARM_AUTHORIZATION_TYPE)))
+                        .filename(inputParameters.getString(HttpClientComponentConstants.RESPONSE_FILENAME))
+                        .followAllRedirects(inputParameters.getBoolean(HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(inputParameters.getBoolean(HttpClientComponentConstants.FOLLOW_REDIRECT, false))
+                        .proxy(inputParameters.getString(HttpClientComponentConstants.PROXY))
                         .responseType(getResponseType(inputParameters))
-                        .timeout(Duration.ofMillis(inputParameters.getInteger(HttpClientConstants.TIMEOUT, 10000))))
-                .headers((Map) inputParameters.getMap(HttpClientConstants.HEADERS, List.class, Collections.emptyMap()))
-                .queryParameters((Map) inputParameters.getMap(HttpClientConstants.QUERY_PARAMETERS, List.class,
+                        .timeout(Duration.ofMillis(inputParameters.getInteger(HttpClientComponentConstants.TIMEOUT, 10000))))
+                .headers((Map) inputParameters.getMap(HttpClientComponentConstants.HEADERS, List.class, Collections.emptyMap()))
+                .queryParameters((Map) inputParameters.getMap(HttpClientComponentConstants.QUERY_PARAMETERS, List.class,
                     Collections.emptyMap()))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
                 .execute();
 
-        if (inputParameters.getBoolean(HttpClientConstants.FULL_RESPONSE, false)) {
+        if (inputParameters.getBoolean(HttpClientComponentConstants.FULL_RESPONSE, false)) {
             return response;
         } else {
             return response.getBody();
@@ -157,7 +158,7 @@ public class HttpClientActionUtils {
     }
 
     private static BodyContentType getBodyContentType(Parameters inputParameters) {
-        String bodyContentTypeParameter = inputParameters.getString(HttpClientConstants.BODY_CONTENT_TYPE);
+        String bodyContentTypeParameter = inputParameters.getString(HttpClientComponentConstants.BODY_CONTENT_TYPE);
 
         return bodyContentTypeParameter == null
             ? null
@@ -167,25 +168,25 @@ public class HttpClientActionUtils {
     private static Body getPayload(Parameters inputParameters, BodyContentType bodyContentType) {
         Body body = null;
 
-        if (inputParameters.containsKey(HttpClientConstants.BODY_CONTENT)) {
+        if (inputParameters.containsKey(HttpClientComponentConstants.BODY_CONTENT)) {
             if (bodyContentType == Http.BodyContentType.BINARY) {
                 body = Http.Body.of(
-                    inputParameters.getRequired(HttpClientConstants.BODY_CONTENT, FileEntry.class),
-                    inputParameters.getString(HttpClientConstants.BODY_CONTENT_MIME_TYPE));
+                    inputParameters.getRequired(HttpClientComponentConstants.BODY_CONTENT, FileEntry.class),
+                    inputParameters.getString(HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == Http.BodyContentType.FORM_DATA) {
                 body = Http.Body.of(
-                    inputParameters.getMap(HttpClientConstants.BODY_CONTENT, List.of(FileEntry.class), Map.of()),
+                    inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, List.of(FileEntry.class), Map.of()),
                     bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.FORM_URL_ENCODED) {
                 body =
-                    Http.Body.of(inputParameters.getMap(HttpClientConstants.BODY_CONTENT, Map.of()), bodyContentType);
+                    Http.Body.of(inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
                 body = Http.Body.of(
-                    inputParameters.getMap(HttpClientConstants.BODY_CONTENT, Map.of()), bodyContentType);
+                    inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()), bodyContentType);
             } else {
                 body = Http.Body.of(
-                    inputParameters.getString(HttpClientConstants.BODY_CONTENT),
-                    inputParameters.getString(HttpClientConstants.BODY_CONTENT_MIME_TYPE, "text/plain"));
+                    inputParameters.getString(HttpClientComponentConstants.BODY_CONTENT),
+                    inputParameters.getString(HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE, "text/plain"));
             }
         }
 
@@ -193,8 +194,8 @@ public class HttpClientActionUtils {
     }
 
     private static ResponseType getResponseType(Parameters inputParameters) {
-        return inputParameters.containsKey(HttpClientConstants.RESPONSE_FORMAT)
-            ? Http.ResponseType.valueOf(inputParameters.getString(HttpClientConstants.RESPONSE_FORMAT))
+        return inputParameters.containsKey(HttpClientComponentConstants.RESPONSE_FORMAT)
+            ? Http.ResponseType.valueOf(inputParameters.getString(HttpClientComponentConstants.RESPONSE_FORMAT))
             : ResponseType.JSON;
     }
 }

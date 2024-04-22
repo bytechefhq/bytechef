@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.http.client.constant.HttpClientConstants;
+import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
 
 /**
@@ -28,7 +28,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientDeleteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientConstants.DELETE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.DELETE)
         .title("DELETE")
         .description("The request method to use.")
         .properties(
@@ -37,7 +37,7 @@ public class HttpClientDeleteAction {
                 // Common properties
                 //
 
-                HttpClientConstants.COMMON_PROPERTIES,
+                HttpClientComponentConstants.COMMON_PROPERTIES,
                 //
                 // Options
                 //
