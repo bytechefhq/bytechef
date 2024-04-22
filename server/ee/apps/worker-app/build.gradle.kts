@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:mailchimp"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-one-drive"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-outlook-365"))
+    implementation(project(":server:libs:modules:components:microsoft:microsoft-share-point"))
     implementation(project(":server:libs:modules:components:mysql"))
     implementation(project(":server:libs:modules:components:object-helper"))
     implementation(project(":server:libs:modules:components:ods-file"))
