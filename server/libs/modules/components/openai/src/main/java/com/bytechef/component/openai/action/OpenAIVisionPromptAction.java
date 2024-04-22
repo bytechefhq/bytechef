@@ -23,12 +23,26 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CONTENT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DETAIL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.IMAGE_URL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.LOGIT_BIAS_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MESSAGES;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
+import static com.bytechef.component.openai.constant.OpenAIConstants.N_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.ROLE;
+import static com.bytechef.component.openai.constant.OpenAIConstants.SEED_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.STOP_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.TOOL_CHOICE_PROPERTY;
+import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.URL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.USER_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.VISION_PROMPT;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -37,7 +51,7 @@ import com.bytechef.component.openai.util.OpenAIUtils;
 /**
  * @author Monika Domiter
  */
-public class OpenAIVisionPromptAction extends AbstractChatCompletionAction {
+public class OpenAIVisionPromptAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(VISION_PROMPT)
         .title("Vision Prompt")
@@ -90,7 +104,7 @@ public class OpenAIVisionPromptAction extends AbstractChatCompletionAction {
             FREQUENCY_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             MAX_TOKENS_PROPERTY,
-            n,
+            N_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             SEED_PROPERTY,
