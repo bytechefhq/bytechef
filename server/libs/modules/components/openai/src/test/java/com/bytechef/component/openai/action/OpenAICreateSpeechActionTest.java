@@ -41,10 +41,10 @@ import org.mockito.MockedConstruction;
 /**
  * @author Monika Domiter
  */
-public class OpenAICreateSpeechActionTest extends AbstractOpenAIActionTest {
+class OpenAICreateSpeechActionTest extends AbstractOpenAIActionTest {
 
     @Test
-    public void testPerform() {
+    void testPerform() {
         ResponseBody mockedResponseBody = mock(ResponseBody.class);
         FileEntry mockedFileEntry = mock(FileEntry.class);
         ArgumentCaptor<CreateSpeechRequest> createSpeechRequestArgumentCaptor = ArgumentCaptor.forClass(

@@ -13,6 +13,8 @@ import Properties from '@/pages/platform/workflow-editor/components/Properties/P
 import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
 import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinitions.queries';
+import {WorkflowNodeDynamicPropertyKeys} from '@/queries/platform/workflowNodeDynamicProperties.queries';
+import {WorkflowNodeOptionKeys} from '@/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
@@ -31,8 +33,6 @@ import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
-import {WorkflowNodeOptionKeys} from "@/queries/platform/workflowNodeOptions.queries";
-import {WorkflowNodeDynamicPropertyKeys} from "@/queries/platform/workflowNodeDynamicProperties.queries";
 
 const TABS = [
     {
@@ -265,17 +265,13 @@ const WorkflowNodeDetailsPanel = ({
             })
         );
 
-            queryClient.invalidateQueries(
-                {
-                    queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties
-                }
-            )
+        queryClient.invalidateQueries({
+            queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
+        });
 
-            queryClient.invalidateQueries(
-                {
-                    queryKey: WorkflowNodeOptionKeys.workflowNodeOptions
-                }
-            )
+        queryClient.invalidateQueries({
+            queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
+        });
 
         setComponents([
             ...components.filter((component) => component.workflowNodeName !== currentNode.name),

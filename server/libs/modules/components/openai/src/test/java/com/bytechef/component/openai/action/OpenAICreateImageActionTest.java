@@ -43,17 +43,17 @@ import org.mockito.MockedConstruction;
 /**
  * @author Monika Domiter
  */
-public class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
+class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
 
     @Test
-    public void testPerform() {
+    void testPerform() {
         ImageResult mockedImageResult = mock(ImageResult.class);
         ArgumentCaptor<CreateImageRequest> createImageRequestArgumentCaptor = ArgumentCaptor.forClass(
             CreateImageRequest.class);
 
         when(mockedParameters.getRequiredString(PROMPT))
             .thenReturn("PROMPT");
-        when(mockedParameters.getString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
         when(mockedParameters.getInteger(N))
             .thenReturn(1);

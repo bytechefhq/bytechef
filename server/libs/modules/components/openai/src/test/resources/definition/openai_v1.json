@@ -12,54 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "OpenAI",
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "bearer_token",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "token",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Bearer Token",
-      "type": "BEARER_TOKEN",
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
-      "acquire": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -188,7 +140,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "ID of the model to use.",
+      "description": "Text-to-Speech model which will generate the audio.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -196,16 +148,23 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": null,
+      "defaultValue": "whisper-1",
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "options": null,
-      "optionsDataSource": null
+      "options": [ {
+        "description": null,
+        "label": "whisper-1",
+        "value": "whisper-1"
+      } ],
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -301,7 +260,7 @@
       "type": "INTEGER",
       "defaultValue": 1,
       "exampleValue": null,
-      "label": "n",
+      "label": "Number of chat completion choices",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
@@ -329,45 +288,6 @@
       "numberPrecision": null,
       "options": null,
       "controlType": "NUMBER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "An object specifying the format that the model must output. Compatible with gpt-4-1106-preview and gpt-3.5-turbo-1106",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "responseFormat",
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Response format",
-      "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "options": null,
-      "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "This feature is in Beta. If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "seed",
-      "type": "INTEGER",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Seed",
-      "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
-      "options": null,
-      "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -456,167 +376,6 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "tools",
-      "type": "ARRAY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Tools",
-      "placeholder": null,
-      "items": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": "The type of the tool. Currently, only function is supported.",
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "type",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Type",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "languageId": null,
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "function",
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Function",
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": "A description of what the function does, used by the model to choose when and how to call the function.",
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "description",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Description",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "languageId": null,
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": "The name of the function to be called. Must be a-z, A-Z, 0-9, or contain underscores and dashes",
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": true,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "languageId": null,
-            "maxLength": 64,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": "The parameters the functions accepts, described as a JSON Schema object.",
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "parameters",
-            "type": "OBJECT",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Parameters",
-            "placeholder": null,
-            "additionalProperties": null,
-            "multipleValues": null,
-            "options": null,
-            "properties": null,
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      } ],
-      "maxItems": null,
-      "minItems": null,
-      "multipleValues": null,
-      "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "toolChoice",
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Tool choice",
-      "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "options": null,
-      "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
       "description": "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -638,7 +397,6 @@
     } ],
     "title": "Ask ChatGPT",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1038,7 +796,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1050,7 +809,7 @@
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
-      "description": "ID of the model to use.",
+      "description": "Text-to-Speech model which will generate the audio.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1058,16 +817,23 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": null,
+      "defaultValue": "whisper-1",
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "options": null,
-      "optionsDataSource": null
+      "options": [ {
+        "description": null,
+        "label": "whisper-1",
+        "value": "whisper-1"
+      } ],
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "The name of the assistant.",
@@ -1385,7 +1151,6 @@
     } ],
     "title": "Create assistant",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1750,7 +1515,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1777,15 +1543,15 @@
       }
     }, {
       "advancedOption": null,
-      "description": "The model to use for image generation.",
+      "description": "Text-to-Speech model which will generate the audio.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
-      "required": false,
+      "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": "dall-e-2",
+      "defaultValue": "whisper-1",
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -1795,14 +1561,13 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "label": "dall-e-3",
-        "value": "dall-e-3"
-      }, {
-        "description": null,
-        "label": "dall-e-2",
-        "value": "dall-e-2"
+        "label": "whisper-1",
+        "value": "whisper-1"
       } ],
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "The quality of the image that will be generated.",
@@ -1933,7 +1698,6 @@
     } ],
     "title": "Create image",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2077,7 +1841,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2097,7 +1862,7 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": null,
+      "defaultValue": "whisper-1",
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -2106,15 +1871,14 @@
       "maxLength": null,
       "minLength": null,
       "options": [ {
-        "description": "Model optimized for speed.",
-        "label": "tts-1",
-        "value": "tts-1"
-      }, {
-        "description": "Model optimized for quality.",
-        "label": "tts-1-hd",
-        "value": "tts-1-hd"
+        "description": null,
+        "label": "whisper-1",
+        "value": "whisper-1"
       } ],
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "The text to generate audio for.",
@@ -2240,7 +2004,6 @@
     } ],
     "title": "Create speech",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -2340,7 +2103,8 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2448,7 +2212,7 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": null,
-      "description": "ID of the model to use",
+      "description": "Text-to-Speech model which will generate the audio.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2469,7 +2233,10 @@
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "The language of the input audio.",
@@ -2803,7 +2570,6 @@
     } ],
     "title": "Create transcriptions",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3204,7 +2970,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -3312,7 +3079,7 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": null,
-      "description": "ID of the model to use",
+      "description": "Text-to-Speech model which will generate the audio.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3333,7 +3100,10 @@
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "An optional text to guide the model's style or continue a previous audio segment. The prompt should be in English.",
@@ -3419,7 +3189,6 @@
     } ],
     "title": "Create translation",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -3820,7 +3589,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -4050,7 +3820,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "ID of the model to use.",
+      "description": "Text-to-Speech model which will generate the audio.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -4058,16 +3828,23 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": null,
+      "defaultValue": "whisper-1",
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "options": null,
-      "optionsDataSource": null
+      "options": [ {
+        "description": null,
+        "label": "whisper-1",
+        "value": "whisper-1"
+      } ],
+      "optionsDataSource": {
+        "loadOptionsDependsOn": null,
+        "options": { }
+      }
     }, {
       "advancedOption": null,
       "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -4163,7 +3940,7 @@
       "type": "INTEGER",
       "defaultValue": 1,
       "exampleValue": null,
-      "label": "n",
+      "label": "Number of chat completion choices",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
@@ -4191,45 +3968,6 @@
       "numberPrecision": null,
       "options": null,
       "controlType": "NUMBER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "An object specifying the format that the model must output. Compatible with gpt-4-1106-preview and gpt-3.5-turbo-1106",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "responseFormat",
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Response format",
-      "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "options": null,
-      "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "This feature is in Beta. If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "seed",
-      "type": "INTEGER",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Seed",
-      "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
-      "options": null,
-      "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -4318,167 +4056,6 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "tools",
-      "type": "ARRAY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Tools",
-      "placeholder": null,
-      "items": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "options": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": "The type of the tool. Currently, only function is supported.",
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "type",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Type",
-          "placeholder": null,
-          "controlType": "TEXT",
-          "languageId": null,
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "function",
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": "Function",
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": [ {
-            "advancedOption": null,
-            "description": "A description of what the function does, used by the model to choose when and how to call the function.",
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "description",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Description",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "languageId": null,
-            "maxLength": null,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": "The name of the function to be called. Must be a-z, A-Z, 0-9, or contain underscores and dashes",
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": true,
-            "name": "name",
-            "type": "STRING",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Name",
-            "placeholder": null,
-            "controlType": "TEXT",
-            "languageId": null,
-            "maxLength": 64,
-            "minLength": null,
-            "options": null,
-            "optionsDataSource": null
-          }, {
-            "advancedOption": null,
-            "description": "The parameters the functions accepts, described as a JSON Schema object.",
-            "displayCondition": null,
-            "expressionEnabled": null,
-            "hidden": null,
-            "metadata": { },
-            "required": false,
-            "name": "parameters",
-            "type": "OBJECT",
-            "defaultValue": null,
-            "exampleValue": null,
-            "label": "Parameters",
-            "placeholder": null,
-            "additionalProperties": null,
-            "multipleValues": null,
-            "options": null,
-            "properties": null,
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
-          } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
-        } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
-      } ],
-      "maxItems": null,
-      "minItems": null,
-      "multipleValues": null,
-      "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
-      "description": "",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": false,
-      "name": "toolChoice",
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Tool choice",
-      "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "options": null,
-      "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }, {
-      "advancedOption": null,
       "description": "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -4500,7 +4077,6 @@
     } ],
     "title": "Vision Prompt",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -4900,6 +4476,55 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
-  } ]
+    },
+    "perform": { }
+  } ],
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "bearer_token",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "token",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Bearer Token",
+      "type": "BEARER_TOKEN",
+      "acquire": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
+  "triggers": null
 }
