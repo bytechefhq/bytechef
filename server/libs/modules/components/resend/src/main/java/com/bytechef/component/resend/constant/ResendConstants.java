@@ -32,13 +32,13 @@ public final class ResendConstants {
     public static final String ATTACHMENTS = "attachments";
     public static final String BCC = "bcc";
     public static final String CC = "cc";
+    public static final String CONTENT_TYPE = "contentType";
     public static final String EMAIL = "email";
     public static final String EMAIL_ADDRESS = "Email address";
     public static final String FROM = "from";
     public static final String HEADERS = "headers";
     public static final String HTML = "html";
     public static final String NAME = "name";
-    public static final String REACT = "react";
     public static final String REPLY_TO = "reply_to";
     public static final String RESEND = "resend";
     public static final String SEND_EMAIL = "sendEmail";
