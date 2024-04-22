@@ -52,7 +52,7 @@ public class HttpClientComponentConstants {
     public static final String FULL_RESPONSE = "fullResponse";
     public static final String HEAD = "head";
     public static final String HEADERS = "headers";
-    public static final String PARM_AUTHORIZATION_TYPE = "authorizationName";
+    public static final String AUTHORIZATION_TYPE = "authorizationName";
     public static final String HTTP_CLIENT = "httpClient";
     public static final String GET = "get";
     public static final String IGNORE_RESPONSE_CODE = "ignoreResponseCode";
