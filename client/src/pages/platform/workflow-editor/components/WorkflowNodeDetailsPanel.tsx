@@ -16,7 +16,7 @@ import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinition
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentType, DataPillType, PropertyType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import {UseMutationResult} from '@tanstack/react-query';
+import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
@@ -31,6 +31,8 @@ import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
+import {WorkflowNodeOptionKeys} from "@/queries/platform/workflowNodeOptions.queries";
+import {WorkflowNodeDynamicPropertyKeys} from "@/queries/platform/workflowNodeDynamicProperties.queries";
 
 const TABS = [
     {
@@ -241,6 +243,8 @@ const WorkflowNodeDetailsPanel = ({
         }
     });
 
+    const queryClient = useQueryClient();
+
     const handleOperationSelectChange = (operationName: string) => {
         if (!currentComponentDefinition || !currentComponent) {
             return;
@@ -260,6 +264,18 @@ const WorkflowNodeDetailsPanel = ({
                 }
             })
         );
+
+            queryClient.invalidateQueries(
+                {
+                    queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties
+                }
+            )
+
+            queryClient.invalidateQueries(
+                {
+                    queryKey: WorkflowNodeOptionKeys.workflowNodeOptions
+                }
+            )
 
         setComponents([
             ...components.filter((component) => component.workflowNodeName !== currentNode.name),
