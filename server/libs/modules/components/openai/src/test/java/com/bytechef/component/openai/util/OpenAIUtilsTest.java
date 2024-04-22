@@ -20,6 +20,8 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDSL;
@@ -27,19 +29,22 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.openai.action.AbstractOpenAIActionTest;
+import com.theokanning.openai.model.Model;
+import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
 
 /**
  * @author Monika Domiter
  */
-public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
+class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
-    public void testGetSizeOptionsForDallE2() {
+     void testGetSizeOptionsForDallE2() {
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_2);
 
@@ -56,7 +61,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
     }
 
     @Test
-    public void testGetSizeOptionsForDallE3() {
+     void testGetSizeOptionsForDallE3() {
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_3);
 
@@ -73,7 +78,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
     }
 
     @Test
-    public void testGetModelPropertiesForDallE2() {
+    void testGetModelPropertiesForDallE2() {
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_2);
 
@@ -102,7 +107,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
     }
 
     @Test
-    public void testGetModelPropertiesForDallE3() {
+    void testGetModelPropertiesForDallE3() {
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_3);
 
@@ -128,5 +133,33 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         Assertions.assertEquals(false, property.getRequired().get());
         Assertions.assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMaxValue());
         Assertions.assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMinValue());
+    }
+
+    @Test
+    void testGetModelOptions() {
+        Model model1 = new Model();
+
+        model1.setId("gpt-4");
+
+        Model model2 = new Model();
+
+        model2.setId("other-model");
+
+        List<Model> models = List.of(model1, model2);
+
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
+            OpenAiService.class,
+            (openAiService, context) -> when(openAiService.listModels()).thenReturn(models))) {
+
+            List<Option<String>> result =
+                OpenAIUtils.getModelOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+
+            assertEquals(1, result.size());
+
+            Option<String> option = result.getFirst();
+
+            assertEquals("gpt-4", option.getLabel());
+            assertEquals("gpt-4", option.getValue());
+        }
     }
 }

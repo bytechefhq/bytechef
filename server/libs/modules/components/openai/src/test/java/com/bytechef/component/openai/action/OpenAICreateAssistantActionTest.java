@@ -46,10 +46,10 @@ import org.mockito.Mockito;
 /**
  * @author Monika Domiter
  */
-public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
+class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
 
     @Test
-    public void testPerform() {
+    void testPerform() {
         Assistant mockedAssistant = Mockito.mock(Assistant.class);
         ArgumentCaptor<AssistantRequest> assistantRequestArgumentCaptor = ArgumentCaptor.forClass(
             AssistantRequest.class);

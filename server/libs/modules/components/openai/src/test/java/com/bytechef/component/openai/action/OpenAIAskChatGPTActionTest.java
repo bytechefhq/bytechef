@@ -44,8 +44,6 @@ import com.theokanning.openai.service.OpenAiService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -53,7 +51,7 @@ import org.mockito.MockedConstruction;
 /**
  * @author Monika Domiter
  */
-public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
+class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
 
     private final ArgumentCaptor<ChatCompletionRequest> chatCompletionRequestArgumentCaptor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
@@ -61,8 +59,8 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
     private final Map<String, Integer> map = new HashMap<>();
     private final List<String> strings = List.of("a");
 
-    @BeforeEach
-    public void before() {
+    @Test
+    void testPerform() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(chatMessages);
         when(mockedParameters.getRequiredString(MODEL))
@@ -85,10 +83,7 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
             .thenReturn(1.0);
         when(mockedParameters.getString(USER))
             .thenReturn("USER");
-    }
 
-    @Test
-    public void testPerformIsNotStream() {
         ChatCompletionResult mockedChatCompletionResult = mock(ChatCompletionResult.class);
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
@@ -112,24 +107,17 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
 
             ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
 
-            assertEquals(false, chatCompletionRequest.getStream());
+            assertEquals(chatMessages, chatCompletionRequest.getMessages());
+            assertEquals("MODEL", chatCompletionRequest.getModel());
+            assertEquals(0.0, chatCompletionRequest.getFrequencyPenalty());
+            assertEquals(map, chatCompletionRequest.getLogitBias());
+            assertEquals(1, chatCompletionRequest.getMaxTokens());
+            assertEquals(1, chatCompletionRequest.getN());
+            assertEquals(0.0, chatCompletionRequest.getPresencePenalty());
+            assertEquals(strings, chatCompletionRequest.getStop());
+            assertEquals(1.0, chatCompletionRequest.getTemperature());
+            assertEquals(1.0, chatCompletionRequest.getTopP());
+            assertEquals("USER", chatCompletionRequest.getUser());
         }
-    }
-
-    @AfterEach
-    public void afterEach() {
-        ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
-
-        assertEquals(chatMessages, chatCompletionRequest.getMessages());
-        assertEquals("MODEL", chatCompletionRequest.getModel());
-        assertEquals(0.0, chatCompletionRequest.getFrequencyPenalty());
-        assertEquals(map, chatCompletionRequest.getLogitBias());
-        assertEquals(1, chatCompletionRequest.getMaxTokens());
-        assertEquals(1, chatCompletionRequest.getN());
-        assertEquals(0.0, chatCompletionRequest.getPresencePenalty());
-        assertEquals(strings, chatCompletionRequest.getStop());
-        assertEquals(1.0, chatCompletionRequest.getTemperature());
-        assertEquals(1.0, chatCompletionRequest.getTopP());
-        assertEquals("USER", chatCompletionRequest.getUser());
     }
 }
