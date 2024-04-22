@@ -117,7 +117,7 @@ const ProjectWorkflowListItem = ({
                                         />
                                     </TooltipTrigger>
 
-                                    <TooltipContent side="right">{componentDefinition?.title}</TooltipContent>
+                                    <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
                                 </Tooltip>
                             </div>
                         );
