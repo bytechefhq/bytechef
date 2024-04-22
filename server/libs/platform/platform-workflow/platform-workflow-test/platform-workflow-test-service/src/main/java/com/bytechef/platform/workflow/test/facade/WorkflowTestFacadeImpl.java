@@ -121,24 +121,22 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                     return output == null ? null : output.getSampleOutput();
                 });
 
-            if (sampleOutput == null) {
-                throw new IllegalArgumentException("\"sampleOutput\" value is not defined");
+            if (sampleOutput != null) {
+                TriggerExecution triggerExecution = TriggerExecution.builder()
+                    .id(-RANDOM.nextLong())
+                    .startDate(LocalDateTime.now())
+                    .endDate(LocalDateTime.now())
+                    .status(Status.COMPLETED)
+                    .workflowTrigger(workflowTrigger)
+                    .build();
+
+                triggerExecutionDTO = new TriggerExecutionDTO(
+                    componentDefinitionService.getComponentDefinition(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion()),
+                    inputs, sampleOutput, triggerExecution);
+
+                inputs = MapUtils.concat((Map<String, Object>) inputs, Map.of(workflowTrigger.getName(), sampleOutput));
             }
-
-            TriggerExecution triggerExecution = TriggerExecution.builder()
-                .id(-RANDOM.nextLong())
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now())
-                .status(Status.COMPLETED)
-                .workflowTrigger(workflowTrigger)
-                .build();
-
-            triggerExecutionDTO = new TriggerExecutionDTO(
-                componentDefinitionService.getComponentDefinition(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion()),
-                inputs, sampleOutput, triggerExecution);
-
-            inputs = MapUtils.concat((Map<String, Object>) inputs, Map.of(workflowTrigger.getName(), sampleOutput));
         }
 
         return new WorkflowTestExecution(
