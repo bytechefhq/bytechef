@@ -33,10 +33,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Ivica Cardic
@@ -116,13 +113,14 @@ public class HttpClientActionUtils {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public static Object execute(Parameters inputParameters, RequestMethod requestMethod, Context context) {
+    public static Object execute(Parameters inputParameters, RequestMethod requestMethod, Context context, Parameters connectionParameters) {
         Http.Response response =
             context
                 .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientConstants.URI), requestMethod))
                 .configuration(
                     Http.allowUnauthorizedCerts(
                         inputParameters.getBoolean(HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS, false))
+                        .disableAuthorization(Objects.isNull(connectionParameters.get(HttpClientConstants.PARM_AUTHORIZATION_TYPE)))
                         .filename(inputParameters.getString(HttpClientConstants.RESPONSE_FILENAME))
                         .followAllRedirects(inputParameters.getBoolean(HttpClientConstants.FOLLOW_ALL_REDIRECTS, false))
                         .followRedirect(inputParameters.getBoolean(HttpClientConstants.FOLLOW_REDIRECT, false))
@@ -144,7 +142,7 @@ public class HttpClientActionUtils {
 
     public static ActionDefinition.SingleConnectionPerformFunction getPerform(RequestMethod requestMethod) {
         return (inputParameters, connectionParameters, context) -> HttpClientActionUtils.execute(
-            inputParameters, requestMethod, context);
+            inputParameters, requestMethod, context, connectionParameters);
     }
 
     @SafeVarargs
