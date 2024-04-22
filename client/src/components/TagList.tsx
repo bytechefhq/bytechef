@@ -21,7 +21,7 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <span className="border-muted inline-flex items-center rounded-full border px-2 py-1 text-xs text-gray-700 hover:border-gray-200">
+    <span className="inline-flex items-center rounded-full border border-muted px-2 py-1 text-xs text-gray-700 hover:border-gray-200">
         {tag.name}
 
         <Cross2Icon
