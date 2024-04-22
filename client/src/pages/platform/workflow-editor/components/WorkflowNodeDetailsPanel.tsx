@@ -250,6 +250,14 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
+        queryClient.invalidateQueries({
+            queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
+        });
+
+        queryClient.invalidateQueries({
+            queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
+        });
+
         setCurrentOperationName(operationName);
 
         setComponentActions(
@@ -264,14 +272,6 @@ const WorkflowNodeDetailsPanel = ({
                 }
             })
         );
-
-        queryClient.invalidateQueries({
-            queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
-        });
-
-        queryClient.invalidateQueries({
-            queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
-        });
 
         setComponents([
             ...components.filter((component) => component.workflowNodeName !== currentNode.name),
