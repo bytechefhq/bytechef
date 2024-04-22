@@ -30,6 +30,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.FUNCTION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.INSTRUCTIONS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.METADATA;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PARAMETERS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
@@ -38,7 +39,9 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.openai.util.OpenAIUtils;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.service.OpenAiService;
@@ -52,10 +55,8 @@ public class OpenAICreateAssistantAction {
         .title("Create assistant")
         .description("Create an assistant with a model and instructions.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("ID of the model to use.")
-                .required(true),
+            MODEL_PROPERTY
+                .options((OptionsDataSource.ActionOptionsFunction<String>) OpenAIUtils::getModelOptions),
             string(NAME)
                 .label("Name")
                 .description("The name of the assistant.")
@@ -118,8 +119,7 @@ public class OpenAICreateAssistantAction {
                     "Set of 16 key-value pairs that can be attached to an object. This can be useful for storing " +
                         "additional information about the object in a structured format. Keys can be a maximum of 64 " +
                         "characters long and values can be a maxium of 512 characters long.")
-                .additionalProperties(
-                    string())
+                .additionalProperties(string())
                 .required(false))
         .outputSchema(
             object()
