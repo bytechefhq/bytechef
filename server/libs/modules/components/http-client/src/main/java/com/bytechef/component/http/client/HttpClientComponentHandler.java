@@ -27,7 +27,7 @@ import com.bytechef.component.http.client.action.HttpClientPatchAction;
 import com.bytechef.component.http.client.action.HttpClientPostAction;
 import com.bytechef.component.http.client.action.HttpClientPutAction;
 import com.bytechef.component.http.client.connection.HttpClientConnection;
-import com.bytechef.component.http.client.constant.HttpClientConstants;
+import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -36,7 +36,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class HttpClientComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(HttpClientConstants.HTTP_CLIENT)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(HttpClientComponentConstants.HTTP_CLIENT)
         .title("HTTP Client")
         .description("Makes an HTTP request and returns the response data.")
         .icon("path:assets/http-client.svg")

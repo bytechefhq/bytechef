@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientConstants {
+public class HttpClientComponentConstants {
 
     public static final String ALLOW_UNAUTHORIZED_CERTS = "allowUnauthorizedCerts";
     public static final String BODY_CONTENT = "bodyContent";

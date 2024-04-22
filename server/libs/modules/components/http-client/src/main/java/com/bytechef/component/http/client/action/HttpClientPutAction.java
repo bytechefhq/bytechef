@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.http.client.constant.HttpClientConstants;
+import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
 
 /**
@@ -29,7 +29,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientPutAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientConstants.PUT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.PUT)
         .title("PUT")
         .description("The request method to use.")
         .properties(
@@ -38,12 +38,12 @@ public class HttpClientPutAction {
                 // Common properties
                 //
 
-                HttpClientConstants.COMMON_PROPERTIES,
+                HttpClientComponentConstants.COMMON_PROPERTIES,
                 //
                 // Body Content properties
                 //
 
-                HttpClientConstants.BODY_CONTENT_PROPERTIES,
+                HttpClientComponentConstants.BODY_CONTENT_PROPERTIES,
                 //
                 // Options
                 //
