@@ -199,8 +199,7 @@ const ProjectWorkflowListItem = ({
                             onClick={() => {
                                 if (project?.id && selectedWorkflow?.id) {
                                     deleteWorkflowMutation.mutate({
-                                        id: project?.id,
-                                        workflowId: selectedWorkflow?.id,
+                                        id: project?.id.toString(),
                                     });
                                 }
                             }}
