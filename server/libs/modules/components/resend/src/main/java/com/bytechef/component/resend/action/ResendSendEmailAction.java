@@ -21,16 +21,17 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
+import static com.bytechef.component.resend.constant.ResendConstants.CONTENT_TYPE;
 import static com.bytechef.component.resend.constant.ResendConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.resend.constant.ResendConstants.FROM;
 import static com.bytechef.component.resend.constant.ResendConstants.HEADERS;
 import static com.bytechef.component.resend.constant.ResendConstants.HTML;
 import static com.bytechef.component.resend.constant.ResendConstants.NAME;
-import static com.bytechef.component.resend.constant.ResendConstants.REACT;
 import static com.bytechef.component.resend.constant.ResendConstants.REPLY_TO;
 import static com.bytechef.component.resend.constant.ResendConstants.SEND_EMAIL;
 import static com.bytechef.component.resend.constant.ResendConstants.SUBJECT;
@@ -93,23 +94,27 @@ public final class ResendSendEmailAction {
                 .description("Reply-to email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),
+            string(CONTENT_TYPE)
+                .label("Content type")
+                .options(
+                    option("HTML", HTML),
+                    option("Plain text", "text"))
+                .defaultValue(HTML)
+                .required(true),
             string(HTML)
                 .label("HTML")
                 .description("The HTML version of the message.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, HTML))
                 .required(false),
             string(TEXT)
                 .label("Text")
                 .description("The plain text version of the message.")
-                .required(false),
-            string(REACT)
-                .label("React")
-                .description("The React component used to write the message. Only available in the Node.js SDK.")
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, "text"))
                 .required(false),
             object(HEADERS)
                 .label("Headers")
                 .description("Custom headers to add to the email.")
-                .additionalProperties(
-                    string())
+                .additionalProperties(string())
                 .required(false),
             array(ATTACHMENTS)
                 .label("Attachments")
