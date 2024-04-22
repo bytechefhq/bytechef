@@ -330,7 +330,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                         .build(),
                     HttpResponse.BodyHandlers.ofString());
 
-                if (httpResponse.statusCode() != 200) {
+                if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
                     throw new ComponentExecutionException(
                         "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
