@@ -32,12 +32,16 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.http.client.constant.HttpClientComponentConstants;
-
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class HttpClientActionUtils {
 
@@ -114,21 +118,27 @@ public class HttpClientActionUtils {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public static Object execute(Parameters inputParameters, RequestMethod requestMethod, Context context, Parameters connectionParameters) {
+    public static Object execute(
+        Parameters inputParameters, RequestMethod requestMethod, Context context, Parameters connectionParameters) {
         Http.Response response =
             context
-                .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientComponentConstants.URI), requestMethod))
+                .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientComponentConstants.URI),
+                    requestMethod))
                 .configuration(
                     Http.allowUnauthorizedCerts(
                         inputParameters.getBoolean(HttpClientComponentConstants.ALLOW_UNAUTHORIZED_CERTS, false))
-                        .disableAuthorization(Objects.isNull(connectionParameters.get(HttpClientComponentConstants.AUTHORIZATION_TYPE)))
+                        .disableAuthorization(
+                            Objects.isNull(connectionParameters.get(HttpClientComponentConstants.AUTHORIZATION_TYPE)))
                         .filename(inputParameters.getString(HttpClientComponentConstants.RESPONSE_FILENAME))
-                        .followAllRedirects(inputParameters.getBoolean(HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS, false))
+                        .followAllRedirects(
+                            inputParameters.getBoolean(HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS, false))
                         .followRedirect(inputParameters.getBoolean(HttpClientComponentConstants.FOLLOW_REDIRECT, false))
                         .proxy(inputParameters.getString(HttpClientComponentConstants.PROXY))
                         .responseType(getResponseType(inputParameters))
-                        .timeout(Duration.ofMillis(inputParameters.getInteger(HttpClientComponentConstants.TIMEOUT, 10000))))
-                .headers((Map) inputParameters.getMap(HttpClientComponentConstants.HEADERS, List.class, Collections.emptyMap()))
+                        .timeout(
+                            Duration.ofMillis(inputParameters.getInteger(HttpClientComponentConstants.TIMEOUT, 10000))))
+                .headers((Map) inputParameters.getMap(HttpClientComponentConstants.HEADERS, List.class,
+                    Collections.emptyMap()))
                 .queryParameters((Map) inputParameters.getMap(HttpClientComponentConstants.QUERY_PARAMETERS, List.class,
                     Collections.emptyMap()))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
@@ -175,11 +185,13 @@ public class HttpClientActionUtils {
                     inputParameters.getString(HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == Http.BodyContentType.FORM_DATA) {
                 body = Http.Body.of(
-                    inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, List.of(FileEntry.class), Map.of()),
+                    inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, List.of(FileEntry.class),
+                        Map.of()),
                     bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.FORM_URL_ENCODED) {
                 body =
-                    Http.Body.of(inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()), bodyContentType);
+                    Http.Body.of(inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()),
+                        bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
                 body = Http.Body.of(
                     inputParameters.getMap(HttpClientComponentConstants.BODY_CONTENT, Map.of()), bodyContentType);
