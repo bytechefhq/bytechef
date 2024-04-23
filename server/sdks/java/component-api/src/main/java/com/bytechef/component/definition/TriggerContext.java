@@ -16,8 +16,70 @@
 
 package com.bytechef.component.definition;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 /**
  *
  */
 public interface TriggerContext extends Context {
+    /**
+     * @param dataFunction
+     * @param <R>
+     * @return
+     */
+    <R> R data(ContextFunction<ActionContext.Data, R> dataFunction);
+
+    /**
+     * @param eventConsumer
+     */
+    void event(Consumer<ActionContext.Event> eventConsumer);
+
+    /**
+     * @param fileFunction
+     * @param <R>
+     * @return
+     */
+    <R> R file(ContextFunction<File, R> fileFunction);
+
+    interface Data {
+
+        enum Scope {
+            WORKFLOW("Workflow"),
+            ACCOUNT("Account");
+
+            private final String label;
+
+            Scope(String label) {
+                this.label = label;
+            }
+
+            public String getLabel() {
+                return label;
+            }
+        }
+
+        /**
+         * @param <T>
+         * @param scope
+         * @param key
+         * @return
+         */
+        <T> Optional<T> fetchValue(ActionContext.Data.Scope scope, String key);
+
+        /**
+         * @param <T>
+         * @param scope
+         * @param key
+         * @return
+         */
+        <T> T getValue(ActionContext.Data.Scope scope, String key);
+
+        /**
+         * @param scope
+         * @param key
+         * @param data
+         */
+        Void setValue(ActionContext.Data.Scope scope, String key, Object data);
+    }
 }

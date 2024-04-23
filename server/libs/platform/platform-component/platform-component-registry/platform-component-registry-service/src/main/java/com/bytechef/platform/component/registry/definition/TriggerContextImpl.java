@@ -16,18 +16,200 @@
 
 package com.bytechef.platform.component.registry.definition;
 
+import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.data.storage.service.DataStorageService;
+import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Ivica Cardic
  */
 public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
+    private final ActionContextImpl.Data data;
+    private final ActionContext.Event event;
+    private final File file;
+
+    @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, String triggerName, ComponentConnection connection,
+        String componentName, int componentVersion, String triggerName, Long instanceId, Type type,
+        String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
+        ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
 
         super(componentName, triggerName, connection, httpClientExecutor);
+
+        this.data = type == null ? new NoOpDataImpl() : new DataImpl(
+            componentName, componentVersion, triggerName, instanceId, type, workflowId, jobId,
+            dataStorageService);
+        this.event = jobId == null ? progress -> {
+        } : new EventImpl(eventPublisher, jobId);
+        this.file = new FileImpl(fileStorageService);
+    }
+
+    @Override
+    public <R> R data(ContextFunction<ActionContextImpl.Data, R> dataFunction) {
+        try {
+            return dataFunction.apply(data);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void event(Consumer<ActionContext.Event> eventConsumer) {
+        eventConsumer.accept(event);
+    }
+
+    @Override
+    public <R> R file(ContextFunction<File, R> fileFunction) {
+        try {
+            return fileFunction.apply(file);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private record DataImpl(
+        String componentName, Integer componentVersion, String triggerName, Long instanceId, Type type,
+        String workflowId,
+        Long jobId, DataStorageService dataStorageService) implements ActionContext.Data {
+
+        @Override
+        public <T> Optional<T> fetchValue(ActionContextImpl.Data.Scope scope, String key) {
+            return dataStorageService.fetch(
+                componentName, triggerName, scope, getScopeId(scope), key, type);
+        }
+
+        @Override
+        public <T> T getValue(ActionContextImpl.Data.Scope scope, String key) {
+            return dataStorageService.get(
+                componentName, triggerName, scope, getScopeId(scope), key, type);
+        }
+
+        @Override
+        public Void setValue(ActionContextImpl.Data.Scope scope, String key, Object value) {
+            dataStorageService.put(
+                componentName, triggerName, scope, getScopeId(scope), key, type, value);
+
+            return null;
+        }
+
+        private String getScopeId(ActionContextImpl.Data.Scope scope) {
+            return switch (scope) {
+                case CURRENT_EXECUTION -> String.valueOf(jobId);
+                case WORKFLOW -> workflowId;
+                case ACCOUNT -> null;
+            };
+        }
+    }
+
+    private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) implements ActionContext.Event {
+
+        @Override
+        public void publishActionProgressEvent(int progress) {
+            eventPublisher.publishEvent(new TaskProgressedApplicationEvent(taskExecutionId, progress));
+        }
+    }
+
+    private record FileImpl(FileStorageService fileStorageService) implements File {
+
+        @Override
+        public InputStream getStream(FileEntry fileEntry) {
+            return fileStorageService.getFileStream(
+                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public String readToString(FileEntry fileEntry) {
+            return fileStorageService.readFileToString(
+                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, String data) {
+            return new FileEntryImpl(
+                fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, data));
+        }
+
+        @Override
+        public java.io.File toTempFile(FileEntry fileEntry) {
+            Path path = toTempFilePath(fileEntry);
+
+            return path.toFile();
+        }
+
+        @Override
+        public Path toTempFilePath(FileEntry fileEntry) {
+            Path tempFilePath;
+
+            try {
+                tempFilePath = Files.createTempFile("trigger_context_", fileEntry.getName());
+
+                Files.copy(
+                    fileStorageService.getFileStream(FileEntryConstants.FILES_DIR, toFileEntry(fileEntry)),
+                    tempFilePath,
+                    StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return tempFilePath;
+        }
+
+        @Override
+        public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
+            InputStream inputStream = getStream(fileEntry);
+
+            return inputStream.readAllBytes();
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, InputStream inputStream) {
+            try {
+                return new FileEntryImpl(
+                    fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
+            } catch (Exception exception) {
+                throw new RuntimeException("Unable to store file " + fileName);
+            }
+        }
+
+        private static com.bytechef.file.storage.domain.FileEntry toFileEntry(FileEntry fileEntry) {
+            return new com.bytechef.file.storage.domain.FileEntry(
+                fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl());
+        }
+    }
+
+    private record NoOpDataImpl() implements ActionContext.Data {
+
+        @Override
+        public <T> Optional<T> fetchValue(ActionContextImpl.Data.Scope scope, String key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public <T> T getValue(ActionContextImpl.Data.Scope scope, String key) {
+            return null;
+        }
+
+        @Override
+        public Void setValue(ActionContextImpl.Data.Scope scope, String key, Object data) {
+            return null;
+        }
     }
 }

@@ -23,6 +23,7 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.trigger.exception.TriggerExecutionException;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
@@ -57,8 +58,11 @@ public class ComponentTriggerHandler implements TriggerHandler {
 
         try {
             return triggerDefinitionFacade.executeTrigger(
-                componentName, componentVersion, triggerName, triggerExecution.getParameters(),
-                triggerExecution.getState(),
+                componentName, componentVersion, triggerName,
+                Type.AUTOMATION,
+                MapUtils.getLong(triggerExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
+                MapUtils.getString(triggerExecution.getMetadata(), MetadataConstants.WORKFLOW_ID), null,
+                triggerExecution.getParameters(), triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {

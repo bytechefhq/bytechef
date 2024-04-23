@@ -70,8 +70,12 @@ public class ContextFactory {
     }
 
     public TriggerContext createTriggerContext(
-        @NonNull String componentName, @NonNull String triggerName, @Nullable ComponentConnection connection) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @Nullable Type type,
+        @Nullable Long instanceId, @Nullable String workflowId, @Nullable Long jobId,
+        @Nullable ComponentConnection connection) {
 
-        return new TriggerContextImpl(componentName, triggerName, connection, httpClientExecutor);
+        return new TriggerContextImpl(
+            componentName, componentVersion, triggerName, instanceId, type, workflowId, jobId,
+            connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor);
     }
 }

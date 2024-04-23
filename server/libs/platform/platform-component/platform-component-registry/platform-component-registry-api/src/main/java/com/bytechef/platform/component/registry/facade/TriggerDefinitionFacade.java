@@ -24,6 +24,8 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import java.util.List;
 import java.util.Map;
+
+import com.bytechef.platform.constant.Type;
 import org.springframework.lang.NonNull;
 
 /**
@@ -68,6 +70,7 @@ public interface TriggerDefinitionFacade {
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Type type, Long instanceId, @NonNull String workflowId, Long jobId,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId);
 
