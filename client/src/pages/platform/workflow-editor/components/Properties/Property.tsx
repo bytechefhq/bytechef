@@ -86,6 +86,7 @@ const Property = ({
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(!formState && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
+    const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
 
     const editorRef = useRef<ReactQuill>(null);
@@ -144,17 +145,8 @@ const Property = ({
         showInputTypeSwitchButton = true;
     }
 
-    const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
-
-    const currentWorkflowComponent = workflowComponents?.find((component) => component.name === currentNode?.name);
-
-    if (!parameterValue) {
-        parameterValue = name ? (currentWorkflowComponent?.parameters?.[name] as unknown as string) : '';
-    }
-
-    if (name && name.endsWith('_0') && defaultValue) {
-        parameterValue = defaultValue;
-    }
+    const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
+        useWorkflowNodeParameterMutation();
 
     const otherComponents = components.filter((component) => {
         if (component.componentName !== currentComponentDefinition?.name) {
@@ -165,9 +157,6 @@ const Property = ({
             return false;
         }
     });
-
-    const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
-        useWorkflowNodeParameterMutation();
 
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow) {
@@ -214,16 +203,17 @@ const Property = ({
             const realValues = mentionInputValue
                 .trim()
                 .split(/<[^>]*>?/gm)
-                .filter((value) => value && (!value.startsWith('<') || !value.endsWith('>') || !value.startsWith('\\')))
+                .filter((value) => value && (!value.startsWith('<') || !value.endsWith('>')))
                 .filter((value) => value.trim().length > 0)
                 .filter((value) => !value.startsWith('\\'))
-                .filter((value) => !value.includes('data-value'));
+                .filter((value) => !value.includes('data-value'))
+                .filter((value) => !value.includes('">'));
 
-            strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
+            const isDataPillRegEx = new RegExp(/([a-zA-Z]+_[0-9]+.[a-zA-Z]+)/g);
 
             strippedValue = realValues
                 .map((value) => {
-                    if (value.includes('/') && !value.startsWith('${') && !value.endsWith('}')) {
+                    if (isDataPillRegEx.test(value) && !value.startsWith('${') && !value.endsWith('}')) {
                         return `\${${value.replace(/\//g, '.')}}`;
                     } else {
                         return value;
@@ -431,20 +421,38 @@ const Property = ({
         }
     }, [formState, name, path]);
 
-    // set value to parameterValue only on initial render
+    // set propertyParameterValue on initial render
     useEffect(() => {
-        if (mentionInput && parameterValue && mentionInputValue === '') {
+        if (!propertyParameterValue) {
+            const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
+
+            const currentWorkflowComponent = workflowComponents?.find(
+                (component) => component.name === currentNode?.name
+            );
+
+            setPropertyParameterValue(name ? (currentWorkflowComponent?.parameters?.[name] as unknown as string) : '');
+        }
+
+        if (name && name.endsWith('_0') && defaultValue) {
+            setPropertyParameterValue(defaultValue);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // set value to propertyParameterValue
+    useEffect(() => {
+        if (mentionInput && propertyParameterValue && mentionInputValue === '') {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
             if (!mentionInputElement) {
                 return;
             }
 
-            const mentionValues: Array<string> = parameterValue
+            const mentionValues: Array<string> = propertyParameterValue
                 .split(/(\$\{.*?\})/g)
                 .filter((value: string) => value !== '');
 
-            if (typeof parameterValue === 'string' && parameterValue.includes('${')) {
+            if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
                 const mentionInputNodes = mentionValues.map((value) => {
                     if (value.startsWith('${')) {
                         const componentName = value.split('_')[0].replace('${', '');
@@ -467,23 +475,23 @@ const Property = ({
 
                 setMentionInputValue(mentionInputNodes.join(''));
             } else {
-                setMentionInputValue(parameterValue);
+                setMentionInputValue(propertyParameterValue);
             }
         }
 
-        if (inputValue === '' && parameterValue) {
-            setInputValue(parameterValue);
+        if (inputValue === '' && propertyParameterValue) {
+            setInputValue(propertyParameterValue);
         }
 
-        if (selectValue === '' && parameterValue) {
-            setSelectValue(parameterValue);
+        if (selectValue === '' && propertyParameterValue) {
+            setSelectValue(propertyParameterValue);
         }
 
-        if (numericValue === '' && parameterValue) {
-            setNumericValue(parameterValue);
+        if (numericValue === '' && propertyParameterValue) {
+            setNumericValue(propertyParameterValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [propertyParameterValue]);
 
     useEffect(() => {
         if (optionsDataSource?.loadOptionsDependsOn) {
@@ -637,7 +645,7 @@ const Property = ({
                                 dataPills={dataPills}
                                 onDeleteClick={handleDelete}
                                 operationName={operationName}
-                                parameterValue={parameterValue}
+                                parameterValue={propertyParameterValue}
                                 path={path}
                                 property={property}
                             />
@@ -748,7 +756,7 @@ const Property = ({
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
-                                value={parameterValue}
+                                value={propertyParameterValue}
                             />
                         )}
 
@@ -778,7 +786,7 @@ const Property = ({
                         currentOperationName={operationName}
                         loadDependsOnValues={loadDependsOnValues}
                         name={name}
-                        parameterValue={parameterValue}
+                        parameterValue={propertyParameterValue}
                     />
                 )}
 
@@ -793,7 +801,7 @@ const Property = ({
                         name={name!}
                         onChange={handleCodeEditorChange}
                         required={required}
-                        value={parameterValue}
+                        value={propertyParameterValue}
                         workflow={workflow}
                         workflowNodeName={currentNode.name}
                     />
