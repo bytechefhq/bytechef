@@ -54,9 +54,13 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.util.OpenAIUtils;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -112,11 +116,23 @@ public class OpenAIAskChatGPTAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
+        ChatMessage chatMessage = null;
+
         OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN), Duration.ZERO);
 
         ChatCompletionRequest chatCompletionRequest = createChatCompletionRequest(inputParameters);
 
-        return openAiService.createChatCompletion(chatCompletionRequest);
+        ChatCompletionResult chatCompletionResult = openAiService.createChatCompletion(chatCompletionRequest);
+
+        List<ChatCompletionChoice> chatCompletionChoices = chatCompletionResult.getChoices();
+
+        if (!chatCompletionChoices.isEmpty()) {
+            ChatCompletionChoice chatCompletionChoice = chatCompletionChoices.getFirst();
+
+            chatMessage = chatCompletionChoice.getMessage();
+        }
+
+        return chatMessage;
     }
 
     private static ChatCompletionRequest createChatCompletionRequest(Parameters inputParameters) {

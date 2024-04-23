@@ -17,7 +17,6 @@
 package com.bytechef.component.openai.util;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
@@ -48,30 +47,13 @@ public class OpenAIUtils {
 
     public static final ModifiableValueProperty<?, ?> OUTPUT_SCHEMA_RESPONSE = object()
         .properties(
-            string("id"),
-            string("object"),
-            integer("created"),
-            string("model"),
-            array("choices")
-                .items(
-                    object()
-                        .properties(
-                            integer("index"),
-                            object("message")
-                                .properties(
-                                    string("role"),
-                                    string("content"),
-                                    string("name"),
-                                    object("functionCall")
-                                        .properties(
-                                            string("name"),
-                                            object("arguments"))),
-                            string("finishReason"))),
-            object("usage")
+            string("role"),
+            string("content"),
+            string("name"),
+            object("functionCall")
                 .properties(
-                    integer("promptTokens"),
-                    integer("completionTokens"),
-                    integer("totalTokens")));
+                    string("name"),
+                    object("arguments")));
 
     private OpenAIUtils() {
     }

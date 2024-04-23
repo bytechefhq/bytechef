@@ -28,15 +28,18 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.TypeReference;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -86,6 +89,18 @@ class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
 
         ChatCompletionResult mockedChatCompletionResult = mock(ChatCompletionResult.class);
 
+        List<ChatCompletionChoice> mockedChatCompletionChoices = mock(List.class);
+
+        when(mockedChatCompletionResult.getChoices()).thenReturn(mockedChatCompletionChoices);
+
+        when(mockedChatCompletionChoices.isEmpty()).thenReturn(false);
+
+        ChatCompletionChoice mockedChatCompletionChoice = mock(ChatCompletionChoice.class);
+
+        when(mockedChatCompletionChoices.getFirst()).thenReturn(mockedChatCompletionChoice);
+
+        when(mockedChatCompletionChoice.getMessage()).thenReturn(mock(ChatMessage.class));
+
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
             mockConstruction(
                 OpenAiService.class,
@@ -93,12 +108,14 @@ class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
                     mock.createChatCompletion(chatCompletionRequestArgumentCaptor.capture()))
                         .thenReturn(mockedChatCompletionResult))) {
 
+            ChatCompletionResult chatCompletionResult = spy(new ChatCompletionResult());
+
             Object result = OpenAIAskChatGPTAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
             assertEquals(1, openAiServices.size());
-            assertEquals(mockedChatCompletionResult, result);
+            assertInstanceOf(ChatMessage.class, result);
 
             OpenAiService openAiService = openAiServices.getFirst();
 
