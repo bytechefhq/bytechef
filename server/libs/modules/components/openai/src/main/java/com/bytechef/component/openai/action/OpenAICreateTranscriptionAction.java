@@ -30,7 +30,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_TRAN
 import static com.bytechef.component.openai.constant.OpenAIConstants.FILE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.LANGUAGE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
@@ -60,7 +59,10 @@ public class OpenAICreateTranscriptionAction {
                 .description("The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, " +
                     "mpga, m4a, ogg, wav, or webm.")
                 .required(true),
-            MODEL_PROPERTY
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true)
                 .options(option(WHISPER_1, WHISPER_1))
                 .defaultValue(WHISPER_1),
             string(LANGUAGE)

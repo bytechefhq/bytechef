@@ -103,11 +103,6 @@ public final class OpenAIConstants {
         .description("The maximum number of tokens to generate in the chat completion.")
         .required(false);
 
-    public static final ModifiableStringProperty MODEL_PROPERTY = string(MODEL)
-        .label("Model")
-        .description("ID of the model to use.")
-        .required(true);
-
     public static final ModifiableIntegerProperty N_PROPERTY = integer(N)
         .label("Number of chat completion choices")
         .description("How many chat completion choices to generate for each input message.")

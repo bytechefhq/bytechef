@@ -30,7 +30,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.FUNCTION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.INSTRUCTIONS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.METADATA;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PARAMETERS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
@@ -55,7 +54,10 @@ public class OpenAICreateAssistantAction {
         .title("Create assistant")
         .description("Create an assistant with a model and instructions.")
         .properties(
-            MODEL_PROPERTY
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) OpenAIUtils::getModelOptions),
             string(NAME)
                 .label("Name")

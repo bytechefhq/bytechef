@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_SPEECH;
 import static com.bytechef.component.openai.constant.OpenAIConstants.INPUT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.SPEED;
 import static com.bytechef.component.openai.constant.OpenAIConstants.VOICE;
@@ -47,7 +46,10 @@ public class OpenAICreateSpeechAction {
         .title("Create speech")
         .description("Generate an audio recording from the input text")
         .properties(
-            MODEL_PROPERTY
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true)
                 .description("Text-to-Speech model which will generate the audio.")
                 .options(
                     option("tts-1", "tts-1", "Model optimized for speed."),

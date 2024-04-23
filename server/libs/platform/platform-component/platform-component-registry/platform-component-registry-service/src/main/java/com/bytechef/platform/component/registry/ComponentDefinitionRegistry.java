@@ -82,9 +82,7 @@ public class ComponentDefinitionRegistry {
         validate(componentDefinitions);
     }
 
-    public ActionDefinition getActionDefinition(
-        String componentName, int componentVersion, String actionName) {
-
+    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition

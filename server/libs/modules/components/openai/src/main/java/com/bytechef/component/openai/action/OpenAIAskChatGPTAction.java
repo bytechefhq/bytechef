@@ -32,7 +32,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MAX_TOKENS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MESSAGES;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N_PROPERTY;
@@ -96,7 +95,10 @@ public class OpenAIAskChatGPTAction {
                                     "differentiate between participants of the same role.")
                             .required(false)))
                 .required(true),
-            MODEL_PROPERTY
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true)
                 .options((ActionOptionsFunction<String>) OpenAIUtils::getModelOptions),
             FREQUENCY_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,

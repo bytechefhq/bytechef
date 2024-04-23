@@ -29,7 +29,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
-import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
@@ -61,7 +60,10 @@ public class OpenAICreateImageAction {
                 .loadPropertiesDependsOn(MODEL)
                 .properties(OpenAIUtils::getModelProperties)
                 .required(true),
-            MODEL_PROPERTY
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true)
                 .description("The model to use for image generation.")
                 .options(
                     option(DALL_E_3, DALL_E_3),

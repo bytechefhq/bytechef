@@ -187,7 +187,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "Text-to-Speech model which will generate the audio.",
+      "description": "ID of the model to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -195,7 +195,7 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": "whisper-1",
+      "defaultValue": null,
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -203,11 +203,7 @@
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "options": [ {
-        "description": null,
-        "label": "whisper-1",
-        "value": "whisper-1"
-      } ],
+      "options": null,
       "optionsDataSource": {
         "loadOptionsDependsOn": null,
         "options": { }
@@ -600,7 +596,7 @@
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
-      "description": "Text-to-Speech model which will generate the audio.",
+      "description": "ID of the model to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -608,7 +604,7 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": "whisper-1",
+      "defaultValue": null,
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -616,11 +612,7 @@
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "options": [ {
-        "description": null,
-        "label": "whisper-1",
-        "value": "whisper-1"
-      } ],
+      "options": null,
       "optionsDataSource": {
         "loadOptionsDependsOn": null,
         "options": { }
@@ -1334,7 +1326,7 @@
       }
     }, {
       "advancedOption": null,
-      "description": "Text-to-Speech model which will generate the audio.",
+      "description": "The model to use for image generation.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1342,7 +1334,7 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": "whisper-1",
+      "defaultValue": "dall-e-2",
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -1352,13 +1344,14 @@
       "minLength": null,
       "options": [ {
         "description": null,
-        "label": "whisper-1",
-        "value": "whisper-1"
+        "label": "dall-e-3",
+        "value": "dall-e-3"
+      }, {
+        "description": null,
+        "label": "dall-e-2",
+        "value": "dall-e-2"
       } ],
-      "optionsDataSource": {
-        "loadOptionsDependsOn": null,
-        "options": { }
-      }
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The quality of the image that will be generated.",
@@ -1653,7 +1646,7 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": "whisper-1",
+      "defaultValue": null,
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -1662,14 +1655,15 @@
       "maxLength": null,
       "minLength": null,
       "options": [ {
-        "description": null,
-        "label": "whisper-1",
-        "value": "whisper-1"
+        "description": "Model optimized for speed.",
+        "label": "tts-1",
+        "value": "tts-1"
+      }, {
+        "description": "Model optimized for quality.",
+        "label": "tts-1-hd",
+        "value": "tts-1-hd"
       } ],
-      "optionsDataSource": {
-        "loadOptionsDependsOn": null,
-        "options": { }
-      }
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The text to generate audio for.",
@@ -2003,7 +1997,7 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": null,
-      "description": "Text-to-Speech model which will generate the audio.",
+      "description": "ID of the model to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2024,10 +2018,7 @@
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
-      "optionsDataSource": {
-        "loadOptionsDependsOn": null,
-        "options": { }
-      }
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The language of the input audio.",
@@ -2870,7 +2861,7 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": null,
-      "description": "Text-to-Speech model which will generate the audio.",
+      "description": "ID of the model to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2891,10 +2882,7 @@
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
-      "optionsDataSource": {
-        "loadOptionsDependsOn": null,
-        "options": { }
-      }
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An optional text to guide the model's style or continue a previous audio segment. The prompt should be in English.",
@@ -3611,7 +3599,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "Text-to-Speech model which will generate the audio.",
+      "description": "ID of the model to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3619,7 +3607,7 @@
       "required": true,
       "name": "model",
       "type": "STRING",
-      "defaultValue": "whisper-1",
+      "defaultValue": null,
       "exampleValue": null,
       "label": "Model",
       "placeholder": null,
@@ -3627,11 +3615,7 @@
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "options": [ {
-        "description": null,
-        "label": "whisper-1",
-        "value": "whisper-1"
-      } ],
+      "options": null,
       "optionsDataSource": {
         "loadOptionsDependsOn": null,
         "options": { }
