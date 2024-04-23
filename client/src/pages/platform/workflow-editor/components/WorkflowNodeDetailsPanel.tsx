@@ -73,6 +73,7 @@ const WorkflowNodeDetailsPanel = ({
     const [activeTab, setActiveTab] = useState('description');
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentComponent, setCurrentComponent] = useState<ComponentType>();
+    const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyType>>([]);
 
     const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -128,10 +129,6 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const {nodeNames} = workflow;
-
-    const currentOperationProperties = currentNode.trigger
-        ? currentTriggerDefinition?.properties
-        : currentActionDefinition?.properties;
 
     const currentNodeIndex = nodeNames?.indexOf(currentNode.name);
 
@@ -301,6 +298,16 @@ const WorkflowNodeDetailsPanel = ({
             updateWorkflowMutation
         );
     };
+
+    useEffect(
+        () =>
+            setCurrentOperationProperties(
+                currentNode.trigger
+                    ? currentTriggerDefinition?.properties ?? []
+                    : currentActionDefinition?.properties ?? []
+            ),
+        [currentActionDefinition?.properties, currentNode.trigger, currentTriggerDefinition?.properties]
+    );
 
     useEffect(() => {
         if (componentDefinition) {
