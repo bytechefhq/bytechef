@@ -73,12 +73,14 @@ public class PipedriveGetDealsAction {
                     "Only fetch deals with a specific status. If omitted, all not deleted deals are returned. If set to deleted, deals that have been deleted up to 30 days ago will be included.")
                 .options(option("Open", "open"), option("Won", "won"), option("Lost", "lost"),
                     option("Deleted", "deleted"), option("All_not_deleted", "all_not_deleted"))
+                .defaultValue("all_not_deleted")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
             integer("start").label("Start")
                 .description("Pagination start")
+                .defaultValue(0)
                 .required(false)
                 .metadata(
                     Map.of(

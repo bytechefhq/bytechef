@@ -68,6 +68,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                     "type", PropertyType.QUERY)),
             integer("startAt").label("Start At")
                 .description("The index of the first item to return in a page of results (page offset).")
+                .defaultValue(0)
                 .required(false)
                 .metadata(
                     Map.of(
@@ -75,6 +76,7 @@ public class JiraSearchForIssuesUsingJqlAction {
             integer("maxResults").label("Max Results")
                 .description(
                     "The maximum number of items to return per page. To manage page size, Jira may return fewer items per page where a large number of fields are requested. The greatest number of items returned per page is achieved when requesting `id` or `key` only.")
+                .defaultValue(50)
                 .required(false)
                 .metadata(
                     Map.of(
@@ -92,11 +94,12 @@ public class JiraSearchForIssuesUsingJqlAction {
                         + "Note: If the JQL is not correctly formed a 400 response code is returned, regardless of the `validateQuery` value.")
                 .options(option("Strict", "strict"), option("Warn", "warn"), option("None", "none"),
                     option("True", "true"), option("False", "false"))
+                .defaultValue("strict")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            array("fields").items(string())
+            array("fields").items(string().defaultValue("*navigable"))
                 .placeholder("Add to Fields")
                 .label("Fields")
                 .description(
@@ -146,6 +149,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                         "type", PropertyType.QUERY)),
             bool("fieldsByKeys").label("Fields By Keys")
                 .description("Reference fields by their key (rather than ID).")
+                .defaultValue(false)
                 .required(false)
                 .metadata(
                     Map.of(

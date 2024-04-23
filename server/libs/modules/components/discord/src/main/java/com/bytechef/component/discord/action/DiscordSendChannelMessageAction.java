@@ -54,6 +54,7 @@ public class DiscordSendChannelMessageAction {
                 .required(true),
                 bool("tts").label("Text   To   Speech")
                     .description("True if this is a TTS message")
+                    .defaultValue(false)
                     .required(false))
                 .label("Message")
                 .metadata(

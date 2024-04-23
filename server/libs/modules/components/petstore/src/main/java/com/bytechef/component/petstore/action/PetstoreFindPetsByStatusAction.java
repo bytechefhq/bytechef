@@ -46,6 +46,7 @@ public class PetstoreFindPetsByStatusAction {
         .properties(string("status").label("Status")
             .description("Status values that need to be considered for filter")
             .options(option("Available", "available"), option("Pending", "pending"), option("Sold", "sold"))
+            .defaultValue("available")
             .required(false)
             .metadata(
                 Map.of(

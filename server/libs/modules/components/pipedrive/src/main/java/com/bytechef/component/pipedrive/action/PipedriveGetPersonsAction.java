@@ -67,6 +67,7 @@ public class PipedriveGetPersonsAction {
                         "type", PropertyType.QUERY)),
             integer("start").label("Start")
                 .description("Pagination start")
+                .defaultValue(0)
                 .required(false)
                 .metadata(
                     Map.of(

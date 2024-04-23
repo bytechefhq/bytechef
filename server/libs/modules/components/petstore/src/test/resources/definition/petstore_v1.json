@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Petstore",
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,17 +61,17 @@
       "refreshOn": null,
       "title": "OAuth2 Implicit",
       "type": "OAUTH2_IMPLICIT_CODE",
-      "apply": null,
-      "authorizationCallback": null,
+      "acquire": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": null,
-      "acquire": null
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -121,17 +120,17 @@
       "refreshOn": null,
       "title": "API Key",
       "type": "API_KEY",
-      "apply": null,
-      "authorizationCallback": null,
+      "acquire": null,
       "authorizationUrl": null,
-      "clientId": null,
       "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "acquire": null
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -1299,7 +1298,7 @@
       "required": false,
       "name": "status",
       "type": "STRING",
-      "defaultValue": null,
+      "defaultValue": "available",
       "exampleValue": null,
       "label": "Status",
       "placeholder": null,
@@ -4769,5 +4768,6 @@
       "sampleOutput": null
     },
     "perform": null
-  } ]
+  } ],
+  "triggers": [ ]
 }

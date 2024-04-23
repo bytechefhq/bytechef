@@ -67,6 +67,7 @@ public class JiraCreateIssueAction {
         .properties(bool("updateHistory").label("Update History")
             .description(
                 "Whether the project in which the issue is created is added to the user's **Recently viewed** project list, as shown under **Projects** in Jira. When provided, the issue type and request type are added to the user's history for a project. These values are then used to provide defaults on the issue create screen.")
+            .defaultValue(false)
             .required(false)
             .metadata(
                 Map.of(

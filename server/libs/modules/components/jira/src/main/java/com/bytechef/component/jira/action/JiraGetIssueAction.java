@@ -59,7 +59,7 @@ public class JiraGetIssueAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            array("fields").items(string())
+            array("fields").items(string().defaultValue("*all"))
                 .placeholder("Add to Fields")
                 .label("Fields")
                 .description(
@@ -85,6 +85,7 @@ public class JiraGetIssueAction {
             bool("fieldsByKeys").label("Fields By Keys")
                 .description(
                     "Whether fields in `fields` are referenced by keys rather than IDs. This parameter is useful where fields have been added by a connect app and a field's key may differ from its ID.")
+                .defaultValue(false)
                 .required(false)
                 .metadata(
                     Map.of(
@@ -104,7 +105,7 @@ public class JiraGetIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            array("properties").items(string())
+            array("properties").items(string().defaultValue("null"))
                 .placeholder("Add to Properties")
                 .label("Properties")
                 .description(
@@ -127,6 +128,7 @@ public class JiraGetIssueAction {
             bool("updateHistory").label("Update History")
                 .description(
                     "Whether the project in which the issue is created is added to the user's **Recently viewed** project list, as shown under **Projects** in Jira. This also populates the [JQL issues search](#api-rest-api-3-search-get) `lastViewed` field.")
+                .defaultValue(false)
                 .required(false)
                 .metadata(
                     Map.of(

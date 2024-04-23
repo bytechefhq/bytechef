@@ -73,6 +73,7 @@ public class PipedriveSearchOrganizationAction {
             integer("start").label("Start")
                 .description(
                     "Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.")
+                .defaultValue(0)
                 .required(false)
                 .metadata(
                     Map.of(
