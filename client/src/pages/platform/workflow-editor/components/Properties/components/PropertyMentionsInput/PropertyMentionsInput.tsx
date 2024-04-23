@@ -8,7 +8,6 @@ import ReactQuill, {Quill} from 'react-quill';
 import './propertyMentionsInput.css';
 
 import {Label} from '@/components/ui/label';
-import {ComponentDefinitionModel} from '@/middleware/platform/configuration';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import {useDataPillPanelStore} from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -17,9 +16,6 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
 import PropertyMentionsInputBlot from './PropertyMentionsInputBlot';
-
-const isAlphaNumericalKeyCode = (event: KeyboardEvent) =>
-    (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90);
 
 Quill.register('formats/property-mention', PropertyMentionsInputBlot);
 
@@ -39,7 +35,6 @@ const MentionInputListItem = (item: DataPillType) => {
 
 interface PropertyMentionsInputProps {
     controlType?: string;
-    currentComponentDefinition: ComponentDefinitionModel;
     dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
@@ -61,7 +56,6 @@ const PropertyMentionsInput = forwardRef(
     (
         {
             controlType,
-            currentComponentDefinition,
             dataPills,
             defaultValue,
             description,
@@ -81,7 +75,7 @@ const PropertyMentionsInput = forwardRef(
     ) => {
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        const {copiedPropertyData, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+        const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -191,49 +185,6 @@ const PropertyMentionsInput = forwardRef(
             }
         };
 
-        const handleOnKeyDown = (event: KeyboardEvent<Element>) => {
-            if (mentionOccurences && isAlphaNumericalKeyCode(event) && singleMention) {
-                // @ts-expect-error Quill false positive
-                const editor = ref.current.getEditor();
-
-                const selection = editor.getSelection();
-
-                const [leaf] = editor.getLeaf(selection?.index || 0);
-
-                if (leaf) {
-                    const length = editor.getLength();
-
-                    editor.deleteText(0, length);
-
-                    editor.insertText(0, '');
-
-                    editor.setSelection(length);
-                }
-            }
-
-            if (singleMention && mentionOccurences) {
-                event.preventDefault();
-            }
-
-            if (event.key === 'v' && (event.metaKey || event.ctrlKey)) {
-                event.preventDefault();
-
-                if (copiedPropertyData.value) {
-                    if (currentComponentDefinition?.icon) {
-                        copiedPropertyData.componentIcon = currentComponentDefinition.icon;
-                    }
-
-                    const mentionInput = focusedInput?.getEditor().getModule('mention');
-
-                    if (!mentionInput) {
-                        return;
-                    }
-
-                    mentionInput.insertItem(copiedPropertyData, true, {blotName: 'property-mention'});
-                }
-            }
-        };
-
         useEffect(() => {
             // @ts-expect-error Quill false positive
             if (!ref?.current) {
@@ -304,7 +255,6 @@ const PropertyMentionsInput = forwardRef(
                         modules={useMemo(() => modules, [])}
                         onChange={(newValue) => handleOnChange(newValue)}
                         onFocus={handleOnFocus}
-                        onKeyDown={handleOnKeyDown}
                         onKeyPress={onKeyPress}
                         placeholder={placeholder}
                         ref={ref}

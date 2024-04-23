@@ -1,12 +1,9 @@
 /* eslint-disable sort-keys */
-import {DataPillType, NodeType} from '@/types/types';
+import {NodeType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowNodeDetailsPanelStateI {
-    copiedPropertyData: DataPillType;
-    setCopiedPropertyData: (copiedPropertyData: DataPillType) => void;
-
     currentNode: NodeType;
     setCurrentNode: (currentNode: NodeType) => void;
 
@@ -22,9 +19,6 @@ interface WorkflowNodeDetailsPanelStateI {
 export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
     devtools(
         (set) => ({
-            copiedPropertyData: {} as DataPillType,
-            setCopiedPropertyData: (copiedPropertyData) => set((state) => ({...state, copiedPropertyData})),
-
             currentNode: {id: '', name: '', type: 'component', version: 1},
             setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
 

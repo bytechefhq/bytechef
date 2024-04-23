@@ -92,7 +92,7 @@ const Property = ({
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {currentNode, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, components, setComponents, workflow} = useWorkflowDataStore();
 
@@ -193,11 +193,31 @@ const Property = ({
             return;
         }
 
-        let strippedValue = mentionInputValue;
+        // TODO handle mix of text and multiple data pills
 
-        const dataPillValues = mentionInputValue
-            .match(/data-value="([^"]+)"/g)
-            ?.map((match) => match.match(/data-value="([^"]+)"/)?.[1]);
+        let strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
+
+        if (strippedValue.startsWith('${')) {
+            const editor = focusedInput.getEditor();
+
+            editor.deleteText(0, editor.getLength());
+
+            editor.setText(' ');
+
+            const mentionInput = editor.getModule('mention');
+
+            mentionInput.insertItem(
+                {
+                    componentIcon: currentComponentDefinition?.icon,
+                    id: currentNode.name,
+                    value: strippedValue.replace('${', '').replace('}', '').replace('.', '/'),
+                },
+                true,
+                {blotName: 'property-mention'}
+            );
+
+            return;
+        }
 
         if (type === 'STRING') {
             const realValues = mentionInputValue
@@ -221,6 +241,10 @@ const Property = ({
                 })
                 .join('');
         } else {
+            const dataPillValues = mentionInputValue
+                .match(/data-value="([^"]+)"/g)
+                ?.map((match) => match.match(/data-value="([^"]+)"/)?.[1]);
+
             const dataPillValue = dataPillValues?.[0];
 
             if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
@@ -556,7 +580,6 @@ const Property = ({
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
                             controlType={controlType}
-                            currentComponentDefinition={currentComponentDefinition}
                             dataPills={dataPills}
                             defaultValue={defaultValue}
                             description={description}
