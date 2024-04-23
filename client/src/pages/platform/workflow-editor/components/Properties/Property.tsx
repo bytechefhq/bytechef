@@ -159,31 +159,27 @@ const Property = ({
     });
 
     const saveInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow) {
-            return;
-        }
-
-        if (!name) {
+        if (!currentComponent || !workflow || !name || !updateWorkflowNodeParameterMutation) {
             return;
         }
 
         const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
 
-        saveProperty(
-            workflow.id!,
-            path,
+        saveProperty({
+            arrayIndex,
+            currentComponentData: currentComponent,
             name,
-            currentComponent,
-            otherComponents,
-            setComponents,
-            updateWorkflowNodeParameterMutation!,
-            isNumericalInput ? numericValueToSave : inputValue,
-            arrayIndex
-        );
+            otherComponentData: otherComponents,
+            path,
+            setComponentData: setComponents,
+            updateWorkflowNodeParameterMutation,
+            value: isNumericalInput ? numericValueToSave : inputValue,
+            workflowId: workflow.id!,
+        });
     }, 200);
 
     const saveMentionInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow || !updateWorkflowNodeParameterMutation || !name) {
+        if (!currentComponent || !workflow.id || !updateWorkflowNodeParameterMutation || !name) {
             return;
         }
 
@@ -290,35 +286,35 @@ const Property = ({
             return;
         }
 
-        saveProperty(
-            workflow.id!,
-            path,
+        saveProperty({
+            arrayIndex,
+            currentComponentData: currentComponent,
             name,
-            currentComponent,
-            otherComponents,
-            setComponents,
+            otherComponentData: otherComponents,
+            path,
+            setComponentData: setComponents,
             updateWorkflowNodeParameterMutation,
-            strippedValue,
-            arrayIndex
-        );
+            value: strippedValue,
+            workflowId: workflow.id,
+        });
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponent || !name) {
+        if (!currentComponent || !name || !updateWorkflowNodeParameterMutation || !workflow.id) {
             return;
         }
 
-        saveProperty(
-            workflow.id!,
-            path,
+        saveProperty({
+            arrayIndex,
+            currentComponentData: currentComponent,
             name,
-            currentComponent,
-            otherComponents,
-            setComponents,
-            updateWorkflowNodeParameterMutation!,
+            otherComponentData: otherComponents,
+            path,
+            setComponentData: setComponents,
+            updateWorkflowNodeParameterMutation,
             value,
-            undefined
-        );
+            workflowId: workflow.id,
+        });
     }, 200);
 
     const handleDelete = (path: string, name: string, arrayIndex?: number) => {
@@ -404,23 +400,23 @@ const Property = ({
     };
 
     const handleSelectChange = (value: string, name: string) => {
-        if (!currentComponent || !workflow || !name) {
+        if (!currentComponent || !workflow.id || !name || !updateWorkflowNodeParameterMutation) {
             return;
         }
 
         setSelectValue(value);
 
-        saveProperty(
-            workflow.id!,
-            path,
+        saveProperty({
+            arrayIndex,
+            currentComponentData: currentComponent,
             name,
-            currentComponent,
-            otherComponents,
-            setComponents,
-            updateWorkflowNodeParameterMutation!,
+            otherComponentData: otherComponents,
+            path,
+            setComponentData: setComponents,
+            updateWorkflowNodeParameterMutation,
             value,
-            arrayIndex
-        );
+            workflowId: workflow.id,
+        });
     };
 
     // set default mentionInput state
