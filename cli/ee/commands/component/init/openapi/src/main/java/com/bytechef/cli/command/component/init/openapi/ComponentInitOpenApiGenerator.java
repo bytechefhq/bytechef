@@ -230,8 +230,7 @@ public class ComponentInitOpenApiGenerator {
             builder.add(
                 ".label($S)",
                 buildPropertyLabel(
-                    StringUtils.isEmpty(schema.getTitle())
-                        ? propertyName.replace("__", "") : schema.getTitle()));
+                    StringUtils.isEmpty(schema.getTitle()) ? propertyName.replace("__", "") : schema.getTitle()));
         }
 
         if (propertyDescription != null) {
@@ -244,6 +243,14 @@ public class ComponentInitOpenApiGenerator {
             if (!Objects.equals(type, "boolean")) {
                 builder.add(".options($L)", codeBlocks.stream()
                     .collect(CodeBlock.joining(",")));
+            }
+        }
+
+        if (schema.getDefault() != null) {
+            if (Objects.equals(type, "string")) {
+                builder.add(".defaultValue($S)", schema.getDefault());
+            } else {
+                builder.add(".defaultValue($L)", schema.getDefault());
             }
         }
 
@@ -1754,8 +1761,8 @@ public class ComponentInitOpenApiGenerator {
                         "Parameter type %s is not supported.".formatted(schema.getType()));
                 }
 
-                checkAdditionalProperties(propertyName, propertyDescription, required, schema, outputSchema, type,
-                    builder);
+                checkAdditionalProperties(
+                    propertyName, propertyDescription, required, schema, outputSchema, type, builder);
             } else {
                 builder.add(
                     getRefCodeBlock(propertyName, required, schema, excludePropertyNameIfEmpty, outputSchema, openAPI));
