@@ -26,8 +26,6 @@ import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.ApplicationEventPublisher;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -35,6 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
@@ -57,8 +56,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
             componentName, componentVersion, triggerName, instanceId, type, workflowId, jobId,
             dataStorageService);
-        this.event = jobId == null ? progress -> {
-        } : new EventImpl(eventPublisher, jobId);
+        this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
     }
 
@@ -119,7 +117,8 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         }
     }
 
-    private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) implements ActionContext.Event {
+    private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId)
+        implements ActionContext.Event {
 
         @Override
         public void publishActionProgressEvent(int progress) {

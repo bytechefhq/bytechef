@@ -22,10 +22,9 @@ import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.constant.Type;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.platform.constant.Type;
 import org.springframework.lang.NonNull;
 
 /**
