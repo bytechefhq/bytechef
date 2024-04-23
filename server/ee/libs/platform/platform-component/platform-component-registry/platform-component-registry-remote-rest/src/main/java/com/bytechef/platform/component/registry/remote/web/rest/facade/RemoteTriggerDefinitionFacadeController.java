@@ -14,12 +14,14 @@ import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -206,7 +208,9 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeTrigger(
                 triggerRequest.componentName, triggerRequest.componentVersion,
-                triggerRequest.triggerName, triggerRequest.inputParameters, triggerRequest.state,
+                triggerRequest.triggerName, triggerRequest.type, triggerRequest.instanceId,
+                triggerRequest.workflowId, triggerRequest.jobId,
+                triggerRequest.inputParameters, triggerRequest.state,
                 triggerRequest.webhookRequest, triggerRequest.connectionId));
     }
 
@@ -284,8 +288,10 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String componentName, int componentVersion, String triggerName, @NotNull Map<String, ?> inputParameters,
-        Object state, @NotNull WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        @NonNull Type type, Long instanceId, @NonNull String workflowId, Long jobId,
+        @NotNull Map<String, ?> inputParameters, Object state, @NotNull WebhookRequest webhookRequest,
+        Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
