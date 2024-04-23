@@ -109,4 +109,6 @@ affinity: {}
 # Helm Variables
 # Used to set ENVIRONMENT VARIABLES for ByteChef Qube
 datasourceJdbcUrl: overrideWithQubinetsValues
+datasourcePassword: overrideWithQubinetsValues
+datasourceUsername: overrideWithQubinetsValues
 webResourceUrl: overrideWithQubinetsValues

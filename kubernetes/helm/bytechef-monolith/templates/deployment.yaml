@@ -39,6 +39,10 @@ spec:
           env:
             - name: "BYTECHEF_DATASOURCE_URL"
               value: {{ .Values.datasourceJdbcUrl }}
+            - name: "BYTECHEF_DATASOURCE_PASSWORD"
+              value: {{ .Values.datasourcePassword }}
+            - name: "BYTECHEF_DATASOURCE_USERNAME"
+              value: {{ .Values.datasourceUsername }}
             - name: "BYTECHEF_RESOURCES_WEB"
               value: {{ .Values.webResourceUrl }}
           ports:
