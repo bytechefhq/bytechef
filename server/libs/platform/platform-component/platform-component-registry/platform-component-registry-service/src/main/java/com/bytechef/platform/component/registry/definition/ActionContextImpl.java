@@ -100,9 +100,11 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         @Override
-        public void setValue(Scope scope, String key, Object value) {
+        public Void setValue(Scope scope, String key, Object value) {
             dataStorageService.put(
                 componentName, actionName, scope, getScopeId(scope), key, type, value);
+
+            return null;
         }
 
         private String getScopeId(Scope scope) {
@@ -203,8 +205,8 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         @Override
-        public void setValue(Scope scope, String key, Object data) {
-
+        public Void setValue(Scope scope, String key, Object data) {
+            return null;
         }
     }
 }

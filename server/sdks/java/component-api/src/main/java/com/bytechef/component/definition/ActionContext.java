@@ -92,7 +92,6 @@ public interface ActionContext extends Context {
          * @param key
          * @param data
          */
-        void setValue(Data.Scope scope, String key, Object data);
+        Void setValue(Data.Scope scope, String key, Object data);
     }
-
 }
