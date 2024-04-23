@@ -108,7 +108,7 @@ public class MicrosoftTeamsOptionUtils {
                 }
             }
         }
+
         return options;
     }
-
 }

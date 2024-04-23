@@ -51,7 +51,7 @@ public class MicrosoftTeamsUtils {
                 }
             }
         }
+
         return members;
     }
-
 }
