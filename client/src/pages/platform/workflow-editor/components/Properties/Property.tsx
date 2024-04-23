@@ -443,6 +443,10 @@ const Property = ({
 
     // set propertyParameterValue on initial render
     useEffect(() => {
+        if (!name) {
+            return;
+        }
+
         if (!propertyParameterValue) {
             const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
 
@@ -453,7 +457,7 @@ const Property = ({
             setPropertyParameterValue(name ? (currentWorkflowComponent?.parameters?.[name] as unknown as string) : '');
         }
 
-        if (name && name.endsWith('_0') && defaultValue) {
+        if (name.endsWith('_0') && defaultValue) {
             setPropertyParameterValue(defaultValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -464,7 +468,7 @@ const Property = ({
         if (mentionInput && propertyParameterValue && mentionInputValue === '') {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
-            if (!mentionInputElement) {
+            if (!mentionInputElement || typeof propertyParameterValue !== 'string') {
                 return;
             }
 
