@@ -17,6 +17,7 @@
 package com.bytechef.component.google.sheets.trigger;
 
 import static com.bytechef.component.definition.ActionContext.Data.Scope.WORKFLOW;
+import static com.bytechef.component.definition.ComponentDSL.*;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY_TRIGGER;
@@ -56,7 +57,10 @@ public class GoogleSheetsOnRowAdded {
             SPREADSHEET_ID_PROPERTY_TRIGGER,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             SHEET_NAME_PROPERTY_TRIGGER)
-        .output()
+        .outputSchema(
+            array()
+                .items(object()
+                    .additionalProperties(string(), array().items(string()))))
         .dynamicWebhookEnable(GoogleSheetsOnRowAdded::dynamicWebhookEnable)
         .dynamicWebhookDisable(GoogleSheetsOnRowAdded::dynamicWebhookDisable)
         .dynamicWebhookRequest(GoogleSheetsOnRowAdded::dynamicWebhookRequest);
