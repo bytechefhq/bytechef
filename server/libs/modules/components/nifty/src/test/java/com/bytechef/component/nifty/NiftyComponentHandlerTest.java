@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Luka Ljubić
  */
-public class NiftyComponentHandlerTest {
+class NiftyComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/nifty_v1.json", new NiftyComponentHandler().getDefinition());

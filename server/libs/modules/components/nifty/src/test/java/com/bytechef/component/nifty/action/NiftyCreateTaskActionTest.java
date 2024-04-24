@@ -35,7 +35,7 @@ import org.mockito.Mockito;
 /**
  * @author Luka Ljubić
  */
-public class NiftyCreateTaskActionTest {
+class NiftyCreateTaskActionTest {
 
     Parameters mockedParameters = Mockito.mock(Parameters.class);
     ArgumentCaptor<Http.Body> bodyArgumentCaptor =
