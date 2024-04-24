@@ -86,6 +86,7 @@ public class GoogleSheetsConstants {
         .label("Sheet")
         .description("The name of the sheet")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetIdOptions)
+        .loadOptionsDependsOn(SPREADSHEET_ID)
         .required(true);
 
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY = string(SHEET_NAME)
