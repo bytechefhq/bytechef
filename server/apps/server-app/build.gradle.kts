@@ -120,6 +120,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:microsoft:microsoft-share-point"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-teams"))
     implementation(project(":server:libs:modules:components:mysql"))
+    implementation(project(":server:libs:modules:components:nifty"))
     implementation(project(":server:libs:modules:components:object-helper"))
     implementation(project(":server:libs:modules:components:ods-file"))
     implementation(project(":server:libs:modules:components:openai"))
