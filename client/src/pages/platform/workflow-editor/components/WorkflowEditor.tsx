@@ -1,7 +1,7 @@
 import {ActionDefinitionBasicModel, UpdateWorkflowRequest} from '@/middleware/platform/configuration';
 import {useGetComponentActionDefinitionQuery} from '@/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {ComponentOperationType, PropertyType} from '@/types/types';
+import {ComponentOperationType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -25,6 +25,7 @@ import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
+import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export interface WorkflowEditorProps {
@@ -279,28 +280,11 @@ const WorkflowEditor = ({
             return;
         }
 
-        const getProperties = (properties: Array<PropertyType>, data: {[key: string]: string | object} = {}) => {
-            properties.forEach((property) => {
-                if (!property.name) {
-                    return;
-                }
-
-                if (property.properties?.length) {
-                    data[property.name!] = getProperties(property.properties, {}) ?? {};
-                } else if (property.items?.length) {
-                    data[property.name!] = [getProperties(property.items, {}) ?? {}];
-                } else {
-                    data[property.name] = property.defaultValue ?? '';
-                }
-            });
-
-            return data;
-        };
-
         saveWorkflowDefinition(
             {
                 ...newNode.data,
-                parameters: getProperties(latestActionDefinition?.properties, {}) ?? {},
+                parameters:
+                    getParametersWithDefaultValues({data: {}, properties: latestActionDefinition?.properties}) ?? {},
                 type: `${newNode.data.componentName}/${workflowComponentWithAlias?.version}/${workflowComponentWithAlias?.actions?.[0].name}`,
             },
             workflow!,

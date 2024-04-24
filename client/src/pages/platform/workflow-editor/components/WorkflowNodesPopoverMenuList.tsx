@@ -112,6 +112,7 @@ const WorkflowNodesPopoverMenuList = memo(
                     setWorkflow({
                         ...workflow,
                         componentNames: tempComponentNames,
+                        nodeNames: [...workflow.nodeNames, newWorkflowNode.data.name],
                     });
 
                     const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
