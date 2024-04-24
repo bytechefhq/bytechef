@@ -29,4 +29,8 @@ public final class NiftyConstants {
     public static final String TASK_GROUP_ID = "task_group_id";
     public static final String PROJECT = "project";
     public static final String DUE_DATE = "due_date";
+
+    private NiftyConstants() {
+
+    }
 }
