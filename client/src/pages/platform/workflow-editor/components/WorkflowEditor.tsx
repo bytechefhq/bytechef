@@ -1,9 +1,11 @@
-import {UpdateWorkflowRequest} from '@/middleware/platform/configuration';
+import {ActionDefinitionBasicModel, UpdateWorkflowRequest} from '@/middleware/platform/configuration';
+import {useGetComponentActionDefinitionQuery} from '@/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {ComponentOperationType} from '@/types/types';
+import {ComponentOperationType, PropertyType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
+import {usePrevious} from '@uidotdev/usehooks';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
@@ -18,7 +20,6 @@ import WorkflowEdge from '../edges/WorkflowEdge';
 import defaultEdges from '../edges/defaultEdges';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
-import usePrevious from '../hooks/usePrevious';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
@@ -39,14 +40,19 @@ const WorkflowEditor = ({
 }: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
     const [latestComponentName, setLatestComponentName] = useState('');
+    const [newNode, setNewNode] = useState<Node | undefined>();
     const [nodeOperations, setNodeOperations] = useState<Array<ComponentOperationType>>([]);
     const [nodes, setNodes] = useState(defaultNodes);
     const [viewportWidth, setViewportWidth] = useState(0);
+    const [workflowComponentWithAlias, setWorkflowComponentWithAlias] = useState<
+        | (ComponentDefinitionBasicModel & {actions?: Array<ActionDefinitionBasicModel>; workflowNodeName: string})
+        | undefined
+    >();
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {componentActions, setComponentActions, setWorkflow, workflow} = useWorkflowDataStore();
 
-    const {componentNames, nodeNames} = workflow;
+    const {componentNames} = workflow;
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
@@ -74,11 +80,24 @@ const WorkflowEditor = ({
 
     const lastComponentName = componentNames?.[componentNames?.length - 1];
 
-    const {data: workflowComponent} = useGetComponentDefinitionQuery(
+    const {
+        data: workflowComponent,
+        isFetched: workflowComponentFetched,
+        isFetchedAfterMount: workflowComponentFetchedAfterMount,
+    } = useGetComponentDefinitionQuery(
         {
-            componentName: latestComponentName || lastComponentName!,
+            componentName: latestComponentName || lastComponentName,
         },
-        !!componentNames?.length
+        !!latestComponentName || !!lastComponentName
+    );
+
+    const {data: latestActionDefinition} = useGetComponentActionDefinitionQuery(
+        {
+            actionName: workflowComponent?.actions?.[0]?.name as string,
+            componentName: workflowComponent?.name as string,
+            componentVersion: workflowComponent?.version as number,
+        },
+        !!workflowComponent
     );
 
     const onDrop: DragEventHandler = (event) => {
@@ -117,19 +136,6 @@ const WorkflowEditor = ({
         }
     };
 
-    const workflowComponentWithAlias = useMemo(() => {
-        if (!workflowComponent || !nodeNames?.length) {
-            return undefined;
-        }
-
-        const sameNodeNames = nodeNames.filter((nodeName) => nodeName === workflowComponent.name);
-
-        return {
-            ...workflowComponent,
-            workflowNodeName: `${workflowComponent.name}_${sameNodeNames.length + 1}`,
-        };
-    }, [nodeNames, workflowComponent]);
-
     const defaultNodesWithWorkflowNodes: Array<Node> | undefined = useMemo(() => {
         if (!workflow || !componentDefinitions.length) {
             return;
@@ -144,9 +150,9 @@ const WorkflowEditor = ({
             workflowComponents = [workflowTrigger, ...(workflowTasks || [])];
         }
 
-        const workflowNodes = workflowComponents?.map((workflowComponent, index) => {
-            const componentName = workflowComponent.type?.split('/')[0];
-            const operationName = workflowComponent.type?.split('/')[2];
+        const workflowNodes = workflowComponents?.map((component, index) => {
+            const componentName = component.type?.split('/')[0];
+            const operationName = component.type?.split('/')[2];
 
             const componentDefinition = componentDefinitions.find(
                 (componentDefinition) => componentDefinition.name === componentName
@@ -154,7 +160,7 @@ const WorkflowEditor = ({
 
             return {
                 data: {
-                    ...workflowComponent,
+                    ...component,
                     componentName: componentDefinition.name,
                     icon: (
                         <InlineSVG
@@ -165,12 +171,12 @@ const WorkflowEditor = ({
                     ),
                     id: componentDefinition.name,
                     label: componentDefinition.title,
-                    name: workflowComponent.name,
+                    name: component.name,
                     operationName,
                     trigger: index === 0,
                     type: 'workflow',
                 },
-                id: workflowComponent.name,
+                id: component.name,
                 position: {x: 0, y: 150 * index},
                 type: 'workflow',
             };
@@ -188,7 +194,13 @@ const WorkflowEditor = ({
             return workflowNodes;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentDefinitions, workflow?.tasks, workflow?.triggers]);
+    }, [
+        componentDefinitions,
+        workflow?.tasks,
+        workflow?.triggers,
+        workflowComponentFetched,
+        workflowComponentFetchedAfterMount,
+    ]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
@@ -240,23 +252,67 @@ const WorkflowEditor = ({
 
         const workflowNodes = getNodes();
 
-        const newNode = workflowNodes.find((node) => node.id === changes[0].id);
-
-        if (!newNode?.data.componentName) {
-            return;
-        }
-
-        if (workflow.triggers?.length && newNode?.data.trigger) {
-            return;
-        }
-
-        saveWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutation);
+        setNewNode(workflowNodes.find((node) => node.id === changes[0].id));
     };
 
-    const workflowNodes = getNodes();
+    // Set workflowComponentWithAlias when workflowComponent is fetched
+    useEffect(() => {
+        if (!workflowComponent || !componentNames?.length || !latestComponentName) {
+            return;
+        }
+
+        const sameComponentNames = componentNames.filter((nodeName) => nodeName === workflowComponent.name);
+
+        setWorkflowComponentWithAlias({
+            ...workflowComponent,
+            workflowNodeName: `${workflowComponent.name}_${sameComponentNames.length}`,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowComponent?.name, componentNames]);
+
+    // useEffect(() => {
+    // }, [componentActions]);
+
+    // Save workflow definition with default parameters when a new node is added
+    useEffect(() => {
+        if (!latestActionDefinition?.properties || !newNode) {
+            return;
+        }
+
+        const getProperties = (properties: Array<PropertyType>, data: {[key: string]: string | object} = {}) => {
+            properties.forEach((property) => {
+                if (!property.name) {
+                    return;
+                }
+
+                if (property.properties?.length) {
+                    data[property.name!] = getProperties(property.properties, {}) ?? {};
+                } else if (property.items?.length) {
+                    data[property.name!] = [getProperties(property.items, {}) ?? {}];
+                } else {
+                    data[property.name] = property.defaultValue ?? '';
+                }
+            });
+
+            return data;
+        };
+
+        saveWorkflowDefinition(
+            {
+                ...newNode.data,
+                parameters: getProperties(latestActionDefinition?.properties, {}) ?? {},
+                type: `${newNode.data.componentName}/${workflowComponentWithAlias?.version}/${workflowComponentWithAlias?.actions?.[0].name}`,
+            },
+            workflow!,
+            updateWorkflowMutation
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [latestActionDefinition?.name, workflowComponentWithAlias?.workflowNodeName, newNode]);
 
     // Update workflow node names when nodes change
     useEffect(() => {
+        const workflowNodes = getNodes();
+
         if (workflowNodes?.length) {
             const workflowNodeNames = workflowNodes.map((node) => {
                 if (node.data.type === 'workflow' && node?.data.name) {
@@ -270,18 +326,25 @@ const WorkflowEditor = ({
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setWorkflow, workflowNodes?.length]);
+    }, [setWorkflow, nodes]);
 
     // Set latest component name when component names change
     useEffect(() => {
         if (componentNames && previousComponentNames?.length) {
-            const latestName = componentNames.find((componentName) => !previousComponentNames?.includes(componentName));
+            const latestName = componentNames.find((componentName) => {
+                const currentNameCount = componentNames.filter((name) => name === componentName).length;
+
+                const previousNameCount = previousComponentNames?.filter((name) => name === componentName).length;
+
+                return currentNameCount > previousNameCount;
+            });
 
             if (latestName) {
                 setLatestComponentName(latestName);
             }
         }
-    }, [componentNames, previousComponentNames]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [previousComponentNames, componentNames]);
 
     // Set component actions when node actions change
     useEffect(() => {
@@ -290,7 +353,11 @@ const WorkflowEditor = ({
 
     // Reconstruct editor nodes on re-render
     useEffect(() => {
-        if (defaultNodesWithWorkflowNodes) {
+        if (defaultNodesWithWorkflowNodes?.length === nodes.length) {
+            return;
+        }
+
+        if (defaultNodesWithWorkflowNodes?.length) {
             const workflowNodes = defaultNodesWithWorkflowNodes.filter((node) => node?.data.componentName);
 
             setWorkflow({
@@ -302,14 +369,18 @@ const WorkflowEditor = ({
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultNodesWithWorkflowNodes, setWorkflow]);
+    }, [defaultNodesWithWorkflowNodes, nodes]);
 
     // Reconstruct editor edges on re-render
     useEffect(() => {
-        if (defaultEdgesWithWorkflowEdges) {
+        if (defaultEdgesWithWorkflowEdges?.length === edges.length) {
+            return;
+        }
+
+        if (defaultEdgesWithWorkflowEdges?.length) {
             setEdges(defaultEdgesWithWorkflowEdges);
         }
-    }, [defaultEdgesWithWorkflowEdges]);
+    }, [defaultEdgesWithWorkflowEdges, edges]);
 
     // Append counter to workflowNodeName when a new node with the same name is added
     useEffect(() => {

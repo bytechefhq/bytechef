@@ -227,9 +227,12 @@ const WorkflowNodesPopoverMenuList = memo(
                     nodes
                         .map((node) => {
                             if (node.id === placeholderId) {
+                                const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
+
                                 setWorkflow({
                                     ...workflow,
                                     componentNames: [...componentNames, clickedItem.name],
+                                    nodeNames: [...workflow.nodeNames, workflowNodeName],
                                 });
 
                                 return {
@@ -249,7 +252,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                             </>
                                         ),
                                         label: clickedItem?.title,
-                                        name: getFormattedName(clickedItem.name!, nodes),
+                                        name: workflowNodeName,
                                         type: node.data?.type,
                                     },
                                     type: 'workflow',
