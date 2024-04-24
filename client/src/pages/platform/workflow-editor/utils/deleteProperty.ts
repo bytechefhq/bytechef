@@ -8,9 +8,8 @@ export default function deleteProperty(
     workflowId: string,
     path: string,
     name: string,
-    currentComponentData: ComponentType,
-    otherComponentData: Array<ComponentType>,
-    setComponentData: (componentData: Array<ComponentType>) => void,
+    currentComponent: ComponentType,
+    setCurrentComponent: (currentComponent: ComponentType) => void,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteWorkflowNodeParameter200ResponseModel,
         Error,
@@ -27,7 +26,7 @@ export default function deleteProperty(
         path = path.substring(0, path.lastIndexOf('.'));
     }
 
-    const {workflowNodeName} = currentComponentData;
+    const {workflowNodeName} = currentComponent;
 
     deleteWorkflowNodeParameterMutation.mutate(
         {
@@ -43,13 +42,12 @@ export default function deleteProperty(
             onSuccess: (response) => {
                 const parameters = response.parameters;
 
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        parameters,
-                    },
-                ]);
+                currentComponent = {
+                    ...currentComponent,
+                    parameters,
+                };
+
+                setCurrentComponent(currentComponent);
             },
         }
     );

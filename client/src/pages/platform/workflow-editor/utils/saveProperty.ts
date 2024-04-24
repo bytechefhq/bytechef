@@ -5,11 +5,10 @@ import {UseMutationResult} from '@tanstack/react-query';
 
 interface SavePropertyProps {
     arrayIndex?: number;
-    currentComponentData: ComponentType;
+    currentComponent: ComponentType;
     name: string;
-    otherComponentData: Array<ComponentType>;
     path: string;
-    setComponentData: (componentData: Array<ComponentType>) => void;
+    setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
     updateWorkflowNodeParameterMutation: UseMutationResult<
         UpdateWorkflowNodeParameter200ResponseModel,
         Error,
@@ -23,11 +22,10 @@ interface SavePropertyProps {
 
 export default function saveProperty({
     arrayIndex,
-    currentComponentData,
+    currentComponent,
     name,
-    otherComponentData,
     path,
-    setComponentData,
+    setCurrentComponent,
     updateWorkflowNodeParameterMutation,
     value,
     workflowId,
@@ -40,7 +38,7 @@ export default function saveProperty({
         path = path.substring(0, path.lastIndexOf('.'));
     }
 
-    const {workflowNodeName} = currentComponentData;
+    const {workflowNodeName} = currentComponent;
 
     updateWorkflowNodeParameterMutation.mutate(
         {
@@ -55,14 +53,13 @@ export default function saveProperty({
         },
         {
             onSuccess: (response) => {
-                setComponentData([
-                    ...otherComponentData,
-                    {
-                        ...currentComponentData,
-                        displayConditions: response.displayConditions,
-                        parameters: response.parameters,
-                    },
-                ]);
+                currentComponent = {
+                    ...currentComponent,
+                    displayConditions: response.displayConditions,
+                    parameters: response.parameters,
+                };
+
+                setCurrentComponent(currentComponent);
             },
         }
     );

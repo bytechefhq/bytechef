@@ -25,7 +25,7 @@ const DataPillPanel = ({
     const componentOperations: Array<ComponentOperationType> = workflowNodeOutputs
         .filter(
             (workflowNodeOutput) =>
-                workflowNodeOutput.workflowNodeName !== currentNode.name &&
+                workflowNodeOutput.workflowNodeName !== currentNode?.name &&
                 (workflowNodeOutput.actionDefinition?.outputDefined ||
                     workflowNodeOutput.actionDefinition?.outputFunctionDefined ||
                     workflowNodeOutput.triggerDefinition?.outputDefined ||

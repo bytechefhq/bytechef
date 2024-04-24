@@ -41,7 +41,6 @@ export type ComponentType = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
-    icon?: JSX.Element | string;
     notes?: string;
     operationName: string;
     parameters?: {

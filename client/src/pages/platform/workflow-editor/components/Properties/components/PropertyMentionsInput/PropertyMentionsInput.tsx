@@ -10,6 +10,7 @@ import './propertyMentionsInput.css';
 import {Label} from '@/components/ui/label';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import {useDataPillPanelStore} from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
@@ -35,7 +36,6 @@ const MentionInputListItem = (item: DataPillType) => {
 
 interface PropertyMentionsInputProps {
     controlType?: string;
-    dataPills?: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
     fieldsetClassName?: string;
@@ -56,7 +56,6 @@ const PropertyMentionsInput = forwardRef(
     (
         {
             controlType,
-            dataPills,
             defaultValue,
             description,
             handleInputTypeSwitchButtonClick,
@@ -75,6 +74,7 @@ const PropertyMentionsInput = forwardRef(
     ) => {
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
+        const {dataPills} = useWorkflowDataStore();
         const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 

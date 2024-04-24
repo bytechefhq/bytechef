@@ -1,4 +1,5 @@
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
+import {NodeType} from '@/types/types';
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 
@@ -6,7 +7,6 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 
 export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id']) {
     const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-
     const {setRightSidebarOpen} = useRightSidebarStore();
 
     const {getNode} = useReactFlow();
@@ -18,7 +18,7 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
             return;
         }
 
-        let nodeData = data;
+        let nodeData: NodeType = data;
 
         if (currentNode.position.y === 0) {
             nodeData = {
@@ -28,7 +28,6 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
         }
 
         setRightSidebarOpen(false);
-
         setWorkflowNodeDetailsPanelOpen(true);
 
         setCurrentNode(nodeData);

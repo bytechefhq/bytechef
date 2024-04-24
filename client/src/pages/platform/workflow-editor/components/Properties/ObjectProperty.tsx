@@ -1,9 +1,10 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ComponentDefinitionModel, ControlTypeModel} from '@/middleware/platform/configuration';
+import {ControlTypeModel} from '@/middleware/platform/configuration';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
-import {ComponentType, DataPillType, PropertyType, SubPropertyType} from '@/types/types';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
@@ -29,9 +30,6 @@ interface ObjectPropertyProps {
     operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    currentComponentDefinition?: ComponentDefinitionModel;
-    currentComponent?: ComponentType;
-    dataPills?: DataPillType[];
     onDeleteClick?: (path: string, name: string) => void;
     path?: string;
     property: PropertyType;
@@ -42,9 +40,6 @@ interface ObjectPropertyProps {
 const ObjectProperty = ({
     arrayIndex,
     arrayName,
-    currentComponent,
-    currentComponentDefinition,
-    dataPills,
     onDeleteClick,
     operationName,
     parameterValue,
@@ -56,6 +51,8 @@ const ObjectProperty = ({
     );
     const [newPropertyName, setNewPropertyName] = useState('');
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
+
+    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const {additionalProperties, label, name} = property;
 
@@ -152,10 +149,7 @@ const ObjectProperty = ({
                             <Property
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                currentComponent={currentComponent}
-                                currentComponentDefinition={currentComponentDefinition}
                                 customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
-                                dataPills={dataPills}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
                                 operationName={operationName}

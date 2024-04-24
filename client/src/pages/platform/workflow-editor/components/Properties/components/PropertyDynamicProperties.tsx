@@ -1,17 +1,14 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {ComponentDefinitionModel, PropertyModel} from '@/middleware/platform/configuration';
+import {PropertyModel} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/queries/platform/workflowNodeDynamicProperties.queries';
-import {ComponentType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
 import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
     currentOperationName?: string;
-    currentComponentDefinition: ComponentDefinitionModel;
-    currentComponent: ComponentType;
     currentNodeConnectionId?: number;
     loadDependsOnValues?: Array<string>;
     name?: string;
@@ -20,8 +17,6 @@ interface PropertyDynamicPropertiesProps {
 }
 
 const PropertyDynamicProperties = ({
-    currentComponent,
-    currentComponentDefinition,
     currentNodeConnectionId,
     currentOperationName,
     loadDependsOnValues,
@@ -39,7 +34,7 @@ const PropertyDynamicProperties = ({
             request: {
                 id: workflow.id!,
                 propertyName: name!,
-                workflowNodeName: currentNode.name!,
+                workflowNodeName: currentNode?.name ?? '',
             },
         },
         !!(loadDependsOnValues ?? []).length &&
@@ -66,8 +61,6 @@ const PropertyDynamicProperties = ({
 
                 return (
                     <Property
-                        currentComponent={currentComponent}
-                        currentComponentDefinition={currentComponentDefinition}
                         key={`${property.name}_${index}_${(loadDependsOnValues ?? []).join('')}`}
                         objectName={name}
                         operationName={currentOperationName}
