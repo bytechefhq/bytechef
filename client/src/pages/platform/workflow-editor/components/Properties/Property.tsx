@@ -1,6 +1,6 @@
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ComponentDefinitionModel, OptionModel} from '@/middleware/platform/configuration';
+import {OptionModel} from '@/middleware/platform/configuration';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/Properties/components/PropertyComboBox';
@@ -18,7 +18,7 @@ import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {ComponentType, DataPillType, PropertyType} from '@/types/types';
+import {PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
@@ -47,10 +47,7 @@ interface PropertyProps {
     operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    currentComponentDefinition?: ComponentDefinitionModel;
-    currentComponent?: ComponentType;
     customClassName?: string;
-    dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
     inputTypeSwitchButtonClassName?: string;
     objectName?: string;
@@ -65,10 +62,7 @@ interface PropertyProps {
 const Property = ({
     arrayIndex,
     arrayName,
-    currentComponent,
-    currentComponentDefinition,
     customClassName,
-    dataPills,
     formState,
     inputTypeSwitchButtonClassName,
     objectName,
@@ -92,9 +86,16 @@ const Property = ({
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {currentNode, focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
+    const {
+        currentComponent,
+        currentComponentDefinition,
+        currentNode,
+        focusedInput,
+        setCurrentComponent,
+        setFocusedInput,
+    } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentDefinitions, components, setComponents, workflow} = useWorkflowDataStore();
+    const {componentDefinitions, workflow} = useWorkflowDataStore();
 
     const defaultValue = property.defaultValue || '';
 
@@ -148,16 +149,6 @@ const Property = ({
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
 
-    const otherComponents = components.filter((component) => {
-        if (component.componentName !== currentComponentDefinition?.name) {
-            return true;
-        } else {
-            currentComponent = component;
-
-            return false;
-        }
-    });
-
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !name || !updateWorkflowNodeParameterMutation) {
             return;
@@ -167,11 +158,10 @@ const Property = ({
 
         saveProperty({
             arrayIndex,
-            currentComponentData: currentComponent,
+            currentComponent,
             name,
-            otherComponentData: otherComponents,
             path,
-            setComponentData: setComponents,
+            setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: isNumericalInput ? numericValueToSave : inputValue,
             workflowId: workflow.id!,
@@ -205,7 +195,7 @@ const Property = ({
             mentionInput.insertItem(
                 {
                     componentIcon: currentComponentDefinition?.icon,
-                    id: currentNode.name,
+                    id: currentNode?.name,
                     value: strippedValue.replace('${', '').replace('}', '').replace('.', '/'),
                 },
                 true,
@@ -288,11 +278,10 @@ const Property = ({
 
         saveProperty({
             arrayIndex,
-            currentComponentData: currentComponent,
+            currentComponent,
             name,
-            otherComponentData: otherComponents,
             path,
-            setComponentData: setComponents,
+            setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: strippedValue,
             workflowId: workflow.id,
@@ -306,11 +295,10 @@ const Property = ({
 
         saveProperty({
             arrayIndex,
-            currentComponentData: currentComponent,
+            currentComponent,
             name,
-            otherComponentData: otherComponents,
             path,
-            setComponentData: setComponents,
+            setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value,
             workflowId: workflow.id,
@@ -323,8 +311,7 @@ const Property = ({
             path,
             name,
             currentComponent!,
-            otherComponents,
-            setComponents,
+            setCurrentComponent,
             deleteWorkflowNodeParameterMutation!,
             arrayIndex
         );
@@ -408,11 +395,10 @@ const Property = ({
 
         saveProperty({
             arrayIndex,
-            currentComponentData: currentComponent,
+            currentComponent,
             name,
-            otherComponentData: otherComponents,
             path,
-            setComponentData: setComponents,
+            setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value,
             workflowId: workflow.id,
@@ -580,7 +566,6 @@ const Property = ({
                     controlType !== 'CODE_EDITOR' && (
                         <PropertyMentionsInput
                             controlType={controlType}
-                            dataPills={dataPills}
                             defaultValue={defaultValue}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
@@ -649,23 +634,13 @@ const Property = ({
                         )}
 
                         {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
-                            <ArrayProperty
-                                currentComponent={currentComponent}
-                                currentComponentDefinition={currentComponentDefinition}
-                                dataPills={dataPills}
-                                onDeleteClick={handleDelete}
-                                path={path}
-                                property={property}
-                            />
+                            <ArrayProperty onDeleteClick={handleDelete} path={path} property={property} />
                         )}
 
                         {controlType === 'OBJECT_BUILDER' && (
                             <ObjectProperty
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                currentComponent={currentComponent}
-                                currentComponentDefinition={currentComponentDefinition}
-                                dataPills={dataPills}
                                 onDeleteClick={handleDelete}
                                 operationName={operationName}
                                 parameterValue={propertyParameterValue}
@@ -674,22 +649,14 @@ const Property = ({
                             />
                         )}
 
-                        {type === 'FILE_ENTRY' && (
-                            <ObjectProperty
-                                currentComponent={currentComponent}
-                                currentComponentDefinition={currentComponentDefinition}
-                                dataPills={dataPills}
-                                operationName={operationName}
-                                property={property}
-                            />
-                        )}
+                        {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
 
                         {register && (isValidControlType || isNumericalInput) && (
                             <PropertyInput
                                 defaultValue={defaultValue}
                                 description={description}
                                 error={hasError}
-                                key={`${currentNode.name}_${name}`}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 required={required}
@@ -709,7 +676,7 @@ const Property = ({
                                 errorMessage={errorMessage}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                                key={`${currentNode.name}_${name}`}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
                                 max={maxValue}
@@ -733,7 +700,7 @@ const Property = ({
                         {!register && (isValidControlType || isNumericalInput) && !!options?.length && (
                             <PropertySelect
                                 description={description}
-                                key={`${currentNode.name}_${name}`}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
@@ -746,9 +713,9 @@ const Property = ({
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 arrayIndex={arrayIndex}
-                                currentNodeConnectionId={currentNode.connectionId}
+                                currentNodeConnectionId={currentNode?.connectionId}
                                 description={description}
-                                key={`${currentNode.name}_${name}`}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 loadDependsOnPaths={optionsDataSource?.loadOptionsDependsOn?.map(
@@ -762,7 +729,7 @@ const Property = ({
                                 required={required}
                                 value={selectValue}
                                 workflowId={workflow.id!}
-                                workflowNodeName={currentNode.name}
+                                workflowNodeName={currentNode?.name ?? ''}
                             />
                         )}
 
@@ -770,7 +737,7 @@ const Property = ({
                             <PropertySelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
-                                key={`${currentNode.name}_${name}`}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
@@ -787,7 +754,7 @@ const Property = ({
                             <PropertyTextArea
                                 description={description}
                                 error={hasError}
-                                key={`${currentNode.name}_${name}`}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name!}
@@ -803,9 +770,7 @@ const Property = ({
 
                 {type === 'DYNAMIC_PROPERTIES' && currentComponentDefinition && currentComponent && (
                     <PropertyDynamicProperties
-                        currentComponent={currentComponent}
-                        currentComponentDefinition={currentComponentDefinition}
-                        currentNodeConnectionId={currentNode.connectionId}
+                        currentNodeConnectionId={currentNode?.connectionId}
                         currentOperationName={operationName}
                         loadDependsOnValues={loadDependsOnValues}
                         name={name}
@@ -817,7 +782,7 @@ const Property = ({
                     <PropertyCodeEditor
                         defaultValue={defaultValue}
                         description={description}
-                        key={`${currentNode.name}_${name}`}
+                        key={`${currentNode?.name}_${name}`}
                         label={label}
                         language={languageId!}
                         leadingIcon={typeIcon}
@@ -826,7 +791,7 @@ const Property = ({
                         required={required}
                         value={propertyParameterValue}
                         workflow={workflow}
-                        workflowNodeName={currentNode.name}
+                        workflowNodeName={currentNode?.name ?? ''}
                     />
                 )}
             </div>

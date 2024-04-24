@@ -33,7 +33,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {getEdges, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
-    const isSelected = currentNode.name === data.name;
+    const isSelected = currentNode?.name === data.name;
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -52,7 +52,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs({
                     id: workflow.id!,
-                    lastWorkflowNodeName: currentNode.name,
+                    lastWorkflowNodeName: currentNode?.name,
                 }),
             });
         },
@@ -137,7 +137,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
         updateWorkflowNodeOutputsMutation.mutate({
             id: workflow.id!,
-            lastWorkflowNodeName: currentNode.name,
+            lastWorkflowNodeName: currentNode?.name,
         });
     };
 

@@ -1,5 +1,5 @@
-import {ComponentDefinitionModel, ControlTypeModel} from '@/middleware/platform/configuration';
-import {ArrayPropertyType, ComponentType, DataPillType, PropertyType} from '@/types/types';
+import {ControlTypeModel} from '@/middleware/platform/configuration';
+import {ArrayPropertyType, ComponentType, PropertyType} from '@/types/types';
 
 import Property from '../Property';
 import DeletePropertyButton from './DeletePropertyButton';
@@ -7,9 +7,7 @@ import DeletePropertyButton from './DeletePropertyButton';
 interface ArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
     arrayName?: string;
-    currentComponentDefinition?: ComponentDefinitionModel;
     currentComponent?: ComponentType;
-    dataPills?: DataPillType[];
     index: number;
     onDeleteClick: (path: string, name: string, index: number) => void;
     path?: string;
@@ -20,8 +18,6 @@ const ArrayPropertyItem = ({
     arrayItem,
     arrayName,
     currentComponent,
-    currentComponentDefinition,
-    dataPills,
     index,
     onDeleteClick,
     path,
@@ -40,10 +36,7 @@ const ArrayPropertyItem = ({
             <Property
                 arrayIndex={index}
                 arrayName={arrayName}
-                currentComponent={currentComponent}
-                currentComponentDefinition={currentComponentDefinition}
                 customClassName="pl-2 w-full"
-                dataPills={dataPills}
                 path={`${path}.${arrayName}`}
                 property={arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
             />

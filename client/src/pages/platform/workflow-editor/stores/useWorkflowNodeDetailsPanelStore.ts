@@ -1,11 +1,19 @@
+import {ComponentDefinitionModel} from '@/middleware/platform/configuration';
+
 /* eslint-disable sort-keys */
-import {NodeType} from '@/types/types';
+import {ComponentType, NodeType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowNodeDetailsPanelStateI {
-    currentNode: NodeType;
-    setCurrentNode: (currentNode: NodeType) => void;
+    currentComponent: ComponentType | undefined;
+    setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
+
+    currentComponentDefinition: ComponentDefinitionModel | undefined;
+    setCurrentComponentDefinition: (currentComponentDefinition: ComponentDefinitionModel | undefined) => void;
+
+    currentNode: NodeType | undefined;
+    setCurrentNode: (currentNode: NodeType | undefined) => void;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     focusedInput: any;
@@ -19,7 +27,14 @@ interface WorkflowNodeDetailsPanelStateI {
 export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
     devtools(
         (set) => ({
-            currentNode: {id: '', name: '', type: 'component', version: 1},
+            currentComponent: undefined,
+            setCurrentComponent: (currentComponent) => set((state) => ({...state, currentComponent})),
+
+            currentComponentDefinition: undefined,
+            setCurrentComponentDefinition: (currentComponentDefinition) =>
+                set((state) => ({...state, currentComponentDefinition})),
+
+            currentNode: undefined,
             setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
 
             focusedInput: null,

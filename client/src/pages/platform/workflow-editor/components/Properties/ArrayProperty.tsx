@@ -1,7 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ComponentDefinitionModel, ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
-import {ArrayPropertyType, ComponentType, DataPillType, PropertyType} from '@/types/types';
+import {ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {ArrayPropertyType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
@@ -23,24 +24,16 @@ const PROPERTY_CONTROL_TYPES = {
 };
 
 interface ArrayPropertyProps {
-    currentComponentDefinition?: ComponentDefinitionModel;
-    currentComponent?: ComponentType;
-    dataPills?: Array<DataPillType>;
     onDeleteClick: (path: string, name: string, index: number) => void;
     path?: string;
     property: PropertyType;
 }
 
-const ArrayProperty = ({
-    currentComponent,
-    currentComponentDefinition,
-    dataPills,
-    onDeleteClick,
-    path,
-    property,
-}: ArrayPropertyProps) => {
+const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
+
+    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const {items, name} = property;
 
@@ -84,18 +77,14 @@ const ArrayProperty = ({
         if (items?.length && name && items[0].type === 'OBJECT') {
             const parameterArrayItems = currentComponent.parameters[name].map(
                 (parameterItem: ArrayPropertyType, index: number) => {
-                    const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) => {
-                        const matchingSubproperty = Object.keys(parameterItem).includes(
-                            property.name as keyof ArrayPropertyType
-                        )
+                    const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
+                        Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                             ? {
                                   ...property,
                                   defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
                               }
-                            : property;
-
-                        return matchingSubproperty;
-                    });
+                            : property
+                    );
 
                     return {
                         ...items[0],
@@ -160,8 +149,6 @@ const ArrayProperty = ({
                                 arrayItem={subItem}
                                 arrayName={name}
                                 currentComponent={currentComponent}
-                                currentComponentDefinition={currentComponentDefinition}
-                                dataPills={dataPills}
                                 index={index}
                                 key={subItem.name}
                                 onDeleteClick={handleDeleteClick}
@@ -174,8 +161,6 @@ const ArrayProperty = ({
                             arrayItem={arrayItem}
                             arrayName={name}
                             currentComponent={currentComponent}
-                            currentComponentDefinition={currentComponentDefinition}
-                            dataPills={dataPills}
                             index={index}
                             key={arrayItem.name}
                             onDeleteClick={handleDeleteClick}

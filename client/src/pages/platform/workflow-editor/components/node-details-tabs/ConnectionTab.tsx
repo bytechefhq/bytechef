@@ -113,7 +113,10 @@ const ConnectionSelect = ({
     };
 
     useEffect(() => {
-        setCurrentNode({...currentNode, connectionId});
+        if (currentNode) {
+            setCurrentNode({...currentNode, connectionId});
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connectionId]);
 

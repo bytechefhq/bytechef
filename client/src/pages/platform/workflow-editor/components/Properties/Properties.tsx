@@ -1,5 +1,4 @@
-import {ComponentDefinitionModel} from '@/middleware/platform/configuration';
-import {ComponentType, DataPillType, PropertyType} from '@/types/types';
+import {PropertyType} from '@/types/types';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -8,10 +7,7 @@ import Property from './Property';
 
 interface PropertiesProps {
     operationName?: string;
-    currentComponentDefinition?: ComponentDefinitionModel;
-    currentComponent?: ComponentType;
     customClassName?: string;
-    dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
     path?: string;
     properties: Array<PropertyType>;
@@ -19,23 +15,10 @@ interface PropertiesProps {
     register?: UseFormRegister<any>;
 }
 
-const Properties = ({
-    currentComponent,
-    currentComponentDefinition,
-    customClassName,
-    dataPills,
-    formState,
-    operationName,
-    path,
-    properties,
-    register,
-}: PropertiesProps) => (
+const Properties = ({customClassName, formState, operationName, path, properties, register}: PropertiesProps) => (
     <ul className={twMerge('space-y-4', customClassName)}>
         {properties.map((property, index) => (
             <Property
-                currentComponent={currentComponent}
-                currentComponentDefinition={currentComponentDefinition}
-                dataPills={dataPills}
                 formState={formState}
                 key={`${property.name}_${index}`}
                 operationName={operationName}

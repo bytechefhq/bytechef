@@ -32,15 +32,15 @@ const WorkflowEditorLayout = ({
     taskDispatcherDefinitions,
     updateWorkflowMutation,
 }: WorkflowEditorLayoutProps) => {
-    const {componentActions, setComponents, workflow} = useWorkflowDataStore();
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+    const {componentActions, workflow} = useWorkflowDataStore();
+    const {currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
-            lastWorkflowNodeName: currentNode.name,
+            lastWorkflowNodeName: currentNode?.name,
         },
-        !!componentActions?.length && !!currentNode.name && !currentNode.trigger
+        !!componentActions?.length && !!currentNode?.name && !currentNode?.trigger
     );
 
     const previousComponentDefinitions = workflowNodeOutputs
@@ -80,10 +80,14 @@ const WorkflowEditorLayout = ({
         });
 
         if (workflowComponents) {
-            setComponents(workflowComponents);
+            if (currentNode) {
+                setCurrentComponent(
+                    workflowComponents.find((component) => component.workflowNodeName === currentNode.name)
+                );
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.tasks]);
+    }, [workflow.tasks, currentNode]);
 
     return (
         <ReactFlowProvider>
@@ -101,12 +105,13 @@ const WorkflowEditorLayout = ({
                 />
             )}
 
-            {(workflowNodeOutputs || (!workflowNodeOutputs && currentNode.trigger)) && previousComponentDefinitions && (
-                <DataPillPanel
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    workflowNodeOutputs={workflowNodeOutputs ?? []}
-                />
-            )}
+            {(workflowNodeOutputs || (!workflowNodeOutputs && currentNode?.trigger)) &&
+                previousComponentDefinitions && (
+                    <DataPillPanel
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        workflowNodeOutputs={workflowNodeOutputs ?? []}
+                    />
+                )}
         </ReactFlowProvider>
     );
 };
