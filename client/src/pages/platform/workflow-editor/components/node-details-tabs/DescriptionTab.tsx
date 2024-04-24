@@ -1,46 +1,34 @@
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {UpdateWorkflowRequest} from '@/middleware/platform/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {UseMutationResult} from '@tanstack/react-query';
-import {ComponentDefinitionModel, WorkflowModel} from 'middleware/platform/configuration';
+import {UpdateWorkflowRequest, WorkflowModel} from 'middleware/platform/configuration';
 import {ChangeEvent} from 'react';
 
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 
 const DescriptionTab = ({
-    componentDefinition,
     updateWorkflowMutation,
 }: {
-    componentDefinition: ComponentDefinitionModel;
     updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
 }) => {
-    const {setComponent, workflow} = useWorkflowDataStore();
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
-
-    const {name, title} = componentDefinition;
-
-    const currentWorkflowTask = workflow?.tasks?.find((task) => task.name === currentNode.name);
+    const {workflow} = useWorkflowDataStore();
+    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const handleLabelChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (!currentComponent) {
             return;
         }
 
-        setComponent({
-            ...currentComponent,
-            title: event.target.value,
-        });
-
-        if (currentNode.componentName) {
+        if (currentComponent?.componentName) {
             saveWorkflowDefinition(
                 {
-                    ...currentNode,
                     componentName: currentComponent.componentName as string,
-                    icon: currentComponent.icon,
+                    icon: undefined,
                     label: event.target.value,
+                    name: currentComponent.workflowNodeName,
                 },
                 workflow,
                 updateWorkflowMutation
@@ -49,11 +37,17 @@ const DescriptionTab = ({
     };
 
     const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (currentComponent) {
-            setComponent({
-                ...currentComponent,
-                notes: event.target.value,
-            });
+        if (currentComponent?.componentName) {
+            saveWorkflowDefinition(
+                {
+                    componentName: currentComponent.componentName as string,
+                    description: event.target.value,
+                    icon: undefined,
+                    name: currentComponent.workflowNodeName,
+                },
+                workflow,
+                updateWorkflowMutation
+            );
         }
     };
 
@@ -63,8 +57,8 @@ const DescriptionTab = ({
                 <Label>Title</Label>
 
                 <Input
-                    defaultValue={currentWorkflowTask?.label || title}
-                    key={`${name}_nodeTitle`}
+                    defaultValue={currentComponent?.title}
+                    key={`${currentComponent?.componentName}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleLabelChange}
                 />
@@ -75,11 +69,11 @@ const DescriptionTab = ({
 
                 <Textarea
                     className="mt-1"
-                    key={`${name}_nodeNotes`}
+                    defaultValue={currentComponent?.notes || ''}
+                    key={`${currentComponent?.componentName}_nodeNotes`}
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
-                    value={currentComponent?.notes || ''}
                 />
             </fieldset>
         </div>
