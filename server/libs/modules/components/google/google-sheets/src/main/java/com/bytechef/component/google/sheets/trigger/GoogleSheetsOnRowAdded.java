@@ -65,6 +65,8 @@ public class GoogleSheetsOnRowAdded {
         .dynamicWebhookDisable(GoogleSheetsOnRowAdded::dynamicWebhookDisable)
         .dynamicWebhookRequest(GoogleSheetsOnRowAdded::dynamicWebhookRequest);
 
+    private GoogleSheetsOnRowAdded() {}
+
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, Context context) {
