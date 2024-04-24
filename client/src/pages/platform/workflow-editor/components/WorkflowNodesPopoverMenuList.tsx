@@ -1,4 +1,5 @@
 import {
+    ActionDefinitionApi,
     ComponentDefinitionApi,
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
@@ -7,8 +8,9 @@ import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/Workf
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
+import {ActionDefinitionKeys} from '@/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
-import {ClickedItemType} from '@/types/types';
+import {ClickedItemType, PropertyType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
@@ -16,6 +18,7 @@ import {memo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
+import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesListProps {
@@ -51,6 +54,16 @@ const WorkflowNodesPopoverMenuList = memo(
         const {componentNames} = workflow;
 
         const handleItemClick = async (clickedItem: ClickedItemType) => {
+            const clickedComponentDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new ComponentDefinitionApi().getComponentDefinition({
+                        componentName: clickedItem.name,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
+                    componentName: clickedItem.name,
+                }),
+            });
+
             if (edge) {
                 const clickedEdge = getEdge(id);
 
@@ -98,6 +111,17 @@ const WorkflowNodesPopoverMenuList = memo(
                     type: 'workflow',
                 };
 
+                const getActionDefinitionRequest = {
+                    actionName: clickedComponentDefinition.actions?.[0].name as string,
+                    componentName: clickedItem.name,
+                    componentVersion: clickedComponentDefinition?.version,
+                };
+
+                const clickedComponentActionDefinition = await queryClient.fetchQuery({
+                    queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+                    queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+                });
+
                 setNodes((nodes) => {
                     const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
 
@@ -122,7 +146,14 @@ const WorkflowNodesPopoverMenuList = memo(
                     tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
 
                     saveWorkflowDefinition(
-                        newWorkflowNode.data,
+                        {
+                            ...newWorkflowNode.data,
+                            parameters: getParametersWithDefaultValues({
+                                data: {},
+                                properties: clickedComponentActionDefinition?.properties as Array<PropertyType>,
+                            }),
+                            type: `${clickedComponentDefinition.name}/${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                        },
                         workflow!,
                         updateWorkflowMutation,
                         previousWorkflowNodeIndex
@@ -140,16 +171,6 @@ const WorkflowNodesPopoverMenuList = memo(
                 }
 
                 if (clickedItem.trigger) {
-                    const clickedComponentDefinition = await queryClient.fetchQuery({
-                        queryFn: () =>
-                            new ComponentDefinitionApi().getComponentDefinition({
-                                componentName: clickedItem.name,
-                            }),
-                        queryKey: ComponentDefinitionKeys.componentDefinition({
-                            componentName: clickedItem.name,
-                        }),
-                    });
-
                     setNodes((nodes: Node[]) =>
                         nodes.map((node) => {
                             if (node.id === placeholderNode.id) {
