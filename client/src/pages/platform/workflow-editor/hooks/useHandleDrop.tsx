@@ -1,12 +1,21 @@
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import {ActionDefinitionKeys} from '@/queries/platform/actionDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
 import getRandomId from '@/utils/getRandomId';
+import {QueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/platform/configuration';
+import {
+    ActionDefinitionApi,
+    ComponentDefinitionApi,
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
+} from 'middleware/platform/configuration';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
+import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export default function useHandleDrop(): [
@@ -24,6 +33,8 @@ export default function useHandleDrop(): [
     const edges = getEdges();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
+
+    const queryClient = new QueryClient();
 
     function handleDropOnPlaceholderNode(
         targetNode: Node,
@@ -98,7 +109,7 @@ export default function useHandleDrop(): [
         });
     }
 
-    function handleDropOnWorkflowEdge(
+    async function handleDropOnWorkflowEdge(
         targetEdge: Edge,
         droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
     ) {
@@ -168,7 +179,39 @@ export default function useHandleDrop(): [
             return edges;
         });
 
-        saveWorkflowDefinition(draggedNode.data, workflow, updateWorkflowMutation, targetEdgeIndex);
+        const draggedComponentDefinition = await queryClient.fetchQuery({
+            queryFn: () =>
+                new ComponentDefinitionApi().getComponentDefinition({
+                    componentName: draggedNode.data.componentName,
+                }),
+            queryKey: ComponentDefinitionKeys.componentDefinition({
+                componentName: draggedNode.data.componentName,
+            }),
+        });
+
+        const getActionDefinitionRequest = {
+            actionName: draggedComponentDefinition.actions?.[0].name as string,
+            componentName: draggedNode.data.componentName,
+            componentVersion: draggedComponentDefinition?.version,
+        };
+
+        const draggedComponentActionDefinition = await queryClient.fetchQuery({
+            queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+            queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+        });
+
+        saveWorkflowDefinition(
+            {
+                ...draggedNode.data,
+                parameters: getParametersWithDefaultValues({
+                    data: {},
+                    properties: draggedComponentActionDefinition.properties || [],
+                }),
+            },
+            workflow,
+            updateWorkflowMutation,
+            targetEdgeIndex
+        );
     }
 
     return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge];
