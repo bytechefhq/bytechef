@@ -80,19 +80,14 @@ public class GoogleSheetsInsertRowAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
-
         List<Object> row = getRowValues(inputParameters);
-
         ValueRange valueRange = new ValueRange()
             .setValues(List.of(row))
             .setMajorDimension("ROWS");
-
         String spreadsheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
-
         String range = createRange(inputParameters.getRequiredString(SHEET_NAME), null);
 
-        sheets
-            .spreadsheets()
+        sheets.spreadsheets()
             .values()
             .append(spreadsheetId, range, valueRange)
             .setValueInputOption(inputParameters.getRequiredString(VALUE_INPUT_OPTION))

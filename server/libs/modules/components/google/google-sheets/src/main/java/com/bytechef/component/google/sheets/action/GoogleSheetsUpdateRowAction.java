@@ -75,18 +75,15 @@ public class GoogleSheetsUpdateRowAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
-
         String range = createRange(
             inputParameters.getRequiredString(SHEET_NAME), inputParameters.getRequiredInteger(ROW_NUMBER));
-
         List<Object> row = getRowValues(inputParameters);
 
         ValueRange valueRange = new ValueRange()
             .setValues(List.of(row))
             .setMajorDimension("ROWS");
 
-        sheets
-            .spreadsheets()
+        sheets.spreadsheets()
             .values()
             .update(inputParameters.getRequiredString(SPREADSHEET_ID), range, valueRange)
             .setValueInputOption("USER_ENTERED")

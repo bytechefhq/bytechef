@@ -60,7 +60,6 @@ public class GoogleSheetsClearSheetAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
-
         Integer startRowIndex = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER) ? 1 : 0;
 
         UpdateCellsRequest updateCellsRequest = new UpdateCellsRequest()
@@ -70,16 +69,11 @@ public class GoogleSheetsClearSheetAction {
                     .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
                     .setStartRowIndex(startRowIndex));
 
-        Request request = new Request().setUpdateCells(updateCellsRequest);
-
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
-            .setRequests(List.of(request));
+            .setRequests(List.of(new Request().setUpdateCells(updateCellsRequest)));
 
-        sheets
-            .spreadsheets()
-            .batchUpdate(
-                inputParameters.getRequiredString(SPREADSHEET_ID),
-                batchUpdateSpreadsheetRequest)
+        sheets.spreadsheets()
+            .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
             .execute();
 
         return null;

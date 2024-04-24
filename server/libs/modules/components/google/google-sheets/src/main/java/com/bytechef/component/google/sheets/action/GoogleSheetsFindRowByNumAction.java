@@ -73,9 +73,7 @@ public class GoogleSheetsFindRowByNumAction {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
         List<Object> row = getRowValues(
-            sheets,
-            inputParameters.getRequiredString(SPREADSHEET_ID),
-            inputParameters.getRequiredString(SHEET_NAME),
+            sheets, inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredString(SHEET_NAME),
             inputParameters.getRequiredInteger(ROW_NUMBER));
 
         return getMapOfValuesForRow(inputParameters, sheets, row);

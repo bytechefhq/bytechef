@@ -64,7 +64,6 @@ public class GoogleSheetsDeleteRowAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
-
         DimensionRange dimensionRange = new DimensionRange()
             .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
             .setDimension("ROWS")
@@ -79,8 +78,7 @@ public class GoogleSheetsDeleteRowAction {
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
             .setRequests(List.of(request));
 
-        sheets
-            .spreadsheets()
+        sheets.spreadsheets()
             .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
             .execute();
 
