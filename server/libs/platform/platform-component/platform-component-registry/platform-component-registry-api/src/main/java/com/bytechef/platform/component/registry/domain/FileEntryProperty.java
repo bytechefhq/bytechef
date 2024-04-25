@@ -28,7 +28,10 @@ import java.util.Objects;
  */
 public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
 
-    private final List<? extends ValueProperty<?>> properties;
+    private List<? extends ValueProperty<?>> properties;
+
+    private FileEntryProperty() {
+    }
 
     public FileEntryProperty(Property.FileEntryProperty fileEntryProperty) {
         super(fileEntryProperty);
