@@ -23,7 +23,7 @@ const ProjectInstanceList = ({
                     {projectInstances.map((projectInstance) => {
                         const projectTagIds = projectInstance.tags?.map((tag) => tag.id);
 
-                        if (!project.id) {
+                        if (!project || !project.id) {
                             return;
                         }
 
