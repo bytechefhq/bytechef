@@ -86,7 +86,14 @@ public class JobTestExecutor {
     private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
 
+        if (componentDefinitionService.hasComponentDefinition(workflowNodeType.componentName(),
+            workflowNodeType.componentVersion())) {
+            return componentDefinitionService.getComponentDefinition(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion());
+        }
+
         return componentDefinitionService.getComponentDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+            "missing", 1);
+
     }
 }
