@@ -155,9 +155,15 @@ const WorkflowEditor = ({
             const componentName = component.type?.split('/')[0];
             const operationName = component.type?.split('/')[2];
 
-            const componentDefinition = componentDefinitions.find(
+            let componentDefinition = componentDefinitions.find(
                 (componentDefinition) => componentDefinition.name === componentName
             )!;
+
+            if (componentDefinition == undefined) {
+                componentDefinition = componentDefinitions.find(
+                    (componentDefinition) => componentDefinition.name === 'missing'
+                )!;
+            }
 
             return {
                 data: {
