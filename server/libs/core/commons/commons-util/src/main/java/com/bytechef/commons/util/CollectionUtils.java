@@ -45,11 +45,12 @@ public final class CollectionUtils {
             .anyMatch(predicate);
     }
 
-    public static <T> List<T> concat(List<T> list1, T item) {
+    @SafeVarargs
+    public static <T> List<T> concat(List<T> list1, T... items) {
         Validate.notNull(list1, "'list1' must not be null");
-        Validate.notNull(item, "'item' must not be null");
+        Validate.notNull(items, "'items' must not be null");
 
-        return Stream.concat(list1.stream(), Stream.of(item))
+        return Stream.concat(list1.stream(), Stream.of(items))
             .toList();
     }
 
