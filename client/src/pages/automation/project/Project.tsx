@@ -582,7 +582,7 @@ const Project = () => {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentWorkflow, workflowId]);
+    }, [currentWorkflow]);
 
     return (
         <>

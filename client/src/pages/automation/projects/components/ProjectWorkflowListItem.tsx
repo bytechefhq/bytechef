@@ -51,8 +51,6 @@ const ProjectWorkflowListItem = ({
         [key: string]: ComponentDefinitionBasicModel | undefined;
     };
 }) => {
-    const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowModel | undefined>(undefined);
-
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -146,7 +144,6 @@ const ProjectWorkflowListItem = ({
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
                             onClick={() => {
-                                setSelectedWorkflow(workflow);
                                 setShowEditDialog(true);
                             }}
                         >
@@ -171,7 +168,6 @@ const ProjectWorkflowListItem = ({
                         <DropdownMenuItem
                             className="text-red-600"
                             onClick={() => {
-                                setSelectedWorkflow(workflow);
                                 setShowDeleteDialog(true);
                             }}
                         >
@@ -197,9 +193,9 @@ const ProjectWorkflowListItem = ({
                         <AlertDialogAction
                             className="bg-red-600"
                             onClick={() => {
-                                if (project?.id && selectedWorkflow?.id) {
+                                if (workflow?.id) {
                                     deleteWorkflowMutation.mutate({
-                                        id: project?.id.toString(),
+                                        id: workflow?.id!,
                                     });
                                 }
                             }}
@@ -210,11 +206,11 @@ const ProjectWorkflowListItem = ({
                 </AlertDialogContent>
             </AlertDialog>
 
-            {showEditDialog && selectedWorkflow && (
+            {showEditDialog && workflow && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflowId={selectedWorkflow.id!}
+                    workflowId={workflow.id!}
                 />
             )}
         </>
