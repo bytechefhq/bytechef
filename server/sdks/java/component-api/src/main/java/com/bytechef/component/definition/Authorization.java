@@ -31,6 +31,7 @@ public interface Authorization {
     String ADD_TO = "addTo";
     String API_TOKEN = "api_token";
     String AUTHORIZATION = "Authorization";
+    String AUTHORIZATION_TYPE = "authorizationName";
     String AUTHORIZATION_URL = "authorizationUrl";
     String EXPIRES_IN = "expires_in";
     String BEARER = "Bearer";

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -77,6 +78,20 @@ public class MapUtils {
 
         return Stream.concat(stream(map1), stream(map2))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
+    }
+
+    public static <K, V1, V2> Map<K, V1> concatDifferentTypes(Map<K, V1> map1, Map<K, V2> map2) {
+        TypeReference<V1> elementType = new TypeReference<V1>() {
+            @Override
+            public Type getType() {
+                return super.getType();
+            }
+        };
+
+        Map<K, V1> newMap = new HashMap<>();
+        map2.forEach((key, value) -> newMap.put(key, convert(value, elementType)));
+
+        return concat(map1, newMap);
     }
 
     public static <K> boolean containsKey(Map<K, ?> map, String key) {

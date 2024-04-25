@@ -127,8 +127,6 @@ public class HttpClientActionUtils {
                 .configuration(
                     Http.allowUnauthorizedCerts(
                         inputParameters.getBoolean(HttpClientComponentConstants.ALLOW_UNAUTHORIZED_CERTS, false))
-                        .disableAuthorization(
-                            Objects.isNull(connectionParameters.get(HttpClientComponentConstants.AUTHORIZATION_TYPE)))
                         .filename(inputParameters.getString(HttpClientComponentConstants.RESPONSE_FILENAME))
                         .followAllRedirects(
                             inputParameters.getBoolean(HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS, false))

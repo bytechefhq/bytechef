@@ -56,6 +56,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
@@ -275,6 +276,10 @@ public class HttpClientExecutor {
         ComponentConnection connection, Context context) {
 
         if (connection != null) {
+            if (Objects.equals(connection.getAuthorizationName(), "none")) {
+                return;
+            }
+
             ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
                 componentName, connection, context);
 
