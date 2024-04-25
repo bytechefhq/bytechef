@@ -60,4 +60,5 @@ public interface ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName);
 
     List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion);
+
 }

@@ -101,6 +101,11 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean hasComponentDefinition(String name, Integer version) {
+        throw new UnsupportedOperationException();
+    }
+
     private static int checkVersion(Integer version) {
         if (version == null) {
             version = 1;

@@ -35,4 +35,6 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
 
     List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType);
+
+    boolean hasComponentDefinition(String name, Integer version);
 }
