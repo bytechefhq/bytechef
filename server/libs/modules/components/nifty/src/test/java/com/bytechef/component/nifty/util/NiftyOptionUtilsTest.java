@@ -81,7 +81,7 @@ class NiftyOptionUtilsTest {
         Map<String, String> task = new LinkedHashMap<>();
         task.put("name", "ProjectName");
         task.put("id", "123");
-        body.put("items", List.of(task));
+        body.put("projects", List.of(task));
 
         Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
             .thenReturn(body);
@@ -91,6 +91,6 @@ class NiftyOptionUtilsTest {
         expectedOptions.add(option("ProjectName", "123"));
 
         assertEquals(expectedOptions,
-            NiftyOptionUtils.getTaskGroupId(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            NiftyOptionUtils.getProjectId(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }
