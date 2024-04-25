@@ -100,6 +100,11 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .toList();
     }
 
+    @Override
+    public boolean hasComponentDefinition(String name, Integer version) {
+        return componentDefinitionRegistry.hasComponentDefinition(name, version);
+    }
+
     private static Predicate<ComponentDefinition> filter(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
 

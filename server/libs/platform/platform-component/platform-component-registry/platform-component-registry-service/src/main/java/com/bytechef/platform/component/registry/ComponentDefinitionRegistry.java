@@ -24,6 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Output;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Component
 @SuppressFBWarnings({
@@ -56,6 +58,13 @@ public class ComponentDefinitionRegistry {
         .title("Manual")
         .icon("path:assets/manual.svg")
         .triggers(trigger("manual").type(TriggerType.STATIC_WEBHOOK));
+
+    private static final ComponentDefinition MISSING_COMPONENT_DEFINITION = component("missing")
+        .title("Missing Component")
+        .icon("path:assets/missing.svg")
+        .version(1)
+        .actions(ComponentDSL.action("missing")
+            .title("Missing Action"));
 
     private final List<ComponentDefinition> componentDefinitions;
 
@@ -73,7 +82,7 @@ public class ComponentDefinitionRegistry {
 
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
             CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
-            MANUAL_COMPONENT_DEFINITION);
+            MANUAL_COMPONENT_DEFINITION, MISSING_COMPONENT_DEFINITION);
 
         this.componentDefinitions = CollectionUtils.sort(componentDefinitions, this::compare);
 
@@ -131,10 +140,24 @@ public class ComponentDefinitionRegistry {
                 .stream()
                 .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow((() -> new IllegalArgumentException("No component " + name + " version " + version)));
         }
 
         return componentDefinition;
+    }
+
+    public boolean hasComponentDefinition(String name, Integer version) {
+        ComponentDefinition componentDefinition;
+
+        return componentDefinitions
+            .stream()
+            .anyMatch(curComponentDefinition -> {
+                if (!name.equalsIgnoreCase(curComponentDefinition.getName())) {
+                    return false;
+                }
+
+                return (version == null) || (version == curComponentDefinition.getVersion());
+            });
     }
 
     public List<? extends ComponentDefinition> getComponentDefinitions(String name) {

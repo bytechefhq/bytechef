@@ -205,10 +205,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public ActionDefinition getActionDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+        if (componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return new ActionDefinition(
+                componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName),
+                componentName, componentVersion);
+        }
 
         return new ActionDefinition(
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName),
+            componentDefinitionRegistry.getActionDefinition("missing", 1, "missing"),
             componentName, componentVersion);
+
     }
 
     @Override
@@ -245,13 +251,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private ActionWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
         String componentName, int componentVersion, String actionName) {
 
-        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
-            componentName, componentVersion);
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            componentName = "missing";
+            componentVersion = 1;
+            actionName = "missing";
 
+        }
+
+        com.bytechef.component.definition.ComponentDefinition componentDefinition =
+            componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition
             .getWorkflowNodeDescriptionFunction()
