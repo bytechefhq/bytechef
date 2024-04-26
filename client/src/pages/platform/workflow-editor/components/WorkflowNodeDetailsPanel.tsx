@@ -418,7 +418,7 @@ const WorkflowNodeDetailsPanel = ({
                             !!currentComponentDefinition.triggers?.length) && (
                             <CurrentOperationSelect
                                 description={
-                                    currentNode.trigger
+                                    currentNode?.trigger
                                         ? currentTriggerDefinition?.description
                                         : currentActionDefinition?.description
                                 }
