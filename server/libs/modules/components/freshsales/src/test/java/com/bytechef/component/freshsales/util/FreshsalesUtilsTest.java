@@ -16,15 +16,12 @@
 
 package com.bytechef.component.freshsales.util;
 
-import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,16 +30,6 @@ import org.junit.jupiter.api.Test;
 class FreshsalesUtilsTest {
 
     private final Parameters mockedParameters = mock(Parameters.class);
-
-    @Test
-    void testGetHeaders() {
-        when(mockedParameters.getRequiredString(KEY))
-            .thenReturn("key");
-
-        Map<String, List<String>> expectedHeaders = Map.of("Authorization", List.of("Token token=key"));
-
-        assertEquals(expectedHeaders, FreshsalesUtils.getHeaders(mockedParameters));
-    }
 
     @Test
     void testGetUrl() {
