@@ -35,6 +35,9 @@ public interface JdbcTaskExecutionRepository
     TaskExecutionRepository {
 
     @Override
+    void deleteById(Long aLong);
+
+    @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
 
     @Override

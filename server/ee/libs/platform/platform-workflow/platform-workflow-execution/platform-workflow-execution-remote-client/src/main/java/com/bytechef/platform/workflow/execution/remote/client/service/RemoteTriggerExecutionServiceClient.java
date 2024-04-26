@@ -11,6 +11,7 @@ import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,7 +43,17 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
     }
 
     @Override
-    public TriggerExecution getJobTriggerExecution(long jobId) {
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteJobTriggerExecution(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<TriggerExecution> fetchJobTriggerExecution(long jobId) {
         throw new UnsupportedOperationException();
     }
 

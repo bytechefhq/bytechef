@@ -39,12 +39,17 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public void restartJob(Long id) {
+    public void deleteJob(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void stopJob(Long id) {
+    public void restartJob(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void stopJob(long id) {
         throw new UnsupportedOperationException();
     }
 }

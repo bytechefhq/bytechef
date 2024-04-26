@@ -27,7 +27,6 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -95,7 +94,7 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")))
-            .hasFieldOrPropertyWithValue("allWorkflowIds", Map.of(1, List.of("workflow1")));
+            .hasFieldOrPropertyWithValue("allWorkflowIds", List.of("workflow1"));
     }
 
     @Test
@@ -174,7 +173,7 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
             .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
-            .hasFieldOrPropertyWithValue("allWorkflowIds", Map.of(1, List.of("workflow1")));
+            .hasFieldOrPropertyWithValue("allWorkflowIds", List.of("workflow1"));
     }
 
     private Project getProject() {

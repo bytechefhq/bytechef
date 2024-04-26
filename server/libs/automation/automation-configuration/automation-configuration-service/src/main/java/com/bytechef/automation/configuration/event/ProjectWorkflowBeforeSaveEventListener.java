@@ -20,28 +20,31 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
-import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
+import org.springframework.data.relational.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class ProjectWorkflowAfterSaveEventListener extends AbstractRelationalEventListener<Workflow> {
+@Transactional
+public class ProjectWorkflowBeforeSaveEventListener extends AbstractRelationalEventListener<Workflow> {
 
     private final ProjectFacade projectFacade;
     private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowAfterSaveEventListener(ProjectFacade projectFacade, ProjectService projectService) {
+    public ProjectWorkflowBeforeSaveEventListener(ProjectFacade projectFacade, ProjectService projectService) {
         this.projectFacade = projectFacade;
         this.projectService = projectService;
     }
 
     @Override
-    protected void onAfterSave(AfterSaveEvent<Workflow> afterSaveEvent) {
+    protected void onBeforeSave(BeforeSaveEvent<Workflow> afterSaveEvent) {
         Workflow workflow = afterSaveEvent.getEntity();
 
-        projectService.fetchWorkflowProject(Validate.notNull(workflow.getId(), "id"))
-            .ifPresent(project -> projectFacade.checkProjectStatus(project.getId()));
+        if (workflow.getId() != null) {
+            projectService.fetchWorkflowProject(workflow.getId())
+                .ifPresent(project -> projectFacade.checkProjectStatus(project.getId(), workflow.getId()));
+        }
     }
 }

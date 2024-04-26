@@ -26,6 +26,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,6 +73,9 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private TriggerDefinitionService triggerDefinitionService;
+
+    @MockBean
+    private TriggerExecutionService triggerExecutionService;
 
     @MockBean
     private TriggerLifecycleFacade triggerLifecycleFacade;

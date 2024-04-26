@@ -39,5 +39,5 @@ public interface TriggerExecutionRepository
         JOIN trigger_execution_job ON trigger_execution_job.trigger_execution_id = trigger_execution.id
         WHERE trigger_execution_job.job_id = :jobId
         """)
-    TriggerExecution findByJobId(@Param("jobId") long jobId);
+    Optional<TriggerExecution> findByJobId(@Param("jobId") long jobId);
 }

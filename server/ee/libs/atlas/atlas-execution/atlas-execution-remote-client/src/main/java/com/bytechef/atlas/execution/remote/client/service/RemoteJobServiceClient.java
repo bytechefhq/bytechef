@@ -13,6 +13,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,11 @@ public class RemoteJobServiceClient implements JobService {
                 .path(JOB_SERVICE + "/create")
                 .build(),
             new JobCreateRequest(jobParameters, workflow), Job.class);
+    }
+
+    @Override
+    public void deleteJob(long id) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -86,6 +92,11 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
+    public List<Job> getWorkflowJobs(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job resumeToStatusStarted(long id) {
         return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
@@ -123,6 +134,11 @@ public class RemoteJobServiceClient implements JobService {
                 .path(JOB_SERVICE + "/update")
                 .build(),
             job, Job.class);
+    }
+
+    @Override
+    public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
+        throw new UnsupportedOperationException();
     }
 
     private record JobCreateRequest(JobParameters jobParameters, Workflow workflow) {

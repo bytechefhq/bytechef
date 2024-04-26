@@ -19,6 +19,7 @@ package com.bytechef.atlas.execution.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
@@ -28,6 +29,8 @@ import org.springframework.data.domain.Page;
 public interface JobService {
 
     Job create(JobParameters jobParameters, Workflow workflow);
+
+    void deleteJob(long id);
 
     Optional<Job> fetchLastJob();
 
@@ -39,6 +42,8 @@ public interface JobService {
 
     Job getTaskExecutionJob(long taskExecutionId);
 
+    List<Job> getWorkflowJobs(String workflowId);
+
     Job resumeToStatusStarted(long id);
 
     Job setStatusToStarted(long id);
@@ -46,4 +51,6 @@ public interface JobService {
     Job setStatusToStopped(long id);
 
     Job update(Job job);
+
+    void updateWorkflowId(String curWorkflowId, String newWorkflowId);
 }

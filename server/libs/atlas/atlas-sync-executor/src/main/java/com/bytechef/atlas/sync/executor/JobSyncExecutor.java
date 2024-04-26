@@ -78,6 +78,7 @@ public class JobSyncExecutor {
     private final ApplicationEventPublisher eventPublisher;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
@@ -106,9 +107,10 @@ public class JobSyncExecutor {
         this.eventPublisher = createEventPublisher(syncMessageBroker);
 
         this.jobFacade = new JobFacadeImpl(
-            eventPublisher, contextService, jobService, taskFileStorage, workflowService);
+            eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
 
         this.jobService = jobService;
+        this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
 
@@ -180,8 +182,8 @@ public class JobSyncExecutor {
 
     public Job execute(JobParameters jobParameters, JobFactoryFunction jobFactoryFunction) {
         JobFacade jobFacade = new JobFacadeImpl(
-            eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskFileStorage,
-            workflowService);
+            eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
+            taskFileStorage, workflowService);
 
         return jobService.getJob(jobFacade.createJob(jobParameters));
     }
@@ -228,8 +230,18 @@ public class JobSyncExecutor {
         }
 
         @Override
+        public List<Job> getWorkflowJobs(String workflowId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public Job create(JobParameters jobParameters, Workflow workflow) {
             return jobFactoryFunction.apply(jobParameters);
+        }
+
+        @Override
+        public void deleteJob(long id) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -259,6 +271,11 @@ public class JobSyncExecutor {
 
         @Override
         public Job update(Job job) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
             throw new UnsupportedOperationException();
         }
     }

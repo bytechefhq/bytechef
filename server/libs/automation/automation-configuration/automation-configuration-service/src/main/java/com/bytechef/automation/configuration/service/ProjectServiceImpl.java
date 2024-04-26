@@ -156,7 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (CollectionUtils.count(project.getWorkflowIds(project.getLastVersion())) == 1) {
             throw new ApplicationException(
-                "The last workflow id=%s cannot be deleted".formatted(workflowId), ProjectErrorType.REMOVE_WORKFLOW);
+                "The last workflow cannot be deleted", ProjectErrorType.REMOVE_WORKFLOW);
         }
 
         project.removeWorkflow(workflowId);

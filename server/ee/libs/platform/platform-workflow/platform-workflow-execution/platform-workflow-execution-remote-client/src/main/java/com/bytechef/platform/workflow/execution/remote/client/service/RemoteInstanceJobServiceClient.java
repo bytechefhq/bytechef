@@ -43,6 +43,11 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
+    public void deleteInstanceJobs(long jobId, Type type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Long> fetchLastJobId(long instanceId, Type type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
@@ -62,6 +67,11 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
                     .path(INSTANCE_JOB_SERVICE + "/fetch-job-instance-id/{jobId}/{type}")
                     .build(jobId, type),
                 Long.class));
+    }
+
+    @Override
+    public List<Long> getJobIds(long instanceId, Type type) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

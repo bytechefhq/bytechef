@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Job;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,8 @@ public interface JobRepository {
 
     Page<Job> findAll(Pageable pageable);
 
+    List<Job> findAllByWorkflowId(String workflowId);
+
     Optional<Job> findById(Long id);
 
     Job findByTaskExecutionId(Long taskExecutionId);
@@ -52,4 +55,6 @@ public interface JobRepository {
     Optional<Job> findTop1ByWorkflowIdOrderByIdDesc(String workflowId);
 
     Job save(Job job);
+
+    void updateWorkflowId(String curWorkflowId, String newWorkflowId);
 }

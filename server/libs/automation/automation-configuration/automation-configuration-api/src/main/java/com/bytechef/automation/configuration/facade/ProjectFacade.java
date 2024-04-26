@@ -31,7 +31,7 @@ public interface ProjectFacade {
 
     Workflow addWorkflow(long id, @NonNull String definition);
 
-    void checkProjectStatus(long id);
+    void checkProjectStatus(long id, String workflowId);
 
     ProjectDTO createProject(@NonNull ProjectDTO projectDTO);
 

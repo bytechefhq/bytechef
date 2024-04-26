@@ -54,6 +54,11 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public void deleteById(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId) {
         return taskExecutions.values()
             .stream()

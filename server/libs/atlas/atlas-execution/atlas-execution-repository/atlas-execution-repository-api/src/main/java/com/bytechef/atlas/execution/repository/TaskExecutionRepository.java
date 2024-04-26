@@ -26,6 +26,9 @@ import java.util.Optional;
  * @author Arik Cohen
  */
 public interface TaskExecutionRepository {
+
+    void deleteById(Long id);
+
     /**
      * Returns the execution steps of the given job
      *

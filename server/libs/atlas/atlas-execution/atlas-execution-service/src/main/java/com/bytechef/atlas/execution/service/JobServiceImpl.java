@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -64,6 +65,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public void deleteJob(long id) {
+        jobRepository.deleteById(id);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<Job> fetchLastJob() {
         return jobRepository.findLastJob();
@@ -91,6 +97,11 @@ public class JobServiceImpl implements JobService {
     @Transactional(readOnly = true)
     public Job getTaskExecutionJob(long taskExecutionId) {
         return jobRepository.findByTaskExecutionId(taskExecutionId);
+    }
+
+    @Override
+    public List<Job> getWorkflowJobs(String workflowId) {
+        return jobRepository.findAllByWorkflowId(workflowId);
     }
 
     @Override
@@ -141,6 +152,11 @@ public class JobServiceImpl implements JobService {
         Validate.notNull(job, "'job' must not be null");
 
         return jobRepository.save(job);
+    }
+
+    @Override
+    public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
+        jobRepository.updateWorkflowId(curWorkflowId, newWorkflowId);
     }
 
     private static boolean isRestartable(Job job) {

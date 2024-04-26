@@ -31,7 +31,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void checkProjectStatus(long id) {
+    public void checkProjectStatus(long id, String workflowId) {
         throw new UnsupportedOperationException();
     }
 

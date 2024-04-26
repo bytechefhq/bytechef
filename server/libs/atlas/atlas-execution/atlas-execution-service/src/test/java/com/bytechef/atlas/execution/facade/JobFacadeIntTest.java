@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -76,12 +77,15 @@ public class JobFacadeIntTest {
         private WorkflowService workflowService;
 
         @MockBean
+        private TaskExecutionService taskExecutionService;
+
+        @MockBean
         private TaskFileStorage taskFileStorage;
 
         @Bean
         JobFacade jobFacade(ApplicationEventPublisher eventPublisher, JobService jobService) {
             return new JobFacadeImpl(
-                eventPublisher, contextService, jobService, taskFileStorage, workflowService);
+                eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
         }
 
         @Bean

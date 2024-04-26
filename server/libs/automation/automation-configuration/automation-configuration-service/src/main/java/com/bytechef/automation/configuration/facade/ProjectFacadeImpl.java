@@ -31,12 +31,14 @@ import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +75,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final CategoryService categoryService;
     private final JobService jobService;
     private final ProjectService projectService;
+    private final ProjectInstanceFacade projectInstanceFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
@@ -80,13 +84,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
-        ProjectService projectService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        TagService tagService, WorkflowService workflowService) {
+        ProjectService projectService, ProjectInstanceFacade projectInstanceFacade,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, TagService tagService,
+        WorkflowService workflowService) {
 
         this.categoryService = categoryService;
         this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
+        this.projectInstanceFacade = projectInstanceFacade;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
         this.workflowService = workflowService;
@@ -94,6 +100,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public Workflow addWorkflow(long id, @NonNull String definition) {
+        checkProjectStatus(id, null);
+
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         projectService.addWorkflow(id, workflow.getId());
@@ -113,14 +121,23 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void checkProjectStatus(long id) {
+    public void checkProjectStatus(long id, @Nullable String workflowId) {
         Project project = projectService.getProject(id);
+
+        List<String> latestWorkflowIds = project.getWorkflowIds(project.getLastVersion());
+
+        if (workflowId != null && !latestWorkflowIds.contains(workflowId)) {
+            throw new ApplicationException(
+                "Older version of the workflow cannot be updated.", ProjectErrorType.UPDATE_OLD_WORKFLOW);
+        }
 
         if (project.getLastStatus() == Status.PUBLISHED) {
             List<String> duplicatedVersionWorkflowIds = new ArrayList<>();
 
-            for (String workflowId : project.getWorkflowIds(project.getLastVersion())) {
-                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(workflowId);
+            for (String curWorkflowId : latestWorkflowIds) {
+                Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(curWorkflowId);
+
+                jobService.updateWorkflowId(curWorkflowId, duplicatedWorkflow.getId());
 
                 duplicatedVersionWorkflowIds.add(duplicatedWorkflow.getId());
 
@@ -131,7 +148,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         .getProjectInstanceWorkflows(projectInstance.getId());
 
                     for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-                        if (Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId)) {
+                        if (Objects.equals(projectInstanceWorkflow.getWorkflowId(), curWorkflowId)) {
                             projectInstanceWorkflow.setWorkflowId(duplicatedWorkflow.getId());
 
                             projectInstanceWorkflowService.update(projectInstanceWorkflow);
@@ -174,19 +191,18 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void deleteProject(long id) {
-        if (!CollectionUtils.isEmpty(projectInstanceService.getProjectInstances(id))) {
-            throw new ApplicationException(
-                "Project id=%s cannot be deleted".formatted(id), ProjectErrorType.CREATE_PROJECT);
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
+
+        for (ProjectInstance projectInstance : projectInstances) {
+            projectInstanceFacade.deleteProjectInstance(projectInstance.getId());
         }
 
         Project project = projectService.getProject(id);
 
-        Map<Integer, List<String>> workflowIdMap = project.getAllWorkflowIds();
+        List<String> workflowIds = project.getAllWorkflowIds();
 
-        for (List<String> workflowIds : workflowIdMap.values()) {
-            for (String workflowId : workflowIds) {
-                workflowService.delete(workflowId);
-            }
+        for (String workflowId : workflowIds) {
+            workflowService.delete(workflowId);
         }
 
         projectService.delete(id);
@@ -200,6 +216,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public void deleteWorkflow(@NonNull String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
+        checkProjectStatus(project.getId(), workflowId);
+
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
 
         for (ProjectInstance projectInstance : projectInstances) {
@@ -209,11 +227,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
             if (CollectionUtils.anyMatch(
                 projectInstanceWorkflows,
                 projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
-
-                if (OptionalUtils.isPresent(jobService.fetchLastWorkflowJob(workflowId))) {
-                    throw new ApplicationException(
-                        "Workflow id=%s is in use".formatted(workflowId), ProjectErrorType.DELETE_WORKFLOW);
-                }
 
                 projectInstanceWorkflows.stream()
                     .filter(
@@ -249,7 +262,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public String duplicateWorkflow(long id, @NonNull String workflowId) {
+        Project project = projectService.getWorkflowProject(workflowId);
+
+        checkProjectStatus(project.getId(), workflowId);
+
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
+
+        Map<String, Object> definitionMap = JsonUtils.read(workflow.getDefinition(), new TypeReference<>() {});
+
+        definitionMap.put("label", MapUtils.getString(definitionMap, "label", "(2)") + " (2)");
+
+        workflowService.update(
+            Validate.notNull(workflow.getId(), "id"),
+            JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         projectService.addWorkflow(id, workflow.getId());
 
@@ -330,7 +355,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return workflowService.getWorkflows(
             projectService.getProjects()
                 .stream()
-                .flatMap(project -> CollectionUtils.stream(project.getWorkflowIds(project.getLastVersion())))
+                .flatMap(project -> CollectionUtils.stream(project.getAllWorkflowIds()))
                 .toList());
     }
 
