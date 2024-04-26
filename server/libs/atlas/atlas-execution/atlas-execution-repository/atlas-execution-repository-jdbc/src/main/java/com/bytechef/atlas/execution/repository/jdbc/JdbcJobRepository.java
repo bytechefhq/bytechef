@@ -19,7 +19,6 @@ package com.bytechef.atlas.execution.repository.jdbc;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import java.util.Optional;
-
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
