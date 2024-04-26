@@ -64,8 +64,7 @@ public class NiftyOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get(BASE_URL + "/projects"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/projects"))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -79,6 +78,7 @@ public class NiftyOptionUtils {
                 }
             }
         }
+
         return options;
     }
 }
