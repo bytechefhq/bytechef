@@ -99,7 +99,10 @@ export default async function saveWorkflowDefinition(
 
     const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
 
-    if (existingWorkflowTask && !operationName) {
+    if (
+        existingWorkflowTask &&
+        (!operationName || JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters))
+    ) {
         return;
     }
 

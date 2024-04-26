@@ -7,6 +7,10 @@ export default function getParametersWithDefaultValues({
     data?: {[key: string]: string | object};
     properties: Array<PropertyType>;
 }) {
+    if (!properties?.length) {
+        return data;
+    }
+
     properties.forEach((property) => {
         if (!property.name) {
             return;
