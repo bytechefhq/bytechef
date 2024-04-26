@@ -46,9 +46,9 @@ public class NiftyCreateTaskAction {
                     .maxLength(320)
                     .required(false),
                 ComponentDSL.string(NiftyConstants.PROJECT)
-                    .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyOptionUtils::getProjectId),
+                    .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions),
                 ComponentDSL.string(NiftyConstants.TASK_GROUP_ID)
-                    .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupId)
+                    .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupIdOptions)
                     .loadOptionsDependsOn(NiftyConstants.PROJECT),
                 ComponentDSL.dateTime(NiftyConstants.DUE_DATE))
             .outputSchema(

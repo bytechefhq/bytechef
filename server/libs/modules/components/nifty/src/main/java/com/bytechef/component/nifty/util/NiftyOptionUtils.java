@@ -36,7 +36,7 @@ public class NiftyOptionUtils {
     private NiftyOptionUtils() {
     }
 
-    public static List<Option<String>> getTaskGroupId(
+    public static List<Option<String>> getTaskGroupIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
@@ -60,7 +60,7 @@ public class NiftyOptionUtils {
         return options;
     }
 
-    public static List<Option<String>> getProjectId(
+    public static List<Option<String>> getProjectIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
