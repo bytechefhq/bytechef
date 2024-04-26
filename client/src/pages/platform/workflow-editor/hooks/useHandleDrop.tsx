@@ -204,7 +204,6 @@ export default function useHandleDrop(): [
             {
                 ...draggedNode.data,
                 parameters: getParametersWithDefaultValues({
-                    data: {},
                     properties: draggedComponentActionDefinition.properties || [],
                 }),
             },

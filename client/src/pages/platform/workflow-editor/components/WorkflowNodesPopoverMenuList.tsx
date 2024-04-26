@@ -149,7 +149,6 @@ const WorkflowNodesPopoverMenuList = memo(
                         {
                             ...newWorkflowNode.data,
                             parameters: getParametersWithDefaultValues({
-                                data: {},
                                 properties: clickedComponentActionDefinition?.properties as Array<PropertyType>,
                             }),
                             type: `${clickedComponentDefinition.name}/${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,

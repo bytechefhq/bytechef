@@ -13,11 +13,25 @@ export default function getParametersWithDefaultValues({
         }
 
         if (property.properties?.length) {
-            data[property.name!] = getParametersWithDefaultValues({data: {}, properties: property.properties}) ?? {};
+            const nestedData = getParametersWithDefaultValues({
+                data: {},
+                properties: property.properties,
+            });
+
+            if (Object.keys(nestedData).length) {
+                data[property.name!] = nestedData;
+            }
         } else if (property.items?.length) {
-            data[property.name!] = [getParametersWithDefaultValues({data: {}, properties: property.items}) ?? {}];
-        } else {
-            data[property.name] = property.defaultValue ?? '';
+            const nestedData = getParametersWithDefaultValues({
+                data: {},
+                properties: property.items,
+            });
+
+            if (Object.keys(nestedData).length) {
+                data[property.name!] = [nestedData];
+            }
+        } else if (property.defaultValue) {
+            data[property.name] = property.defaultValue;
         }
     });
 

@@ -151,7 +151,11 @@ const WorkflowNodeDetailsPanel = ({
         };
     });
 
-    const hasOutputData = currentActionDefinition?.outputDefined || currentActionDefinition?.outputFunctionDefined || currentTriggerDefinition?.outputDefined  || currentTriggerDefinition?.outputFunctionDefined;
+    const hasOutputData =
+        currentActionDefinition?.outputDefined ||
+        currentActionDefinition?.outputFunctionDefined ||
+        currentTriggerDefinition?.outputDefined ||
+        currentTriggerDefinition?.outputFunctionDefined;
 
     const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
@@ -414,9 +418,10 @@ const WorkflowNodeDetailsPanel = ({
                             !!currentComponentDefinition.triggers?.length) && (
                             <CurrentOperationSelect
                                 description={
-                                currentNode.trigger
-                                    ? currentTriggerDefinition?.description
-                                    : currentActionDefinition?.description}
+                                    currentNode.trigger
+                                        ? currentTriggerDefinition?.description
+                                        : currentActionDefinition?.description
+                                }
                                 handleValueChange={handleOperationSelectChange}
                                 operations={
                                     (currentNode?.trigger
