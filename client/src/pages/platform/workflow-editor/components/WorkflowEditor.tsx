@@ -39,12 +39,12 @@ const WorkflowEditor = ({
     taskDispatcherDefinitions,
     updateWorkflowMutation,
 }: WorkflowEditorProps) => {
-    const [edges, setEdges] = useState(defaultEdges);
+    const [edges, setEdges] = useState<Array<Edge>>();
     const [isSaving, setIsSaving] = useState(false);
     const [latestComponentName, setLatestComponentName] = useState('');
     const [newNode, setNewNode] = useState<Node | undefined>();
     const [nodeOperations, setNodeOperations] = useState<Array<ComponentOperationType>>([]);
-    const [nodes, setNodes] = useState(defaultNodes);
+    const [nodes, setNodes] = useState<Array<Node>>();
     const [viewportWidth, setViewportWidth] = useState(0);
     const [workflowComponentWithAlias, setWorkflowComponentWithAlias] = useState<
         | (ComponentDefinitionBasicModel & {actions?: Array<ActionDefinitionBasicModel>; workflowNodeName: string})
@@ -82,11 +82,7 @@ const WorkflowEditor = ({
 
     const lastComponentName = componentNames?.[componentNames?.length - 1];
 
-    const {
-        data: workflowComponent,
-        isFetched: workflowComponentFetched,
-        isFetchedAfterMount: workflowComponentFetchedAfterMount,
-    } = useGetComponentDefinitionQuery(
+    const {data: workflowComponent} = useGetComponentDefinitionQuery(
         {
             componentName: latestComponentName || lastComponentName,
         },
@@ -204,13 +200,7 @@ const WorkflowEditor = ({
             return workflowNodes;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        componentDefinitions,
-        workflow?.tasks,
-        workflow?.triggers,
-        workflowComponentFetched,
-        workflowComponentFetchedAfterMount,
-    ]);
+    }, [workflow?.tasks, workflow?.triggers]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
@@ -350,7 +340,11 @@ const WorkflowEditor = ({
 
     // Reconstruct editor nodes on re-render
     useEffect(() => {
-        if (defaultNodesWithWorkflowNodes?.length === nodes.length) {
+        const outOfDate = componentNames?.some(
+            (componentName) => !defaultNodesWithWorkflowNodes?.some((node) => node.data.componentName === componentName)
+        );
+
+        if (outOfDate) {
             return;
         }
 
@@ -366,11 +360,11 @@ const WorkflowEditor = ({
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultNodesWithWorkflowNodes, nodes]);
+    }, [defaultNodesWithWorkflowNodes]);
 
     // Reconstruct editor edges on re-render
     useEffect(() => {
-        if (defaultEdgesWithWorkflowEdges?.length === edges.length) {
+        if (defaultEdgesWithWorkflowEdges?.length === edges?.length) {
             return;
         }
 
@@ -422,22 +416,13 @@ const WorkflowEditor = ({
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
-    // If no custom trigger is set on first render, set Manual Trigger as default trigger
-    useEffect(() => {
-        if (!workflow.triggers?.length && defaultNodes[0].data) {
-            saveWorkflowDefinition(defaultNodes[0].data, workflow, updateWorkflowMutation);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     useLayout();
 
     return (
         <div className="flex h-full flex-1 flex-col">
             <ReactFlow
-                defaultEdges={defaultEdgesWithWorkflowEdges}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                defaultNodes={defaultNodesWithWorkflowNodes as Node<any, string | undefined>[]}
+                defaultEdges={defaultEdgesWithWorkflowEdges || defaultEdges}
+                defaultNodes={defaultNodesWithWorkflowNodes || defaultNodes}
                 defaultViewport={{
                     x: viewportWidth / 2,
                     y: 50,
