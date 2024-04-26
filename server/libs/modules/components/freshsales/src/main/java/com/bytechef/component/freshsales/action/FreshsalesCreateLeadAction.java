@@ -16,6 +16,12 @@
 
 package com.bytechef.component.freshsales.action;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -27,14 +33,7 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIR
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME_PROPERTY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME_PROPERTY;
-import static com.bytechef.component.freshsales.util.FreshsalesUtils.getHeaders;
 import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
-
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Monika Domiter
@@ -67,7 +66,6 @@ public class FreshsalesCreateLeadAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(getUrl(connectionParameters, "leads")))
-            .headers(getHeaders(connectionParameters))
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),

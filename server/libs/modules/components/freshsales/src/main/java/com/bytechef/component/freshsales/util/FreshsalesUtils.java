@@ -16,12 +16,9 @@
 
 package com.bytechef.component.freshsales.util;
 
-import static com.bytechef.component.definition.Authorization.KEY;
-import static com.bytechef.component.definition.Authorization.USERNAME;
-
 import com.bytechef.component.definition.Parameters;
-import java.util.List;
-import java.util.Map;
+
+import static com.bytechef.component.definition.Authorization.USERNAME;
 
 /**
  * @author Monika Domiter
@@ -29,11 +26,6 @@ import java.util.Map;
 public class FreshsalesUtils {
 
     private FreshsalesUtils() {
-    }
-
-    public static Map<String, List<String>> getHeaders(Parameters connectionParameters) {
-        return Map.of(
-            "Authorization", List.of("Token token=" + connectionParameters.getRequiredString(KEY)));
     }
 
     public static String getUrl(Parameters connectionParameters, String resource) {

@@ -22,8 +22,13 @@ import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -43,8 +48,14 @@ public class FreshsalesConnection {
                         string(KEY)
                             .label("API Key")
                             .description("The API Key supplied by Freshsales")
-                            .required(true)));
+                            .required(true))
+                    .apply(FreshsalesConnection::getApplyResponse));
 
     private FreshsalesConnection() {
+    }
+
+    private static Authorization.ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
+        return Authorization.ApplyResponse.ofHeaders(
+            Map.of("Authorization", List.of("Token token=" + connectionParameters.getRequiredString(KEY))));
     }
 }
