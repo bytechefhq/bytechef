@@ -289,8 +289,7 @@ const WorkflowEditor = ({
         saveWorkflowDefinition(
             {
                 ...newNode.data,
-                parameters:
-                    getParametersWithDefaultValues({data: {}, properties: latestActionDefinition?.properties}) ?? {},
+                parameters: getParametersWithDefaultValues({properties: latestActionDefinition?.properties}),
                 type: `${newNode.data.componentName}/${workflowComponentWithAlias?.version}/${workflowComponentWithAlias?.actions?.[0].name}`,
             },
             workflow!,
