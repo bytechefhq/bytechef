@@ -22,8 +22,13 @@ import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -41,8 +46,17 @@ public class CopperConnection {
                             .required(true),
                         string(KEY)
                             .label("Key")
-                            .required(true)));
+                            .required(true))
+                    .apply(CopperConnection::getApplyResponse));
 
     private CopperConnection() {
+    }
+
+    private static ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
+        return ApplyResponse.ofHeaders(
+            Map.of(
+                "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
+                "X-PW-Application", List.of("developer_api"),
+                "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))));
     }
 }

@@ -50,7 +50,6 @@ import static com.bytechef.component.copper.constant.CopperConstants.TITLE;
 import static com.bytechef.component.copper.constant.CopperConstants.URL;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES_PROPERTY;
-import static com.bytechef.component.copper.util.CopperUtils.getHeaders;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -174,7 +173,6 @@ public class CopperCreatePersonAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(BASE_URL + "/people"))
-            .headers(getHeaders(connectionParameters))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),

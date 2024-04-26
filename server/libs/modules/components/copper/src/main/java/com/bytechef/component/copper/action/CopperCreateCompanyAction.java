@@ -46,7 +46,6 @@ import static com.bytechef.component.copper.constant.CopperConstants.TAGS_PROPER
 import static com.bytechef.component.copper.constant.CopperConstants.URL;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES_PROPERTY;
-import static com.bytechef.component.copper.util.CopperUtils.getHeaders;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -134,7 +133,6 @@ public class CopperCreateCompanyAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(BASE_URL + "/companies"))
-            .headers(getHeaders(connectionParameters))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
