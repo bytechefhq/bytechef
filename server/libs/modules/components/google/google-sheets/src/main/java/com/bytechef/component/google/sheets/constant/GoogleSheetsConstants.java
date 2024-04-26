@@ -96,6 +96,7 @@ public class GoogleSheetsConstants {
             (ActionOptionsFunction<String>) (
                 inputParameters, connectionParameters, loadDependsOnPaths, searchText,
                 context) -> GoogleSheetsUtils.getSheetNameOptions(inputParameters, connectionParameters))
+        .loadOptionsDependsOn(SPREADSHEET_ID)
         .required(true);
 
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY_TRIGGER = string(SHEET_NAME)
@@ -105,6 +106,7 @@ public class GoogleSheetsConstants {
             (TriggerOptionsFunction<String>) (
                 inputParameters, connectionParameters, loadDependsOnPaths, searchText,
                 context) -> GoogleSheetsUtils.getSheetNameOptions(inputParameters, connectionParameters))
+        .loadOptionsDependsOn(SPREADSHEET_ID)
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty ROW_PROPERTY = dynamicProperties(ROW)
