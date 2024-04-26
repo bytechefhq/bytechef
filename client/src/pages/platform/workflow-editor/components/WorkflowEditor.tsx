@@ -40,6 +40,7 @@ const WorkflowEditor = ({
     updateWorkflowMutation,
 }: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
+    const [isSaving, setIsSaving] = useState(false);
     const [latestComponentName, setLatestComponentName] = useState('');
     const [newNode, setNewNode] = useState<Node | undefined>();
     const [nodeOperations, setNodeOperations] = useState<Array<ComponentOperationType>>([]);
@@ -132,6 +133,8 @@ const WorkflowEditor = ({
 
                 if (targetEdge) {
                     handleDropOnWorkflowEdge(targetEdge, droppedNode);
+
+                    return;
                 }
             }
         }
@@ -277,14 +280,13 @@ const WorkflowEditor = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowComponent?.name, componentNames]);
 
-    // useEffect(() => {
-    // }, [componentActions]);
-
     // Save workflow definition with default parameters when a new node is added
     useEffect(() => {
-        if (!latestActionDefinition?.properties || !newNode) {
+        if (!latestActionDefinition?.properties || !newNode || isSaving) {
             return;
         }
+
+        setIsSaving(true);
 
         saveWorkflowDefinition(
             {
@@ -294,9 +296,15 @@ const WorkflowEditor = ({
             },
             workflow!,
             updateWorkflowMutation
-        );
+        )
+            .then(() => setIsSaving(false))
+            .catch((error) => {
+                console.error('Save workflow definition failed:', error);
+
+                setIsSaving(false);
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [latestActionDefinition?.name, workflowComponentWithAlias?.workflowNodeName, newNode]);
+    }, [latestActionDefinition?.name, newNode]);
 
     // Update workflow node names when nodes change
     useEffect(() => {
