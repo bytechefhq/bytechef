@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -31,17 +30,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
  */
 class CopperOptionUtilsTest {
 
-    private MockedStatic<CopperUtils> copperUtilsMockedStatic;
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
@@ -49,11 +45,6 @@ class CopperOptionUtilsTest {
 
     @BeforeEach
     public void beforeEach() {
-        copperUtilsMockedStatic = mockStatic(CopperUtils.class);
-
-        copperUtilsMockedStatic.when(() -> CopperUtils.getHeaders(mockedParameters))
-            .thenReturn(Map.of());
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(any()))
@@ -62,11 +53,6 @@ class CopperOptionUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        copperUtilsMockedStatic.close();
     }
 
     @Test
