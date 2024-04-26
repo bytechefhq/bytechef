@@ -20,21 +20,21 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.google.sheets.connection.GoogleSheetsConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.GOOGLE_SHEETS;
 
-import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.sheets.action.GoogleSheetsClearSheetAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsFindRowByNumAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsUpdateRowAction;
-import com.bytechef.component.google.sheets.trigger.GoogleSheetsOnRowAdded;
+import com.bytechef.component.google.sheets.trigger.GoogleSheetsOnRowAddedTrigger;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Monika Domiter
  */
-@AutoService(OpenApiComponentHandler.class)
-public class GoogleSheetsComponentHandler implements OpenApiComponentHandler {
+@AutoService(ComponentHandler.class)
+public class GoogleSheetsComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_SHEETS)
         .title("Google Sheets")
@@ -49,7 +49,7 @@ public class GoogleSheetsComponentHandler implements OpenApiComponentHandler {
             GoogleSheetsFindRowByNumAction.ACTION_DEFINITION,
             GoogleSheetsInsertRowAction.ACTION_DEFINITION,
             GoogleSheetsUpdateRowAction.ACTION_DEFINITION)
-        .triggers(GoogleSheetsOnRowAdded.TRIGGER_DEFINITION);
+        .triggers(GoogleSheetsOnRowAddedTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

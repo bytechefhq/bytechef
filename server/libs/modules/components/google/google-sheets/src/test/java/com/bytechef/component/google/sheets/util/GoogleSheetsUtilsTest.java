@@ -108,7 +108,8 @@ class GoogleSheetsUtilsTest {
                 GoogleSheetsRowUtils.class)) {
 
                 googleSheetsRowUtilsMockedStatic
-                    .when(() -> GoogleSheetsRowUtils.getRow(any(Sheets.class), anyString(), anyString(), anyInt()))
+                    .when(() -> GoogleSheetsRowUtils.getRowValues(
+                        any(Sheets.class), anyString(), anyString(), anyInt()))
                     .thenReturn(List.of("header1", "header2", "header3"));
 
                 List<Property.ValueProperty<?>> result = GoogleSheetsUtils.createArrayPropertyForRow(
@@ -170,7 +171,7 @@ class GoogleSheetsUtilsTest {
 
         try (MockedStatic<GoogleSheetsRowUtils> sheetsRowUtilsMockedStatic = mockStatic(GoogleSheetsRowUtils.class)) {
             sheetsRowUtilsMockedStatic
-                .when(() -> GoogleSheetsRowUtils.getRow(
+                .when(() -> GoogleSheetsRowUtils.getRowValues(
                     any(Sheets.class), spreadsheetIdArgumentCaptor.capture(), sheetNameArgumentCaptor.capture(),
                     rowNumberArgumentCaptor.capture()))
                 .thenReturn(mockedFirstRow);
@@ -217,7 +218,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
-    void testGetRowValuesWhereFirstRowHeaders() {
+    void testGetRowValuesWhereFirstSpreadsheetRowValuesHeaders() {
         Map<String, Object> rowMap = Map.of("name", "name", "email", "email");
 
         when(mockedParameters.getRequired(VALUES))
@@ -229,7 +230,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
-    void testGetRowValuesWhereFirstRowNotHeaders() {
+    void testGetRowValuesWhereFirstSpreadsheetRowValuesNotHeaders() {
         List rowList = List.of("name", 1233, false);
 
         when(mockedParameters.getRequiredList(VALUES, Object.class))
@@ -295,7 +296,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(sheetsList);
 
             List<Option<String>> sheetNameOptions = GoogleSheetsUtils.getSheetNameOptions(
-                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
+                mockedParameters, mockedParameters);
 
             assertNotNull(sheetNameOptions);
             assertEquals(2, sheetNameOptions.size());
@@ -347,7 +348,7 @@ class GoogleSheetsUtilsTest {
                 .thenReturn(new FileList().setFiles(files));
 
             List<Option<String>> spreadsheetIdOptions = GoogleSheetsUtils.getSpreadsheetIdOptions(
-                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
+                mockedParameters, mockedParameters);
 
             assertNotNull(spreadsheetIdOptions);
             assertEquals(2, spreadsheetIdOptions.size());
