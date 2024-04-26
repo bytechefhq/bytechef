@@ -21,7 +21,6 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.AD
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.EMAIL_ADDRESSES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTIES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PHONE_NUMBERS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,8 +37,10 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
 
     @Test
     void testPerform() {
-        when(mockedParameters.getMap(NAME_PROPERTIES, String.class))
-            .thenReturn(Map.of(FIRST_NAME, "fname", LAST_NAME,  "lname"));
+        when(mockedParameters.getString(FIRST_NAME))
+            .thenReturn("fname");
+        when(mockedParameters.getString(LAST_NAME))
+            .thenReturn("lname");
         when(mockedParameters.getRequiredString(TYPE))
             .thenReturn("type");
         when(mockedParameters.getString(ABOUT))

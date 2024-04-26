@@ -16,10 +16,6 @@
 
 package com.bytechef.component.capsule.crm.util;
 
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME_PROPERTY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME_PROPERTY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,7 +26,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,33 +41,6 @@ class CapsuleCRMUtilsTest {
     private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
-
-    @Test
-    void testCreateNamePropertiesForPerson() {
-        when(mockedParameters.getRequiredString(TYPE))
-                .thenReturn("person");
-
-        List<Property.ValueProperty<?>> nameProperties = CapsuleCRMUtils.createNameProperties(
-            mockedParameters, mockedParameters, Map.of(), mockedContext);
-
-        assertEquals(2, nameProperties.size());
-
-        assertEquals(FIRST_NAME_PROPERTY, nameProperties.getFirst());
-        assertEquals(LAST_NAME_PROPERTY, nameProperties.get(1));
-    }
-
-    @Test
-    void testCreateNamePropertiesForOrganization() {
-        when(mockedParameters.getRequiredString(TYPE))
-            .thenReturn("organization");
-
-        List<Property.ValueProperty<?>> nameProperties = CapsuleCRMUtils.createNameProperties(
-            mockedParameters, mockedParameters, Map.of(), mockedContext);
-
-        assertEquals(1, nameProperties.size());
-
-        assertEquals(NAME_PROPERTY, nameProperties.getFirst());
-    }
 
     @Test
     void testGetCountryOptions() {
