@@ -16,6 +16,13 @@
 
 package com.bytechef.component.freshsales.action;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -39,15 +46,7 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.STA
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.TWITTER;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.WORK_NUMBER;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ZIPCODE;
-import static com.bytechef.component.freshsales.util.FreshsalesUtils.getHeaders;
 import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
-
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 
 /**
  * @author Monika Domiter
@@ -141,7 +140,6 @@ public class FreshsalesCreateContactAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(getUrl(connectionParameters, "contacts")))
-            .headers(getHeaders(connectionParameters))
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getString(FIRST_NAME),
