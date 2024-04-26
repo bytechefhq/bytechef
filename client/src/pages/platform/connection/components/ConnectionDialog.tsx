@@ -213,9 +213,12 @@ const ConnectionDialog = ({
         setIsOpen(false);
 
         setTimeout(() => {
+            console.log('ee');
             formReset();
 
+            setAuthorizationName(undefined);
             setOAuth2Error(undefined);
+            setSelectedComponentDefinition(undefined);
             setWizardStep('configuration_step');
 
             connectionMutation.reset();
