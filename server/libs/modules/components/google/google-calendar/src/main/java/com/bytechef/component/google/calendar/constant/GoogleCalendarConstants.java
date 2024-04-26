@@ -81,7 +81,6 @@ public class GoogleCalendarConstants {
     public static final String REMINDERS = "reminders";
     public static final String SEND_UPDATES = "sendUpdates";
     public static final String SELF = "self";
-    public static final String SINGLE_EVENTS = "singleEvents";
     public static final String STATUS = "status";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";

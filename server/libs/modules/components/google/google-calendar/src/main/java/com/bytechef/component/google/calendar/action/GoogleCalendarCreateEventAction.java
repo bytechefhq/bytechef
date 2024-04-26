@@ -19,8 +19,12 @@ package com.bytechef.component.google.calendar.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTACHMENTS;
@@ -36,12 +40,13 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GUEST_CAN_MODIFY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GUEST_CAN_SEE_OTHER_GUESTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCATION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.METHOD;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MINUTES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.REMINDERS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.USE_DEFAULT;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
 
@@ -49,7 +54,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
@@ -79,9 +83,30 @@ public class GoogleCalendarCreateEventAction {
                 .label("All day event?")
                 .defaultValue(false)
                 .required(true),
-            dynamicProperties(TIME)
-                .loadPropertiesDependsOn(ALL_DAY)
-                .properties(GoogleCalendarUtils::createTimeProperties),
+            date(START)
+                .label("Start date")
+                .description("The start date of the event.")
+                .displayCondition("%s == true".formatted(ALL_DAY))
+                .required(true),
+            date(END)
+                .label("End date")
+                .description("The end date of the event.")
+                .displayCondition("%s == true".formatted(ALL_DAY))
+                .required(true),
+            dateTime(START)
+                .label("Start date time")
+                .description(
+                    "The (inclusive) start time of the event. For a recurring event, this is the start time of the " +
+                        "first instance.")
+                .displayCondition("%s == false".formatted(ALL_DAY))
+                .required(true),
+            dateTime(END)
+                .label("End date time")
+                .description(
+                    "The (exclusive) end time of the event. For a recurring event, this is the end time of the " +
+                        "first instance.")
+                .displayCondition("%s == false".formatted(ALL_DAY))
+                .required(true),
             string(DESCRIPTION)
                 .label("Description")
                 .description("Description of the event. Can contain HTML.")
@@ -123,9 +148,27 @@ public class GoogleCalendarCreateEventAction {
                 .description("Whether the default reminders of the calendar apply to the event.")
                 .defaultValue(true)
                 .required(true),
-            dynamicProperties("Reminders")
-                .loadPropertiesDependsOn(USE_DEFAULT)
-                .properties(GoogleCalendarUtils::createRemindersProperties))
+            array(REMINDERS)
+                .label("Reminders")
+                .displayCondition("%s == false".formatted(USE_DEFAULT))
+                .items(
+                    object()
+                        .properties(
+                            string(METHOD)
+                                .label("How is reminder sent?")
+                                .options(
+                                    option("Email", "email", "Reminders are sent via email."),
+                                    option("Popup", "popup", "Reminders are sent via a UI popup."))
+                                .required(true),
+                            integer(MINUTES)
+                                .label("Minutes before reminder")
+                                .description(
+                                    "Number of minutes before the start of the event when the reminder " +
+                                        "should trigger.")
+                                .minValue(0)
+                                .maxValue(40320)
+                                .required(true)))
+                .required(false))
         .outputSchema(EVENT_PROPERTY)
         .perform(GoogleCalendarCreateEventAction::perform);
 
