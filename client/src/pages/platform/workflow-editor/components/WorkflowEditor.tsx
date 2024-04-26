@@ -1,4 +1,5 @@
-import {ActionDefinitionBasicModel, UpdateWorkflowRequest} from '@/middleware/platform/configuration';
+import {ActionDefinitionBasicModel} from '@/middleware/platform/configuration';
+import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
 import {useGetComponentActionDefinitionQuery} from '@/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {ComponentOperationType} from '@/types/types';
@@ -31,7 +32,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasicModel[];
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
 }
 
 const WorkflowEditor = ({

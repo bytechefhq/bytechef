@@ -27,6 +27,7 @@ import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog'
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -248,6 +249,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     createWorkflowMutation={createProjectWorkflowMutation}
                     onClose={() => setShowWorkflowDialog(false)}
                     parentId={project.id}
+                    useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}
         </>

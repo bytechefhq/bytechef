@@ -1,16 +1,63 @@
-import {UpdateWorkflowRequest, WorkflowApi, WorkflowModel} from '@/middleware/platform/configuration';
-import {useMutation} from '@tanstack/react-query';
+import {WorkflowModel} from '@/middleware/platform/configuration';
+import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
+import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 
-interface UpdateWorkflowMutationProps {
-    onSuccess?: (result: WorkflowModel, variables: UpdateWorkflowRequest) => void;
-    onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
+export interface UpdateWorkflowRequestI {
+    id: string;
+    workflowModel: WorkflowModel;
 }
 
-export const useUpdateWorkflowMutation = (mutationProps?: UpdateWorkflowMutationProps) =>
-    useMutation({
-        mutationFn: (request: UpdateWorkflowRequest) => {
-            return new WorkflowApi().updateWorkflow(request);
+interface UpdateWorkflowMutationPropsI {
+    onSuccess?: (result: WorkflowModel, variables: UpdateWorkflowRequestI) => void;
+    onError?: (error: Error, variables: UpdateWorkflowRequestI) => void;
+}
+
+interface WorkflowKeysI {
+    workflow: (id: string) => Array<string>;
+    workflows: Array<string>;
+}
+
+const useUpdatePlatformWorkflowMutation = ({
+    onError,
+    onSuccess,
+    useUpdateWorkflowMutation,
+    workflowId,
+    workflowKeys,
+}: {
+    useUpdateWorkflowMutation: (
+        mutationProps?: UpdateWorkflowMutationPropsI | undefined
+    ) => UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
+    workflowId: string;
+    workflowKeys: WorkflowKeysI;
+    onError?: () => void;
+    onSuccess?: () => void;
+}) => {
+    const queryClient = useQueryClient();
+
+    return useUpdateWorkflowMutation({
+        onError: () => {
+            queryClient.invalidateQueries({
+                queryKey: workflowKeys.workflow(workflowId),
+            });
+
+            if (onError) {
+                onError();
+            }
         },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
+        onSuccess: (workflow: WorkflowModel) => {
+            queryClient.invalidateQueries({
+                queryKey: workflowKeys.workflow(workflow.id!),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
+            });
+
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
     });
+};
+
+export default useUpdatePlatformWorkflowMutation;

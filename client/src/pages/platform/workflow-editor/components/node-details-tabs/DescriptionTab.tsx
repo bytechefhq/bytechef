@@ -1,10 +1,11 @@
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {UseMutationResult} from '@tanstack/react-query';
-import {UpdateWorkflowRequest, WorkflowModel} from 'middleware/platform/configuration';
+import {WorkflowModel} from 'middleware/platform/configuration';
 import {ChangeEvent} from 'react';
 
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
@@ -12,7 +13,7 @@ import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 const DescriptionTab = ({
     updateWorkflowMutation,
 }: {
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
 }) => {
     const {workflow} = useWorkflowDataStore();
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();

@@ -26,8 +26,8 @@ import {
 } from '@/mutations/automation/workflows.mutations';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
-import {WorkflowKeys} from '@/queries/platform/workflows.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -195,7 +195,7 @@ const ProjectWorkflowListItem = ({
                             onClick={() => {
                                 if (workflow?.id) {
                                     deleteWorkflowMutation.mutate({
-                                        id: workflow?.id!,
+                                        id: workflow.id,
                                     });
                                 }
                             }}
@@ -210,6 +210,7 @@ const ProjectWorkflowListItem = ({
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
                     updateWorkflowMutation={updateWorkflowMutation}
+                    useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
                 />
             )}
