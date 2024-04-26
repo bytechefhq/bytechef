@@ -6,7 +6,6 @@ export * from './ConnectionDefinitionApi';
 export * from './Oauth2Api';
 export * from './TaskDispatcherDefinitionApi';
 export * from './TriggerDefinitionApi';
-export * from './WorkflowApi';
 export * from './WorkflowNodeDescriptionApi';
 export * from './WorkflowNodeDynamicPropertiesApi';
 export * from './WorkflowNodeOptionApi';
