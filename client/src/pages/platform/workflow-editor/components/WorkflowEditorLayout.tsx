@@ -87,7 +87,7 @@ const WorkflowEditorLayout = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.tasks, currentNode]);
+    }, [workflow.tasks, workflow.triggers, currentNode]);
 
     return (
         <ReactFlowProvider>
