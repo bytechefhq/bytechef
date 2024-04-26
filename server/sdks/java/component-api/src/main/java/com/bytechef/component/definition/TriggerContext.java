@@ -23,6 +23,7 @@ import java.util.function.Consumer;
  *
  */
 public interface TriggerContext extends Context {
+
     /**
      * @param dataFunction
      * @param <R>
