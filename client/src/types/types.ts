@@ -48,6 +48,7 @@ export type ComponentType = {
         [key: string]: any;
     };
     title?: string;
+    type?: string;
     workflowNodeName: string;
 };
 
