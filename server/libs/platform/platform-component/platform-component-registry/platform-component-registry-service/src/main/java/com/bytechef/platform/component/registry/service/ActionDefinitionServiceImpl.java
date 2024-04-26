@@ -19,12 +19,18 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.*;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
+import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
@@ -39,14 +45,9 @@ import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.registry.util.SchemaUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -169,13 +170,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         case SingleConnectionPerformFunction singleConnectionPerformFunction ->
                             singleConnectionPerformFunction.apply(
                                 new ParametersImpl(inputParameters),
-                                new ParametersImpl(
-                                    CollectionUtils.findFirstMapOrElse(
-                                        connections.values(),
-                                        (componentConnection) -> MapUtils.concatDifferentTypes(
-                                            componentConnection.getParameters(),
-                                            Map.of(Authorization.AUTHORIZATION_TYPE, componentConnection.authorizationName())),
-                                        Map.of())),
+                                new ParametersImpl(CollectionUtils.findFirstMapOrElse(connections.values(),
+                                    (componentConnection) -> MapUtils.concatDifferentTypes(
+                                        componentConnection.getParameters(),
+                                        Map.of(Authorization.AUTHORIZATION_TYPE,
+                                            componentConnection.authorizationName())),
+                                    Map.of())),
                                 context);
                         case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
                             multipleConnectionsPerformFunction.apply(
