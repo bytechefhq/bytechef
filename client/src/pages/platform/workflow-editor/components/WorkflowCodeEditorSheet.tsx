@@ -7,11 +7,9 @@ import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowKeys} from '@/queries/platform/workflows.queries';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -38,8 +36,6 @@ const WorkflowCodeEditorSheet = ({
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
-    const queryClient = useQueryClient();
-
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const handleRunClick = () => {
@@ -58,10 +54,6 @@ const WorkflowCodeEditorSheet = ({
                 .catch(() => {
                     setWorkflowIsRunning(false);
                     setWorkflowTestExecution(undefined);
-
-                    queryClient.invalidateQueries({
-                        queryKey: WorkflowKeys.workflow(workflow.id!),
-                    });
                 });
         }
     };

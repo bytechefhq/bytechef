@@ -9,9 +9,9 @@ import './WorkflowEditorLayout.css';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
-    UpdateWorkflowRequest,
     WorkflowModel,
 } from '@/middleware/platform/configuration';
+import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
 import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {UseMutationResult} from '@tanstack/react-query';
 import {useEffect} from 'react';
@@ -24,7 +24,7 @@ import WorkflowEditor from './WorkflowEditor';
 export interface WorkflowEditorLayoutProps {
     componentDefinitions: ComponentDefinitionBasicModel[];
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
 }
 
 const WorkflowEditorLayout = ({

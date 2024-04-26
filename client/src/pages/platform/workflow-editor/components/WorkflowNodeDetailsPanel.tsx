@@ -3,11 +3,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ComponentDefinitionBasicModel,
-    UpdateWorkflowRequest,
     WorkflowConnectionModel,
     WorkflowModel,
     WorkflowNodeOutputModel,
 } from '@/middleware/platform/configuration';
+import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
@@ -66,7 +66,7 @@ const WorkflowNodeDetailsPanel = ({
     workflowNodeOutputs,
 }: {
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
     workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');

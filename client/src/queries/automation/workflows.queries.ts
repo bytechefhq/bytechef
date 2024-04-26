@@ -1,10 +1,12 @@
+import {WorkflowApi} from '@/middleware/automation/configuration';
+import {WorkflowModel} from '@/middleware/platform/configuration';
+
 /* eslint-disable sort-keys */
-import {WorkflowApi, WorkflowModel} from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowKeys = {
     workflow: (id: string) => [...WorkflowKeys.workflows, id],
-    workflows: ['workflows'] as const,
+    workflows: ['workflows'],
 };
 
 export const useGetWorkflowQuery = (id: string, enabled?: boolean) =>
