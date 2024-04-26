@@ -25,7 +25,6 @@ import static com.bytechef.component.copper.constant.CopperConstants.DETAILS_PRO
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
-import static com.bytechef.component.copper.util.CopperUtils.getHeaders;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
@@ -97,7 +96,6 @@ public class CopperCreateActivityAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(BASE_URL + "/activities"))
-            .headers(getHeaders(connectionParameters))
             .body(
                 Http.Body.of(
                     TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),

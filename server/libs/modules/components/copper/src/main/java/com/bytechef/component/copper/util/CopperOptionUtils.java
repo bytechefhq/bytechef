@@ -17,7 +17,6 @@
 package com.bytechef.component.copper.util;
 
 import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
-import static com.bytechef.component.copper.util.CopperUtils.getHeaders;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
@@ -53,7 +52,6 @@ public class CopperOptionUtils {
         Map<String, ArrayList<Map<String, Object>>> body =
             context
                 .http(http -> http.get(BASE_URL + "/activity_types"))
-                .headers(getHeaders(connectionParameters))
                 .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
                 .execute()
                 .getBody(new Context.TypeReference<>() {});
@@ -73,7 +71,6 @@ public class CopperOptionUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.post(BASE_URL + "/companies/search"))
-            .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -87,7 +84,6 @@ public class CopperOptionUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get(BASE_URL + "/contact_types"))
-            .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -101,7 +97,6 @@ public class CopperOptionUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.get(BASE_URL + "/tags"))
-            .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
@@ -123,7 +118,6 @@ public class CopperOptionUtils {
 
         List<Map<String, Object>> body = context
             .http(http -> http.post(BASE_URL + "/users/search"))
-            .headers(getHeaders(connectionParameters))
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
