@@ -17,12 +17,7 @@
 package com.bytechef.component.capsule.crm.util;
 
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.BASE_URL;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME_PROPERTY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME_PROPERTY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PERSON;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.ActionContext;
@@ -30,7 +25,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,19 +35,6 @@ import java.util.Map;
 public class CapsuleCRMUtils {
 
     private CapsuleCRMUtils() {
-    }
-
-    public static List<ValueProperty<?>> createNameProperties(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext context) {
-
-        String type = inputParameters.getRequiredString(TYPE);
-
-        if (type.equals(PERSON)) {
-            return List.of(FIRST_NAME_PROPERTY, LAST_NAME_PROPERTY);
-        } else {
-            return List.of(NAME_PROPERTY);
-        }
     }
 
     public static List<Option<String>> getCountryOptions(

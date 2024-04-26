@@ -27,12 +27,12 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.EM
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME_PROPERTIES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NUMBER;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PERSON;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PHONE_NUMBERS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STATE;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STREET;
+import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STRING_DISPLAY_CONDITION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ZIP;
 import static com.bytechef.component.definition.ComponentDSL.action;
@@ -40,7 +40,6 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
@@ -56,7 +55,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -74,10 +72,21 @@ public class CapsuleCRMCreateContactAction {
                     option("Person", PERSON),
                     option("Organization", "organization"))
                 .required(true),
-            dynamicProperties(NAME_PROPERTIES)
-                .loadPropertiesDependsOn(TYPE)
-                .properties(CapsuleCRMUtils::createNameProperties)
-                .required(false),
+            string(FIRST_NAME)
+                .label("First name")
+                .description("The first name of the person.")
+                .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, PERSON))
+                .required(true),
+            string(LAST_NAME)
+                .label("Last name")
+                .description("The last name of the person.")
+                .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, PERSON))
+                .required(true),
+            string(NAME)
+                .label("Name")
+                .description("The name of the organisation.")
+                .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, "organization"))
+                .required(true),
             string(ABOUT)
                 .label("About")
                 .description("A short description of the party.")
@@ -171,17 +180,15 @@ public class CapsuleCRMCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, String> nameProperties = inputParameters.getMap(NAME_PROPERTIES, String.class);
-
         return actionContext.http(http -> http.post(BASE_URL + "/parties"))
             .body(
                 Http.Body.of(
                     "party",
                     new Object[] {
                         TYPE, inputParameters.getRequiredString(TYPE),
-                        FIRST_NAME, nameProperties.get(FIRST_NAME),
-                        LAST_NAME, nameProperties.get(LAST_NAME),
-                        NAME, nameProperties.get(NAME),
+                        FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                        LAST_NAME, inputParameters.getString(LAST_NAME),
+                        NAME, inputParameters.getString(NAME),
                         ABOUT, inputParameters.getString(ABOUT),
                         EMAIL_ADDRESSES, inputParameters.getList(EMAIL_ADDRESSES),
                         ADDRESSES, inputParameters.getList(ADDRESSES),

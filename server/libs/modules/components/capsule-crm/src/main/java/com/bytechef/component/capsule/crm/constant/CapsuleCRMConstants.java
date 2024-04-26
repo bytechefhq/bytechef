@@ -16,10 +16,6 @@
 
 package com.bytechef.component.capsule.crm.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-
 /**
  * @author Monika Domiter
  */
@@ -43,29 +39,14 @@ public class CapsuleCRMConstants {
     public static final String FIRST_NAME = "firstName";
     public static final String LAST_NAME = "lastName";
     public static final String NAME = "name";
-    public static final String NAME_PROPERTIES = "nameProperties";
     public static final String NUMBER = "number";
     public static final String PERSON = "person";
     public static final String PHONE_NUMBERS = "phoneNumbers";
     public static final String STATE = "state";
     public static final String STREET = "street";
+    public static final String STRING_DISPLAY_CONDITION = "%s == '%s'";
     public static final String TYPE = "type";
     public static final String ZIP = "zip";
-
-    public static final ModifiableStringProperty FIRST_NAME_PROPERTY = string(FIRST_NAME)
-        .label("First name")
-        .description("The first name of the person.")
-        .required(true);
-
-    public static final ModifiableStringProperty LAST_NAME_PROPERTY = string(LAST_NAME)
-        .label("Last name")
-        .description("The last name of the person.")
-        .required(true);
-
-    public static final ModifiableStringProperty NAME_PROPERTY = string(NAME)
-        .label("Name")
-        .description("The name of the organisation.")
-        .required(true);
 
     private CapsuleCRMConstants() {
     }
