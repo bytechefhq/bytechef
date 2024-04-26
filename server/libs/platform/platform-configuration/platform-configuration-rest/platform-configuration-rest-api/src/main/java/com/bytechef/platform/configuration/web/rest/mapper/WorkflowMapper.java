@@ -77,7 +77,11 @@ public abstract class WorkflowMapper {
                 (int) getWorkflowTaskConnectionsCount(workflowTasks) +
                     (int) getWorkflowTriggerConnectionsCount(workflowTriggers));
             workflowBasicModel.setInputsCount(CollectionUtils.size(workflow.getInputs()));
-            workflowBasicModel.setManualTrigger(CollectionUtils.isEmpty(WorkflowTrigger.of(workflow)));
+            workflowBasicModel.setManualTrigger(
+                CollectionUtils.isEmpty(workflowTriggers) ||
+                    CollectionUtils.contains(
+                        CollectionUtils.map(workflowTriggers, WorkflowTrigger::getName),
+                        "manual"));
             workflowBasicModel.setWorkflowTaskComponentNames(
                 workflowTasks
                     .stream()

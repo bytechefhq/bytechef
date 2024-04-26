@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class TaskExecutionServiceClient implements TaskExecutionService {
+public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String TASK_EXECUTION_SERVICE = "/remote/task-execution-service";
@@ -29,7 +29,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
     private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public TaskExecutionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+    public RemoteTaskExecutionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
@@ -41,6 +41,16 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
                 .path(TASK_EXECUTION_SERVICE + "/create")
                 .build(),
             taskExecution, TaskExecution.class);
+    }
+
+    @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteJobTaskExecutions(long jobId) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

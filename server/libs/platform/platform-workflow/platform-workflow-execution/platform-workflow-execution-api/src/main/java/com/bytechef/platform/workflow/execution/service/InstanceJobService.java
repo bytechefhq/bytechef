@@ -31,9 +31,13 @@ public interface InstanceJobService {
 
     InstanceJob create(long jobId, long instanceId, Type type);
 
+    void deleteInstanceJobs(long jobId, Type type);
+
     Optional<Long> fetchLastJobId(long instanceId, Type type);
 
     Optional<Long> fetchJobInstanceId(long jobId, Type type);
+
+    List<Long> getJobIds(long instanceId, Type type);
 
     Page<Long> getJobIds(
         Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,

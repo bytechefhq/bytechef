@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.constant.ProjectInstanceErrorType;
 import com.bytechef.automation.configuration.domain.Project;
@@ -48,6 +49,7 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -70,12 +72,14 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private final InstanceJobFacade instanceJobFacade;
     private final InstanceJobService instanceJobService;
+    private final JobFacade jobFacade;
     private final JobService jobService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
     private final TagService tagService;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final TriggerExecutionService triggerExecutionService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
     private final String webhookUrl;
     private final WorkflowConnectionFacade workflowConnectionFacade;
@@ -83,20 +87,24 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobService jobService,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TagService tagService, TriggerDefinitionService triggerDefinitionService,
-        TriggerLifecycleFacade triggerLifecycleFacade, @Value("${bytechef.webhook-url}") String webhookUrl,
+        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobFacade jobFacade,
+        JobService jobService, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
+        TagService tagService, TriggerDefinitionService triggerDefinitionService,
+        TriggerExecutionService triggerExecutionService, TriggerLifecycleFacade triggerLifecycleFacade,
+        @Value("${bytechef.webhook-url}") String webhookUrl,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
 
         this.instanceJobFacade = instanceJobFacade;
         this.instanceJobService = instanceJobService;
+        this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
         this.tagService = tagService;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.triggerExecutionService = triggerExecutionService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
         this.webhookUrl = webhookUrl;
         this.workflowConnectionFacade = workflowConnectionFacade;
@@ -171,28 +179,33 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public void deleteProjectInstance(long id) {
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-            .getProjectInstanceWorkflows(id);
+        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
-        if (OptionalUtils.isPresent(instanceJobService.fetchLastJobId(id, Type.AUTOMATION))) {
+        if (projectInstance.isEnabled()) {
             throw new ApplicationException(
-                "ProjectInstance id=%s has executed workflows".formatted(id),
-                ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
+                "Project instance id=%s is enabled".formatted(id), ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
+        }
+
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows =
+            projectInstanceWorkflowService.getProjectInstanceWorkflows(id);
+
+        List<Long> jobIds = instanceJobService.getJobIds(id, Type.AUTOMATION);
+
+        for (long jobId : jobIds) {
+            triggerExecutionService.deleteJobTriggerExecution(jobId);
+
+            instanceJobService.deleteInstanceJobs(jobId, Type.AUTOMATION);
+
+            jobFacade.deleteJob(jobId);
         }
 
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            if (projectInstanceWorkflow.isEnabled()) {
-                throw new ApplicationException(
-                    "ProjectInstanceWorkflow id=%s must be disabled".formatted(projectInstanceWorkflow.getId()),
-                    ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
-            }
-
             projectInstanceWorkflowService.delete(projectInstanceWorkflow.getId());
         }
 
         projectInstanceService.delete(id);
 
-// TODO find a way to delete ll tags not referenced anymore
+// TODO find a way to delete all tags not referenced anymore
 //        project.getTagIds()
 //            .forEach(tagService::delete);
     }
@@ -453,7 +466,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                 triggerWorkflowNodeType.componentOperationName());
 
-            if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK) {
+            if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
+                !Objects.equals(triggerDefinition.getName(), "manual")) {
+
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
                         Type.AUTOMATION, projectInstanceId, workflow.getId(), workflowTrigger.getName()));

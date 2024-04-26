@@ -50,10 +50,10 @@ public class WorkflowExecutionConfiguration {
     @Bean
     JobFacade jobFacade(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         return new JobFacadeImpl(
-            eventPublisher, contextService, jobService, taskFileStorage, workflowService);
+            eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
     }
 
     @Bean

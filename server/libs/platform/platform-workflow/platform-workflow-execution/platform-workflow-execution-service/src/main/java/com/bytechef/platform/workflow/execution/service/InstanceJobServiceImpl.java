@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,12 @@ public class InstanceJobServiceImpl implements InstanceJobService {
     }
 
     @Override
+    public void deleteInstanceJobs(long jobId, Type type) {
+        instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
+            .ifPresent(instanceJob -> instanceJobRepository.deleteById(Validate.notNull(instanceJob.getId(), "id")));
+    }
+
+    @Override
     public Optional<Long> fetchLastJobId(long instanceId, Type type) {
         return instanceJobRepository
             .findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type.ordinal())
@@ -59,6 +66,11 @@ public class InstanceJobServiceImpl implements InstanceJobService {
     public Optional<Long> fetchJobInstanceId(long jobId, Type type) {
         return instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(InstanceJob::getInstanceId);
+    }
+
+    @Override
+    public List<Long> getJobIds(long instanceId, Type type) {
+        return instanceJobRepository.findallJobIds(instanceId, type.ordinal());
     }
 
     @Override

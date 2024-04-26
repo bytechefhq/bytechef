@@ -24,7 +24,7 @@ import com.bytechef.platform.exception.ErrorType;
  */
 public enum ProjectErrorType implements ErrorType {
 
-    CREATE_PROJECT(100), DELETE_WORKFLOW(101), REMOVE_WORKFLOW(102);
+    DELETE_WORKFLOW(100), REMOVE_WORKFLOW(101), UPDATE_OLD_WORKFLOW(102);
 
     private final int errorKey;
 

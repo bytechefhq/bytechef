@@ -9,6 +9,7 @@ package com.bytechef.platform.workflow.execution.remote.web.rest.service;
 
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class RemoteInstanceJobServiceController {
 
     private final InstanceJobService instanceJobService;
 
+    @SuppressFBWarnings("EI")
     public RemoteInstanceJobServiceController(InstanceJobService instanceJobService) {
         this.instanceJobService = instanceJobService;
     }

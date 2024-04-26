@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.repository.TriggerExecutionRepository;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,8 +46,18 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
     }
 
     @Override
+    public void delete(long id) {
+        triggerExecutionRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteJobTriggerExecution(long id) {
+
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public TriggerExecution getJobTriggerExecution(long jobId) {
+    public Optional<TriggerExecution> fetchJobTriggerExecution(long jobId) {
         return triggerExecutionRepository.findByJobId(jobId);
     }
 

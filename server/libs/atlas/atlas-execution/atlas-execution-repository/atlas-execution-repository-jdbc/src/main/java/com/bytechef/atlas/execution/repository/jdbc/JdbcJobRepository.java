@@ -19,6 +19,8 @@ package com.bytechef.atlas.execution.repository.jdbc;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import java.util.Optional;
+
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -59,4 +61,8 @@ public interface JdbcJobRepository
     Job findByTaskExecutionId(@Param("taskExecutionId") Long taskExecutionId);
 
     Job save(Job job);
+
+    @Modifying
+    @Query("UPDATE job SET workflow_id = :newWorkflowId WHERE workflow_id = :curWorkflowId")
+    void updateWorkflowId(@Param("curWorkflowId") String curWorkflowId, @Param("newWorkflowId") String newWorkflowId);
 }

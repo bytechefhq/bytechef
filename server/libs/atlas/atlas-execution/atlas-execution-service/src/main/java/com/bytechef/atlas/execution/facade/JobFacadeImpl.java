@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
@@ -45,17 +46,19 @@ public class JobFacadeImpl implements JobFacade {
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final JobService jobService;
+    private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.jobService = jobService;
+        this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
@@ -83,12 +86,20 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
-    public void restartJob(Long id) {
+    @Transactional
+    public void deleteJob(long id) {
+        taskExecutionService.deleteJobTaskExecutions(id);
+
+        jobService.deleteJob(id);
+    }
+
+    @Override
+    public void restartJob(long id) {
         eventPublisher.publishEvent(new ResumeJobEvent(id));
     }
 
     @Override
-    public void stopJob(Long id) {
+    public void stopJob(long id) {
         eventPublisher.publishEvent(new StopJobEvent(id));
     }
 }

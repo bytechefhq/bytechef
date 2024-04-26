@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.service;
 
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -25,7 +26,11 @@ public interface TriggerExecutionService {
 
     TriggerExecution create(TriggerExecution triggerExecution);
 
-    TriggerExecution getJobTriggerExecution(long jobId);
+    void delete(long id);
+
+    void deleteJobTriggerExecution(long id);
+
+    Optional<TriggerExecution> fetchJobTriggerExecution(long jobId);
 
     TriggerExecution getTriggerExecution(long id);
 

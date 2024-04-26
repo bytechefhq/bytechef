@@ -48,6 +48,20 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
+    public void delete(long id) {
+        taskExecutionRepository.findById(id);
+    }
+
+    @Override
+    public void deleteJobTaskExecutions(long jobId) {
+        List<TaskExecution> taskExecutions = getJobTaskExecutions(jobId);
+
+        for (TaskExecution taskExecution : taskExecutions) {
+            taskExecutionRepository.deleteById(Validate.notNull(taskExecution.getId(), "id"));
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
         return OptionalUtils.get(taskExecutionRepository.findById(id));

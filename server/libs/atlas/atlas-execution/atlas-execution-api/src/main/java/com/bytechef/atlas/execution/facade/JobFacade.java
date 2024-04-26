@@ -25,7 +25,9 @@ public interface JobFacade {
 
     long createJob(JobParameters jobParameters);
 
-    void restartJob(Long id);
+    void deleteJob(long id);
 
-    void stopJob(Long id);
+    void restartJob(long id);
+
+    void stopJob(long id);
 }

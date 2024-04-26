@@ -17,8 +17,11 @@
 package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,4 +35,7 @@ public interface InstanceJobRepository extends ListCrudRepository<InstanceJob, L
     Optional<InstanceJob> findByJobIdAndType(Long jobId, int type);
 
     Optional<InstanceJob> findTop1ByInstanceIdAndTypeOrderByJobIdDesc(long instanceId, int type);
+
+    @Query("SELECT job_id FROM instance_job where instance_id = :instanceId and type = :type")
+    List<Long> findallJobIds(@Param("instanceId") long instanceId, @Param("type") int type);
 }

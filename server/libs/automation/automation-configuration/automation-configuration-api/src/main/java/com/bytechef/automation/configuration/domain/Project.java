@@ -155,7 +155,11 @@ public final class Project {
         return getClass().hashCode();
     }
 
-    public Map<Integer, List<String>> getAllWorkflowIds() {
+    public List<String> getAllWorkflowIds() {
+        return CollectionUtils.map(projectWorkflows, ProjectWorkflow::getWorkflowId);
+    }
+
+    public Map<Integer, List<String>> getAllWorkflowIdMap() {
         return projectWorkflows.stream()
             .collect(Collectors.groupingBy(
                 ProjectWorkflow::getProjectVersion,
@@ -229,7 +233,7 @@ public final class Project {
     }
 
     public List<String> getWorkflowIds(int projectVersion) {
-        Map<Integer, List<String>> workflowIdMap = getAllWorkflowIds();
+        Map<Integer, List<String>> workflowIdMap = getAllWorkflowIdMap();
 
         if (workflowIdMap.containsKey(projectVersion)) {
             return workflowIdMap.get(projectVersion);

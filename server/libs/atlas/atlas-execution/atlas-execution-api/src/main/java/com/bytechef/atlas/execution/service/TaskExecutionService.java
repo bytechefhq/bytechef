@@ -26,6 +26,10 @@ public interface TaskExecutionService {
 
     TaskExecution create(TaskExecution taskExecution);
 
+    void delete(long id);
+
+    void deleteJobTaskExecutions(long jobId);
+
     TaskExecution getTaskExecution(long id);
 
     List<TaskExecution> getJobTaskExecutions(long jobId);

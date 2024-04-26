@@ -27,7 +27,6 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
@@ -123,7 +122,9 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
                 OptionalUtils.orElse(projectInstanceIdOptional, null),
-                triggerExecutionService.getJobTriggerExecution(Validate.notNull(job.getId(), "id")), job));
+                OptionalUtils.orElse(
+                    triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
+                job));
     }
 
     @Override
@@ -139,7 +140,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         } else if (projectId != null) {
             Project project = projectService.getProject(projectId);
 
-            workflowIds.addAll(project.getWorkflowIds(getProjectVersion(project.getLastVersion(), projectInstanceId)));
+            workflowIds.addAll(project.getAllWorkflowIds());
         } else {
             workflowIds.addAll(
                 CollectionUtils.map(projectFacade.getProjectWorkflows(), Workflow::getId));
@@ -171,9 +172,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                 Validate.notNull(job.getId(), "id"),
                 CollectionUtils.getFirst(
                     projects,
-                    project -> CollectionUtils.contains(
-                        project.getWorkflowIds(getProjectVersion(project.getLastVersion(), projectInstanceId)),
-                        job.getWorkflowId())),
+                    project -> CollectionUtils.contains(project.getAllWorkflowIds(), job.getWorkflowId())),
                 OptionalUtils.map(
                     instanceJobService.fetchJobInstanceId(job.getId(), Type.AUTOMATION),
                     projectInstanceService::getProjectInstance),
@@ -181,7 +180,9 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                 CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
                 getTriggerExecutionDTO(
                     projectInstanceId,
-                    triggerExecutionService.getJobTriggerExecution(Validate.notNull(job.getId(), "id")), job)));
+                    OptionalUtils.orElse(
+                        triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
+                    job)));
         }
 
         return workflowExecutionPage;
@@ -211,16 +212,6 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                         ? null
                         : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
             });
-    }
-
-    private int getProjectVersion(int lastProjectVersion, Long projectInstanceId) {
-        ProjectInstance projectInstance = null;
-
-        if (projectInstanceId != null) {
-            projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
-        }
-
-        return projectInstance == null ? lastProjectVersion : projectInstance.getProjectVersion();
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

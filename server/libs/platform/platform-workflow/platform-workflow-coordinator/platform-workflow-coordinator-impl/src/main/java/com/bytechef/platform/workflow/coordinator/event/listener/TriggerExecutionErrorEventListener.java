@@ -21,6 +21,7 @@ import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class TriggerExecutionErrorEventListener implements ErrorEventListener {
 
     private final TriggerExecutionService triggerExecutionService;
 
+    @SuppressFBWarnings("EI")
     public TriggerExecutionErrorEventListener(TriggerExecutionService triggerExecutionService) {
         this.triggerExecutionService = triggerExecutionService;
     }
