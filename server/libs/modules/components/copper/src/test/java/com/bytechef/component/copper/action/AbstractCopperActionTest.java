@@ -19,18 +19,14 @@ package com.bytechef.component.copper.action;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.copper.util.CopperUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
  * @author Monika Domiter
@@ -39,20 +35,14 @@ public abstract class AbstractCopperActionTest {
 
     protected ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
         ArgumentCaptor.forClass(Context.Http.Body.class);
-    protected MockedStatic<CopperUtils> copperUtilsMockedStatic;
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
     protected Parameters mockedParameters = mock(Parameters.class);
     protected Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
-    Map<String, Object> responeseMap = Map.of("key", "value");
+    protected Map<String, Object> responeseMap = Map.of("key", "value");
 
     @BeforeEach
     public void beforeEach() {
-        copperUtilsMockedStatic = mockStatic(CopperUtils.class);
-
-        copperUtilsMockedStatic.when(() -> CopperUtils.getHeaders(mockedParameters))
-            .thenReturn(Map.of());
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.headers(anyMap()))
@@ -67,8 +57,4 @@ public abstract class AbstractCopperActionTest {
             .thenReturn(responeseMap);
     }
 
-    @AfterEach
-    public void afterEach() {
-        copperUtilsMockedStatic.close();
-    }
 }
