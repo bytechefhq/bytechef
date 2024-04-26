@@ -633,7 +633,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "loadOptionsDependsOn": [ "datasheetId" ],
         "options": { }
       }
     }, {
