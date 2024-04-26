@@ -16,9 +16,9 @@
 
 package com.bytechef.component.freshsales.util;
 
-import com.bytechef.component.definition.Parameters;
-
 import static com.bytechef.component.definition.Authorization.USERNAME;
+
+import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Monika Domiter
