@@ -52,7 +52,7 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
         try (MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic =
             mockStatic(GoogleSheetsRowUtils.class)) {
             googleSheetsRowUtilsMockedStatic
-                .when(() -> GoogleSheetsRowUtils.getRow(
+                .when(() -> GoogleSheetsRowUtils.getRowValues(
                     any(Sheets.class),
                     spreadsheetIdArgumentCaptor.capture(),
                     sheetNameArgumentCaptor.capture(),

@@ -30,7 +30,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils.getRow;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils.getRowValues;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 
 import com.bytechef.component.definition.ActionContext;
@@ -72,7 +72,7 @@ public class GoogleSheetsFindRowByNumAction {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        List<Object> row = getRow(
+        List<Object> row = getRowValues(
             sheets,
             inputParameters.getRequiredString(SPREADSHEET_ID),
             inputParameters.getRequiredString(SHEET_NAME),

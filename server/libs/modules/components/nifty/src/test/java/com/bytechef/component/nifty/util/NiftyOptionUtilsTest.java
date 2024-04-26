@@ -57,7 +57,7 @@ class NiftyOptionUtilsTest {
     }
 
     @Test
-    void testGetTaskGroupId() {
+    void testGetTaskGroupIdOptions() {
         Map<String, Object> body = new HashMap<>();
         Map<String, String> task = new LinkedHashMap<>();
         task.put("name", "taskName");
@@ -72,11 +72,11 @@ class NiftyOptionUtilsTest {
         expectedOptions.add(option("taskName", "123"));
 
         assertEquals(expectedOptions,
-            NiftyOptionUtils.getTaskGroupId(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            NiftyOptionUtils.getTaskGroupIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
-    void testGetProjectId() {
+    void testGetProjectIdOptions() {
         Map<String, Object> body = new HashMap<>();
         Map<String, String> task = new LinkedHashMap<>();
         task.put("name", "ProjectName");
@@ -91,6 +91,6 @@ class NiftyOptionUtilsTest {
         expectedOptions.add(option("ProjectName", "123"));
 
         assertEquals(expectedOptions,
-            NiftyOptionUtils.getProjectId(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            NiftyOptionUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

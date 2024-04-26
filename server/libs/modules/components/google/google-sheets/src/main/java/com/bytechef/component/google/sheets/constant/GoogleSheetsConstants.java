@@ -67,13 +67,19 @@ public class GoogleSheetsConstants {
     public static final ModifiableStringProperty SPREADSHEET_ID_PROPERTY = string(SPREADSHEET_ID)
         .label("Spreadsheet")
         .description("The spreadsheet to apply the updates to.")
-        .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
+        .options(
+            (ActionOptionsFunction<String>) (
+                inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                context) -> GoogleSheetsUtils.getSpreadsheetIdOptions(inputParameters, connectionParameters))
         .required(true);
 
     public static final ModifiableStringProperty SPREADSHEET_ID_PROPERTY_TRIGGER = string(SPREADSHEET_ID)
         .label("Spreadsheet")
         .description("The spreadsheet to apply the updates to.")
-        .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
+        .options(
+            (TriggerOptionsFunction<String>) (
+                inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                context) -> GoogleSheetsUtils.getSpreadsheetIdOptions(inputParameters, connectionParameters))
         .required(true);
 
     public static final ModifiableIntegerProperty SHEET_ID_PROPERTY = integer(SHEET_ID)
@@ -85,13 +91,19 @@ public class GoogleSheetsConstants {
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY = string(SHEET_NAME)
         .label("Sheet")
         .description("The name of the sheet")
-        .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
+        .options(
+            (ActionOptionsFunction<String>) (
+                inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                context) -> GoogleSheetsUtils.getSheetNameOptions(inputParameters, connectionParameters))
         .required(true);
 
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY_TRIGGER = string(SHEET_NAME)
         .label("Sheet")
         .description("The name of the sheet")
-        .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
+        .options(
+            (TriggerOptionsFunction<String>) (
+                inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                context) -> GoogleSheetsUtils.getSheetNameOptions(inputParameters, connectionParameters))
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty ROW_PROPERTY = dynamicProperties(ROW)

@@ -17,7 +17,9 @@
 package com.bytechef.component.google.sheets.trigger;
 
 import static com.bytechef.component.definition.ActionContext.Data.Scope.WORKFLOW;
-import static com.bytechef.component.definition.ComponentDSL.*;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY_TRIGGER;
@@ -47,8 +49,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class GoogleSheetsOnRowAdded {
+/**
+ * @author Marko Kriskovic
+ */
+public class GoogleSheetsOnRowAddedTrigger {
+
     private static final String ON_ROW_ADDED = "onRowAdded";
+
     public static final ComponentDSL.ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger(ON_ROW_ADDED)
         .title("OnRowAdded")
         .description("Triggers when you add a row in google sheets. Refresh the page when you're done putting input.")
@@ -59,13 +66,15 @@ public class GoogleSheetsOnRowAdded {
             SHEET_NAME_PROPERTY_TRIGGER)
         .outputSchema(
             array()
-                .items(object()
-                    .additionalProperties(string(), array().items(string()))))
-        .dynamicWebhookEnable(GoogleSheetsOnRowAdded::dynamicWebhookEnable)
-        .dynamicWebhookDisable(GoogleSheetsOnRowAdded::dynamicWebhookDisable)
-        .dynamicWebhookRequest(GoogleSheetsOnRowAdded::dynamicWebhookRequest);
+                .items(
+                    object()
+                        .additionalProperties(string(), array().items(string()))))
+        .dynamicWebhookEnable(GoogleSheetsOnRowAddedTrigger::dynamicWebhookEnable)
+        .dynamicWebhookDisable(GoogleSheetsOnRowAddedTrigger::dynamicWebhookDisable)
+        .dynamicWebhookRequest(GoogleSheetsOnRowAddedTrigger::dynamicWebhookRequest);
 
-    private GoogleSheetsOnRowAdded() {}
+    private GoogleSheetsOnRowAddedTrigger() {
+    }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
@@ -74,8 +83,7 @@ public class GoogleSheetsOnRowAdded {
         Drive drive = GoogleServices.getDrive(connectionParameters);
         String fileId = inputParameters.getRequiredString(SPREADSHEET_ID);
 
-        String uuid = UUID.randomUUID()
-            .toString();
+        String uuid = String.valueOf(UUID.randomUUID());
 
         Channel channelConfig = new Channel()
             .setAddress(webhookUrl)
@@ -83,7 +91,8 @@ public class GoogleSheetsOnRowAdded {
             .setPayload(true)
             .setType("web_hook");
 
-        Channel channel = null;
+        Channel channel;
+
         try {
             channel = drive.files()
                 .watch(fileId, channelConfig)
@@ -92,8 +101,8 @@ public class GoogleSheetsOnRowAdded {
             throw new RuntimeException(e);
         }
 
-        return new DynamicWebhookEnableOutput(Map.of("id", channel.getId(), "resourceId", channel.getResourceId()),
-            null);
+        return new DynamicWebhookEnableOutput(
+            Map.of("id", channel.getId(), "resourceId", channel.getResourceId()), null);
     }
 
     protected static void dynamicWebhookDisable(
@@ -124,11 +133,13 @@ public class GoogleSheetsOnRowAdded {
 
         Optional<Object> currentRowNumOptional =
             context.data(data -> data.fetchValue(WORKFLOW, "currentRow"));
+
         int currentRowNum = currentRowNumOptional.map(o -> Integer.parseInt(o.toString()))
             .orElse(0);
 
-        List<List<Object>> values = GoogleSheetsUtils.getAll(sheets, inputParameters.getRequiredString(SPREADSHEET_ID),
-            inputParameters.getRequiredString(SHEET_NAME));
+        List<List<Object>> values =
+            GoogleSheetsUtils.getSpreadsheetValues(sheets, inputParameters.getRequiredString(SPREADSHEET_ID),
+                inputParameters.getRequiredString(SHEET_NAME));
 
         if (values == null)
             return Collections.emptyList();

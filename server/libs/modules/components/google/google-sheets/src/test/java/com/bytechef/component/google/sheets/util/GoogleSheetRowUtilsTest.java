@@ -80,7 +80,7 @@ class GoogleSheetRowUtilsTest {
             when(mockedValueRange.getValues())
                 .thenReturn(List.of(List.of(values)));
 
-            List<Object> result = GoogleSheetsRowUtils.getRow(mockedSheets, spreadSheetId, sheetName, rowNumber);
+            List<Object> result = GoogleSheetsRowUtils.getRowValues(mockedSheets, spreadSheetId, sheetName, rowNumber);
 
             assertEquals(List.of(values), result);
             assertEquals("UNFORMATTED_VALUE", valueRenderOptionArgumentCaptor.getValue());

@@ -35,7 +35,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
@@ -72,7 +71,7 @@ public class GoogleSheetsUtils {
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
         if (isFirstRowHeader) {
-            List<Object> firstRow = GoogleSheetsRowUtils.getRow(
+            List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
                 GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
                 inputParameters.getRequiredString(SHEET_NAME), 1);
 
@@ -104,24 +103,21 @@ public class GoogleSheetsUtils {
         Map<String, Object> valuesMap;
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
-            List<Object> firstRow = GoogleSheetsRowUtils.getRow(
+            List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
                 sheets, inputParameters.getRequiredString(SPREADSHEET_ID),
-                inputParameters.getRequiredString(SHEET_NAME),
-                1);
+                inputParameters.getRequiredString(SHEET_NAME), 1);
 
-            valuesMap = IntStream
-                .range(0, row.size())
+            valuesMap = IntStream.range(0, row.size())
                 .boxed()
                 .collect(
-                    Collectors.toMap(i -> String.valueOf(firstRow.get(i)), i -> row.get(i)
-                        .toString(), (a, b) -> b, LinkedHashMap::new));
+                    Collectors.toMap(i -> String.valueOf(firstRow.get(i)),
+                        i -> String.valueOf(row.get(i)), (a, b) -> b, LinkedHashMap::new));
         } else {
-            valuesMap = IntStream
-                .range(0, row.size())
+            valuesMap = IntStream.range(0, row.size())
                 .boxed()
                 .collect(
-                    Collectors.toMap(i -> columnToLabel(i + 1), i -> row.get(i)
-                        .toString(), (a, b) -> b, LinkedHashMap::new));
+                    Collectors.toMap(
+                        i -> columnToLabel(i + 1), i -> String.valueOf(row.get(i)), (a, b) -> b, LinkedHashMap::new));
         }
 
         return valuesMap;
@@ -130,10 +126,13 @@ public class GoogleSheetsUtils {
     public static List<Map<String, Object>> getMapOfValuesForRowAndColumn(
         Parameters inputParameters, Sheets sheets, List<List<Object>> values, int currentRowNum, int newRowNum)
         throws IOException {
+
         List<Map<String, Object>> list = new ArrayList<>();
+
         for (int i = currentRowNum; i < newRowNum; i++) {
             list.add(getMapOfValuesForRow(inputParameters, sheets, values.get(i)));
         }
+
         return list;
     }
 
@@ -147,13 +146,13 @@ public class GoogleSheetsUtils {
         } else {
             row = inputParameters.getRequiredList(VALUES, Object.class);
         }
+
         return row;
     }
 
     public static List<Option<String>> getSheetIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context)
-        throws IOException {
+        String searchText, ActionContext context) throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -173,31 +172,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetNameOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) throws IOException {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        List<Sheet> sheetsList = GoogleServices.getSheets(connectionParameters)
-            .spreadsheets()
-            .get(inputParameters.getRequiredString(SPREADSHEET_ID))
-            .execute()
-            .getSheets();
-
-        for (Sheet sheet : sheetsList) {
-            SheetProperties sheetProperties = sheet.getProperties();
-
-            String sheetTitle = sheetProperties.getTitle();
-
-            options.add(option(sheetTitle, sheetTitle));
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getSheetNameOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, TriggerContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters) throws IOException {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -219,9 +194,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSpreadsheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context)
-        throws IOException {
+        Parameters inputParameters, Parameters connectionParameters) throws IOException {
 
         List<File> files = GoogleServices.getDrive(connectionParameters)
             .files()
@@ -241,27 +214,17 @@ public class GoogleSheetsUtils {
         return options;
     }
 
-    public static List<Option<String>> getSpreadsheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, TriggerContext context)
+    public static List<List<Object>> getSpreadsheetValues(Sheets sheets, String spreadSheetId, String sheetName)
         throws IOException {
 
-        List<File> files = GoogleServices.getDrive(connectionParameters)
-            .files()
-            .list()
-            .setQ("mimeType='application/vnd.google-apps.spreadsheet'")
-            .setIncludeItemsFromAllDrives(inputParameters.getBoolean(INCLUDE_ITEMS_FROM_ALL_DRIVES))
-            .setSupportsAllDrives(true)
+        return sheets.spreadsheets()
+            .values()
+            .get(spreadSheetId, sheetName)
+            .setValueRenderOption("UNFORMATTED_VALUE")
+            .setDateTimeRenderOption("FORMATTED_STRING")
+            .setMajorDimension("ROWS")
             .execute()
-            .getFiles();
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (File file : files) {
-            options.add(option(file.getName(), file.getId()));
-        }
-
-        return options;
+            .getValues();
     }
 
     private static String columnToLabel(int columnNumber) {
@@ -274,19 +237,5 @@ public class GoogleSheetsUtils {
         }
 
         return "column_" + columnName;
-    }
-
-    public static List<List<Object>> getAll(Sheets sheets, String spreadSheetId, String sheetName)
-        throws IOException {
-
-        return sheets
-            .spreadsheets()
-            .values()
-            .get(spreadSheetId, sheetName)
-            .setValueRenderOption("UNFORMATTED_VALUE")
-            .setDateTimeRenderOption("FORMATTED_STRING")
-            .setMajorDimension("ROWS")
-            .execute()
-            .getValues();
     }
 }
