@@ -62,8 +62,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": { },
-      "clientSecret": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -71,7 +70,8 @@
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "authorizationCallback": null
+      "authorizationUrl": { },
+      "clientSecret": null
     } ],
     "properties": null,
     "version": 1,
@@ -152,11 +152,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
+      "controlType": "SELECT",
       "optionsDataSource": {
         "loadOptionsDependsOn": [ "spreadsheetId" ],
         "options": { }
-      },
-      "controlType": "SELECT"
+      }
     }, {
       "advancedOption": null,
       "description": "If the first row is header",
@@ -184,8 +184,8 @@
     } ],
     "title": "Clear sheet",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -259,11 +259,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
+      "controlType": "SELECT",
       "optionsDataSource": {
         "loadOptionsDependsOn": [ "spreadsheetId" ],
         "options": { }
-      },
-      "controlType": "SELECT"
+      }
     }, {
       "advancedOption": null,
       "description": "The row number to delete",
@@ -281,13 +281,13 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Delete row",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -364,7 +364,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "loadOptionsDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -408,12 +408,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Find row by number",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -473,8 +472,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -499,11 +498,12 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -580,7 +580,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "loadOptionsDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -653,7 +653,6 @@
     } ],
     "title": "Insert row",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -713,8 +712,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -739,11 +738,12 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -820,7 +820,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "loadOptionsDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -840,8 +840,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "If the first row is header",
@@ -884,7 +884,6 @@
     } ],
     "title": "Update row",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -944,8 +943,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "NUMBER"
+          "controlType": "NUMBER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -970,11 +969,12 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   } ],
   "triggers": [ {
     "batch": null,
@@ -1051,7 +1051,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "loadOptionsDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     } ],
@@ -1062,11 +1062,10 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": null,
-    "deduplicate": null,
-    "poll": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1155,27 +1154,28 @@
             "minItems": null,
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { }
+    "deduplicate": null,
+    "poll": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null
   } ]
 }
