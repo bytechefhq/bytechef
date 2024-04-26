@@ -21,7 +21,6 @@ import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
 import static com.bytechef.component.copper.constant.CopperConstants.CREATE_ACTIVITY;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
-import static com.bytechef.component.copper.constant.CopperConstants.DETAILS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
@@ -35,7 +34,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
@@ -51,9 +50,10 @@ public class CopperCreateActivityAction {
             string(ACTIVITY_TYPE)
                 .label("Activity type")
                 .description("The Activity Type of this Activity.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) CopperOptionUtils::getActivityTypeOptions)
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getActivityTypeOptions)
                 .required(true),
-            DETAILS_PROPERTY
+            string(DETAILS)
+                .label("Details")
                 .description("Text body of this Activity.")
                 .required(true),
             object(PARENT)

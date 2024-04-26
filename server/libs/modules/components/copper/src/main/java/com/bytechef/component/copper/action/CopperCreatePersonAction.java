@@ -17,39 +17,31 @@
 package com.bytechef.component.copper.action;
 
 import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS;
-import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
-import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
+import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY_LABEL;
 import static com.bytechef.component.copper.constant.CopperConstants.CITY;
 import static com.bytechef.component.copper.constant.CopperConstants.COMPANY_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_ID;
-import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.COUNTRY;
 import static com.bytechef.component.copper.constant.CopperConstants.CREATE_PERSON;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
-import static com.bytechef.component.copper.constant.CopperConstants.DETAILS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.EMAIL;
 import static com.bytechef.component.copper.constant.CopperConstants.EMAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
-import static com.bytechef.component.copper.constant.CopperConstants.NAME_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.NUMBER;
 import static com.bytechef.component.copper.constant.CopperConstants.OTHER;
 import static com.bytechef.component.copper.constant.CopperConstants.PHONE_NUMBERS;
-import static com.bytechef.component.copper.constant.CopperConstants.PHONE_NUMBERS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.POSTAL_CODE;
 import static com.bytechef.component.copper.constant.CopperConstants.SOCIALS;
-import static com.bytechef.component.copper.constant.CopperConstants.SOCIALS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.STATE;
 import static com.bytechef.component.copper.constant.CopperConstants.STREET;
 import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
-import static com.bytechef.component.copper.constant.CopperConstants.TAGS_PROPERTY;
 import static com.bytechef.component.copper.constant.CopperConstants.TITLE;
 import static com.bytechef.component.copper.constant.CopperConstants.URL;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
-import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES_PROPERTY;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -59,9 +51,9 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 
@@ -74,8 +66,10 @@ public class CopperCreatePersonAction {
         .title("Create person")
         .description("Creates a new Person")
         .properties(
-            NAME_PROPERTY
-                .description("The first and last name of the Person."),
+            string(NAME)
+                .label("Name")
+                .description("The first and last name of the Person.")
+                .required(true),
             array(EMAILS)
                 .label("Emails")
                 .description("Email addresses belonging to the Person.")
@@ -96,8 +90,11 @@ public class CopperCreatePersonAction {
                                     option(OTHER, OTHER))
                                 .required(false)))
                 .required(false),
-            ASSIGNEE_PROPERTY
-                .description("User that will be the owner of the Person."),
+            string(ASSIGNEE_ID)
+                .label("Assignee")
+                .description("User that will be the owner of the Person.")
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
+                .required(false),
             string(TITLE)
                 .label("Title")
                 .description("The professional title of the Person.")
@@ -105,22 +102,107 @@ public class CopperCreatePersonAction {
             string(COMPANY_ID)
                 .label("Company")
                 .description("Primary Company with which the Person is associated.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) CopperOptionUtils::getCompanyIdOptions)
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getCompanyIdOptions)
                 .required(false),
-            CONTACT_TYPE_PROPERTY
-                .description("The unique identifier of the Contact Type of the Person."),
-            DETAILS_PROPERTY
-                .description("Description of the person."),
-            PHONE_NUMBERS_PROPERTY
-                .description("Phone numbers belonging to the person."),
-            SOCIALS_PROPERTY
-                .description("Social profiles belonging to the Person."),
-            WEBSITES_PROPERTY
-                .description("Websites belonging to the Person."),
-            ADDRESS_PROPERTY
-                .description("Person's street, city, state, postal code, and country."),
-            TAGS_PROPERTY
-                .description("Tags associated with the Person."))
+            string(CONTACT_TYPE_ID)
+                .label("Contact type")
+                .description("The unique identifier of the Contact Type of the Person.")
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
+                .required(false),
+            string(DETAILS)
+                .label("Details")
+                .description("Description of the person.")
+                .required(false),
+            array(PHONE_NUMBERS)
+                .label("Phone numbers")
+                .description("Phone numbers belonging to the person.")
+                .items(
+                    object()
+                        .properties(
+                            string(NUMBER)
+                                .label("Number")
+                                .description("A phone number.")
+                                .required(false),
+                            string(CATEGORY)
+                                .label(CATEGORY_LABEL)
+                                .description("The category of the phone number.")
+                                .options(
+                                    option("Work", "work"),
+                                    option("Mobile", "mobile"),
+                                    option("Home", "home"),
+                                    option("Other", OTHER))
+                                .required(false)))
+                .required(false),
+            array(SOCIALS)
+                .label("Socials")
+                .description("Social profiles belonging to the Person.")
+                .items(
+                    object()
+                        .properties(
+                            string(URL)
+                                .label("URL")
+                                .description("The URL of a social profile.")
+                                .required(false),
+                            string(CATEGORY)
+                                .label(CATEGORY_LABEL)
+                                .description("The category of the social profile.")
+                                .options(
+                                    option("LinkedIn", "linkedin"),
+                                    option("Twitter", "twitter"),
+                                    option("Facebook", "facebook"),
+                                    option("Youtube", "youtube"),
+                                    option("Quora", "quora"),
+                                    option("Instagram", "instagram"),
+                                    option("Pinterest", "pinterest"),
+                                    option("Other", OTHER))
+                                .required(false)))
+                .required(false),
+            array(WEBSITES)
+                .label("Websites")
+                .description("Websites belonging to the Person.")
+                .items(
+                    object()
+                        .properties(
+                            string(URL)
+                                .label("URL")
+                                .description("The URL of a website.")
+                                .required(false),
+                            string(CATEGORY)
+                                .label(CATEGORY_LABEL)
+                                .description("The category of the website.")
+                                .options(
+                                    option("work", "work"),
+                                    option("personal", "personal"),
+                                    option(OTHER, OTHER))
+                                .required(false)))
+                .required(false),
+            object(ADDRESS)
+                .label("Address")
+                .description("Person's street, city, state, postal code, and country.")
+                .properties(
+                    string(STREET)
+                        .label("Street")
+                        .required(false),
+                    string(CITY)
+                        .label("City")
+                        .required(false),
+                    string(STATE)
+                        .label("State")
+                        .required(false),
+                    string(POSTAL_CODE)
+                        .label("Postal code")
+                        .required(false),
+                    string(COUNTRY)
+                        .label("Country")
+                        .required(false))
+                .required(false),
+            array(TAGS)
+                .label("Tags")
+                .description("Tags associated with the Person.")
+                .items(
+                    string()
+                        .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))
+                .required(false))
         .outputSchema(
             object()
                 .properties(
@@ -189,7 +271,7 @@ public class CopperCreatePersonAction {
                     TAGS, inputParameters.getList(TAGS)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 
 }
