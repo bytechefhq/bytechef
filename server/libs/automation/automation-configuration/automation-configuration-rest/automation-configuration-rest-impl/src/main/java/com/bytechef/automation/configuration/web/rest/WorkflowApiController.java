@@ -89,11 +89,15 @@ public class WorkflowApiController implements WorkflowApi {
 
     @Override
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
+        // TODO Add check regarding platform type
+
         return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowFacade);
     }
 
     @Override
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
+        // TODO Add check regarding platform type
+
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowFacade.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),
