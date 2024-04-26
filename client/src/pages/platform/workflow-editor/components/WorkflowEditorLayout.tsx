@@ -64,7 +64,7 @@ const WorkflowEditorLayout = ({
     }, [workflow.tasks?.length, refetchWorkflowNodeOutputs]);
 
     useEffect(() => {
-        const workflowComponents = workflow.tasks?.map((task) => {
+        const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((task) => {
             const {label, name, parameters, type} = task;
 
             const [componentName, operationName] = type.split('/v1/');
