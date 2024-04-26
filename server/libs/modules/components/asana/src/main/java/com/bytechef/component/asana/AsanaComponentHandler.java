@@ -85,7 +85,6 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
                             ((ModifiableArrayProperty) baseProperty2)
                                 .items(
                                     string()
-                                        .loadOptionsDependsOn(WORKSPACE)
                                         .options((ActionOptionsFunction<String>) AsanaUtils::getTagOptions));
                         }
                     }
