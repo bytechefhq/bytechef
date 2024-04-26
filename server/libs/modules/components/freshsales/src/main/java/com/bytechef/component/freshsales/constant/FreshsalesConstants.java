@@ -16,11 +16,6 @@
 
 package com.bytechef.component.freshsales.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.Property;
-
 /**
  * @author Monika Domiter
  */
@@ -51,16 +46,5 @@ public class FreshsalesConstants {
     public static final String WEBSITE = "website";
     public static final String WORK_NUMBER = "work_number";
     public static final String ZIPCODE = "zipcode";
-
-    public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
-        .label("Email")
-        .controlType(Property.ControlType.EMAIL)
-        .required(true);
-    public static final ModifiableStringProperty FIRST_NAME_PROPERTY = string(FIRST_NAME)
-        .label("First name")
-        .required(false);
-    public static final ModifiableStringProperty LAST_NAME_PROPERTY = string(LAST_NAME)
-        .label("Last name")
-        .required(false);
 
 }

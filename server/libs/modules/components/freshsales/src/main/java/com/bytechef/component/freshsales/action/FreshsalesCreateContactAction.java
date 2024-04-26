@@ -16,13 +16,6 @@
 
 package com.bytechef.component.freshsales.action;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -32,13 +25,10 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CIT
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.COUNTRY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_CONTACT;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FACEBOOK;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME_PROPERTY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.JOB_TITLE;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME_PROPERTY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LINKEDIN;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.MEDIUM;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.MOBILE_NUMBER;
@@ -47,6 +37,13 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.TWI
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.WORK_NUMBER;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ZIPCODE;
 import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Monika Domiter
@@ -57,20 +54,27 @@ public class FreshsalesCreateContactAction {
         .title("Create contact")
         .description("Add new contact in Freshsales CRM")
         .properties(
-            FIRST_NAME_PROPERTY
-                .description("First name of the contact"),
-            LAST_NAME_PROPERTY
-                .description("Last name of the contact"),
+            string(FIRST_NAME)
+                .label("First name")
+                .description("First name of the contact")
+                .required(false),
+            string(LAST_NAME)
+                .label("Last name")
+                .description("Last name of the contact")
+                .required(false),
             string(JOB_TITLE)
                 .label("Job title")
                 .description("Designation of the contact in the account they belong to")
                 .required(false),
-            EMAIL_PROPERTY
-                .description("Primary email address of the contact"),
+            string(EMAIL)
+                .label("Email")
+                .description("Primary email address of the contact")
+                .controlType(ControlType.EMAIL)
+                .required(true),
             string(WORK_NUMBER)
                 .label("Work number")
                 .description("Work phone number of the contact")
-                .controlType(Property.ControlType.PHONE)
+                .controlType(ControlType.PHONE)
                 .required(false),
             string(MOBILE_NUMBER)
                 .label("Mobile number")

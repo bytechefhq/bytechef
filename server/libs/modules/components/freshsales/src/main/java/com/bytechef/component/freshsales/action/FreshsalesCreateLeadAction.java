@@ -16,24 +16,22 @@
 
 package com.bytechef.component.freshsales.action;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_LEAD;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME_PROPERTY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME_PROPERTY;
 import static com.bytechef.component.freshsales.util.FreshsalesUtils.getUrl;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Monika Domiter
@@ -44,12 +42,19 @@ public class FreshsalesCreateLeadAction {
         .title("Create lead")
         .description("Creates a new lead")
         .properties(
-            FIRST_NAME_PROPERTY
-                .description("First name of the lead"),
-            LAST_NAME_PROPERTY
-                .description("Last name of the lead"),
-            EMAIL_PROPERTY
-                .description("Primary email address of the lead"))
+            string(FIRST_NAME)
+                .label("First name")
+                .description("First name of the lead")
+                .required(false),
+            string(LAST_NAME)
+                .label("Last name")
+                .description("Last name of the lead")
+                .required(false),
+            string(EMAIL)
+                .label("Email")
+                .description("Primary email address of the lead")
+                .controlType(ControlType.EMAIL)
+                .required(true))
         .outputSchema(
             object()
                 .properties(
@@ -73,7 +78,7 @@ public class FreshsalesCreateLeadAction {
                     EMAIL, inputParameters.getRequiredString(EMAIL)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
     }
 }
