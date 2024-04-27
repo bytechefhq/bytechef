@@ -116,9 +116,13 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
         setIsOpen(false);
 
         setTimeout(() => {
-            reset();
+            reset({
+                environment: EnvironmentModel.Development,
+                projectInstanceWorkflows: [],
+            });
 
             setActiveStepIndex(0);
+            setProjectId(undefined);
 
             if (onClose) {
                 onClose();

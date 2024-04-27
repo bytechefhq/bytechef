@@ -3,6 +3,7 @@ import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/compon
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
+import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
 import {useGetProjectVersionsQuery} from '@/queries/automation/projectVersions.queries';
 import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
@@ -11,6 +12,7 @@ import {ProjectInstanceModel, ProjectModel, ProjectStatusModel} from 'middleware
 import {Dispatch, FocusEventHandler, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormRegister, UseFormReturn, UseFormSetValue} from 'react-hook-form';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
     control: Control<ProjectInstanceModel>;
@@ -143,6 +145,8 @@ const ProjectInstanceDialogBasicStep = ({
     setProjectId,
     setValue,
 }: ProjectDialogBasicStepProps) => {
+    const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
+
     return (
         <div className="grid gap-4">
             {!projectInstance?.id && (
@@ -158,7 +162,9 @@ const ProjectInstanceDialogBasicStep = ({
                                     onBlur={field.onBlur}
                                     onChange={(item) => {
                                         if (item) {
+                                            resetWorkflowsEnabledStore();
                                             setValue('projectId', item.value);
+                                            setValue('projectVersion', undefined);
                                             setProjectId(item.value);
                                         }
                                     }}

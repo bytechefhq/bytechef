@@ -82,14 +82,14 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
             {(workflowEnabled.get(workflowId) || switchHidden) && (
                 <div className="mt-2">
                     <Tabs aria-label="Tabs" defaultValue="configuration">
-                        <TabsList className="grid w-full grid-cols-2">
+                        <TabsList className="mb-2 grid w-full grid-cols-2">
                             <TabsTrigger value="configuration">Configuration</TabsTrigger>
 
                             <TabsTrigger value="connections">Connections</TabsTrigger>
                         </TabsList>
 
                         {workflow && (
-                            <TabsContent value="configuration">
+                            <TabsContent className="mt-0" value="configuration">
                                 <ProjectInstanceDialogWorkflowsStepItemConfiguration
                                     formState={formState}
                                     register={register}
@@ -99,7 +99,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                             </TabsContent>
                         )}
 
-                        <TabsContent className="grid gap-4" value="connections">
+                        <TabsContent className="mt-0 grid gap-4" value="connections">
                             <ProjectInstanceDialogWorkflowsStepItemConnections
                                 control={control}
                                 workflowConnections={workflowConnections}
