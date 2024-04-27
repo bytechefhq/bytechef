@@ -137,6 +137,22 @@ const WorkflowEditor = ({
         }
     };
 
+    const handleNodeChange = async (changes: NodeDimensionChange[]) => {
+        const changesIds = changes.map((change) => change.id);
+
+        const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
+            changesIds.includes(node?.data.name)
+        );
+
+        if (changesIncludeExistingNodes) {
+            return;
+        }
+
+        const workflowNodes = getNodes();
+
+        setNewNode(workflowNodes.find((node) => node.id === changes[0].id));
+    };
+
     const defaultNodesWithWorkflowNodes: Array<Node> | undefined = useMemo(() => {
         if (!workflow || !componentDefinitions.length) {
             return;
@@ -240,22 +256,6 @@ const WorkflowEditor = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [defaultNodesWithWorkflowNodes, workflow.id]);
-
-    const handleNodeChange = async (changes: NodeDimensionChange[]) => {
-        const changesIds = changes.map((change) => change.id);
-
-        const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
-            changesIds.includes(node?.data.name)
-        );
-
-        if (changesIncludeExistingNodes) {
-            return;
-        }
-
-        const workflowNodes = getNodes();
-
-        setNewNode(workflowNodes.find((node) => node.id === changes[0].id));
-    };
 
     // Update nodes and edges when workflow changes
     useEffect(() => {
