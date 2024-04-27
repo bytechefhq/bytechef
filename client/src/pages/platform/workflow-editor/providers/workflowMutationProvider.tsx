@@ -1,10 +1,8 @@
-import {WorkflowModel} from '@/middleware/platform/configuration';
-import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
-import {UseMutationResult} from '@tanstack/react-query';
+import {UpdateWorkflowMutationType} from '@/types/types';
 import {createContext, useContext} from 'react';
 
 export interface WorkflowMutationStateI {
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 export interface WorkflowMutationProviderProps {

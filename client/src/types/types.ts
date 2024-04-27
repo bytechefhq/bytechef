@@ -18,7 +18,10 @@ import {
     TaskPropertyModel,
     TimePropertyModel,
     ValuePropertyModel,
+    WorkflowModel,
 } from '@/middleware/platform/configuration';
+import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
+import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
 
 export type DataPillType = {
@@ -155,3 +158,5 @@ type PropertyTypeAllType = ArrayPropertyModel &
 export type PropertyType = Omit<PropertyTypeAllType, 'controlType'> & {
     controlType?: ControlTypeModel;
 };
+
+export type UpdateWorkflowMutationType = UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;

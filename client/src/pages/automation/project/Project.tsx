@@ -33,8 +33,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
-import {ProjectModel, ProjectStatusModel, UpdateWorkflowRequest} from '@/middleware/automation/configuration';
-import {WorkflowModel} from '@/middleware/platform/configuration';
+import {ProjectModel, ProjectStatusModel} from '@/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/middleware/platform/workflow/test';
 import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {
@@ -82,8 +81,9 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/queries/platform/workflowTestConfigurations.queries';
+import {UpdateWorkflowMutationType} from '@/types/types';
 import {DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
-import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {
     CableIcon,
     CircleDotIcon,
@@ -161,7 +161,7 @@ const Header = ({
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
     projectId: number;
     runDisabled: boolean;
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
 }) => {
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
