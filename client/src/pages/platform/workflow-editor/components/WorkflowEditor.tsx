@@ -201,7 +201,7 @@ const WorkflowEditor = ({
             return workflowNodes;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow?.tasks, workflow?.triggers]);
+    }, [workflow?.tasks, workflow?.triggers, workflow.id]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
@@ -239,7 +239,7 @@ const WorkflowEditor = ({
             return workflowEdges;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultNodesWithWorkflowNodes]);
+    }, [defaultNodesWithWorkflowNodes, workflow.id]);
 
     const handleNodeChange = async (changes: NodeDimensionChange[]) => {
         const changesIds = changes.map((change) => change.id);
@@ -256,6 +256,14 @@ const WorkflowEditor = ({
 
         setNewNode(workflowNodes.find((node) => node.id === changes[0].id));
     };
+
+    // Update nodes and edges when workflow changes
+    useEffect(() => {
+        setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
+
+        setEdges(defaultEdgesWithWorkflowEdges);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflow.id]);
 
     // Set workflowComponentWithAlias when workflowComponent is fetched
     useEffect(() => {
