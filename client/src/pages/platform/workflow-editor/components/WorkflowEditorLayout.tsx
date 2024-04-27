@@ -80,12 +80,10 @@ const WorkflowEditorLayout = ({
             };
         });
 
-        if (workflowComponents) {
-            if (currentNode) {
-                setCurrentComponent(
-                    workflowComponents.find((component) => component.workflowNodeName === currentNode.name)
-                );
-            }
+        if (workflowComponents && currentNode) {
+            setCurrentComponent(
+                workflowComponents.find((component) => component.workflowNodeName === currentNode.name)
+            );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks, workflow.triggers, currentNode]);
