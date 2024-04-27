@@ -64,9 +64,11 @@ const WorkflowExecutionsTestOutputHeader = ({
 
 const WorkflowExecutionsTestOutput = ({
     onCloseClick,
+    resizablePanelSize = 30,
     workflowIsRunning,
     workflowTestExecution,
 }: {
+    resizablePanelSize?: number;
     workflowIsRunning: boolean;
     workflowTestExecution?: WorkflowTestExecutionModel;
     onCloseClick?: () => void;
@@ -122,7 +124,7 @@ const WorkflowExecutionsTestOutput = ({
 
                     {!workflowIsRunning && workflowTestExecution?.job ? (
                         <ResizablePanelGroup direction="horizontal">
-                            <ResizablePanel className="overflow-y-auto py-4" defaultSize={30}>
+                            <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
                                 <ul className="divide-y divide-gray-100">
                                     {triggerExecution && (
                                         <WorkflowTriggerExecutionItem

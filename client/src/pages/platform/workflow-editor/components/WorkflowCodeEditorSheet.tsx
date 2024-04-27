@@ -216,6 +216,7 @@ const WorkflowCodeEditorSheet = ({
                                 </div>
                             ) : (
                                 <WorkflowExecutionsTestOutput
+                                    resizablePanelSize={40}
                                     workflowIsRunning={workflowIsRunning}
                                     workflowTestExecution={workflowTestExecution}
                                 />
