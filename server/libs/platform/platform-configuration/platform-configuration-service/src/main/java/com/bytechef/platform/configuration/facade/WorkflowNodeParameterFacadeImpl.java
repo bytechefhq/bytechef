@@ -270,7 +270,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
                 if (entry.getValue() instanceof Map<?, ?> curMap) {
                     if (curMap.containsKey(WorkflowConstants.NAME)) {
-                        return getTask(workflowNodeName, List.of((Map<String, ?>) curMap));
+                        Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of((Map<String, ?>) curMap));
+
+                        if (curTaskMap != null) {
+                            return curTaskMap;
+                        }
                     } else {
                         for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
                             if (curMapEntry.getValue() instanceof Map<?, ?> curTask) {
@@ -280,8 +284,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                     continue;
                                 }
 
-                                Map<String, ?> curTaskMap =
-                                    getTask(workflowNodeName, List.of((Map<String, ?>) curTask));
+                                Map<String, ?> curTaskMap = getTask(
+                                    workflowNodeName, List.of((Map<String, ?>) curTask));
 
                                 if (curTaskMap != null) {
                                     return curTaskMap;
