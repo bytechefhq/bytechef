@@ -109,7 +109,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
         setWorkflow({
             ...workflow,
-            componentNames: componentNames.filter((componentName) => componentName !== data.name),
+            componentNames: componentNames.filter((componentName) => componentName !== data.componentName),
             tasks: updatedTasks,
         });
 
