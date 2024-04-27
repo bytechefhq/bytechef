@@ -152,7 +152,9 @@ const Project = () => {
 
     const testConfigurationDisabled =
         (workflow?.inputs ?? []).length === 0 &&
-        (workflow?.tasks ?? []).flatMap((task) => (task.connections ? task.connections : [])).length === 0;
+        [...(workflow?.triggers ?? []), ...(workflow?.tasks ?? [])].flatMap((operation) =>
+            operation.connections ? operation.connections : []
+        ).length === 0;
 
     const queryClient = useQueryClient();
 

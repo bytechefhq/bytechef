@@ -149,9 +149,10 @@ const WorkflowTestConfigurationDialog = ({
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
         useConnectionQuery();
 
-    const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? []).flatMap((task) =>
-        task.connections ? task.connections : []
-    );
+    const workflowConnections: WorkflowConnectionModel[] = [
+        ...(workflow?.triggers ?? []),
+        ...(workflow?.tasks ?? []),
+    ].flatMap((operation) => (operation.connections ? operation.connections : []));
 
     const workflowTestConfigurationConnections = workflowConnections.map((workflowConnection) => {
         const workflowTestConfigurationConnection = (workflowTestConfiguration?.connections ?? []).find(
