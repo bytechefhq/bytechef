@@ -1,5 +1,6 @@
 import {Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import {ExecutionErrorModel} from '@/middleware/automation/workflow/execution';
+import WorkflowExecutionContentClipboardButton from '@/pages/platform/workflow-executions/components/WorkflowExecutionContentClipboardButton';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {ExpandIcon} from 'lucide-react';
 import ReactJson from 'react-json-view';
@@ -36,9 +37,13 @@ const WorkflowExecutionContent = ({
                                     <div className="flex items-center justify-between uppercase">
                                         <DialogTitle>Input</DialogTitle>
 
-                                        <DialogClose asChild>
-                                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                        </DialogClose>
+                                        <div className="flex space-x-1">
+                                            <WorkflowExecutionContentClipboardButton value={input} />
+
+                                            <DialogClose asChild>
+                                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
+                                            </DialogClose>
+                                        </div>
                                     </div>
                                 </DialogHeader>
 
@@ -59,6 +64,8 @@ const WorkflowExecutionContent = ({
                                 </div>
                             </DialogContent>
                         </Dialog>
+
+                        <WorkflowExecutionContentClipboardButton value={input} />
                     </div>
                 </header>
 
@@ -93,9 +100,13 @@ const WorkflowExecutionContent = ({
                                         <div className="flex items-center justify-between uppercase">
                                             <DialogTitle>Output</DialogTitle>
 
-                                            <DialogClose asChild>
-                                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                            </DialogClose>
+                                            <div className="flex space-x-1">
+                                                <WorkflowExecutionContentClipboardButton value={output} />
+
+                                                <DialogClose asChild>
+                                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
+                                                </DialogClose>
+                                            </div>
                                         </div>
                                     </DialogHeader>
 
@@ -116,6 +127,8 @@ const WorkflowExecutionContent = ({
                                     </div>
                                 </DialogContent>
                             </Dialog>
+
+                            <WorkflowExecutionContentClipboardButton value={output} />
                         </div>
                     </header>
 
