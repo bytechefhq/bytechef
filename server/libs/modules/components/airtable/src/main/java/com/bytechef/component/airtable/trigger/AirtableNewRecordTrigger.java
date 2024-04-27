@@ -19,9 +19,11 @@ package com.bytechef.component.airtable.trigger;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 
+import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -50,10 +52,19 @@ public class AirtableNewRecordTrigger {
             string(BASE_ID)
                 .label("BaseId")
                 .description("The base id.")
+                .options(
+                    (TriggerOptionsFunction<String>) (
+                        inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                        context) -> AirtableUtils.getBaseIdOptions(context))
                 .required(true),
             string(TABLE_ID)
                 .label("TableId")
                 .description("The table id.")
+                .options(
+                    (TriggerOptionsFunction<String>) (
+                        inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                        context) -> AirtableUtils.getTableIdOptions(inputParameters, context))
+                .loadOptionsDependsOn(BASE_ID)
                 .required(true),
             string(TRIGGER_FIELD)
                 .label("TriggerField")

@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +58,10 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(modifiableProperty.getName(), BASE_ID)) {
-            ((ModifiableStringProperty) modifiableProperty).options(AirtableUtils.getBaseIdOptions());
+            ((ModifiableStringProperty) modifiableProperty).options(
+                (ActionOptionsFunction<String>) (
+                    inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                    context) -> AirtableUtils.getBaseIdOptions(context));
         }
 
         if (Objects.equals(modifiableProperty.getName(), "__item")) {
@@ -69,7 +73,10 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
         if (Objects.equals(modifiableProperty.getName(), TABLE_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
                 .loadOptionsDependsOn(BASE_ID)
-                .options(AirtableUtils.getTableIdOptions());
+                .options(
+                    (ActionOptionsFunction<String>) (
+                        inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                        context) -> AirtableUtils.getTableIdOptions(inputParameters, context));
         }
 
         return modifiableProperty;

@@ -32,7 +32,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property;
 import java.util.ArrayList;
@@ -48,23 +48,21 @@ public class AirtableUtils {
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
     @SuppressWarnings("unchecked")
-    public static ActionOptionsFunction<String> getBaseIdOptions() {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            Map<String, ?> body = context
-                .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
-                .configuration(Http.responseType(ResponseType.JSON))
-                .execute()
-                .getBody(new Context.TypeReference<>() {});
+    public static List<Option<String>> getBaseIdOptions(Context context) {
+        Map<String, ?> body = context
+            .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {});
 
-            context.logger(
-                logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
+        context.logger(
+            logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
 
-            if (body.containsKey("error")) {
-                throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
-            }
+        if (body.containsKey("error")) {
+            throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
 
-            return getOptions((Map<String, List<Map<?, ?>>>) body, "bases");
-        };
+        return getOptions((Map<String, List<Map<?, ?>>>) body, "bases");
     }
 
     public static ActionPropertiesFunction getFieldsProperties() {
@@ -143,24 +141,23 @@ public class AirtableUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static ActionOptionsFunction<String> getTableIdOptions() {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
-                inputParameters.getRequiredString(BASE_ID));
+    public static List<Option<String>> getTableIdOptions(Parameters inputParameters, Context context) {
+        String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
+            inputParameters.getRequiredString(BASE_ID));
 
-            Map<String, ?> body = context.http(http -> http.get(url)
-                .configuration(Http.responseType(ResponseType.JSON))
-                .execute()
-                .getBody(new Context.TypeReference<>() {}));
+        Map<String, ?> body = context.http(http -> http.get(url)
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new Context.TypeReference<>() {}));
 
-            if (body.containsKey("error")) {
-                throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
-            }
+        if (body.containsKey("error")) {
+            throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
 
-            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, body)));
+        context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, body)));
 
-            return getOptions((Map<String, List<Map<?, ?>>>) body, "tables");
-        };
+        return getOptions((Map<String, List<Map<?, ?>>>) body, "tables");
+
     }
 
     private static List<Option<String>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
