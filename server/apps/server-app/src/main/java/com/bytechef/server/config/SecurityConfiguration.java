@@ -20,6 +20,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 import com.bytechef.platform.user.config.SecurityProperties;
+import com.bytechef.platform.user.config.SecurityProperties.RememberMe;
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
 import com.bytechef.platform.web.rest.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -135,8 +136,7 @@ public class SecurityConfiguration {
                 rememberMe -> rememberMe
                     .rememberMeServices(rememberMeServices)
                     .rememberMeParameter("remember-me")
-                    .key(securityProperties.getRememberMe()
-                        .getKey()))
+                    .key(getRememberMeKey()))
             .exceptionHandling(
                 exceptionHanding -> exceptionHanding.defaultAuthenticationEntryPointFor(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
@@ -160,5 +160,11 @@ public class SecurityConfiguration {
     @Bean
     MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
         return new MvcRequestMatcher.Builder(introspector);
+    }
+
+    private String getRememberMeKey() {
+        RememberMe rememberMe = securityProperties.getRememberMe();
+
+        return rememberMe.getKey();
     }
 }
