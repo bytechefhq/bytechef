@@ -100,7 +100,7 @@ const PropertyComboBox = ({
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
     if (loadDependsOnValues?.length && !options.length) {
-        placeholder = `${loadDependsOnValues} is not defined`;
+        placeholder = `${loadDependsOnPaths} is not defined`;
     } else if (!currentNodeConnectionId) {
         placeholder = 'Connection missing...';
     }
