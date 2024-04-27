@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {Dialog, DialogClose, DialogContent, DialogTrigger} from '@/components/ui/dialog';
+import {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
@@ -108,7 +108,7 @@ const WorkflowOutputsSheetDialog = ({
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <h4 className="font-medium leading-none">{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</h4>
+                            <DialogTitle>{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</DialogTitle>
 
                             <DialogClose asChild>
                                 <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
