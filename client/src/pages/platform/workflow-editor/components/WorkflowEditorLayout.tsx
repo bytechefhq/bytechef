@@ -56,6 +56,7 @@ const WorkflowEditorLayout = ({
                               componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
                       )[0]
               )
+              .filter((componentDefinition) => !!componentDefinition)
         : [];
 
     // refetch workflowNodeOutputs when a new node is added
