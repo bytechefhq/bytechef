@@ -218,7 +218,7 @@ const WorkflowEditor = ({
                         type: 'workflow',
                     });
                 } else {
-                    const lastNodeId = getRandomId();
+                    const lastNodeId = nodes?.[nodes.length - 1].id ?? getRandomId();
 
                     defaultNodesWithWorkflowNodes.push({
                         data: {label: '+'},
@@ -238,6 +238,7 @@ const WorkflowEditor = ({
 
             return workflowEdges;
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [defaultNodesWithWorkflowNodes]);
 
     const handleNodeChange = async (changes: NodeDimensionChange[]) => {
@@ -365,11 +366,9 @@ const WorkflowEditor = ({
 
     // Reconstruct editor edges on re-render
     useEffect(() => {
-        if (defaultEdgesWithWorkflowEdges?.length === edges?.length) {
-            return;
-        }
+        const isEdgesUnchanged = defaultEdgesWithWorkflowEdges?.every((edge, index) => edge.id === edges?.[index]?.id);
 
-        if (defaultEdgesWithWorkflowEdges?.length) {
+        if (!isEdgesUnchanged) {
             setEdges(defaultEdgesWithWorkflowEdges);
         }
     }, [defaultEdgesWithWorkflowEdges, edges]);

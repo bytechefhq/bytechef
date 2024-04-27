@@ -68,13 +68,15 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
         const edges = getEdges();
 
-        setNodes((nodes) => nodes.filter((node) => node.id !== id));
+        const remainingNodes = nodes.filter((node) => node.id !== id);
+
+        setNodes(remainingNodes);
 
         const connectedEdges = getConnectedEdges([node], edges);
-        const currentNodeIndex = nodes.findIndex((node) => node.id === id);
+        const deletedNodeIndex = nodes.findIndex((node) => node.id === id);
 
-        const previousNode = nodes[currentNodeIndex - 1];
-        const nextNode = nodes[currentNodeIndex + 1];
+        const previousNode = nodes[deletedNodeIndex - 1];
+        const nextNode = nodes[deletedNodeIndex + 1];
 
         if (previousNode && nextNode) {
             const connectedEdgeIds = connectedEdges.map((edge) => edge.id);
@@ -82,17 +84,8 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             setEdges((edges) => {
                 const leftoverEdges = edges.filter((edge) => !connectedEdgeIds.includes(edge.id));
 
-                if (previousNode.type === 'workflow' && nextNode.type === 'placeholder') {
-                    return [
-                        ...leftoverEdges,
-                        {
-                            id: `${previousNode.id}=>${nextNode.id}`,
-                            source: previousNode.id,
-                            target: nextNode.id,
-                            type: 'placeholder',
-                        },
-                    ];
-                }
+                const edgeType =
+                    previousNode.type === 'workflow' && nextNode.type === 'placeholder' ? 'placeholder' : 'workflow';
 
                 return [
                     ...leftoverEdges,
@@ -100,7 +93,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                         id: `${previousNode.id}=>${nextNode.id}`,
                         source: previousNode.id,
                         target: nextNode.id,
-                        type: 'workflow',
+                        type: edgeType,
                     },
                 ];
             });
