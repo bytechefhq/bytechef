@@ -23,6 +23,7 @@ import {ProjectModel, ProjectStatusModel, TagModel} from '@/middleware/automatio
 import {useUpdateProjectTagsMutation} from '@/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
@@ -44,6 +45,7 @@ interface ProjectItemProps {
 const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const navigate = useNavigate();
@@ -205,6 +207,13 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     New Workflow
                                 </DropdownMenuItem>
 
+                                <DropdownMenuItem
+                                    disabled={project.status === ProjectStatusModel.Published}
+                                    onClick={() => setShowPublishProjectDialog(true)}
+                                >
+                                    Publish
+                                </DropdownMenuItem>
+
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
@@ -245,6 +254,10 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             </AlertDialog>
 
             {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
+
+            {showPublishProjectDialog && !!project.id && (
+                <ProjectPublishDialog onClose={() => setShowPublishProjectDialog(false)} project={project} />
+            )}
 
             {showWorkflowDialog && !!project.id && (
                 <WorkflowDialog
