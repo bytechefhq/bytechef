@@ -4,10 +4,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ComponentDefinitionBasicModel,
     WorkflowConnectionModel,
-    WorkflowModel,
     WorkflowNodeOutputModel,
 } from '@/middleware/platform/configuration';
-import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
 import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
@@ -15,9 +13,9 @@ import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinition
 import {WorkflowNodeDynamicPropertyKeys} from '@/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {DataPillType, PropertyType} from '@/types/types';
+import {DataPillType, PropertyType, UpdateWorkflowMutationType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
@@ -66,7 +64,7 @@ const WorkflowNodeDetailsPanel = ({
     workflowNodeOutputs,
 }: {
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');

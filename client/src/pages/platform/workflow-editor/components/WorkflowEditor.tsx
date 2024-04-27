@@ -1,17 +1,11 @@
 import {ActionDefinitionBasicModel} from '@/middleware/platform/configuration';
-import {UpdateWorkflowRequestI} from '@/mutations/platform/workflows.mutations';
 import {useGetComponentActionDefinitionQuery} from '@/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {ComponentOperationType} from '@/types/types';
+import {ComponentOperationType, UpdateWorkflowMutationType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
-import {UseMutationResult} from '@tanstack/react-query';
 import {usePrevious} from '@uidotdev/usehooks';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-    WorkflowModel,
-} from 'middleware/platform/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/platform/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
@@ -32,7 +26,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasicModel[];
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
-    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 const WorkflowEditor = ({
@@ -282,7 +276,7 @@ const WorkflowEditor = ({
 
     // Save workflow definition with default parameters when a new node is added
     useEffect(() => {
-        if (!latestActionDefinition?.properties || !newNode || isSaving) {
+        if (!latestActionDefinition?.properties || !newNode || isSaving || !workflowComponentWithAlias) {
             return;
         }
 
