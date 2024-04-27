@@ -55,7 +55,7 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                                                 <Badge
                                                     variant={
                                                         projectVersion.status === ProjectStatusModel.Published
-                                                            ? 'success'
+                                                            ? 'success_outline'
                                                             : 'secondary'
                                                     }
                                                 >

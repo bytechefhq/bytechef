@@ -151,7 +151,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         <div className="flex flex-col items-end gap-y-4">
                             <Badge
                                 className="flex space-x-1"
-                                variant={project.status === ProjectStatusModel.Published ? 'success' : 'secondary'}
+                                variant={
+                                    project.status === ProjectStatusModel.Published ? 'success_outline' : 'secondary'
+                                }
                             >
                                 <span>V{project.projectVersion}</span>
 

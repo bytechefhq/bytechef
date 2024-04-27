@@ -24,9 +24,9 @@ const columns = [
             <Badge
                 variant={
                     info.getValue()?.status === 'COMPLETED'
-                        ? 'success'
+                        ? 'success_outline'
                         : info.getValue()?.status === 'FAILED'
-                          ? 'destructive'
+                          ? 'destructive_outline'
                           : 'secondary'
                 }
             >

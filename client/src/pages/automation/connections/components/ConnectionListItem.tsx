@@ -121,7 +121,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
 
                         <div className="flex items-center justify-end gap-x-6">
                             <div className="flex flex-col items-end gap-y-4">
-                                <Badge variant={connection.active ? 'success' : 'secondary'}>
+                                <Badge variant={connection.active ? 'success_outline' : 'secondary'}>
                                     {connection.active ? 'Active' : 'Not Active'}
                                 </Badge>
 

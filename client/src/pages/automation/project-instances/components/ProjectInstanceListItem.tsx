@@ -154,7 +154,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            <Badge variant={projectInstance.enabled ? 'success' : 'secondary'}>
+                            <Badge variant={projectInstance.enabled ? 'success_outline' : 'secondary'}>
                                 {projectInstance.enabled ? 'Enabled' : 'Disabled'}
                             </Badge>
 
