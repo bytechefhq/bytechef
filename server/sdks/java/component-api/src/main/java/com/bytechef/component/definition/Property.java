@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -34,7 +35,7 @@ public interface Property extends BaseProperty {
     /**
      *
      */
-    enum ControlType {
+    enum ControlType implements BaseControlType {
         ARRAY_BUILDER,
         CODE_EDITOR,
         DATE,

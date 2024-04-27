@@ -235,6 +235,11 @@ public interface BaseProperty {
         /**
          *
          */
+        BaseControlType getControlType();
+
+        /**
+         *
+         */
         Optional<V> getDefaultValue();
 
         /**

@@ -19,6 +19,7 @@ package com.bytechef.platform.registry.util;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseFileEntry;
 import com.bytechef.definition.BaseOutput;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
@@ -42,6 +43,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +157,15 @@ public class SchemaUtils {
 
                 yield map;
             }
-            case BaseStringProperty p -> "sample " + p.getName();
+            case BaseStringProperty p -> {
+                BaseControlType baseControlType = p.getControlType();
+
+                if (Objects.equals(baseControlType.name(), "EMAIL")) {
+                    yield "sample_email@" + p.getName();
+                } else {
+                    yield "sample " + p.getName();
+                }
+            }
             case BaseTimeProperty ignored -> LocalTime.now();
             default -> throw new IllegalArgumentException(
                 "Definition %s is not allowed".formatted(definitionProperty.getName()));
