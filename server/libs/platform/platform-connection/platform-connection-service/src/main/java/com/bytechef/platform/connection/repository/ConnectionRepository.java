@@ -42,9 +42,9 @@ public interface ConnectionRepository
             WHERE connection.component_name = :componentName
             AND connection.type = :type
             AND connection_tag.tag_id = :tagId
-            ORDER BY connection.name
+            ORDER BY LOWER(connection.name)
         """)
-    List<Connection> findAllByComponentNameAndTagIdAndType(
+    List<Connection> findAllByComponentNameAndTagIdAndTypeOrderByName(
         @Param("componentName") String componentName, @Param("tagId") long tagId, @Param("type") int type);
 
     @Query("""
@@ -54,9 +54,9 @@ public interface ConnectionRepository
             AND connection.connection_version = :connectionVersion
             AND connection.type = :type
             AND connection_tag.tag_id = :tagId
-            ORDER BY connection.name
+            ORDER BY LOWER(connection.name)
         """)
-    Iterable<Connection> findAllByCNCVTIT(
+    List<Connection> findAllByCNCVTITOrderByName(
         @Param("componentName") String componentName, @Param("connectionVersion") int connectionVersion,
         @Param("tagId") long tagId, @Param("type") int type);
 
@@ -65,9 +65,9 @@ public interface ConnectionRepository
             JOIN connection_tag ON connection.id = connection_tag.connection_id
             WHERE connection.type = :type
             AND connection_tag.tag_id = :tagId
-            ORDER BY connection.name
+            ORDER BY LOWER(connection.name)
         """)
-    List<Connection> findAllByTagIdAndType(@Param("tagId") long tagId, @Param("type") int type);
+    List<Connection> findAllByTagIdAndTypeOrderByName(@Param("tagId") long tagId, @Param("type") int type);
 
-    List<Connection> findAllByType(int type);
+    List<Connection> findAllByTypeOrderByName(int type);
 }

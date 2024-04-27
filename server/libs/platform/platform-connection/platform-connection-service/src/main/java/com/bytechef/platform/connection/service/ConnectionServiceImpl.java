@@ -83,10 +83,10 @@ public class ConnectionServiceImpl implements ConnectionService {
     public List<Connection> getConnections(
         String componentName, Integer connectionVersion, Long tagId, Type type) {
 
-        Iterable<Connection> connectionIterable;
+        List<Connection> connectionIterable;
 
         if (StringUtils.isBlank(componentName) && tagId == null) {
-            connectionIterable = connectionRepository.findAllByType(type.ordinal());
+            connectionIterable = connectionRepository.findAllByTypeOrderByName(type.ordinal());
         } else if (StringUtils.isNotBlank(componentName) && tagId == null) {
             if (connectionVersion == null) {
                 connectionIterable = connectionRepository.findAllByComponentNameAndTypeOrderByName(
@@ -96,16 +96,15 @@ public class ConnectionServiceImpl implements ConnectionService {
                     componentName, connectionVersion, type.ordinal());
             }
         } else if (StringUtils.isBlank(componentName)) {
-            connectionIterable = connectionRepository.findAllByTagIdAndType(tagId, type.ordinal());
+            connectionIterable = connectionRepository.findAllByTagIdAndTypeOrderByName(tagId, type.ordinal());
         } else {
             if (connectionVersion == null) {
-                connectionIterable = connectionRepository.findAllByComponentNameAndTagIdAndType(
+                connectionIterable = connectionRepository.findAllByComponentNameAndTagIdAndTypeOrderByName(
                     componentName, tagId, type.ordinal());
             } else {
-                connectionIterable = connectionRepository.findAllByCNCVTIT(
+                connectionIterable = connectionRepository.findAllByCNCVTITOrderByName(
                     componentName, connectionVersion, tagId, type.ordinal());
             }
-
         }
 
         return CollectionUtils.toList(connectionIterable);

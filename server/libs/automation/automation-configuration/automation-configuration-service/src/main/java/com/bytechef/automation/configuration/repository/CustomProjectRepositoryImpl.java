@@ -39,7 +39,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
     @Override
     public List<Project> findAllProjects(Long categoryId, List<Long> ids, Long tagId, Integer status) {
         List<Object> arguments = new ArrayList<>();
-        String query = "SELECT DISTINCT project.* FROM project ";
+        String query = "SELECT DISTINCT project.*, LOWER(name) AS lower_name FROM project ";
 
         query += "JOIN project_version ON project.id = project_version.project_id ";
 
@@ -97,7 +97,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "project_version.status = ? ";
         }
 
-        query += "ORDER BY project.name ASC";
+        query += "ORDER BY lower_name ASC";
 
         List<Project> projects = jdbcClient.sql(query)
             .params(arguments)
