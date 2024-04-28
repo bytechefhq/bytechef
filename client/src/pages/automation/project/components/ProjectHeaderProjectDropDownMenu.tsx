@@ -7,11 +7,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useToast} from '@/components/ui/use-toast';
 import {ProjectModel} from '@/middleware/automation/configuration';
 import {useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
+import {useCreateProjectWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon} from 'lucide-react';
+import {ChangeEvent, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const ProjectHeaderProjectDropDownMenu = ({
@@ -23,7 +26,12 @@ const ProjectHeaderProjectDropDownMenu = ({
     onEdit: () => void;
     project: ProjectModel;
 }) => {
+    const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+
     const navigate = useNavigate();
+
+    const {toast} = useToast();
+
     const queryClient = useQueryClient();
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
@@ -34,38 +42,77 @@ const ProjectHeaderProjectDropDownMenu = ({
         },
     });
 
+    const importProjectWorkflowMutation = useCreateProjectWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
+
+            if (hiddenFileInputRef.current) {
+                hiddenFileInputRef.current.value = '';
+            }
+
+            toast({
+                description: 'Workflow is imported.',
+            });
+        },
+    });
+
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            importProjectWorkflowMutation.mutate({
+                id: project.id!,
+                workflowModel: {
+                    definition: await e.target.files[0].text(),
+                },
+            });
+        }
+    };
+
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <div>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button className="hover:bg-gray-200" size="icon" variant="ghost">
-                                <SettingsIcon className="h-5" />
-                            </Button>
-                        </TooltipTrigger>
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <div>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button className="hover:bg-gray-200" size="icon" variant="ghost">
+                                    <SettingsIcon className="h-5" />
+                                </Button>
+                            </TooltipTrigger>
 
-                        <TooltipContent>Project Settings</TooltipContent>
-                    </Tooltip>
-                </div>
-            </DropdownMenuTrigger>
+                            <TooltipContent>Project Settings</TooltipContent>
+                        </Tooltip>
+                    </div>
+                </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit()}>Edit</DropdownMenuItem>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onEdit()}>Edit</DropdownMenuItem>
 
-                {project && (
-                    <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
-                        Duplicate
+                    {project && (
+                        <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
+                            Duplicate
+                        </DropdownMenuItem>
+                    )}
+
+                    <DropdownMenuItem
+                        onClick={() => {
+                            if (hiddenFileInputRef.current) {
+                                hiddenFileInputRef.current.click();
+                            }
+                        }}
+                    >
+                        Import Workflow
                     </DropdownMenuItem>
-                )}
 
-                <DropdownMenuSeparator />
+                    <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="text-red-600" onClick={() => onDelete()}>
-                    Delete
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    <DropdownMenuItem className="text-red-600" onClick={() => onDelete()}>
+                        Delete
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
+        </>
     );
 };
 

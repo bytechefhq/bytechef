@@ -19,6 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useToast} from '@/components/ui/use-toast';
 import {ProjectModel, ProjectStatusModel, TagModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
@@ -31,7 +32,7 @@ import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {ChangeEvent, useRef, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
 import TagList from '../../../../components/TagList';
@@ -48,7 +49,11 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
+    const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+
     const navigate = useNavigate();
+
+    const {toast} = useToast();
 
     const queryClient = useQueryClient();
 
@@ -78,6 +83,22 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         },
     });
 
+    const importProjectWorkflowMutation = useCreateProjectWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.projects,
+            });
+
+            if (hiddenFileInputRef.current) {
+                hiddenFileInputRef.current.value = '';
+            }
+
+            toast({
+                description: 'Workflow is imported.',
+            });
+        },
+    });
+
     const updateProjectTagsMutation = useUpdateProjectTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
@@ -86,6 +107,17 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             });
         },
     });
+
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            importProjectWorkflowMutation.mutate({
+                id: project.id!,
+                workflowModel: {
+                    definition: await e.target.files[0].text(),
+                },
+            });
+        }
+    };
 
     return (
         <>
@@ -214,6 +246,16 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     Publish
                                 </DropdownMenuItem>
 
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        if (hiddenFileInputRef.current) {
+                                            hiddenFileInputRef.current.click();
+                                        }
+                                    }}
+                                >
+                                    Import Workflow
+                                </DropdownMenuItem>
+
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
@@ -267,6 +309,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}
+
+            <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
         </>
     );
 };

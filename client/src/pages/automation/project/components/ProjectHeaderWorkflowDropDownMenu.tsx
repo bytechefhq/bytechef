@@ -71,6 +71,12 @@ const ProjectHeaderWorkflowDropDownMenu = ({
                     Duplicate
                 </DropdownMenuItem>
 
+                <DropdownMenuItem
+                    onClick={() => (window.location.href = `/api/automation/workflows/${workflowId}/export`)}
+                >
+                    Export
+                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem className="text-red-600" onClick={() => onShowDeleteWorkflowAlertDialog()}>
