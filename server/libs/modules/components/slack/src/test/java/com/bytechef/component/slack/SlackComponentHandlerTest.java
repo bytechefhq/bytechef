@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Mario Cvjetojevic
  */
-public final class SlackComponentHandlerTest {
+class SlackComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/slack_v1.json", new SlackComponentHandler().getDefinition());
     }
 }

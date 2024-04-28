@@ -36,6 +36,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -47,14 +48,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
  */
 public abstract class AbstractSlackActionTest {
-
-    protected static final String SEARCH_TEXT = "12345";
 
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Parameters mockedParameters = mock(Parameters.class);
@@ -65,17 +63,8 @@ public abstract class AbstractSlackActionTest {
 
     @BeforeEach
     public void beforeEach() {
-        mockedApp = Mockito.mockConstruction(App.class, (mock, context) -> {
-            when(mock.client()).thenReturn(mockedMethodsClient);
-        });
-    }
+        mockedApp = mockConstruction(App.class, (mock, context) -> when(mock.client()).thenReturn(mockedMethodsClient));
 
-    @AfterEach
-    public void afterEach() {
-        mockedApp.close();
-    }
-
-    protected void beforeTestPerformWhenMockedParametersThenReturn(){
         when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn(ACCESS_TOKEN);
         when(mockedParameters.getRequiredString(CHANNEL_ID))
@@ -112,7 +101,8 @@ public abstract class AbstractSlackActionTest {
             .thenReturn(USERNAME);
     }
 
-    protected void afterTestPerformAssertEquals() {
+    @AfterEach
+    public void afterEach() {
         ChatPostMessageRequest chatPostMessageRequest = chatPostMessageRequestArgumentCaptor.getValue();
 
         assertEquals(ACCESS_TOKEN, chatPostMessageRequest.getToken());
@@ -131,5 +121,7 @@ public abstract class AbstractSlackActionTest {
         assertTrue(chatPostMessageRequest.isUnfurlLinks());
         assertTrue(chatPostMessageRequest.isUnfurlMedia());
         assertEquals(USERNAME, chatPostMessageRequest.getUsername());
+
+        mockedApp.close();
     }
 }
