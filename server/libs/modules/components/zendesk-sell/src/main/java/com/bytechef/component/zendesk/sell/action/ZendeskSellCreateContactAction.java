@@ -18,7 +18,6 @@ package com.bytechef.component.zendesk.sell.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -30,7 +29,6 @@ import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.IS_ORGANIZATION;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.LAST_NAME;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.NAME;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.NAME_PROPERTY;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.TITLE;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.WEBSITE;
 
@@ -40,12 +38,12 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.zendesk.sell.util.ZendeskSellUtils;
 
 /**
  * @author Monika Domiter
  */
 public class ZendeskSellCreateContactAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
         .title("Create contact")
         .description("Creates new contact. A contact may represent a single individual or an organization.")
@@ -54,9 +52,21 @@ public class ZendeskSellCreateContactAction {
                 .label("Is contact represent an organization?")
                 .description("Is contact represent an organization or a single individual?")
                 .required(true),
-            dynamicProperties(NAME_PROPERTY)
-                .loadPropertiesDependsOn(IS_ORGANIZATION)
-                .properties(ZendeskSellUtils::createNameProperties),
+            string(NAME)
+                .label("Name")
+                .description("The name of the organisation.")
+                .displayCondition("%s == true".formatted(IS_ORGANIZATION))
+                .required(false),
+            string(FIRST_NAME)
+                .label("First name")
+                .description("The first name of the person.")
+                .displayCondition("%s == false".formatted(IS_ORGANIZATION))
+                .required(false),
+            string(LAST_NAME)
+                .label("Last name")
+                .description("The last name of the person.")
+                .displayCondition("%s == false".formatted(IS_ORGANIZATION))
+                .required(true),
             string(TITLE)
                 .label("Title")
                 .required(false),
