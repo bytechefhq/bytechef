@@ -8,20 +8,19 @@ import {ProjectInstanceApi, ProjectInstanceWorkflowModel} from '@/middleware/aut
 import {ComponentDefinitionBasicModel, WorkflowBasicModel} from '@/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
+import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ClipboardIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const projectInstanceApi = new ProjectInstanceApi();
 
 const ProjectInstanceWorkflowListItem = ({
     filteredComponentNames,
-    projectId,
     projectInstanceEnabled,
     projectInstanceId,
     projectInstanceWorkflow,
@@ -30,7 +29,6 @@ const ProjectInstanceWorkflowListItem = ({
     workflowTaskDispatcherDefinitions,
 }: {
     filteredComponentNames?: string[];
-    projectId: number;
     projectInstanceEnabled: boolean;
     projectInstanceId: number;
     projectInstanceWorkflow: ProjectInstanceWorkflowModel;
@@ -43,6 +41,8 @@ const ProjectInstanceWorkflowListItem = ({
     };
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
+    const {setProjectInstanceWorkflowSheetOpen, setWorkflowId} = useProjectInstanceWorkflowSheetStore();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -76,6 +76,11 @@ const ProjectInstanceWorkflowListItem = ({
         );
     };
 
+    const handleWorkflowLabelClick = () => {
+        setWorkflowId(workflow.id!);
+        setProjectInstanceWorkflowSheetOpen(true);
+    };
+
     const handleWorkflowRun = () => {
         projectInstanceApi
             .createProjectInstanceWorkflowJob({
@@ -91,17 +96,14 @@ const ProjectInstanceWorkflowListItem = ({
 
     return (
         <>
-            <Link
-                className="flex flex-1 items-center"
-                to={`/automation/projects/${projectId}/workflows/${workflow.id}`}
-            >
+            <div className="flex flex-1 items-center">
                 <div
                     className={twMerge(
                         'w-96 text-sm font-semibold',
                         !projectInstanceWorkflow.enabled && 'text-muted-foreground'
                     )}
                 >
-                    {workflow.label}
+                    <button onClick={handleWorkflowLabelClick}>{workflow.label}</button>
                 </div>
 
                 <div className="ml-6 flex">
@@ -130,7 +132,7 @@ const ProjectInstanceWorkflowListItem = ({
                         );
                     })}
                 </div>
-            </Link>
+            </div>
 
             <div className="flex items-center justify-end gap-x-6">
                 {projectInstanceWorkflow?.lastExecutionDate ? (

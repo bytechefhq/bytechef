@@ -105,7 +105,6 @@ const ProjectInstanceWorkflowList = ({
                                         <ProjectInstanceWorkflowListItem
                                             filteredComponentNames={filteredComponentNames}
                                             key={workflow.id}
-                                            projectId={projectId}
                                             projectInstanceEnabled={projectInstanceEnabled}
                                             projectInstanceId={projectInstanceId}
                                             projectInstanceWorkflow={projectInstanceWorkflow}

@@ -3,6 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {ProjectInstanceModel} from '@/middleware/automation/configuration';
+import ProjectInstanceWorkflowSheet from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowSheet';
 import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
 import {useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
 import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
@@ -191,6 +192,8 @@ const ProjectInstances = () => {
                                     />
                                 )
                         )}
+
+                        <ProjectInstanceWorkflowSheet />
                     </div>
                 ) : (
                     <EmptyList
