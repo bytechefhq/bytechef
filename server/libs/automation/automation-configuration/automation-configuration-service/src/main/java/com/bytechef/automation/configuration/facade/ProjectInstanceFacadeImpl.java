@@ -37,9 +37,12 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.exception.ApplicationException;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -70,6 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
+    private final ConnectionService connectionService;
     private final InstanceJobFacade instanceJobFacade;
     private final InstanceJobService instanceJobService;
     private final JobFacade jobFacade;
@@ -87,14 +91,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobFacade jobFacade,
-        JobService jobService, ProjectInstanceService projectInstanceService,
+        ConnectionService connectionService, InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService,
+        JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         TagService tagService, TriggerDefinitionService triggerDefinitionService,
         TriggerExecutionService triggerExecutionService, TriggerLifecycleFacade triggerLifecycleFacade,
         @Value("${bytechef.webhook-url}") String webhookUrl,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
 
+        this.connectionService = connectionService;
         this.instanceJobFacade = instanceJobFacade;
         this.instanceJobService = instanceJobService;
         this.jobFacade = jobFacade;
@@ -157,7 +162,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 .stream()
                 .peek(projectInstanceWorkflow -> {
                     if (projectInstanceWorkflow.isEnabled()) {
-                        validateInputs(projectInstanceWorkflow);
+                        List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections =
+                            projectInstanceWorkflow.getConnections();
+                        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+                        validateConnections(projectInstanceWorkflowConnections, workflow);
+                        validateInputs(projectInstanceWorkflow.getInputs(), workflow);
                     }
 
                     projectInstanceWorkflow.setProjectInstanceId(Validate.notNull(projectInstance.getId(), "id"));
@@ -496,6 +506,24 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             jobService.fetchLastWorkflowJob(workflowId),
             Job::getEndDate,
             null);
+    }
+
+    private void validateConnections(
+        List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections, Workflow workflow) {
+
+        for (ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection : projectInstanceWorkflowConnections) {
+            Connection connection = connectionService.getConnection(
+                projectInstanceWorkflowConnection.getConnectionId());
+
+            WorkflowConnection workflowConnection = workflowConnectionFacade.getWorkflowConnection(
+                workflow, projectInstanceWorkflowConnection.getWorkflowNodeName(),
+                projectInstanceWorkflowConnection.getKey());
+
+            if (!Objects.equals(connection.getComponentName(), workflowConnection.componentName())) {
+                throw new IllegalArgumentException(
+                    "Connection component name does not match workflow connection component name");
+            }
+        }
     }
 
     private void validateInputs(ProjectInstanceWorkflow projectInstanceWorkflow) {

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
@@ -26,6 +27,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,6 +45,21 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
         this.componentDefinitionService = componentDefinitionService;
         this.workflowConnectionFactoryResolver = workflowConnectionFactoryResolver;
+    }
+
+    @Override
+    public WorkflowConnection getWorkflowConnection(Workflow workflow, String workflowNodeName, String key) {
+        return WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .map(this::getWorkflowConnections)
+            .orElseGet(() -> {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                return getWorkflowConnections(workflowTask);
+            })
+            .stream()
+            .filter(workflowConnection -> Objects.equals(workflowConnection.key(), key))
+            .findFirst()
+            .orElseThrow();
     }
 
     @Override

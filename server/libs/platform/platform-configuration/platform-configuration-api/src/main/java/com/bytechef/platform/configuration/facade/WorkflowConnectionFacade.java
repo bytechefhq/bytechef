@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -25,6 +26,8 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface WorkflowConnectionFacade {
+
+    WorkflowConnection getWorkflowConnection(Workflow workflow, String workflowNodeName, String key);
 
     List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask);
 
