@@ -20,12 +20,15 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationConnectionRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationInputsRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,12 +42,16 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEndpoint
 public class WorkflowTestConfigurationApiController implements WorkflowTestConfigurationApi {
 
+    private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final ConversionService conversionService;
 
+    @SuppressFBWarnings("EI")
     public WorkflowTestConfigurationApiController(
+        WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService, ConversionService conversionService) {
 
+        this.workflowTestConfigurationFacade = workflowTestConfigurationFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.conversionService = conversionService;
     }
@@ -74,7 +81,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowTestConfigurationService.saveWorkflowTestConfiguration(
+                workflowTestConfigurationFacade.saveWorkflowTestConfiguration(
                     conversionService.convert(
                         workflowTestConfigurationModel.workflowId(workflowId), WorkflowTestConfiguration.class)),
                 WorkflowTestConfigurationModel.class));
@@ -85,7 +92,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
         String workflowId, String workflowNodeName, String workflowConnectionKey,
         SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
 
-        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+        workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey,
             saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
 
@@ -99,7 +106,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
         String workflowId,
         SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel) {
 
-        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(
+        workflowTestConfigurationFacade.saveWorkflowTestConfigurationInputs(
             workflowId, saveWorkflowTestConfigurationInputsRequestModel.getInputs());
 
         return ResponseEntity
