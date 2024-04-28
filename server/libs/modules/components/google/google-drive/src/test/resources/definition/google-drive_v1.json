@@ -119,7 +119,7 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": null,
-      "description": "Folder where the file should be created; if no folder is selected, the file will be created in the root folder.",
+      "description": "Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -226,9 +226,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
-        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "name": "new-file.txt"
       }
     },
     "perform": { }
@@ -399,7 +399,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "Folder where the file should be created; if no folder is selected, the file will be created in the root folder.",
+      "description": "Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -506,9 +506,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
-        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "name": "new-file.txt"
       }
     },
     "perform": { }
@@ -702,9 +702,9 @@
         "optionsDataSource": null
       },
       "sampleOutput": {
-        "name": "new-file.txt",
+        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         "mimeType": "plain/text",
-        "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "name": "new-file.txt"
       }
     },
     "perform": { }
