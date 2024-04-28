@@ -16,10 +16,8 @@
 
 package com.bytechef.component.slack.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.slack.constant.SlackConstants.AS_USER_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS_PROPERTY;
@@ -42,19 +40,12 @@ import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_MEDIA_
 import static com.bytechef.component.slack.constant.SlackConstants.USERNAME_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
-import com.slack.api.bolt.App;
 import com.slack.api.methods.SlackApiException;
-import com.slack.api.methods.request.conversations.ConversationsListRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
-import com.slack.api.methods.response.conversations.ConversationsListResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Mario Cvjetojevic
@@ -69,7 +60,7 @@ public final class SlackSendMessageAction {
             string(CHANNEL_ID)
                 .label("Channel")
                 .description("The id of a channel where the message will be sent.")
-                .options((ActionOptionsFunction<String>) SlackSendMessageAction::getChannelOptions)
+                .options((ActionOptionsFunction<String>) SlackUtils::getChannelOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,
             ATTACHMENTS_PROPERTY,
@@ -100,24 +91,4 @@ public final class SlackSendMessageAction {
         return SlackUtils.chatPostMessage(inputParameters, connectionParameters, CHANNEL_ID);
     }
 
-    public static List<Option<String>> getChannelOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context)
-        throws IOException, SlackApiException {
-
-        ConversationsListResponse response = new App()
-            .client()
-            .conversationsList(
-                ConversationsListRequest
-                    .builder()
-                    .token(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                    .build());
-
-        return response.getChannels()
-            .stream()
-            .filter(channel -> StringUtils.isNotEmpty(searchText) &&
-                StringUtils.startsWith(channel.getName(), searchText))
-            .map(channel -> (Option<String>) option(channel.getName(), channel.getId()))
-            .toList();
-    }
 }
