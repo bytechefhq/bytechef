@@ -18,14 +18,13 @@ package com.bytechef.component.slack.constant;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
-import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.slack.util.SlackUtils;
 
 /**
  * @author Mario Cvjetojevic
@@ -55,11 +54,29 @@ public final class SlackConstants {
             option("Text", TEXT,
                 "How this field works and whether it is required depends on other fields you use in your API call."))
         .required(true);
-    public static final String CONTENT = "content";
-    public static final Property CONTENT_PROPERTY = dynamicProperties(CONTENT)
-        .loadPropertiesDependsOn(CONTENT_TYPE)
-        .properties(SlackUtils::getContentTypeProperties)
-        .required(true);
+
+    public static final ModifiableStringProperty ATTACHMENTS_PROPERTY =
+        string(ATTACHMENTS)
+            .label("Attachments")
+            .description("A JSON-based array of structured attachments, presented as a URL-encoded string.")
+            .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ATTACHMENTS))
+            .required(true);
+
+    public static final ModifiableStringProperty BLOCKS_PROPERTY =
+        string(BLOCKS)
+            .label("Blocks")
+            .description("A JSON-based array of structured blocks, presented as a URL-encoded string.")
+            .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, BLOCKS))
+            .required(true);
+
+    public static final ModifiableStringProperty TEXT_PROPERTY =
+        string(TEXT)
+            .label("Text")
+            .description(
+                "How this field works and whether it is required depends on other fields you use in your API call.")
+            .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, TEXT))
+            .required(true);
+
     public static final String AS_USER = "asUser";
     public static final Property AS_USER_PROPERTY = bool(AS_USER)
         .label("As user")

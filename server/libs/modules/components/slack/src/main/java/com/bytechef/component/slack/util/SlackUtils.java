@@ -17,7 +17,6 @@
 package com.bytechef.component.slack.util;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.slack.constant.SlackConstants.AS_USER;
 import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS;
 import static com.bytechef.component.slack.constant.SlackConstants.BLOCKS;
@@ -34,48 +33,17 @@ import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_LINKS;
 import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_MEDIA;
 import static com.bytechef.component.slack.constant.SlackConstants.USERNAME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.slack.constant.SlackConstants;
 import com.slack.api.bolt.App;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class SlackUtils {
-    public static List<? extends Property.ValueProperty<?>> getContentTypeProperties(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext context) {
-
-        return switch (inputParameters.getRequiredString(SlackConstants.CONTENT_TYPE)) {
-            case SlackConstants.ATTACHMENTS -> List.of(
-                string(SlackConstants.ATTACHMENTS)
-                    .label("Attachments")
-                    .description(
-                        "A JSON-based array of structured attachments, presented as a URL-encoded string.")
-                    .required(true));
-            case SlackConstants.BLOCKS -> List.of(
-                string(SlackConstants.BLOCKS)
-                    .label("Blocks")
-                    .description(
-                        "A JSON-based array of structured blocks, presented as a URL-encoded string.")
-                    .required(true));
-            case SlackConstants.TEXT -> List.of(
-                string(SlackConstants.TEXT)
-                    .label("Text")
-                    .description(
-                        "How this field works and whether it is required depends on other fields you use in your API call.")
-                    .required(true));
-            default -> throw new IllegalArgumentException();
-        };
-    }
 
     public static ChatPostMessageResponse chatPostMessage(
         Parameters inputParameters, Parameters connectionParameters, String channelParameter)
