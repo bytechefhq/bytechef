@@ -16,10 +16,6 @@
 
 package com.bytechef.component.zendesk.sell.constant;
 
-import static com.bytechef.component.definition.ComponentDSL.string;
-
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-
 /**
  * @author Monika Domiter
  */
@@ -36,25 +32,9 @@ public class ZendeskSellConstants {
     public static final String IS_ORGANIZATION = "is_organization";
     public static final String LAST_NAME = "last_name";
     public static final String NAME = "name";
-    public static final String NAME_PROPERTY = "nameProperty";
     public static final String TITLE = "title";
     public static final String WEBSITE = "website";
     public static final String ZENDESK_SELL = "zendeskSell";
-
-    public static final ModifiableStringProperty FIRST_NAME_PROPERTY = string(FIRST_NAME)
-        .label("First name")
-        .description("The first name of the person.")
-        .required(false);
-
-    public static final ModifiableStringProperty LAST_NAME_PROPERTY = string(LAST_NAME)
-        .label("Last name")
-        .description("The last name of the person.")
-        .required(true);
-
-    public static final ModifiableStringProperty ORGANIZATION_NAME_PROPERTY = string(NAME)
-        .label("Name")
-        .description("The name of the organisation.")
-        .required(false);
 
     private ZendeskSellConstants() {
     }
