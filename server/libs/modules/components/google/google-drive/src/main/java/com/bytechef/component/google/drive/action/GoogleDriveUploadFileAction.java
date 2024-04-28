@@ -18,17 +18,19 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
@@ -51,10 +53,13 @@ public final class GoogleDriveUploadFileAction {
                 .label("File")
                 .description("The object property which contains a reference to the file to upload.")
                 .required(true),
-            PARENT_FOLDER_PROPERTY
+            string(PARENT_FOLDER)
+                .label("Parent folder")
                 .description(
                     "Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to " +
-                        "the root folder."))
+                        "the root folder.")
+                .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
+                .required(false))
         .outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY)
         .sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT)
         .perform(GoogleDriveUploadFileAction::perform);

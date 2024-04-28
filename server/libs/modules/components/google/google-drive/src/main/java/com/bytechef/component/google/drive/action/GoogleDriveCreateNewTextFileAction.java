@@ -25,13 +25,14 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
@@ -71,10 +72,13 @@ public final class GoogleDriveCreateNewTextFileAction {
                     option("XML", "text/xml"))
                 .defaultValue("plain/text")
                 .required(true),
-            PARENT_FOLDER_PROPERTY
+            string(PARENT_FOLDER)
+                .label("Parent folder")
                 .description(
                     "Folder where the file should be created; if no folder is selected, the file will be created " +
-                        "in the root folder."))
+                        "in the root folder.")
+                .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
+                .required(false))
         .outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY)
         .sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT)
         .perform(GoogleDriveCreateNewTextFileAction::perform);

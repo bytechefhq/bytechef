@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
 import java.util.Map;
 
 /**
@@ -56,11 +53,6 @@ public final class GoogleDriveConstants {
         ID, "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
         MIME_TYPE, "plain/text",
         NAME, "new-file.txt");
-
-    public static final ModifiableStringProperty PARENT_FOLDER_PROPERTY = string(PARENT_FOLDER)
-        .label("Parent folder")
-        .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFolderOptions)
-        .required(false);
 
     private GoogleDriveConstants() {
     }
