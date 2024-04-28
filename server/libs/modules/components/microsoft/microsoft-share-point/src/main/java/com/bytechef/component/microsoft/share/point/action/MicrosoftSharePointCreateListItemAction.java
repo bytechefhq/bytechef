@@ -26,7 +26,6 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FIELDS;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID_PROPERTY;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
 
@@ -34,6 +33,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import java.util.ArrayList;
@@ -50,7 +50,11 @@ public class MicrosoftSharePointCreateListItemAction {
         .description("Creates a new item in a list.")
         .properties(
             SITE_ID_PROPERTY,
-            LIST_ID_PROPERTY,
+            string(LIST_ID)
+                .label("List")
+                .loadOptionsDependsOn(SITE_ID)
+                .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
+                .required(true),
             dynamicProperties(COLUMNS)
                 .loadPropertiesDependsOn(SITE_ID, LIST_ID)
                 .properties(MicrosoftSharePointUtils::createPropertiesForListItem))
