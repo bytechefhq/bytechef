@@ -12,74 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Twilio",
-  "triggers": null,
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "basic_auth",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "username",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Username",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "password",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Password",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "Basic Auth",
-      "type": "BASIC_AUTH",
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
-      "acquire": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": null,
-    "test": null
-  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -189,8 +121,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource). Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource).",
@@ -232,8 +164,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum length in seconds that the Message can remain in Twilio's outgoing message queue. If a queued Message exceeds the validity_period, the Message is not sent. A validity_period greater than 5 is recommended.",
@@ -251,8 +183,8 @@
       "maxValue": 14400,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Reserved",
@@ -396,8 +328,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "For Messaging Services with Link Shortening configured only: A Boolean indicating whether or not Twilio should shorten links in the body of the Message.",
@@ -478,8 +410,8 @@
         "label": "Date time",
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -504,8 +436,8 @@
           "options": { }
         }
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "If set to true, Twilio delivers the message as a single MMS message, regardless of the presence of media.",
@@ -608,19 +540,44 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
+      "description": "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool.",
+      "displayCondition": "source == 'from'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
       "required": true,
-      "name": "sourceProperty",
-      "type": "DYNAMIC_PROPERTIES",
-      "header": null,
-      "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "source" ],
-        "properties": { }
-      }
+      "name": "from",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "From",
+      "placeholder": null,
+      "controlType": "PHONE",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The SID of the Messaging Service you want to associate with the Message. When this parameter is provided and the from parameter is omitted, Twilio selects the optimal sender from the Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a specific Sender from the Sender Pool.",
+      "displayCondition": "source == 'messagingServiceSid'",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "messagingServiceSid",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Messaging Service SID",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -651,23 +608,69 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": null,
+      "description": "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter.",
+      "displayCondition": "content == 'body'",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "body",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Body",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": 1600,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are fully supported by Twilio and content is formatted for delivery on destination devices. The media size limit is 5 MB for supported file types (jpeg, jpg, png, gif) and 500 KB for other types of accepted media. To send more than one image in the message, provide multiple media_url parameters in the POST request. You can include up to ten media_url parameters per message. International and carrier limits apply.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
-      "required": false,
-      "name": "contentProperty",
-      "type": "DYNAMIC_PROPERTIES",
-      "header": null,
-      "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "content" ],
-        "properties": { }
-      }
+      "required": true,
+      "name": "mediaUrl",
+      "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Media URL",
+      "placeholder": null,
+      "items": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "controlType": "URL",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "maxItems": null,
+      "minItems": null,
+      "multipleValues": null,
+      "options": null,
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "For Content Editor/API only: The SID of the Content Template to be used with the Message, e.g., HXXXXXXXXXXXXXXXXXXXXXXXXXXXXX. If this parameter is not provided, a Content Template is not used. Find the SID in the Console on the Content Editor page. For Content API users, the SID is found in Twilio's response when creating the Template or by fetching your Templates.",
-      "displayCondition": null,
+      "displayCondition": "content == 'mediaUrl'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
@@ -803,8 +806,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -857,8 +860,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -880,8 +883,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1074,8 +1077,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1097,8 +1100,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1131,8 +1134,8 @@
             "label": null,
             "placeholder": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "DATE_TIME"
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1154,8 +1157,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1173,8 +1176,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1229,8 +1232,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -1248,11 +1251,11 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1311,14 +1314,82 @@
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
     },
     "perform": { }
-  } ]
+  } ],
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "basic_auth",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "username",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Username",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "password",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Password",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "Basic Auth",
+      "type": "BASIC_AUTH",
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
+    "test": null
+  },
+  "triggers": null
 }
