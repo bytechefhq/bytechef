@@ -49,19 +49,6 @@ public class MicrosoftSharePointConstants {
     public static final String UPLOAD_FILE = "uploadFile";
     public static final String VALUE = "value";
 
-    public static final ModifiableStringProperty LIST_ID_PROPERTY = string(LIST_ID)
-        .label("List")
-        .loadOptionsDependsOn(SITE_ID)
-        .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
-        .required(true);
-
-    public static final ModifiableStringProperty PARENT_FOLDER_PROPERTY = string(PARENT_FOLDER)
-        .label("Parent folder")
-        .description("If no folder is selected, file will be uploaded to root folder")
-        .loadOptionsDependsOn(SITE_ID)
-        .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
-        .required(false);
-
     public static final ModifiableStringProperty SITE_ID_PROPERTY = string(SITE_ID)
         .label("Site")
         .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
