@@ -147,8 +147,6 @@ public class ComponentDefinitionRegistry {
     }
 
     public boolean hasComponentDefinition(String name, Integer version) {
-        ComponentDefinition componentDefinition;
-
         return componentDefinitions
             .stream()
             .anyMatch(curComponentDefinition -> {
