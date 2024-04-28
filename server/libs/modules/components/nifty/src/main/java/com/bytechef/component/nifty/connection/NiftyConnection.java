@@ -16,11 +16,13 @@
 
 package com.bytechef.component.nifty.connection;
 
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import java.util.List;
 
@@ -28,17 +30,17 @@ import java.util.List;
  * @author Luka Ljubić
  */
 public class NiftyConnection {
+
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(((connectionParameters, context) -> "https://openapi.niftypm.com/api/v1.0"))
+        .baseUri((connectionParameters, context) -> "https://openapi.niftypm.com/api/v1.0")
         .authorizations(authorization(
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
-                    string(Authorization.CLIENT_ID)
+                    string(CLIENT_ID)
                         .label("Client id")
                         .required(true),
-                    string(Authorization.CLIENT_SECRET)
+                    string(CLIENT_SECRET)
                         .label("Client secret")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://nifty.pm/authorize")

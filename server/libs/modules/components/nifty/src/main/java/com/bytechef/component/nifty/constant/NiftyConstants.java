@@ -21,16 +21,15 @@ package com.bytechef.component.nifty.constant;
  */
 public final class NiftyConstants {
 
-    public static final String NIFTY = "nifty";
     public static final String BASE_URL = "https://openapi.niftypm.com/api/v1.0";
     public static final String CREATE_TASK = "createTask";
-    public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
-    public static final String TASK_GROUP_ID = "task_group_id";
-    public static final String PROJECT = "project";
     public static final String DUE_DATE = "due_date";
+    public static final String NAME = "name";
+    public static final String PROJECT = "project";
+    public static final String NIFTY = "nifty";
+    public static final String TASK_GROUP_ID = "task_group_id";
 
     private NiftyConstants() {
-
     }
 }
