@@ -22,9 +22,10 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.slack.constant.SlackConstants.AS_USER_PROPERTY;
+import static com.bytechef.component.slack.constant.SlackConstants.ATTACHMENTS_PROPERTY;
+import static com.bytechef.component.slack.constant.SlackConstants.BLOCKS_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL_ID;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.CONTENT_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.CONTENT_TYPE_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.ICON_EMOJI_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.ICON_URL_PROPERTY;
@@ -34,6 +35,7 @@ import static com.bytechef.component.slack.constant.SlackConstants.MRKDWN_PROPER
 import static com.bytechef.component.slack.constant.SlackConstants.PARSE_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.REPLY_BROADCAST_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.SEND_MESSAGE;
+import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.THREAD_TS_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_LINKS_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.UNFURL_MEDIA_PROPERTY;
@@ -66,12 +68,13 @@ public final class SlackSendMessageAction {
         .properties(
             string(CHANNEL_ID)
                 .label("Channel")
-                .description(
-                    "The id of a channel where the message will be sent.")
+                .description("The id of a channel where the message will be sent.")
                 .options((ActionOptionsFunction<String>) SlackSendMessageAction::getChannelOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,
-            CONTENT_PROPERTY,
+            ATTACHMENTS_PROPERTY,
+            BLOCKS_PROPERTY,
+            TEXT_PROPERTY,
             AS_USER_PROPERTY,
             ICON_EMOJI_PROPERTY,
             ICON_URL_PROPERTY,
