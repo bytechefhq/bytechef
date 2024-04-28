@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
@@ -24,10 +26,19 @@ import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.util.WorkflowApiControllerUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -41,14 +52,17 @@ public class WorkflowApiController implements WorkflowApi {
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
     private final WorkflowFacade workflowFacade;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
-        ConversionService conversionService, ProjectFacade projectFacade, WorkflowFacade workflowFacade) {
+        ConversionService conversionService, ProjectFacade projectFacade, WorkflowFacade workflowFacade,
+        WorkflowService workflowService) {
 
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
         this.workflowFacade = workflowFacade;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -69,6 +83,29 @@ public class WorkflowApiController implements WorkflowApi {
     @Override
     public ResponseEntity<String> duplicateWorkflow(Long id, String workflowId) {
         return ResponseEntity.ok(projectFacade.duplicateWorkflow(id, workflowId));
+    }
+
+    @GetMapping("/workflows/{id}/export")
+    @ResponseBody
+    public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") String id) {
+        Workflow workflow = workflowService.getWorkflow(id);
+
+        ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.ok();
+
+        bodyBuilder.contentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        Workflow.Format format = workflow.getFormat();
+
+        String fileName = String.format(
+            "%s.%s", StringUtils.isEmpty(workflow.getLabel()) ? workflow.getId() : workflow.getLabel(),
+            StringUtils.lowerCase(format.name()));
+
+        bodyBuilder.header(
+            HttpHeaders.CONTENT_DISPOSITION, "filename=\"" + fileName + "\"");
+
+        String definition = workflow.getDefinition();
+
+        return bodyBuilder.body(new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
