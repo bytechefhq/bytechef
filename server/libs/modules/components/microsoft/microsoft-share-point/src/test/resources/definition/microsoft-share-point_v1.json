@@ -46,7 +46,7 @@
       }
     }, {
       "advancedOption": null,
-      "description": "If no folder is selected, file will be uploaded to root folder",
+      "description": "If no folder is selected, file will be uploaded to root folder.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -633,7 +633,6 @@
     },
     "perform": { }
   } ],
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -720,5 +719,6 @@
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  }
+  },
+  "triggers": null
 }
