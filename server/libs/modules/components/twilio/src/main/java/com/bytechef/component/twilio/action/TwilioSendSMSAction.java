@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -34,7 +33,6 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.APPLICATION
 import static com.bytechef.component.twilio.constant.TwilioConstants.ATTEMPT;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
-import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_PROPERTY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_RETENTION;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_VARIABLES;
@@ -54,7 +52,6 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.SEND_SMS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SHORTEN_URLS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SMART_ENCODED;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
-import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE_PROPERTY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.STATUS_CALLBACK;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.VALIDITY_PERIOD;
@@ -229,9 +226,26 @@ public class TwilioSendSMSAction {
                     option("From", FROM),
                     option("Messaging Service SID", MESSAGING_SERVICE_SID))
                 .required(true),
-            dynamicProperties(SOURCE_PROPERTY)
-                .loadPropertiesDependsOn(SOURCE)
-                .properties(TwilioUtils::getSourceProperties)
+            string(FROM)
+                .label("From")
+                .description(
+                    "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short " +
+                        "code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter " +
+                        "must be a sender that is hosted within Twilio and belongs to the Account creating the " +
+                        "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
+                        "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
+                        "specific sender from your Sender Pool.")
+                .displayCondition("%s == '%s'".formatted(SOURCE, FROM))
+                .controlType(Property.ControlType.PHONE)
+                .required(true),
+            string(MESSAGING_SERVICE_SID)
+                .label("Messaging Service SID")
+                .description(
+                    "The SID of the Messaging Service you want to associate with the Message. When this parameter is " +
+                        "provided and the from parameter is omitted, Twilio selects the optimal sender from the " +
+                        "Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a " +
+                        "specific Sender from the Sender Pool.")
+                .displayCondition("%s == '%s'".formatted(SOURCE, MESSAGING_SERVICE_SID))
                 .required(true),
             string(CONTENT)
                 .label("Content")
@@ -239,10 +253,29 @@ public class TwilioSendSMSAction {
                     option("Body", BODY),
                     option("Media URL", MEDIA_URL))
                 .required(true),
-            dynamicProperties(CONTENT_PROPERTY)
-                .loadPropertiesDependsOn(CONTENT)
-                .properties(TwilioUtils::getContentProperties)
-                .required(false),
+            string(BODY)
+                .label("Body")
+                .description(
+                    "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If " +
+                        "the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is " +
+                        "segmented and charged accordingly. For long body text, consider using the send_as_mms " +
+                        "parameter.")
+                .maxLength(1600)
+                .displayCondition("%s == '%s'".formatted(CONTENT, BODY))
+                .required(true),
+            array(MEDIA_URL)
+                .label("Media URL")
+                .description(
+                    "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are " +
+                        "fully supported by Twilio and content is formatted for delivery on destination devices. The " +
+                        "media size limit is 5 MB for supported file types (jpeg, jpg, png, gif) and 500 KB for " +
+                        "other types of accepted media. To send more than one image in the message, provide multiple " +
+                        "media_url parameters in the POST request. You can include up to ten media_url parameters " +
+                        "per message. International and carrier limits apply.")
+                .items(
+                    string()
+                        .controlType(Property.ControlType.URL))
+                .required(true),
             string(CONTENT_SID)
                 .label("Content SID")
                 .description(
@@ -251,6 +284,7 @@ public class TwilioSendSMSAction {
                         "Template is not used. Find the SID in the Console on the Content Editor page. For Content " +
                         "API users, the SID is found in Twilio's response when creating the Template or by fetching " +
                         "your Templates.")
+                .displayCondition("%s == '%s'".formatted(CONTENT, MEDIA_URL))
                 .required(false))
         .outputSchema(
             object()
