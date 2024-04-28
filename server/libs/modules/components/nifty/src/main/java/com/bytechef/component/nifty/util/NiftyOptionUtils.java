@@ -21,7 +21,8 @@ import static com.bytechef.component.nifty.constant.NiftyConstants.BASE_URL;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -43,9 +44,9 @@ public class NiftyOptionUtils {
         Map<String, Object> body = context
             .http(http -> http.get(
                 BASE_URL + "/taskgroups?project_id=" + inputParameters.getRequiredString(PROJECT) + "&archived=false"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -65,9 +66,9 @@ public class NiftyOptionUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/projects"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 

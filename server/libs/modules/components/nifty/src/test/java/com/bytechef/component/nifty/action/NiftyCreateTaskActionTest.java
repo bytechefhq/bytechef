@@ -16,49 +16,52 @@
 
 package com.bytechef.component.nifty.action;
 
+import static com.bytechef.component.nifty.constant.NiftyConstants.DESCRIPTION;
+import static com.bytechef.component.nifty.constant.NiftyConstants.DUE_DATE;
+import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
+import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
+import static com.bytechef.component.nifty.constant.NiftyConstants.TASK_GROUP_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.nifty.constant.NiftyConstants;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 /**
  * @author Luka Ljubić
  */
 class NiftyCreateTaskActionTest {
 
-    Parameters mockedParameters = Mockito.mock(Parameters.class);
-    ArgumentCaptor<Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Http.Body.class);
-    ActionContext mockedContext = Mockito.mock(ActionContext.class);
+    ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    ActionContext mockedContext = mock(ActionContext.class);
+    Http.Executor mockedExecutor = mock(Http.Executor.class);
+    Parameters mockedParameters = mock(Parameters.class);
+    Http.Response mockedResponse = mock(Http.Response.class);
     Map<String, Object> responeseMap = Map.of("key", "value");
-    Context.Http.Executor mockedExecutor = Mockito.mock(Context.Http.Executor.class);
-    Context.Http.Response mockedResponse = Mockito.mock(Context.Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
-
-        Mockito.when(mockedContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.headers(anyMap()))
+        when(mockedExecutor.headers(anyMap()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.execute())
+        when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responeseMap);
     }
 
@@ -66,16 +69,16 @@ class NiftyCreateTaskActionTest {
     void testPerform() {
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
-        Mockito.when(mockedParameters.getString(NiftyConstants.NAME))
-            .thenReturn((String) propertyStubsMap.get(NiftyConstants.NAME));
-        Mockito.when(mockedParameters.getString(NiftyConstants.DESCRIPTION))
-            .thenReturn((String) propertyStubsMap.get(NiftyConstants.DESCRIPTION));
-        Mockito.when(mockedParameters.getString(NiftyConstants.PROJECT))
-            .thenReturn((String) propertyStubsMap.get(NiftyConstants.PROJECT));
-        Mockito.when(mockedParameters.getString(NiftyConstants.TASK_GROUP_ID))
-            .thenReturn((String) propertyStubsMap.get(NiftyConstants.TASK_GROUP_ID));
-        Mockito.when(mockedParameters.getString(NiftyConstants.DUE_DATE))
-            .thenReturn((String) propertyStubsMap.get(NiftyConstants.DUE_DATE));
+        when(mockedParameters.getString(NAME))
+            .thenReturn((String) propertyStubsMap.get(NAME));
+        when(mockedParameters.getString(DESCRIPTION))
+            .thenReturn((String) propertyStubsMap.get(DESCRIPTION));
+        when(mockedParameters.getString(PROJECT))
+            .thenReturn((String) propertyStubsMap.get(PROJECT));
+        when(mockedParameters.getString(TASK_GROUP_ID))
+            .thenReturn((String) propertyStubsMap.get(TASK_GROUP_ID));
+        when(mockedParameters.getString(DUE_DATE))
+            .thenReturn((String) propertyStubsMap.get(DUE_DATE));
 
         Object result = NiftyCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
 
@@ -89,10 +92,10 @@ class NiftyCreateTaskActionTest {
     private static Map<String, Object> createPropertyStubsMap() {
         Map<String, Object> propertyStubsMap = new HashMap<>();
 
-        propertyStubsMap.put(NiftyConstants.NAME, "name");
-        propertyStubsMap.put(NiftyConstants.DESCRIPTION, "description");
-        propertyStubsMap.put(NiftyConstants.TASK_GROUP_ID, "task_group_id");
-        propertyStubsMap.put(NiftyConstants.DUE_DATE, "due_date");
+        propertyStubsMap.put(NAME, "name");
+        propertyStubsMap.put(DESCRIPTION, "description");
+        propertyStubsMap.put(TASK_GROUP_ID, "task_group_id");
+        propertyStubsMap.put(DUE_DATE, "due_date");
 
         return propertyStubsMap;
     }
