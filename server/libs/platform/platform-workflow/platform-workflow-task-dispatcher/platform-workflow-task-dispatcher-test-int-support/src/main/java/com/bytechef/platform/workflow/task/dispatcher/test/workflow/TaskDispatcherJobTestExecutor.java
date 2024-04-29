@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -28,12 +29,15 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 
 public class TaskDispatcherJobTestExecutor {
@@ -106,5 +110,14 @@ public class TaskDispatcherJobTestExecutor {
     @FunctionalInterface
     public interface TaskHandlerMapSupplier {
         Map<String, TaskHandler<?>> get();
+    }
+
+    public List<ExecutionError> getExecutionErrors(long jobId) {
+        List<TaskExecution> jobTaskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+        return jobTaskExecutions.stream()
+            .map(TaskExecution::getError)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 }
