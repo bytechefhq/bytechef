@@ -74,7 +74,8 @@ public final class DropboxCreateNewTextFileAction {
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
         String destinationFilePath = inputParameters.getRequiredString(DESTINATION_FILENAME);
-        if(!destinationFilePath.endsWith(".paper")) destinationFilePath += ".paper";
+        if (!destinationFilePath.endsWith(".paper"))
+            destinationFilePath += ".paper";
 
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
             destinationFilePath, ImportFormat.PLAIN_TEXT)) {
