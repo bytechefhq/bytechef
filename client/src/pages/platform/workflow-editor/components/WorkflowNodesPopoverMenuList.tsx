@@ -18,6 +18,7 @@ import {memo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
@@ -44,6 +45,7 @@ const WorkflowNodesPopoverMenuList = memo(
         triggerComponentDefinitions,
     }: WorkflowNodesListProps) => {
         const {setWorkflow, workflow} = useWorkflowDataStore();
+        const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -208,6 +210,8 @@ const WorkflowNodesPopoverMenuList = memo(
                                     id: getFormattedName(clickedItem.name!, nodes),
                                     type: 'workflow',
                                 };
+
+                                setCurrentNode(newTriggerNode.data);
 
                                 saveWorkflowDefinition(newTriggerNode.data, workflow, updateWorkflowMutation);
 
