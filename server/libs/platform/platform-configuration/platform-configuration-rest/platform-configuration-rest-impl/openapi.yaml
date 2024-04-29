@@ -2188,6 +2188,9 @@ components:
           items:
             $ref: "#/components/schemas/WorkflowConnection"
           readOnly: true
+        description:
+          description: "The description of the task."
+          type: "string"
         destination:
           $ref: '#/components/schemas/DataStreamComponent'
         finalize:
@@ -2233,7 +2236,7 @@ components:
             \ be deemed as timed-out."
           type: "string"
         type:
-          description: "The type of a task."
+          description: "The type of the task."
           type: "string"
     WorkflowTrigger:
       description: "Represents a definition of a workflow trigger."
@@ -2247,6 +2250,9 @@ components:
           items:
             $ref: "#/components/schemas/WorkflowConnection"
           readOnly: true
+        description:
+          description: "The description of the task."
+          type: "string"
         label:
           description: "The human-readable description of the task."
           type: "string"
@@ -2264,5 +2270,5 @@ components:
             \ be deemed as timed-out."
           type: "string"
         type:
-          description: "The type of a trigger."
+          description: "The type of the trigger."
           type: "string"
