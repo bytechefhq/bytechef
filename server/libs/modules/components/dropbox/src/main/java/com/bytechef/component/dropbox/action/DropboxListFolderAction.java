@@ -84,6 +84,6 @@ public final class DropboxListFolderAction {
 
         String filePath = inputParameters.getString(SOURCE_FILENAME);
 
-        return dbxUserFilesRequests.listFolder(filePath!=null ? filePath : "");
+        return dbxUserFilesRequests.listFolder(filePath != null ? filePath : "");
     }
 }
