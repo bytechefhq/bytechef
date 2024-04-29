@@ -268,7 +268,8 @@ const WorkflowNodeDetailsPanel = ({
                 label: title,
                 name: workflowNodeName || currentNode?.name || '',
                 operationName,
-                type: `${componentName}/v1/${operationName}`,
+                trigger: currentNode?.trigger,
+                type: `${componentName}/v${currentComponentDefinition.version}/${operationName}`,
             },
             workflow,
             updateWorkflowMutation

@@ -45,7 +45,7 @@ export default async function saveWorkflowDefinition(
             label: nodeData.label,
             name: nodeData.name,
             parameters: nodeData.parameters,
-            type: `${nodeData.componentName}/v1/${nodeData.operationName}`,
+            type: nodeData.type ?? `${nodeData.componentName}/v1/${nodeData.operationName}`,
         };
 
         updateWorkflowMutation.mutate(
