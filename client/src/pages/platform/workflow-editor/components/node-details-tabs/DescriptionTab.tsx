@@ -5,6 +5,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {UpdateWorkflowMutationType} from '@/types/types';
 import {ChangeEvent} from 'react';
+import {useDebouncedCallback} from 'use-debounce';
 
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 
@@ -12,7 +13,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
     const {workflow} = useWorkflowDataStore();
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    const handleLabelChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!currentComponent) {
             return;
         }
@@ -21,6 +22,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
             saveWorkflowDefinition(
                 {
                     componentName: currentComponent.componentName as string,
+                    description: currentComponent?.notes,
                     icon: undefined,
                     label: event.target.value,
                     name: currentComponent.workflowNodeName,
@@ -29,22 +31,23 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                 updateWorkflowMutation
             );
         }
-    };
+    }, 200);
 
-    const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
         if (currentComponent?.componentName) {
             saveWorkflowDefinition(
                 {
                     componentName: currentComponent.componentName as string,
                     description: event.target.value,
                     icon: undefined,
+                    label: currentComponent?.title,
                     name: currentComponent.workflowNodeName,
                 },
                 workflow,
                 updateWorkflowMutation
             );
         }
-    };
+    }, 200);
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
@@ -69,6 +72,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
+                    rows={6}
                 />
             </fieldset>
         </div>

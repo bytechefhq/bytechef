@@ -42,6 +42,7 @@ export default async function saveWorkflowDefinition(
     if (nodeData.trigger) {
         const newTrigger: WorkflowTriggerModel = {
             connections: nodeData.connections,
+            description: nodeData.description,
             label: nodeData.label,
             name: nodeData.name,
             parameters: nodeData.parameters,
@@ -71,7 +72,7 @@ export default async function saveWorkflowDefinition(
         return;
     }
 
-    const {componentName, label, name, parameters} = nodeData;
+    const {componentName, description, label, name, parameters} = nodeData;
 
     let {operationName} = nodeData;
 
@@ -91,6 +92,7 @@ export default async function saveWorkflowDefinition(
     }
 
     const newTask: WorkflowTaskModel = {
+        description,
         label,
         name,
         parameters,

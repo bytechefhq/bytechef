@@ -8,7 +8,7 @@ import './WorkflowEditorLayout.css';
 
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {UpdateWorkflowMutationType} from '@/types/types';
+import {ComponentType, UpdateWorkflowMutationType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -76,19 +76,20 @@ const WorkflowEditorLayout = ({
     }, [workflow.tasks?.length, refetchWorkflowNodeOutputs]);
 
     useEffect(() => {
-        const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((task) => {
-            const {label, name, parameters, type} = task;
+        const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((operation) => {
+            const {description, label, name, parameters, type} = operation;
 
             const [componentName, operationName] = type.split('/v1/');
 
             return {
                 componentName,
+                notes: description,
                 operationName,
                 parameters,
                 title: label,
                 type,
                 workflowNodeName: name,
-            };
+            } as ComponentType;
         });
 
         if (workflowComponents && currentNode) {

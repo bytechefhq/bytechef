@@ -1,7 +1,9 @@
-import {WorkflowModel} from '@/middleware/automation/configuration';
-
 /* eslint-disable sort-keys */
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
+import {
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionModel,
+    WorkflowModel,
+} from '@/middleware/platform/configuration';
 import {ComponentOperationType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
