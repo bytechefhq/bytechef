@@ -210,8 +210,6 @@ const WorkflowNodeDetailsPanel = ({
         }
     });
 
-    console.log('currentOperationProperties: ', currentOperationProperties);
-
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
             return workflowConnections.length > 0;
