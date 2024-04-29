@@ -28,6 +28,7 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
         }
 
         setRightSidebarOpen(false);
+
         setWorkflowNodeDetailsPanelOpen(true);
 
         setCurrentNode(nodeData);
