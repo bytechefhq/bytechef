@@ -33,8 +33,7 @@ class DropboxListFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
     void testPerform() throws DbxException {
-        Mockito
-            .when(parameters.getString(SOURCE_FILENAME))
+        Mockito.when(parameters.getString(SOURCE_FILENAME))
             .thenReturn(SOURCE_STUB);
 
         DropboxListFolderAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
@@ -48,8 +47,7 @@ class DropboxListFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
     void testPerformNull() throws DbxException {
-        Mockito
-            .when(parameters.getString(SOURCE_FILENAME))
+        Mockito.when(parameters.getString(SOURCE_FILENAME))
             .thenReturn(null);
 
         DropboxListFolderAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
