@@ -16,6 +16,8 @@
 
 package com.bytechef.component.dropbox.action;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
@@ -33,14 +35,14 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-public class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
+class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
 
     @Test
-    public void testPerform() throws DbxException, IOException {
+    void testPerform() throws DbxException, IOException {
         PaperCreateUploader paperCreateUploader = Mockito.mock(PaperCreateUploader.class);
 
         Mockito
-            .when(filesRequests.paperCreate(DESTINATION_STUB, ImportFormat.PLAIN_TEXT))
+            .when(filesRequests.paperCreate(any(), eq(ImportFormat.PLAIN_TEXT)))
             .thenReturn(paperCreateUploader);
 
         DropboxCreateNewTextFileAction.perform(
@@ -52,7 +54,7 @@ public class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTes
             .should(times(1))
             .paperCreate(stringArgumentCaptorA.capture(), importFormatArgumentCaptor.capture());
 
-        Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorA.getValue());
+        Assertions.assertEquals(DESTINATION_STUB + ".paper", stringArgumentCaptorA.getValue());
         Assertions.assertEquals(ImportFormat.PLAIN_TEXT, importFormatArgumentCaptor.getValue());
 
         ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
