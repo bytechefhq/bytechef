@@ -82,6 +82,9 @@ const Property = ({
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
+    const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
+        (property.type !== 'STRING' && !!property.name && property.expressionEnabled) || false
+    );
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -136,16 +139,6 @@ const Property = ({
 
     const showMentionInput = controlType === 'FILE_ENTRY' || mentionInput;
 
-    let showInputTypeSwitchButton = type !== 'STRING' && !!name && property.expressionEnabled;
-
-    if (controlType === 'FILE_ENTRY') {
-        showInputTypeSwitchButton = false;
-    }
-
-    if (controlType === 'SELECT') {
-        showInputTypeSwitchButton = true;
-    }
-
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
 
@@ -179,7 +172,7 @@ const Property = ({
             return;
         }
 
-        // TODO handle mix of text and multiple data pills
+        // TODO handle mix of text and multiple data pills when pasting
 
         let strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
 
@@ -541,6 +534,17 @@ const Property = ({
         }
     }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
 
+    // set showInputTypeSwitchButton state depending on the controlType
+    useEffect(() => {
+        if (controlType === 'FILE_ENTRY') {
+            setShowInputTypeSwitchButton(false);
+        }
+
+        if (controlType === 'SELECT') {
+            setShowInputTypeSwitchButton(true);
+        }
+    }, [controlType]);
+
     if (property.displayCondition && !currentComponent?.displayConditions?.[property.displayCondition]) {
         return <></>;
     }
@@ -580,7 +584,7 @@ const Property = ({
                             }}
                             ref={editorRef}
                             required={required}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton!}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
                             singleMention={type !== 'STRING'}
                             value={mentionInputValue}
                         />
@@ -715,6 +719,7 @@ const Property = ({
                                 arrayIndex={arrayIndex}
                                 currentNodeConnectionId={currentNode?.connectionId}
                                 description={description}
+                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -727,6 +732,7 @@ const Property = ({
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 path={path}
                                 required={required}
+                                showInputTypeSwitchButton={showInputTypeSwitchButton}
                                 value={selectValue}
                                 workflowId={workflow.id!}
                                 workflowNodeName={currentNode?.name ?? ''}
