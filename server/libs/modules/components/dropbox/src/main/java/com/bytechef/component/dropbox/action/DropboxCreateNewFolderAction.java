@@ -42,8 +42,8 @@ public final class DropboxCreateNewFolderAction {
         .title("Create new folder")
         .description("Create a folder at a given path.")
         .properties(string(DESTINATION_FILENAME)
-            .label("Destination path")
-            .description("Path to create a folder on.")
+            .label("Folder path/name")
+            .description("The path of the new folder. Starts with / as root.")
             .required(true))
         .outputSchema(
             object()

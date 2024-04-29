@@ -42,13 +42,13 @@ import java.io.InputStream;
 public final class DropboxCreateNewTextFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEXT_FILE)
-        .title("Create new text file")
-        .description("Create a new text file.")
+        .title("Create a new paper file")
+        .description("Create a new file on which you can write at a given path")
         .properties(
             string(DESTINATION_FILENAME)
-                .label("Filename")
-                .description("The path at which the new text file should be created.")
-                .placeholder("/New_text_file.txt")
+                .label("Paper path/name")
+                .description("The path of the new paper file. Starts with / as root.")
+                .placeholder("/directory/New paper file")
                 .required(true))
         .outputSchema(
             object()
@@ -73,8 +73,11 @@ public final class DropboxCreateNewTextFileAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
+        String destinationFilePath = inputParameters.getRequiredString(DESTINATION_FILENAME);
+        if(!destinationFilePath.endsWith(".paper")) destinationFilePath += ".paper";
+
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
-            inputParameters.getRequiredString(DESTINATION_FILENAME), ImportFormat.PLAIN_TEXT)) {
+            destinationFilePath, ImportFormat.PLAIN_TEXT)) {
 
             return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
         }
