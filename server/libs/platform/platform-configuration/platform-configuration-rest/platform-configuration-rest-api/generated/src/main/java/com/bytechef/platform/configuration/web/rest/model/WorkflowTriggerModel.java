@@ -27,11 +27,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-29T06:21:57.549276+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class WorkflowTriggerModel {
 
   @Valid
   private List<@Valid WorkflowConnectionModel> connections;
+
+  private String description;
 
   private String label;
 
@@ -82,6 +84,26 @@ public class WorkflowTriggerModel {
 
   public void setConnections(List<@Valid WorkflowConnectionModel> connections) {
     this.connections = connections;
+  }
+
+  public WorkflowTriggerModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description of the task.
+   * @return description
+  */
+  
+  @Schema(name = "description", description = "The description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public WorkflowTriggerModel label(String label) {
@@ -178,11 +200,11 @@ public class WorkflowTriggerModel {
   }
 
   /**
-   * The type of a trigger.
+   * The type of the trigger.
    * @return type
   */
   @NotNull 
-  @Schema(name = "type", description = "The type of a trigger.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "type", description = "The type of the trigger.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
   public String getType() {
     return type;
@@ -202,6 +224,7 @@ public class WorkflowTriggerModel {
     }
     WorkflowTriggerModel workflowTrigger = (WorkflowTriggerModel) o;
     return Objects.equals(this.connections, workflowTrigger.connections) &&
+        Objects.equals(this.description, workflowTrigger.description) &&
         Objects.equals(this.label, workflowTrigger.label) &&
         Objects.equals(this.name, workflowTrigger.name) &&
         Objects.equals(this.parameters, workflowTrigger.parameters) &&
@@ -211,7 +234,7 @@ public class WorkflowTriggerModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, label, name, parameters, timeout, type);
+    return Objects.hash(connections, description, label, name, parameters, timeout, type);
   }
 
   @Override
@@ -219,6 +242,7 @@ public class WorkflowTriggerModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTriggerModel {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");

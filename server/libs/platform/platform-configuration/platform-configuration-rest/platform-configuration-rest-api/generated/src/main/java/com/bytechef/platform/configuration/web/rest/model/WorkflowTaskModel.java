@@ -28,11 +28,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.936320+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-29T06:21:57.549276+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class WorkflowTaskModel {
 
   @Valid
   private List<@Valid WorkflowConnectionModel> connections;
+
+  private String description;
 
   private DataStreamComponentModel destination;
 
@@ -98,6 +100,26 @@ public class WorkflowTaskModel {
 
   public void setConnections(List<@Valid WorkflowConnectionModel> connections) {
     this.connections = connections;
+  }
+
+  public WorkflowTaskModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description of the task.
+   * @return description
+  */
+  
+  @Schema(name = "description", description = "The description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public WorkflowTaskModel destination(DataStreamComponentModel destination) {
@@ -338,11 +360,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The type of a task.
+   * The type of the task.
    * @return type
   */
   @NotNull 
-  @Schema(name = "type", description = "The type of a task.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "type", description = "The type of the task.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
   public String getType() {
     return type;
@@ -362,6 +384,7 @@ public class WorkflowTaskModel {
     }
     WorkflowTaskModel workflowTask = (WorkflowTaskModel) o;
     return Objects.equals(this.connections, workflowTask.connections) &&
+        Objects.equals(this.description, workflowTask.description) &&
         Objects.equals(this.destination, workflowTask.destination) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
@@ -377,7 +400,7 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, destination, finalize, label, name, node, parameters, post, pre, source, timeout, type);
+    return Objects.hash(connections, description, destination, finalize, label, name, node, parameters, post, pre, source, timeout, type);
   }
 
   @Override
@@ -385,6 +408,7 @@ public class WorkflowTaskModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTaskModel {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    destination: ").append(toIndentedString(destination)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");

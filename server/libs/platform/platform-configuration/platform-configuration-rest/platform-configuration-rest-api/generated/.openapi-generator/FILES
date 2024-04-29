@@ -7,7 +7,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionA
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDescriptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPropertiesApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
