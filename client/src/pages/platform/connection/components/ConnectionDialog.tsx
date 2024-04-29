@@ -217,7 +217,6 @@ const ConnectionDialog = ({
 
             setAuthorizationName(undefined);
             setOAuth2Error(undefined);
-            setSelectedComponentDefinition(undefined);
             setWizardStep('configuration_step');
 
             connectionMutation.reset();
