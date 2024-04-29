@@ -6,15 +6,11 @@ tasks:
   parameters:
     list: "${range(1,10)}"
     iteratee:
-      name: "sequence_1"
-      type: "sequence/v1"
+    - name: "sumVar1"
+      type: "var"
       parameters:
-        tasks:
-        - name: "sumVar1"
-          type: "var"
-          parameters:
-            value: "${1 + loop_1.item}"
-        - name: "sumVar2"
-          type: "var"
-          parameters:
-            value: "${sumVar1 + 2}"
+        value: "${1 + loop_1.item}"
+    - name: "sumVar2"
+      type: "var"
+      parameters:
+        value: "${sumVar1 + 2}"
