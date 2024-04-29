@@ -74,7 +74,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        WorkflowTask iteratee = MapUtils.getRequired(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<WorkflowTask> iterateeWorkflowTasks =
+            MapUtils.getRequiredList(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
         List<?> list = MapUtils.getList(taskExecution.getParameters(), LIST, Collections.emptyList());
 
         taskExecution.setStartDate(LocalDateTime.now());
@@ -88,13 +89,13 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(1)
-                .workflowTask(iteratee)
+                .workflowTask(iterateeWorkflowTasks.getFirst())
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
                 taskFileStorage.readContextValue(
                     contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
+                        Validate.notNull(taskExecution.getId(), "parentId"), Context.Classname.TASK_EXECUTION)));
 
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
