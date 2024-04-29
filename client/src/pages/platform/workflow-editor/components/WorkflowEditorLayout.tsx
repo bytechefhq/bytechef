@@ -9,7 +9,7 @@ import './WorkflowEditorLayout.css';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {UpdateWorkflowMutationType} from '@/types/types';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -27,15 +27,18 @@ const WorkflowEditorLayout = ({
     taskDispatcherDefinitions,
     updateWorkflowMutation,
 }: WorkflowEditorLayoutProps) => {
+    const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
+
     const {componentActions, workflow} = useWorkflowDataStore();
-    const {currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode, setCurrentComponent, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
-            lastWorkflowNodeName: currentNode?.name,
+            lastWorkflowNodeName: currentNodeName,
         },
-        !!componentActions?.length && !!currentNode?.name && !currentNode?.trigger
+        !!componentActions?.length && !!currentNodeName && !currentNode?.trigger
     );
 
     const previousComponentDefinitions = workflowNodeOutputs
@@ -53,6 +56,19 @@ const WorkflowEditorLayout = ({
               )
               .filter((componentDefinition) => !!componentDefinition)
         : [];
+
+    useEffect(() => {
+        if (currentNode?.name) {
+            setCurrentNodeName(currentNode?.name);
+        }
+    }, [currentNode?.name]);
+
+    useEffect(() => {
+        if (!workflowNodeDetailsPanelOpen) {
+            setWorkflowNodeDetailsPanelOpen(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentNodeName, workflowNodeDetailsPanelOpen]);
 
     // refetch workflowNodeOutputs when a new node is added
     useEffect(() => {
@@ -91,7 +107,7 @@ const WorkflowEditorLayout = ({
                 updateWorkflowMutation={updateWorkflowMutation}
             />
 
-            {currentNode?.name && (
+            {currentNodeName && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation}
