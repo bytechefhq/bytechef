@@ -393,7 +393,7 @@ const Property = ({
             path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
-            value,
+            value: value === 'true',
             workflowId: workflow.id,
         });
     };
