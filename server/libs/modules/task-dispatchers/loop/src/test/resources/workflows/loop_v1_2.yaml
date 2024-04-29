@@ -9,12 +9,12 @@ tasks:
   parameters:
     list: "${range(1,10)}"
     iteratee:
-      name: "loop_2"
+    - name: "loop_2"
       type: "loop/v1"
       parameters:
         list: "${range(1,loop_1.item)}"
         iteratee:
-          name: "var1"
+        - name: "var1"
           type: "var"
           parameters:
             value: "${loop_1.item + '_' + loop_2.item}"

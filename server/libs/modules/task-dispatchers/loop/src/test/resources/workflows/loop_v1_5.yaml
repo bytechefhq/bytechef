@@ -6,7 +6,7 @@ tasks:
   parameters:
     list: "${range(1,10)}"
     iteratee:
-      name: "condition_1"
+    - name: "condition_1"
       type: "condition/v1"
       parameters:
         conditions:
