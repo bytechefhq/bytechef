@@ -10,6 +10,8 @@ import {FocusEventHandler, ReactNode, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
+import InputTypeSwitchButton from './InputTypeSwitchButton';
+
 import type {OptionModel} from '@/middleware/platform/configuration';
 
 type ComboBoxItemType = {
@@ -25,6 +27,7 @@ interface PropertyComboBoxProps {
     arrayIndex?: number;
     currentNodeConnectionId?: number;
     description?: string;
+    handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     loadDependsOnPaths?: Array<string>;
     loadDependsOnValues?: Array<string>;
@@ -36,6 +39,7 @@ interface PropertyComboBoxProps {
     path?: string;
     placeholder?: string;
     required?: boolean;
+    showInputTypeSwitchButton?: boolean;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
     workflowId: string;
@@ -46,6 +50,7 @@ const PropertyComboBox = ({
     arrayIndex,
     currentNodeConnectionId,
     description,
+    handleInputTypeSwitchButtonClick,
     label,
     leadingIcon,
     loadDependsOnPaths,
@@ -57,6 +62,7 @@ const PropertyComboBox = ({
     path,
     placeholder = 'Select...',
     required,
+    showInputTypeSwitchButton,
     value,
     workflowId,
     workflowNodeName,
@@ -106,7 +112,7 @@ const PropertyComboBox = ({
     }
 
     return (
-        <fieldset className="w-full space-y-2">
+        <fieldset className="w-full space-y-1">
             {label && (
                 <div className="flex items-center">
                     <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
@@ -124,6 +130,14 @@ const PropertyComboBox = ({
                             <TooltipContent>{description}</TooltipContent>
                         </Tooltip>
                     )}
+
+                    {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                        <InputTypeSwitchButton
+                            className="ml-auto"
+                            handleClick={handleInputTypeSwitchButtonClick}
+                            mentionInput={false}
+                        />
+                    )}
                 </div>
             )}
 
@@ -131,7 +145,11 @@ const PropertyComboBox = ({
                 <PopoverTrigger asChild onBlur={onBlur}>
                     <Button
                         aria-expanded={open}
-                        className={twMerge('relative w-full justify-between', leadingIcon && 'relative')}
+                        className={twMerge(
+                            'relative w-full justify-between',
+                            leadingIcon && 'relative',
+                            showInputTypeSwitchButton && 'mt-0'
+                        )}
                         disabled={isRefetching}
                         name={name}
                         role="combobox"
