@@ -46,7 +46,7 @@ public final class DropboxListFolderAction {
                 .label("Path")
                 .description("A unique identifier for the file. Must match pattern " +
                     "\" (/(.|[\\\\r\\\\n])*)?|id:.*|(ns:[0-9]+(/.*)?)\" and not be null.")
-                .required(true))
+                .required(false))
         .outputSchema(
             object()
                 .properties(
@@ -82,6 +82,8 @@ public final class DropboxListFolderAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME));
+        String filePath = inputParameters.getString(SOURCE_FILENAME);
+
+        return dbxUserFilesRequests.listFolder(filePath!=null ? filePath : "");
     }
 }
