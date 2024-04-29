@@ -213,7 +213,6 @@ const ConnectionDialog = ({
         setIsOpen(false);
 
         setTimeout(() => {
-            console.log('ee');
             formReset();
 
             setAuthorizationName(undefined);
