@@ -18,11 +18,13 @@ package com.bytechef.task.dispatcher.loop;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -71,15 +73,36 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch1() {
-        taskDispatcherJobTestExecutor.execute(
+        assertNoTaskErrors(taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_1"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap()));
 
         Assertions.assertEquals(
             IntStream.rangeClosed(2, 11)
                 .boxed()
                 .collect(Collectors.toList()),
             testVarTaskHandler.get("sumVar1"));
+    }
+
+    private void assertNoTaskErrors(Job job) {
+        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(job.getId());
+
+        if (!executionErrors.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            executionErrors.stream()
+                .forEachOrdered(executionError -> {
+                    stringBuilder.append(executionError.getMessage());
+                    stringBuilder.append(System.lineSeparator());
+                    executionError.getStackTrace()
+                        .forEach(s -> {
+                            stringBuilder.append(s);
+                            stringBuilder.append(System.lineSeparator());
+                        });
+                });
+
+            Assertions.fail(stringBuilder.toString());
+        }
     }
 
     @Test
@@ -99,9 +122,11 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch3() {
-        taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.encodeBase64ToString("loop_v1_3"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
+        assertNoTaskErrors(
+            taskDispatcherJobTestExecutor.execute(
+                EncodingUtils.encodeBase64ToString("loop_v1_3"),
+                this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
+                getTaskHandlerMap()));
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 13)
