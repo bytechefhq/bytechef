@@ -51,7 +51,8 @@ public final class WorkflowTaskDTO {
      *
      */
     public WorkflowTaskDTO(
-        List<WorkflowConnection> connections, String description, DataStreamComponent destination, List<WorkflowTask> finalize,
+        List<WorkflowConnection> connections, String description, DataStreamComponent destination,
+        List<WorkflowTask> finalize,
         String label, int maxRetries, String name, String node, Map<String, ?> parameters, List<WorkflowTask> post,
         List<WorkflowTask> pre, DataStreamComponent source, int taskNumber, String timeout, String type) {
 
