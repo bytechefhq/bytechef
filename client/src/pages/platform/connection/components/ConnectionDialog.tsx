@@ -215,9 +215,13 @@ const ConnectionDialog = ({
         setTimeout(() => {
             formReset();
 
-            setAuthorizationName(undefined);
             setOAuth2Error(undefined);
             setWizardStep('configuration_step');
+
+            if (!componentDefinition) {
+                setAuthorizationName(undefined);
+                setSelectedComponentDefinition(undefined);
+            }
 
             connectionMutation.reset();
 
