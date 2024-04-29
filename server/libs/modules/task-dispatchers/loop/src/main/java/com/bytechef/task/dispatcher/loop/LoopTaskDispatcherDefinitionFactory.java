@@ -57,7 +57,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
                 .defaultValue(false))
-        .taskProperties(task(ITERATEE))
+        .taskProperties(array(ITERATEE).items(task()))
         .variableProperties(LoopTaskDispatcherDefinitionFactory::getVariableProperties);
 
     @Override
