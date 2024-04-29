@@ -149,7 +149,11 @@ const ObjectProperty = ({
                             <Property
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                customClassName={twMerge('w-full last-of-type:pb-0', label && 'mb-0 pl-2')}
+                                customClassName={twMerge(
+                                    'w-full last-of-type:pb-0',
+                                    label && 'mb-0',
+                                    name === '__item' ? 'pb-0' : 'pl-2'
+                                )}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
                                 operationName={operationName}
