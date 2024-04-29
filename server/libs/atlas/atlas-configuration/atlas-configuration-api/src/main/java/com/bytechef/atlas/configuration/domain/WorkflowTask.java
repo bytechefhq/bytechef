@@ -38,6 +38,7 @@ import org.apache.commons.lang3.Validate;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTask implements Task, Serializable {
 
+    private String description;
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
     private final Map<String, Object> extensions = new HashMap<>();
@@ -56,7 +57,9 @@ public class WorkflowTask implements Task, Serializable {
         Validate.notNull(source, "'source' must not be null");
 
         for (Map.Entry<String, ?> entry : source.entrySet()) {
-            if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
+            if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
+                this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
+            } else if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
                 this.finalize = MapUtils.getList(
                     source, WorkflowConstants.FINALIZE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
@@ -128,6 +131,10 @@ public class WorkflowTask implements Task, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(finalize, label, name, node, parameters, post, pre, taskNumber, timeout, type);
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
@@ -247,6 +254,10 @@ public class WorkflowTask implements Task, Serializable {
             map.put(entry.getKey(), entry.getValue());
         }
 
+        if (description != null) {
+            map.put(WorkflowConstants.DESCRIPTION, description);
+        }
+
         map.put(WorkflowConstants.FINALIZE, CollectionUtils.map(finalize, WorkflowTask::toMap));
 
         if (label != null) {
@@ -283,6 +294,7 @@ public class WorkflowTask implements Task, Serializable {
             ", label='" + label + '\'' +
             ", type='" + type + '\'' +
             ", node='" + node + '\'' +
+            ", description='" + description + '\'' +
             ", timeout='" + timeout + '\'' +
             ", pre=" + pre +
             ", post=" + post +

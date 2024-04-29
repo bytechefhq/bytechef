@@ -32,6 +32,7 @@ import java.util.Objects;
 public final class WorkflowTaskDTO {
 
     private final List<WorkflowConnection> connections;
+    private final String description;
     private final DataStreamComponent destination;
     private final List<WorkflowTask> finalize;
     private final String label;
@@ -50,11 +51,12 @@ public final class WorkflowTaskDTO {
      *
      */
     public WorkflowTaskDTO(
-        List<WorkflowConnection> connections, DataStreamComponent destination, List<WorkflowTask> finalize,
+        List<WorkflowConnection> connections, String description, DataStreamComponent destination, List<WorkflowTask> finalize,
         String label, int maxRetries, String name, String node, Map<String, ?> parameters, List<WorkflowTask> post,
         List<WorkflowTask> pre, DataStreamComponent source, int taskNumber, String timeout, String type) {
 
         this.connections = connections;
+        this.description = description;
         this.destination = destination;
         this.finalize = finalize;
         this.label = label;
@@ -72,15 +74,19 @@ public final class WorkflowTaskDTO {
 
     public WorkflowTaskDTO(WorkflowTask workflowTask, List<WorkflowConnection> connections, DataStream dataStream) {
         this(
-            connections, dataStream == null ? null : dataStream.destination(), workflowTask.getFinalize(),
-            workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getName(), workflowTask.getNode(),
-            workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
+            connections, workflowTask.getDescription(), dataStream == null ? null : dataStream.destination(),
+            workflowTask.getFinalize(), workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getName(),
+            workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
             dataStream == null ? null : dataStream.source(), workflowTask.getTaskNumber(), workflowTask.getTimeout(),
             workflowTask.getType());
     }
 
     public List<WorkflowConnection> getConnections() {
         return connections;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public DataStreamComponent getDestination() {
@@ -174,6 +180,7 @@ public final class WorkflowTaskDTO {
     public String toString() {
         return "WorkflowTaskDTO[" +
             "connections=" + connections + ", " +
+            "description=" + description + ", " +
             "destination=" + destination + ", " +
             "finalize=" + finalize + ", " +
             "label=" + label + ", " +

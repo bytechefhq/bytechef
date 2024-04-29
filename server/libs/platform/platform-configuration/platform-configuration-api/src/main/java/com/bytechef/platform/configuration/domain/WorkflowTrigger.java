@@ -38,6 +38,7 @@ import org.apache.commons.lang3.Validate;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTrigger implements Serializable, Trigger {
 
+    private String description;
     private final Map<String, Object> extensions = new HashMap<>();
     private Map<String, ?> metadata = new HashMap<>();
     private String name;
@@ -50,7 +51,9 @@ public class WorkflowTrigger implements Serializable, Trigger {
         Validate.notNull(source, "'source' must not be null");
 
         for (Map.Entry<String, ?> entry : source.entrySet()) {
-            if (WorkflowConstants.LABEL.equals(entry.getKey())) {
+            if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
+                this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
+            } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
                 this.metadata = MapUtils.getMap(source, WorkflowConstants.METADATA, Collections.emptyMap());
@@ -120,6 +123,10 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return Objects.hash(label, name, parameters, timeout, type);
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
@@ -168,6 +175,10 @@ public class WorkflowTrigger implements Serializable, Trigger {
             map.put(entry.getKey(), entry.getValue());
         }
 
+        if (description != null) {
+            map.put(WorkflowConstants.DESCRIPTION, description);
+        }
+
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);
         }
@@ -194,6 +205,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return "WorkflowTrigger{" +
             "name='" + name + '\'' +
             ", label='" + label + '\'' +
+            ", description='" + description + '\'' +
             ", timeout='" + timeout + '\'' +
             ", type='" + type + '\'' +
             ", parameters=" + parameters +
