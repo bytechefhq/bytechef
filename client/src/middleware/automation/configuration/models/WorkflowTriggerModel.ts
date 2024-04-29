@@ -33,6 +33,12 @@ export interface WorkflowTriggerModel {
      */
     readonly connections?: Array<WorkflowConnectionModel>;
     /**
+     * The description of the task.
+     * @type {string}
+     * @memberof WorkflowTriggerModel
+     */
+    description?: string;
+    /**
      * The human-readable description of the task.
      * @type {string}
      * @memberof WorkflowTriggerModel
@@ -57,7 +63,7 @@ export interface WorkflowTriggerModel {
      */
     timeout?: string;
     /**
-     * The type of a trigger.
+     * The type of the trigger.
      * @type {string}
      * @memberof WorkflowTriggerModel
      */
@@ -84,6 +90,7 @@ export function WorkflowTriggerModelFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
+        'description': json['description'] == null ? undefined : json['description'],
         'label': json['label'] == null ? undefined : json['label'],
         'name': json['name'],
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
@@ -98,6 +105,7 @@ export function WorkflowTriggerModelToJSON(value?: WorkflowTriggerModel | null):
     }
     return {
         
+        'description': value['description'],
         'label': value['label'],
         'name': value['name'],
         'parameters': value['parameters'],

@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/ConnectionApi.ts
 apis/ConnectionTagApi.ts
 apis/index.ts
