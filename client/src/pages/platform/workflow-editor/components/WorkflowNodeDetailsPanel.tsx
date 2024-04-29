@@ -102,7 +102,7 @@ const WorkflowNodeDetailsPanel = ({
             componentName: currentComponentDefinition?.name as string,
             componentVersion: currentComponentDefinition?.version as number,
         },
-        !!currentComponentDefinition?.actions && !!getActionName()
+        !!currentComponentDefinition?.actions && !currentNode?.trigger && !!getActionName()
     );
 
     const getTriggerName = (): string => {
@@ -113,7 +113,7 @@ const WorkflowNodeDetailsPanel = ({
             : (currentComponentDefinition?.triggers?.[0]?.name as string);
     };
 
-    const {data: currentTriggerDefinition} = useGetTriggerDefinitionQuery(
+    const {data: currentTriggerDefinition, isFetched: currentTriggerFetched} = useGetTriggerDefinitionQuery(
         {
             componentName: currentComponentDefinition?.name as string,
             componentVersion: currentComponentDefinition?.version as number,
@@ -209,6 +209,8 @@ const WorkflowNodeDetailsPanel = ({
             availableDataPills.push(...formattedProperties);
         }
     });
+
+    console.log('currentOperationProperties: ', currentOperationProperties);
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
@@ -310,7 +312,10 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
-        if (currentActionFetched && activeTab !== 'output') {
+        if (
+            activeTab !== 'output' &&
+            ((!currentNode?.trigger && currentActionFetched) || (currentNode?.trigger && currentTriggerFetched))
+        ) {
             if (!currentOperationProperties?.length) {
                 setActiveTab('description');
             }
@@ -331,7 +336,11 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
-        if (activeTab === 'properties' && currentActionFetched && !currentOperationProperties) {
+        if (
+            activeTab === 'properties' &&
+            ((!currentNode?.trigger && currentActionFetched) || (currentNode?.trigger && currentTriggerFetched)) &&
+            !currentOperationProperties
+        ) {
             setActiveTab('description');
         }
 
@@ -432,25 +441,27 @@ const WorkflowNodeDetailsPanel = ({
                             />
                         )}
 
-                        {currentActionFetched && nodeTabs.length > 1 && (
-                            <div className="flex justify-center">
-                                {nodeTabs.map((tab) => (
-                                    <Button
-                                        className={twMerge(
-                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                            activeTab === tab?.name &&
-                                                'border-blue-500 text-blue-500 hover:text-blue-500'
-                                        )}
-                                        key={tab.name}
-                                        name={tab.name}
-                                        onClick={() => setActiveTab(tab.name)}
-                                        variant="ghost"
-                                    >
-                                        {tab.label}
-                                    </Button>
-                                ))}
-                            </div>
-                        )}
+                        {((!currentNode?.trigger && currentActionFetched) ||
+                            (currentNode?.trigger && currentTriggerFetched)) &&
+                            nodeTabs.length > 1 && (
+                                <div className="flex justify-center">
+                                    {nodeTabs.map((tab) => (
+                                        <Button
+                                            className={twMerge(
+                                                'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                activeTab === tab?.name &&
+                                                    'border-blue-500 text-blue-500 hover:text-blue-500'
+                                            )}
+                                            key={tab.name}
+                                            name={tab.name}
+                                            onClick={() => setActiveTab(tab.name)}
+                                            variant="ghost"
+                                        >
+                                            {tab.label}
+                                        </Button>
+                                    ))}
+                                </div>
+                            )}
 
                         <div className="relative h-full overflow-y-scroll">
                             {currentComponentDefinition && (
