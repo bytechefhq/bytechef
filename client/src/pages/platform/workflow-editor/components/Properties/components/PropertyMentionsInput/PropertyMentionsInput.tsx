@@ -64,7 +64,7 @@ const PropertyMentionsInput = forwardRef(
             leadingIcon,
             onChange,
             onKeyPress,
-            placeholder = "Show data pills using '{'",
+            placeholder,
             required,
             showInputTypeSwitchButton,
             singleMention,
@@ -256,7 +256,9 @@ const PropertyMentionsInput = forwardRef(
                         onChange={(newValue) => handleOnChange(newValue)}
                         onFocus={handleOnFocus}
                         onKeyPress={onKeyPress}
-                        placeholder={placeholder}
+                        placeholder={
+                            placeholder ? `${placeholder} (Show data pills using '{')` : "Show data pills using '{'"
+                        }
                         ref={ref}
                         value={value}
                     />
