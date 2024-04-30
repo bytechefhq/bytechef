@@ -9,13 +9,16 @@ export default function useGlobalErrorInterceptor() {
             if (response.status < 200 || response.status > 299) {
                 const clonedResponse = response.clone();
 
-                clonedResponse.json().then((data) => {
-                    toast({
-                        description: data.detail,
-                        title: data.title,
-                        variant: 'destructive',
-                    });
-                });
+                clonedResponse
+                    .json()
+                    .then((data) => {
+                        toast({
+                            description: data.detail,
+                            title: data.title,
+                            variant: 'destructive',
+                        });
+                    })
+                    .catch((e) => console.error(e.message));
             }
 
             return response;
