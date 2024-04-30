@@ -38,7 +38,7 @@ const WorkflowEditorLayout = ({
             id: workflow.id!,
             lastWorkflowNodeName: currentNodeName,
         },
-        !!componentActions?.length && !!currentNodeName && !currentNode?.trigger
+        !!componentActions?.length && !!currentNodeName && !!currentNode && !currentNode?.trigger
     );
 
     const previousComponentDefinitions = workflowNodeOutputs
@@ -60,11 +60,13 @@ const WorkflowEditorLayout = ({
     useEffect(() => {
         if (currentNode?.name) {
             setCurrentNodeName(currentNode?.name);
+        } else {
+            setCurrentNodeName(undefined);
         }
     }, [currentNode?.name]);
 
     useEffect(() => {
-        if (!workflowNodeDetailsPanelOpen) {
+        if (!workflowNodeDetailsPanelOpen && currentNodeName) {
             setWorkflowNodeDetailsPanelOpen(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,13 +94,11 @@ const WorkflowEditorLayout = ({
             } as ComponentType;
         });
 
-        if (workflowComponents && currentNode) {
-            setCurrentComponent(
-                workflowComponents.find((component) => component.workflowNodeName === currentNode.name)
-            );
+        if (workflowComponents && currentNodeName) {
+            setCurrentComponent(workflowComponents.find((component) => component.workflowNodeName === currentNodeName));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.tasks, workflow.triggers, currentNode]);
+    }, [workflow.tasks, workflow.triggers, currentNodeName]);
 
     return (
         <ReactFlowProvider>

@@ -74,14 +74,19 @@ const WorkflowNodeDetailsPanel = ({
     const {
         currentComponent,
         currentNode,
+        setCurrentComponent,
         setCurrentComponentDefinition,
+        setCurrentNode,
         setWorkflowNodeDetailsPanelOpen,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
-    const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
-        componentName: currentNode?.componentName || currentNode?.id || '',
-    });
+    const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
+        {
+            componentName: currentNode?.componentName || currentNode?.id || '',
+        },
+        !!currentNode
+    );
 
     const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
 
@@ -158,9 +163,9 @@ const WorkflowNodeDetailsPanel = ({
     const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
             id: workflow.id!,
-            workflowNodeName: currentNode?.name || '',
+            workflowNodeName: currentNode?.name as string,
         },
-        hasOutputData && activeTab === 'output'
+        !!currentNode?.name && !!workflow.id && hasOutputData && activeTab === 'output'
     );
 
     const workflowConnections: WorkflowConnectionModel[] =
@@ -276,6 +281,17 @@ const WorkflowNodeDetailsPanel = ({
         );
     };
 
+    const handlePanelClose = () => {
+        setCurrentNode(undefined);
+
+        setCurrentComponent(undefined);
+
+        setCurrentComponentDefinition(undefined);
+
+        setWorkflowNodeDetailsPanelOpen(false);
+    };
+
+    // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(
         () =>
             setCurrentOperationProperties(
@@ -357,7 +373,7 @@ const WorkflowNodeDetailsPanel = ({
 
     // Close the panel if the current node is deleted
     useEffect(() => {
-        if (currentNode?.name && !nodeNames.includes(currentNode?.name)) {
+        if (!currentNode?.name || !nodeNames.includes(currentNode?.name)) {
             setWorkflowNodeDetailsPanelOpen(false);
         }
     }, [currentNode?.name, nodeNames, setWorkflowNodeDetailsPanelOpen]);
@@ -378,7 +394,7 @@ const WorkflowNodeDetailsPanel = ({
         refetchWorkflowNodeOutput();
     }, [currentOperationName, refetchWorkflowNodeOutput]);
 
-    if (!workflowNodeDetailsPanelOpen) {
+    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentComponentDefinition) {
         return <></>;
     }
 
@@ -413,7 +429,7 @@ const WorkflowNodeDetailsPanel = ({
                         <button
                             aria-label="Close the node details dialog"
                             className="ml-auto pr-0"
-                            onClick={() => setWorkflowNodeDetailsPanelOpen(false)}
+                            onClick={handlePanelClose}
                         >
                             <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
                         </button>
