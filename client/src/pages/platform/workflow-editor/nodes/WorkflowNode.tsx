@@ -113,7 +113,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             tasks: updatedTasks,
         });
 
-        setCurrentNode(undefined);
+        if (currentNode?.name === data.name) {
+            setCurrentNode(undefined);
+        }
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,

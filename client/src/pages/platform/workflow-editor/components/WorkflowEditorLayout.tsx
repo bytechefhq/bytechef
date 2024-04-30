@@ -74,8 +74,10 @@ const WorkflowEditorLayout = ({
 
     // refetch workflowNodeOutputs when a new node is added
     useEffect(() => {
-        refetchWorkflowNodeOutputs();
-    }, [workflow.tasks?.length, refetchWorkflowNodeOutputs]);
+        if (currentNode && !currentNode?.trigger) {
+            refetchWorkflowNodeOutputs();
+        }
+    }, [workflow.tasks?.length, currentNode, refetchWorkflowNodeOutputs]);
 
     useEffect(() => {
         const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((operation) => {
