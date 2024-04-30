@@ -736,7 +736,6 @@ const Property = ({
                         {controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 arrayIndex={arrayIndex}
-                                currentNodeConnectionId={currentNode?.connectionId}
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 key={`${currentNode?.name}_${name}`}

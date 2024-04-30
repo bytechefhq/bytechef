@@ -10,6 +10,7 @@ import {FocusEventHandler, ReactNode, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
+import {useWorkflowNodeDetailsPanelStore} from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 import type {OptionModel} from '@/middleware/platform/configuration';
@@ -25,7 +26,6 @@ type ComboBoxItemType = {
 
 interface PropertyComboBoxProps {
     arrayIndex?: number;
-    currentNodeConnectionId?: number;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
@@ -48,7 +48,6 @@ interface PropertyComboBoxProps {
 
 const PropertyComboBox = ({
     arrayIndex,
-    currentNodeConnectionId,
     description,
     handleInputTypeSwitchButtonClick,
     label,
@@ -68,6 +67,8 @@ const PropertyComboBox = ({
     workflowNodeName,
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
+
+    const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     if (path) {
         path = path.replace('parameters.', '').replace('parameters', '');
@@ -91,8 +92,9 @@ const PropertyComboBox = ({
                 workflowNodeName,
             },
         },
-        (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
-            !!currentNodeConnectionId
+        !!currentNode &&
+            (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
+            !!currentNode?.connectionId
     );
 
     if (optionsData) {
@@ -105,9 +107,11 @@ const PropertyComboBox = ({
 
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
+    const missingConnection = currentNode?.connections?.length && !currentNode.connectionId;
+
     if (loadDependsOnValues?.length && !options.length) {
         placeholder = `${loadDependsOnPaths} is not defined`;
-    } else if (!currentNodeConnectionId) {
+    } else if (missingConnection) {
         placeholder = 'Connection missing...';
     }
 
@@ -195,7 +199,7 @@ const PropertyComboBox = ({
                                             className={twMerge(
                                                 leadingIcon && 'ml-9',
                                                 ((loadDependsOnValues?.length && !options.length) ||
-                                                    !currentNodeConnectionId) &&
+                                                    missingConnection) &&
                                                     'text-red-600'
                                             )}
                                         >
