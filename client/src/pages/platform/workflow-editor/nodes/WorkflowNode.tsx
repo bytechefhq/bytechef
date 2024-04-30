@@ -24,7 +24,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
-    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode, setCurrentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
     const {componentNames} = workflow;
@@ -112,6 +112,8 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             componentNames: componentNames.filter((componentName) => componentName !== data.componentName),
             tasks: updatedTasks,
         });
+
+        setCurrentNode(undefined);
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
