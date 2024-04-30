@@ -23,14 +23,16 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.BASE_URL;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.LIST_FILES;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID_PROPERTY;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,14 @@ public class MicrosoftOneDriveListFilesAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_FILES)
         .title("List Files")
         .description("List files in a OneDrive folder")
-        .properties(PARENT_ID_PROPERTY)
+        .properties(
+            string(PARENT_ID)
+                .label("Parent folder")
+                .description(
+                    "Folder from which you want to list files. If no folder is specified, the root folder will " +
+                        "be used.")
+                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .required(false))
         .outputSchema(
             array()
                 .items(

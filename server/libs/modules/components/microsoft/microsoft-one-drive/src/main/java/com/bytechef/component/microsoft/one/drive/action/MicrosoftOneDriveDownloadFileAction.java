@@ -23,7 +23,6 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.DOWNLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -41,7 +40,11 @@ public class MicrosoftOneDriveDownloadFileAction {
         .title("Download file")
         .description("Download a file from your Microsoft OneDrive")
         .properties(
-            PARENT_ID_PROPERTY,
+            string(PARENT_ID)
+                .label("Parent folder")
+                .description("Folder from which you want to download the file.")
+                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .required(false),
             string(ID)
                 .label("File")
                 .description("File to download")
