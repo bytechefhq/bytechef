@@ -23,7 +23,7 @@
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
-      "description": null,
+      "description": "Team where the channel will be created.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -183,7 +183,7 @@
     "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
-      "description": null,
+      "description": "Team where the channel is located.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -216,7 +216,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Channel",
+      "label": "Channel to send message to.",
       "placeholder": null,
       "controlType": "SELECT",
       "languageId": null,
@@ -652,7 +652,6 @@
     },
     "perform": { }
   } ],
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -723,21 +722,22 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
+      "clientId": null,
+      "clientSecret": null
     } ],
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  }
+  },
+  "triggers": null
 }
