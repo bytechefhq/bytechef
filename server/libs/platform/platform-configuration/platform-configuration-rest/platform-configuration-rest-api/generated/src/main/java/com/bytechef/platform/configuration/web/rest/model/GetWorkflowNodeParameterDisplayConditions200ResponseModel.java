@@ -18,53 +18,22 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * UpdateWorkflowNodeParameter200ResponseModel
+ * GetWorkflowNodeParameterDisplayConditions200ResponseModel
  */
 
-@JsonTypeName("updateWorkflowNodeParameter_200_response")
+@JsonTypeName("getWorkflowNodeParameterDisplayConditions_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-01T08:31:43.380174+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
-public class UpdateWorkflowNodeParameter200ResponseModel {
-
-  @Valid
-  private Map<String, Object> parameters = new HashMap<>();
+public class GetWorkflowNodeParameterDisplayConditions200ResponseModel {
 
   @Valid
   private Map<String, Boolean> displayConditions = new HashMap<>();
 
-  public UpdateWorkflowNodeParameter200ResponseModel parameters(Map<String, Object> parameters) {
-    this.parameters = parameters;
-    return this;
-  }
-
-  public UpdateWorkflowNodeParameter200ResponseModel putParametersItem(String key, Object parametersItem) {
-    if (this.parameters == null) {
-      this.parameters = new HashMap<>();
-    }
-    this.parameters.put(key, parametersItem);
-    return this;
-  }
-
-  /**
-   * Get parameters
-   * @return parameters
-  */
-  
-  @Schema(name = "parameters", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("parameters")
-  public Map<String, Object> getParameters() {
-    return parameters;
-  }
-
-  public void setParameters(Map<String, Object> parameters) {
-    this.parameters = parameters;
-  }
-
-  public UpdateWorkflowNodeParameter200ResponseModel displayConditions(Map<String, Boolean> displayConditions) {
+  public GetWorkflowNodeParameterDisplayConditions200ResponseModel displayConditions(Map<String, Boolean> displayConditions) {
     this.displayConditions = displayConditions;
     return this;
   }
 
-  public UpdateWorkflowNodeParameter200ResponseModel putDisplayConditionsItem(String key, Boolean displayConditionsItem) {
+  public GetWorkflowNodeParameterDisplayConditions200ResponseModel putDisplayConditionsItem(String key, Boolean displayConditionsItem) {
     if (this.displayConditions == null) {
       this.displayConditions = new HashMap<>();
     }
@@ -95,21 +64,19 @@ public class UpdateWorkflowNodeParameter200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateWorkflowNodeParameter200ResponseModel updateWorkflowNodeParameter200Response = (UpdateWorkflowNodeParameter200ResponseModel) o;
-    return Objects.equals(this.parameters, updateWorkflowNodeParameter200Response.parameters) &&
-        Objects.equals(this.displayConditions, updateWorkflowNodeParameter200Response.displayConditions);
+    GetWorkflowNodeParameterDisplayConditions200ResponseModel getWorkflowNodeParameterDisplayConditions200Response = (GetWorkflowNodeParameterDisplayConditions200ResponseModel) o;
+    return Objects.equals(this.displayConditions, getWorkflowNodeParameterDisplayConditions200Response.displayConditions);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(parameters, displayConditions);
+    return Objects.hash(displayConditions);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateWorkflowNodeParameter200ResponseModel {\n");
-    sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
+    sb.append("class GetWorkflowNodeParameterDisplayConditions200ResponseModel {\n");
     sb.append("    displayConditions: ").append(toIndentedString(displayConditions)).append("\n");
     sb.append("}");
     return sb.toString();

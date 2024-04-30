@@ -7,6 +7,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeParameterDisplayConditions200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-29T06:21:57.549276+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-01T08:31:43.380174+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "workflow-node-parameter", description = "The Platform Workflow Node Parameter API")
 public interface WorkflowNodeParameterApi {
@@ -89,6 +90,49 @@ public interface WorkflowNodeParameterApi {
 
 
     /**
+     * GET /workflows/{id}/parameters/{workflowNodeName}/display-conditions : Get an action or trigger property options shown in the editor
+     * Get an action or trigger property options shown in the editor.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
+     * @return The workflow node parameter display conditions. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkflowNodeParameterDisplayConditions",
+        summary = "Get an action or trigger property options shown in the editor",
+        description = "Get an action or trigger property options shown in the editor.",
+        tags = { "workflow-node-parameter" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow node parameter display conditions.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = GetWorkflowNodeParameterDisplayConditions200ResponseModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflows/{id}/parameters/{workflowNodeName}/display-conditions",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<GetWorkflowNodeParameterDisplayConditions200ResponseModel> getWorkflowNodeParameterDisplayConditions(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"displayConditions\" : { \"key\" : true } }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * PATCH /workflows/{id}/parameters : Updates a workflow node parameter
      * Updates a workflow node parameter.
      *
@@ -121,7 +165,7 @@ public interface WorkflowNodeParameterApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"displayConditions\" : { \"key\" : \"\" }, \"parameters\" : { \"key\" : \"\" } }";
+                    String exampleString = "{ \"displayConditions\" : { \"key\" : true }, \"parameters\" : { \"key\" : \"\" } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
