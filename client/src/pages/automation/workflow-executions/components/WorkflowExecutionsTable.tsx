@@ -44,8 +44,12 @@ const columns = [
         header: 'Project',
     }),
     columnHelper.accessor('projectInstance', {
-        cell: (info) => info.getValue()?.name,
+        cell: (info) => `${info.getValue()?.name} V${info.getValue()?.projectVersion}`,
         header: 'Instance',
+    }),
+    columnHelper.accessor('projectInstance', {
+        cell: (info) => info.getValue()?.environment,
+        header: 'Environment',
     }),
     columnHelper.accessor((row) => row.job, {
         cell: (info) => getDuration(info),

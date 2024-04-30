@@ -8,8 +8,8 @@ import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {ProjectModel} from '@/middleware/automation/configuration';
-import {useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
+import {useGetProjectInstanceQuery, useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowExecutionsQuery} from '@/queries/automation/workflowExecutions.queries';
 import {ActivityIcon} from 'lucide-react';
 import {
@@ -79,7 +79,11 @@ export const WorkflowExecutions = () => {
 
     const navigate = useNavigate();
 
-    const {data: projectInstances} = useGetProjectInstancesQuery({});
+    const {data: projectInstance} = useGetProjectInstanceQuery(filterProjectInstanceId!, !!filterProjectInstanceId);
+
+    const {data: projectInstances} = useGetProjectInstancesQuery({
+        projectId: filterProjectId,
+    });
 
     const {data: projects} = useGetProjectsQuery({});
 
@@ -97,7 +101,12 @@ export const WorkflowExecutions = () => {
         workflowId: filterWorkflowId,
     });
 
-    const {data: workflows} = useGetProjectWorkflowsQuery(filterProjectId!, !!filterProjectId);
+    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: workflows} = useGetProjectVersionWorkflowsQuery(
+        filterProjectId!,
+        projectInstance?.projectVersion!,
+        !!projectInstance
+    );
 
     const emptyListMessage =
         !filterStatus &&
@@ -313,7 +322,9 @@ export const WorkflowExecutions = () => {
                                     ? projectInstances?.map((projectInstance) => ({
                                           label: (
                                               <span className="flex items-center">
-                                                  <span className="mr-1 ">{projectInstance.name}</span>
+                                                  <span className="mr-1 ">
+                                                      {projectInstance.name} V{projectInstance.projectVersion}
+                                                  </span>
 
                                                   <span className="text-xs text-gray-500">
                                                       {projectInstance?.tags?.map((tag) => tag.name).join(', ')}
