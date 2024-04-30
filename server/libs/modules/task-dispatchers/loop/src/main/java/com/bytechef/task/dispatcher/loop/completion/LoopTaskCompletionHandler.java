@@ -93,7 +93,26 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> iterateeWorkflowTasks =
             MapUtils.getRequiredList(loopTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
 
+        Map<String, Object> newLoopContext = new HashMap<>(
+            taskFileStorage.readContextValue(
+                contextService.peek(
+                    Validate.notNull(loopTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
+
+        if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+            newLoopContext.put(
+                taskExecution.getName(),
+                taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+
+            contextService.push(
+                Validate.notNull(loopTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(
+                    Validate.notNull(loopTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                    newLoopContext));
+        }
+
         if (taskExecution.getTaskNumber() < iterateeWorkflowTasks.size()) {
+
+
             WorkflowTask nextIterateeWorkflowTask = iterateeWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution nextWorkflowTaskExecution = TaskExecution.builder()
@@ -104,19 +123,23 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 .workflowTask(nextIterateeWorkflowTask)
                 .build();
 
-            Map<String, ?> context = taskFileStorage.readContextValue(
+            Map<String, Object> newNextTaskContext = new HashMap<>(
+                taskFileStorage.readContextValue(
                 contextService.peek(
-                    Validate.notNull(nextWorkflowTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                    Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
-            nextWorkflowTaskExecution.evaluate(context);
+            if (newLoopContext.containsKey(taskExecution.getName())) {
+                newNextTaskContext.put(taskExecution.getName(), newLoopContext.get(taskExecution.getName()));
+            }
 
-            nextWorkflowTaskExecution = taskExecutionService.create(nextWorkflowTaskExecution);
+            nextWorkflowTaskExecution =
+                taskExecutionService.create(nextWorkflowTaskExecution.evaluate(newNextTaskContext));
 
             contextService.push(
                 Validate.notNull(nextWorkflowTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                 taskFileStorage.storeContextValue(
                     Validate.notNull(nextWorkflowTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    context));
+                    newNextTaskContext));
 
             taskDispatcher.dispatch(nextWorkflowTaskExecution);
 
@@ -126,7 +149,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
         List<?> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
 
-        Map<String, Object> taskExecutionContext = new HashMap<>(
+        Map<String, Object> newTaskExecutionContext = new HashMap<>(
             taskFileStorage.readContextValue(
                 contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
@@ -134,7 +157,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         WorkflowTask loopWorkflowTask = loopTaskExecution.getWorkflowTask();
 
         Map<String, Object> loopWorkflowTaskNameMap =
-            (Map<String, Object>) taskExecutionContext.get(loopWorkflowTask.getName());
+            (Map<String, Object>) newTaskExecutionContext.get(loopWorkflowTask.getName());
         Integer listIndex = (Integer) loopWorkflowTaskNameMap.get(INDEX);
 
         if (loopForever || listIndex < list.size()) {
