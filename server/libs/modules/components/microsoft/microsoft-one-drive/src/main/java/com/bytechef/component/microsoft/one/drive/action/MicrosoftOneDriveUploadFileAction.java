@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.BASE_URL;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID_PROPERTY;
+import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.UPLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
@@ -32,7 +32,9 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 
 /**
  * @author Monika Domiter
@@ -43,8 +45,13 @@ public class MicrosoftOneDriveUploadFileAction {
         .title("Upload file")
         .description("Upload a file to your Microsoft OneDrive")
         .properties(
-            PARENT_ID_PROPERTY
-                .description("Folder where to upload file"),
+            string(PARENT_ID)
+                .label("Parent folder")
+                .description(
+                    "Folder where the file should be uploaded; if no folder is selected, the file will be " +
+                        "uploaded in the root folder.")
+                .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
+                .required(false),
             fileEntry(FILE)
                 .label("File")
                 .description("File to upload")
