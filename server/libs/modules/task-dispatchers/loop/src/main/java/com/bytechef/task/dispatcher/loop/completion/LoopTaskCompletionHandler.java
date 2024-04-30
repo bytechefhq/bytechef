@@ -27,6 +27,7 @@ import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -89,35 +90,76 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(
             Validate.notNull(taskExecution.getParentId(), "parentId"));
 
-        boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        Map<String, ?> iteratee = MapUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
-        List<?> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
+        List<WorkflowTask> iterateeWorkflowTasks =
+            MapUtils.getRequiredList(loopTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
 
-        if (loopForever || taskExecution.getTaskNumber() < list.size()) {
-            TaskExecution subTaskExecution = TaskExecution.builder()
+        if (taskExecution.getTaskNumber() < iterateeWorkflowTasks.size()) {
+            WorkflowTask nextIterateeWorkflowTask = iterateeWorkflowTasks.get(taskExecution.getTaskNumber());
+
+            TaskExecution nextWorkflowTaskExecution = TaskExecution.builder()
                 .jobId(loopTaskExecution.getJobId())
                 .parentId(loopTaskExecution.getId())
                 .priority(loopTaskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
-                .workflowTask(new WorkflowTask(iteratee))
+                .workflowTask(nextIterateeWorkflowTask)
+                .build();
+
+            Map<String, ?> context = taskFileStorage.readContextValue(
+                contextService.peek(
+                    Validate.notNull(nextWorkflowTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+
+            nextWorkflowTaskExecution.evaluate(context);
+
+            nextWorkflowTaskExecution = taskExecutionService.create(nextWorkflowTaskExecution);
+
+            contextService.push(
+                Validate.notNull(nextWorkflowTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(
+                    Validate.notNull(nextWorkflowTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                    context));
+
+            taskDispatcher.dispatch(nextWorkflowTaskExecution);
+
+            return;
+        }
+
+        boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
+        List<?> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
+
+        Map<String, Object> taskExecutionContext = new HashMap<>(
+            taskFileStorage.readContextValue(
+                contextService.peek(
+                    taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
+
+        WorkflowTask loopWorkflowTask = loopTaskExecution.getWorkflowTask();
+
+        Map<String, Object> loopWorkflowTaskNameMap =
+            (Map<String, Object>) taskExecutionContext.get(loopWorkflowTask.getName());
+        Integer listIndex = (Integer) loopWorkflowTaskNameMap.get(INDEX);
+
+        if (loopForever || listIndex < list.size()) {
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(loopTaskExecution.getJobId())
+                .parentId(loopTaskExecution.getId())
+                .priority(loopTaskExecution.getPriority())
+                .taskNumber(1)
+                .workflowTask(iterateeWorkflowTasks.getFirst())
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
                 taskFileStorage.readContextValue(
                     contextService.peek(
-                        Validate.notNull(loopTaskExecution.getId(), "parentId"), Classname.TASK_EXECUTION)));
-
-            WorkflowTask workflowTask = loopTaskExecution.getWorkflowTask();
+                        loopTaskExecution.getId(), Classname.TASK_EXECUTION)));
 
             Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
             if (!list.isEmpty()) {
-                workflowTaskNameMap.put(ITEM, list.get(taskExecution.getTaskNumber()));
+                workflowTaskNameMap.put(ITEM, list.get(listIndex));
             }
 
-            workflowTaskNameMap.put(INDEX, taskExecution.getTaskNumber());
+            workflowTaskNameMap.put(INDEX, listIndex + 1);
 
-            newContext.put(workflowTask.getName(), workflowTaskNameMap);
+            newContext.put(loopWorkflowTask.getName(), workflowTaskNameMap);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
 

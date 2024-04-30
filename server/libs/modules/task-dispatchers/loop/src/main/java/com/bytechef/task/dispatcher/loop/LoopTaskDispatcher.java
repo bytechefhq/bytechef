@@ -95,9 +95,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             Map<String, Object> newContext = new HashMap<>(
                 taskFileStorage.readContextValue(
                     contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "parentId"), Context.Classname.TASK_EXECUTION)));
-
-            WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
             Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
@@ -105,9 +103,11 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 workflowTaskNameMap.put(ITEM, list.getFirst());
             }
 
-            workflowTaskNameMap.put(INDEX, 0);
+            workflowTaskNameMap.put(INDEX, 1);
 
-            newContext.put(workflowTask.getName(), workflowTaskNameMap);
+            WorkflowTask loopWorkflowTask = taskExecution.getWorkflowTask();
+
+            newContext.put(loopWorkflowTask.getName(), workflowTaskNameMap);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution.evaluate(newContext));
 
