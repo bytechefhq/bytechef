@@ -20,9 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 
 /**
  * @author Monika Domiter
@@ -45,17 +43,6 @@ public class MicrosoftTeamsConstants {
     public static final String TENANT_ID = "tenantId";
     public static final String TEAM_ID = "teamId";
     public static final String VALUE = "value";
-
-    public static final ModifiableStringProperty TEAM_ID_PROPERTY = string(TEAM_ID)
-        .label("Team")
-        .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
-        .required(true);
-
-    public static final ModifiableStringProperty CHANNEL_ID_PROPERTY = string(CHANNEL_ID)
-        .label("Channel")
-        .loadOptionsDependsOn(TEAM_ID)
-        .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getChannelIdOptions)
-        .required(true);
 
     public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
         .label("Message text format")

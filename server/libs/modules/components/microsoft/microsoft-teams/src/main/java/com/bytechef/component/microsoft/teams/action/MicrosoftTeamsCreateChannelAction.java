@@ -25,13 +25,14 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 
 /**
  * @author Monika Domiter
@@ -42,7 +43,11 @@ public class MicrosoftTeamsCreateChannelAction {
         .title("Create channel")
         .description("Creates a new channel within a team.")
         .properties(
-            TEAM_ID_PROPERTY,
+            string(TEAM_ID)
+                .label("Team")
+                .description("Team where the channel will be created.")
+                .options((OptionsDataSource.ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
+                .required(true),
             string(DISPLAY_NAME)
                 .label("Channel name")
                 .maxLength(50)

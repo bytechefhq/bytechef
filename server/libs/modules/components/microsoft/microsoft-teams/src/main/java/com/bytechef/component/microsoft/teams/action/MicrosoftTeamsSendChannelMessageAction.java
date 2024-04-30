@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BASE_URL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.BODY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE;
@@ -30,13 +29,14 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.SEND_CHANNEL_MESSAGE;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 
 /**
  * @author Monika Domiter
@@ -47,8 +47,16 @@ public class MicrosoftTeamsSendChannelMessageAction {
         .title("Send channel message")
         .description("Sends a message to a channel.")
         .properties(
-            TEAM_ID_PROPERTY,
-            CHANNEL_ID_PROPERTY,
+            string(TEAM_ID)
+                .label("Team")
+                .description("Team where the channel is located.")
+                .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
+                .required(true),
+            string(CHANNEL_ID)
+                .label("Channel to send message to.")
+                .loadOptionsDependsOn(TEAM_ID)
+                .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getChannelIdOptions)
+                .required(true),
             CONTENT_TYPE_PROPERTY,
             CONTENT_PROPERTY)
         .outputSchema(
