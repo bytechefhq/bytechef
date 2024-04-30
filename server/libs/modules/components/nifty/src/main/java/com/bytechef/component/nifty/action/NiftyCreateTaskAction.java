@@ -52,19 +52,32 @@ public class NiftyCreateTaskAction {
                 .required(true),
             string(DESCRIPTION)
                 .label("Description")
-                .description("Description of the project")
+                .description("Description of the task.")
                 .maxLength(320)
                 .required(false),
             string(PROJECT)
-                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions),
+                .label("Project")
+                .description("Project within which the task will be created.")
+                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions)
+                .required(true),
             string(TASK_GROUP_ID)
+                .label("Status")
                 .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupIdOptions)
-                .loadOptionsDependsOn(PROJECT),
-            dateTime(DUE_DATE))
+                .loadOptionsDependsOn(PROJECT)
+                .required(true),
+            dateTime(DUE_DATE)
+                .label("Due date")
+                .description("Due date for the task.")
+                .required(false))
         .outputSchema(
             object()
                 .properties(
-                    string(TASK_GROUP_ID)))
+                    string("id"),
+                    string(NAME),
+                    string(PROJECT),
+                    string(DESCRIPTION),
+                    string(DUE_DATE),
+                    string("task_group")))
         .perform(NiftyCreateTaskAction::perform);
 
     private NiftyCreateTaskAction() {
@@ -76,10 +89,10 @@ public class NiftyCreateTaskAction {
         return actionContext.http(http -> http.post(BASE_URL + "/tasks"))
             .body(
                 Http.Body.of(
-                    NAME, inputParameters.getString(NAME),
+                    NAME, inputParameters.getRequiredString(NAME),
                     DESCRIPTION, inputParameters.getString(DESCRIPTION),
-                    TASK_GROUP_ID, inputParameters.getString(TASK_GROUP_ID),
-                    DUE_DATE, inputParameters.getString(DUE_DATE)))
+                    TASK_GROUP_ID, inputParameters.getRequiredString(TASK_GROUP_ID),
+                    DUE_DATE, inputParameters.getLocalDateTime(DUE_DATE)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
