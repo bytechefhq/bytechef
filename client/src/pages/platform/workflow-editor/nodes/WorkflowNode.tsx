@@ -198,7 +198,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
                 {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
 
-                <span className="text-sm text-gray-500">{data.name}</span>
+                <span className="text-sm text-gray-500">{data.trigger ? 'trigger_1' : data.name}</span>
             </div>
 
             <Handle
