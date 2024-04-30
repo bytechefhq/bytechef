@@ -35,6 +35,7 @@ models/ExecutionErrorModel.ts
 models/FileEntryPropertyModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
 models/GetWorkflowNodeDescription200ResponseModel.ts
+models/GetWorkflowNodeParameterDisplayConditions200ResponseModel.ts
 models/HelpModel.ts
 models/IntegerPropertyModel.ts
 models/NullPropertyModel.ts

@@ -21,6 +21,7 @@ export * from './ExecutionErrorModel';
 export * from './FileEntryPropertyModel';
 export * from './GetOAuth2AuthorizationParametersRequestModel';
 export * from './GetWorkflowNodeDescription200ResponseModel';
+export * from './GetWorkflowNodeParameterDisplayConditions200ResponseModel';
 export * from './HelpModel';
 export * from './IntegerPropertyModel';
 export * from './NullPropertyModel';

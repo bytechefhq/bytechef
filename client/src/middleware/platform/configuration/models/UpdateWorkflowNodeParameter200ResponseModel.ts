@@ -27,10 +27,10 @@ export interface UpdateWorkflowNodeParameter200ResponseModel {
     parameters?: { [key: string]: any; };
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {{ [key: string]: boolean; }}
      * @memberof UpdateWorkflowNodeParameter200ResponseModel
      */
-    displayConditions?: { [key: string]: any; };
+    displayConditions?: { [key: string]: boolean; };
 }
 
 /**

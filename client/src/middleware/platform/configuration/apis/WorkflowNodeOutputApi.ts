@@ -22,20 +22,59 @@ import {
     WorkflowNodeOutputModelToJSON,
 } from '../models/index';
 
+export interface GetPreviousWorkflowNodeOutputsRequest {
+    id: string;
+    lastWorkflowNodeName?: string;
+}
+
 export interface GetWorkflowNodeOutputRequest {
     id: string;
     workflowNodeName: string;
-}
-
-export interface GetWorkflowNodeOutputsRequest {
-    id: string;
-    lastWorkflowNodeName?: string;
 }
 
 /**
  * 
  */
 export class WorkflowNodeOutputApi extends runtime.BaseAPI {
+
+    /**
+     * Get all workflow node outputs used in a workflow.
+     * Get all dynamic workflow node outputs used in a workflow
+     */
+    async getPreviousWorkflowNodeOutputsRaw(requestParameters: GetPreviousWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowNodeOutputModel>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getPreviousWorkflowNodeOutputs().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['lastWorkflowNodeName'] != null) {
+            queryParameters['lastWorkflowNodeName'] = requestParameters['lastWorkflowNodeName'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/outputs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowNodeOutputModelFromJSON));
+    }
+
+    /**
+     * Get all workflow node outputs used in a workflow.
+     * Get all dynamic workflow node outputs used in a workflow
+     */
+    async getPreviousWorkflowNodeOutputs(requestParameters: GetPreviousWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowNodeOutputModel>> {
+        const response = await this.getPreviousWorkflowNodeOutputsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get workflow node output of an action task or trigger used in a workflow.
@@ -76,45 +115,6 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
      */
     async getWorkflowNodeOutput(requestParameters: GetWorkflowNodeOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeOutputModel> {
         const response = await this.getWorkflowNodeOutputRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get all workflow node outputs used in a workflow.
-     * Get all dynamic workflow node outputs used in a workflow
-     */
-    async getWorkflowNodeOutputsRaw(requestParameters: GetWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowNodeOutputModel>>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling getWorkflowNodeOutputs().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['lastWorkflowNodeName'] != null) {
-            queryParameters['lastWorkflowNodeName'] = requestParameters['lastWorkflowNodeName'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/workflows/{id}/outputs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowNodeOutputModelFromJSON));
-    }
-
-    /**
-     * Get all workflow node outputs used in a workflow.
-     * Get all dynamic workflow node outputs used in a workflow
-     */
-    async getWorkflowNodeOutputs(requestParameters: GetWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowNodeOutputModel>> {
-        const response = await this.getWorkflowNodeOutputsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
