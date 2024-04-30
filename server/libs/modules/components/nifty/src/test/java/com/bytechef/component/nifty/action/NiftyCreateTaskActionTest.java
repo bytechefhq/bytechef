@@ -23,7 +23,6 @@ import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 import static com.bytechef.component.nifty.constant.NiftyConstants.TASK_GROUP_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +30,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +53,6 @@ class NiftyCreateTaskActionTest {
     public void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(anyMap()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -69,16 +67,16 @@ class NiftyCreateTaskActionTest {
     void testPerform() {
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
-        when(mockedParameters.getString(NAME))
+        when(mockedParameters.getRequiredString(NAME))
             .thenReturn((String) propertyStubsMap.get(NAME));
         when(mockedParameters.getString(DESCRIPTION))
             .thenReturn((String) propertyStubsMap.get(DESCRIPTION));
         when(mockedParameters.getString(PROJECT))
             .thenReturn((String) propertyStubsMap.get(PROJECT));
-        when(mockedParameters.getString(TASK_GROUP_ID))
+        when(mockedParameters.getRequiredString(TASK_GROUP_ID))
             .thenReturn((String) propertyStubsMap.get(TASK_GROUP_ID));
-        when(mockedParameters.getString(DUE_DATE))
-            .thenReturn((String) propertyStubsMap.get(DUE_DATE));
+        when(mockedParameters.getLocalDateTime(DUE_DATE))
+            .thenReturn((LocalDateTime) propertyStubsMap.get(DUE_DATE));
 
         Object result = NiftyCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
 
@@ -95,7 +93,7 @@ class NiftyCreateTaskActionTest {
         propertyStubsMap.put(NAME, "name");
         propertyStubsMap.put(DESCRIPTION, "description");
         propertyStubsMap.put(TASK_GROUP_ID, "task_group_id");
-        propertyStubsMap.put(DUE_DATE, "due_date");
+        propertyStubsMap.put(DUE_DATE, LocalDateTime.of(2000, 1, 1, 1, 1, 1));
 
         return propertyStubsMap;
     }
