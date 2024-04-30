@@ -1440,6 +1440,200 @@ public final class ComponentDSL {
         }
     }
 
+    public static final class ModifiableDateProperty
+        extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
+        implements Property.DateProperty {
+
+        private List<String> loadOptionsDependsOn;
+        private List<Option<LocalDate>> options;
+        private OptionsFunction optionsFunction;
+
+        private ModifiableDateProperty() {
+            this(null);
+        }
+
+        private ModifiableDateProperty(String name) {
+            super(name, Type.DATE);
+        }
+
+        public ModifiableDateProperty defaultValue(LocalDate defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ModifiableDateProperty exampleValue(LocalDate exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
+        }
+
+        public ModifiableDateProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
+            if (loadOptionsDependsOn != null) {
+                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+            }
+
+            return this;
+        }
+
+        @SafeVarargs
+        public final ModifiableDateProperty options(Option<LocalDate>... options) {
+            if (options != null) {
+                this.options = List.of(options);
+            }
+
+            return this;
+        }
+
+        public ModifiableDateProperty options(OptionsFunction optionsFunction) {
+            this.optionsFunction = optionsFunction;
+
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDateProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+        }
+
+        @Override
+        public ControlType getControlType() {
+            if (options == null && optionsFunction == null) {
+                return ControlType.DATE;
+            } else {
+                return ControlType.SELECT;
+            }
+        }
+
+        @Override
+        public Optional<List<? extends Option<LocalDate>>> getOptions() {
+            return Optional.ofNullable(options);
+        }
+
+        @Override
+        public Optional<OptionsDataSource> getOptionsDataSource() {
+            return Optional.ofNullable(
+                optionsFunction == null
+                    ? null
+                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+        }
+    }
+
+    public static final class ModifiableDateTimeProperty
+        extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
+        implements Property.DateTimeProperty {
+
+        private List<String> loadOptionsDependsOn;
+        private List<Option<LocalDateTime>> options;
+        private OptionsFunction optionsFunction;
+
+        private ModifiableDateTimeProperty() {
+            this(null);
+        }
+
+        private ModifiableDateTimeProperty(String name) {
+            super(name, Type.DATE_TIME);
+        }
+
+        public ModifiableDateTimeProperty defaultValue(LocalDateTime defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ModifiableDateTimeProperty exampleValue(LocalDateTime exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
+        }
+
+        public ModifiableDateTimeProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
+            if (loadOptionsDependsOn != null) {
+                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+            }
+
+            return this;
+        }
+
+        @SafeVarargs
+        public final ModifiableDateTimeProperty options(Option<LocalDateTime>... options) {
+            if (options != null) {
+                this.options = List.of(options);
+            }
+
+            return this;
+        }
+
+        public ModifiableDateTimeProperty options(OptionsFunction optionsFunction) {
+            this.optionsFunction = optionsFunction;
+
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDateTimeProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+        }
+
+        @Override
+        public ControlType getControlType() {
+            if (options == null && optionsFunction == null) {
+                return ControlType.DATE_TIME;
+            } else {
+                return ControlType.SELECT;
+            }
+        }
+
+        @Override
+        public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
+            return Optional.ofNullable(options);
+        }
+
+        @Override
+        public Optional<OptionsDataSource> getOptionsDataSource() {
+            return Optional.ofNullable(
+                optionsFunction == null
+                    ? null
+                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+        }
+    }
+
     public static final class ModifiableDynamicPropertiesProperty
         extends ModifiableProperty<ModifiableDynamicPropertiesProperty>
         implements Property.DynamicPropertiesProperty {
@@ -1829,200 +2023,6 @@ public final class ComponentDSL {
         @Override
         public int getVersion() {
             return version;
-        }
-    }
-
-    public static final class ModifiableDateProperty
-        extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
-        implements Property.DateProperty {
-
-        private List<String> loadOptionsDependsOn;
-        private List<Option<LocalDate>> options;
-        private OptionsFunction optionsFunction;
-
-        private ModifiableDateProperty() {
-            this(null);
-        }
-
-        private ModifiableDateProperty(String name) {
-            super(name, Type.DATE);
-        }
-
-        public ModifiableDateProperty defaultValue(LocalDate defaultValue) {
-            this.defaultValue = defaultValue;
-
-            return this;
-        }
-
-        public ModifiableDateProperty exampleValue(LocalDate exampleValue) {
-            this.exampleValue = exampleValue;
-
-            return this;
-        }
-
-        public ModifiableDateProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
-            }
-
-            return this;
-        }
-
-        @SafeVarargs
-        public final ModifiableDateProperty options(Option<LocalDate>... options) {
-            if (options != null) {
-                this.options = List.of(options);
-            }
-
-            return this;
-        }
-
-        public ModifiableDateProperty options(OptionsFunction optionsFunction) {
-            this.optionsFunction = optionsFunction;
-
-            return this;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ModifiableDateProperty that)) {
-                return false;
-            }
-
-            if (!super.equals(o)) {
-                return false;
-            }
-
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
-        }
-
-        @Override
-        public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
-                return ControlType.DATE;
-            } else {
-                return ControlType.SELECT;
-            }
-        }
-
-        @Override
-        public Optional<List<? extends Option<LocalDate>>> getOptions() {
-            return Optional.ofNullable(options);
-        }
-
-        @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
-            return Optional.ofNullable(
-                optionsFunction == null
-                    ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
-        }
-    }
-
-    public static final class ModifiableDateTimeProperty
-        extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
-        implements Property.DateTimeProperty {
-
-        private List<String> loadOptionsDependsOn;
-        private List<Option<LocalDateTime>> options;
-        private OptionsFunction optionsFunction;
-
-        private ModifiableDateTimeProperty() {
-            this(null);
-        }
-
-        private ModifiableDateTimeProperty(String name) {
-            super(name, Type.DATE_TIME);
-        }
-
-        public ModifiableDateTimeProperty defaultValue(LocalDateTime defaultValue) {
-            this.defaultValue = defaultValue;
-
-            return this;
-        }
-
-        public ModifiableDateTimeProperty exampleValue(LocalDateTime exampleValue) {
-            this.exampleValue = exampleValue;
-
-            return this;
-        }
-
-        public ModifiableDateTimeProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
-            }
-
-            return this;
-        }
-
-        @SafeVarargs
-        public final ModifiableDateTimeProperty options(Option<LocalDateTime>... options) {
-            if (options != null) {
-                this.options = List.of(options);
-            }
-
-            return this;
-        }
-
-        public ModifiableDateTimeProperty options(OptionsFunction optionsFunction) {
-            this.optionsFunction = optionsFunction;
-
-            return this;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ModifiableDateTimeProperty that)) {
-                return false;
-            }
-
-            if (!super.equals(o)) {
-                return false;
-            }
-
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
-        }
-
-        @Override
-        public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
-                return ControlType.DATE_TIME;
-            } else {
-                return ControlType.SELECT;
-            }
-        }
-
-        @Override
-        public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
-            return Optional.ofNullable(options);
-        }
-
-        @Override
-        public Optional<OptionsDataSource> getOptionsDataSource() {
-            return Optional.ofNullable(
-                optionsFunction == null
-                    ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
         }
     }
 
