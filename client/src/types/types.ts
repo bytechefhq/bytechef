@@ -63,6 +63,7 @@ export type ClickedItemType = {
 
 export type NodeType = {
     componentName?: string;
+    connections?: Array<WorkflowConnectionType>;
     connectionId?: number;
     icon?: ReactNode;
     id: string;
