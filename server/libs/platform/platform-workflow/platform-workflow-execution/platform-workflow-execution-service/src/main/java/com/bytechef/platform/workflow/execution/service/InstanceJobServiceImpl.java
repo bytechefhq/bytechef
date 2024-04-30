@@ -69,6 +69,13 @@ public class InstanceJobServiceImpl implements InstanceJobService {
     }
 
     @Override
+    public long getJobInstanceId(long jobId, Type type) {
+        return instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
+            .map(InstanceJob::getInstanceId)
+            .orElseThrow();
+    }
+
+    @Override
     public List<Long> getJobIds(long instanceId, Type type) {
         return instanceJobRepository.findallJobIds(instanceId, type.ordinal());
     }

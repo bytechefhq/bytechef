@@ -70,6 +70,11 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
+    public long getJobInstanceId(long jobId, Type type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Long> getJobIds(long instanceId, Type type) {
         throw new UnsupportedOperationException();
     }

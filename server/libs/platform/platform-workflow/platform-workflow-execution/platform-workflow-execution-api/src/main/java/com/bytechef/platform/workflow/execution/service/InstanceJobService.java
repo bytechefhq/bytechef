@@ -37,6 +37,8 @@ public interface InstanceJobService {
 
     Optional<Long> fetchJobInstanceId(long jobId, Type type);
 
+    long getJobInstanceId(long jobId, Type type);
+
     List<Long> getJobIds(long instanceId, Type type);
 
     Page<Long> getJobIds(
