@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
+    implementation(project(":server:libs:embedded:embedded-swagger"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-impl"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
@@ -33,6 +34,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-rest"))
