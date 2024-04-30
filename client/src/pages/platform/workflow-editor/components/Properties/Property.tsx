@@ -115,6 +115,7 @@ const Property = ({
         name,
         options,
         optionsDataSource,
+        placeholder = '',
         properties,
         propertiesDataSource,
         required,
@@ -582,6 +583,7 @@ const Property = ({
                                     event.key !== '{' && event.preventDefault();
                                 }
                             }}
+                            placeholder={placeholder}
                             ref={editorRef}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
@@ -663,6 +665,7 @@ const Property = ({
                                 key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
+                                placeholder={placeholder}
                                 required={required}
                                 type={hidden ? 'hidden' : getInputHTMLType(controlType)}
                                 {...register(`${path}.${name}`, {
@@ -690,7 +693,9 @@ const Property = ({
                                 name={`${path}.${name}` || name || `${arrayName}_0`}
                                 onChange={handleInputChange}
                                 placeholder={
-                                    isNumericalInput && minValue && maxValue ? `From ${minValue} to ${maxValue}` : ''
+                                    isNumericalInput && minValue && maxValue
+                                        ? `From ${minValue} to ${maxValue}`
+                                        : placeholder
                                 }
                                 ref={inputRef}
                                 required={required}

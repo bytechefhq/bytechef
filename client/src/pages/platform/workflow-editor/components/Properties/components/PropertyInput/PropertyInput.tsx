@@ -38,6 +38,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             leadingIcon,
             name,
             onChange,
+            placeholder,
             required,
             showInputTypeSwitchButton,
             title,
@@ -99,6 +100,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         key={key}
                         name={name}
                         onChange={onChange}
+                        placeholder={placeholder}
                         ref={ref}
                         required={required}
                         type={type}
