@@ -16,11 +16,7 @@ const sidebarNavItems = [
         title: 'Embedded',
     },
     {
-        href: '/settings/e/api-keys',
-        title: 'API Keys',
-    },
-    {
-        href: '/settings/e/signing-keys',
+        href: '/settings/signing-keys',
         title: 'Signing Keys',
     },
 ];
