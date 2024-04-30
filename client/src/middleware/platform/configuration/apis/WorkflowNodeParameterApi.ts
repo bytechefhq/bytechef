@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   DeleteWorkflowNodeParameter200ResponseModel,
   DeleteWorkflowNodeParameterRequestModel,
+  GetWorkflowNodeParameterDisplayConditions200ResponseModel,
   UpdateWorkflowNodeParameter200ResponseModel,
   UpdateWorkflowNodeParameterRequestModel,
 } from '../models/index';
@@ -25,6 +26,8 @@ import {
     DeleteWorkflowNodeParameter200ResponseModelToJSON,
     DeleteWorkflowNodeParameterRequestModelFromJSON,
     DeleteWorkflowNodeParameterRequestModelToJSON,
+    GetWorkflowNodeParameterDisplayConditions200ResponseModelFromJSON,
+    GetWorkflowNodeParameterDisplayConditions200ResponseModelToJSON,
     UpdateWorkflowNodeParameter200ResponseModelFromJSON,
     UpdateWorkflowNodeParameter200ResponseModelToJSON,
     UpdateWorkflowNodeParameterRequestModelFromJSON,
@@ -34,6 +37,11 @@ import {
 export interface DeleteWorkflowNodeParameterRequest {
     id: string;
     deleteWorkflowNodeParameterRequestModel?: DeleteWorkflowNodeParameterRequestModel;
+}
+
+export interface GetWorkflowNodeParameterDisplayConditionsRequest {
+    id: string;
+    workflowNodeName: string;
 }
 
 export interface UpdateWorkflowNodeParameterRequest {
@@ -81,6 +89,48 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
      */
     async deleteWorkflowNodeParameter(requestParameters: DeleteWorkflowNodeParameterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteWorkflowNodeParameter200ResponseModel> {
         const response = await this.deleteWorkflowNodeParameterRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getWorkflowNodeParameterDisplayConditionsRaw(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetWorkflowNodeParameterDisplayConditions200ResponseModel>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowNodeParameterDisplayConditions().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getWorkflowNodeParameterDisplayConditions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/parameters/{workflowNodeName}/display-conditions`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetWorkflowNodeParameterDisplayConditions200ResponseModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Get an action or trigger property options shown in the editor.
+     * Get an action or trigger property options shown in the editor
+     */
+    async getWorkflowNodeParameterDisplayConditions(requestParameters: GetWorkflowNodeParameterDisplayConditionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeParameterDisplayConditions200ResponseModel> {
+        const response = await this.getWorkflowNodeParameterDisplayConditionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
