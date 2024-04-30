@@ -378,6 +378,20 @@ const Property = ({
                 setDataPillPanelOpen(true);
             }, 50);
         }
+
+        if (!currentComponent || !name || !updateWorkflowNodeParameterMutation || !workflow.id) {
+            return;
+        }
+
+        saveProperty({
+            currentComponent,
+            name,
+            path,
+            setCurrentComponent,
+            updateWorkflowNodeParameterMutation,
+            value: null,
+            workflowId: workflow.id!,
+        });
     };
 
     const handleSelectChange = (value: string, name: string) => {
