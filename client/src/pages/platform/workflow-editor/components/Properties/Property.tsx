@@ -408,7 +408,7 @@ const Property = ({
             path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
-            value: value === 'true',
+            value: type === 'BOOLEAN' ? value === 'true' : value,
             workflowId: workflow.id,
         });
     };
