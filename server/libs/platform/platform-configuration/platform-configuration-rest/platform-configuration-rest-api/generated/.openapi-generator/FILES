@@ -36,6 +36,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ExecutionErrorM
 src/main/java/com/bytechef/platform/configuration/web/rest/model/FileEntryPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetWorkflowNodeDescription200ResponseModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/GetWorkflowNodeParameterDisplayConditions200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/HelpModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/IntegerPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/NullPropertyModel.java
