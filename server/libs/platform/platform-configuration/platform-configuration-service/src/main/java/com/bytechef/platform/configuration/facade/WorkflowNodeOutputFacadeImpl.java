@@ -115,7 +115,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    public List<WorkflowNodeOutputDTO> getWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
+    public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -169,7 +169,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     public Map<String, ?> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
-        return getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
+        return getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
             .stream()
             .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.sampleOutput() != null)
             .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
