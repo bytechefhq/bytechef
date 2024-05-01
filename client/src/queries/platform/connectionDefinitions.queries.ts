@@ -10,7 +10,8 @@ import {useQuery} from '@tanstack/react-query';
 export const ConnectDefinitionKeys = {
     connectionDefinition: (request?: GetComponentConnectionDefinitionRequest) => [
         ...ConnectDefinitionKeys.connectionDefinitions,
-        request,
+        request?.componentName,
+        request?.componentVersion,
     ],
     connectionDefinitions: ['connectionDefinitions'],
     filteredConnectionDefinitions: (request: GetComponentConnectionDefinitionsRequest) => [

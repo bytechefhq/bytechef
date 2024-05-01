@@ -9,7 +9,10 @@ import {useQuery} from '@tanstack/react-query';
 export const WorkflowNodeOptionKeys = {
     propertyWorkflowNodeOptions: (request: GetWorkflowNodeOptionsRequest, loadDependencyValueKey: string) => [
         ...WorkflowNodeOptionKeys.workflowNodeOptions,
-        request,
+        request.id,
+        request.workflowNodeName,
+        request.propertyName,
+        request.searchText,
         loadDependencyValueKey,
     ],
     workflowNodeOptions: ['workflowNodeOptions'] as const,

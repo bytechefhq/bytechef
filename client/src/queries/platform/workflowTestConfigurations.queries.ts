@@ -17,7 +17,8 @@ export const WorkflowTestConfigurationKeys = {
     workflowTestConfigurations: ['workflowTestConfigurations'] as const,
     workflowTestConfigurationConnections: (request: GetWorkflowTestConfigurationConnectionsRequest) => [
         ...WorkflowTestConfigurationKeys.workflowTestConfigurations,
-        request,
+        request.workflowId,
+        request.workflowNodeName,
     ],
 };
 

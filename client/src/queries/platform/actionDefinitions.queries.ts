@@ -9,7 +9,9 @@ import {
 export const ActionDefinitionKeys = {
     actionDefinition: (request: GetComponentActionDefinitionRequest) => [
         ...ActionDefinitionKeys.actionDefinitions,
-        request,
+        request.componentName,
+        request.componentVersion,
+        request.actionName,
     ],
     actionDefinitions: ['actionDefinitions'] as const,
 };
