@@ -6,15 +6,12 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeOutputModel;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -23,12 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
@@ -65,7 +60,7 @@ public interface WorkflowNodeOutputApi {
         value = "/workflows/{id}/outputs/{workflowNodeName}",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
@@ -93,7 +88,7 @@ public interface WorkflowNodeOutputApi {
      * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "getWorkflowNodeOutputs",
+        operationId = "getPreviousWorkflowNodeOutputs",
         summary = "Get all dynamic workflow node outputs used in a workflow",
         description = "Get all workflow node outputs used in a workflow.",
         tags = { "workflow-node-output" },
@@ -108,8 +103,8 @@ public interface WorkflowNodeOutputApi {
         value = "/workflows/{id}/outputs",
         produces = { "application/json" }
     )
-    
-    default ResponseEntity<List<WorkflowNodeOutputModel>> getWorkflowNodeOutputs(
+
+    default ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
         @Parameter(name = "id", description = "The workflow id for which to return all used action definitions", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "lastWorkflowNodeName", description = "The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3)", in = ParameterIn.QUERY) @Valid @RequestParam(value = "lastWorkflowNodeName", required = false) String lastWorkflowNodeName
     ) {

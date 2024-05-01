@@ -53,12 +53,12 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     }
 
     @Override
-    public ResponseEntity<List<WorkflowNodeOutputModel>> getWorkflowNodeOutputs(
+    public ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
         String workflowId, String lastWorkflowNodeName) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowNodeOutputFacade.getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
+                workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
                 workflowNodeOutputDTO -> conversionService.convert(workflowNodeOutputDTO,
                     WorkflowNodeOutputModel.class)));
     }
