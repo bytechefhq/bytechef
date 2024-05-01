@@ -52,9 +52,9 @@ public final class WorkflowTaskDTO {
      */
     public WorkflowTaskDTO(
         List<WorkflowConnection> connections, String description, DataStreamComponent destination,
-        List<WorkflowTask> finalize,
-        String label, int maxRetries, String name, String node, Map<String, ?> parameters, List<WorkflowTask> post,
-        List<WorkflowTask> pre, DataStreamComponent source, int taskNumber, String timeout, String type) {
+        List<WorkflowTask> finalize, String label, int maxRetries, String name, String node, Map<String, ?> parameters,
+        List<WorkflowTask> post, List<WorkflowTask> pre, DataStreamComponent source, int taskNumber, String timeout,
+        String type) {
 
         this.connections = connections;
         this.description = description;
@@ -155,26 +155,21 @@ public final class WorkflowTaskDTO {
         WorkflowTaskDTO that = (WorkflowTaskDTO) obj;
 
         return Objects.equals(this.connections, that.connections) &&
+            Objects.equals(this.description, that.description) &&
             Objects.equals(this.destination, that.destination) &&
-            Objects.equals(this.finalize, that.finalize) &&
-            Objects.equals(this.label, that.label) &&
-            this.maxRetries == that.maxRetries &&
-            Objects.equals(this.name, that.name) &&
-            Objects.equals(this.node, that.node) &&
-            Objects.equals(this.parameters, that.parameters) &&
-            Objects.equals(this.post, that.post) &&
-            Objects.equals(this.pre, that.pre) &&
-            Objects.equals(this.source, that.source) &&
-            this.taskNumber == that.taskNumber &&
-            Objects.equals(this.timeout, that.timeout) &&
-            Objects.equals(this.type, that.type);
+            Objects.equals(this.finalize, that.finalize) && Objects.equals(this.label, that.label) &&
+            this.maxRetries == that.maxRetries && Objects.equals(this.name, that.name) &&
+            Objects.equals(this.node, that.node) && Objects.equals(this.parameters, that.parameters) &&
+            Objects.equals(this.post, that.post) && Objects.equals(this.pre, that.pre) &&
+            Objects.equals(this.source, that.source) && this.taskNumber == that.taskNumber &&
+            Objects.equals(this.timeout, that.timeout) && Objects.equals(this.type, that.type);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            connections, destination, finalize, label, maxRetries, name, node, parameters, post, pre, source,
-            taskNumber, timeout, type);
+            connections, description, destination, finalize, label, maxRetries, name, node, parameters, post, pre,
+            source, taskNumber, timeout, type);
     }
 
     @Override
