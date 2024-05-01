@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
-import {useUpdateWorkflowNodeOutputsMutation} from '@/mutations/platform/workflowNodeOutputs.mutations';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useGetWorkflowNodeDescriptionQuery} from '@/queries/platform/workflowNodeDescriptions.queries';
@@ -46,17 +45,6 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const queryClient = useQueryClient();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
-
-    const updateWorkflowNodeOutputsMutation = useUpdateWorkflowNodeOutputsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs({
-                    id: workflow.id!,
-                    lastWorkflowNodeName: currentNode?.name,
-                }),
-            });
-        },
-    });
 
     const handleDeleteNodeClick = () => {
         const nodes = getNodes();
@@ -117,25 +105,32 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             setCurrentNode(undefined);
         }
 
-        updateWorkflowMutation.mutate({
-            id: workflow.id!,
-            workflowModel: {
-                definition: JSON.stringify(
-                    {
-                        ...workflowDefinition,
-                        tasks: updatedTasks,
-                    },
-                    null,
-                    SPACE
-                ),
-                version: workflow.version,
+        updateWorkflowMutation.mutate(
+            {
+                id: workflow.id!,
+                workflowModel: {
+                    definition: JSON.stringify(
+                        {
+                            ...workflowDefinition,
+                            tasks: updatedTasks,
+                        },
+                        null,
+                        SPACE
+                    ),
+                    version: workflow.version,
+                },
             },
-        });
-
-        updateWorkflowNodeOutputsMutation.mutate({
-            id: workflow.id!,
-            lastWorkflowNodeName: currentNode?.name,
-        });
+            {
+                onSuccess: () => {
+                    queryClient.invalidateQueries({
+                        queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs({
+                            id: workflow.id!,
+                            lastWorkflowNodeName: currentNode?.name,
+                        }),
+                    });
+                },
+            }
+        );
     };
 
     return (
