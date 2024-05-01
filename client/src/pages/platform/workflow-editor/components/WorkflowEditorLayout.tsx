@@ -8,6 +8,7 @@ import './WorkflowEditorLayout.css';
 
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
+import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/queries/platform/workflowNodeParameters.queries';
 import {ComponentType, UpdateWorkflowMutationType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
@@ -30,8 +31,22 @@ const WorkflowEditorLayout = ({
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
 
     const {componentActions, workflow} = useWorkflowDataStore();
-    const {currentNode, setCurrentComponent, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    const {
+        currentComponent,
+        currentNode,
+        setCurrentComponent,
+        setWorkflowNodeDetailsPanelOpen,
+        workflowNodeDetailsPanelOpen,
+    } = useWorkflowNodeDetailsPanelStore();
+
+    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
+        {
+            id: workflow.id!,
+            workflowNodeName: currentComponent?.workflowNodeName!,
+        },
+        !!currentComponent
+    );
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
         {
@@ -96,11 +111,21 @@ const WorkflowEditorLayout = ({
             } as ComponentType;
         });
 
-        if (workflowComponents && currentNodeName) {
+        if (workflowComponents && currentNodeName && currentComponent?.workflowNodeName !== currentNodeName) {
             setCurrentComponent(workflowComponents.find((component) => component.workflowNodeName === currentNodeName));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks, workflow.triggers, currentNodeName]);
+
+    useEffect(() => {
+        if (currentComponent && workflowNodeParameterDisplayConditions) {
+            setCurrentComponent({
+                ...currentComponent,
+                displayConditions: workflowNodeParameterDisplayConditions.displayConditions!,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowNodeParameterDisplayConditions]);
 
     return (
         <ReactFlowProvider>
