@@ -36,8 +36,8 @@ public class WorkflowTaskMapper {
     public interface WorkflowTaskToWorkflowTaskModelMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
 
         @Named(value = "workflowTaskToWorkflowTaskModelMapper")
-        @Mapping(target = "destination", ignore = true)
         @Mapping(target = "connections", ignore = true)
+        @Mapping(target = "destination", ignore = true)
         @Mapping(target = "source", ignore = true)
         WorkflowTaskModel convert(WorkflowTask workflowTask);
 
