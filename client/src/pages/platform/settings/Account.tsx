@@ -7,7 +7,7 @@ const Account = () => {
             header={<PageHeader centerTitle={true} position="main" title="Account" />}
             leftSidebarOpen={false}
         >
-            <div className="p-4">TODO</div>
+            <div className="w-full p-4 2xl:mx-auto 2xl:w-4/5">TODO</div>
         </LayoutContainer>
     );
 };
