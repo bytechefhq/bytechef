@@ -27,6 +27,9 @@ public interface WorkflowNodeParameterFacade {
     Map<String, ?> deleteParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex);
 
+    @SuppressWarnings("unchecked")
+    Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName);
+
     UpdateParameterResult updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
 
