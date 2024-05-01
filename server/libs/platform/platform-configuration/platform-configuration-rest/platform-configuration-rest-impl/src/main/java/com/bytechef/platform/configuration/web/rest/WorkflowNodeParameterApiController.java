@@ -21,6 +21,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade.UpdateParameterResult;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeParameterDisplayConditions200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameter200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -59,6 +60,16 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
+    public ResponseEntity<GetWorkflowNodeParameterDisplayConditions200ResponseModel>
+        getWorkflowNodeParameterDisplayConditions(String id, String workflowNodeName) {
+
+        return ResponseEntity.ok(
+            new GetWorkflowNodeParameterDisplayConditions200ResponseModel()
+                .displayConditions(
+                    workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName)));
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
@@ -72,7 +83,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
         return ResponseEntity.ok(
             new UpdateWorkflowNodeParameter200ResponseModel()
-                .displayConditions((Map<String, Object>) updateParameterResult.displayConditionMap())
+                .displayConditions(updateParameterResult.displayConditionMap())
                 .parameters((Map<String, Object>) updateParameterResult.parameterMap()));
     }
 }

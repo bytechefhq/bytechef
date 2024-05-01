@@ -93,6 +93,27 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     @SuppressWarnings("unchecked")
+    public Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName) {
+        Map<String, Boolean> displayConditionMap = new HashMap<>();
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
+
+        ParameterMapPropertiesResult result = getParameterMapProperties(
+            workflowNodeName, (Map<String, Object>) definitionMap);
+
+        for (String name : result.parameterMap.keySet()) {
+            displayConditionMap.putAll(
+                getDisplayConditions(
+                    workflowNodeName, name, result.properties, workflow, result.parameterMap, result.taskParameters));
+        }
+
+        return displayConditionMap;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public UpdateParameterResult updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
 
@@ -103,25 +124,23 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         ParameterMapPropertiesResult result = getParameterMapProperties(
             workflowNodeName, (Map<String, Object>) definitionMap);
 
-        Map<String, ?> parameterMap = result.parameterMap;
-
         Map<String, Boolean> displayConditionMap = Map.of();
 
-        updateParameter(path, name, arrayIndex, value, (Map<String, Object>) parameterMap);
+        updateParameter(path, name, arrayIndex, value, (Map<String, Object>) result.parameterMap);
 
         // dependOn list should not contain paths inside arrays
 
         if (arrayIndex == null) {
-            checkDependOn(name, result.properties(), parameterMap);
+            checkDependOn(name, result.properties(), result.parameterMap);
 
-            displayConditionMap = checkDisplayConditions(
-                workflowNodeName, name, result.properties, workflow, parameterMap, result.taskParameters);
+            displayConditionMap = getDisplayConditions(
+                workflowNodeName, name, result.properties, workflow, result.parameterMap, result.taskParameters);
         }
 
         workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
             workflow.getVersion());
 
-        return new UpdateParameterResult(displayConditionMap, parameterMap);
+        return new UpdateParameterResult(displayConditionMap, result.parameterMap);
     }
 
     // For now only check the first, root level of properties on which other properties could depend on
@@ -155,7 +174,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     // For now only check the first, root level of properties on which other properties could depend on
     @SuppressWarnings("unchecked")
-    private Map<String, Boolean> checkDisplayConditions(
+    private Map<String, Boolean> getDisplayConditions(
         String workflowNodeName, String name, List<? extends Property> properties, Workflow workflow,
         Map<String, ?> parameterMap, boolean taskParameters) {
 
