@@ -31,6 +31,6 @@ public interface WorkflowNodeParameterFacade {
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
 
     @SuppressFBWarnings("EI")
-    record UpdateParameterResult(Map<String, ?> displayConditionMap, Map<String, ?> parameterMap) {
+    record UpdateParameterResult(Map<String, Boolean> displayConditionMap, Map<String, ?> parameterMap) {
     }
 }
