@@ -830,6 +830,38 @@ paths:
                     type: "object"
                     additionalProperties:
                       type: "boolean"
+  /workflows/{id}/parameters/{workflowNodeName}/display-conditions:
+    get:
+      description: "Get an action or trigger property options shown in the editor."
+      summary: "Get an action or trigger property options shown in the editor"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "getWorkflowNodeParameterDisplayConditions"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow node parameter display conditions."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  displayConditions:
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
   /workflows/{id}/properties/{workflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
