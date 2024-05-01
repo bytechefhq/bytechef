@@ -7,7 +7,7 @@ import 'reactflow/dist/base.css';
 import './WorkflowEditorLayout.css';
 
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from '@/middleware/platform/configuration';
-import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
+import {useGetPreviousWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ComponentType, UpdateWorkflowMutationType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
@@ -33,7 +33,7 @@ const WorkflowEditorLayout = ({
     const {currentNode, setCurrentComponent, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
-    const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
+    const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
             lastWorkflowNodeName: currentNodeName,

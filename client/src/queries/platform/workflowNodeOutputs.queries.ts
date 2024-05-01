@@ -1,17 +1,17 @@
 /* eslint-disable sort-keys */
 import {
+    GetPreviousWorkflowNodeOutputsRequest,
     GetWorkflowNodeOutputRequest,
-    GetWorkflowNodeOutputsRequest,
     WorkflowNodeOutputApi,
     WorkflowNodeOutputModel,
 } from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeOutputKeys = {
-    filteredWorkflowNodeOutputs: (request: GetWorkflowNodeOutputsRequest) => [
+    filteredPreviousWorkflowNodeOutputs: (request: GetPreviousWorkflowNodeOutputsRequest) => [
         ...WorkflowNodeOutputKeys.workflowNodeOutputs,
         request.id,
-        'lastWorkflowNodeName',
+        'previousWorkflowNodeOutputs',
         request.lastWorkflowNodeName,
     ],
     workflowNodeOutput: (request: GetWorkflowNodeOutputRequest) => [
@@ -30,9 +30,12 @@ export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequ
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetWorkflowNodeOutputsQuery = (request: GetWorkflowNodeOutputsRequest, enabled?: boolean) =>
+export const useGetPreviousWorkflowNodeOutputsQuery = (
+    request: GetPreviousWorkflowNodeOutputsRequest,
+    enabled?: boolean
+) =>
     useQuery<WorkflowNodeOutputModel[], Error>({
-        queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs(request),
-        queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutputs(request),
+        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs(request),
+        queryFn: () => new WorkflowNodeOutputApi().getPreviousWorkflowNodeOutputs(request),
         enabled: enabled === undefined ? true : enabled,
     });

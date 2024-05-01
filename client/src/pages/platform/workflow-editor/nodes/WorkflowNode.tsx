@@ -123,7 +123,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             {
                 onSuccess: () => {
                     queryClient.invalidateQueries({
-                        queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs({
+                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                             id: workflow.id!,
                             lastWorkflowNodeName: currentNode?.name,
                         }),
