@@ -8,7 +8,12 @@ import {TriggerDefinitionModel} from '@/middleware/platform/configuration/models
 import {useQuery} from '@tanstack/react-query';
 
 export const TriggerDefinitionKeys = {
-    triggerDefinition: (request: GetComponentTriggerDefinitionRequest) => ['triggerDefinition', request],
+    triggerDefinition: (request: GetComponentTriggerDefinitionRequest) => [
+        'triggerDefinition',
+        request.componentName,
+        request.componentVersion,
+        request.triggerName,
+    ],
 };
 
 export const useGetTriggerDefinitionQuery = (request: GetComponentTriggerDefinitionRequest, enabled?: boolean) =>

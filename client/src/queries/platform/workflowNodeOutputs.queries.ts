@@ -17,7 +17,6 @@ export const WorkflowNodeOutputKeys = {
     workflowNodeOutput: (request: GetWorkflowNodeOutputRequest) => [
         ...WorkflowNodeOutputKeys.workflowNodeOutputs,
         request.id,
-        'workflowNodeOutput',
         request.workflowNodeName,
     ],
     workflowNodeOutputs: ['workflowNodeOutputs'] as const,

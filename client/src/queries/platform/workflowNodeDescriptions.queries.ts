@@ -10,7 +10,8 @@ import {useQuery} from '@tanstack/react-query';
 export const WorkflowNodeDescriptionKeys = {
     workflowNodeDescription: (request: GetWorkflowNodeOutputRequest) => [
         ...WorkflowNodeDescriptionKeys.workflowNodeDescriptions,
-        request,
+        request.id,
+        request.workflowNodeName,
     ],
     workflowNodeDescriptions: ['workflowNodeDescriptions'] as const,
 };

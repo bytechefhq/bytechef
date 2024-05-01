@@ -10,7 +10,13 @@ export const WorkflowNodeDynamicPropertyKeys = {
     propertyWorkflowNodeDynamicProperties: (
         request: GetWorkflowNodeDynamicPropertiesRequest,
         loadDependencyValueKey: string
-    ) => [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, request, loadDependencyValueKey],
+    ) => [
+        ...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
+        request.id,
+        request.workflowNodeName,
+        request.propertyName,
+        loadDependencyValueKey,
+    ],
     workflowNodeDynamicProperties: ['workflowNodeDynamicProperties'] as const,
 };
 

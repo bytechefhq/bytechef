@@ -9,9 +9,10 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowNodeParameterKeys = {
-    propertyWorkflowNodeOptions: (request: GetWorkflowNodeParameterDisplayConditionsRequest) => [
+    propertyWorkflowNodeParameterDisplayConditions: (request: GetWorkflowNodeParameterDisplayConditionsRequest) => [
         ...WorkflowNodeParameterKeys.workflowNodeParameters,
-        request,
+        request.id,
+        request.workflowNodeName,
         'displayConditions',
     ],
     workflowNodeParameters: ['workflowNodeParameters'] as const,
@@ -22,7 +23,7 @@ export const useGetWorkflowNodeParameterDisplayConditionsQuery = (
     enabled?: boolean
 ) =>
     useQuery<GetWorkflowNodeParameterDisplayConditions200ResponseModel, Error>({
-        queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeOptions(request),
+        queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions(request),
         queryFn: () => new WorkflowNodeParameterApi().getWorkflowNodeParameterDisplayConditions(request),
         enabled: enabled === undefined ? true : enabled,
     });

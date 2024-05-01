@@ -12,7 +12,8 @@ import {useQuery} from '@tanstack/react-query';
 export const ComponentDefinitionKeys = {
     componentDefinition: (request: GetComponentDefinitionRequest) => [
         ...ComponentDefinitionKeys.componentDefinitions,
-        request,
+        request.componentName,
+        request.componentVersion,
     ],
     componentDefinitions: ['componentDefinitions'] as const,
     filteredComponentDefinitions: (request?: GetComponentDefinitionsRequest) => [
@@ -21,7 +22,7 @@ export const ComponentDefinitionKeys = {
     ],
     filteredDataStreamComponentDefinitions: (request?: GetDataStreamComponentDefinitionsRequest) => [
         ...ComponentDefinitionKeys.componentDefinitions,
-        request,
+        request?.componentType,
     ],
 };
 
