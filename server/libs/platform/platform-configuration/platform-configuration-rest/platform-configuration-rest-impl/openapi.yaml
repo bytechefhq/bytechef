@@ -682,7 +682,7 @@ paths:
       summary: "Get all dynamic workflow node outputs used in a workflow"
       tags:
         - "workflow-node-output"
-      operationId: "getWorkflowNodeOutputs"
+      operationId: "getPreviousWorkflowNodeOutputs"
       parameters:
         - name: "id"
           description: "The workflow id for which to return all used action definitions"
