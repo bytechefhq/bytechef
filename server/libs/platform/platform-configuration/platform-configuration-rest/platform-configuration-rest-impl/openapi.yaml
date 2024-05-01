@@ -828,7 +828,8 @@ paths:
                     additionalProperties: true
                   displayConditions:
                     type: "object"
-                    additionalProperties: true
+                    additionalProperties:
+                      type: "boolean"
   /workflows/{id}/properties/{workflowNodeName}/options/{propertyName}:
     get:
       description: "Get an action or trigger property options shown in the editor."
