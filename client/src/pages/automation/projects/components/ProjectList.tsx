@@ -6,7 +6,7 @@ import ProjectWorkflowList from './ProjectWorkflowList';
 
 const ProjectList = ({projects, tags}: {projects: ProjectModel[]; tags: TagModel[]}) => {
     return (
-        <div className="w-full px-2 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             {projects.map((project) => {
                 const projectTagIds = project.tags?.map((tag) => tag.id);
 

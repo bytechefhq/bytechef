@@ -87,7 +87,7 @@ const LayoutContainer = ({
                         leftSidebarWidths[leftSidebarWidth][0]
                     )}
                 >
-                    <nav className="flex h-full flex-col">
+                    <nav className="flex h-full flex-col border-r">
                         {leftSidebarHeader}
 
                         <div className="size-full overflow-y-auto">{leftSidebarBody}</div>
