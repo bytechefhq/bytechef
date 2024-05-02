@@ -29,8 +29,8 @@ interface PropertyComboBoxProps {
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
-    loadDependsOnPaths?: Array<string>;
-    loadDependsOnValues?: Array<string>;
+    lookupDependsOnPaths?: Array<string>;
+    lookupDependsOnValues?: Array<string>;
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
@@ -52,8 +52,8 @@ const PropertyComboBox = ({
     handleInputTypeSwitchButtonClick,
     label,
     leadingIcon,
-    loadDependsOnPaths,
-    loadDependsOnValues,
+    lookupDependsOnPaths,
+    lookupDependsOnValues,
     name,
     onBlur,
     onValueChange,
@@ -84,16 +84,18 @@ const PropertyComboBox = ({
         isRefetching,
     } = useGetWorkflowNodeOptionsQuery(
         {
-            loadDependencyValueKey: (loadDependsOnValues ?? []).join(''),
+            loadDependencyValueKey: (lookupDependsOnValues ?? []).join(''),
             request: {
                 id: workflowId,
-                loadDependsOnPaths: loadDependsOnPaths,
+                lookupDependsOnPaths,
                 propertyName: (path ? path.replace('parameters.', '').replace('parameters', '') + '.' : '') + name!,
                 workflowNodeName,
             },
         },
         !!currentNode &&
-            (loadDependsOnValues ? loadDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue) : false) &&
+            (lookupDependsOnValues
+                ? lookupDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue)
+                : false) &&
             !!currentNode?.connectionId
     );
 
@@ -109,8 +111,8 @@ const PropertyComboBox = ({
 
     const missingConnection = currentNode?.connections?.length && !currentNode.connectionId;
 
-    if (loadDependsOnValues?.length && !options.length) {
-        placeholder = `${loadDependsOnPaths} is not defined`;
+    if (lookupDependsOnValues?.length && !options.length) {
+        placeholder = `${lookupDependsOnPaths} is not defined`;
     } else if (missingConnection) {
         placeholder = 'Connection missing...';
     }
@@ -165,25 +167,25 @@ const PropertyComboBox = ({
                             </div>
                         )}
 
-                        {loadDependsOnValues && isRefetching && !currentOption?.label && (
+                        {lookupDependsOnValues && isRefetching && !currentOption?.label && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Refetching...
                             </span>
                         )}
 
-                        {loadDependsOnValues && isLoading && (
+                        {lookupDependsOnValues && isLoading && (
                             <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
                                 <LoadingIcon /> Loading...
                             </span>
                         )}
 
-                        {!loadDependsOnValues && !options.length && (
+                        {!lookupDependsOnValues && !options.length && (
                             <span className="rounded-md border p-2 text-sm text-muted-foreground">
                                 No options available
                             </span>
                         )}
 
-                        {((loadDependsOnValues && !isLoading) || !loadDependsOnValues) && (
+                        {((lookupDependsOnValues && !isLoading) || !lookupDependsOnValues) && (
                             <>
                                 {currentOption ? (
                                     <span className={twMerge('flex w-full items-center', leadingIcon && 'ml-9')}>
@@ -198,7 +200,7 @@ const PropertyComboBox = ({
                                         <span
                                             className={twMerge(
                                                 leadingIcon && 'ml-9',
-                                                ((loadDependsOnValues?.length && !options.length) ||
+                                                ((lookupDependsOnValues?.length && !options.length) ||
                                                     missingConnection) &&
                                                     'text-red-600'
                                             )}
