@@ -71,8 +71,7 @@ components:
         parameters:
           description: "The parameters of a connection."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
           writeOnly: true
         tags:
           type: "array"

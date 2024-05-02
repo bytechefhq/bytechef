@@ -1022,8 +1022,7 @@ components:
           description: "The input parameters of an project instance used as workflow\
             \ input values."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
         connections:
           description: "The connections used by a project instance."
           type: "array"

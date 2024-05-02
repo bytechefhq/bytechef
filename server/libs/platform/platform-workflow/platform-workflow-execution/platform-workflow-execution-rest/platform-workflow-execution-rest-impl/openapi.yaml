@@ -244,8 +244,7 @@ components:
           description: "The key-value map of the inputs passed to the job when it\
           \ was created."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
           readOnly: true
         label:
           description: "The job's human-readable name."
@@ -263,8 +262,7 @@ components:
         outputs:
           description: "The key-value map of the outputs returned."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
           readOnly: true
         parentTaskExecutionId:
           description: "The id of the parent task that created this job. Required\
@@ -380,8 +378,7 @@ components:
         inputs:
           description: "The inputs expected by the workflow"
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
         label:
           description: "The job's human-readable name"
           type: "string"
