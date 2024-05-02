@@ -38,6 +38,6 @@ public class InfobipConnection {
                 .title("API Key")
                 .properties(
                     string(VALUE)
-                        .label("Value")
+                        .label("Token")
                         .required(true)));
 }

@@ -73,7 +73,7 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
                             .defaultValue("X-Shopify-Access-Token")
                             .hidden(true),
                         string(VALUE)
-                            .label("Value")
+                            .label("Access Token")
                             .required(true)))
             .baseUri((connectionParameters, context) -> getBaseUrl(connectionParameters));
     }
