@@ -4,7 +4,7 @@ import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middlewa
 import DataPillPanelBody, {ComponentOperationType} from '@/pages/platform/workflow-editor/components/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -46,7 +46,14 @@ const DataPillPanel = ({
                 }) as ComponentOperationType
         );
 
-    if (!dataPillPanelOpen || !workflowNodeDetailsPanelOpen) {
+    useEffect(() => {
+        if (!workflowNodeDetailsPanelOpen) {
+            setDataPillPanelOpen(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowNodeDetailsPanelOpen]);
+
+    if (!dataPillPanelOpen) {
         return <></>;
     }
 
