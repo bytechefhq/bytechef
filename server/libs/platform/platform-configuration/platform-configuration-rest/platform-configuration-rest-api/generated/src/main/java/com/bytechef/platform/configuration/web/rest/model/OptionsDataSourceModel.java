@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OptionsDataSource", description = "Defines function that should dynamically load options for the property.")
 @JsonTypeName("OptionsDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:01:14.462391+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:23:18.552647+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class OptionsDataSourceModel {
 
   @Valid
@@ -35,7 +35,7 @@ public class OptionsDataSourceModel {
     return this;
   }
 
-  public OptionsDataSourceModel addoptionsLookupDependsOnItem(String optionsLookupDependsOnItem) {
+  public OptionsDataSourceModel addOptionsLookupDependsOnItem(String optionsLookupDependsOnItem) {
     if (this.optionsLookupDependsOn == null) {
       this.optionsLookupDependsOn = new ArrayList<>();
     }
@@ -47,14 +47,14 @@ public class OptionsDataSourceModel {
    * The list of property names on which value change the property options should load/reload.
    * @return optionsLookupDependsOn
   */
-
+  
   @Schema(name = "optionsLookupDependsOn", description = "The list of property names on which value change the property options should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("optionsLookupDependsOn")
-  public List<String> getoptionsLookupDependsOn() {
+  public List<String> getOptionsLookupDependsOn() {
     return optionsLookupDependsOn;
   }
 
-  public void setoptionsLookupDependsOn(List<String> optionsLookupDependsOn) {
+  public void setOptionsLookupDependsOn(List<String> optionsLookupDependsOn) {
     this.optionsLookupDependsOn = optionsLookupDependsOn;
   }
 
