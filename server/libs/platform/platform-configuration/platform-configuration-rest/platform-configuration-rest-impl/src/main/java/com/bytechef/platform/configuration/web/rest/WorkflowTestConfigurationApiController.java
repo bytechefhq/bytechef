@@ -95,8 +95,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
             workflowId, workflowNodeName, workflowConnectionKey,
             saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 
@@ -108,8 +107,7 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationInputs(
             workflowId, saveWorkflowTestConfigurationInputsRequestModel.getInputs());
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 }
