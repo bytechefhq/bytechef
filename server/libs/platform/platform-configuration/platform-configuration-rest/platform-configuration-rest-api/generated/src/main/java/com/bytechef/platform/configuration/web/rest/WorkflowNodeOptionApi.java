@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:01:14.462391+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:23:18.552647+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "workflow-node-option", description = "The Platform Workflow Node Option API")
 public interface WorkflowNodeOptionApi {
@@ -68,7 +68,7 @@ public interface WorkflowNodeOptionApi {
         value = "/workflows/{id}/properties/{workflowNodeName}/options/{propertyName}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<OptionModel>> getWorkflowNodeOptions(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
