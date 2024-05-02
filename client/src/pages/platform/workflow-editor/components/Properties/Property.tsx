@@ -76,7 +76,7 @@ const Property = ({
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
-    const [loadDependsOnValues, setLoadDependsOnValues] = useState<Array<string> | undefined>();
+    const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(!formState && property.controlType !== 'SELECT');
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
@@ -512,8 +512,8 @@ const Property = ({
     }, [propertyParameterValue]);
 
     useEffect(() => {
-        if (optionsDataSource?.loadOptionsDependsOn) {
-            const loadDependsOnValues = optionsDataSource?.loadOptionsDependsOn.map((key) => {
+        if (optionsDataSource?.optionsLookupDependsOn) {
+            const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map((key) => {
                 return key
                     .split('.')
                     .reduce((acc, key) => {
@@ -526,13 +526,13 @@ const Property = ({
                     ?.toString();
             });
 
-            setLoadDependsOnValues(loadDependsOnValues);
+            setLookupDependsOnValues(optionsLookupDependsOnValues);
         }
-    }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.loadOptionsDependsOn]);
+    }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
     useEffect(() => {
-        if (propertiesDataSource?.loadPropertiesDependsOn) {
-            const loadDependsOnValues = propertiesDataSource?.loadPropertiesDependsOn.map((key) => {
+        if (propertiesDataSource?.propertiesLookupDependsOn) {
+            const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map((key) => {
                 return key
                     .split('.')
                     .reduce((acc, key) => {
@@ -545,9 +545,9 @@ const Property = ({
                     ?.toString();
             });
 
-            setLoadDependsOnValues(loadDependsOnValues);
+            setLookupDependsOnValues(propertiesLookupDependsOnValues);
         }
-    }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.loadPropertiesDependsOn]);
+    }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
 
     // set showInputTypeSwitchButton state depending on the controlType
     useEffect(() => {
@@ -741,10 +741,10 @@ const Property = ({
                                 key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                loadDependsOnPaths={optionsDataSource?.loadOptionsDependsOn?.map(
-                                    (loadOptionDependsOn) => loadOptionDependsOn.replace('[index]', `[${arrayIndex}]`)
+                                lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map((path) =>
+                                    path.replace('[index]', `[${arrayIndex}]`)
                                 )}
-                                loadDependsOnValues={loadDependsOnValues}
+                                lookupDependsOnValues={lookupDependsOnValues}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
@@ -796,7 +796,7 @@ const Property = ({
                     <PropertyDynamicProperties
                         currentNodeConnectionId={currentNode?.connectionId}
                         currentOperationName={operationName}
-                        loadDependsOnValues={loadDependsOnValues}
+                        lookupDependsOnValues={lookupDependsOnValues}
                         name={name}
                         parameterValue={propertyParameterValue}
                     />

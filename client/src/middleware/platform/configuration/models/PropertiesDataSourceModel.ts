@@ -24,7 +24,7 @@ export interface PropertiesDataSourceModel {
      * @type {Array<string>}
      * @memberof PropertiesDataSourceModel
      */
-    loadPropertiesDependsOn?: Array<string>;
+    propertiesLookupDependsOn?: Array<string>;
 }
 
 /**
@@ -44,7 +44,7 @@ export function PropertiesDataSourceModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'loadPropertiesDependsOn': json['loadPropertiesDependsOn'] == null ? undefined : json['loadPropertiesDependsOn'],
+        'propertiesLookupDependsOn': json['propertiesLookupDependsOn'] == null ? undefined : json['propertiesLookupDependsOn'],
     };
 }
 
@@ -54,7 +54,7 @@ export function PropertiesDataSourceModelToJSON(value?: PropertiesDataSourceMode
     }
     return {
         
-        'loadPropertiesDependsOn': value['loadPropertiesDependsOn'],
+        'propertiesLookupDependsOn': value['propertiesLookupDependsOn'],
     };
 }
 
