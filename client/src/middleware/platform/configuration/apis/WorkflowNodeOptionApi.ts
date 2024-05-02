@@ -26,7 +26,7 @@ export interface GetWorkflowNodeOptionsRequest {
     id: string;
     workflowNodeName: string;
     propertyName: string;
-    loadDependsOnPaths?: Array<string>;
+    lookupDependsOnPaths?: Array<string>;
     searchText?: string;
 }
 
@@ -63,8 +63,8 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters['loadDependsOnPaths'] != null) {
-            queryParameters['loadDependsOnPaths'] = requestParameters['loadDependsOnPaths'];
+        if (requestParameters['lookupDependsOnPaths'] != null) {
+            queryParameters['lookupDependsOnPaths'] = requestParameters['lookupDependsOnPaths'];
         }
 
         if (requestParameters['searchText'] != null) {

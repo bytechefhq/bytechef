@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "PropertiesDataSource", description = "Defines function that should load properties.")
 @JsonTypeName("PropertiesDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:23:18.552647+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:29:46.245387+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class PropertiesDataSourceModel {
 
   @Valid
@@ -35,11 +35,11 @@ public class PropertiesDataSourceModel {
     return this;
   }
 
-  public PropertiesDataSourceModel addLoadPropertiesDependsOnItem(String loadPropertiesDependsOnItem) {
+  public PropertiesDataSourceModel addPropertiesLookupDependsOnItem(String propertiesLookupDependsOnItem) {
     if (this.propertiesLookupDependsOn == null) {
       this.propertiesLookupDependsOn = new ArrayList<>();
     }
-    this.propertiesLookupDependsOn.add(loadPropertiesDependsOnItem);
+    this.propertiesLookupDependsOn.add(propertiesLookupDependsOnItem);
     return this;
   }
 
@@ -47,14 +47,14 @@ public class PropertiesDataSourceModel {
    * The list of property names on which value change the properties should load/reload.
    * @return propertiesLookupDependsOn
   */
-
+  
   @Schema(name = "propertiesLookupDependsOn", description = "The list of property names on which value change the properties should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("propertiesLookupDependsOn")
-  public List<String> getLoadPropertiesDependsOn() {
+  public List<String> getPropertiesLookupDependsOn() {
     return propertiesLookupDependsOn;
   }
 
-  public void setLoadPropertiesDependsOn(List<String> propertiesLookupDependsOn) {
+  public void setPropertiesLookupDependsOn(List<String> propertiesLookupDependsOn) {
     this.propertiesLookupDependsOn = propertiesLookupDependsOn;
   }
 

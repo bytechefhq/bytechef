@@ -24,7 +24,7 @@ export interface OptionsDataSourceModel {
      * @type {Array<string>}
      * @memberof OptionsDataSourceModel
      */
-    loadOptionsDependsOn?: Array<string>;
+    optionsLookupDependsOn?: Array<string>;
 }
 
 /**
@@ -44,7 +44,7 @@ export function OptionsDataSourceModelFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'loadOptionsDependsOn': json['loadOptionsDependsOn'] == null ? undefined : json['loadOptionsDependsOn'],
+        'optionsLookupDependsOn': json['optionsLookupDependsOn'] == null ? undefined : json['optionsLookupDependsOn'],
     };
 }
 
@@ -54,7 +54,7 @@ export function OptionsDataSourceModelToJSON(value?: OptionsDataSourceModel | nu
     }
     return {
         
-        'loadOptionsDependsOn': value['loadOptionsDependsOn'],
+        'optionsLookupDependsOn': value['optionsLookupDependsOn'],
     };
 }
 
