@@ -368,8 +368,7 @@ paths:
                 parameters:
                   description: "The parameters of a connection."
                   type: "object"
-                  additionalProperties:
-                    type: "object"
+                  additionalProperties: true
         required: true
       responses:
         "200":
@@ -1782,8 +1781,7 @@ components:
         parameters:
           description: "The parameters of an action."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
     TaskProperty:
       description: "A task property used in task dispatchers."
       type: "object"
@@ -2248,8 +2246,7 @@ components:
         parameters:
           description: "Key-value map of task parameters."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
         post:
           description: "The (optional) list of tasks that are to be executed after\
             \ the successful execution of a task."
@@ -2296,8 +2293,7 @@ components:
         parameters:
           description: "Key-value map of task parameters."
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
         timeout:
           description: "The timeout expression which describes when a trigger should\
             \ be deemed as timed-out."

@@ -18,8 +18,7 @@ definitions:
         type: "array"
         items:
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
       label:
         description: "The descriptive name for a workflow."
         type: "string"
@@ -28,8 +27,7 @@ definitions:
         type: "array"
         items:
           type: "object"
-          additionalProperties:
-            type: "object"
+          additionalProperties: true
       triggers:
         description: "The triggers that can trigger a workflow."
         type: "array"
@@ -141,6 +139,4 @@ definitions:
           \ \"TaskDispatcher\" implementations designed to handle that type of task\
           \ dispatcher."
         type: "string"
-      additionalProperties:
-        description: "The additional properties defined by particular task dispatcher."
-        type: "object"
+      additionalProperties: true
