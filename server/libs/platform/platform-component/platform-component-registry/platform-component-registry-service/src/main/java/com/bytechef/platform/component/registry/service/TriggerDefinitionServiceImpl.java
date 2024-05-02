@@ -210,7 +210,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> lookupDependsOnPaths,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
+        @NonNull List<String> lookupDependsOnPaths,
         String searchText, ComponentConnection connection, @NonNull TriggerContext context) {
 
         OptionsDataSource.TriggerOptionsFunction<?> optionsFunction = getComponentOptionsFunction(

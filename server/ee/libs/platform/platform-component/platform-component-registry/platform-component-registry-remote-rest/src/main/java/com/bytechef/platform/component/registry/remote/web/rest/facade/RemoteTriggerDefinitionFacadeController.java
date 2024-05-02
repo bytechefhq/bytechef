@@ -57,7 +57,8 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.lookupDependsOnPaths,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters,
+                propertiesRequest.lookupDependsOnPaths,
                 propertiesRequest.connectionId));
     }
 

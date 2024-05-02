@@ -73,7 +73,8 @@ public interface TriggerDefinitionService {
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> lookupDependsOnPaths,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
+        @NonNull List<String> lookupDependsOnPaths,
         @Nullable String searchText, @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     Output executeOutput(

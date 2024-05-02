@@ -142,7 +142,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeOptions(
-            componentName, componentVersion, triggerName, inputParameters, propertyName, lookupDependsOnPaths, searchText,
+            componentName, componentVersion, triggerName, inputParameters, propertyName, lookupDependsOnPaths,
+            searchText,
             componentConnection, contextFactory.createTriggerContext(componentName, componentVersion, triggerName, null,
                 null, null, null, componentConnection));
     }
