@@ -2370,7 +2370,7 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": null,
+            "optionsLookupDependsOn": null,
             "options": { }
           },
           "controlType": "SELECT"

@@ -52,11 +52,11 @@ public class MicrosoftSharePointCreateListItemAction {
             SITE_ID_PROPERTY,
             string(LIST_ID)
                 .label("List")
-                .loadOptionsDependsOn(SITE_ID)
+                .optionsLookupDependsOn(SITE_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
                 .required(true),
             dynamicProperties(COLUMNS)
-                .loadPropertiesDependsOn(SITE_ID, LIST_ID)
+                .propertiesLookupDependsOn(SITE_ID, LIST_ID)
                 .properties(MicrosoftSharePointUtils::createPropertiesForListItem))
         .outputSchema(
             object()

@@ -27,14 +27,14 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class OptionsDataSource {
 
-    private final List<String> loadOptionsDependsOn;
+    private final List<String> optionsLookupDependsOn;
 
     public OptionsDataSource(com.bytechef.component.definition.OptionsDataSource optionsDataSource) {
-        this.loadOptionsDependsOn = OptionalUtils.orElse(optionsDataSource.getLoadOptionsDependsOn(), List.of());
+        this.optionsLookupDependsOn = OptionalUtils.orElse(optionsDataSource.getOptionsLookupDependsOn(), List.of());
     }
 
-    public List<String> getLoadOptionsDependsOn() {
-        return loadOptionsDependsOn;
+    public List<String> getOptionsLookupDependsOn() {
+        return optionsLookupDependsOn;
     }
 
     @Override
@@ -43,18 +43,18 @@ public class OptionsDataSource {
             return true;
         if (!(o instanceof OptionsDataSource that))
             return false;
-        return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn);
+        return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(loadOptionsDependsOn);
+        return Objects.hash(optionsLookupDependsOn);
     }
 
     @Override
     public String toString() {
         return "OptionsDataSource{" +
-            "loadOptionsDependsOn=" + loadOptionsDependsOn +
+            "optionsLookupDependsOn=" + optionsLookupDependsOn +
             '}';
     }
 }

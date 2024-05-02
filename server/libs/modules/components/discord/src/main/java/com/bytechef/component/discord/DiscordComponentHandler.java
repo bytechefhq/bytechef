@@ -114,7 +114,7 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
                 .options((ActionOptionsFunction<String>) DiscordUtils::getGuildIdOptions);
         } else if (Objects.equals(modifiableProperty.getName(), CHANNEL_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                .loadOptionsDependsOn(GUILD_ID)
+                .optionsLookupDependsOn(GUILD_ID)
                 .options((ActionOptionsFunction<String>) DiscordUtils::getChannelIdOptions);
         } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
             Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
@@ -129,7 +129,7 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
                             option("GUILD_CATEGORY", 4, "an organizational category that contains up to 50 channels"));
                 } else if (Objects.equals(baseProperty.getName(), RECIPIENT_ID)) {
                     ((ModifiableStringProperty) baseProperty)
-                        .loadOptionsDependsOn(GUILD_ID)
+                        .optionsLookupDependsOn(GUILD_ID)
                         .options((ActionOptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions);
                 }
             }

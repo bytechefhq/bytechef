@@ -205,7 +205,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -614,7 +614,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -1321,7 +1321,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "model" ],
+        "propertiesLookupDependsOn": [ "model" ],
         "properties": { }
       }
     }, {
@@ -1428,7 +1428,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -3617,7 +3617,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {

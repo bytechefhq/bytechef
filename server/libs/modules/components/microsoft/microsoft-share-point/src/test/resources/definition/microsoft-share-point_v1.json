@@ -41,7 +41,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -64,7 +64,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "siteId" ],
+        "optionsLookupDependsOn": [ "siteId" ],
         "options": { }
       }
     }, {
@@ -184,7 +184,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -344,7 +344,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -367,7 +367,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "siteId" ],
+        "optionsLookupDependsOn": [ "siteId" ],
         "options": { }
       }
     }, {
@@ -382,7 +382,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "siteId", "listId" ],
+        "propertiesLookupDependsOn": [ "siteId", "listId" ],
         "properties": { }
       }
     } ],
@@ -462,7 +462,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -485,7 +485,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "siteId" ],
+        "optionsLookupDependsOn": [ "siteId" ],
         "options": { }
       }
     }, {

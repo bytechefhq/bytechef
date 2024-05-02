@@ -369,7 +369,7 @@
           "minLength": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": null,
+            "optionsLookupDependsOn": null,
             "options": { }
           }
         }, {

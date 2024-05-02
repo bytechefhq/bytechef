@@ -108,7 +108,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -154,7 +154,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spreadsheetId" ],
+        "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -215,7 +215,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -261,7 +261,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spreadsheetId" ],
+        "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -317,7 +317,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -364,7 +364,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spreadsheetId" ],
+        "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -533,7 +533,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -580,7 +580,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spreadsheetId" ],
+        "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -647,7 +647,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "isTheFirstRowHeader" ],
+        "propertiesLookupDependsOn": [ "isTheFirstRowHeader" ],
         "properties": { }
       }
     } ],
@@ -773,7 +773,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -820,7 +820,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spreadsheetId" ],
+        "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     }, {
@@ -878,7 +878,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "isTheFirstRowHeader" ],
+        "propertiesLookupDependsOn": [ "isTheFirstRowHeader" ],
         "properties": { }
       }
     } ],
@@ -1004,7 +1004,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -1051,7 +1051,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spreadsheetId" ],
+        "optionsLookupDependsOn": [ "spreadsheetId" ],
         "options": { }
       }
     } ],

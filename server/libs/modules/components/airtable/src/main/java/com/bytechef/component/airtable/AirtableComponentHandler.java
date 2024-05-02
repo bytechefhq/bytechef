@@ -60,22 +60,22 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
         if (Objects.equals(modifiableProperty.getName(), BASE_ID)) {
             ((ModifiableStringProperty) modifiableProperty).options(
                 (ActionOptionsFunction<String>) (
-                    inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                    inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
                     context) -> AirtableUtils.getBaseIdOptions(context));
         }
 
         if (Objects.equals(modifiableProperty.getName(), "__item")) {
             ((ModifiableDynamicPropertiesProperty) modifiableProperty)
-                .loadPropertiesDependsOn(BASE_ID, TABLE_ID)
+                .propertiesLookupDependsOn(BASE_ID, TABLE_ID)
                 .properties(AirtableUtils.getFieldsProperties());
         }
 
         if (Objects.equals(modifiableProperty.getName(), TABLE_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
-                .loadOptionsDependsOn(BASE_ID)
+                .optionsLookupDependsOn(BASE_ID)
                 .options(
                     (ActionOptionsFunction<String>) (
-                        inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
                         context) -> AirtableUtils.getTableIdOptions(inputParameters, context));
         }
 

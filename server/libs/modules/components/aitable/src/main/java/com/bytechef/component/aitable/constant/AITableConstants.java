@@ -59,12 +59,12 @@ public class AITableConstants {
     public static final ModifiableStringProperty DATASHEET_ID_PROPERTY = string(DATASHEET_ID)
         .label("Datasheet")
         .description("AITable Datasheet")
-        .loadOptionsDependsOn(SPACE_ID)
+        .optionsLookupDependsOn(SPACE_ID)
         .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetIdOptions)
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY = dynamicProperties(FIELDS)
-        .loadPropertiesDependsOn(DATASHEET_ID)
+        .propertiesLookupDependsOn(DATASHEET_ID)
         .properties(AITableUtils::createPropertiesForRecord);
 
     public static final ModifiableObjectProperty OUTPUT_PROPERTY = object()

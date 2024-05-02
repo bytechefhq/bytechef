@@ -82,7 +82,7 @@
           "minLength": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": null,
+            "optionsLookupDependsOn": null,
             "options": { }
           }
         }, {
@@ -145,7 +145,7 @@
           "minLength": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": [ "__item.data.workspace" ],
+            "optionsLookupDependsOn": [ "__item.data.workspace" ],
             "options": { }
           }
         } ],
@@ -454,7 +454,7 @@
           "minLength": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": null,
+            "optionsLookupDependsOn": null,
             "options": { }
           }
         }, {
@@ -477,7 +477,7 @@
           "minLength": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": [ "workspace" ],
+            "optionsLookupDependsOn": [ "workspace" ],
             "options": { }
           }
         }, {
@@ -571,7 +571,7 @@
             "minLength": null,
             "options": null,
             "optionsDataSource": {
-              "loadOptionsDependsOn": null,
+              "optionsLookupDependsOn": null,
               "options": { }
             }
           } ],
@@ -601,7 +601,7 @@
           "minLength": null,
           "options": null,
           "optionsDataSource": {
-            "loadOptionsDependsOn": [ "workspace" ],
+            "optionsLookupDependsOn": [ "workspace" ],
             "options": { }
           }
         } ],

@@ -56,7 +56,7 @@ public class AITableFindRecordsAction {
                 .items(
                     string()
                         .options((ActionOptionsFunction<String>) AITableUtils::getFieldNamesOptions)
-                        .loadOptionsDependsOn(DATASHEET_ID))
+                        .optionsLookupDependsOn(DATASHEET_ID))
                 .required(false),
             array(RECORD_IDS)
                 .label("Record IDs")
@@ -64,7 +64,7 @@ public class AITableFindRecordsAction {
                 .items(
                     string()
                         .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
-                        .loadOptionsDependsOn(DATASHEET_ID))
+                        .optionsLookupDependsOn(DATASHEET_ID))
                 .required(false),
             integer(MAX_RECORDS)
                 .label("Max records")

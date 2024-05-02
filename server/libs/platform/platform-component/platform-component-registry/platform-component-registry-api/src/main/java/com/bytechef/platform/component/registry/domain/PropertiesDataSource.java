@@ -27,15 +27,15 @@ import org.apache.commons.lang3.Validate;
 @SuppressFBWarnings("EI")
 public class PropertiesDataSource {
 
-    private final List<String> loadPropertiesDependsOn;
+    private final List<String> propertiesLookupDependsOn;
 
     public PropertiesDataSource(com.bytechef.component.definition.PropertiesDataSource<?> propertiesDataSource) {
-        this.loadPropertiesDependsOn = Validate.notNull(
-            propertiesDataSource.getLoadPropertiesDependsOn(), "loadPropertiesDependsOn");
+        this.propertiesLookupDependsOn = Validate.notNull(
+            propertiesDataSource.getPropertiesLookupDependsOn(), "propertiesLookupDependsOn");
     }
 
-    public List<String> getLoadPropertiesDependsOn() {
-        return loadPropertiesDependsOn;
+    public List<String> getPropertiesLookupDependsOn() {
+        return propertiesLookupDependsOn;
     }
 
     @Override
@@ -44,18 +44,18 @@ public class PropertiesDataSource {
             return true;
         if (!(o instanceof PropertiesDataSource that))
             return false;
-        return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn);
+        return Objects.equals(propertiesLookupDependsOn, that.propertiesLookupDependsOn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(loadPropertiesDependsOn);
+        return Objects.hash(propertiesLookupDependsOn);
     }
 
     @Override
     public String toString() {
         return "PropertiesDataSource{" +
-            "loadPropertiesDependsOn=" + loadPropertiesDependsOn +
+            "propertiesLookupDependsOn=" + propertiesLookupDependsOn +
             '}';
     }
 }

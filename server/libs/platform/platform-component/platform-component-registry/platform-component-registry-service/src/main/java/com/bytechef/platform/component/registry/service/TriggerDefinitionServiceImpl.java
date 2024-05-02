@@ -88,7 +88,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        List<String> loadDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
+        List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
 
         PropertiesDataSource.TriggerPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
@@ -99,7 +99,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     new ParametersImpl(inputParameters),
                     connection == null ? null : new ParametersImpl(connection.parameters()),
                     MapUtils.toMap(
-                        loadDependsOnPaths,
+                        lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
                         item -> item),
                     context),
@@ -210,7 +210,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> loadDependsOnPaths,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> lookupDependsOnPaths,
         String searchText, ComponentConnection connection, @NonNull TriggerContext context) {
 
         OptionsDataSource.TriggerOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
@@ -222,7 +222,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     new ParametersImpl(inputParameters),
                     connection == null ? null : new ParametersImpl(connection.parameters()),
                     MapUtils.toMap(
-                        loadDependsOnPaths,
+                        lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
                         item -> item),
                     searchText, context),

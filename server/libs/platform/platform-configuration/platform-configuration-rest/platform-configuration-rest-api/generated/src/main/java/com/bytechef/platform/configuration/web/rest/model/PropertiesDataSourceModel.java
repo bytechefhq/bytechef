@@ -28,34 +28,34 @@ import jakarta.annotation.Generated;
 public class PropertiesDataSourceModel {
 
   @Valid
-  private List<String> loadPropertiesDependsOn;
+  private List<String> propertiesLookupDependsOn;
 
-  public PropertiesDataSourceModel loadPropertiesDependsOn(List<String> loadPropertiesDependsOn) {
-    this.loadPropertiesDependsOn = loadPropertiesDependsOn;
+  public PropertiesDataSourceModel propertiesLookupDependsOn(List<String> propertiesLookupDependsOn) {
+    this.propertiesLookupDependsOn = propertiesLookupDependsOn;
     return this;
   }
 
   public PropertiesDataSourceModel addLoadPropertiesDependsOnItem(String loadPropertiesDependsOnItem) {
-    if (this.loadPropertiesDependsOn == null) {
-      this.loadPropertiesDependsOn = new ArrayList<>();
+    if (this.propertiesLookupDependsOn == null) {
+      this.propertiesLookupDependsOn = new ArrayList<>();
     }
-    this.loadPropertiesDependsOn.add(loadPropertiesDependsOnItem);
+    this.propertiesLookupDependsOn.add(loadPropertiesDependsOnItem);
     return this;
   }
 
   /**
    * The list of property names on which value change the properties should load/reload.
-   * @return loadPropertiesDependsOn
+   * @return propertiesLookupDependsOn
   */
-  
-  @Schema(name = "loadPropertiesDependsOn", description = "The list of property names on which value change the properties should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("loadPropertiesDependsOn")
+
+  @Schema(name = "propertiesLookupDependsOn", description = "The list of property names on which value change the properties should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("propertiesLookupDependsOn")
   public List<String> getLoadPropertiesDependsOn() {
-    return loadPropertiesDependsOn;
+    return propertiesLookupDependsOn;
   }
 
-  public void setLoadPropertiesDependsOn(List<String> loadPropertiesDependsOn) {
-    this.loadPropertiesDependsOn = loadPropertiesDependsOn;
+  public void setLoadPropertiesDependsOn(List<String> propertiesLookupDependsOn) {
+    this.propertiesLookupDependsOn = propertiesLookupDependsOn;
   }
 
   @Override
@@ -67,19 +67,19 @@ public class PropertiesDataSourceModel {
       return false;
     }
     PropertiesDataSourceModel propertiesDataSource = (PropertiesDataSourceModel) o;
-    return Objects.equals(this.loadPropertiesDependsOn, propertiesDataSource.loadPropertiesDependsOn);
+    return Objects.equals(this.propertiesLookupDependsOn, propertiesDataSource.propertiesLookupDependsOn);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(loadPropertiesDependsOn);
+    return Objects.hash(propertiesLookupDependsOn);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class PropertiesDataSourceModel {\n");
-    sb.append("    loadPropertiesDependsOn: ").append(toIndentedString(loadPropertiesDependsOn)).append("\n");
+    sb.append("    propertiesLookupDependsOn: ").append(toIndentedString(propertiesLookupDependsOn)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -71,15 +71,15 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getWorkspaceIdOptions);
                         } else if (Objects.equals(baseProperty2.getName(), PROJECT)) {
                             ((ModifiableStringProperty) baseProperty2)
-                                .loadOptionsDependsOn(WORKSPACE)
+                                .optionsLookupDependsOn(WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getProjectIdOptions);
                         } else if (Objects.equals(baseProperty2.getName(), ASSIGNEE)) {
                             ((ModifiableStringProperty) baseProperty2)
-                                .loadOptionsDependsOn(WORKSPACE)
+                                .optionsLookupDependsOn(WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getAssigneeOptions);
                         } else if (Objects.equals(baseProperty2.getName(), TEAM)) {
                             ((ModifiableStringProperty) baseProperty2)
-                                .loadOptionsDependsOn("__item.data." + WORKSPACE)
+                                .optionsLookupDependsOn("__item.data." + WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getTeamOptions);
                         } else if (Objects.equals(baseProperty2.getName(), TAGS)) {
                             ((ModifiableArrayProperty) baseProperty2)

@@ -57,7 +57,7 @@ public class OpenAICreateImageAction {
         .description("Create an image using text-to-image models")
         .properties(
             dynamicProperties(PROMPT)
-                .loadPropertiesDependsOn(MODEL)
+                .propertiesLookupDependsOn(MODEL)
                 .properties(OpenAIUtils::getModelProperties)
                 .required(true),
             string(MODEL)

@@ -29,15 +29,15 @@ public interface OptionsDataSource {
      *
      * @return
      */
-    default Optional<List<String>> getLoadOptionsDependsOn() {
-        return Optional.empty();
-    }
+    OptionsFunction getOptions();
 
     /**
      *
      * @return
      */
-    OptionsFunction getOptions();
+    default Optional<List<String>> getOptionsLookupDependsOn() {
+        return Optional.empty();
+    }
 
     /**
      *
@@ -55,14 +55,14 @@ public interface OptionsDataSource {
          *
          * @param inputParameters
          * @param connectionParameters
-         * @param loadDependsOnPaths
+         * @param lookupDependsOnPaths
          * @param searchText
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends Option<T>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
             String searchText, ActionContext context) throws Exception;
     }
 
@@ -76,14 +76,14 @@ public interface OptionsDataSource {
          *
          * @param inputParameters
          * @param connectionParameters
-         * @param loadDependsOnPaths
+         * @param lookupDependsOnPaths
          * @param searchText
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends Option<T>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
             String searchText, TriggerContext context) throws Exception;
     }
 }

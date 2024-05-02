@@ -57,7 +57,7 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.loadDependsOnPaths,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.lookupDependsOnPaths,
                 propertiesRequest.connectionId));
     }
 
@@ -178,7 +178,7 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.triggerName,
-                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.loadDependsOnPaths,
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.lookupDependsOnPaths,
                 optionsRequest.searchText, optionsRequest.connectionId));
     }
 
@@ -270,7 +270,7 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, ?> inputParameters, Long connectionId, List<String> loadDependsOnPaths,
+        @NotNull Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths,
         String searchText) {
     }
 
@@ -283,7 +283,7 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, Object> inputParameters, Long connectionId, List<String> loadDependsOnPaths) {
+        @NotNull Map<String, Object> inputParameters, Long connectionId, List<String> lookupDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")

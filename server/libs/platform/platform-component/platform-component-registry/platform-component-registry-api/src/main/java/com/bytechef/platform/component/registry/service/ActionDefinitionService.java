@@ -34,12 +34,12 @@ public interface ActionDefinitionService {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths,
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
         @Nullable ComponentConnection connection, @NonNull ActionContext context);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection connection, @NonNull ActionContext context);
 
     Output executeOutput(

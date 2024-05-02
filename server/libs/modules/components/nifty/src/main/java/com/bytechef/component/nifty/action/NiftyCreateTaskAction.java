@@ -63,7 +63,7 @@ public class NiftyCreateTaskAction {
             string(TASK_GROUP_ID)
                 .label("Status")
                 .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupIdOptions)
-                .loadOptionsDependsOn(PROJECT)
+                .optionsLookupDependsOn(PROJECT)
                 .required(true),
             dateTime(DUE_DATE)
                 .label("Due date")

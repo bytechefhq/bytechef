@@ -61,7 +61,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     @SuppressWarnings("unchecked")
     public List<Property> getWorkflowNodeDynamicProperties(
         @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
-        @NonNull List<String> loadDependsOnPaths) {
+        @NonNull List<String> lookupDependsOnPaths) {
 
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
@@ -77,7 +77,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 return triggerDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                     workflowNodeType.componentOperationName(), propertyName, workflowTrigger.evaluateParameters(inputs),
-                    loadDependsOnPaths, connectionId);
+                    lookupDependsOnPaths, connectionId);
             })
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -91,7 +91,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                     workflowNodeType.componentOperationName(), propertyName,
                     workflowTask.evaluateParameters(
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
-                    loadDependsOnPaths, connectionId);
+                    lookupDependsOnPaths, connectionId);
             });
     }
 }
