@@ -17,6 +17,7 @@ import ProjectPublishPopover from '@/pages/automation/project/components/Project
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
@@ -55,7 +56,10 @@ const ProjectHeader = ({
         showEditWorkflowDialog,
         workflowIsRunning,
     } = useWorkflowEditorStore();
+
     const {setWorkflow, workflow} = useWorkflowDataStore();
+
+    const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const navigate = useNavigate();
 
@@ -126,6 +130,8 @@ const ProjectHeader = ({
 
     const handleProjectWorkflowValueChange = (id: string) => {
         setWorkflowTestExecution(undefined);
+
+        setCurrentNode(undefined);
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
     };
