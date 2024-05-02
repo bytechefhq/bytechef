@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-01T08:31:43.380174+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:01:14.462391+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class WorkflowTriggerModel {
 
   @Valid
