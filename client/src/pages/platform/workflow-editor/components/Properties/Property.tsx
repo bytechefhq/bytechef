@@ -441,7 +441,7 @@ const Property = ({
             return;
         }
 
-        if (!propertyParameterValue) {
+        if (!propertyParameterValue || propertyParameterValue === defaultValue) {
             const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
 
             const currentWorkflowComponent = workflowComponents?.find(
@@ -501,7 +501,7 @@ const Property = ({
             setInputValue(propertyParameterValue);
         }
 
-        if (selectValue === '' && propertyParameterValue) {
+        if (selectValue === '' || (selectValue === defaultValue && propertyParameterValue)) {
             setSelectValue(propertyParameterValue);
         }
 
