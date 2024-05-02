@@ -257,7 +257,7 @@ const WorkflowEditor = ({
 
         setEdges(defaultEdgesWithWorkflowEdges);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.id]);
+    }, [defaultNodesWithWorkflowNodes, defaultEdgesWithWorkflowEdges, workflow.id]);
 
     // Set workflowComponentWithAlias when workflowComponent is fetched
     useEffect(() => {
