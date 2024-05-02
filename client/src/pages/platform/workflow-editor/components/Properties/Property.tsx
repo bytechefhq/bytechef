@@ -209,15 +209,22 @@ const Property = ({
                 .filter((value) => !value.includes('data-value'))
                 .filter((value) => !value.includes('">'));
 
-            const isDataPillRegEx = new RegExp(/([a-zA-Z]+_[0-9]+.[a-zA-Z]+)/g);
+            const isRootDataPillRegEx = new RegExp(/([a-zA-Z]+_\d+)/g);
+            const isChildDataPillRegEx = new RegExp(/([a-zA-Z]+_[0-9]+.[a-zA-Z]+)/g);
 
             strippedValue = realValues
                 .map((value) => {
-                    if (isDataPillRegEx.test(value) && !value.startsWith('${') && !value.endsWith('}')) {
-                        return `\${${value.replace(/\//g, '.')}}`;
-                    } else {
-                        return value;
+                    const isDataPillValue = isRootDataPillRegEx.test(value) || isChildDataPillRegEx.test(value);
+
+                    if (isDataPillValue && !value.startsWith('${') && !value.endsWith('}')) {
+                        if (value.includes('\\')) {
+                            return `\${${value.replace(/\//g, '.')}}`;
+                        }
+
+                        return `\${${value}}`;
                     }
+
+                    return value;
                 })
                 .join('');
         } else {
