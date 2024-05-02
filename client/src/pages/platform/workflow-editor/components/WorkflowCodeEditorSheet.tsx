@@ -73,12 +73,8 @@ const WorkflowCodeEditorSheet = ({
                         },
                     },
                     {
-                        onError: () => {
-                            setDirty(true);
-                        },
-                        onSuccess: () => {
-                            setDirty(false);
-                        },
+                        onError: () => setDirty(true),
+                        onSuccess: () => setDirty(false),
                     }
                 );
             } catch (e) {
