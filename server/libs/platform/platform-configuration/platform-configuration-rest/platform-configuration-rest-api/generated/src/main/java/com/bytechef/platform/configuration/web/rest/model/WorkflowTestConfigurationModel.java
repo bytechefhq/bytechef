@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:23:18.552647+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:29:46.245387+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class WorkflowTestConfigurationModel {
 
   private String createdBy;
