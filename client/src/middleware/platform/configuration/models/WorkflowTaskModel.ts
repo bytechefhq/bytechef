@@ -76,10 +76,10 @@ export interface WorkflowTaskModel {
     node?: string;
     /**
      * Key-value map of task parameters.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof WorkflowTaskModel
      */
-    parameters?: { [key: string]: object; };
+    parameters?: { [key: string]: any; };
     /**
      * The (optional) list of tasks that are to be executed after the successful execution of a task.
      * @type {Array<WorkflowTaskModel>}

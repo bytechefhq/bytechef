@@ -21,10 +21,10 @@ import { mapValues } from '../runtime';
 export interface TaskDispatcherOperationRequestModel {
     /**
      * The parameters of an action.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof TaskDispatcherOperationRequestModel
      */
-    parameters: { [key: string]: object; };
+    parameters: { [key: string]: any; };
 }
 
 /**

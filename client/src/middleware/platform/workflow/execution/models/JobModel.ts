@@ -76,10 +76,10 @@ export interface JobModel {
     readonly id?: string;
     /**
      * The key-value map of the inputs passed to the job when it was created.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof JobModel
      */
-    readonly inputs?: { [key: string]: object; };
+    readonly inputs?: { [key: string]: any; };
     /**
      * The job's human-readable name.
      * @type {string}
@@ -100,10 +100,10 @@ export interface JobModel {
     readonly lastModifiedDate?: Date;
     /**
      * The key-value map of the outputs returned.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof JobModel
      */
-    readonly outputs?: { [key: string]: object; };
+    readonly outputs?: { [key: string]: any; };
     /**
      * The id of the parent task that created this job. Required for sub-flows.
      * @type {number}

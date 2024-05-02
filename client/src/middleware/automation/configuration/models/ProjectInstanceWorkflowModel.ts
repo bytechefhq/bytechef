@@ -40,10 +40,10 @@ export interface ProjectInstanceWorkflowModel {
     readonly createdDate?: Date;
     /**
      * The input parameters of an project instance used as workflow input values.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof ProjectInstanceWorkflowModel
      */
-    inputs?: { [key: string]: object; };
+    inputs?: { [key: string]: any; };
     /**
      * The connections used by a project instance.
      * @type {Array<ProjectInstanceWorkflowConnectionModel>}

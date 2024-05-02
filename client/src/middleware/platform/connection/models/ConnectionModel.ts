@@ -112,10 +112,10 @@ export interface ConnectionModel {
     name: string;
     /**
      * The parameters of a connection.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof ConnectionModel
      */
-    parameters: { [key: string]: object; };
+    parameters: { [key: string]: any; };
     /**
      * 
      * @type {Array<TagModel>}

@@ -39,6 +39,12 @@ export interface WorkflowTaskModel {
      */
     readonly connections?: Array<WorkflowConnectionModel>;
     /**
+     * The description of the task.
+     * @type {string}
+     * @memberof WorkflowTaskModel
+     */
+    description?: string;
+    /**
      * 
      * @type {DataStreamComponentModel}
      * @memberof WorkflowTaskModel
@@ -70,10 +76,10 @@ export interface WorkflowTaskModel {
     node?: string;
     /**
      * Key-value map of task parameters.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof WorkflowTaskModel
      */
-    parameters?: { [key: string]: object; };
+    parameters?: { [key: string]: any; };
     /**
      * The (optional) list of tasks that are to be executed after the successful execution of a task.
      * @type {Array<WorkflowTaskModel>}
@@ -99,7 +105,7 @@ export interface WorkflowTaskModel {
      */
     timeout?: string;
     /**
-     * The type of a task.
+     * The type of the task.
      * @type {string}
      * @memberof WorkflowTaskModel
      */
@@ -126,6 +132,7 @@ export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
+        'description': json['description'] == null ? undefined : json['description'],
         'destination': json['destination'] == null ? undefined : DataStreamComponentModelFromJSON(json['destination']),
         'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'label': json['label'] == null ? undefined : json['label'],
@@ -146,6 +153,7 @@ export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
     }
     return {
         
+        'description': value['description'],
         'destination': DataStreamComponentModelToJSON(value['destination']),
         'finalize': value['finalize'] == null ? undefined : ((value['finalize'] as Array<any>).map(WorkflowTaskModelToJSON)),
         'label': value['label'],
