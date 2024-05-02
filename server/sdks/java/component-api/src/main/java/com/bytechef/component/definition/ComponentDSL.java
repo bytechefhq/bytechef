@@ -681,7 +681,8 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(items, that.items) && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
+            return Objects.equals(items, that.items)
+                && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxItems, that.maxItems) && Objects.equals(minItems, that.minItems)
                 && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(options, that.options)
                 && Objects.equals(optionsFunction, that.optionsFunction);
@@ -2703,7 +2704,8 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return controlType == that.controlType && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
+            return controlType == that.controlType
+                && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxLength, that.maxLength) && Objects.equals(minLength, that.minLength)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
@@ -3303,7 +3305,8 @@ public final class ComponentDSL {
         @Override
         public Optional<List<String>> getOptionsLookupDependsOn() {
             return Optional
-                .ofNullable(optionsLookupDependsOn == null ? null : Collections.unmodifiableList(optionsLookupDependsOn));
+                .ofNullable(
+                    optionsLookupDependsOn == null ? null : Collections.unmodifiableList(optionsLookupDependsOn));
         }
 
         @Override

@@ -77,7 +77,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
-            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths, searchText,
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText,
             componentConnection,
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, null, componentConnection));
