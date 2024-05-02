@@ -39,10 +39,10 @@ export interface GetOAuth2AuthorizationParametersRequestModel {
     connectionVersion?: number;
     /**
      * The parameters of a connection.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof GetOAuth2AuthorizationParametersRequestModel
      */
-    parameters: { [key: string]: object; };
+    parameters: { [key: string]: any; };
 }
 
 /**

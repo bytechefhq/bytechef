@@ -46,10 +46,10 @@ export interface JobParametersModel {
     connections?: Array<JobConnectionModel>;
     /**
      * The inputs expected by the workflow
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof JobParametersModel
      */
-    inputs?: { [key: string]: object; };
+    inputs?: { [key: string]: any; };
     /**
      * The job's human-readable name
      * @type {string}
