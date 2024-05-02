@@ -658,7 +658,7 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "loadDependsOnPaths"
+        - name: "lookupDependsOnPaths"
           description: "The list of dependency paths."
           required: false
           in: "query"
@@ -887,7 +887,7 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "loadDependsOnPaths"
+        - name: "lookupDependsOnPaths"
           description: "The list of dependency paths."
           required: false
           in: "query"
@@ -1584,7 +1584,7 @@ components:
         \ property."
       type: "object"
       properties:
-        loadOptionsDependsOn:
+        optionsLookupDependsOn:
           description: "The list of property names on which value change the property\
             \ options should load/reload."
           type: "array"
@@ -1594,7 +1594,7 @@ components:
       description: "Defines function that should load properties."
       type: "object"
       properties:
-        loadPropertiesDependsOn:
+        propertiesLookupDependsOn:
           description: "The list of property names on which value change the properties\
             \ should load/reload."
           type: "array"

@@ -48,7 +48,7 @@ public class MicrosoftOneDriveDownloadFileAction {
             string(ID)
                 .label("File")
                 .description("File to download")
-                .loadOptionsDependsOn(PARENT_ID)
+                .optionsLookupDependsOn(PARENT_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))
         .outputSchema(fileEntry())

@@ -48,7 +48,7 @@ public interface WorkflowNodeDynamicPropertiesApi {
      * @param id The workflow id (required)
      * @param workflowNodeName The name of a workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
      * @param propertyName The name of a property. (required)
-     * @param loadDependsOnPaths The list of dependency paths. (optional)
+     * @param lookupDependsOnPaths The list of dependency paths. (optional)
      * @return The list of options. (status code 200)
      */
     @Operation(
@@ -67,12 +67,12 @@ public interface WorkflowNodeDynamicPropertiesApi {
         value = "/workflows/{id}/dynamic-properties/{workflowNodeName}/properties/{propertyName}",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<List<PropertyModel>> getWorkflowNodeDynamicProperties(
         @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
-        @Parameter(name = "loadDependsOnPaths", description = "The list of dependency paths.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "loadDependsOnPaths", required = false) List<String> loadDependsOnPaths
+        @Parameter(name = "lookupDependsOnPaths", description = "The list of dependency paths.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "lookupDependsOnPaths", required = false) List<String> lookupDependsOnPaths
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

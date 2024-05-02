@@ -49,7 +49,7 @@ public class BoxDownloadFileAction {
             string(FILE_ID)
                 .label("File")
                 .description("File to download.")
-                .loadOptionsDependsOn(ID)
+                .optionsLookupDependsOn(ID)
                 .options((ActionOptionsFunction<String>) BoxUtils::getFileIdOptions)
                 .required(true))
         .outputSchema(fileEntry())

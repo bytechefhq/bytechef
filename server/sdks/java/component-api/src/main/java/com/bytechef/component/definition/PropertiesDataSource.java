@@ -26,17 +26,17 @@ import java.util.Map;
 public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesFunction> {
 
     /**
-     *
-     * @return
-     */
-    List<String> getLoadPropertiesDependsOn();
-
-    /**
      * The function that returns a list of properties.
      *
      * @return The function implementation
      */
     F getProperties();
+
+    /**
+     *
+     * @return
+     */
+    List<String> getPropertiesLookupDependsOn();
 
     /**
      *
@@ -54,13 +54,13 @@ public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesF
          *
          * @param inputParameters
          * @param connectionParameters
-         * @param loadDependsOnPaths
+         * @param lookupDependsOnPaths
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
             ActionContext context) throws Exception;
     }
 
@@ -74,13 +74,13 @@ public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesF
          *
          * @param inputParameters
          * @param connectionParameters
-         * @param loadDependsOnPaths
+         * @param lookupDependsOnPaths
          * @param context
          * @return
          * @throws Exception
          */
         List<? extends ValueProperty<?>> apply(
-            Parameters inputParameters, Parameters connectionParameters, Map<String, String> loadDependsOnPaths,
+            Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
             TriggerContext context) throws Exception;
     }
 }

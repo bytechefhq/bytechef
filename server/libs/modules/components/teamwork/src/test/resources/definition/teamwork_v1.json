@@ -381,7 +381,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {

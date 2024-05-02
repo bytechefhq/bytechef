@@ -58,7 +58,7 @@ public class AcceloCreateTaskAction {
             string(AGAINST_ID)
                 .label("Against object")
                 .description("Object the task is against.")
-                .loadOptionsDependsOn(AGAINST_TYPE)
+                .optionsLookupDependsOn(AGAINST_TYPE)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) AcceloUtils::getAgainstIdOptions)
                 .required(true),
             date(DATE_STARTED)

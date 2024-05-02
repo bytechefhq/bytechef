@@ -54,7 +54,7 @@ public class AirtableNewRecordTrigger {
                 .description("The base id.")
                 .options(
                     (TriggerOptionsFunction<String>) (
-                        inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
                         context) -> AirtableUtils.getBaseIdOptions(context))
                 .required(true),
             string(TABLE_ID)
@@ -62,9 +62,9 @@ public class AirtableNewRecordTrigger {
                 .description("The table id.")
                 .options(
                     (TriggerOptionsFunction<String>) (
-                        inputParameters, connectionParameters, loadDependsOnPaths, searchText,
+                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
                         context) -> AirtableUtils.getTableIdOptions(inputParameters, context))
-                .loadOptionsDependsOn(BASE_ID)
+                .optionsLookupDependsOn(BASE_ID)
                 .required(true),
             string(TRIGGER_FIELD)
                 .label("TriggerField")

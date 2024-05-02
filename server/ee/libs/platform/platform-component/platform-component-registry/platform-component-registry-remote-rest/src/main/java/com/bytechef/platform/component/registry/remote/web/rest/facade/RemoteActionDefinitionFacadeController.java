@@ -51,7 +51,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.loadDependsOnPaths,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.lookupDependsOnPaths,
                 propertiesRequest.connectionId));
     }
 
@@ -80,7 +80,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
-                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.loadDependsOnPaths,
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.lookupDependsOnPaths,
                 optionsRequest.searchText, optionsRequest.connectionId));
     }
 
@@ -122,7 +122,7 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> inputParameters, Long connectionId, List<String> loadDependsOnPaths, String searchText) {
+        Map<String, Object> inputParameters, Long connectionId, List<String> lookupDependsOnPaths, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
@@ -135,7 +135,7 @@ public class RemoteActionDefinitionFacadeController {
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         @NotNull String propertyName, Map<String, Object> inputParameters, Long connectionId,
-        List<String> loadDependsOnPaths) {
+        List<String> lookupDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")

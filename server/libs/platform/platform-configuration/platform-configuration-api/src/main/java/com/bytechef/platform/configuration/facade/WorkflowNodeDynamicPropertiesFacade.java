@@ -27,5 +27,5 @@ public interface WorkflowNodeDynamicPropertiesFacade {
 
     List<Property> getWorkflowNodeDynamicProperties(
         @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
-        @NonNull List<String> loadDependsOnPaths);
+        @NonNull List<String> lookupDependsOnPaths);
 }

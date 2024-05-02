@@ -31,11 +31,11 @@ public interface ActionDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, Long connectionId);
+        Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
         Long connectionId);
 
     Output executeOutput(

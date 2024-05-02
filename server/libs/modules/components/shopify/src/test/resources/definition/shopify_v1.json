@@ -277,7 +277,7 @@
               "options": null,
               "controlType": "SELECT",
               "optionsDataSource": {
-                "loadOptionsDependsOn": null,
+                "optionsLookupDependsOn": null,
                 "options": { }
               }
             }, {
@@ -299,7 +299,7 @@
               "options": null,
               "controlType": "SELECT",
               "optionsDataSource": {
-                "loadOptionsDependsOn": [ "__item.order.line_items[index].product_id" ],
+                "optionsLookupDependsOn": [ "__item.order.line_items[index].product_id" ],
                 "options": { }
               }
             }, {
@@ -779,7 +779,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     } ],
@@ -820,7 +820,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     } ],
@@ -1207,7 +1207,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -1714,7 +1714,7 @@
       "options": null,
       "controlType": "SELECT",
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     } ],

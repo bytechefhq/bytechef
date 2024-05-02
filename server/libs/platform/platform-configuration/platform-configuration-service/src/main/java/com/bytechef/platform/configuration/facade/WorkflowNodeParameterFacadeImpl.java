@@ -155,7 +155,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     continue;
                 }
 
-                dependOnPropertyNames = optionsDataSource.getLoadOptionsDependsOn();
+                dependOnPropertyNames = optionsDataSource.getOptionsLookupDependsOn();
             } else if (property instanceof DynamicPropertiesProperty dynamicPropertiesProperty) {
                 PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getPropertiesDataSource();
 
@@ -163,7 +163,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     continue;
                 }
 
-                dependOnPropertyNames = propertiesDataSource.getLoadPropertiesDependsOn();
+                dependOnPropertyNames = propertiesDataSource.getPropertiesLookupDependsOn();
             }
 
             if (dependOnPropertyNames.contains(name)) {

@@ -28,34 +28,34 @@ import jakarta.annotation.Generated;
 public class OptionsDataSourceModel {
 
   @Valid
-  private List<String> loadOptionsDependsOn;
+  private List<String> optionsLookupDependsOn;
 
-  public OptionsDataSourceModel loadOptionsDependsOn(List<String> loadOptionsDependsOn) {
-    this.loadOptionsDependsOn = loadOptionsDependsOn;
+  public OptionsDataSourceModel optionsLookupDependsOn(List<String> optionsLookupDependsOn) {
+    this.optionsLookupDependsOn = optionsLookupDependsOn;
     return this;
   }
 
-  public OptionsDataSourceModel addLoadOptionsDependsOnItem(String loadOptionsDependsOnItem) {
-    if (this.loadOptionsDependsOn == null) {
-      this.loadOptionsDependsOn = new ArrayList<>();
+  public OptionsDataSourceModel addoptionsLookupDependsOnItem(String optionsLookupDependsOnItem) {
+    if (this.optionsLookupDependsOn == null) {
+      this.optionsLookupDependsOn = new ArrayList<>();
     }
-    this.loadOptionsDependsOn.add(loadOptionsDependsOnItem);
+    this.optionsLookupDependsOn.add(optionsLookupDependsOnItem);
     return this;
   }
 
   /**
    * The list of property names on which value change the property options should load/reload.
-   * @return loadOptionsDependsOn
+   * @return optionsLookupDependsOn
   */
-  
-  @Schema(name = "loadOptionsDependsOn", description = "The list of property names on which value change the property options should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("loadOptionsDependsOn")
-  public List<String> getLoadOptionsDependsOn() {
-    return loadOptionsDependsOn;
+
+  @Schema(name = "optionsLookupDependsOn", description = "The list of property names on which value change the property options should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsLookupDependsOn")
+  public List<String> getoptionsLookupDependsOn() {
+    return optionsLookupDependsOn;
   }
 
-  public void setLoadOptionsDependsOn(List<String> loadOptionsDependsOn) {
-    this.loadOptionsDependsOn = loadOptionsDependsOn;
+  public void setoptionsLookupDependsOn(List<String> optionsLookupDependsOn) {
+    this.optionsLookupDependsOn = optionsLookupDependsOn;
   }
 
   @Override
@@ -67,19 +67,19 @@ public class OptionsDataSourceModel {
       return false;
     }
     OptionsDataSourceModel optionsDataSource = (OptionsDataSourceModel) o;
-    return Objects.equals(this.loadOptionsDependsOn, optionsDataSource.loadOptionsDependsOn);
+    return Objects.equals(this.optionsLookupDependsOn, optionsDataSource.optionsLookupDependsOn);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(loadOptionsDependsOn);
+    return Objects.hash(optionsLookupDependsOn);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OptionsDataSourceModel {\n");
-    sb.append("    loadOptionsDependsOn: ").append(toIndentedString(loadOptionsDependsOn)).append("\n");
+    sb.append("    optionsLookupDependsOn: ").append(toIndentedString(optionsLookupDependsOn)).append("\n");
     sb.append("}");
     return sb.toString();
   }

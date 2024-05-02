@@ -50,7 +50,7 @@ public class DiscordSendDirectMessageAction {
             string(RECIPIENT_ID)
                 .label("Recipient")
                 .description("The recipient to open a DM channel with")
-                .loadOptionsDependsOn(GUILD_ID)
+                .optionsLookupDependsOn(GUILD_ID)
                 .options((ActionOptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions)
                 .required(true),
             string(CONTENT)

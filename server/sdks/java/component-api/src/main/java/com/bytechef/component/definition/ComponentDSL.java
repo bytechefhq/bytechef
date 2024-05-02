@@ -463,7 +463,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<List<?>, ModifiableArrayProperty> implements Property.ArrayProperty {
 
         private List<? extends ModifiableValueProperty<?, ?>> items;
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private Long maxItems;
         private Long minItems;
         private Boolean multipleValues;
@@ -577,9 +577,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableArrayProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableArrayProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -664,7 +664,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
 
         @Override
@@ -681,7 +681,7 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(items, that.items) && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(items, that.items) && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxItems, that.maxItems) && Objects.equals(minItems, that.minItems)
                 && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(options, that.options)
                 && Objects.equals(optionsFunction, that.optionsFunction);
@@ -690,7 +690,7 @@ public final class ComponentDSL {
         @Override
         public int hashCode() {
             return Objects.hash(
-                super.hashCode(), items, loadOptionsDependsOn, multipleValues, options, optionsFunction);
+                super.hashCode(), items, optionsLookupDependsOn, multipleValues, options, optionsFunction);
         }
     }
 
@@ -1444,7 +1444,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
         implements Property.DateProperty {
 
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private List<Option<LocalDate>> options;
         private OptionsFunction optionsFunction;
 
@@ -1468,9 +1468,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableDateProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableDateProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -1505,13 +1505,13 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+            return Objects.hash(super.hashCode(), optionsLookupDependsOn, options, optionsFunction);
         }
 
         @Override
@@ -1533,7 +1533,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
     }
 
@@ -1541,7 +1541,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
         implements Property.DateTimeProperty {
 
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private List<Option<LocalDateTime>> options;
         private OptionsFunction optionsFunction;
 
@@ -1565,9 +1565,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableDateTimeProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableDateTimeProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -1602,13 +1602,13 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+            return Objects.hash(super.hashCode(), optionsLookupDependsOn, options, optionsFunction);
         }
 
         @Override
@@ -1630,7 +1630,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
     }
 
@@ -1639,16 +1639,16 @@ public final class ComponentDSL {
         implements Property.DynamicPropertiesProperty {
 
         private String header;
-        private List<String> loadPropertiesDependsOn;
+        private List<String> propertiesLookupDependsOn;
         private PropertiesDataSource.PropertiesFunction propertiesFunction;
 
         public ModifiableDynamicPropertiesProperty(String name) {
             super(name, Type.DYNAMIC_PROPERTIES);
         }
 
-        public ModifiableDynamicPropertiesProperty loadPropertiesDependsOn(String... loadPropertiesDependsOn) {
-            if (loadPropertiesDependsOn != null) {
-                this.loadPropertiesDependsOn = List.of(loadPropertiesDependsOn);
+        public ModifiableDynamicPropertiesProperty propertiesLookupDependsOn(String... propertiesLookupDependsOn) {
+            if (propertiesLookupDependsOn != null) {
+                this.propertiesLookupDependsOn = List.of(propertiesLookupDependsOn);
             }
 
             return this;
@@ -1683,7 +1683,7 @@ public final class ComponentDSL {
                 return null;
             }
 
-            return new PropertiesDataSourceImpl(loadPropertiesDependsOn, propertiesFunction);
+            return new PropertiesDataSourceImpl(propertiesLookupDependsOn, propertiesFunction);
         }
 
         @Override
@@ -1702,13 +1702,13 @@ public final class ComponentDSL {
 
             ModifiableDynamicPropertiesProperty that = (ModifiableDynamicPropertiesProperty) o;
 
-            return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn)
+            return Objects.equals(propertiesLookupDependsOn, that.propertiesLookupDependsOn)
                 && Objects.equals(propertiesFunction, that.propertiesFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), loadPropertiesDependsOn, propertiesFunction);
+            return Objects.hash(super.hashCode(), propertiesLookupDependsOn, propertiesFunction);
         }
     }
 
@@ -1765,7 +1765,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<Long, ModifiableIntegerProperty>
         implements Property.IntegerProperty {
 
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private Long maxValue;
         private Long minValue;
         private List<Option<Long>> options;
@@ -1791,9 +1791,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableIntegerProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableIntegerProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -1848,14 +1848,14 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxValue, minValue, options, optionsFunction);
+            return Objects.hash(super.hashCode(), optionsLookupDependsOn, maxValue, minValue, options, optionsFunction);
         }
 
         @Override
@@ -1887,7 +1887,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
     }
 
@@ -2048,7 +2048,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<Double, ModifiableNumberProperty>
         implements Property.NumberProperty {
 
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private Integer maxNumberPrecision;
         private Double maxValue;
         private Integer minNumberPrecision;
@@ -2113,9 +2113,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableNumberProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableNumberProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -2180,7 +2180,7 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxNumberPrecision, that.maxNumberPrecision)
                 && Objects.equals(maxValue, that.maxValue)
                 && Objects.equals(minNumberPrecision, that.minNumberPrecision)
@@ -2190,7 +2190,7 @@ public final class ComponentDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxNumberPrecision, maxValue,
+            return Objects.hash(super.hashCode(), optionsLookupDependsOn, maxNumberPrecision, maxValue,
                 minNumberPrecision, minValue, numberPrecision, options, optionsFunction);
         }
 
@@ -2238,7 +2238,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
     }
 
@@ -2247,7 +2247,7 @@ public final class ComponentDSL {
         implements ObjectProperty {
 
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private Boolean multipleValues;
         private List<Option<Object>> options;
         private OptionsFunction optionsFunction;
@@ -2290,9 +2290,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableObjectProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableObjectProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -2349,14 +2349,14 @@ public final class ComponentDSL {
             }
 
             return Objects.equals(additionalProperties, that.additionalProperties)
-                && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(options, that.options)
                 && Objects.equals(optionsFunction, that.optionsFunction) && Objects.equals(properties, that.properties);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), additionalProperties, loadOptionsDependsOn, multipleValues, options,
+            return Objects.hash(super.hashCode(), additionalProperties, optionsLookupDependsOn, multipleValues, options,
                 optionsFunction, properties);
         }
 
@@ -2388,7 +2388,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
 
         @Override
@@ -2610,7 +2610,7 @@ public final class ComponentDSL {
 
         private ControlType controlType;
         private String languageId;
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private Integer maxLength;
         private Integer minLength;
         private List<Option<String>> options;
@@ -2648,9 +2648,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableStringProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableStringProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -2703,14 +2703,14 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return controlType == that.controlType && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return controlType == that.controlType && Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(maxLength, that.maxLength) && Objects.equals(minLength, that.minLength)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), controlType, loadOptionsDependsOn, maxLength, minLength, options,
+            return Objects.hash(super.hashCode(), controlType, optionsLookupDependsOn, maxLength, minLength, options,
                 optionsFunction);
         }
 
@@ -2752,7 +2752,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
     }
 
@@ -2760,7 +2760,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty>
         implements Property.TimeProperty {
 
-        private List<String> loadOptionsDependsOn;
+        private List<String> optionsLookupDependsOn;
         private List<Option<LocalTime>> options;
         private OptionsFunction optionsFunction;
 
@@ -2784,9 +2784,9 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTimeProperty loadOptionsDependsOn(String... loadOptionsDependsOn) {
-            if (loadOptionsDependsOn != null) {
-                this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
+        public ModifiableTimeProperty optionsLookupDependsOn(String... optionsLookupDependsOn) {
+            if (optionsLookupDependsOn != null) {
+                this.optionsLookupDependsOn = List.of(optionsLookupDependsOn);
             }
 
             return this;
@@ -2821,13 +2821,13 @@ public final class ComponentDSL {
                 return false;
             }
 
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+            return Objects.hash(super.hashCode(), optionsLookupDependsOn, options, optionsFunction);
         }
 
         @Override
@@ -2845,7 +2845,7 @@ public final class ComponentDSL {
             return Optional.ofNullable(
                 optionsFunction == null
                     ? null
-                    : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+                    : new OptionsDataSourceImpl(optionsLookupDependsOn, optionsFunction));
         }
     }
 
@@ -3292,18 +3292,18 @@ public final class ComponentDSL {
 
     private static class OptionsDataSourceImpl implements OptionsDataSource {
 
-        private final List<String> loadOptionsDependsOn;
+        private final List<String> optionsLookupDependsOn;
         private final OptionsFunction options;
 
         private OptionsDataSourceImpl(List<String> loadOptionsDependOnPropertyNames, OptionsFunction options) {
-            this.loadOptionsDependsOn = loadOptionsDependOnPropertyNames;
+            this.optionsLookupDependsOn = loadOptionsDependOnPropertyNames;
             this.options = Objects.requireNonNull(options);
         }
 
         @Override
-        public Optional<List<String>> getLoadOptionsDependsOn() {
+        public Optional<List<String>> getOptionsLookupDependsOn() {
             return Optional
-                .ofNullable(loadOptionsDependsOn == null ? null : Collections.unmodifiableList(loadOptionsDependsOn));
+                .ofNullable(optionsLookupDependsOn == null ? null : Collections.unmodifiableList(optionsLookupDependsOn));
         }
 
         @Override
@@ -3323,13 +3323,13 @@ public final class ComponentDSL {
 
             OptionsDataSourceImpl that = (OptionsDataSourceImpl) o;
 
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+            return Objects.equals(optionsLookupDependsOn, that.optionsLookupDependsOn)
                 && Objects.equals(options, that.options);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(loadOptionsDependsOn, options);
+            return Objects.hash(optionsLookupDependsOn, options);
         }
     }
 
@@ -3349,26 +3349,26 @@ public final class ComponentDSL {
     private static class PropertiesDataSourceImpl
         implements PropertiesDataSource<PropertiesDataSource.PropertiesFunction> {
 
-        private final List<String> loadPropertiesDependsOn;
+        private final List<String> propertiesLookupDependsOn;
         private final PropertiesFunction propertiesFunction;
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn, PropertiesFunction propertiesFunction) {
             if (loadPropertiesDependOn == null || loadPropertiesDependOn.isEmpty()) {
-                throw new IllegalArgumentException("loadPropertiesDependsOn is not defined.");
+                throw new IllegalArgumentException("propertiesLookupDependsOn is not defined.");
             }
 
             if (propertiesFunction == null) {
                 throw new IllegalArgumentException("propertiesFunction is not defined.");
             }
 
-            this.loadPropertiesDependsOn = loadPropertiesDependOn;
+            this.propertiesLookupDependsOn = loadPropertiesDependOn;
             this.propertiesFunction = propertiesFunction;
         }
 
         @Override
-        public List<String> getLoadPropertiesDependsOn() {
-            return Collections.unmodifiableList(loadPropertiesDependsOn);
+        public List<String> getPropertiesLookupDependsOn() {
+            return Collections.unmodifiableList(propertiesLookupDependsOn);
         }
 
         @Override

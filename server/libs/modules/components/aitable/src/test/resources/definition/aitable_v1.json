@@ -41,7 +41,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -64,7 +64,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spaceId" ],
+        "optionsLookupDependsOn": [ "spaceId" ],
         "options": { }
       }
     }, {
@@ -101,7 +101,7 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": {
-          "loadOptionsDependsOn": [ "datasheetId" ],
+          "optionsLookupDependsOn": [ "datasheetId" ],
           "options": { }
         }
       } ],
@@ -145,7 +145,7 @@
         "minLength": null,
         "options": null,
         "optionsDataSource": {
-          "loadOptionsDependsOn": [ "datasheetId" ],
+          "optionsLookupDependsOn": [ "datasheetId" ],
           "options": { }
         }
       } ],
@@ -587,7 +587,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -610,7 +610,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spaceId" ],
+        "optionsLookupDependsOn": [ "spaceId" ],
         "options": { }
       }
     }, {
@@ -633,7 +633,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "datasheetId" ],
+        "optionsLookupDependsOn": [ "datasheetId" ],
         "options": { }
       }
     }, {
@@ -648,7 +648,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "datasheetId" ],
+        "propertiesLookupDependsOn": [ "datasheetId" ],
         "properties": { }
       }
     } ],
@@ -1064,7 +1064,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": null,
+        "optionsLookupDependsOn": null,
         "options": { }
       }
     }, {
@@ -1087,7 +1087,7 @@
       "minLength": null,
       "options": null,
       "optionsDataSource": {
-        "loadOptionsDependsOn": [ "spaceId" ],
+        "optionsLookupDependsOn": [ "spaceId" ],
         "options": { }
       }
     }, {
@@ -1102,7 +1102,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "datasheetId" ],
+        "propertiesLookupDependsOn": [ "datasheetId" ],
         "properties": { }
       }
     } ],

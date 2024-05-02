@@ -39,7 +39,7 @@ public interface TriggerDefinitionService {
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        List<String> loadDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+        List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
@@ -73,7 +73,7 @@ public interface TriggerDefinitionService {
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> loadDependsOnPaths,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @NonNull List<String> lookupDependsOnPaths,
         @Nullable String searchText, @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
     Output executeOutput(

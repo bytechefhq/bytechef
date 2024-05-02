@@ -53,7 +53,7 @@ public class AITableUpdateRecordAction {
             string(RECORD_ID)
                 .label("Record")
                 .description("Record to update")
-                .loadOptionsDependsOn(DATASHEET_ID)
+                .optionsLookupDependsOn(DATASHEET_ID)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .required(true),
             FIELDS_DYNAMIC_PROPERTY)

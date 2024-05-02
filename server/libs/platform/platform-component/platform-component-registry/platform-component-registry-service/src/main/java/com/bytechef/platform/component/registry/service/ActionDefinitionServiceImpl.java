@@ -67,7 +67,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths,
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
         ComponentConnection connection, @NonNull ActionContext context) {
 
         ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
@@ -79,7 +79,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     new ParametersImpl(inputParameters),
                     new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
                     MapUtils.toMap(
-                        loadDependsOnPaths,
+                        lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
                         item -> item),
                     context)
@@ -95,7 +95,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> loadDependsOnPaths, String searchText,
+        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
         ComponentConnection connection, @NonNull ActionContext context) {
 
         ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
@@ -107,7 +107,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     new ParametersImpl(inputParameters),
                     new ParametersImpl(connection == null ? Map.of() : connection.parameters()),
                     MapUtils.toMap(
-                        loadDependsOnPaths,
+                        lookupDependsOnPaths,
                         item -> item.substring(item.lastIndexOf(".") + 1),
                         item -> item),
                     searchText, context)

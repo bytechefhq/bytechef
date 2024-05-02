@@ -27,5 +27,5 @@ public interface WorkflowNodeOptionFacade {
 
     List<Option> getWorkflowNodeOptions(
         @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
-        @NonNull List<String> loadDependsOnPaths, String searchText);
+        @NonNull List<String> lookupDependsOnPaths, String searchText);
 }
