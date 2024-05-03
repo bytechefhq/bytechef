@@ -21,8 +21,9 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.COPY;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,13 +44,17 @@ public final class DropboxCopyAction {
             "Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder " +
                 "all its contents will be copied.")
         .properties(
-            string(SOURCE_FILENAME)
+            string(FILENAME)
+                .label("Filename")
+                .description("Name of the file with the extension. Don't fill in if you want a folder.")
+                .required(false),
+            string(SOURCE)
                 .label("Source path")
-                .description("The path which the file or folder should be copyed from.")
+                .description("The path which the file or folder should be copyed from.  Root is /.")
                 .required(true),
-            string(DESTINATION_FILENAME)
+            string(DESTINATION)
                 .label("Destination path")
-                .description("The path which the file or folder should be copyed to.")
+                .description("The path which the file or folder should be copyed to.  Root is /.")
                 .required(true))
         .outputSchema(
             object()
@@ -78,8 +83,12 @@ public final class DropboxCopyAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
+        String filename = inputParameters.getRequiredString(FILENAME);
+        String source = inputParameters.getRequiredString(SOURCE);
+        String destination = inputParameters.getRequiredString(DESTINATION);
+
         return dbxUserFilesRequests.copyV2(
-            inputParameters.getRequiredString(SOURCE_FILENAME),
-            inputParameters.getRequiredString(DESTINATION_FILENAME));
+            (source.endsWith("/") ? source : source+"/") + filename,
+            (destination.endsWith("/") ? destination : destination+"/") + filename);
     }
 }

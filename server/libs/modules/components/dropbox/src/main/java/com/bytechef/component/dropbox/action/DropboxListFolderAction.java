@@ -23,7 +23,8 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.LIST_FOLDER;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -42,10 +43,9 @@ public final class DropboxListFolderAction {
         .title("List folder")
         .description("Lists content of a folder.")
         .properties(
-            string(SOURCE_FILENAME)
+            string(SOURCE)
                 .label("Path")
-                .description("A unique identifier for the file. Must match pattern " +
-                    "\" (/(.|[\\\\r\\\\n])*)?|id:.*|(ns:[0-9]+(/.*)?)\" and not be null.")
+                .description("Path of the filename. Inputting nothing searches root.")
                 .required(false))
         .outputSchema(
             object()
@@ -82,7 +82,7 @@ public final class DropboxListFolderAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        String filePath = inputParameters.getString(SOURCE_FILENAME);
+        String filePath = inputParameters.getString(SOURCE);
 
         return dbxUserFilesRequests.listFolder(filePath != null ? filePath : "");
     }

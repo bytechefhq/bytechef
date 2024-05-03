@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_FOLDER;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -41,9 +41,9 @@ public final class DropboxCreateNewFolderAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_FOLDER)
         .title("Create new folder")
         .description("Create a folder at a given path.")
-        .properties(string(DESTINATION_FILENAME)
+        .properties(string(DESTINATION)
             .label("Folder path/name")
-            .description("The path of the new folder. Starts with / as root.")
+            .description("The path of the new folder. Root is /.")
             .required(true))
         .outputSchema(
             object()
@@ -92,6 +92,6 @@ public final class DropboxCreateNewFolderAction {
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
         return dbxUserFilesRequests.createFolderV2(
-            inputParameters.getRequiredString(DESTINATION_FILENAME));
+            inputParameters.getRequiredString(DESTINATION));
     }
 }
