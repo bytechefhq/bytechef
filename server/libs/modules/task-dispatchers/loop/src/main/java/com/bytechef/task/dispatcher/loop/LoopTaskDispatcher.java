@@ -88,7 +88,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .jobId(taskExecution.getJobId())
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
-                .taskNumber(1)
+                .taskNumber(0)
                 .workflowTask(iterateeWorkflowTasks.getFirst())
                 .build();
 
