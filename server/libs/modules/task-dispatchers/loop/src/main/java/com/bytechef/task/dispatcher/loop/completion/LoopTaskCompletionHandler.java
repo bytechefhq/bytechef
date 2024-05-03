@@ -112,7 +112,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         if (taskExecution.getTaskNumber() < iterateeWorkflowTasks.size()) {
 
-
             WorkflowTask nextIterateeWorkflowTask = iterateeWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution nextWorkflowTaskExecution = TaskExecution.builder()
@@ -125,8 +124,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             Map<String, Object> newNextTaskContext = new HashMap<>(
                 taskFileStorage.readContextValue(
-                contextService.peek(
-                    Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
+                    contextService.peek(
+                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
             if (newLoopContext.containsKey(taskExecution.getName())) {
                 newNextTaskContext.put(taskExecution.getName(), newLoopContext.get(taskExecution.getName()));
@@ -158,7 +157,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         Map<String, Object> loopWorkflowTaskNameMap =
             (Map<String, Object>) newTaskExecutionContext.get(loopWorkflowTask.getName());
-        Integer listIndex = (Integer) loopWorkflowTaskNameMap.get(INDEX);
+        Integer listIndex = (Integer) loopWorkflowTaskNameMap.get(INDEX) + 1;
 
         if (loopForever || listIndex < list.size()) {
             TaskExecution subTaskExecution = TaskExecution.builder()
@@ -180,7 +179,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 workflowTaskNameMap.put(ITEM, list.get(listIndex));
             }
 
-            workflowTaskNameMap.put(INDEX, listIndex + 1);
+            workflowTaskNameMap.put(INDEX, listIndex);
 
             newContext.put(loopWorkflowTask.getName(), workflowTaskNameMap);
 

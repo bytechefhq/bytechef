@@ -103,7 +103,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 workflowTaskNameMap.put(ITEM, list.getFirst());
             }
 
-            workflowTaskNameMap.put(INDEX, 1);
+            workflowTaskNameMap.put(INDEX, 0);
 
             WorkflowTask loopWorkflowTask = taskExecution.getWorkflowTask();
 
