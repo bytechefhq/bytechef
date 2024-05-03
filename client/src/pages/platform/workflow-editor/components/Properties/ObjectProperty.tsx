@@ -50,7 +50,9 @@ const ObjectProperty = ({
         (property.properties as Array<PropertyType>) || []
     );
     const [newPropertyName, setNewPropertyName] = useState('');
-    const [newPropertyType, setNewPropertyType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
+    const [newPropertyType, setNewPropertyType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>(
+        (property.additionalProperties?.[0]?.type as keyof typeof PROPERTY_CONTROL_TYPES) || 'STRING'
+    );
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
@@ -62,6 +64,7 @@ const ObjectProperty = ({
             controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
             custom: true,
             expressionEnabled: true,
+            label: newPropertyName,
             name: newPropertyName,
             type: (newPropertyType ||
                 additionalProperties?.[0].type ||
@@ -106,6 +109,7 @@ const ObjectProperty = ({
                     defaultValue: currentComponent.parameters![name][parameter!],
                 };
             } else {
+                console.log(name, 'else');
                 return {
                     controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
                     custom: true,

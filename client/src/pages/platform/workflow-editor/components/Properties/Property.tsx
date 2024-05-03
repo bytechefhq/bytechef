@@ -78,7 +78,7 @@ const Property = ({
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
-    const [mentionInput, setMentionInput] = useState(!formState && property.controlType !== 'SELECT');
+    const [mentionInput, setMentionInput] = useState(false);
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
@@ -422,6 +422,10 @@ const Property = ({
 
     // set default mentionInput state
     useEffect(() => {
+        if (!formState && property.controlType !== 'SELECT') {
+            setMentionInput(true);
+        }
+
         if (controlType === 'ARRAY_BUILDER') {
             setMentionInput(false);
         }
@@ -429,6 +433,7 @@ const Property = ({
         if (controlType === 'OBJECT_BUILDER') {
             setMentionInput(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [controlType, properties?.length]);
 
     useEffect(() => {

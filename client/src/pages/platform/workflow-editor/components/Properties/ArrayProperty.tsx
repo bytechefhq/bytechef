@@ -63,51 +63,57 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         onDeleteClick(path, name, index);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getParameterByPath = (path: string, object: any) =>
+        path.split('.').reduce((object, key) => object[key], object);
+
     // render individual array items with data gathered from parameters
     useEffect(() => {
         if (
-            !currentComponent?.parameters ||
             !name ||
-            !currentComponent.parameters[name] ||
-            !Object.keys(currentComponent?.parameters).length
+            !currentComponent ||
+            !currentComponent.parameters ||
+            !Object.keys(currentComponent.parameters).length
         ) {
             return;
         }
 
-        if (items?.length && name && items[0].type === 'OBJECT') {
-            const parameterArrayItems = currentComponent.parameters[name].map(
-                (parameterItem: ArrayPropertyType, index: number) => {
-                    const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
-                        Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
-                            ? {
-                                  ...property,
-                                  defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
-                              }
-                            : property
-                    );
+        let params = currentComponent.parameters;
 
-                    return {
-                        ...items[0],
-                        custom: true,
-                        name: `${name}_${index}`,
-                        properties: subProperties,
-                    };
-                }
-            );
+        if (path && path !== 'parameters') {
+            params = getParameterByPath(path, currentComponent);
+        }
+
+        if (items?.length && name && items[0].type === 'OBJECT' && currentComponent.parameters[name]) {
+            const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => {
+                const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
+                    Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
+                        ? {
+                              ...property,
+                              defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                          }
+                        : property
+                );
+
+                return {
+                    ...items[0],
+                    custom: true,
+                    name: `${name}_${index}`,
+                    properties: subProperties,
+                };
+            });
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
-        } else if (name) {
-            const parameterArrayItems = currentComponent.parameters[name].map(
-                (parameterItem: ArrayPropertyType, index: number) => ({
-                    controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
-                    custom: true,
-                    defaultValue: parameterItem,
-                    name: `${name}_${index}`,
-                    type: newItemType,
-                })
-            );
+        } else if (name && params?.[name]) {
+            const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => ({
+                controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
+                custom: true,
+                defaultValue: parameterItem,
+                name: `${name}_${index}`,
+                type: newItemType,
+            }));
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
