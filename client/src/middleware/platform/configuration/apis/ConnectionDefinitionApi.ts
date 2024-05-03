@@ -64,7 +64,7 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/connection-definition`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/connection-definition`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -106,7 +106,7 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/connection-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/connection-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

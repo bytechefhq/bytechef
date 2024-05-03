@@ -72,7 +72,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters['actionName']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/action-definitions/{actionName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters['actionName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -114,7 +114,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/action-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/action-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

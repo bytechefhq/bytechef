@@ -72,7 +72,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions/{triggerName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -114,7 +114,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/trigger-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
