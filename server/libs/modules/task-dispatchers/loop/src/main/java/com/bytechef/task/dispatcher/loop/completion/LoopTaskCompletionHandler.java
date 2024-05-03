@@ -44,6 +44,7 @@ import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
@@ -98,41 +99,14 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         int nextTaskIndex = taskExecution.getTaskNumber() + 1;
 
         if (nextTaskIndex < iterateeWorkflowTasks.size()) {
-            WorkflowTask nextIterateeWorkflowTask = iterateeWorkflowTasks.get(nextTaskIndex);
-
-            TaskExecution nextChildTaskExecution = TaskExecution.builder()
-                .jobId(loopTaskExecution.getJobId())
-                .parentId(loopTaskExecution.getId())
-                .priority(loopTaskExecution.getPriority())
-                .taskNumber(nextTaskIndex)
-                .workflowTask(nextIterateeWorkflowTask)
-                .build();
-
-            Map<String, Object> nextChildContextValue = new HashMap<>(
-                taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
-
-            if (parentContextValue.containsKey(taskExecution.getName())) {
-                nextChildContextValue.put(taskExecution.getName(), parentContextValue.get(taskExecution.getName()));
-            }
-
-            nextChildTaskExecution =
-                taskExecutionService.create(nextChildTaskExecution.evaluate(nextChildContextValue));
-
-            contextService.push(
-                Validate.notNull(nextChildTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(nextChildTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    nextChildContextValue));
-
-            taskDispatcher.dispatch(nextChildTaskExecution);
+            handleCurrentIterationNextChildTaskExecution(taskExecution, loopTaskExecution, nextTaskIndex,
+                iterateeWorkflowTasks.get(nextTaskIndex), parentContextValue);
 
             return;
         }
 
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        List<?> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
+        List<?> items = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
 
         Map<String, Object> newTaskExecutionContext = new HashMap<>(
             taskFileStorage.readContextValue(
@@ -143,40 +117,10 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         Map<String, Object> loopWorkflowTaskNameMap =
             (Map<String, Object>) newTaskExecutionContext.get(loopWorkflowTask.getName());
-        Integer listIndex = (Integer) loopWorkflowTaskNameMap.get(INDEX) + 1;
+        Integer index = (Integer) loopWorkflowTaskNameMap.get(INDEX) + 1;
 
-        if (loopForever || listIndex < list.size()) {
-            TaskExecution firstChildTaskExecution = TaskExecution.builder()
-                .jobId(loopTaskExecution.getJobId())
-                .parentId(loopTaskExecution.getId())
-                .priority(loopTaskExecution.getPriority())
-                .taskNumber(0)
-                .workflowTask(iterateeWorkflowTasks.getFirst())
-                .build();
-
-            Map<String, Object> firstChildContextValue = new HashMap<>(
-                taskFileStorage.readContextValue(
-                    contextService.peek(
-                        loopTaskExecution.getId(), Classname.TASK_EXECUTION)));
-
-            Map<String, Object> workflowTaskNameMap = new HashMap<>();
-
-            if (!list.isEmpty()) {
-                workflowTaskNameMap.put(ITEM, list.get(listIndex));
-            }
-
-            workflowTaskNameMap.put(INDEX, listIndex);
-
-            firstChildContextValue.put(loopWorkflowTask.getName(), workflowTaskNameMap);
-
-            firstChildTaskExecution = taskExecutionService.create(firstChildTaskExecution.evaluate(firstChildContextValue));
-
-            contextService.push(
-                Validate.notNull(firstChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(firstChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, firstChildContextValue));
-
-            taskDispatcher.dispatch(firstChildTaskExecution);
+        if (loopForever || index < items.size()) {
+            handleNewIterationFirstChildTaskExecution(loopTaskExecution, iterateeWorkflowTasks, items, index);
         } else {
             loopTaskExecution.setEndDate(LocalDateTime.now());
 
@@ -184,7 +128,81 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
-    private Map<String, Object> updateParentContextValue(TaskExecution taskExecution, TaskExecution parentTaskExecution) {
+    private void handleNewIterationFirstChildTaskExecution(
+        TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items, Integer index) {
+        TaskExecution firstChildTaskExecution = TaskExecution.builder()
+            .jobId(parentTaskExecution.getJobId())
+            .parentId(parentTaskExecution.getId())
+            .priority(parentTaskExecution.getPriority())
+            .taskNumber(0)
+            .workflowTask(iterateeWorkflowTasks.getFirst())
+            .build();
+
+        Map<String, Object> firstChildContextValue = new HashMap<>(
+            taskFileStorage.readContextValue(
+                contextService.peek(
+                    parentTaskExecution.getId(), Classname.TASK_EXECUTION)));
+
+        Map<String, Object> workflowTaskNameMap = new HashMap<>();
+
+        if (!items.isEmpty()) {
+            workflowTaskNameMap.put(ITEM, items.get(index));
+        }
+
+        workflowTaskNameMap.put(INDEX, index);
+
+        WorkflowTask parentWorkflowTask = parentTaskExecution.getWorkflowTask();
+
+        firstChildContextValue.put(parentWorkflowTask.getName(), workflowTaskNameMap);
+
+        firstChildTaskExecution =
+            taskExecutionService.create(firstChildTaskExecution.evaluate(firstChildContextValue));
+
+        contextService.push(
+            Validate.notNull(firstChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+            taskFileStorage.storeContextValue(
+                Validate.notNull(firstChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                firstChildContextValue));
+
+        taskDispatcher.dispatch(firstChildTaskExecution);
+    }
+
+    private void handleCurrentIterationNextChildTaskExecution(
+        TaskExecution previousChildTaskExecution, TaskExecution parentTaskExecution, int nextTaskIndex,
+        WorkflowTask nextIterateeWorkflowTask, Map<String, Object> parentContextValue) {
+
+        TaskExecution nextChildTaskExecution = TaskExecution.builder()
+            .jobId(parentTaskExecution.getJobId())
+            .parentId(parentTaskExecution.getId())
+            .priority(parentTaskExecution.getPriority())
+            .taskNumber(nextTaskIndex)
+            .workflowTask(nextIterateeWorkflowTask)
+            .build();
+
+        Map<String, Object> nextChildContextValue = new HashMap<>(
+            taskFileStorage.readContextValue(
+                contextService.peek(
+                    Validate.notNull(previousChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION)));
+
+        if (parentContextValue.containsKey(previousChildTaskExecution.getName())) {
+            nextChildContextValue.put(previousChildTaskExecution.getName(),
+                parentContextValue.get(previousChildTaskExecution.getName()));
+        }
+
+        nextChildTaskExecution =
+            taskExecutionService.create(nextChildTaskExecution.evaluate(nextChildContextValue));
+
+        contextService.push(
+            Validate.notNull(nextChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+            taskFileStorage.storeContextValue(
+                Validate.notNull(nextChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                nextChildContextValue));
+
+        taskDispatcher.dispatch(nextChildTaskExecution);
+    }
+
+    private Map<String, Object>
+        updateParentContextValue(TaskExecution taskExecution, TaskExecution parentTaskExecution) {
         Map<String, Object> contextValue = new HashMap<>(
             taskFileStorage.readContextValue(
                 contextService.peek(
