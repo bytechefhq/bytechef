@@ -49,6 +49,7 @@ import org.springframework.context.ApplicationEventPublisher;
  * <code>iteratee</code> function on each item on the <code>stream</code>.
  *
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
