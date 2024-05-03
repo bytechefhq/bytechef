@@ -78,7 +78,58 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}/action-definitions:
+  /component-definitions/{componentName}:
+    get:
+      description: "Get a component definition."
+      summary: "Get a component definition"
+      tags:
+        - "component-definition"
+      operationId: "getComponentDefinition"
+      parameters:
+        - name: "componentName"
+          description: "The name of a component to get."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The version of a component to get. If not set, teh latest version\
+          \ is returned."
+          required: false
+          in: "query"
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComponentDefinition"
+  /component-definitions/{componentName}/versions:
+    get:
+      description: "Get all component definition versions of a component."
+      summary: "Get all component definition versions of a component"
+      tags:
+        - "component-definition"
+      operationId: "getComponentDefinitionVersions"
+      parameters:
+        - name: "componentName"
+          description: "The name of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /component-definitions/{componentName}/versions/{componentVersion}/action-definitions:
     get:
       description: "Get a list of action definitions for a component."
       summary: "Get a list of action definitions for a component"
@@ -107,7 +158,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ActionDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}:
+  /component-definitions/{componentName}/versions/{componentVersion}/action-definitions/{actionName}:
     get:
       description: "Get an action definition of a component."
       summary: "Get an action definition of a component"
@@ -140,7 +191,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
-  /component-definitions/{componentName}/{componentVersion}/connection-definition:
+  /component-definitions/{componentName}/versions/{componentVersion}/connection-definition:
     get:
       description: "Get connection definition for a component."
       summary: "Get connection definition for a component"
@@ -167,7 +218,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectionDefinition"
-  /component-definitions/{componentName}/{componentVersion}/connection-definitions:
+  /component-definitions/{componentName}/versions/{componentVersion}/connection-definitions:
     get:
       description: "Get all compatible connection definitions for a component."
       summary: "Get all compatible connection definitions for a component"
@@ -196,58 +247,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ConnectionDefinitionBasic"
-  /component-definitions/{componentName}:
-    get:
-      description: "Get a component definition."
-      summary: "Get a component definition"
-      tags:
-      - "component-definition"
-      operationId: "getComponentDefinition"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component to get."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component to get. If not set, teh latest version\
-          \ is returned."
-        required: false
-        in: "query"
-        schema:
-          type: "integer"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ComponentDefinition"
-  /component-definitions/{componentName}/versions:
-    get:
-      description: "Get all component definition versions of a component."
-      summary: "Get all component definition versions of a component"
-      tags:
-      - "component-definition"
-      operationId: "getComponentDefinitionVersions"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}/trigger-definitions:
+  /component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions:
     get:
       description: "Get a list of trigger definitionss for a component."
       summary: "Get a list of trigger definitionss for a component"
@@ -276,7 +276,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/TriggerDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}:
+  /component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions/{triggerName}:
     get:
       description: "Get a trigger definition of a component."
       summary: "Get a trigger definition of a component"
