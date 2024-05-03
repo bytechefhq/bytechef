@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-rest"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
     implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))

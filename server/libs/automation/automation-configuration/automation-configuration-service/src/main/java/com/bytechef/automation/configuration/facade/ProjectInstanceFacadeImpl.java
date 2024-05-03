@@ -39,7 +39,7 @@ import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.exception.ApplicationException;
+import com.bytechef.platform.configuration.exception.ConfigurationException;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -125,7 +125,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         Project project = projectService.getProject(Validate.notNull(projectInstance.getProjectId(), "projectId"));
 
         if (!project.isPublished()) {
-            throw new ApplicationException(
+            throw new ConfigurationException(
                 "Project id=%s is not published".formatted(projectId),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
@@ -192,7 +192,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
         if (projectInstance.isEnabled()) {
-            throw new ApplicationException(
+            throw new ConfigurationException(
                 "Project instance id=%s is enabled".formatted(id), ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
         }
 

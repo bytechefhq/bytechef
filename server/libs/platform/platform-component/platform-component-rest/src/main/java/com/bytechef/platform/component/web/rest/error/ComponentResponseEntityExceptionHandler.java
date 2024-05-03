@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest.error;
+package com.bytechef.platform.component.web.rest.error;
 
-import com.bytechef.platform.configuration.exception.ConfigurationException;
+import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.web.rest.error.constant.AbstractResponseEntityExceptionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -36,26 +34,23 @@ import org.springframework.web.context.request.WebRequest;
  */
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class ConfigurationResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationResponseEntityExceptionHandler.class);
+public class ComponentResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConfigurationException.class)
+    @ExceptionHandler(ComponentExecutionException.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-    public ResponseEntity<ProblemDetail> handleConfigurationExceptionException(
-        final ConfigurationException exception, final WebRequest request) {
+    public ResponseEntity<Object> handleComponentExecutionException(
+        final ComponentExecutionException exception, final WebRequest request) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(exception.getMessage(), exception);
-        }
+        logger.error(exception.getMessage(), exception);
 
         return ResponseEntity
             .of(
                 createProblemDetail(
-                    exception.getCause() == null ? exception : (Exception) exception.getCause(), HttpStatus.BAD_REQUEST,
-                    exception.getEntityClass(), exception.getErrorKey(), exception.getErrorMessageCode(),
-                    exception.getErrorMessageArguments(), null, request))
+                    exception.getCause() == null ? exception : (Exception) exception.getCause(),
+                    HttpStatus.BAD_REQUEST, exception.getEntityClass(), exception.getErrorKey(),
+                    exception.getErrorMessageCode(), null, Map.of("inputParameters", exception.getInputParameters()),
+                    request))
             .build();
     }
 }

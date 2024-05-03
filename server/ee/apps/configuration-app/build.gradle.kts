@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-rest"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))

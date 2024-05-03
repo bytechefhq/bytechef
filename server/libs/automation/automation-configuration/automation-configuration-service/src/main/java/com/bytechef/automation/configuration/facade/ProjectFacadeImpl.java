@@ -36,7 +36,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.platform.configuration.exception.ApplicationException;
+import com.bytechef.platform.configuration.exception.ConfigurationException;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -132,7 +132,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<String> latestWorkflowIds = project.getWorkflowIds(project.getLastVersion());
 
         if (workflowId != null && !latestWorkflowIds.contains(workflowId)) {
-            throw new ApplicationException(
+            throw new ConfigurationException(
                 "Older version of the workflow cannot be updated.", ProjectErrorType.UPDATE_OLD_WORKFLOW);
         }
 

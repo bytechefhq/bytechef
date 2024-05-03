@@ -23,29 +23,29 @@ import java.util.List;
 /**
  * @author Igor Beslic
  */
-public class ApplicationException extends AbstractException {
+public class ConfigurationException extends AbstractException {
 
-    public ApplicationException(String message, ErrorType errorType) {
+    public ConfigurationException(String message, ErrorType errorType) {
         super(message, errorType);
     }
 
-    public ApplicationException(String message, ErrorType errorType, List<?> errorMessageArguments) {
+    public ConfigurationException(String message, ErrorType errorType, List<?> errorMessageArguments) {
         super(message, errorType, errorMessageArguments);
     }
 
-    public ApplicationException(Throwable cause, ErrorType errorType) {
+    public ConfigurationException(Throwable cause, ErrorType errorType) {
         super(cause, errorType);
     }
 
-    public ApplicationException(Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
+    public ConfigurationException(Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
         super(cause, errorType, errorMessageArguments);
     }
 
-    public ApplicationException(String message, Throwable cause, ErrorType errorType) {
+    public ConfigurationException(String message, Throwable cause, ErrorType errorType) {
         super(message, cause, errorType);
     }
 
-    public ApplicationException(
+    public ConfigurationException(
         String message, Throwable cause, ErrorType errorType, List<?> errorMessageArguments) {
 
         super(message, cause, errorType, errorMessageArguments);

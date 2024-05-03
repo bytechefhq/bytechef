@@ -23,7 +23,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.configuration.exception.ApplicationException;
+import com.bytechef.platform.configuration.exception.ConfigurationException;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -155,7 +155,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = getProject(id);
 
         if (CollectionUtils.count(project.getWorkflowIds(project.getLastVersion())) == 1) {
-            throw new ApplicationException(
+            throw new ConfigurationException(
                 "The last workflow cannot be deleted", ProjectErrorType.REMOVE_WORKFLOW);
         }
 
