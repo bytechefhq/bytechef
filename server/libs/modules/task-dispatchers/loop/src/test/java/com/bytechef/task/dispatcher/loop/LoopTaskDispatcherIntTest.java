@@ -180,10 +180,7 @@ public class LoopTaskDispatcherIntTest {
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
-            (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorage));
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage));
     }
 
     @SuppressWarnings("PMD")
@@ -197,9 +194,6 @@ public class LoopTaskDispatcherIntTest {
                 taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            (taskDispatcher) -> new SequenceTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
