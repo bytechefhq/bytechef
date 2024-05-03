@@ -23,7 +23,7 @@ public class LoopTaskDispatcherConstants {
 
     public static final String LOOP = "loop";
     public static final String LOOP_BREAK = "loop-break";
-    public static final String LIST = "list";
+    public static final String ITEMS = "items";
     public static final String INDEX = "index";
     public static final String LOOP_FOREVER = "loopForever";
     public static final String ITERATEE = "iteratee";

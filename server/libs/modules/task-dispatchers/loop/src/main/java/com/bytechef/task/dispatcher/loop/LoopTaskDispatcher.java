@@ -18,8 +18,8 @@ package com.bytechef.task.dispatcher.loop;
 
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
@@ -77,7 +77,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
         List<WorkflowTask> iterateeWorkflowTasks =
             MapUtils.getRequiredList(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
-        List<?> list = MapUtils.getList(taskExecution.getParameters(), LIST, Collections.emptyList());
+        List<?> list = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
 
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);

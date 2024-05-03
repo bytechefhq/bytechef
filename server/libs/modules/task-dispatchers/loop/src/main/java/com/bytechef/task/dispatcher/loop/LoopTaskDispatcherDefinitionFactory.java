@@ -24,8 +24,8 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
@@ -51,7 +51,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .description("Loops sequentially over list of items.")
         .icon("path:assets/loop.svg")
         .properties(
-            array(LIST).label("List of items")
+            array(ITEMS).label("List of items")
                 .description("List of items to iterate over."),
             bool(LOOP_FOREVER)
                 .label("Loop Forever")
@@ -68,7 +68,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     private static ObjectProperty getVariableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
-        List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
+        List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
 
         if (list.isEmpty()) {
             variableProperties = object();

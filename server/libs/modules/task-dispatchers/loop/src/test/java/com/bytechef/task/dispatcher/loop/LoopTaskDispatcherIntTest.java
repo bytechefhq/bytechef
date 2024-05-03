@@ -31,8 +31,6 @@ import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatch
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
-import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
-import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

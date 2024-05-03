@@ -7,12 +7,12 @@ tasks:
 - name: "loop_1"
   type: "loop/v1"
   parameters:
-    list: "${range(1,10)}"
+    items: "${range(1,10)}"
     iteratee:
     - name: "loop_2"
       type: "loop/v1"
       parameters:
-        list: "${range(1,loop_1.item)}"
+        items: "${range(1,loop_1.item)}"
         iteratee:
         - name: "var1"
           type: "var"

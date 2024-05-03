@@ -4,7 +4,7 @@ tasks:
 - name: "loop_1"
   type: "loop/v1"
   parameters:
-    list: "${range(1,10)}"
+    items: "${range(1,10)}"
     iteratee:
     - name: "sumVar1"
       type: "var"
