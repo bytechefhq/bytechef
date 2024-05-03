@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegerProperty", description = "An integer property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-02T06:29:46.245387+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-03T12:40:20.184626+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class IntegerPropertyModel extends ValuePropertyModel {
 
   private Long defaultValue;
