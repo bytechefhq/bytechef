@@ -150,7 +150,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Type type, Long instanceId, @NonNull String workflowId, Long jobId,
+        @NonNull Type type, Long instanceId, String workflowId, Long jobId,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId) {
 

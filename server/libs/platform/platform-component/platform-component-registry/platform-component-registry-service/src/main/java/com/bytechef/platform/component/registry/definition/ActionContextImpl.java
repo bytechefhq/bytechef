@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -84,8 +85,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String actionName, Long instanceId, Type type,
-        String workflowId,
-        Long jobId, DataStorageService dataStorageService) implements Data {
+        String workflowId, Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
@@ -108,11 +108,12 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         private String getScopeId(Scope scope) {
-            return switch (scope) {
-                case CURRENT_EXECUTION -> String.valueOf(jobId);
-                case WORKFLOW -> workflowId;
-                case ACCOUNT -> null;
-            };
+            return Validate.notNull(
+                switch (scope) {
+                    case CURRENT_EXECUTION -> String.valueOf(jobId);
+                    case WORKFLOW -> workflowId;
+                    case ACCOUNT -> null;
+                }, "scope");
         }
     }
 

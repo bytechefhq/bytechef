@@ -44,7 +44,7 @@ public interface ActionDefinitionFacade {
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, Type type, Long instanceId,
-        @NonNull String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
+        String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds);
 
     String executeWorkflowNodeDescription(

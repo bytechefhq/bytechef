@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -108,11 +109,12 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         }
 
         private String getScopeId(ActionContextImpl.Data.Scope scope) {
-            return switch (scope) {
-                case CURRENT_EXECUTION -> String.valueOf(jobId);
-                case WORKFLOW -> workflowId;
-                case ACCOUNT -> null;
-            };
+            return Validate.notNull(
+                switch (scope) {
+                    case CURRENT_EXECUTION -> String.valueOf(jobId);
+                    case WORKFLOW -> workflowId;
+                    case ACCOUNT -> null;
+                }, "scope");
         }
     }
 
