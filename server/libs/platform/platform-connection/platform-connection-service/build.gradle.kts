@@ -4,7 +4,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     api(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:sdks:java:component-api"))
+    implementation(project(":server:sdks:backend:java:component-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
