@@ -68,8 +68,7 @@ public class ProjectApiController implements ProjectApi {
     public ResponseEntity<Void> deleteProject(Long id) {
         projectFacade.deleteProject(id);
 
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .build();
     }
 

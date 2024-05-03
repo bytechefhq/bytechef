@@ -85,8 +85,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String triggerName, Long instanceId, Type type,
-        String workflowId,
-        Long jobId, DataStorageService dataStorageService) implements ActionContext.Data {
+        String workflowId, Long jobId, DataStorageService dataStorageService) implements ActionContext.Data {
 
         @Override
         public <T> Optional<T> fetchValue(ActionContextImpl.Data.Scope scope, String key) {
