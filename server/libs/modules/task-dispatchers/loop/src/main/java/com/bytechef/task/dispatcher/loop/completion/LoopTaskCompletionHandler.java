@@ -18,8 +18,8 @@ package com.bytechef.task.dispatcher.loop.completion;
 
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEMS;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
@@ -106,7 +106,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        List<?> items = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
+        List<?> items = MapUtils.getList(loopTaskExecution.getParameters(), ITEMS, Collections.emptyList());
 
         Map<String, Object> newTaskExecutionContext = new HashMap<>(
             taskFileStorage.readContextValue(

@@ -12,7 +12,7 @@
     "hidden": null,
     "metadata": { },
     "required": null,
-    "name": "list",
+    "name": "items",
     "type": "ARRAY",
     "defaultValue": null,
     "description": "List of items to iterate over.",
