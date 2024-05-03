@@ -25,7 +25,8 @@ import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTRY;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.UPLOAD_FILE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
@@ -53,10 +54,15 @@ public final class DropboxUploadFileAction {
                 .label("File")
                 .description("The object property which contains a reference to the file to be written.")
                 .required(true),
-            string(DESTINATION_FILENAME)
-                .label("Filename")
+            string(DESTINATION)
+                .label("Destination path")
                 .description("The path to which the file should be written.")
-                .placeholder("/your_file.pdf")
+                .placeholder("/directory/")
+                .required(true),
+            string(FILENAME)
+                .label("Filename")
+                .description("Name of the file. Needs to have the appropriate extension.")
+                .placeholder("your_file.pdf")
                 .required(true))
         .outputSchema(
             object()
@@ -131,7 +137,8 @@ public final class DropboxUploadFileAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException, IOException {
 
-        String fileName = inputParameters.getRequiredString(DESTINATION_FILENAME);
+        String destination = inputParameters.getRequiredString(DESTINATION);
+        String filePath = (destination.endsWith("/") ? destination : destination+"/") + inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = actionContext.file(
             file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
@@ -139,7 +146,7 @@ public final class DropboxUploadFileAction {
             DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
                 connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-            UploadBuilder uploadBuilder = dbxUserFilesRequests.uploadBuilder(fileName);
+            UploadBuilder uploadBuilder = dbxUserFilesRequests.uploadBuilder(filePath);
 
             return uploadBuilder.uploadAndFinish(inputStream);
         }

@@ -21,8 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_TEXT_FILE;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.*;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,12 +42,17 @@ public final class DropboxCreateNewTextFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEXT_FILE)
         .title("Create a new paper file")
-        .description("Create a new file on which you can write at a given path")
+        .description("Create a new .paper file on which you can write at a given path")
         .properties(
-            string(DESTINATION_FILENAME)
+            string(DESTINATION)
                 .label("Paper path/name")
                 .description("The path of the new paper file. Starts with / as root.")
-                .placeholder("/directory/New paper file")
+                .placeholder("/directory/")
+                .required(true),
+            string(FILENAME)
+                .label("Filename")
+                .description("Name of the paper file")
+                .placeholder("New paper file")
                 .required(true))
         .outputSchema(
             object()
@@ -73,12 +77,13 @@ public final class DropboxCreateNewTextFileAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        String destinationFilePath = inputParameters.getRequiredString(DESTINATION_FILENAME);
-        if (!destinationFilePath.endsWith(".paper"))
-            destinationFilePath += ".paper";
+        String flieName = inputParameters.getRequiredString(FILENAME);
+        String destination = inputParameters.getRequiredString(DESTINATION);
 
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
-            destinationFilePath, ImportFormat.PLAIN_TEXT)) {
+            (destination.endsWith("/") ? destination : destination+"/") +
+                (flieName.endsWith(".paper") ? flieName : flieName+".paper"),
+            ImportFormat.PLAIN_TEXT)) {
 
             return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
         }

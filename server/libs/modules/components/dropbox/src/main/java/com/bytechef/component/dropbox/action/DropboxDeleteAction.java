@@ -21,7 +21,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DELETE;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -41,11 +42,14 @@ public final class DropboxDeleteAction {
         .description(
             "Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.")
         .properties(
-            string(SOURCE_FILENAME)
+            string(SOURCE)
                 .label("Path")
-                .description("Path in the user's Dropbox to delete. Must match pattern " +
-                    "\"(/(.|[\\\\r\\\\n])*)|(ns:[0-9]+(/.*)?)|(id:.*)\" and not be null.")
-                .required(true))
+                .description("Path of the file or folder. Root is /.")
+                .required(true),
+            string(FILENAME)
+                .label("Filename")
+                .description("Name of the file. Leave empty if you want to delete a folder.")
+                .required(false))
         .outputSchema(
             object()
                 .properties(
@@ -74,6 +78,9 @@ public final class DropboxDeleteAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        return dbxUserFilesRequests.deleteV2(inputParameters.getRequiredString(SOURCE_FILENAME));
+        String source = inputParameters.getRequiredString(SOURCE);
+
+        return dbxUserFilesRequests.deleteV2(
+            (source.endsWith("/") ? source : source+"/") + inputParameters.getRequiredString(FILENAME));
     }
 }

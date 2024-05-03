@@ -25,7 +25,8 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.GET_FILE_LINK;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -47,11 +48,14 @@ public final class DropboxGetFileLinkAction {
                 "you will get 410 Gone. This URL should not be used to display content directly in the browser. " +
                 "The Content-Type of the link is determined automatically by the file's mime type.")
         .properties(
-            string(SOURCE_FILENAME)
-                .label("Path")
+            string(SOURCE)
+                .label("Path to the file")
                 .description(
-                    "The path to the file you want a temporary link to. Must match pattern " +
-                        "\" (/(.|[\\\\r\\\\n])*|id:.*)|(rev:[0-9a-f]{9,})|(ns:[0-9]+(/.*)?)\" and not be null.")
+                    "The path to the file you want a temporary link to.  Root is /.")
+                .required(true),
+            string(FILENAME)
+                .label("Filename")
+                .description("Name of the file with the extension.")
                 .required(true))
         .outputSchema(
             object()
@@ -156,7 +160,9 @@ public final class DropboxGetFileLinkAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
+        String source = inputParameters.getRequiredString(SOURCE);
+
         return dbxUserFilesRequests.getTemporaryLink(
-            inputParameters.getRequiredString(SOURCE_FILENAME));
+            (source.endsWith("/") ? source : source+"/") + inputParameters.getRequiredString(FILENAME));
     }
 }
