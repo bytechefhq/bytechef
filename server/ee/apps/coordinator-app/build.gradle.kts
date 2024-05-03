@@ -46,7 +46,6 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:loop"))
     implementation(project(":server:libs:modules:task-dispatchers:map"))
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
-    implementation(project(":server:libs:modules:task-dispatchers:sequence"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
 
     runtimeOnly("org.springframework.boot:spring-boot-starter-amqp")

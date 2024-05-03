@@ -54,8 +54,6 @@ import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
-import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
-import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
@@ -116,10 +114,7 @@ public class WebhookConfiguration {
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
                 taskCompletionHandler, counterService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
-                taskCompletionHandler, taskExecutionService),
-            (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorage));
+                taskCompletionHandler, taskExecutionService));
     }
 
     private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(ObjectMapper objectMapper) {
@@ -167,9 +162,6 @@ public class WebhookConfiguration {
                 taskFileStorage),
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            (taskDispatcher) -> new SequenceTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService,
                 taskFileStorage));
     }
 }
