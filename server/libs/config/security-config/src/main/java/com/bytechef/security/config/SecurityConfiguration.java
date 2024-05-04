@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.security.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import com.bytechef.platform.user.config.SecurityProperties;
-import com.bytechef.platform.user.config.SecurityProperties.RememberMe;
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
-import com.bytechef.platform.web.rest.filter.SpaWebFilter;
+import com.bytechef.security.web.rest.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -165,7 +163,7 @@ public class SecurityConfiguration {
     }
 
     private String getRememberMeKey() {
-        RememberMe rememberMe = securityProperties.getRememberMe();
+        SecurityProperties.RememberMe rememberMe = securityProperties.getRememberMe();
 
         return rememberMe.getKey();
     }

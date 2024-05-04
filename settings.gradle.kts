@@ -73,6 +73,7 @@ include("server:libs:config:environment-config")
 include("server:libs:config:jackson-config")
 include("server:libs:config:jdbc-config")
 include("server:libs:config:liquibase-config")
+include("server:libs:config:security-config")
 
 include("server:libs:core:commons:commons-data")
 include("server:libs:core:commons:commons-util")
