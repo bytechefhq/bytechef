@@ -211,7 +211,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/projects/{id}/{projectVersion}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"projectVersion"}}`, encodeURIComponent(String(requestParameters['projectVersion']))),
+            path: `/projects/{id}/versions/{projectVersion}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"projectVersion"}}`, encodeURIComponent(String(requestParameters['projectVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
