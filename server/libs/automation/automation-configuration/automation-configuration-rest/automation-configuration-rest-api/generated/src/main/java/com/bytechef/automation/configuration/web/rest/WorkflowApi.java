@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-03T11:02:27.392671+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-04T17:40:20.756135+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {
@@ -148,7 +148,7 @@ public interface WorkflowApi {
 
 
     /**
-     * GET /projects/{id}/{projectVersion}/workflows : Get workflows for particular project version.
+     * GET /projects/{id}/versions/{projectVersion}/workflows : Get workflows for particular project version.
      * Get workflows for particular project version.
      *
      * @param id The id of a project. (required)
@@ -168,7 +168,7 @@ public interface WorkflowApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/projects/{id}/{projectVersion}/workflows",
+        value = "/projects/{id}/versions/{projectVersion}/workflows",
         produces = { "application/json" }
     )
     

@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-03T11:02:27.392671+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-04T17:40:20.756135+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 @Validated
 @Tag(name = "project-instance", description = "The Automation Project Instance API")
 public interface ProjectInstanceApi {
@@ -267,7 +267,7 @@ public interface ProjectInstanceApi {
      * GET /project-instances : Get project instances
      * Get project instances.
      *
-     * @param environment The project ids used for filtering project instances. (optional)
+     * @param environment The environment. (optional)
      * @param projectId The project ids used for filtering project instances. (optional)
      * @param tagId The tag id of used for filtering project instances. (optional)
      * @return The list of project instances. (status code 200)
@@ -290,7 +290,7 @@ public interface ProjectInstanceApi {
     )
     
     default ResponseEntity<List<ProjectInstanceModel>> getProjectInstances(
-        @Parameter(name = "environment", description = "The project ids used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
+        @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
         @Parameter(name = "projectId", description = "The project ids used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectId", required = false) Long projectId,
         @Parameter(name = "tagId", description = "The tag id of used for filtering project instances.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
     ) {
