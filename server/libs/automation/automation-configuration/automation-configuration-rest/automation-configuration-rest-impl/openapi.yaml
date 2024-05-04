@@ -28,7 +28,7 @@ paths:
       operationId: "getProjectInstances"
       parameters:
       - name: "environment"
-        description: "The project ids used for filtering project instances."
+        description: "The environment."
         in: "query"
         required: false
         schema:
@@ -539,6 +539,36 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ProjectVersion"
+  /projects/{id}/versions/{projectVersion}/workflows:
+    get:
+      description: "Get workflows for particular project version."
+      summary: "Get workflows for particular project version."
+      tags:
+        - "workflow"
+      operationId: "getProjectVersionWorkflows"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "The array of project workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -642,36 +672,6 @@ paths:
             application/json:
               schema:
                 type: string
-  /projects/{id}/{projectVersion}/workflows:
-    get:
-      description: "Get workflows for particular project version."
-      summary: "Get workflows for particular project version."
-      tags:
-        - "workflow"
-      operationId: "getProjectVersionWorkflows"
-      parameters:
-        - name: "id"
-          description: "The id of a project."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "projectVersion"
-          description: "The version of a project."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-      responses:
-        "200":
-          description: "The array of project workflows."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
   /workflows/{id}:
     delete:
       description: "Delete a workflow."
