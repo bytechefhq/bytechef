@@ -21,8 +21,6 @@ subprojects {
     apply(plugin = "org.sonarqube")
 
     dependencies {
-        implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
-
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 }
