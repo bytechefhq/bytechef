@@ -29,27 +29,28 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Igor Beslic
  */
 @Configuration
-@EnableConfigurationProperties(StaticResourceProperties.class)
+@EnableConfigurationProperties(StaticResourcesProperties.class)
 @Profile({
     "docker"
 })
-public class WebConfiguration implements WebMvcConfigurer {
+public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
-    private final StaticResourceProperties staticResourceProperties;
+    private static final Logger logger = LoggerFactory.getLogger(StaticResourcesWebConfiguration.class);
 
-    public WebConfiguration(StaticResourceProperties staticResourceProperties) {
-        this.staticResourceProperties = new StaticResourceProperties();
+    private final StaticResourcesProperties staticResourcesProperties;
 
-        this.staticResourceProperties.setWeb(staticResourceProperties.getWeb());
+    public StaticResourcesWebConfiguration(StaticResourcesProperties staticResourcesProperties) {
+        this.staticResourcesProperties = new StaticResourcesProperties();
+
+        this.staticResourcesProperties.setWeb(staticResourcesProperties.getWeb());
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         ResourceHandlerRegistration resourceHandlerRegistration = registry.addResourceHandler("/**", "*");
 
-        resourceHandlerRegistration.addResourceLocations(staticResourceProperties.getWeb());
+        resourceHandlerRegistration.addResourceLocations(staticResourcesProperties.getWeb());
 
-        logger.info("Serving static web content at {}", staticResourceProperties.getWeb());
+        logger.info("Serving static web content at {}", staticResourcesProperties.getWeb());
     }
 }
