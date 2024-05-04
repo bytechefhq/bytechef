@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.static_resources.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

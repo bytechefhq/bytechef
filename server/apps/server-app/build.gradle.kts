@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:config:security-config"))
+    implementation(project(":server:libs:config:static-resources-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
