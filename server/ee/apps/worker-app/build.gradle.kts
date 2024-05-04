@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))
+    implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
@@ -28,7 +29,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
     implementation(project(":server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-client"))

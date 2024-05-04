@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.web.rest.jackson;
+package com.bytechef.web.rest.jackson.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
