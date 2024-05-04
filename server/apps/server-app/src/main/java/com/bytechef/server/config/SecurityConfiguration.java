@@ -103,6 +103,8 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui/**"))
                     .permitAll()
+                    .requestMatchers(mvc.pattern("/swagger-ui.html"))
+                    .permitAll()
                     .requestMatchers(mvc.pattern("/api/authenticate"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/api/register"))
