@@ -109,7 +109,6 @@ const ObjectProperty = ({
                     defaultValue: currentComponent.parameters![name][parameter!],
                 };
             } else {
-                console.log(name, 'else');
                 return {
                     controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
                     custom: true,
