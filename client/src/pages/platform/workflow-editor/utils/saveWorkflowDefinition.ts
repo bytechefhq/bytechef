@@ -103,7 +103,9 @@ export default async function saveWorkflowDefinition(
 
     if (
         existingWorkflowTask &&
-        (!operationName || JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters))
+        (!operationName ||
+            (existingWorkflowTask.parameters &&
+                JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters)))
     ) {
         return;
     }
