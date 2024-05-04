@@ -8,7 +8,7 @@ subprojects {
 
         implementation("org.apache.commons:commons-lang3")
         implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
-        implementation(project(":server:sdks:backend:java:component-api"))
+        implementation(project(":sdks:backend:java:component-api"))
 
         testImplementation(rootProject.libs.org.json)
         testImplementation(project(":server:libs:test:test-support"))

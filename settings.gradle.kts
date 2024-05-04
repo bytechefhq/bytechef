@@ -237,8 +237,8 @@ include("server:libs:modules:task-dispatchers:subflow")
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
-include("server:sdks:backend:java:component-api")
-include("server:sdks:backend:java:definition-api")
+include("sdks:backend:java:component-api")
+include("sdks:backend:java:definition-api")
 
 // EE
 
