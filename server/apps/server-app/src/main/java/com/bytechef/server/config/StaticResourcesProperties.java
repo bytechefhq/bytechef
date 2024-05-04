@@ -22,7 +22,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Igor Beslic
  */
 @ConfigurationProperties(prefix = "bytechef.resources", ignoreUnknownFields = false)
-public class StaticResourceProperties {
+public class StaticResourcesProperties {
 
     private String web;
 
