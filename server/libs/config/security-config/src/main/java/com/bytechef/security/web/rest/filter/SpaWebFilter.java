@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.web.rest.filter;
+package com.bytechef.security.web.rest.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.RequestDispatcher;
