@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.web.rest.error;
+package com.bytechef.web.rest.error;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

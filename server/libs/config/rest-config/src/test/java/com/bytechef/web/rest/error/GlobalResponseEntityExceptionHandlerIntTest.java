@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.web.rest.error;
+package com.bytechef.web.rest.error;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
