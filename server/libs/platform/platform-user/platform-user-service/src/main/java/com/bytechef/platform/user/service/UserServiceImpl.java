@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.service;
 
-import com.bytechef.platform.user.constant.Constants;
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
@@ -27,9 +27,9 @@ import com.bytechef.platform.user.exception.UsernameAlreadyUsedException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.platform.user.security.SecurityUtils;
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
-import com.bytechef.platform.user.util.RandomUtil;
+import com.bytechef.platform.user.util.RandomUtils;
+import com.bytechef.platform.user.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -57,7 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Optional<User> activateRegistration(String key) {
-        log.debug("Activating user for activation key {}", key);
+        logger.debug("Activating user for activation key {}", key);
 
         return userRepository.findByActivationKey(key)
             .map(user -> {
@@ -85,13 +85,13 @@ public class UserServiceImpl implements UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
                 this.clearUserCaches(user);
-                log.debug("Activated user: {}", user);
+                logger.debug("Activated user: {}", user);
                 return user;
             });
     }
 
     public Optional<User> completePasswordReset(String newPassword, String key) {
-        log.debug("Reset user password for reset key {}", key);
+        logger.debug("Reset user password for reset key {}", key);
 
         return userRepository.findByResetKey(key)
             .filter(user -> user.getResetDate()
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmailIgnoreCase(mail)
             .filter(User::isActivated)
             .map(user -> {
-                user.setResetKey(RandomUtil.generateResetKey());
+                user.setResetKey(RandomUtils.generateResetKey());
                 user.setResetDate(Instant.now());
 
                 this.clearUserCaches(user);
@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
         // new user is not active
         newUser.setActivated(false);
         // new user gets registration key
-        newUser.setActivationKey(RandomUtil.generateActivationKey());
+        newUser.setActivationKey(RandomUtils.generateActivationKey());
 
         Set<Authority> authorities = new HashSet<>();
 
@@ -174,7 +174,7 @@ public class UserServiceImpl implements UserService {
 
         this.clearUserCaches(newUser);
 
-        log.debug("Created Information for User: {}", newUser);
+        logger.debug("Created Information for User: {}", newUser);
 
         return newUser;
     }
@@ -209,15 +209,15 @@ public class UserServiceImpl implements UserService {
         user.setImageUrl(userDTO.getImageUrl());
 
         if (userDTO.getLangKey() == null) {
-            user.setLangKey(Constants.DEFAULT_LANGUAGE); // default language
+            user.setLangKey(UserConstants.DEFAULT_LANGUAGE); // default language
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
 
-        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+        String encryptedPassword = passwordEncoder.encode(RandomUtils.generatePassword());
 
         user.setPassword(encryptedPassword);
-        user.setResetKey(RandomUtil.generateResetKey());
+        user.setResetKey(RandomUtils.generateResetKey());
         user.setResetDate(Instant.now());
         user.setActivated(true);
 
@@ -236,7 +236,7 @@ public class UserServiceImpl implements UserService {
 
         this.clearUserCaches(user);
 
-        log.debug("Created Information for User: {}", user);
+        logger.debug("Created Information for User: {}", user);
 
         return user;
     }
@@ -281,7 +281,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                log.debug("Changed Information for User: {}", user);
+                logger.debug("Changed Information for User: {}", user);
 
                 return user;
             })
@@ -295,7 +295,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                log.debug("Deleted User: {}", user);
+                logger.debug("Deleted User: {}", user);
             });
     }
 
@@ -326,7 +326,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                log.debug("Changed Information for User: {}", user);
+                logger.debug("Changed Information for User: {}", user);
             });
     }
 
@@ -347,7 +347,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                log.debug("Changed password for User: {}", user);
+                logger.debug("Changed password for User: {}", user);
             });
     }
 
@@ -385,7 +385,7 @@ public class UserServiceImpl implements UserService {
         LocalDate now = LocalDate.now();
         persistentTokenRepository.findAllByTokenDateBefore(now.minusMonths(1))
             .forEach(token -> {
-                log.debug("Deleting token {}", token.getSeries());
+                logger.debug("Deleting token {}", token.getSeries());
 
 //                User user = token.getUser();
 //
@@ -407,7 +407,7 @@ public class UserServiceImpl implements UserService {
                 Instant.now()
                     .minus(3, ChronoUnit.DAYS))
             .forEach(user -> {
-                log.debug("Deleting not activated user {}", user.getLogin());
+                logger.debug("Deleting not activated user {}", user.getLogin());
 
                 userRepository.delete(user);
 

@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component("userDetailsService")
 public class DomainUserDetailsService implements UserDetailsService {
 
-    private final Logger log = LoggerFactory.getLogger(DomainUserDetailsService.class);
+    private static final Logger log = LoggerFactory.getLogger(DomainUserDetailsService.class);
 
     private final AuthorityRepository authorityRepository;
     private final UserRepository userRepository;

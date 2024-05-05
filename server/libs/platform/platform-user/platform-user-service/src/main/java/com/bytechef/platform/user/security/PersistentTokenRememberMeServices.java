@@ -20,7 +20,7 @@ import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.platform.user.util.RandomUtil;
+import com.bytechef.platform.user.util.RandomUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.Serializable;
@@ -71,19 +71,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class PersistentTokenRememberMeServices extends AbstractRememberMeServices {
 
-    private final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
+    private static final Logger logger = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
     // Token is valid for one month
     private static final int TOKEN_VALIDITY_DAYS = 31;
-
     private static final int TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * TOKEN_VALIDITY_DAYS;
-
     private static final long UPGRADED_TOKEN_VALIDITY_MILLIS = 5000L;
 
     private final PersistentTokenCache<UpgradedRememberMeToken> upgradedTokenCache;
-
     private final PersistentTokenRepository persistentTokenRepository;
-
     private final UserRepository userRepository;
 
     public PersistentTokenRememberMeServices(
@@ -108,7 +104,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
             if (upgradedToken != null) {
                 login = upgradedToken.getUserLoginIfValid(cookieTokens);
-                log.debug("Detected previously upgraded login token for user '{}'", login);
+
+                logger.debug("Detected previously upgraded login token for user '{}'", login);
             }
 
             if (login == null) {
@@ -120,17 +117,18 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 login = user.getLogin();
 
                 // Token also matches, so login is valid. Update the token value, keeping the *same* series number.
-                log.debug("Refreshing persistent login token for user '{}', series '{}'", login, token.getSeries());
+                logger.debug("Refreshing persistent login token for user '{}', series '{}'", login, token.getSeries());
 
                 token.setTokenDate(LocalDate.now());
-                token.setTokenValue(RandomUtil.generateRandomAlphanumericString());
+                token.setTokenValue(RandomUtils.generateRandomAlphanumericString());
                 token.setIpAddress(request.getRemoteAddr());
                 token.setUserAgent(request.getHeader("User-Agent"));
 
                 try {
                     persistentTokenRepository.save(token);
                 } catch (DataAccessException e) {
-                    log.error("Failed to update token: ", e);
+                    logger.error("Failed to update token: ", e);
+
                     throw new RememberMeAuthenticationException("Autologin failed due to data access problem", e);
                 }
                 addCookie(token, request, response);
@@ -146,15 +144,15 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
         String login = successfulAuthentication.getName();
 
-        log.debug("Creating new persistent login for user {}", login);
+        logger.debug("Creating new persistent login for user {}", login);
 
         PersistentToken token = userRepository.findByLogin(login)
             .map(u -> {
                 PersistentToken t = new PersistentToken();
 
-                t.setSeries(RandomUtil.generateRandomAlphanumericString());
+                t.setSeries(RandomUtils.generateRandomAlphanumericString());
                 t.setUser(u);
-                t.setTokenValue(RandomUtil.generateRandomAlphanumericString());
+                t.setTokenValue(RandomUtils.generateRandomAlphanumericString());
                 t.setTokenDate(LocalDate.now());
                 t.setIpAddress(request.getRemoteAddr());
                 t.setUserAgent(request.getHeader("User-Agent"));
@@ -168,7 +166,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
             addCookie(token, request, response);
         } catch (DataAccessException e) {
-            log.error("Failed to save persistent token ", e);
+            logger.error("Failed to save persistent token ", e);
         }
     }
 
@@ -192,9 +190,9 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 PersistentToken token = getPersistentToken(cookieTokens);
                 persistentTokenRepository.deleteById(token.getSeries());
             } catch (InvalidCookieException ice) {
-                log.info("Invalid cookie, no persistent token could be deleted", ice);
+                logger.info("Invalid cookie, no persistent token could be deleted", ice);
             } catch (RememberMeAuthenticationException rmae) {
-                log.debug("No persistent token found, so no token could be deleted", rmae);
+                logger.debug("No persistent token found, so no token could be deleted", rmae);
             }
         }
 
@@ -223,7 +221,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         PersistentToken token = optionalToken.orElseThrow();
 
         // We have a match for this user/series combination
-        log.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
+        logger.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
 
         if (!presentedToken.equals(token.getTokenValue())) {
             // Token doesn't match series value. Delete this session and throw an exception.
@@ -233,9 +231,10 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 "Invalid remember-me token (Series/token) mismatch. Implies previous " + "cookie theft attack.");
         }
 
-        if (token.getTokenDate()
-            .plusDays(TOKEN_VALIDITY_DAYS)
-            .isBefore(LocalDate.now())) {
+        LocalDate tokenDate = token.getTokenDate()
+            .plusDays(TOKEN_VALIDITY_DAYS);
+
+        if (tokenDate.isBefore(LocalDate.now())) {
             persistentTokenRepository.deleteById(token.getSeries());
 
             throw new RememberMeAuthenticationException("Remember-me login has expired");
