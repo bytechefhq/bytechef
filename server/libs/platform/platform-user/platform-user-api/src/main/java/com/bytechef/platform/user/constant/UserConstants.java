@@ -19,7 +19,7 @@ package com.bytechef.platform.user.constant;
 /**
  * @author Ivica Cardic
  */
-public final class Constants {
+public final class UserConstants {
 
     // Regex for acceptable logins
     public static final String LOGIN_REGEX =
@@ -28,6 +28,6 @@ public final class Constants {
     public static final String SYSTEM = "system";
     public static final String DEFAULT_LANGUAGE = "en";
 
-    private Constants() {
+    private UserConstants() {
     }
 }

@@ -24,7 +24,7 @@ import org.apache.commons.lang3.RandomStringUtils;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("DMI")
-public final class RandomUtil {
+public final class RandomUtils {
 
     private static final int DEF_COUNT = 20;
 
@@ -35,7 +35,7 @@ public final class RandomUtil {
         SECURE_RANDOM.nextBytes(new byte[64]);
     }
 
-    private RandomUtil() {
+    private RandomUtils() {
     }
 
     /**
