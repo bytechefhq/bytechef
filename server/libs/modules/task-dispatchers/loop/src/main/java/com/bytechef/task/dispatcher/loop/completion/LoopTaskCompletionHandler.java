@@ -27,19 +27,21 @@ import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -84,12 +86,18 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
+        TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(
+            Validate.notNull(taskExecution.getParentId(), "parentId"));
+
+        if (loopTaskExecution == null) {
+            handleFailedTaskExecution(taskExecution, "Unable to obtain parent loop task execution");
+
+            return;
+        }
+
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
-
-        TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(
-            Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         List<WorkflowTask> iterateeWorkflowTasks =
             MapUtils.getRequiredList(loopTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
@@ -108,10 +116,18 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
         List<?> items = MapUtils.getList(loopTaskExecution.getParameters(), ITEMS, Collections.emptyList());
 
+        FileEntry contextValueFileEntry =
+            contextService.peek(Validate.notNull(taskExecution.getId(), "task execution id"), Classname.TASK_EXECUTION);
+
+        if (contextValueFileEntry == null) {
+            handleFailedTaskExecution(loopTaskExecution, "Unable to load {} task execution context value");
+
+            return;
+        }
+
         Map<String, Object> newTaskExecutionContext = new HashMap<>(
             taskFileStorage.readContextValue(
-                contextService.peek(
-                    taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
+                contextValueFileEntry));
 
         WorkflowTask loopWorkflowTask = loopTaskExecution.getWorkflowTask();
 
@@ -128,8 +144,19 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
+    private void handleFailedTaskExecution(TaskExecution loopTaskExecution, String message) {
+        loopTaskExecution.setStatus(TaskExecution.Status.FAILED);
+
+        loopTaskExecution.setError(new ExecutionError(message, Collections.emptyList()));
+
+        loopTaskExecution.setEndDate(LocalDateTime.now());
+
+        taskCompletionHandler.handle(loopTaskExecution);
+    }
+
     private void handleNewIterationFirstChildTaskExecution(
-        TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items, Integer index) {
+        @Nonnull TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items,
+        Integer index) {
         TaskExecution firstChildTaskExecution = TaskExecution.builder()
             .jobId(parentTaskExecution.getJobId())
             .parentId(parentTaskExecution.getId())
@@ -138,10 +165,18 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
             .workflowTask(iterateeWorkflowTasks.getFirst())
             .build();
 
+        FileEntry contextValueFileEntry = contextService.peek(
+            Validate.notNull(parentTaskExecution.getId(), "parent id"), Classname.TASK_EXECUTION);
+
+        if (contextValueFileEntry == null) {
+            handleFailedTaskExecution(parentTaskExecution, "Unable to load context value for parent task execution");
+
+            return;
+        }
+
         Map<String, Object> firstChildContextValue = new HashMap<>(
             taskFileStorage.readContextValue(
-                contextService.peek(
-                    parentTaskExecution.getId(), Classname.TASK_EXECUTION)));
+                contextValueFileEntry));
 
         Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
