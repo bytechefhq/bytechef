@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,8 +83,26 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar1"));
     }
 
-    private void assertNoTaskErrors(Job job) {
-        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(job.getId());
+    private void assertNoTaskErrors(@Nonnull Job job) {
+        if (taskDispatcherJobTestExecutor == null) {
+            Assertions.fail("Executor must not be null");
+
+            return;
+        }
+
+        if ((job != null) && job.getId() == null) {
+            Assertions.fail("Job must not be null");
+
+            return;
+        }
+
+        long jobId = job.getId();
+
+        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(jobId);
+
+        if (executionErrors == null) {
+            return;
+        }
 
         if (!executionErrors.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
