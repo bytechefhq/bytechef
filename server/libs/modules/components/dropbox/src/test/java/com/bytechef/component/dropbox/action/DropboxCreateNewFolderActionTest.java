@@ -37,8 +37,8 @@ public class DropboxCreateNewFolderActionTest extends AbstractDropboxActionTest 
 
         then(filesRequests)
             .should(times(1))
-            .createFolderV2(stringArgumentCaptorA.capture());
+            .createFolderV2(stringArgumentCaptorSource.capture());
 
-        Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorA.getValue());
+        Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorSource.getValue());
     }
 }

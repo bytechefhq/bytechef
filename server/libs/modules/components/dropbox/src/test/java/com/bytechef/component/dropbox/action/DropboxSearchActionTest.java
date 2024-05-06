@@ -41,8 +41,8 @@ public class DropboxSearchActionTest extends AbstractDropboxActionTest {
 
         then(filesRequests)
             .should(times(1))
-            .searchV2(stringArgumentCaptorA.capture());
+            .searchV2(stringArgumentCaptorSource.capture());
 
-        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());
+        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorSource.getValue());
     }
 }

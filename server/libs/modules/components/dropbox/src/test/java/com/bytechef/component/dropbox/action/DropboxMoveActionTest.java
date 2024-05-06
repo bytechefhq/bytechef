@@ -36,9 +36,9 @@ public class DropboxMoveActionTest extends AbstractDropboxActionTest {
 
         then(filesRequests)
             .should(times(1))
-            .moveV2(stringArgumentCaptorA.capture(), stringArgumentCaptorB.capture());
+            .moveV2(stringArgumentCaptorSource.capture(), stringArgumentCaptorDestination.capture());
 
-        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());
-        Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorB.getValue());
+        Assertions.assertEquals(SOURCE_STUB + "/" + FILENAME_STUB, stringArgumentCaptorSource.getValue());
+        Assertions.assertEquals(DESTINATION_STUB + "/" + FILENAME_STUB, stringArgumentCaptorDestination.getValue());
     }
 }
