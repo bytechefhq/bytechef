@@ -21,10 +21,10 @@ package com.bytechef.component.dropbox.constant;
  */
 public final class DropboxConstants {
 
+    public static final String DESTINATION = "destination";
     public static final String DROPBOX = "dropbox";
     public static final String FILENAME = "filename";
     public static final String SOURCE = "source";
-    public static final String DESTINATION = "destination";
     public static final String SEARCH_STRING = "searchString";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String CLIENT_IDENTIFIER = "-";
