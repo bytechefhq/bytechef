@@ -5,6 +5,7 @@ WORKDIR /build
 COPY --chown=gradle:gradle ./.git ./.git
 COPY --chown=gradle:gradle ./buildSrc ./buildSrc
 COPY --chown=gradle:gradle ./gradle ./gradle
+COPY --chown=gradle:gradle ./sdks ./sdks
 COPY --chown=gradle:gradle ./server ./server
 COPY --chown=gradle:gradle ./build.gradle.kts ./build.gradle.kts
 COPY --chown=gradle:gradle ./gradle.properties ./gradle.properties
