@@ -84,7 +84,7 @@ public class LoopTaskDispatcherIntTest {
     }
 
     private void assertNoTaskErrors(@NonNull Job job) {
-        if ((job != null) && job.getId() == null) {
+        if (job.getId() == null) {
             Assertions.fail("Job must not be null");
 
             return;
