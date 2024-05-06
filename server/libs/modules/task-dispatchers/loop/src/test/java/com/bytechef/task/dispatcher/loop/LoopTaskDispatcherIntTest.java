@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,13 +91,8 @@ public class LoopTaskDispatcherIntTest {
             return;
         }
 
-        long jobId = job.getId();
-
-        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(jobId);
-
-        if (executionErrors == null) {
-            return;
-        }
+        List<ExecutionError> executionErrors = taskDispatcherJobTestExecutor.getExecutionErrors(
+            Validate.notNull(job.getId(), "id"));
 
         if (!executionErrors.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
