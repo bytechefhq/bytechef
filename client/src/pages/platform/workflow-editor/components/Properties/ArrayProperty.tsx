@@ -7,6 +7,7 @@ import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 
+import getParameterByPath from '../../utils/getParameterByPath';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
 
@@ -63,10 +64,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         onDeleteClick(path, name, index);
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const getParameterByPath = (path: string, object: any) =>
-        path.split('.').reduce((object, key) => object[key], object);
-
     // render individual array items with data gathered from parameters
     useEffect(() => {
         if (
@@ -98,7 +95,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 return {
                     ...items[0],
                     custom: true,
-                    name: `${name}_${index}`,
+                    name: `${index}`,
                     properties: subProperties,
                 };
             });
@@ -111,7 +108,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
                 custom: true,
                 defaultValue: parameterItem,
-                name: `${name}_${index}`,
+                name: `${index}`,
                 type: newItemType,
             }));
 
