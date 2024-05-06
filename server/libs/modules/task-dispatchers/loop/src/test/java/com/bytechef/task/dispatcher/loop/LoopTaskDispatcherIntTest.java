@@ -36,12 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -83,7 +83,7 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar1"));
     }
 
-    private void assertNoTaskErrors(@Nonnull Job job) {
+    private void assertNoTaskErrors(@NonNull Job job) {
         if (taskDispatcherJobTestExecutor == null) {
             Assertions.fail("Executor must not be null");
 
