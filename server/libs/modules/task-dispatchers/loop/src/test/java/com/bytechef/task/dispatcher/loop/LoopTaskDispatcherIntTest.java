@@ -111,6 +111,7 @@ public class LoopTaskDispatcherIntTest {
                 .forEachOrdered(executionError -> {
                     stringBuilder.append(executionError.getMessage());
                     stringBuilder.append(System.lineSeparator());
+
                     executionError.getStackTrace()
                         .forEach(s -> {
                             stringBuilder.append(s);
