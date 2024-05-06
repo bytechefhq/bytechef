@@ -132,7 +132,8 @@ public class CsvFileReadAction {
             if (configuration.headerRow()) {
                 CsvSchema headerSchema = CsvSchema
                     .emptySchema()
-                    .withHeader();
+                    .withHeader()
+                    .withColumnSeparator(configuration.delimiter.charAt(0));
 
                 MappingIterator<Map<String, String>> iterator = CsvFileConstants.CSV_MAPPER
                     .readerForMapOf(String.class)
