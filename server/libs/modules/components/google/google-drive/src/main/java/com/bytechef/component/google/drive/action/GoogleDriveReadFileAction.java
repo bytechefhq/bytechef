@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleDriveOptionUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -61,12 +62,26 @@ public final class GoogleDriveReadFileAction {
 
         String fileId = inputParameters.getRequiredString(FILE_ID);
 
-        try (InputStream inputStream = drive
-            .files()
-            .get(fileId)
-            .executeMediaAsInputStream()) {
+        Drive.Files files = drive.files();
 
-            return actionContext.file(file -> file.storeContent("fileName", inputStream));
+        Drive.Files.Get get = files.get(fileId);
+
+        try (InputStream inputStream = get.executeMediaAsInputStream()) {
+            String fileName = getFileName(files, fileId);
+
+            return actionContext.file(file -> file.storeContent(fileName, inputStream));
         }
+    }
+
+    private static String getFileName(Drive.Files files, String fileId) throws IOException {
+        return files.list()
+            .setQ("mimeType != 'application/vnd.google-apps.folder'")
+            .execute()
+            .getFiles()
+            .stream()
+            .filter(file -> fileId.equals(file.getId()))
+            .map(File::getName)
+            .findFirst()
+            .orElse("fileName");
     }
 }
