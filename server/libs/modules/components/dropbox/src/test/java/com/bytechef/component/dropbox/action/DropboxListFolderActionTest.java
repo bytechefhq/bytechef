@@ -16,7 +16,7 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
@@ -33,29 +33,29 @@ class DropboxListFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
     void testPerform() throws DbxException {
-        Mockito.when(parameters.getString(SOURCE_FILENAME))
+        Mockito.when(parameters.getString(SOURCE))
             .thenReturn(SOURCE_STUB);
 
         DropboxListFolderAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))
-            .listFolder(stringArgumentCaptorA.capture());
+            .listFolder(stringArgumentCaptorSource.capture());
 
-        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());
+        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorSource.getValue());
     }
 
     @Test
     void testPerformNull() throws DbxException {
-        Mockito.when(parameters.getString(SOURCE_FILENAME))
+        Mockito.when(parameters.getString(SOURCE))
             .thenReturn(null);
 
         DropboxListFolderAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))
-            .listFolder(stringArgumentCaptorA.capture());
+            .listFolder(stringArgumentCaptorSource.capture());
 
-        Assertions.assertEquals("", stringArgumentCaptorA.getValue());
+        Assertions.assertEquals("", stringArgumentCaptorSource.getValue());
     }
 }

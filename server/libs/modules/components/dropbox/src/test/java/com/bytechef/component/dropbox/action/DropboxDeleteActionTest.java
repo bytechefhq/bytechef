@@ -36,8 +36,8 @@ public class DropboxDeleteActionTest extends AbstractDropboxActionTest {
 
         then(filesRequests)
             .should(times(1))
-            .deleteV2(stringArgumentCaptorA.capture());
+            .deleteV2(stringArgumentCaptorSource.capture());
 
-        Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());
+        Assertions.assertEquals(SOURCE_STUB + "/" + FILENAME_STUB, stringArgumentCaptorSource.getValue());
     }
 }

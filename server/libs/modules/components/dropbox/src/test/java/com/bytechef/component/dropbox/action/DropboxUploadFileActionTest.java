@@ -32,10 +32,10 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
+class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
 
     @Test
-    public void testPerform() throws IOException, DbxException {
+    void testPerform() throws IOException, DbxException {
         Mockito
             .when(parameters.getRequiredString(FILE_ENTRY))
             .thenReturn(SOURCE_STUB);
@@ -43,19 +43,19 @@ public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
         UploadBuilder uploadBuilder = Mockito.mock(UploadBuilder.class);
 
         Mockito
-            .when(filesRequests.uploadBuilder(DESTINATION_STUB))
+            .when(filesRequests.uploadBuilder(DESTINATION_STUB + "/" + FILENAME_STUB))
             .thenReturn(uploadBuilder);
 
         DropboxUploadFileAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))
-            .uploadBuilder(stringArgumentCaptorA.capture());
+            .uploadBuilder(stringArgumentCaptorSource.capture());
 
         then(uploadBuilder)
             .should(times(1))
             .uploadAndFinish(any());
 
-        Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorA.getValue());
+        Assertions.assertEquals(DESTINATION_STUB + "/" + FILENAME_STUB, stringArgumentCaptorSource.getValue());
     }
 }

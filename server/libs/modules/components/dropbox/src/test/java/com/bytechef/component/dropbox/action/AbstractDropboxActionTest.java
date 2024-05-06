@@ -17,8 +17,9 @@
 package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.dropbox.util.DropboxUtils;
@@ -35,12 +36,14 @@ import org.mockito.Mockito;
 public abstract class AbstractDropboxActionTest {
     static final String DESTINATION_STUB = "destinationPathStub";
     static final String SOURCE_STUB = "sourcePathStub";
+    static final String FILENAME_STUB = "filenameStub";
 
     protected MockedStatic<DropboxUtils> dropboxUtils;
     protected DbxUserFilesRequests filesRequests;
     protected Parameters parameters;
-    protected ArgumentCaptor<String> stringArgumentCaptorA;
-    protected ArgumentCaptor<String> stringArgumentCaptorB;
+    protected ArgumentCaptor<String> stringArgumentCaptorSource;
+    protected ArgumentCaptor<String> stringArgumentCaptorDestination;
+    //protected ArgumentCaptor<String> stringArgumentCaptorFilename;
 
     @BeforeEach
     public void beforeEach() {
@@ -53,19 +56,24 @@ public abstract class AbstractDropboxActionTest {
             .thenReturn(filesRequests);
 
         parameters = Mockito.mock(Parameters.class);
-        stringArgumentCaptorA = ArgumentCaptor.forClass(String.class);
-        stringArgumentCaptorB = ArgumentCaptor.forClass(String.class);
+        stringArgumentCaptorSource = ArgumentCaptor.forClass(String.class);
+        stringArgumentCaptorDestination = ArgumentCaptor.forClass(String.class);
+        //stringArgumentCaptorFilename = ArgumentCaptor.forClass(String.class);
 
         Mockito
             .when(parameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("");
 
         Mockito
-            .when(parameters.getRequiredString(SOURCE_FILENAME))
+            .when(parameters.getRequiredString(FILENAME))
+            .thenReturn(FILENAME_STUB);
+
+        Mockito
+            .when(parameters.getRequiredString(SOURCE))
             .thenReturn(SOURCE_STUB);
 
         Mockito
-            .when(parameters.getRequiredString(DESTINATION_FILENAME))
+            .when(parameters.getRequiredString(DESTINATION))
             .thenReturn(DESTINATION_STUB);
     }
 
