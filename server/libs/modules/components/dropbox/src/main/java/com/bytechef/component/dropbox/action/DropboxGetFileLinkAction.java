@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDSL.date;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.GET_FILE_LINK;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.GET_FILE_LINK;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
@@ -163,6 +163,6 @@ public final class DropboxGetFileLinkAction {
         String source = inputParameters.getRequiredString(SOURCE);
 
         return dbxUserFilesRequests.getTemporaryLink(
-            (source.endsWith("/") ? source : source+"/") + inputParameters.getRequiredString(FILENAME));
+            (source.endsWith("/") ? source : source + "/") + inputParameters.getRequiredString(FILENAME));
     }
 }

@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.COPY;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
@@ -88,7 +88,7 @@ public final class DropboxCopyAction {
         String destination = inputParameters.getRequiredString(DESTINATION);
 
         return dbxUserFilesRequests.copyV2(
-            (source.endsWith("/") ? source : source+"/") + filename,
-            (destination.endsWith("/") ? destination : destination+"/") + filename);
+            (source.endsWith("/") ? source : source + "/") + filename,
+            (destination.endsWith("/") ? destination : destination + "/") + filename);
     }
 }

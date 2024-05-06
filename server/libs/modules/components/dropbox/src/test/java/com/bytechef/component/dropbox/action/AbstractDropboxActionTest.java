@@ -18,8 +18,8 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.dropbox.util.DropboxUtils;
@@ -43,7 +43,7 @@ public abstract class AbstractDropboxActionTest {
     protected Parameters parameters;
     protected ArgumentCaptor<String> stringArgumentCaptorSource;
     protected ArgumentCaptor<String> stringArgumentCaptorDestination;
-    //protected ArgumentCaptor<String> stringArgumentCaptorFilename;
+    // protected ArgumentCaptor<String> stringArgumentCaptorFilename;
 
     @BeforeEach
     public void beforeEach() {
@@ -58,7 +58,7 @@ public abstract class AbstractDropboxActionTest {
         parameters = Mockito.mock(Parameters.class);
         stringArgumentCaptorSource = ArgumentCaptor.forClass(String.class);
         stringArgumentCaptorDestination = ArgumentCaptor.forClass(String.class);
-        //stringArgumentCaptorFilename = ArgumentCaptor.forClass(String.class);
+        // stringArgumentCaptorFilename = ArgumentCaptor.forClass(String.class);
 
         Mockito
             .when(parameters.getRequiredString(ACCESS_TOKEN))
