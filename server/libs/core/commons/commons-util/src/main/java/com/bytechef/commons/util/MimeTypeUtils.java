@@ -128,6 +128,7 @@ public class MimeTypeUtils {
     public static final String MIME_TEXT_HTML = "text/html";
     public static final String MIME_TEXT_CALENDAR = "text/calendar";
     public static final String MIME_TEXT_CSS = "text/css";
+    public static final String MIME_TEXT_CSV = "text/csv";
     public static final String MIME_TEXT_SGML = "text/sgml";
     public static final String MIME_TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
     public static final String MIME_TEXT_VND_WAP_XML = "text/vnd.wap.wml";
@@ -282,7 +283,7 @@ public class MimeTypeUtils {
                 put1("cc", MIME_TEXT_PLAIN);
                 put1("chh", MIME_TEXT_PLAIN);
                 put1("java", MIME_TEXT_PLAIN);
-                put1("csv", MIME_TEXT_PLAIN);
+                put1("csv", MIME_TEXT_CSV);
                 put1("bat", MIME_TEXT_PLAIN);
                 put1("cmd", MIME_TEXT_PLAIN);
                 put1("asc", MIME_TEXT_PLAIN);
