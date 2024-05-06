@@ -99,8 +99,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        List<WorkflowTask> iterateeWorkflowTasks =
-            MapUtils.getRequiredList(loopTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
+        List<WorkflowTask> iterateeWorkflowTasks = MapUtils.getRequiredList(
+            loopTaskExecution.getParameters(), ITERATEE, WorkflowTask.class);
 
         Map<String, Object> parentContextValue = updateParentContextValue(taskExecution, loopTaskExecution);
 
@@ -126,14 +126,14 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         Map<String, Object> newTaskExecutionContext = new HashMap<>(
-            taskFileStorage.readContextValue(
-                contextValueFileEntry));
+            taskFileStorage.readContextValue(contextValueFileEntry));
 
         WorkflowTask loopWorkflowTask = loopTaskExecution.getWorkflowTask();
 
-        Map<String, Object> loopWorkflowTaskNameMap =
-            (Map<String, Object>) newTaskExecutionContext.get(loopWorkflowTask.getName());
-        Integer index = (Integer) loopWorkflowTaskNameMap.get(INDEX) + 1;
+        Map<String, ?> loopWorkflowTaskNameMap = MapUtils.getRequiredMap(
+            newTaskExecutionContext, loopWorkflowTask.getName());
+
+        int index = (Integer) loopWorkflowTaskNameMap.get(INDEX) + 1;
 
         if (loopForever || index < items.size()) {
             handleNewIterationFirstChildTaskExecution(loopTaskExecution, iterateeWorkflowTasks, items, index);
@@ -157,6 +157,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     private void handleNewIterationFirstChildTaskExecution(
         @NonNull TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items,
         Integer index) {
+
         TaskExecution firstChildTaskExecution = TaskExecution.builder()
             .jobId(parentTaskExecution.getJobId())
             .parentId(parentTaskExecution.getId())
