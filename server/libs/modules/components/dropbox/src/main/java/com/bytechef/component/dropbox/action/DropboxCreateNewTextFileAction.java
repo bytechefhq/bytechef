@@ -79,13 +79,16 @@ public final class DropboxCreateNewTextFileAction {
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        String flieName = inputParameters.getRequiredString(FILENAME);
+        String fileName = inputParameters.getRequiredString(FILENAME);
+
+        fileName = fileName.endsWith(".paper") ? fileName : fileName + ".paper";
+
         String destination = inputParameters.getRequiredString(DESTINATION);
 
+        destination = destination.endsWith("/") ? destination : destination + "/";
+
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
-            (destination.endsWith("/") ? destination : destination + "/") +
-                (flieName.endsWith(".paper") ? flieName : flieName + ".paper"),
-            ImportFormat.PLAIN_TEXT)) {
+            destination + fileName, ImportFormat.PLAIN_TEXT)) {
 
             return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
         }

@@ -86,10 +86,13 @@ public final class DropboxMoveAction {
 
         String filename = inputParameters.getRequiredString(FILENAME);
         String source = inputParameters.getRequiredString(SOURCE);
+
+        source = source.endsWith("/") ? source : source + "/";
+
         String destination = inputParameters.getRequiredString(DESTINATION);
 
-        return dbxUserFilesRequests.moveV2(
-            (source.endsWith("/") ? source : source + "/") + filename,
-            (destination.endsWith("/") ? destination : destination + "/") + filename);
+        destination = destination.endsWith("/") ? destination : destination + "/";
+
+        return dbxUserFilesRequests.moveV2(source + filename, destination + filename);
     }
 }
