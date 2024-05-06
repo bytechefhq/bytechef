@@ -4,10 +4,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {
-    WorkflowTestConfigurationKeys,
-    useGetWorkflowTestConfigurationConnectionsQuery,
-} from '@/queries/platform/workflowTestConfigurations.queries';
+import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
@@ -172,20 +169,17 @@ const ConnectionTab = ({
     workflowConnections,
     workflowId,
     workflowNodeName,
+    workflowTestConfigurationConnections,
 }: {
     componentDefinition: ComponentDefinitionModel;
     workflowConnections: WorkflowConnectionModel[];
     workflowNodeName: string;
     workflowId: string;
+    workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnectionModel>;
 }) => {
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery} = useConnectionQuery();
-
-    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
-        workflowId,
-        workflowNodeName,
-    });
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">

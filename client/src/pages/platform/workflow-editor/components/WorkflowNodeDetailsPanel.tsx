@@ -13,6 +13,7 @@ import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinition
 import {WorkflowNodeDynamicPropertyKeys} from '@/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
+import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/queries/platform/workflowTestConfigurations.queries';
 import {DataPillType, PropertyType, UpdateWorkflowMutationType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -92,6 +93,14 @@ const WorkflowNodeDetailsPanel = ({
 
     const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
+
+    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
+        {
+            workflowId: workflow.id as string,
+            workflowNodeName: currentNode?.name as string,
+        },
+        !!workflow.id && !!currentNode
+    );
 
     const getActionName = (): string => {
         const currentComponentActionNames = currentComponentDefinition?.actions?.map((action) => action.name);
@@ -380,7 +389,7 @@ const WorkflowNodeDetailsPanel = ({
 
     // If the current component requires a connection, set the active tab to 'connection'
     useEffect(() => {
-        if (currentComponentDefinition?.connectionRequired) {
+        if (currentComponentDefinition?.connectionRequired && !workflowTestConfigurationConnections?.length) {
             setActiveTab('connection');
         }
 
@@ -498,6 +507,7 @@ const WorkflowNodeDetailsPanel = ({
                                             workflowConnections={workflowConnections}
                                             workflowId={workflow.id!}
                                             workflowNodeName={currentNode?.name}
+                                            workflowTestConfigurationConnections={workflowTestConfigurationConnections}
                                         />
                                     )}
 

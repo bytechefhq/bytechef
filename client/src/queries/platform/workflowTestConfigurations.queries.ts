@@ -23,11 +23,13 @@ export const WorkflowTestConfigurationKeys = {
 };
 
 export const useGetWorkflowTestConfigurationConnectionsQuery = (
-    request: GetWorkflowTestConfigurationConnectionsRequest
+    request: GetWorkflowTestConfigurationConnectionsRequest,
+    enabled?: boolean
 ) =>
     useQuery<WorkflowTestConfigurationConnectionModel[], Error>({
         queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurationConnections(request),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfigurationConnections(request),
+        enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkflowTestConfigurationRequest) =>
