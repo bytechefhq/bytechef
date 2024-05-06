@@ -35,7 +35,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, Context.Classname classname, FileEntry value) {
+    public void push(long stackId, @NonNull Context.Classname classname, @NonNull FileEntry value) {
         Validate.notNull(classname, "'classname' must not be null");
         Validate.notNull(value, "'value' must not be null");
 
@@ -45,7 +45,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, int subStackId, Context.Classname classname, @NonNull FileEntry value) {
+    public void push(long stackId, int subStackId, @NonNull Context.Classname classname, @NonNull FileEntry value) {
         Validate.notNull(classname, "'classname' must not be null");
         Validate.notNull(value, "'value' must not be null");
 
@@ -56,17 +56,21 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     @Transactional(readOnly = true)
-    public FileEntry peek(long stackId, Context.Classname classname) {
+    public FileEntry peek(long stackId, @NonNull Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
             stackId, classname.ordinal());
+
+        Validate.notNull(context, "context");
 
         return context.getValue();
     }
 
     @Override
-    public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
+    public FileEntry peek(long stackId, int subStackId, @NonNull Context.Classname classname) {
         Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
             stackId, subStackId, classname.ordinal());
+
+        Validate.notNull(context, "context");
 
         return context.getValue();
     }

@@ -33,7 +33,6 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -113,12 +112,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         FileEntry contextValueFileEntry =
             contextService.peek(Validate.notNull(taskExecution.getId(), "task execution id"), Classname.TASK_EXECUTION);
 
-        if (contextValueFileEntry == null) {
-            handleFailedTaskExecution(loopTaskExecution, "Unable to load {} task execution context value");
-
-            return;
-        }
-
         Map<String, Object> newTaskExecutionContext = new HashMap<>(
             taskFileStorage.readContextValue(contextValueFileEntry));
 
@@ -138,16 +131,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
-    private void handleFailedTaskExecution(TaskExecution loopTaskExecution, String message) {
-        loopTaskExecution.setStatus(TaskExecution.Status.FAILED);
-
-        loopTaskExecution.setError(new ExecutionError(message, Collections.emptyList()));
-
-        loopTaskExecution.setEndDate(LocalDateTime.now());
-
-        taskCompletionHandler.handle(loopTaskExecution);
-    }
-
     private void handleNewIterationFirstChildTaskExecution(
         @NonNull TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items,
         Integer index) {
@@ -162,12 +145,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         FileEntry contextValueFileEntry = contextService.peek(
             Validate.notNull(parentTaskExecution.getId(), "parent id"), Classname.TASK_EXECUTION);
-
-        if (contextValueFileEntry == null) {
-            handleFailedTaskExecution(parentTaskExecution, "Unable to load context value for parent task execution");
-
-            return;
-        }
 
         Map<String, Object> firstChildContextValue = new HashMap<>(
             taskFileStorage.readContextValue(
