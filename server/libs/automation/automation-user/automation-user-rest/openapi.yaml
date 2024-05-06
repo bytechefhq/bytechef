@@ -163,6 +163,5 @@ components:
       description: "The environment of an api key."
       type: "string"
       enum:
-        - "DEVELOPMENT"
-        - "STAGING"
+        - "TEST"
         - "PRODUCTION"

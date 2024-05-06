@@ -21,5 +21,5 @@ package com.bytechef.platform.constant;
  */
 public enum Environment {
 
-    DEVELOPMENT, STAGING, PRODUCTION
+    TEST, PRODUCTION
 }

@@ -97,8 +97,7 @@ components:
       description: "The environment of a connection."
       type: "string"
       enum:
-        - "DEVELOPMENT"
-        - "STAGING"
+        - "TEST"
         - "PRODUCTION"
     Tag:
       description: "A tag."

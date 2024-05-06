@@ -774,8 +774,7 @@ components:
       description: "The environment of a project."
       type: "string"
       enum:
-        - "DEVELOPMENT"
-        - "STAGING"
+        - "TEST"
         - "PRODUCTION"
     Project:
       description: "A group of workflows that make one logical project."
