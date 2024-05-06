@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
@@ -66,6 +65,7 @@ import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -290,7 +290,7 @@ public class HttpClientExecutor {
         }
     }
 
-    private URI createURI(String urlString, @Nonnull Map<String, List<String>> queryParameters) {
+    private URI createURI(String urlString, @NonNull Map<String, List<String>> queryParameters) {
         URI uri;
 
         if (queryParameters.isEmpty()) {
