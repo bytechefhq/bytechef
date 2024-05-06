@@ -138,7 +138,8 @@ public final class DropboxUploadFileAction {
         throws DbxException, IOException {
 
         String destination = inputParameters.getRequiredString(DESTINATION);
-        String filePath = (destination.endsWith("/") ? destination : destination+"/") + inputParameters.getRequiredString(FILENAME);
+        String filePath =
+            (destination.endsWith("/") ? destination : destination + "/") + inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = actionContext.file(
             file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {

@@ -21,7 +21,9 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.*;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_TEXT_FILE;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -81,8 +83,8 @@ public final class DropboxCreateNewTextFileAction {
         String destination = inputParameters.getRequiredString(DESTINATION);
 
         try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
-            (destination.endsWith("/") ? destination : destination+"/") +
-                (flieName.endsWith(".paper") ? flieName : flieName+".paper"),
+            (destination.endsWith("/") ? destination : destination + "/") +
+                (flieName.endsWith(".paper") ? flieName : flieName + ".paper"),
             ImportFormat.PLAIN_TEXT)) {
 
             return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());

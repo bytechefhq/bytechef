@@ -54,7 +54,8 @@ class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
             .should(times(1))
             .paperCreate(stringArgumentCaptorSource.capture(), importFormatArgumentCaptor.capture());
 
-        Assertions.assertEquals(DESTINATION_STUB + "/" + FILENAME_STUB + ".paper", stringArgumentCaptorSource.getValue());
+        Assertions.assertEquals(DESTINATION_STUB + "/" + FILENAME_STUB + ".paper",
+            stringArgumentCaptorSource.getValue());
         Assertions.assertEquals(ImportFormat.PLAIN_TEXT, importFormatArgumentCaptor.getValue());
 
         ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);

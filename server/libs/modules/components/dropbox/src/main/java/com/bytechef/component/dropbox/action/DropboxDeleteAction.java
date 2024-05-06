@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DELETE;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
+import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 
 import com.bytechef.component.definition.ActionContext;
@@ -81,6 +81,6 @@ public final class DropboxDeleteAction {
         String source = inputParameters.getRequiredString(SOURCE);
 
         return dbxUserFilesRequests.deleteV2(
-            (source.endsWith("/") ? source : source+"/") + inputParameters.getRequiredString(FILENAME));
+            (source.endsWith("/") ? source : source + "/") + inputParameters.getRequiredString(FILENAME));
     }
 }
