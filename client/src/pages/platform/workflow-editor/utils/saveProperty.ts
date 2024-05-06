@@ -34,7 +34,7 @@ export default function saveProperty({
 
     path = path.replace('parameters.', '').replace('parameters', '');
 
-    if (arrayIndex !== undefined && path.endsWith(`_${arrayIndex}`)) {
+    if (arrayIndex !== undefined && path.endsWith(arrayIndex.toString())) {
         path = path.substring(0, path.lastIndexOf('.'));
     }
 
@@ -45,7 +45,7 @@ export default function saveProperty({
             id: workflowId,
             updateWorkflowNodeParameterRequestModel: {
                 arrayIndex,
-                name: name.endsWith(`_${arrayIndex}`) ? undefined : name,
+                name: name === arrayIndex?.toString() ? undefined : name,
                 path,
                 value,
                 workflowNodeName,
