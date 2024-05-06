@@ -27,6 +27,7 @@ import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
+import getParameterByPath from '../../utils/getParameterByPath';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -138,8 +139,6 @@ const Property = ({
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    const showMentionInput = controlType === 'FILE_ENTRY' || mentionInput;
-
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
 
@@ -175,9 +174,9 @@ const Property = ({
 
         // TODO handle mix of text and multiple data pills when pasting
 
-        let strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
+        let strippedValue: string | number = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
 
-        if (strippedValue.startsWith('${')) {
+        if (strippedValue.startsWith('${') && focusedInput) {
             const editor = focusedInput.getEditor();
 
             editor.deleteText(0, editor.getLength());
@@ -217,7 +216,7 @@ const Property = ({
                     const isDataPillValue = isRootDataPillRegEx.test(value) || isChildDataPillRegEx.test(value);
 
                     if (isDataPillValue && !value.startsWith('${') && !value.endsWith('}')) {
-                        if (value.includes('\\')) {
+                        if (value.includes('\\') || value.includes('/')) {
                             return `\${${value.replace(/\//g, '.')}}`;
                         }
 
@@ -227,6 +226,8 @@ const Property = ({
                     return value;
                 })
                 .join('');
+        } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
+            strippedValue = parseInt(strippedValue);
         } else {
             const dataPillValues = mentionInputValue
                 .match(/data-value="([^"]+)"/g)
@@ -422,7 +423,11 @@ const Property = ({
 
     // set default mentionInput state
     useEffect(() => {
-        if (!formState && property.controlType !== 'SELECT') {
+        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
+            setMentionInput(true);
+        }
+
+        if ((type === 'STRING' || type === 'NUMBER' || type === 'INTEGER') && controlType !== 'SELECT') {
             setMentionInput(true);
         }
 
@@ -460,10 +465,16 @@ const Property = ({
                 (component) => component.name === currentNode?.name
             );
 
-            setPropertyParameterValue(name ? (currentWorkflowComponent?.parameters?.[name] as unknown as string) : '');
+            let params = currentWorkflowComponent?.parameters;
+
+            if (path && path !== 'parameters') {
+                params = getParameterByPath(path, currentWorkflowComponent);
+            }
+
+            setPropertyParameterValue(name ? (params?.[name] as unknown as string) : '');
         }
 
-        if (name.endsWith('_0') && defaultValue) {
+        if (name === '0' && defaultValue) {
             setPropertyParameterValue(defaultValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -471,8 +482,12 @@ const Property = ({
 
     // set value to propertyParameterValue
     useEffect(() => {
-        if (mentionInput && propertyParameterValue && mentionInputValue === '') {
+        if (mentionInput && propertyParameterValue) {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
+
+            if (typeof propertyParameterValue === 'number') {
+                setMentionInputValue(propertyParameterValue.toString());
+            }
 
             if (!mentionInputElement || typeof propertyParameterValue !== 'string') {
                 return;
@@ -485,6 +500,7 @@ const Property = ({
             if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
                 const mentionInputNodes = mentionValues.map((value) => {
                     if (value.startsWith('${')) {
+                        value = value.replace('.', '/');
                         const componentName = value.split('_')[0].replace('${', '');
 
                         const componentIcon =
@@ -521,7 +537,7 @@ const Property = ({
             setNumericValue(propertyParameterValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [propertyParameterValue]);
+    }, [propertyParameterValue, mentionInput]);
 
     useEffect(() => {
         if (optionsDataSource?.optionsLookupDependsOn) {
@@ -590,7 +606,7 @@ const Property = ({
             )}
         >
             <div className="w-full">
-                {showMentionInput &&
+                {mentionInput &&
                     currentComponent &&
                     currentComponentDefinition &&
                     type !== 'DYNAMIC_PROPERTIES' &&
@@ -618,7 +634,7 @@ const Property = ({
                         />
                     )}
 
-                {!showMentionInput && (
+                {!mentionInput && (
                     <>
                         {((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
                             controlType === 'ARRAY_BUILDER') && (
