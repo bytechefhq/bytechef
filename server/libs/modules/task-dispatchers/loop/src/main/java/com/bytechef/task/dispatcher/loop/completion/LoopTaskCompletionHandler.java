@@ -89,12 +89,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(
             Validate.notNull(taskExecution.getParentId(), "parentId"));
 
-        if (loopTaskExecution == null) {
-            handleFailedTaskExecution(taskExecution, "Unable to obtain parent loop task execution");
-
-            return;
-        }
-
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
