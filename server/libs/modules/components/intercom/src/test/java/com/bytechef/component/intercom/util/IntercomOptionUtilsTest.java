@@ -57,6 +57,7 @@ class IntercomOptionUtilsTest {
     void testGetContactIdOptions() {
         Map<String, Object> body = new HashMap<>();
         Map<String, String> task = new LinkedHashMap<>();
+
         task.put("name", "contactId");
         task.put("id", "123");
         body.put("data", List.of(task));
@@ -68,7 +69,8 @@ class IntercomOptionUtilsTest {
 
         expectedOptions.add(option("contactId", "123"));
 
-        assertEquals(expectedOptions,
+        assertEquals(
+            expectedOptions,
             IntercomOptionUtils.getContactIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

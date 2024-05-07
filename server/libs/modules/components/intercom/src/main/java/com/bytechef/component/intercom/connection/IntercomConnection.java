@@ -35,6 +35,7 @@ import java.util.Map;
  * @author Luka Ljubić
  */
 public class IntercomConnection {
+
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
             AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),

@@ -30,13 +30,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 class IntercomUtilsTest {
+
     private final ActionContext mockedContext = Mockito.mock(ActionContext.class);
     private final Context.Http.Executor mockedExecutor = Mockito.mock(Context.Http.Executor.class);
     private final Context.Http.Response mockedResponse = Mockito.mock(Context.Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
-
         Mockito.when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         Mockito.when(mockedExecutor.configuration(any()))
@@ -50,6 +50,7 @@ class IntercomUtilsTest {
         String id = "exampleId";
         String role = "exampleRole";
         Map<String, Object> body = new HashMap<>();
+
         body.put("role", role);
 
         Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
@@ -68,6 +69,7 @@ class IntercomUtilsTest {
         Map<String, Object> adminData = new HashMap<>();
 
         String id = "exampleId";
+
         adminData.put("id", id);
         body.put("admins", List.of(adminData));
 
@@ -80,7 +82,5 @@ class IntercomUtilsTest {
         assertEquals(2, result.size());
         assertEquals("admin", result.get("type"));
         assertEquals(id, result.get("id"));
-
     }
-
 }

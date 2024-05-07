@@ -40,58 +40,58 @@ import com.bytechef.component.intercom.constant.IntercomConstants;
 
 public class IntercomCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION =
-        action(IntercomConstants.CREATE_CONTACT)
-            .title("Create Contact")
-            .description("Create new contact")
-            .properties(
-                string(ROLE)
-                    .options(option("User", USER), option("Lead", LEAD))
-                    .label("Contact Role")
-                    .description("Role of the contact")
-                    .maxLength(100)
-                    .required(true),
-                string(EMAIL)
-                    .label("Contact Email")
-                    .description("Email of the contact")
-                    .maxLength(100)
-                    .required(true),
-                string(NAME)
-                    .label("Contact Name")
-                    .description("Name of the contact")
-                    .maxLength(360)
-                    .required(false),
-                string(PHONE)
-                    .label("Contact Phone")
-                    .description("Phone of the contact must start with a \"+\" sign")
-                    .maxLength(200)
-                    .required(false),
-                string(AVATAR)
-                    .label("Contact Image")
-                    .description("Image of the contact")
-                    .maxLength(500)
-                    .required(false))
-            .outputSchema(
-                object()
-                    .properties(
-                        string("type"),
-                        string("id"),
-                        string(ROLE),
-                        string(EMAIL),
-                        string(PHONE),
-                        string(NAME)))
-            .perform(IntercomCreateContactAction::perform);
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(IntercomConstants.CREATE_CONTACT)
+        .title("Create Contact")
+        .description("Create new contact")
+        .properties(
+            string(ROLE)
+                .options(option("User", USER), option("Lead", LEAD))
+                .label("Contact Role")
+                .description("Role of the contact")
+                .maxLength(100)
+                .required(true),
+            string(EMAIL)
+                .label("Contact Email")
+                .description("Email of the contact")
+                .maxLength(100)
+                .required(true),
+            string(NAME)
+                .label("Contact Name")
+                .description("Name of the contact")
+                .maxLength(360)
+                .required(false),
+            string(PHONE)
+                .label("Contact Phone")
+                .description("Phone of the contact must start with a \"+\" sign")
+                .maxLength(200)
+                .required(false),
+            string(AVATAR)
+                .label("Contact Image")
+                .description("Image of the contact")
+                .maxLength(500)
+                .required(false))
+        .outputSchema(
+            object()
+                .properties(
+                    string("type"),
+                    string("id"),
+                    string(ROLE),
+                    string(EMAIL),
+                    string(PHONE),
+                    string(NAME)))
+        .perform(IntercomCreateContactAction::perform);
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.post(BASE_URL + "/contacts"))
-            .body(Body.of(
-                ROLE, inputParameters.getRequiredString(ROLE),
-                EMAIL, inputParameters.getRequiredString(EMAIL),
-                NAME, inputParameters.getString(NAME),
-                PHONE, inputParameters.getString(PHONE),
-                AVATAR, inputParameters.getString(AVATAR)))
+            .body(
+                Body.of(
+                    ROLE, inputParameters.getRequiredString(ROLE),
+                    EMAIL, inputParameters.getRequiredString(EMAIL),
+                    NAME, inputParameters.getString(NAME),
+                    PHONE, inputParameters.getString(PHONE),
+                    AVATAR, inputParameters.getString(AVATAR)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
