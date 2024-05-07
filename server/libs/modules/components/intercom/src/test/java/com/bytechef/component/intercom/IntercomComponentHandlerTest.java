@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 class IntercomComponentHandlerTest {
     @Test
     void testGetComponentDeffinition() {
+
         JsonFileAssert.assertEquals("definition/intercom_v1.json", new IntercomComponentHandler().getDefinition());
     }
 }

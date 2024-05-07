@@ -20,6 +20,7 @@ package com.bytechef.component.intercom.constant;
  * @author Luka Ljubić
  */
 public class IntercomConstants {
+
     public static final String AVATAR = "avatar";
     public static final String BASE_URL = "https://api.intercom.io";
     public static final String BODY = "body";

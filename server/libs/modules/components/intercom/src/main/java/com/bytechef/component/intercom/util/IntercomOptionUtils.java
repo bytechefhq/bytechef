@@ -35,9 +35,7 @@ public class IntercomOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get(
-                BASE_URL + "/contacts"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/contacts"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -51,6 +49,7 @@ public class IntercomOptionUtils {
                 }
             }
         }
+
         return options;
     }
 }

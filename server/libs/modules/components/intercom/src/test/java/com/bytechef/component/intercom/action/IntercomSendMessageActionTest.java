@@ -97,7 +97,6 @@ class IntercomSendMessageActionTest {
         propertyStubsMap.put(SUBJECT, "subject");
         propertyStubsMap.put(BODY, "body");
         propertyStubsMap.put(TEMPLATE, "template");
-
         propertyStubsMap.put(FROM, fromMap);
         propertyStubsMap.put(TO, Collections.emptyMap());
 

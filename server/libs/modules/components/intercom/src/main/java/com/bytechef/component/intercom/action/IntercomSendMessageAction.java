@@ -43,44 +43,44 @@ import java.util.Map;
 
 public class IntercomSendMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION =
-        action(IntercomConstants.SEND_MESSAGE)
-            .title("Send Message")
-            .description("Send a new message")
-            .properties(
-                string(MESSAGE_TYPE)
-                    .options(option("In App", "inapp"), option("Email", "email"))
-                    .label("Message Type")
-                    .description("In app message or email message")
-                    .required(true),
-                string(SUBJECT)
-                    .label("Title")
-                    .description("Title of the Email/Message")
-                    .maxLength(360)
-                    .required(true),
-                string(BODY)
-                    .label("Content")
-                    .description("Content of the message")
-                    .maxLength(360)
-                    .required(true),
-                string(TEMPLATE)
-                    .options(option("Plain", "plain"), option("Personal", "personal"))
-                    .label("Template")
-                    .description("The style of the outgoing message")
-                    .required(true),
-                string(TO)
-                    .label("To")
-                    .description("Receiver of the message")
-                    .required(true)
-                    .options(
-                        (OptionsDataSource.ActionOptionsFunction<String>) IntercomOptionUtils::getContactIdOptions))
-            .outputSchema(
-                object())
-            .perform(IntercomSendMessageAction::perform);
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(IntercomConstants.SEND_MESSAGE)
+        .title("Send Message")
+        .description("Send a new message")
+        .properties(
+            string(MESSAGE_TYPE)
+                .options(option("In App", "inapp"), option("Email", "email"))
+                .label("Message Type")
+                .description("In app message or email message")
+                .required(true),
+            string(SUBJECT)
+                .label("Title")
+                .description("Title of the Email/Message")
+                .maxLength(360)
+                .required(true),
+            string(BODY)
+                .label("Content")
+                .description("Content of the message")
+                .maxLength(360)
+                .required(true),
+            string(TEMPLATE)
+                .options(option("Plain", "plain"), option("Personal", "personal"))
+                .label("Template")
+                .description("The style of the outgoing message")
+                .required(true),
+            string(TO)
+                .label("To")
+                .description("Receiver of the message")
+                .required(true)
+                .options(
+                    (OptionsDataSource.ActionOptionsFunction<String>) IntercomOptionUtils::getContactIdOptions))
+        .outputSchema(
+            object())
+        .perform(IntercomSendMessageAction::perform);
 
     static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-        Map<String, String> toData = IntercomUtils.getAdminId(actionContext);
         Map<String, String> fromData = IntercomUtils.getContactRole(inputParameters.getString(TO), actionContext);
+        Map<String, String> toData = IntercomUtils.getAdminId(actionContext);
+
         return actionContext.http(http -> http.post(BASE_URL + "/messages"))
             .body(
                 Body.of(

@@ -30,10 +30,7 @@ import java.util.Map;
 public class IntercomUtils {
 
     public static Map<String, String> getContactRole(String id, ActionContext context) {
-
-        Map<String, Object> body = context
-            .http(http -> http.get(
-                BASE_URL + "/contacts/" + id))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/contacts/" + id))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -50,9 +47,7 @@ public class IntercomUtils {
 
     public static Map<String, String> getAdminId(ActionContext context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get(
-                BASE_URL + "/admins"))
+        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/admins"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new Context.TypeReference<>() {});
