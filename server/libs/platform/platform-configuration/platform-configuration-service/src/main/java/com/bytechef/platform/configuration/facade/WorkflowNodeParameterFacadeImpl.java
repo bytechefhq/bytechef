@@ -140,14 +140,18 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         if (arrayIndex == null) {
             checkDependOn(name, result.properties(), result.parameterMap);
+        } else {
+            // For now only check the first, root level of properties on which other properties could depend on
 
-            Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-                workflow.getId());
-
-            displayConditionMap = checkDisplayConditionsParameters(
-                workflowNodeName, name, result.properties, workflow, result.parameterMap, inputMap,
-                result.taskParameters);
+            name = path;
         }
+
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId());
+
+        displayConditionMap = checkDisplayConditionsParameters(
+            workflowNodeName, name, result.properties, workflow, result.parameterMap, inputMap,
+            result.taskParameters);
 
         workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
             workflow.getVersion());
