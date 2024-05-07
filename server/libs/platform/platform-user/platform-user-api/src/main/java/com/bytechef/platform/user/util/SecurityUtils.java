@@ -41,6 +41,7 @@ public final class SecurityUtils {
      */
     public static Optional<String> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
+
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
 
@@ -52,6 +53,7 @@ public final class SecurityUtils {
         } else if (authentication.getPrincipal() instanceof String s) {
             return s;
         }
+
         return null;
     }
 
@@ -61,8 +63,10 @@ public final class SecurityUtils {
      * @return true if the user is authenticated, false otherwise.
      */
     public static boolean isAuthenticated() {
-        Authentication authentication = SecurityContextHolder.getContext()
-            .getAuthentication();
+        SecurityContext context = SecurityContextHolder.getContext();
+
+        Authentication authentication = context.getAuthentication();
+
         return authentication != null
             && getAuthorities(authentication).noneMatch(AuthoritiesConstants.ANONYMOUS::equals);
     }
@@ -74,10 +78,12 @@ public final class SecurityUtils {
      * @return true if the current user has any of the authorities, false otherwise.
      */
     public static boolean hasCurrentUserAnyOfAuthorities(String... authorities) {
-        Authentication authentication = SecurityContextHolder.getContext()
-            .getAuthentication();
-        return (authentication != null
-            && getAuthorities(authentication).anyMatch(authority -> Arrays.asList(authorities)
+        SecurityContext context = SecurityContextHolder.getContext();
+
+        Authentication authentication = context.getAuthentication();
+
+        return (authentication != null &&
+            getAuthorities(authentication).anyMatch(authority -> Arrays.asList(authorities)
                 .contains(authority)));
     }
 
