@@ -18,8 +18,7 @@
  * @export
  */
 export const EnvironmentModel = {
-    Development: 'DEVELOPMENT',
-    Staging: 'STAGING',
+    Test: 'TEST',
     Production: 'PRODUCTION'
 } as const;
 export type EnvironmentModel = typeof EnvironmentModel[keyof typeof EnvironmentModel];
