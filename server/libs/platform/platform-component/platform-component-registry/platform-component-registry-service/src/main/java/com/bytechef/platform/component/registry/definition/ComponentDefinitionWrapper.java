@@ -52,4 +52,26 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
     public Optional<List<? extends ActionDefinition>> getActions() {
         return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
     }
+
+    @Override
+    public String toString() {
+        return "ComponentDefinitionWrapper{" +
+            "name='" + name + '\'' +
+            ", version=" + version +
+            ", title='" + title + '\'' +
+            ", description='" + description + '\'' +
+            ", connection=" + connection +
+            ", category='" + category + '\'' +
+            ", customAction=" + customAction +
+            ", customActionHelp=" + customActionHelp +
+            ", actions=" + actions +
+            ", triggers=" + triggers +
+            ", resources=" + resources +
+            ", tags=" + tags +
+            ", dataStreamItemReader=" + dataStreamItemReader +
+            ", dataStreamItemWriter=" + dataStreamItemWriter +
+            ", metadata=" + metadata +
+            ", icon='" + icon + '\'' +
+            "} ";
+    }
 }

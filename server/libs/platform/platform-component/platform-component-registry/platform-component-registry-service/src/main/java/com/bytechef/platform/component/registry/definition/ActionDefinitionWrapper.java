@@ -37,4 +37,19 @@ public class ActionDefinitionWrapper extends AbstractActionDefinitionWrapper imp
     public Optional<PerformFunction> getPerform() {
         return Optional.ofNullable(performFunction);
     }
+
+    @Override
+    public String toString() {
+        return "ActionDefinitionWrapper{" +
+            ", name='" + name + '\'' +
+            ", title='" + title + '\'' +
+            ", description='" + description + '\'' +
+            ", batch=" + batch +
+            ", deprecated=" + deprecated +
+            ", help=" + help +
+            ", output=" + output +
+            ", properties=" + properties +
+            ", metadata=" + metadata +
+            "} ";
+    }
 }

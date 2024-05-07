@@ -457,6 +457,22 @@ public final class ComponentDSL {
         public boolean isDefaultOutputFunction() {
             return defaultOutputFunction;
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableActionDefinition{" +
+                "name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", batch=" + batch +
+                ", deprecated=" + deprecated +
+                ", help=" + help +
+                ", outputSchema=" + outputSchema +
+                ", properties=" + properties +
+                ", sampleOutput=" + sampleOutput +
+                ", metadata=" + metadata +
+                '}';
+        }
     }
 
     public static final class ModifiableArrayProperty
@@ -1305,6 +1321,31 @@ public final class ComponentDSL {
                 description, icon, tags, metadata, name, resources, version, title, triggerDefinitions,
                 workflowConnectionKeys);
         }
+
+        @Override
+        public String toString() {
+            return "ModifiableComponentDefinition{" +
+                "name='" + name + '\'' +
+                ", version=" + version +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", connectionDefinition=" + connectionDefinition +
+                ", additionalConnections=" + additionalConnections +
+                ", category='" + category + '\'' +
+                ", connectionRequired=" + connectionRequired +
+                ", customAction=" + customAction +
+                ", customActionHelp=" + customActionHelp +
+                ", dataStreamItemReader=" + dataStreamItemReader +
+                ", dataStreamItemWriter=" + dataStreamItemWriter +
+                ", metadata=" + metadata +
+                ", resources=" + resources +
+                ", tags=" + tags +
+                ", actionDefinitions=" + actionDefinitions +
+                ", triggerDefinitions=" + triggerDefinitions +
+                ", workflowConnectionKeys=" + workflowConnectionKeys +
+                ", icon='" + icon + '\'' +
+                '}';
+        }
     }
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
@@ -1438,6 +1479,16 @@ public final class ComponentDSL {
         @Override
         public int getVersion() {
             return version;
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableConnectionDefinition{" +
+                ", version=" + version +
+                ", authorizationRequired=" + authorizationRequired +
+                ", authorizations=" + authorizations +
+                ", properties=" + properties +
+                '}';
         }
     }
 
@@ -2871,7 +2922,7 @@ public final class ComponentDSL {
         private PollFunction pollFunction;
         private List<? extends Property> properties;
         private Object sampleOutput;
-        private StaticWebhookRequestFunction staticWebhookRequest;
+        private StaticWebhookRequestFunction staticWebhookRequestFunction;
         private String title;
         private TriggerType type;
         private Boolean webhookRawBody;
@@ -3025,7 +3076,7 @@ public final class ComponentDSL {
         }
 
         public ModifiableTriggerDefinition staticWebhookRequest(StaticWebhookRequestFunction staticWebhookRequest) {
-            this.staticWebhookRequest = staticWebhookRequest;
+            this.staticWebhookRequestFunction = staticWebhookRequest;
 
             return this;
         }
@@ -3100,7 +3151,7 @@ public final class ComponentDSL {
                 && Objects.equals(outputFunction, that.outputFunction)
                 && Objects.equals(sampleOutput, that.sampleOutput)
                 && Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties)
-                && Objects.equals(staticWebhookRequest, that.staticWebhookRequest)
+                && Objects.equals(staticWebhookRequestFunction, that.staticWebhookRequestFunction)
                 && Objects.equals(title, that.title) && type == that.type
                 && Objects.equals(webhookRawBody, that.webhookRawBody)
                 && Objects.equals(webhookValidateFunction, that.webhookValidateFunction)
@@ -3114,7 +3165,7 @@ public final class ComponentDSL {
             return Objects.hash(batch, deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
                 help, listenerDisableConsumer, listenerEnableConsumer, name, outputSchema, defaultOutputFunction,
-                outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequest, title, type,
+                outputFunction, sampleOutput, pollFunction, properties, staticWebhookRequestFunction, title, type,
                 webhookRawBody, webhookValidateFunction, workflowNodeDescriptionFunction, workflowSyncExecution,
                 workflowSyncValidation);
         }
@@ -3201,7 +3252,7 @@ public final class ComponentDSL {
 
         @Override
         public Optional<StaticWebhookRequestFunction> getStaticWebhookRequest() {
-            return Optional.ofNullable(staticWebhookRequest);
+            return Optional.ofNullable(staticWebhookRequestFunction);
         }
 
         @Override
@@ -3242,6 +3293,25 @@ public final class ComponentDSL {
         @Override
         public boolean isDefaultOutputFunction() {
             return defaultOutputFunction;
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableTriggerDefinition{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", description='" + description + '\'' +
+                ", title='" + title + '\'' +
+                ", batch=" + batch +
+                ", deprecated=" + deprecated +
+                ", help=" + help +
+                ", outputSchema=" + outputSchema +
+                ", properties=" + properties +
+                ", sampleOutput=" + sampleOutput +
+                ", webhookRawBody=" + webhookRawBody +
+                ", workflowSyncExecution=" + workflowSyncExecution +
+                ", workflowSyncValidation=" + workflowSyncValidation +
+                '}';
         }
     }
 
