@@ -12,7 +12,6 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     errorMessage?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     inputTypeSwitchButtonClassName?: string;
-    key?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
@@ -33,7 +32,6 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             handleInputTypeSwitchButtonClick,
             id,
             inputTypeSwitchButtonClassName,
-            key,
             label,
             leadingIcon,
             name,
@@ -97,7 +95,6 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         )}
                         disabled={disabled}
                         id={id || name}
-                        key={key}
                         name={name}
                         onChange={onChange}
                         placeholder={placeholder}
