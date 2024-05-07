@@ -92,7 +92,7 @@ const ConnectionDialog = ({
         defaultValues: {
             authorizationName: '',
             componentName: componentDefinition?.name,
-            environment: connection?.environment || EnvironmentModel.Development,
+            environment: connection?.environment || EnvironmentModel.Test,
             name: connection?.name || '',
             tags:
                 connection?.tags?.map((tag) => ({
@@ -512,9 +512,7 @@ const ConnectionDialog = ({
                                                         </SelectTrigger>
 
                                                         <SelectContent>
-                                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                                            <SelectItem value="STAGING">Staging</SelectItem>
+                                                            <SelectItem value="TEST">Test</SelectItem>
 
                                                             <SelectItem value="PRODUCTION">Production</SelectItem>
                                                         </SelectContent>
