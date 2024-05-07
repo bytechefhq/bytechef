@@ -62,8 +62,8 @@ import java.util.Map;
 public final class SendgridSendEmailAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SENDEMAIL)
-        .title("Title")
-        .description("Send an email.")
+        .title("Send an email")
+        .description("Sends an email.")
         .properties(
             string(FROM)
                 .label("From:")
