@@ -84,7 +84,10 @@ public class SendgridUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> templates : result.get("templates")) {
-            options.add(option(templates.get("name").toString(), templates.get("id").toString()));
+            options.add(option(templates.get("name")
+                .toString(),
+                templates.get("id")
+                    .toString()));
         }
 
         return options;
