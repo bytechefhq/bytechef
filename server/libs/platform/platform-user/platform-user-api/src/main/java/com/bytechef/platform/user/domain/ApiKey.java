@@ -180,6 +180,7 @@ public class ApiKey {
             ", name='" + name + '\'' +
             ", type=" + type +
             ", userId=" + userId +
+            ", environment='" + environment + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", secretKey='" + secretKey + '\'' +
