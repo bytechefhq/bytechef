@@ -5,7 +5,9 @@ import {PropertyType} from '@/types/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
+import {useReactFlow} from 'reactflow';
 
+import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {ComponentActionI} from './DataPillPanelBody';
 
@@ -23,10 +25,17 @@ const DataPillPanelBodyPropertiesItem = ({
     const {icon, title} = componentAction.componentDefinition;
 
     const {componentActions} = useWorkflowDataStore();
+    const {getNodes} = useReactFlow();
 
     const currentComponentAction = componentActions.find(
         (action) => action.workflowNodeName === componentAction.workflowNodeName
     );
+
+    const nodes = getNodes();
+
+    const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === componentAction.workflowNodeName);
+
+    const handleOutputTabRedirectClick = useNodeClickHandler(redirectTargetNode?.data, redirectTargetNode?.data.name);
 
     return (
         <>
@@ -93,15 +102,21 @@ const DataPillPanelBodyPropertiesItem = ({
                         </ul>
                     </>
                 ) : (
-                    <div className="flex flex-col gap-6 py-1">
-                        <div className="font-semibold">Test component</div>
+                    <div className="flex flex-col gap-3">
+                        <span className="font-semibold">Test component</span>
 
-                        <div className="text-sm">
-                            This component needs to be tested, to generate output schema. Please go to the
-                            &quot;Output&quot; tab of the component.
-                        </div>
+                        <p className="text-sm">
+                            <span className="font-semibold">{currentComponentAction?.workflowNodeName} </span>
+                            needs to be tested to generate an output schema. Please go to the &quot;Output&quot; tab of
+                            the
+                            <span className="font-semibold"> {currentComponentAction?.workflowNodeName} </span>{' '}
+                            component.
+                        </p>
 
-                        <Button variant="secondary">Go to Output tab</Button>
+                        <Button onClick={handleOutputTabRedirectClick} variant="secondary">
+                            Go to
+                            <span className="pl-1 font-semibold">{currentComponentAction?.workflowNodeName}</span>
+                        </Button>
                     </div>
                 )}
             </AccordionContent>
