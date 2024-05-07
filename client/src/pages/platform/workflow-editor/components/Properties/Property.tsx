@@ -307,14 +307,14 @@ const Property = ({
         });
     }, 200);
 
-    const handleDelete = (path: string, name: string, arrayIndex?: number) => {
+    const handleDelete = (path: string, name?: string, arrayIndex?: number) => {
         deleteProperty(
             workflow.id!,
             path,
-            name,
             currentComponent!,
             setCurrentComponent,
             deleteWorkflowNodeParameterMutation!,
+            name,
             arrayIndex
         );
     };
@@ -708,7 +708,6 @@ const Property = ({
                                 defaultValue={defaultValue}
                                 description={description}
                                 error={hasError}
-                                key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 placeholder={placeholder}
@@ -729,7 +728,6 @@ const Property = ({
                                 errorMessage={errorMessage}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                                key={`${currentNode?.name}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
                                 max={maxValue}

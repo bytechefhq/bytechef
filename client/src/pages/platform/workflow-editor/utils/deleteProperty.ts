@@ -7,7 +7,6 @@ import {ComponentType} from '@/types/types';
 export default function deleteProperty(
     workflowId: string,
     path: string,
-    name: string,
     currentComponent: ComponentType,
     setCurrentComponent: (currentComponent: ComponentType) => void,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
@@ -16,6 +15,7 @@ export default function deleteProperty(
         DeleteWorkflowNodeParameterRequest,
         unknown
     >,
+    name?: string,
     arrayIndex?: number
 ) {
     // TODO fix in Property.tsx path value, it should be without 'parameters.' prefix and should not contain '${arrayName}_${arrayIndex}' as suffix if array is updated
@@ -32,7 +32,7 @@ export default function deleteProperty(
         {
             deleteWorkflowNodeParameterRequestModel: {
                 arrayIndex,
-                name: name.endsWith('_' + arrayIndex) ? undefined : name,
+                name: !name || name.endsWith('_' + arrayIndex) ? undefined : name,
                 path,
                 workflowNodeName,
             },

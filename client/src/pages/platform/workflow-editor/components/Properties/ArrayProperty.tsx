@@ -25,7 +25,7 @@ const PROPERTY_CONTROL_TYPES = {
 };
 
 interface ArrayPropertyProps {
-    onDeleteClick: (path: string, name: string, index: number) => void;
+    onDeleteClick: (path: string, name?: string, index?: number) => void;
     path?: string;
     property: PropertyType;
 }
@@ -61,7 +61,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)
         );
 
-        onDeleteClick(path, name, index);
+        onDeleteClick(path, undefined, index);
     };
 
     // render individual array items with data gathered from parameters
