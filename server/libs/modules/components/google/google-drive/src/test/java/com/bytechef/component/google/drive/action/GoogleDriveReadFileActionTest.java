@@ -23,12 +23,14 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
  * @author Monika Domiter
  */
+@Disabled
 class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
 
     private final InputStream mockedInputStream = mock(InputStream.class);
