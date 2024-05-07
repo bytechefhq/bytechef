@@ -78,13 +78,13 @@ public class SendgridUtils {
 
         Response response = sg.api(request);
 
-        Map<String, List<Map<String, String>>> result = context.json(
+        Map<String, List<Map<String, Object>>> result = context.json(
             json -> json.read(response.getBody(), new Context.TypeReference<>() {}));
 
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<String, String> templates : result.get("templates")) {
-            options.add(option(templates.get("name"), templates.get("id")));
+        for (Map<String, Object> templates : result.get("templates")) {
+            options.add(option(templates.get("name").toString(), templates.get("id").toString()));
         }
 
         return options;
