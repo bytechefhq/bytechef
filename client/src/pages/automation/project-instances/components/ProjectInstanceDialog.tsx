@@ -41,7 +41,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
         defaultValues: {
             description: projectInstance?.description || undefined,
             enabled: projectInstance?.enabled || false,
-            environment: projectInstance?.environment || EnvironmentModel.Development,
+            environment: projectInstance?.environment || EnvironmentModel.Test,
             name: projectInstance?.name || undefined,
             projectId: projectInstance?.project?.id || undefined,
             projectInstanceWorkflows: [],
@@ -117,7 +117,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
 
         setTimeout(() => {
             reset({
-                environment: EnvironmentModel.Development,
+                environment: EnvironmentModel.Test,
                 projectInstanceWorkflows: [],
             });
 

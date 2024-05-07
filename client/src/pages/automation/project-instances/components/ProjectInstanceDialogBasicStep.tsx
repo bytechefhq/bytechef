@@ -243,9 +243,7 @@ const ProjectInstanceDialogBasicStep = ({
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        <SelectItem value="DEVELOPMENT">Development</SelectItem>
-
-                                        <SelectItem value="STAGING">Staging</SelectItem>
+                                        <SelectItem value="TEST">Test</SelectItem>
 
                                         <SelectItem value="PRODUCTION">Production</SelectItem>
                                     </SelectContent>
