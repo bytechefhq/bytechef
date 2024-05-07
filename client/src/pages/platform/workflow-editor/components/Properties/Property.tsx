@@ -423,6 +423,10 @@ const Property = ({
 
     // set default mentionInput state
     useEffect(() => {
+        if (register) {
+            return;
+        }
+
         if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
             setMentionInput(true);
         }
