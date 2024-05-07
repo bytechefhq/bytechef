@@ -94,8 +94,8 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                                <TableHead key={header.id}>
+                            {headerGroup.headers.map((header, index) => (
+                                <TableHead key={`${headerGroup.id}_${header.id}_${index}`}>
                                     {!header.isPlaceholder &&
                                         flexRender(header.column.columnDef.header, header.getContext())}
                                 </TableHead>
@@ -107,8 +107,8 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
-                            {row.getVisibleCells().map((cell) => (
-                                <TableCell className="whitespace-nowrap p-3" key={cell.id}>
+                            {row.getVisibleCells().map((cell, index) => (
+                                <TableCell className="whitespace-nowrap p-3" key={`${row.id}_${cell.id}_${index}`}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}
