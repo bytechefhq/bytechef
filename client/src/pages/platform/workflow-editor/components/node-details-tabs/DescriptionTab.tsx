@@ -11,7 +11,7 @@ import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 
 const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: UpdateWorkflowMutationType}) => {
     const {workflow} = useWorkflowDataStore();
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!currentComponent) {
@@ -28,7 +28,14 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                     name: currentComponent.workflowNodeName,
                 },
                 workflow,
-                updateWorkflowMutation
+                updateWorkflowMutation,
+                undefined,
+                () => {
+                    setCurrentComponent({
+                        ...currentComponent,
+                        title: event.target.value,
+                    });
+                }
             );
         }
     }, 200);
@@ -46,7 +53,14 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                     trigger: !!currentNode?.trigger,
                 },
                 workflow,
-                updateWorkflowMutation
+                updateWorkflowMutation,
+                undefined,
+                () => {
+                    setCurrentComponent({
+                        ...currentComponent,
+                        notes: event.target.value,
+                    });
+                }
             );
         }
     }, 200);

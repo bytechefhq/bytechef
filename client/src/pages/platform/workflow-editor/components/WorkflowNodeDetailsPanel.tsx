@@ -274,11 +274,12 @@ const WorkflowNodeDetailsPanel = ({
             })
         );
 
-        const {componentName, title, workflowNodeName} = currentComponent;
+        const {componentName, notes, title, workflowNodeName} = currentComponent;
 
         saveWorkflowDefinition(
             {
                 componentName,
+                description: notes,
                 label: title,
                 name: workflowNodeName || currentNode?.name || '',
                 operationName,
@@ -286,7 +287,14 @@ const WorkflowNodeDetailsPanel = ({
                 type: `${componentName}/v${currentComponentDefinition.version}/${operationName}`,
             },
             workflow,
-            updateWorkflowMutation
+            updateWorkflowMutation,
+            undefined,
+            () => {
+                setCurrentComponent({
+                    ...currentComponent,
+                    operationName,
+                });
+            }
         );
     };
 
