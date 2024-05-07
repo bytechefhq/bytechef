@@ -86,7 +86,7 @@ const ConnectionDialog = ({
     const [selectedComponentDefinition, setSelectedComponentDefinition] = useState<
         ComponentDefinitionBasicModel | undefined
     >(componentDefinition);
-    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
+    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(false);
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -344,7 +344,11 @@ const ConnectionDialog = ({
             setValue('componentName', componentDefinition.name);
             setAuthorizationName(undefined);
             setSelectedComponentDefinition(componentDefinition);
-            setUsePredefinedOAuthApp(true);
+
+            if (oAuth2Properties?.predefinedApps) {
+                setUsePredefinedOAuthApp(oAuth2Properties?.predefinedApps?.includes(componentDefinition?.name || ''));
+            }
+
             setWizardStep('configuration_step');
         }
     };
@@ -576,7 +580,11 @@ const ConnectionDialog = ({
                                 )}
 
                                 {showRedirectUriInput && oAuth2Properties?.redirectUri && (
-                                    <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
+                                    <div>
+                                        <Label>Redirect URI</Label>
+
+                                        <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
+                                    </div>
                                 )}
 
                                 {showAuthorizationProperties &&
