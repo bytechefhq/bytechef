@@ -327,6 +327,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpRequest.newBuilder()
                         .POST(builder.build())
                         .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
+                        .header("Accept", "application/json")
                         .build(),
                     HttpResponse.BodyHandlers.ofString());
 
