@@ -38,9 +38,11 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -100,13 +102,18 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        ParameterMapPropertiesResult result = getParameterMapProperties(
+        ParameterMapPropertiesResult parameterMapProperties = getParameterMapProperties(
             workflowNodeName, (Map<String, Object>) definitionMap);
 
-        for (String name : result.parameterMap.keySet()) {
+        Set<String> keySet = parameterMapProperties.parameterMap.keySet();
+
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+
+        for (String name : new HashSet<>(keySet)) {
             displayConditionMap.putAll(
-                getDisplayConditions(
-                    workflowNodeName, name, result.properties, workflow, result.parameterMap, result.taskParameters));
+                checkDisplayConditionsParameters(
+                    workflowNodeName, name, parameterMapProperties.properties, workflow,
+                    parameterMapProperties.parameterMap, inputMap, parameterMapProperties.taskParameters));
         }
 
         return displayConditionMap;
@@ -125,16 +132,21 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflowNodeName, (Map<String, Object>) definitionMap);
 
         Map<String, Boolean> displayConditionMap = Map.of();
+        Map<String, ?> parameterMap = result.parameterMap;
 
-        updateParameter(path, name, arrayIndex, value, (Map<String, Object>) result.parameterMap);
+        updateParameter(path, name, arrayIndex, value, (Map<String, Object>) parameterMap);
 
         // dependOn list should not contain paths inside arrays
 
         if (arrayIndex == null) {
             checkDependOn(name, result.properties(), result.parameterMap);
 
-            displayConditionMap = getDisplayConditions(
-                workflowNodeName, name, result.properties, workflow, result.parameterMap, result.taskParameters);
+            Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+                workflow.getId());
+
+            displayConditionMap = checkDisplayConditionsParameters(
+                workflowNodeName, name, result.properties, workflow, result.parameterMap, inputMap,
+                result.taskParameters);
         }
 
         workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
@@ -174,13 +186,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     // For now only check the first, root level of properties on which other properties could depend on
     @SuppressWarnings("unchecked")
-    private Map<String, Boolean> getDisplayConditions(
+    private Map<String, Boolean> checkDisplayConditionsParameters(
         String workflowNodeName, String name, List<? extends Property> properties, Workflow workflow,
-        Map<String, ?> parameterMap, boolean taskParameters) {
+        Map<String, ?> parameterMap, Map<String, ?> inputMap, boolean taskParameters) {
 
-        Map<String, Boolean> resultMap = new HashMap<>();
-
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+        Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         for (Property property : properties) {
             if (property.getDisplayCondition() == null) {
@@ -204,18 +214,18 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 result = evaluate(
                     displayCondition,
                     MapUtils.concat(
-                        MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs),
+                        MapUtils.concat((Map<String, Object>) inputMap, (Map<String, Object>) outputs),
                         (Map<String, Object>) parameterMap));
             } else {
                 result = evaluate(
                     displayCondition,
-                    MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) parameterMap));
+                    MapUtils.concat((Map<String, Object>) inputMap, (Map<String, Object>) parameterMap));
             }
 
-            resultMap.put(displayCondition, result);
+            displayConditionMap.put(displayCondition, result);
         }
 
-        return resultMap;
+        return displayConditionMap;
     }
 
     private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
