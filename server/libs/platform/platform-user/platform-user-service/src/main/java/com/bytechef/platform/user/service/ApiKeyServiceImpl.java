@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
@@ -72,6 +73,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     @Override
     public void delete(long id) {
         apiKeyRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean hasApiKey(String secretKey, Environment environment) {
+        return apiKeyRepository.findBySecretKeyAndEnvironment(secretKey, environment.ordinal())
+            .isPresent();
     }
 
     @Override

@@ -18,6 +18,7 @@ package com.bytechef.platform.user.repository;
 
 import com.bytechef.platform.user.domain.ApiKey;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -28,4 +29,6 @@ import org.springframework.stereotype.Repository;
 public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
 
     List<ApiKey> findAllByType(int type);
+
+    Optional<ApiKey> findBySecretKeyAndEnvironment(String apiKey, int ordinal);
 }
