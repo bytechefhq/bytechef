@@ -73,7 +73,7 @@ const PropertyComboBox = ({
     if (path) {
         path = path.replace('parameters.', '').replace('parameters', '');
 
-        if (path.endsWith('_' + arrayIndex)) {
+        if (path.endsWith(`_${arrayIndex}`)) {
             path = path.substring(0, path.lastIndexOf('.')) + `[${arrayIndex}]`;
         }
     }
