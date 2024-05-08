@@ -533,8 +533,10 @@ const Property = ({
             setInputValue(propertyParameterValue);
         }
 
-        if (selectValue === '' || (selectValue === defaultValue && propertyParameterValue)) {
-            setSelectValue(propertyParameterValue);
+        if (selectValue === '' || (selectValue === defaultValue && propertyParameterValue !== undefined)) {
+            if (propertyParameterValue !== undefined) {
+                setSelectValue(propertyParameterValue.toString());
+            }
         }
 
         if (numericValue === '' && propertyParameterValue) {

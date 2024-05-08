@@ -59,7 +59,7 @@ const PropertySelect = ({
         )}
 
         {options.length ? (
-            <Select defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value}>
+            <Select defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value?.toString()}>
                 <SelectTrigger aria-label="Select" className={twMerge(leadingIcon && 'relative')}>
                     <>
                         {leadingIcon ? (
