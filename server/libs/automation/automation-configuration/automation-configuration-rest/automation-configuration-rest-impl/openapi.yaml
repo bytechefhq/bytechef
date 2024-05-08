@@ -568,7 +568,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+                  $ref: "#/components/schemas/WorkflowBasic"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -616,7 +616,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+                  $ref: "#/components/schemas/WorkflowBasic"
     post:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
@@ -635,7 +635,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow'
+              $ref: "#/components/schemas/Workflow"
         required: true
       responses:
         "200":
@@ -643,7 +643,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                $ref: "#/components/schemas/Workflow"
   /projects/{id}/workflows/{workflowId}/duplicate:
     post:
       description: "Duplicates existing workflow."
@@ -708,7 +708,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                $ref: "#/components/schemas/Workflow"
     put:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
@@ -726,7 +726,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+              $ref: "#/components/schemas/Workflow"
         required: true
       responses:
         "200":
@@ -734,7 +734,127 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                $ref: "#/components/schemas/Workflow"
+  /workflows/{id}/parameters:
+    delete:
+      description: "Deletes a workflow node parameter."
+      summary: "Deletes a workflow node parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "deleteWorkflowNodeParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "workflowNodeName"
+              properties:
+                arrayIndex:
+                  description: "The array index."
+                  type: "integer"
+                name:
+                  description: "The parameter name."
+                  type: "string"
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+                workflowNodeName:
+                  description: "The workflow node name."
+                  type: "string"
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  parameters:
+                    type: "object"
+                    additionalProperties: true
+    patch:
+      description: "Updates a workflow node parameter."
+      summary: "Updates a workflow node parameter"
+      tags:
+        - "workflow-node-parameter"
+      operationId: "updateWorkflowNodeParameter"
+      parameters:
+        - name: "id"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "path"
+                - "workflowNodeName"
+              properties:
+                arrayIndex:
+                  description: "The array index."
+                  type: "integer"
+                name:
+                  description: "The parameter name."
+                  type: "string"
+                path:
+                  description: "The workflow node parameter path."
+                  type: "string"
+                value:
+                  description: "The value."
+                  type: "object"
+                workflowNodeName:
+                  description: "The workflow node name."
+                  type: "string"
+      responses:
+        "200":
+          description: "The updated workflow node parameters."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  parameters:
+                    type: "object"
+                    additionalProperties: true
+                  displayConditions:
+                    type: "object"
+                    additionalProperties:
+                      type: "boolean"
+  /workflows/by-project-workflow-id/{projectWorkflowId}:
+    get:
+      description: "Get workflow for particular project."
+      summary: "Get workflow for particular project."
+      tags:
+        - "workflow"
+      operationId: "getProjectWorkflow"
+      parameters:
+        - name: "projectWorkflowId"
+          description: "The id of a project workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The project workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
 components:
   schemas:
     Category:
@@ -821,17 +941,17 @@ components:
           description: "The version of a project."
           type: "integer"
           readOnly: true
+        projectWorkflowIds:
+          description: "The project workflow ids belonging to this project."
+          type: "array"
+          items:
+            type: "string"
         status:
           $ref: '#/components/schemas/ProjectStatus'
         tags:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
-        workflowIds:
-          description: "The workflow ids belonging to this project."
-          type: "array"
-          items:
-            type: "string"
         __version:
           type: "integer"
     ProjectBasic:
@@ -1142,3 +1262,21 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
+    Workflow:
+      description: "The blueprint that describe the execution of a job."
+      allOf:
+        - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+        - type: "object"
+          properties:
+            projectWorkflowId:
+              description: "The project workflow id"
+              type: "number"
+    WorkflowBasic:
+      description: "The blueprint that describe the execution of a job."
+      allOf:
+        - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+        - type: "object"
+          properties:
+            projectWorkflowId:
+              description: "The project workflow id"
+              type: "number"
