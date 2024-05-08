@@ -52,15 +52,12 @@ export default function saveProperty({
             },
         },
         {
-            onSuccess: (response) => {
-                currentComponent = {
+            onSuccess: (response) =>
+                setCurrentComponent({
                     ...currentComponent,
                     displayConditions: response.displayConditions,
                     parameters: response.parameters,
-                };
-
-                setCurrentComponent(currentComponent);
-            },
+                }),
         }
     );
 }
