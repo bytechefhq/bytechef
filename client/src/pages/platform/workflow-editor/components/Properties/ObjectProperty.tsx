@@ -143,7 +143,11 @@ const ObjectProperty = ({
           }));
 
     if (properties?.length) {
-        availablePropertyTypes = [];
+        const hasCustomProperty = (properties as Array<PropertyType>).find((property) => property.custom);
+
+        if (!hasCustomProperty) {
+            availablePropertyTypes = [];
+        }
     }
 
     return (

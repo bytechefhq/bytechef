@@ -111,7 +111,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 return {
                     ...items[0],
                     custom: true,
-                    name: `${index}`,
+                    name: index.toString(),
                     properties: subProperties,
                 };
             });
@@ -129,13 +129,24 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     parameterItemType = 'OBJECT';
                 }
 
+                const customSubProperties = Object.keys(parameterItem).map((key) => ({
+                    controlType: 'STRING',
+                    custom: true,
+                    defaultValue: parameterItem[key as keyof ArrayPropertyType],
+                    label: key,
+                    name: key,
+                    type: 'STRING',
+                }));
+
                 return {
+                    arrayName: name,
                     controlType: PROPERTY_CONTROL_TYPES[
                         parameterItemType as keyof typeof PROPERTY_CONTROL_TYPES
                     ] as ControlTypeModel,
                     custom: true,
                     defaultValue: parameterItem,
-                    name: `${index}`,
+                    name: index.toString(),
+                    properties: parameterItemType === 'OBJECT' ? customSubProperties : undefined,
                     type: parameterItemType,
                 };
             });
