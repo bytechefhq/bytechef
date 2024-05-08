@@ -368,6 +368,7 @@ const Property = ({
         setNumericValue('');
         setInputValue('');
         setMentionInputValue('');
+        setSelectValue('');
 
         if (mentionInput) {
             setTimeout(() => {
