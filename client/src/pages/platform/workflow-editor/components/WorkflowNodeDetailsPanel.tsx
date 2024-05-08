@@ -411,6 +411,16 @@ const WorkflowNodeDetailsPanel = ({
         refetchWorkflowNodeOutput();
     }, [currentOperationName, refetchWorkflowNodeOutput]);
 
+    useEffect(() => {
+        if (currentNode && workflowTestConfigurationConnections?.[0]?.connectionId) {
+            setCurrentNode({
+                ...currentNode,
+                connectionId: workflowTestConfigurationConnections[0]?.connectionId,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowTestConfigurationConnections]);
+
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentComponentDefinition) {
         return <></>;
     }
