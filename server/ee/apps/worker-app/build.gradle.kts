@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:google:google-sheets"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:components:mailchimp"))
+    implementation(project(":server:libs:modules:components:microsoft:microsoft-excel"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-one-drive"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-outlook-365"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-share-point"))
