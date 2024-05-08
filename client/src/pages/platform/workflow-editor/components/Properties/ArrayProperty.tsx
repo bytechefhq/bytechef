@@ -120,13 +120,25 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 setArrayItems(parameterArrayItems);
             }
         } else if (name && params?.[name]) {
-            const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => ({
-                controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
-                custom: true,
-                defaultValue: parameterItem,
-                name: `${index}`,
-                type: newItemType,
-            }));
+            const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => {
+                let parameterItemType = 'STRING';
+
+                if (Array.isArray(parameterItem)) {
+                    parameterItemType = 'ARRAY';
+                } else if (typeof parameterItem === 'object') {
+                    parameterItemType = 'OBJECT';
+                }
+
+                return {
+                    controlType: PROPERTY_CONTROL_TYPES[
+                        parameterItemType as keyof typeof PROPERTY_CONTROL_TYPES
+                    ] as ControlTypeModel,
+                    custom: true,
+                    defaultValue: parameterItem,
+                    name: `${index}`,
+                    type: parameterItemType,
+                };
+            });
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
