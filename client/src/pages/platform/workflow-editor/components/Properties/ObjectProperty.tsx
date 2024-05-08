@@ -56,7 +56,7 @@ const ObjectProperty = ({
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    const {additionalProperties, label, name} = property;
+    const {additionalProperties, label, name, properties} = property;
 
     const handleAddItemClick = () => {
         const newItem: SubPropertyType = {
@@ -90,8 +90,8 @@ const ObjectProperty = ({
             return;
         }
 
-        const objectParameters = property.properties?.length
-            ? property.properties?.map((property) => property.name)
+        const objectParameters = properties?.length
+            ? properties?.map((property) => property.name)
             : Object.keys(currentComponent.parameters![name]);
 
         if (!objectParameters.length) {
@@ -99,7 +99,7 @@ const ObjectProperty = ({
         }
 
         const preexistingProperties = objectParameters.map((parameter) => {
-            const matchingProperty = (property.properties as Array<PropertyType>)?.find(
+            const matchingProperty = (properties as Array<PropertyType>)?.find(
                 (property) => property.name === parameter
             );
 
@@ -126,8 +126,24 @@ const ObjectProperty = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    if (!subProperties?.length && !additionalProperties?.length) {
-        return <></>;
+    let availablePropertyTypes = additionalProperties?.length
+        ? additionalProperties?.reduce((types: Array<{label: string; value: string}>, property) => {
+              if (property.type) {
+                  types.push({
+                      label: property.type,
+                      value: property.type,
+                  });
+              }
+
+              return types;
+          }, [])
+        : Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
+              label: type,
+              value: type,
+          }));
+
+    if (properties?.length) {
+        availablePropertyTypes = [];
     }
 
     return (
@@ -183,7 +199,7 @@ const ObjectProperty = ({
                 })}
             </ul>
 
-            {!!additionalProperties?.length && (
+            {!!availablePropertyTypes?.length && (
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
@@ -219,27 +235,25 @@ const ObjectProperty = ({
                                 value={newPropertyName}
                             />
 
-                            {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
+                            {availablePropertyTypes?.length > 1 ? (
                                 <PropertySelect
                                     label="Type"
                                     onValueChange={(value) =>
                                         setNewPropertyType(value as keyof typeof PROPERTY_CONTROL_TYPES)
                                     }
-                                    options={(additionalProperties as Array<PropertyType>).map(
-                                        (additionalProperty) => ({
-                                            label: additionalProperty.type!,
-                                            value: additionalProperty.type!,
-                                        })
-                                    )}
+                                    options={availablePropertyTypes.map((property) => ({
+                                        label: property.value!,
+                                        value: property.value!,
+                                    }))}
                                     value={newPropertyType}
                                 />
                             ) : (
                                 <div className="flex w-full flex-col">
                                     <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
 
-                                    {additionalProperties[0] && (
+                                    {availablePropertyTypes[0] && (
                                         <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
-                                            {additionalProperties[0].type}
+                                            {availablePropertyTypes[0].value}
                                         </span>
                                     )}
                                 </div>
