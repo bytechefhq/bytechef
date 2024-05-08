@@ -64,6 +64,22 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         onDeleteClick(path, undefined, index);
     };
 
+    const availableItemTypes = items?.length
+        ? items?.reduce((types: Array<{label: string; value: string}>, item) => {
+              if (item.type) {
+                  types.push({
+                      label: item.type,
+                      value: item.type,
+                  });
+              }
+
+              return types;
+          }, [])
+        : Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
+              label: type,
+              value: type,
+          }));
+
     // render individual array items with data gathered from parameters
     useEffect(() => {
         if (
@@ -119,22 +135,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const availableItemTypes = items?.length
-        ? items?.reduce((types: Array<{label: string; value: string}>, item) => {
-              if (item.type) {
-                  types.push({
-                      label: item.type,
-                      value: item.type,
-                  });
-              }
-
-              return types;
-          }, [])
-        : Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
-              label: type,
-              value: type,
-          }));
 
     useEffect(() => {
         if (availableItemTypes.length === 1) {
