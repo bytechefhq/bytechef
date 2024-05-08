@@ -25,6 +25,7 @@ import {
     useUpdateWorkflowMutation,
 } from '@/mutations/automation/workflows.mutations';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {ProjectWorkflowKeys} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
@@ -75,6 +76,10 @@ const ProjectWorkflowListItem = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: (workflow) => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflows(project.id!),
+            });
+
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
