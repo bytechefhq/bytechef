@@ -45,7 +45,7 @@ const WorkflowEditorLayout = ({
             id: workflow.id!,
             workflowNodeName: currentComponent?.workflowNodeName!,
         },
-        !!currentComponent
+        !!currentComponent && !!currentComponent?.workflowNodeName
     );
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
@@ -118,14 +118,14 @@ const WorkflowEditorLayout = ({
     }, [workflow.tasks, workflow.triggers, currentNodeName]);
 
     useEffect(() => {
-        if (currentComponent && workflowNodeParameterDisplayConditions) {
+        if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
             setCurrentComponent({
                 ...currentComponent,
-                displayConditions: workflowNodeParameterDisplayConditions.displayConditions!,
+                displayConditions: workflowNodeParameterDisplayConditions?.displayConditions!,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowNodeParameterDisplayConditions]);
+    }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
 
     return (
         <ReactFlowProvider>
