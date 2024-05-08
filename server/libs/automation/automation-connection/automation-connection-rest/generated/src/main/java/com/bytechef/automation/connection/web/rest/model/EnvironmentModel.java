@@ -22,11 +22,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-04-21T11:16:38.349730+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public enum EnvironmentModel {
-  
-  DEVELOPMENT("DEVELOPMENT"),
-  
-  STAGING("STAGING"),
-  
+
+  TEST("TEST"),
+
   PRODUCTION("PRODUCTION");
 
   private String value;
