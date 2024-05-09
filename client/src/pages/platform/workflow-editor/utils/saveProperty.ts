@@ -1,5 +1,7 @@
-import {UpdateWorkflowNodeParameterRequest} from '@/middleware/platform/configuration';
-import {UpdateWorkflowNodeParameter200ResponseModel} from '@/middleware/platform/configuration/models/UpdateWorkflowNodeParameter200ResponseModel';
+import {
+    UpdateWorkflowNodeParameter200ResponseModelI,
+    UpdateWorkflowNodeParameterRequestI,
+} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
@@ -11,9 +13,9 @@ interface SavePropertyProps {
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
     successCallback?: () => void;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateWorkflowNodeParameter200ResponseModel,
+        UpdateWorkflowNodeParameter200ResponseModelI,
         Error,
-        UpdateWorkflowNodeParameterRequest,
+        UpdateWorkflowNodeParameterRequestI,
         unknown
     >;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

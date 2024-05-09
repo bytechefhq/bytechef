@@ -69,7 +69,7 @@ const Projects = () => {
                                 onClose={(project) => {
                                     if (project) {
                                         navigate(
-                                            `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
+                                            `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
                                         );
                                     }
                                 }}
@@ -166,7 +166,19 @@ const Projects = () => {
                     projects && tags && <ProjectList projects={projects} tags={tags} />
                 ) : (
                     <EmptyList
-                        button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
+                        button={
+                            <ProjectDialog
+                                onClose={(project) => {
+                                    if (project) {
+                                        navigate(
+                                            `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
+                                        );
+                                    }
+                                }}
+                                project={undefined}
+                                triggerNode={<Button>Create Project</Button>}
+                            />
+                        }
                         icon={<FolderIcon className="size-12 text-gray-400" />}
                         message="Get started by creating a new project."
                         title="No Projects"

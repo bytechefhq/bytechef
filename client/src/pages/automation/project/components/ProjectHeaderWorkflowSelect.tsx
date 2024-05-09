@@ -12,16 +12,21 @@ import {useGetProjectWorkflowsQuery} from '@/queries/automation/projectWorkflows
 const ProjectHeaderWorkflowSelect = ({
     onValueChange,
     projectId,
-    workflowId,
+    projectWorkflowId,
 }: {
-    onValueChange: (id: string) => void;
+    onValueChange: (projectWorkflowId: number) => void;
     projectId: number;
-    workflowId: string;
+    projectWorkflowId: number;
 }) => {
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId);
 
     return (
-        <Select defaultValue={workflowId} name="projectWorkflowSelect" onValueChange={onValueChange} value={workflowId}>
+        <Select
+            defaultValue={projectWorkflowId.toString()}
+            name="projectWorkflowSelect"
+            onValueChange={(value) => onValueChange(+value)}
+            value={projectWorkflowId.toString()}
+        >
             <SelectTrigger className="mr-0.5 w-60 border-0 shadow-none hover:bg-gray-200">
                 <SelectValue className="font-semibold" placeholder="Select a workflow" />
             </SelectTrigger>
@@ -32,7 +37,10 @@ const ProjectHeaderWorkflowSelect = ({
                         <SelectLabel>Workflows</SelectLabel>
 
                         {projectWorkflows.map((workflow) => (
-                            <SelectItem key={workflow.id!} value={workflow.id!}>
+                            <SelectItem
+                                key={workflow.projectWorkflowId!}
+                                value={workflow.projectWorkflowId!.toString()}
+                            >
                                 {workflow.label!}
                             </SelectItem>
                         ))}

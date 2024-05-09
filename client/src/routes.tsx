@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
                                     }),
                                 queryKey: ProjectKeys.project(parseInt(params.projectId!)),
                             }),
-                        path: 'projects/:projectId/workflows/:workflowId',
+                        path: 'projects/:projectId/project-workflows/:projectWorkflowId',
                     },
                     {
                         element: <Projects />,
