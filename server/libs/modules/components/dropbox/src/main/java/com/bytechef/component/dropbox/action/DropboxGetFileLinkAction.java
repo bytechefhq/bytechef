@@ -55,7 +55,8 @@ public final class DropboxGetFileLinkAction {
                 .required(true),
             string(FILENAME)
                 .label("Filename")
-                .description("Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect)")
+                .description(
+                    "Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect)")
                 .required(true))
         .outputSchema(
             object()
