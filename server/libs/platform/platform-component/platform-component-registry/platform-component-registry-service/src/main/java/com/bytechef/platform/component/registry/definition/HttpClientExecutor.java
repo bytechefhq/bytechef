@@ -314,13 +314,14 @@ public class HttpClientExecutor {
     private String getConnectionUrl(
         String urlString, String componentName, ComponentConnection componentConnection, Context context) {
 
-        if (urlString.startsWith("http://") || urlString.startsWith("https://") || componentConnection == null) {
+        if (urlString.contains("://") || (componentConnection == null)) {
             return urlString;
-        } else {
-            return OptionalUtils.map(
-                connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
-                baseUri -> baseUri + urlString);
         }
+
+        return OptionalUtils.map(
+            connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
+            baseUri -> baseUri + urlString);
+
     }
 
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
