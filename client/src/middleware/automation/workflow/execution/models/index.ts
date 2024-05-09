@@ -14,6 +14,7 @@ export * from './TaskExecutionModel';
 export * from './TriggerExecutionModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';
+export * from './WorkflowBasic1Model';
 export * from './WorkflowBasicModel';
 export * from './WorkflowConnectionModel';
 export * from './WorkflowExecutionBasicModel';

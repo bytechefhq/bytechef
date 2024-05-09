@@ -52,10 +52,10 @@ export interface WorkflowTriggerModel {
     name: string;
     /**
      * Key-value map of task parameters.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: any; }}
      * @memberof WorkflowTriggerModel
      */
-    parameters?: { [key: string]: object; };
+    parameters?: { [key: string]: any; };
     /**
      * The timeout expression which describes when a trigger should be deemed as timed-out.
      * @type {string}

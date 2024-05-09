@@ -97,6 +97,12 @@ export interface WorkflowBasicModel {
      * @memberof WorkflowBasicModel
      */
     version?: number;
+    /**
+     * The project workflow id
+     * @type {number}
+     * @memberof WorkflowBasicModel
+     */
+    projectWorkflowId?: number;
 }
 
 /**
@@ -129,6 +135,7 @@ export function WorkflowBasicModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'workflowTaskComponentNames': json['workflowTaskComponentNames'] == null ? undefined : json['workflowTaskComponentNames'],
         'workflowTriggerComponentNames': json['workflowTriggerComponentNames'] == null ? undefined : json['workflowTriggerComponentNames'],
         'version': json['__version'] == null ? undefined : json['__version'],
+        'projectWorkflowId': json['projectWorkflowId'] == null ? undefined : json['projectWorkflowId'],
     };
 }
 
@@ -140,6 +147,7 @@ export function WorkflowBasicModelToJSON(value?: WorkflowBasicModel | null): any
         
         'description': value['description'],
         '__version': value['version'],
+        'projectWorkflowId': value['projectWorkflowId'],
     };
 }
 

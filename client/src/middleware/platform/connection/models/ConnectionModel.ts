@@ -13,18 +13,18 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ConnectionEnvironmentModel } from './ConnectionEnvironmentModel';
+import {
+    ConnectionEnvironmentModelFromJSON,
+    ConnectionEnvironmentModelFromJSONTyped,
+    ConnectionEnvironmentModelToJSON,
+} from './ConnectionEnvironmentModel';
 import type { CredentialStatusModel } from './CredentialStatusModel';
 import {
     CredentialStatusModelFromJSON,
     CredentialStatusModelFromJSONTyped,
     CredentialStatusModelToJSON,
 } from './CredentialStatusModel';
-import type { EnvironmentModel } from './EnvironmentModel';
-import {
-    EnvironmentModelFromJSON,
-    EnvironmentModelFromJSONTyped,
-    EnvironmentModelToJSON,
-} from './EnvironmentModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -82,10 +82,10 @@ export interface ConnectionModel {
     credentialStatus?: CredentialStatusModel;
     /**
      * 
-     * @type {EnvironmentModel}
+     * @type {ConnectionEnvironmentModel}
      * @memberof ConnectionModel
      */
-    environment?: EnvironmentModel;
+    environment?: ConnectionEnvironmentModel;
     /**
      * The id of a connection.
      * @type {number}
@@ -157,7 +157,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusModelFromJSON(json['credentialStatus']),
-        'environment': json['environment'] == null ? undefined : EnvironmentModelFromJSON(json['environment']),
+        'environment': json['environment'] == null ? undefined : ConnectionEnvironmentModelFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
@@ -178,7 +178,7 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusModelToJSON(value['credentialStatus']),
-        'environment': EnvironmentModelToJSON(value['environment']),
+        'environment': ConnectionEnvironmentModelToJSON(value['environment']),
         'name': value['name'],
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),

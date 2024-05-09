@@ -44,6 +44,10 @@ export interface GetProjectVersionWorkflowsRequest {
     projectVersion: number;
 }
 
+export interface GetProjectWorkflowRequest {
+    projectWorkflowId: number;
+}
+
 export interface GetProjectWorkflowsRequest {
     id: number;
 }
@@ -226,6 +230,41 @@ export class WorkflowApi extends runtime.BaseAPI {
      */
     async getProjectVersionWorkflows(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowBasicModel>> {
         const response = await this.getProjectVersionWorkflowsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get workflow for particular project.
+     * Get workflow for particular project.
+     */
+    async getProjectWorkflowRaw(requestParameters: GetProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
+        if (requestParameters['projectWorkflowId'] == null) {
+            throw new runtime.RequiredError(
+                'projectWorkflowId',
+                'Required parameter "projectWorkflowId" was null or undefined when calling getProjectWorkflow().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/by-project-workflow-id/{projectWorkflowId}`.replace(`{${"projectWorkflowId"}}`, encodeURIComponent(String(requestParameters['projectWorkflowId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Get workflow for particular project.
+     * Get workflow for particular project.
+     */
+    async getProjectWorkflow(requestParameters: GetProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
+        const response = await this.getProjectWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
