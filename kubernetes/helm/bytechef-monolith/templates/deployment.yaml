@@ -45,6 +45,8 @@ spec:
               value: {{ .Values.datasourceUsername }}
             - name: "BYTECHEF_RESOURCES_WEB"
               value: {{ .Values.webResourceUrl }}
+            - name: "SPRING_PROFILES_ACTIVE"
+              value: {{ .Values.springProfilesActive }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
