@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-06T08:23:46.980771+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:18:06.491822+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class ProjectModel {
 
   private CategoryModel category;
@@ -56,13 +56,13 @@ public class ProjectModel {
 
   private Integer projectVersion;
 
+  @Valid
+  private List<String> projectWorkflowIds;
+
   private ProjectStatusModel status;
 
   @Valid
   private List<@Valid TagModel> tags;
-
-  @Valid
-  private List<String> workflowIds;
 
   private Integer version;
 
@@ -277,6 +277,34 @@ public class ProjectModel {
     this.projectVersion = projectVersion;
   }
 
+  public ProjectModel projectWorkflowIds(List<String> projectWorkflowIds) {
+    this.projectWorkflowIds = projectWorkflowIds;
+    return this;
+  }
+
+  public ProjectModel addProjectWorkflowIdsItem(String projectWorkflowIdsItem) {
+    if (this.projectWorkflowIds == null) {
+      this.projectWorkflowIds = new ArrayList<>();
+    }
+    this.projectWorkflowIds.add(projectWorkflowIdsItem);
+    return this;
+  }
+
+  /**
+   * The project workflow ids belonging to this project.
+   * @return projectWorkflowIds
+  */
+  
+  @Schema(name = "projectWorkflowIds", description = "The project workflow ids belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectWorkflowIds")
+  public List<String> getProjectWorkflowIds() {
+    return projectWorkflowIds;
+  }
+
+  public void setProjectWorkflowIds(List<String> projectWorkflowIds) {
+    this.projectWorkflowIds = projectWorkflowIds;
+  }
+
   public ProjectModel status(ProjectStatusModel status) {
     this.status = status;
     return this;
@@ -325,34 +353,6 @@ public class ProjectModel {
     this.tags = tags;
   }
 
-  public ProjectModel workflowIds(List<String> workflowIds) {
-    this.workflowIds = workflowIds;
-    return this;
-  }
-
-  public ProjectModel addWorkflowIdsItem(String workflowIdsItem) {
-    if (this.workflowIds == null) {
-      this.workflowIds = new ArrayList<>();
-    }
-    this.workflowIds.add(workflowIdsItem);
-    return this;
-  }
-
-  /**
-   * The workflow ids belonging to this project.
-   * @return workflowIds
-  */
-  
-  @Schema(name = "workflowIds", description = "The workflow ids belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowIds")
-  public List<String> getWorkflowIds() {
-    return workflowIds;
-  }
-
-  public void setWorkflowIds(List<String> workflowIds) {
-    this.workflowIds = workflowIds;
-  }
-
   public ProjectModel version(Integer version) {
     this.version = version;
     return this;
@@ -392,15 +392,15 @@ public class ProjectModel {
         Objects.equals(this.name, project.name) &&
         Objects.equals(this.publishedDate, project.publishedDate) &&
         Objects.equals(this.projectVersion, project.projectVersion) &&
+        Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.status, project.status) &&
         Objects.equals(this.tags, project.tags) &&
-        Objects.equals(this.workflowIds, project.workflowIds) &&
         Objects.equals(this.version, project.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, status, tags, workflowIds, version);
+    return Objects.hash(category, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, projectWorkflowIds, status, tags, version);
   }
 
   @Override
@@ -417,9 +417,9 @@ public class ProjectModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
+    sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
-    sb.append("    workflowIds: ").append(toIndentedString(workflowIds)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
