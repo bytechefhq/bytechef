@@ -18,7 +18,7 @@ package com.bytechef.platform.connection.dto;
 
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
-import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
-    LocalDateTime createdDate, CredentialStatus credentialStatus, Environment environment, Long id,
+    LocalDateTime createdDate, CredentialStatus credentialStatus, ConnectionEnvironment environment, Long id,
     String lastModifiedBy, LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags,
     int version) {
 
@@ -72,7 +72,7 @@ public record ConnectionDTO(
         private String createdBy;
         private LocalDateTime createdDate;
         private CredentialStatus credentialStatus;
-        private Environment environment;
+        private ConnectionEnvironment environment;
         private Long id;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
@@ -125,7 +125,7 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder environment(Environment environment) {
+        public Builder environment(ConnectionEnvironment environment) {
             this.environment = environment;
 
             return this;
