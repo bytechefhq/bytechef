@@ -9,6 +9,7 @@ interface SavePropertyProps {
     name: string;
     path: string;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
+    successCallback?: () => void;
     updateWorkflowNodeParameterMutation: UseMutationResult<
         UpdateWorkflowNodeParameter200ResponseModel,
         Error,
@@ -26,6 +27,7 @@ export default function saveProperty({
     name,
     path,
     setCurrentComponent,
+    successCallback,
     updateWorkflowNodeParameterMutation,
     value,
     workflowId,
@@ -52,12 +54,15 @@ export default function saveProperty({
             },
         },
         {
-            onSuccess: (response) =>
+            onSuccess: (response) => {
+                successCallback && successCallback();
+
                 setCurrentComponent({
                     ...currentComponent,
                     displayConditions: response.displayConditions,
                     parameters: response.parameters,
-                }),
+                });
+            },
         }
     );
 }

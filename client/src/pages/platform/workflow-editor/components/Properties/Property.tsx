@@ -135,7 +135,7 @@ const Property = ({
 
     const isValidControlType = controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
 
-    const isNumericalInput = controlType === 'INTEGER' || controlType === 'NUMBER';
+    const isNumericalInput = !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
@@ -365,10 +365,6 @@ const Property = ({
 
     const handleInputTypeSwitchButtonClick = () => {
         setMentionInput(!mentionInput);
-        setNumericValue('');
-        setInputValue('');
-        setMentionInputValue('');
-        setSelectValue('');
 
         if (mentionInput) {
             setTimeout(() => {
@@ -392,11 +388,26 @@ const Property = ({
             return;
         }
 
+        if (mentionInput && !mentionInputValue) {
+            return;
+        } else if (!mentionInput && isNumericalInput && !numericValue) {
+            return;
+        } else if (!mentionInput && !isNumericalInput && !inputValue) {
+            return;
+        }
+
         saveProperty({
             currentComponent,
             name,
             path,
             setCurrentComponent,
+            successCallback: () => {
+                setNumericValue('');
+                setInputValue('');
+                setMentionInputValue('');
+                setSelectValue('');
+                setPropertyParameterValue('');
+            },
             updateWorkflowNodeParameterMutation,
             value: null,
             workflowId: workflow.id!,
@@ -530,7 +541,7 @@ const Property = ({
             }
         }
 
-        if (inputValue === '' && propertyParameterValue) {
+        if (!mentionInput && inputValue === '' && propertyParameterValue) {
             setInputValue(propertyParameterValue);
         }
 
