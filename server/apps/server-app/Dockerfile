@@ -1,7 +1,6 @@
 # docker/dockerfile:1
 FROM ghcr.io/graalvm/graalvm-community:21.0.2  AS bytechef-base
 
-ARG ARG_BUILD_HOME=server
 ARG ARG_APPLICATION_HOME=/opt/bytechef
 
 ENV ENV_JVM_MEMORY_OPTS="-Xms1G -Xmx2G"
