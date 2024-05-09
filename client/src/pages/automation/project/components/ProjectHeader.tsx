@@ -36,11 +36,13 @@ const workflowTestApi = new WorkflowTestApi();
 const ProjectHeader = ({
     bottomResizablePanelRef,
     projectId,
+    projectWorkflowId,
     runDisabled,
     updateWorkflowMutation,
 }: {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
     projectId: number;
+    projectWorkflowId: number;
     runDisabled: boolean;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }) => {
@@ -86,7 +88,7 @@ const ProjectHeader = ({
                 bottomResizablePanelRef.current.resize(0);
             }
 
-            navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
+            navigate(`/automation/projects/${projectId}/project-workflows/${workflow.projectWorkflowId}`);
         },
     });
 
@@ -128,12 +130,12 @@ const ProjectHeader = ({
         }
     };
 
-    const handleProjectWorkflowValueChange = (id: string) => {
+    const handleProjectWorkflowValueChange = (projectWorkflowId: number) => {
         setWorkflowTestExecution(undefined);
 
         setCurrentNode(undefined);
 
-        navigate(`/automation/projects/${projectId}/workflows/${id}`);
+        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}`);
     };
 
     const handleRunClick = () => {
@@ -178,7 +180,7 @@ const ProjectHeader = ({
                     <ProjectHeaderWorkflowSelect
                         onValueChange={handleProjectWorkflowValueChange}
                         projectId={projectId}
-                        workflowId={workflow.id!}
+                        projectWorkflowId={projectWorkflowId}
                     />
 
                     <ProjectHeaderWorkflowDropDownMenu

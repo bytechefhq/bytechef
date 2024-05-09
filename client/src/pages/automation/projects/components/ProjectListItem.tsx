@@ -59,7 +59,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
-            navigate(`/automation/projects/${project.id}/workflows/${workflow?.id}`);
+            navigate(`/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}`);
 
             setShowWorkflowDialog(false);
         },
@@ -128,7 +128,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             <div className="relative flex items-center gap-2">
                                 <Link
                                     className="flex gap-2"
-                                    to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
+                                    to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`}
                                 >
                                     {project.description ? (
                                         <Tooltip>
@@ -153,9 +153,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             <div className="flex items-center">
                                 <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
                                     <div className="mr-1">
-                                        {project.workflowIds?.length === 1
-                                            ? `${project.workflowIds?.length} workflow`
-                                            : `${project.workflowIds?.length} workflows`}
+                                        {project.projectWorkflowIds?.length === 1
+                                            ? `${project.projectWorkflowIds?.length} workflow`
+                                            : `${project.projectWorkflowIds?.length} workflows`}
                                     </div>
 
                                     <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
@@ -224,7 +224,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 <DropdownMenuItem
                                     onClick={() =>
                                         navigate(
-                                            `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
+                                            `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
                                         )
                                     }
                                 >

@@ -38,7 +38,7 @@ const ProjectHeaderProjectDropDownMenu = ({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            navigate(`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`);
+            navigate(`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`);
         },
     });
 

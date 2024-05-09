@@ -1,8 +1,7 @@
 import {
-    DeleteWorkflowNodeParameter200ResponseModel,
-    DeleteWorkflowNodeParameterRequest,
-} from '@/middleware/platform/configuration';
-import {ComponentType} from '@/types/types';
+    DeleteWorkflowNodeParameter200ResponseModelI,
+    DeleteWorkflowNodeParameterRequestI,
+} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 
 export default function deleteProperty(
     workflowId: string,
@@ -10,9 +9,9 @@ export default function deleteProperty(
     currentComponent: ComponentType,
     setCurrentComponent: (currentComponent: ComponentType) => void,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
-        DeleteWorkflowNodeParameter200ResponseModel,
+        DeleteWorkflowNodeParameter200ResponseModelI,
         Error,
-        DeleteWorkflowNodeParameterRequest,
+        DeleteWorkflowNodeParameterRequestI,
         unknown
     >,
     name?: string,
@@ -53,4 +52,5 @@ export default function deleteProperty(
     );
 }
 
+import {ComponentType} from '@/types/types';
 import {UseMutationResult} from '@tanstack/react-query';

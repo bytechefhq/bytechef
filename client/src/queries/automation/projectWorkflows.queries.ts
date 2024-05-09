@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {WorkflowApi, WorkflowBasicModel} from '@/middleware/automation/configuration';
+import {WorkflowApi, WorkflowBasicModel, WorkflowModel} from '@/middleware/automation/configuration';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useQuery} from '@tanstack/react-query';
 
@@ -10,8 +10,21 @@ export const ProjectWorkflowKeys = {
         projectVersion,
         'projectWorkflows',
     ],
+    projectWorkflow: (projectId: number, projectWorkflowId: number) => [
+        ...ProjectKeys.projects,
+        projectId,
+        'projectWorkflows',
+        projectWorkflowId,
+    ],
     projectWorkflows: (projectId: number) => [...ProjectKeys.projects, projectId, 'projectWorkflows'],
 };
+
+export const useGetProjectWorkflowQuery = (id: number, projectWorkflowId: number, enabled?: boolean) =>
+    useQuery<WorkflowModel, Error>({
+        queryKey: ProjectWorkflowKeys.projectWorkflow(id, projectWorkflowId),
+        queryFn: () => new WorkflowApi().getProjectWorkflow({projectWorkflowId}),
+        enabled: enabled === undefined ? true : enabled,
+    });
 
 export const useGetProjectWorkflowsQuery = (id: number, enabled?: boolean) =>
     useQuery<WorkflowBasicModel[], Error>({

@@ -1,10 +1,10 @@
 import {
     DeleteWorkflowNodeParameter200ResponseModel,
     DeleteWorkflowNodeParameterRequest,
+    UpdateWorkflowNodeParameter200ResponseModel,
     UpdateWorkflowNodeParameterRequest,
     WorkflowNodeParameterApi,
-} from '@/middleware/platform/configuration';
-import {UpdateWorkflowNodeParameter200ResponseModel} from '@/middleware/platform/configuration/models/UpdateWorkflowNodeParameter200ResponseModel';
+} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface DeleteWorkflowNodeParameterProps {

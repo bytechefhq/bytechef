@@ -1,11 +1,11 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
-import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {
     useDeleteWorkflowNodeParameterMutation,
     useUpdateWorkflowNodeParameterMutation,
-} from '@/mutations/platform/workflowNodeParameters.mutations';
+} from '@/mutations/automation/workflowNodeParameters.mutations';
+import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import useUpdatePlatformWorkflowMutation from '@/mutations/platform/workflows.mutations';
 import ProjectHeader from '@/pages/automation/project/components/ProjectHeader';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
@@ -27,8 +27,9 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/queries/automation/connections.queries';
+import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
+import {WorkflowKeys} from '@/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/queries/platform/workflowTestConfigurations.queries';
@@ -53,7 +54,7 @@ const Project = () => {
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
-    const {projectId, workflowId} = useParams();
+    const {projectId, projectWorkflowId} = useParams();
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
@@ -116,7 +117,7 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: currentWorkflow} = useGetWorkflowQuery(workflowId!);
+    const {data: currentWorkflow} = useGetProjectWorkflowQuery(+projectId!, +projectWorkflowId!);
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
@@ -176,6 +177,10 @@ const Project = () => {
                 queryKey: ProjectKeys.project(parseInt(projectId!)),
             });
 
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
+            });
+
             setShowEditWorkflowDialog(false);
         },
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
@@ -223,7 +228,7 @@ const Project = () => {
         setWorkflowNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowId]);
+    }, [projectWorkflowId]);
 
     useEffect(() => {
         if (currentWorkflow) {
@@ -258,6 +263,7 @@ const Project = () => {
                         <ProjectHeader
                             bottomResizablePanelRef={bottomResizablePanelRef}
                             projectId={parseInt(projectId)}
+                            projectWorkflowId={parseInt(projectWorkflowId!)}
                             runDisabled={runDisabled}
                             updateWorkflowMutation={updateWorkflowMutation}
                         />

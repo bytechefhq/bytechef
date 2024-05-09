@@ -1,23 +1,53 @@
-import {
-    DeleteWorkflowNodeParameter200ResponseModel,
-    DeleteWorkflowNodeParameterRequest,
-    UpdateWorkflowNodeParameter200ResponseModel,
-    UpdateWorkflowNodeParameterRequest,
-} from '@/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode, createContext, useContext} from 'react';
 
+export interface DeleteWorkflowNodeParameter200ResponseModelI {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters?: {[key: string]: any};
+}
+
+export interface DeleteWorkflowNodeParameterRequestModelI {
+    arrayIndex?: number;
+    name?: string;
+    path: string;
+    workflowNodeName: string;
+}
+
+export interface DeleteWorkflowNodeParameterRequestI {
+    id: string;
+    deleteWorkflowNodeParameterRequestModel?: DeleteWorkflowNodeParameterRequestModelI;
+}
+
+export interface UpdateWorkflowNodeParameter200ResponseModelI {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters?: {[key: string]: any};
+    displayConditions?: {[key: string]: boolean};
+}
+
+export interface UpdateWorkflowNodeParameterRequestModelI {
+    arrayIndex?: number;
+    name?: string;
+    path: string;
+    value?: object;
+    workflowNodeName: string;
+}
+
+export interface UpdateWorkflowNodeParameterRequestI {
+    id: string;
+    updateWorkflowNodeParameterRequestModel?: UpdateWorkflowNodeParameterRequestModelI;
+}
+
 export interface WorkflowNodeParameterMutationStateI {
     deleteWorkflowNodeParameterMutation?: UseMutationResult<
-        DeleteWorkflowNodeParameter200ResponseModel,
+        DeleteWorkflowNodeParameter200ResponseModelI,
         Error,
-        DeleteWorkflowNodeParameterRequest,
+        DeleteWorkflowNodeParameterRequestI,
         unknown
     >;
     updateWorkflowNodeParameterMutation?: UseMutationResult<
-        UpdateWorkflowNodeParameter200ResponseModel,
+        UpdateWorkflowNodeParameter200ResponseModelI,
         Error,
-        UpdateWorkflowNodeParameterRequest,
+        UpdateWorkflowNodeParameterRequestI,
         unknown
     >;
 }

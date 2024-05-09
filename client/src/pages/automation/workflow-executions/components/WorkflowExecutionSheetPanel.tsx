@@ -22,7 +22,11 @@ const WorkflowExecutionSheetPanel = ({workflowExecution}: {workflowExecution: Wo
                 <div className="flex items-center">
                     <Button
                         className="mr-1"
-                        onClick={() => navigate(`/automation/projects/${project?.id}/workflows/${workflow?.id}`)}
+                        onClick={() =>
+                            navigate(
+                                `/automation/projects/${project?.id}/project-workflows/${workflow?.projectWorkflowId}`
+                            )
+                        }
                         size="sm"
                         variant="outline"
                     >
