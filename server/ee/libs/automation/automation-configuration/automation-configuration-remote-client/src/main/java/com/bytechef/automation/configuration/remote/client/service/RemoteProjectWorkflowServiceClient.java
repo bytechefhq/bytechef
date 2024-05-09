@@ -31,7 +31,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public List<Long> getProjectWorkflowIds(Long projectId, int projectVersion) {
+    public List<Long> getProjectWorkflowIds(long projectId, int projectVersion) {
         throw new UnsupportedOperationException();
     }
 
@@ -51,17 +51,17 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public List<String> getWorkflowIds(Long projectId) {
+    public List<String> getWorkflowIds(long projectId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<String> getWorkflowIds(Long projectId, int projectVersion) {
+    public List<String> getWorkflowIds(long projectId, int projectVersion) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ProjectWorkflow getProjectWorkflow(long projectId, long id) {
+    public ProjectWorkflow getProjectWorkflow(long id) {
         throw new UnsupportedOperationException();
     }
 

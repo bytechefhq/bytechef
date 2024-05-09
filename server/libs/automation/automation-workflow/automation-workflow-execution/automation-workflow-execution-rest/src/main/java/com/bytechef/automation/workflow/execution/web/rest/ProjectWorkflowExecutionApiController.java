@@ -35,13 +35,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class WorkflowExecutionApiController implements WorkflowExecutionApi {
+public class ProjectWorkflowExecutionApiController implements WorkflowExecutionApi {
 
     private final ConversionService conversionService;
     private final WorkflowExecutionFacade workflowExecutionFacade;
 
     @SuppressFBWarnings("EI")
-    public WorkflowExecutionApiController(
+    public ProjectWorkflowExecutionApiController(
         ConversionService conversionService, WorkflowExecutionFacade workflowExecutionFacade) {
 
         this.conversionService = conversionService;

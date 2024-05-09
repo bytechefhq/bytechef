@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest.util;
+package com.bytechef.automation.workflow.execution.web.rest;
 
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowApiControllerUtils {
+@Disabled
+@WebMvcTest(value = ProjectWorkflowExecutionApiController.class)
+public class ProjectWorkflowExecutionApiControllerIntTest {
 
-    public static ResponseEntity<WorkflowModel> getWorkflow(
-        String id, ConversionService conversionService, WorkflowFacade workflowFacade) {
+    @Test
+    public void testGetProjectWorkflowExecution() {
+// TODO
+    }
 
-        return ResponseEntity.ok(conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class));
+    @Test
+    public void testSearchProjectWorkflowExecutions() {
+// TODO
     }
 }

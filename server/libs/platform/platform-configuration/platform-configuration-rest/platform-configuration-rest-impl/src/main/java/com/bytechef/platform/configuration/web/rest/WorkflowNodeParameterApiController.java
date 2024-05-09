@@ -18,14 +18,8 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade.UpdateParameterResult;
-import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameter200ResponseModel;
-import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowNodeParameterRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeParameterDisplayConditions200ResponseModel;
-import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameter200ResponseModel;
-import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodeParameterRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,20 +40,6 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public ResponseEntity<DeleteWorkflowNodeParameter200ResponseModel> deleteWorkflowNodeParameter(
-        String id, DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
-
-        return ResponseEntity.ok(
-            new DeleteWorkflowNodeParameter200ResponseModel().parameters(
-                (Map<String, Object>) workflowNodeParameterFacade.deleteParameter(
-                    id, deleteWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-                    deleteWorkflowNodeParameterRequestModel.getPath(),
-                    deleteWorkflowNodeParameterRequestModel.getName(),
-                    deleteWorkflowNodeParameterRequestModel.getArrayIndex())));
-    }
-
-    @Override
     public ResponseEntity<GetWorkflowNodeParameterDisplayConditions200ResponseModel>
         getWorkflowNodeParameterDisplayConditions(String id, String workflowNodeName) {
 
@@ -67,23 +47,5 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
             new GetWorkflowNodeParameterDisplayConditions200ResponseModel()
                 .displayConditions(
                     workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName)));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
-        String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
-
-        UpdateParameterResult updateParameterResult = workflowNodeParameterFacade.updateParameter(
-            id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-            updateWorkflowNodeParameterRequestModel.getPath(),
-            updateWorkflowNodeParameterRequestModel.getName(),
-            updateWorkflowNodeParameterRequestModel.getArrayIndex(),
-            updateWorkflowNodeParameterRequestModel.getValue());
-
-        return ResponseEntity.ok(
-            new UpdateWorkflowNodeParameter200ResponseModel()
-                .displayConditions(updateParameterResult.displayConditionMap())
-                .parameters((Map<String, Object>) updateParameterResult.parameterMap()));
     }
 }

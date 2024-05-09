@@ -133,6 +133,11 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
         workflowTestConfigurationRepository.save(workflowTestConfiguration);
     }
 
+    @Override
+    public void updateWorkflowId(String oldWorkflowId, String newWorkflowId) {
+        workflowTestConfigurationRepository.updateWorkflowId(oldWorkflowId, newWorkflowId);
+    }
+
     private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId) {
         return OptionalUtils.orElseGet(
             workflowTestConfigurationRepository.findByWorkflowId(workflowId),

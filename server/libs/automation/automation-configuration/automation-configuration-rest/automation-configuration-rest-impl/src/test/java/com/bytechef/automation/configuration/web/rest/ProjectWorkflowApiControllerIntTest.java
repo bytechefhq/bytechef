@@ -19,12 +19,13 @@ package com.bytechef.automation.configuration.web.rest;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
-import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -47,8 +48,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = ProjectConfigurationRestTestConfiguration.class)
-@WebMvcTest(WorkflowApiController.class)
-public class WorkflowApiControllerIntTest {
+@WebMvcTest(ProjectWorkflowApiController.class)
+public class ProjectWorkflowApiControllerIntTest {
 
     public static final String DEFINITION = """
         {
@@ -95,7 +96,7 @@ public class WorkflowApiControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(workflowFacade.getWorkflow("1"))
+            when(projectFacade.getProjectWorkflow("1"))
                 .thenReturn(getWorkflowDTO());
 
             this.webTestClient
@@ -159,9 +160,11 @@ public class WorkflowApiControllerIntTest {
     private WorkflowDTO getWorkflowDTO() {
         Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON);
 
+        List<WorkflowTask> tasks = workflow.getTasks();
+
         return new WorkflowDTO(
-            workflow, List.of(new WorkflowTaskDTO(workflow.getTasks()
-                .getFirst(), List.of(), null)),
-            List.of());
+            new com.bytechef.platform.configuration.dto.WorkflowDTO(
+                workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), List.of(), null)), List.of()),
+            0);
     }
 }

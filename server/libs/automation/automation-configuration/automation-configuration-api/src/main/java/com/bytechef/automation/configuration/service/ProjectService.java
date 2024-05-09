@@ -27,9 +27,7 @@ import java.util.Optional;
  */
 public interface ProjectService {
 
-    void addVersion(long id, List<String> duplicatedVersionWorkflowIds);
-
-    Project addWorkflow(long id, String workflowId);
+    int addVersion(long id);
 
     long countProjects();
 
@@ -56,8 +54,6 @@ public interface ProjectService {
     Project getWorkflowProject(String workflowId);
 
     void publishProject(long id, String description);
-
-    void removeWorkflow(long id, String workflowId);
 
     Project update(long id, List<Long> tagIds);
 
