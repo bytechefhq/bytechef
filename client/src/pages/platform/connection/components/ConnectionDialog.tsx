@@ -30,7 +30,7 @@ import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
 } from 'middleware/platform/configuration';
-import {ConnectionModel, EnvironmentModel, TagModel} from 'middleware/platform/connection';
+import {ConnectionEnvironmentModel, ConnectionModel, TagModel} from 'middleware/platform/connection';
 import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
 import {
     useGetConnectionDefinitionQuery,
@@ -61,7 +61,7 @@ interface ConnectionDialogProps {
 
 export interface ConnectionDialogFormProps {
     authorizationName: string;
-    environment: EnvironmentModel;
+    environment: ConnectionEnvironmentModel;
     componentName: string;
     name: string;
     parameters: {[key: string]: object};
@@ -86,13 +86,13 @@ const ConnectionDialog = ({
     const [selectedComponentDefinition, setSelectedComponentDefinition] = useState<
         ComponentDefinitionBasicModel | undefined
     >(componentDefinition);
-    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(false);
+    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
             componentName: componentDefinition?.name,
-            environment: connection?.environment || EnvironmentModel.Test,
+            environment: connection?.environment || ConnectionEnvironmentModel.Development,
             name: connection?.name || '',
             tags:
                 connection?.tags?.map((tag) => ({
@@ -516,6 +516,8 @@ const ConnectionDialog = ({
                                                         </SelectTrigger>
 
                                                         <SelectContent>
+                                                            <SelectItem value="DEVELOPMENT">Development</SelectItem>
+
                                                             <SelectItem value="TEST">Test</SelectItem>
 
                                                             <SelectItem value="PRODUCTION">Production</SelectItem>
