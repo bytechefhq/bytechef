@@ -273,10 +273,5 @@ public class JobSyncExecutor {
         public Job update(Job job) {
             throw new UnsupportedOperationException();
         }
-
-        @Override
-        public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
-            throw new UnsupportedOperationException();
-        }
     }
 }
