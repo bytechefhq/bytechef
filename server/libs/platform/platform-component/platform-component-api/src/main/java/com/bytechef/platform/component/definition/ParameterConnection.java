@@ -20,6 +20,7 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public interface ParameterConnection {
 
@@ -28,6 +29,8 @@ public interface ParameterConnection {
     int getVersion();
 
     Map<String, ?> getParameters();
+
+    <T> T getParameter(String key);
 
     String getAuthorizationName();
 }
