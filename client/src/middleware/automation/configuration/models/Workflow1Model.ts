@@ -47,138 +47,132 @@ import {
 /**
  * The blueprint that describe the execution of a job.
  * @export
- * @interface WorkflowModel
+ * @interface Workflow1Model
  */
-export interface WorkflowModel {
+export interface Workflow1Model {
     /**
      * The created by.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly createdBy?: string;
     /**
      * The created date.
      * @type {Date}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly createdDate?: Date;
     /**
      * The definition of a workflow.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     definition?: string;
     /**
      * The description of a workflow.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     description?: string;
     /**
      * 
      * @type {WorkflowFormatModel}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     format?: WorkflowFormatModel;
     /**
      * The id of a workflow.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly id?: string;
     /**
      * The workflow's expected list of inputs.
      * @type {Array<WorkflowInputModel>}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly inputs?: Array<WorkflowInputModel>;
     /**
      * The descriptive name for the workflow
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly label?: string;
     /**
      * The last modified by.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
      * @type {Date}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly lastModifiedDate?: Date;
     /**
      * The workflow's list of expected outputs.
      * @type {Array<WorkflowOutputModel>}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly outputs?: Array<WorkflowOutputModel>;
     /**
      * The type of the source which stores the workflow definition.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
-    sourceType?: WorkflowModelSourceTypeEnum;
+    sourceType?: Workflow1ModelSourceTypeEnum;
     /**
      * The maximum number of times a task may retry.
      * @type {number}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly maxRetries?: number;
     /**
      * The steps that make up the workflow.
      * @type {Array<WorkflowTaskModel>}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly tasks?: Array<WorkflowTaskModel>;
     /**
      * The steps that make up the workflow.
      * @type {Array<WorkflowTriggerModel>}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     readonly triggers?: Array<WorkflowTriggerModel>;
     /**
      * 
      * @type {number}
-     * @memberof WorkflowModel
+     * @memberof Workflow1Model
      */
     version?: number;
-    /**
-     * The project workflow id
-     * @type {number}
-     * @memberof WorkflowModel
-     */
-    projectWorkflowId?: number;
 }
 
 
 /**
  * @export
  */
-export const WorkflowModelSourceTypeEnum = {
+export const Workflow1ModelSourceTypeEnum = {
     Classpath: 'CLASSPATH',
     Filesystem: 'FILESYSTEM',
     Git: 'GIT',
     Jdbc: 'JDBC'
 } as const;
-export type WorkflowModelSourceTypeEnum = typeof WorkflowModelSourceTypeEnum[keyof typeof WorkflowModelSourceTypeEnum];
+export type Workflow1ModelSourceTypeEnum = typeof Workflow1ModelSourceTypeEnum[keyof typeof Workflow1ModelSourceTypeEnum];
 
 
 /**
- * Check if a given object implements the WorkflowModel interface.
+ * Check if a given object implements the Workflow1Model interface.
  */
-export function instanceOfWorkflowModel(value: object): boolean {
+export function instanceOfWorkflow1Model(value: object): boolean {
     return true;
 }
 
-export function WorkflowModelFromJSON(json: any): WorkflowModel {
-    return WorkflowModelFromJSONTyped(json, false);
+export function Workflow1ModelFromJSON(json: any): Workflow1Model {
+    return Workflow1ModelFromJSONTyped(json, false);
 }
 
-export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowModel {
+export function Workflow1ModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): Workflow1Model {
     if (json == null) {
         return json;
     }
@@ -200,11 +194,10 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'tasks': json['tasks'] == null ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'triggers': json['triggers'] == null ? undefined : ((json['triggers'] as Array<any>).map(WorkflowTriggerModelFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
-        'projectWorkflowId': json['projectWorkflowId'] == null ? undefined : json['projectWorkflowId'],
     };
 }
 
-export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
+export function Workflow1ModelToJSON(value?: Workflow1Model | null): any {
     if (value == null) {
         return value;
     }
@@ -215,7 +208,6 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
         'format': WorkflowFormatModelToJSON(value['format']),
         'sourceType': value['sourceType'],
         '__version': value['version'],
-        'projectWorkflowId': value['projectWorkflowId'],
     };
 }
 

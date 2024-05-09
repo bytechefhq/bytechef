@@ -99,6 +99,12 @@ export interface ProjectModel {
      */
     readonly projectVersion?: number;
     /**
+     * The project workflow ids belonging to this project.
+     * @type {Array<string>}
+     * @memberof ProjectModel
+     */
+    projectWorkflowIds?: Array<string>;
+    /**
      * 
      * @type {ProjectStatusModel}
      * @memberof ProjectModel
@@ -110,12 +116,6 @@ export interface ProjectModel {
      * @memberof ProjectModel
      */
     tags?: Array<TagModel>;
-    /**
-     * The workflow ids belonging to this project.
-     * @type {Array<string>}
-     * @memberof ProjectModel
-     */
-    workflowIds?: Array<string>;
     /**
      * 
      * @type {number}
@@ -152,9 +152,9 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'name': json['name'],
         'publishedDate': json['publishedDate'] == null ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'status': json['status'] == null ? undefined : ProjectStatusModelFromJSON(json['status']),
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
-        'workflowIds': json['workflowIds'] == null ? undefined : json['workflowIds'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -169,9 +169,9 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
         'description': value['description'],
         'name': value['name'],
         'publishedDate': value['publishedDate'] == null ? undefined : ((value['publishedDate']).toISOString()),
+        'projectWorkflowIds': value['projectWorkflowIds'],
         'status': ProjectStatusModelToJSON(value['status']),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
-        'workflowIds': value['workflowIds'],
         '__version': value['version'],
     };
 }

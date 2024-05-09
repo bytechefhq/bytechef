@@ -28,8 +28,6 @@ models/ControlTypeModel.ts
 models/DataStreamComponentModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
-models/DeleteWorkflowNodeParameter200ResponseModel.ts
-models/DeleteWorkflowNodeParameterRequestModel.ts
 models/DynamicPropertiesPropertyModel.ts
 models/ExecutionErrorModel.ts
 models/FileEntryPropertyModel.ts
@@ -61,8 +59,6 @@ models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
 models/TriggerTypeModel.ts
-models/UpdateWorkflowNodeParameter200ResponseModel.ts
-models/UpdateWorkflowNodeParameterRequestModel.ts
 models/ValuePropertyModel.ts
 models/WorkflowBasicModel.ts
 models/WorkflowConnectionModel.ts

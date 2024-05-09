@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 index.ts
@@ -16,6 +15,7 @@ models/TaskExecutionModel.ts
 models/TriggerExecutionModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts
+models/WorkflowBasic1Model.ts
 models/WorkflowBasicModel.ts
 models/WorkflowConnectionModel.ts
 models/WorkflowExecutionBasicModel.ts

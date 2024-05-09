@@ -4,11 +4,14 @@ apis/ProjectInstanceApi.ts
 apis/ProjectInstanceTagApi.ts
 apis/ProjectTagApi.ts
 apis/WorkflowApi.ts
+apis/WorkflowNodeParameterApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/CreateProjectInstanceWorkflowJob200ResponseModel.ts
 models/DataStreamComponentModel.ts
+models/DeleteWorkflowNodeParameter200ResponseModel.ts
+models/DeleteWorkflowNodeParameterRequestModel.ts
 models/EnvironmentModel.ts
 models/ProjectBasicModel.ts
 models/ProjectInstanceBasicModel.ts
@@ -22,6 +25,10 @@ models/ProjectVersionModel.ts
 models/PublishProjectRequestModel.ts
 models/TagModel.ts
 models/UpdateTagsRequestModel.ts
+models/UpdateWorkflowNodeParameter200ResponseModel.ts
+models/UpdateWorkflowNodeParameterRequestModel.ts
+models/Workflow1Model.ts
+models/WorkflowBasic1Model.ts
 models/WorkflowBasicModel.ts
 models/WorkflowConnectionModel.ts
 models/WorkflowFormatModel.ts
