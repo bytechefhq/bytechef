@@ -44,4 +44,6 @@ public interface WorkflowTestConfigurationService {
         String workflowId, String workflowNodeName, String key, long connectionId);
 
     void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
+
+    void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }

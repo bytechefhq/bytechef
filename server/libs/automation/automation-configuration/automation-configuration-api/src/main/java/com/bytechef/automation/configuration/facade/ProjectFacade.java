@@ -16,13 +16,14 @@
 
 package com.bytechef.automation.configuration.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.springframework.lang.NonNull;
 
 /**
@@ -30,15 +31,16 @@ import org.springframework.lang.NonNull;
  */
 public interface ProjectFacade {
 
-    Workflow addWorkflow(long id, @NonNull String definition);
-
-    void checkProjectStatus(long id, String workflowId);
+    WorkflowDTO addWorkflow(long id, @NonNull String definition);
 
     ProjectDTO createProject(@NonNull ProjectDTO projectDTO);
 
     void deleteProject(long id);
 
     void deleteWorkflow(@NonNull String workflowId);
+
+    Map<String, ?> deleteWorkflowParameter(
+        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex);
 
     ProjectDTO duplicateProject(long id);
 
@@ -50,11 +52,15 @@ public interface ProjectFacade {
 
     List<Tag> getProjectTags();
 
-    List<Workflow> getProjectWorkflows();
+    WorkflowDTO getProjectWorkflow(String workflowId);
 
-    List<Workflow> getProjectWorkflows(long id);
+    WorkflowDTO getProjectWorkflow(long projectWorkflowId);
 
-    List<Workflow> getProjectVersionWorkflows(long id, int projectVersion);
+    List<WorkflowDTO> getProjectWorkflows();
+
+    List<WorkflowDTO> getProjectWorkflows(long id);
+
+    List<WorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion);
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
 
@@ -63,4 +69,7 @@ public interface ProjectFacade {
     void updateProjectTags(long id, @NonNull List<Tag> tags);
 
     WorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+
+    UpdateParameterResultDTO updateWorkflowParameter(
+        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
 }

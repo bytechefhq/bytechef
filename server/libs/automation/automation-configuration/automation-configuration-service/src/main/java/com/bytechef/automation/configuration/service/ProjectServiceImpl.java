@@ -16,14 +16,12 @@
 
 package com.bytechef.automation.configuration.service;
 
-import com.bytechef.automation.configuration.constant.ProjectErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.configuration.exception.ConfigurationException;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -45,23 +43,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void addVersion(long id, List<String> duplicatedVersionWorkflowIds) {
+    public int addVersion(long id) {
         Project project = getProject(id);
 
-        project.addVersion(duplicatedVersionWorkflowIds);
+        int newVersion = project.addVersion();
 
         projectRepository.save(project);
-    }
 
-    @Override
-    public Project addWorkflow(long id, String workflowId) {
-        Validate.notNull(workflowId, "'workflowId' must not be null");
-
-        Project project = getProject(id);
-
-        project.addWorkflowId(workflowId);
-
-        return projectRepository.save(project);
+        return newVersion;
     }
 
     @Override
@@ -146,20 +135,6 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = getProject(id);
 
         project.publish(description);
-
-        projectRepository.save(project);
-    }
-
-    @Override
-    public void removeWorkflow(long id, String workflowId) {
-        Project project = getProject(id);
-
-        if (CollectionUtils.count(project.getWorkflowIds(project.getLastVersion())) == 1) {
-            throw new ConfigurationException(
-                "The last workflow cannot be deleted", ProjectErrorType.REMOVE_WORKFLOW);
-        }
-
-        project.removeWorkflow(workflowId);
 
         projectRepository.save(project);
     }

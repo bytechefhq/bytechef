@@ -14,26 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.workflow.execution.web.rest;
+package com.bytechef.platform.configuration.dto;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 
-/**
- * @author Ivica Cardic
- */
-@Disabled
-@WebMvcTest(value = WorkflowExecutionApiController.class)
-public class WorkflowExecutionApiControllerIntTest {
-
-    @Test
-    public void testGetProjectWorkflowExecution() {
-// TODO
-    }
-
-    @Test
-    public void testSearchProjectWorkflowExecutions() {
-// TODO
-    }
+@SuppressFBWarnings("EI")
+public record UpdateParameterResultDTO(Map<String, Boolean> displayConditionMap, Map<String, ?> parameterMap) {
 }

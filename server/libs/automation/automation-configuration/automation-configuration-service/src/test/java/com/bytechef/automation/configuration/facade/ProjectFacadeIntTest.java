@@ -25,8 +25,11 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
@@ -68,6 +71,9 @@ public class ProjectFacadeIntTest {
     private ProjectRepository projectRepository;
 
     @Autowired
+    private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @Autowired
     TagRepository tagRepository;
 
     @Autowired
@@ -75,6 +81,7 @@ public class ProjectFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
 
         categoryRepository.deleteAll();
@@ -89,12 +96,12 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        Workflow workflow = projectFacade.addWorkflow(
+        WorkflowDTO workflow = projectFacade.addWorkflow(
             Validate.notNull(project.getId(), "id"),
             "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
-        assertThat(workflow.getDescription()).isEqualTo("Description");
-        assertThat(workflow.getLabel()).isEqualTo("New Workflow");
+        assertThat(workflow.description()).isEqualTo("Description");
+        assertThat(workflow.label()).isEqualTo("New Workflow");
     }
 
     @Test
@@ -115,22 +122,9 @@ public class ProjectFacadeIntTest {
         assertThat(projectDTO.name()).isEqualTo("name1");
         assertThat(projectDTO.id()).isNotNull();
         assertThat(projectDTO.tags()).hasSize(1);
-        assertThat(projectDTO.workflowIds()).hasSize(1);
+        assertThat(projectDTO.projectWorkflowIds()).hasSize(1);
         assertThat(categoryRepository.count()).isEqualTo(1);
         assertThat(tagRepository.count()).isEqualTo(1);
-
-        projectDTO = ProjectDTO.builder()
-            .category(new Category("name"))
-            .description("description")
-            .name("name2")
-            .tags(List.of(new Tag("tag1")))
-            .workflowIds(List.of("workflow2"))
-            .build();
-
-        projectDTO = projectFacade.createProject(projectDTO);
-
-        assertThat(projectDTO.workflowIds()).hasSize(1);
-        assertThat(projectDTO.workflowIds()).contains("workflow2");
     }
 
     @Test
@@ -265,14 +259,16 @@ public class ProjectFacadeIntTest {
         Project project = new Project();
 
         project.setName("name");
-        project.addWorkflowId(Validate.notNull(workflow.getId(), "id"));
 
         project = projectRepository.save(project);
 
-        List<Workflow> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
+        projectWorkflowRepository.save(
+            new ProjectWorkflow(project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id")));
+
+        List<WorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 
         List<String> ids = workflows.stream()
-            .map(Workflow::getId)
+            .map(WorkflowDTO::id)
             .toList();
 
         assertThat(ids).contains(workflow.getId());
@@ -288,13 +284,13 @@ public class ProjectFacadeIntTest {
         projectDTO = projectFacade.createProject(projectDTO);
 
         assertThat(projectDTO.tags()).hasSize(2);
-        assertThat(projectDTO.workflowIds()).hasSize(1);
+        assertThat(projectDTO.projectWorkflowIds()).hasSize(1);
 
         projectDTO = ProjectDTO.builder()
             .id(projectDTO.id())
             .name("name")
             .tags(List.of(new Tag("tag1")))
-            .workflowIds(projectDTO.workflowIds())
+            .projectWorkflowIds(projectDTO.projectWorkflowIds())
             .build();
 
         projectDTO = projectFacade.updateProject(projectDTO);

@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -81,6 +82,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
+    private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerExecutionService triggerExecutionService;
@@ -94,9 +96,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ConnectionService connectionService, InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService,
         JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerDefinitionService triggerDefinitionService,
-        TriggerExecutionService triggerExecutionService, TriggerLifecycleFacade triggerLifecycleFacade,
-        @Value("${bytechef.webhook-url}") String webhookUrl,
+        ProjectWorkflowService projectWorkflowService, TagService tagService,
+        TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
+        TriggerLifecycleFacade triggerLifecycleFacade, @Value("${bytechef.webhook-url}") String webhookUrl,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
@@ -107,6 +109,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
+        this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
@@ -264,9 +267,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     public ProjectInstanceDTO getProjectInstance(long id) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
-        Project project = projectService.getProject(projectInstance.getProjectId());
-
-        List<String> workflowIds = project.getWorkflowIds(projectInstance.getProjectVersion());
+        List<String> workflowIds = projectWorkflowService.getWorkflowIds(
+            projectInstance.getProjectId(), projectInstance.getProjectVersion());
 
         return new ProjectInstanceDTO(
             projectInstance,
@@ -314,7 +316,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 Project project = CollectionUtils.getFirst(
                     projects, curProject -> Objects.equals(curProject.getId(), projectInstance.getProjectId()));
 
-                List<String> workflowIds = project.getWorkflowIds(projectInstance.getProjectVersion());
+                List<String> workflowIds = projectWorkflowService.getWorkflowIds(
+                    projectInstance.getProjectId(), projectInstance.getProjectVersion());
 
                 return new ProjectInstanceDTO(
                     projectInstance,

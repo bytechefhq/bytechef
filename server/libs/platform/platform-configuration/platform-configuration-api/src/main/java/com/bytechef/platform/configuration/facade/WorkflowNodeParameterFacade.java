@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import java.util.Map;
 
 /**
@@ -27,13 +27,9 @@ public interface WorkflowNodeParameterFacade {
     Map<String, ?> deleteParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex);
 
-    @SuppressWarnings("unchecked")
     Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName);
 
-    UpdateParameterResult updateParameter(
+    UpdateParameterResultDTO updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
 
-    @SuppressFBWarnings("EI")
-    record UpdateParameterResult(Map<String, Boolean> displayConditionMap, Map<String, ?> parameterMap) {
-    }
 }

@@ -33,6 +33,7 @@ import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -121,7 +122,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     @SuppressWarnings("unchecked")
-    public UpdateParameterResult updateParameter(
+    public UpdateParameterResultDTO updateParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -156,7 +157,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
             workflow.getVersion());
 
-        return new UpdateParameterResult(displayConditionMap, result.parameterMap);
+        return new UpdateParameterResultDTO(displayConditionMap, result.parameterMap);
     }
 
     // For now only check the first, root level of properties on which other properties could depend on

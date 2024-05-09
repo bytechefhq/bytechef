@@ -21,7 +21,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
@@ -125,18 +124,6 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
                         projectVersion.version, projectVersion.status, projectVersion.publishedDate,
                         projectVersion.description))
                     .toList());
-
-            project.setProjectWorkflows(
-                jdbcClient
-                    .sql(
-                        "SELECT project_workflow.workflow_id, project_workflow.project_version FROM project_workflow WHERE project_id = ?")
-                    .param(project.getId())
-                    .query(ProjectWorkflow.class)
-                    .list()
-                    .stream()
-                    .map(projectVersion -> new com.bytechef.automation.configuration.domain.ProjectWorkflow(
-                        projectVersion.workflow_id, projectVersion.project_version))
-                    .collect(Collectors.toSet()));
         }
 
         return projects;

@@ -29,16 +29,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.configuration.web.rest.CategoryApiController")
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class CategoryApiController implements CategoryApi {
+public class ProjectCategoryApiController implements CategoryApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI")
-    public CategoryApiController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectCategoryApiController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }

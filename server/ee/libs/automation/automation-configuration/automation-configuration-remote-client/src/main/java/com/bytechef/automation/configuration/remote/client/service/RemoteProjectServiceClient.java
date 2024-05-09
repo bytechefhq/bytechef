@@ -37,12 +37,7 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public void addVersion(long id, List<String> duplicatedVersionWorkflowIds) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Project addWorkflow(long id, String workflowId) {
+    public int addVersion(long id) {
         throw new UnsupportedOperationException();
     }
 
@@ -128,11 +123,6 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public void publishProject(long id, String description) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void removeWorkflow(long id, String workflowId) {
         throw new UnsupportedOperationException();
     }
 

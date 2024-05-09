@@ -71,15 +71,6 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    public void testAddWorkflow() {
-        Project project = projectRepository.save(getProject());
-
-        project = projectService.addWorkflow(Validate.notNull(project.getId(), "id"), "workflow2");
-
-        assertThat(project.getWorkflowIds(project.getLastVersion())).contains("workflow2");
-    }
-
-    @Test
     public void testCreate() {
         Project project = getProject();
 
@@ -93,8 +84,7 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("categoryId", category.getId())
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")))
-            .hasFieldOrPropertyWithValue("allWorkflowIds", List.of("workflow1"));
+            .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")));
     }
 
     @Test
@@ -154,7 +144,6 @@ public class ProjectServiceIntTest {
         project.setDescription("description2");
         project.setName("name2");
         project.setTagIds(List.of(tag.getId()));
-        project.addWorkflowId("workflow2");
 
         project = projectService.update(project);
 
@@ -164,7 +153,6 @@ public class ProjectServiceIntTest {
         project.setDescription("description2");
         project.setName("name2");
         project.setTagIds(List.of(tag.getId()));
-        project.addWorkflowId("workflow2");
 
         project = projectService.update(project);
 
@@ -172,8 +160,7 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("categoryId", category2.getId())
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
-            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
-            .hasFieldOrPropertyWithValue("allWorkflowIds", List.of("workflow1"));
+            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()));
     }
 
     private Project getProject() {
@@ -181,7 +168,6 @@ public class ProjectServiceIntTest {
             .categoryId(category.getId())
             .description("description")
             .name("name")
-            .workflowIds(List.of("workflow1"))
             .build();
     }
 }

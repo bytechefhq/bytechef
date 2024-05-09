@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.repository;
+package com.bytechef.automation.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jdbc.repository.query.Modifying;
-import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
 @Repository
-public interface WorkflowTestConfigurationRepository extends ListCrudRepository<WorkflowTestConfiguration, Long> {
+public interface ProjectWorkflowRepository
+    extends ListCrudRepository<ProjectWorkflow, Long> {
 
-    Optional<WorkflowTestConfiguration> findByWorkflowId(String workflowId);
+    int countByProjectIdAndProjectVersion(long projectId, int projectVersion);
 
-    @Modifying
-    @Query("UPDATE workflow_test_configuration SET workflow_id = :newWorkflowId WHERE workflow_id = :oldWorkflowId")
-    void updateWorkflowId(@Param("oldWorkflowId") String oldWorkflowId, @Param("newWorkflowId") String newWorkflowId);
+    List<ProjectWorkflow> findAllByProjectId(Long projectId);
+
+    List<ProjectWorkflow> findAllByProjectIdAndProjectVersion(Long projectId, int projectVersion);
+
+    Optional<ProjectWorkflow> findByProjectIdAndProjectVersionAndWorkflowId(
+        long projectId, int projectVersion, String workflowId);
+
+    Optional<ProjectWorkflow> findByWorkflowId(String workflowId);
 }

@@ -19,12 +19,10 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.web.rest.model.WorkflowBasicModel;
+import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.platform.configuration.web.rest.util.WorkflowApiControllerUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -44,24 +42,21 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.configuration.web.rest.WorkflowApiController")
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class WorkflowApiController implements WorkflowApi {
+public class ProjectWorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
-    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowApiController(
-        ConversionService conversionService, ProjectFacade projectFacade, WorkflowFacade workflowFacade,
-        WorkflowService workflowService) {
+    public ProjectWorkflowApiController(
+        ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
 
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
-        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
     }
 
@@ -109,6 +104,12 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
+    public ResponseEntity<WorkflowModel> getProjectWorkflow(Long projectWorkflowId) {
+        return ResponseEntity.ok(
+            conversionService.convert(projectFacade.getProjectWorkflow(projectWorkflowId), WorkflowModel.class));
+    }
+
+    @Override
     public ResponseEntity<List<WorkflowBasicModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
             CollectionUtils.map(
@@ -128,7 +129,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         // TODO Add check regarding platform type
 
-        return WorkflowApiControllerUtils.getWorkflow(id, conversionService, workflowFacade);
+        return ResponseEntity.ok(conversionService.convert(projectFacade.getProjectWorkflow(id), WorkflowModel.class));
     }
 
     @Override

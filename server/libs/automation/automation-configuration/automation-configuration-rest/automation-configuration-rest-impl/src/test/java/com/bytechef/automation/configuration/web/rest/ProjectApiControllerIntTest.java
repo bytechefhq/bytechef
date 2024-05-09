@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
@@ -177,7 +178,7 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            Workflow workflow = new Workflow("workflow1", "{}", Format.JSON);
+            WorkflowDTO workflow = new WorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), 0);
 
             when(projectFacade.getProjectWorkflows(1L))
                 .thenReturn(List.of(workflow));
@@ -302,7 +303,7 @@ public class ProjectApiControllerIntTest {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-        Workflow workflow = new Workflow("id", definition, Format.JSON);
+        WorkflowDTO workflow = new WorkflowDTO(new Workflow("id", definition, Format.JSON), 0);
 
         when(projectFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);
@@ -321,7 +322,7 @@ public class ProjectApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
+                .isEqualTo(Validate.notNull(workflow.id(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {
@@ -346,7 +347,7 @@ public class ProjectApiControllerIntTest {
             .id(1L)
             .name("name2")
             .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
-            .workflowIds(List.of("workflow1"))
+            .projectWorkflowIds(List.of(1L))
             .build();
         ProjectModel projectModel = new ProjectModel()
             .id(1L)
@@ -372,8 +373,8 @@ public class ProjectApiControllerIntTest {
                 .isEqualTo(projectDTO.description())
                 .jsonPath("$.name")
                 .isEqualTo("name2")
-                .jsonPath("$.workflowIds[0]")
-                .isEqualTo("workflow1");
+                .jsonPath("$.projectWorkflowIds[0]")
+                .isEqualTo(1L);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -416,7 +417,7 @@ public class ProjectApiControllerIntTest {
             .id(1L)
             .name("name")
             .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
-            .workflowIds(List.of("workflow1"))
+            .projectWorkflowIds(List.of(1L))
             .build();
     }
 

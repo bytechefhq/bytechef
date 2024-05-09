@@ -28,10 +28,12 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -62,7 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
+public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -72,6 +74,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
+    private final ProjectWorkflowService projectWorkflowService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final TriggerExecutionService triggerExecutionService;
@@ -79,11 +82,12 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowExecutionFacadeImpl(
+    public ProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
         JobService jobService, InstanceJobService instanceJobService, ProjectFacade projectFacade,
         ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         WorkflowService workflowService) {
 
@@ -95,6 +99,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
+        this.projectWorkflowService = projectWorkflowService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.triggerExecutionService = triggerExecutionService;
@@ -138,12 +143,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         if (workflowId != null) {
             workflowIds.add(workflowId);
         } else if (projectId != null) {
-            Project project = projectService.getProject(projectId);
-
-            workflowIds.addAll(project.getAllWorkflowIds());
+            workflowIds.addAll(projectWorkflowService.getWorkflowIds(projectId));
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(projectFacade.getProjectWorkflows(), Workflow::getId));
+                CollectionUtils.map(projectFacade.getProjectWorkflows(), WorkflowDTO::id));
         }
 
         Page<WorkflowExecution> workflowExecutionPage;
@@ -172,7 +175,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                 Validate.notNull(job.getId(), "id"),
                 CollectionUtils.getFirst(
                     projects,
-                    project -> CollectionUtils.contains(project.getAllWorkflowIds(), job.getWorkflowId())),
+                    project -> CollectionUtils.contains(
+                        projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
                 OptionalUtils.map(
                     instanceJobService.fetchJobInstanceId(job.getId(), Type.AUTOMATION),
                     projectInstanceService::getProjectInstance),

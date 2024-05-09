@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.dto;
+package com.bytechef.automation.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,14 +30,30 @@ import java.util.List;
 public record WorkflowDTO(
     String createdBy, LocalDateTime createdDate, String definition, String description, Workflow.Format format,
     String id, List<Workflow.Input> inputs, String label, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    List<Workflow.Output> outputs, Workflow.SourceType sourceType, int maxRetries, List<WorkflowTaskDTO> tasks,
-    List<WorkflowTriggerDTO> triggers, int version, Workflow workflow) {
+    List<Workflow.Output> outputs, long projectWorkflowId, Workflow.SourceType sourceType, int maxRetries,
+    List<WorkflowTaskDTO> tasks, List<WorkflowTriggerDTO> triggers, int version, Workflow workflow) {
 
-    public WorkflowDTO(Workflow workflow, List<WorkflowTaskDTO> tasks, List<WorkflowTriggerDTO> triggers) {
+    public WorkflowDTO(Workflow workflow, long projectWorkflowId) {
         this(
             workflow.getCreatedBy(), workflow.getCreatedDate(), workflow.getDefinition(), workflow.getDescription(),
             workflow.getFormat(), workflow.getId(), workflow.getInputs(), workflow.getLabel(),
             workflow.getLastModifiedBy(), workflow.getLastModifiedDate(), workflow.getOutputs(),
-            workflow.getSourceType(), workflow.getMaxRetries(), tasks, triggers, workflow.getVersion(), workflow);
+            projectWorkflowId, workflow.getSourceType(), workflow.getMaxRetries(),
+            workflow.getAllTasks()
+                .stream()
+                .map(workflowTask -> new WorkflowTaskDTO(workflowTask, List.of(), null))
+                .toList(),
+            List.of(), workflow.getVersion(), workflow);
+    }
+
+    public WorkflowDTO(
+        com.bytechef.platform.configuration.dto.WorkflowDTO workflowDTO, long projectWorkflowId) {
+
+        this(
+            workflowDTO.createdBy(), workflowDTO.createdDate(), workflowDTO.definition(), workflowDTO.description(),
+            workflowDTO.format(), workflowDTO.id(), workflowDTO.inputs(), workflowDTO.label(),
+            workflowDTO.lastModifiedBy(), workflowDTO.lastModifiedDate(), workflowDTO.outputs(),
+            projectWorkflowId, workflowDTO.sourceType(), workflowDTO.maxRetries(), workflowDTO.tasks(),
+            workflowDTO.triggers(), workflowDTO.version(), workflowDTO.workflow());
     }
 }

@@ -95,7 +95,6 @@ public class ProjectRepositoryIntTest {
         return Project.builder()
             .description("description")
             .name("name")
-            .workflowIds(workflowIds)
             .build();
     }
 }

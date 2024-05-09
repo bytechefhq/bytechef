@@ -26,10 +26,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -83,9 +81,6 @@ public final class Project {
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectVersion> projectVersions = new HashSet<>();
 
-    @MappedCollection(idColumn = "project_id")
-    private Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
-
     @Version
     private int version;
 
@@ -96,8 +91,7 @@ public final class Project {
     @PersistenceCreator
     public Project(
         AggregateReference<Category, Long> categoryId, String description, Long id, String name,
-        Set<ProjectTag> projectTags, Set<ProjectVersion> projectVersions, Set<ProjectWorkflow> projectWorkflows,
-        int version) {
+        Set<ProjectTag> projectTags, Set<ProjectVersion> projectVersions, int version) {
 
         this.categoryId = categoryId;
         this.description = description;
@@ -105,7 +99,6 @@ public final class Project {
         this.name = name;
         this.projectTags.addAll(projectTags);
         this.projectVersions.addAll(projectVersions);
-        this.projectWorkflows.addAll(projectWorkflows);
         this.version = version;
     }
 
@@ -113,26 +106,14 @@ public final class Project {
         return new Builder();
     }
 
-    public void addVersion(List<String> duplicatedVersionWorkflowIds) {
+    public int addVersion() {
         ProjectVersion projectVersion = getLastProjectVersion();
 
         int newVersion = projectVersion.getVersion() + 1;
 
-        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
-            if (projectWorkflow.getProjectVersion() == projectVersion.getVersion()) {
-                projectWorkflow.setProjectVersion(newVersion);
-            }
-        }
-
         projectVersions.add(new ProjectVersion(newVersion));
 
-        for (String workflowId : duplicatedVersionWorkflowIds) {
-            projectWorkflows.add(new ProjectWorkflow(workflowId, projectVersion.getVersion()));
-        }
-    }
-
-    public void addWorkflowId(String workflowId) {
-        projectWorkflows.add(new ProjectWorkflow(workflowId, getLastVersion()));
+        return newVersion;
     }
 
     @Override
@@ -155,17 +136,17 @@ public final class Project {
         return getClass().hashCode();
     }
 
-    public List<String> getAllWorkflowIds() {
-        return CollectionUtils.map(projectWorkflows, ProjectWorkflow::getWorkflowId);
-    }
-
-    public Map<Integer, List<String>> getAllWorkflowIdMap() {
-        return projectWorkflows.stream()
-            .collect(Collectors.groupingBy(
-                ProjectWorkflow::getProjectVersion,
-                Collectors.collectingAndThen(
-                    Collectors.toList(), list -> CollectionUtils.map(list, ProjectWorkflow::getWorkflowId))));
-    }
+//    public List<String> getAllWorkflowIds() {
+//        return CollectionUtils.map(projectWorkflows, ProjectWorkflow::getWorkflowId);
+//    }
+//
+//    public Map<Integer, List<String>> getAllWorkflowIdMap() {
+//        return projectWorkflows.stream()
+//            .collect(Collectors.groupingBy(
+//                ProjectWorkflow::getProjectVersion,
+//                Collectors.collectingAndThen(
+//                    Collectors.toList(), list -> CollectionUtils.map(list, ProjectWorkflow::getWorkflowId))));
+//    }
 
     public Long getCategoryId() {
         return categoryId == null ? null : categoryId.getId();
@@ -232,16 +213,6 @@ public final class Project {
         return version;
     }
 
-    public List<String> getWorkflowIds(int projectVersion) {
-        Map<Integer, List<String>> workflowIdMap = getAllWorkflowIdMap();
-
-        if (workflowIdMap.containsKey(projectVersion)) {
-            return workflowIdMap.get(projectVersion);
-        } else {
-            return List.of();
-        }
-    }
-
     public boolean isPublished() {
         return projectVersions.stream()
             .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
@@ -253,13 +224,6 @@ public final class Project {
         projectVersion.setDescription(description);
         projectVersion.setPublishedDate(LocalDateTime.now());
         projectVersion.setStatus(Status.PUBLISHED);
-    }
-
-    public void removeWorkflow(String workflowId) {
-        projectWorkflows.stream()
-            .filter(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId))
-            .findFirst()
-            .ifPresent(projectWorkflows::remove);
     }
 
     public void setCategory(Category category) {
@@ -288,9 +252,9 @@ public final class Project {
         this.projectVersions = new HashSet<>(projectVersions);
     }
 
-    public void setProjectWorkflows(Set<ProjectWorkflow> projectWorkflows) {
-        this.projectWorkflows = new HashSet<>(projectWorkflows);
-    }
+//    public void setProjectWorkflows(Set<ProjectWorkflow> projectWorkflows) {
+//        this.projectWorkflows = new HashSet<>(projectWorkflows);
+//    }
 
     public void setTagIds(List<Long> tagIds) {
         this.projectTags = new HashSet<>();
@@ -336,7 +300,6 @@ public final class Project {
         private String name;
         private List<Long> tagIds;
         private int version;
-        private List<String> workflowIds = List.of();
 
         private Builder() {
         }
@@ -371,12 +334,6 @@ public final class Project {
             return this;
         }
 
-        public Builder workflowIds(List<String> workflowIds) {
-            this.workflowIds = workflowIds;
-
-            return this;
-        }
-
         public Project build() {
             Project project = new Project();
 
@@ -389,8 +346,6 @@ public final class Project {
             project.setName(name);
             project.setTagIds(tagIds);
             project.setVersion(version);
-
-            workflowIds.forEach(project::addWorkflowId);
 
             return project;
         }
