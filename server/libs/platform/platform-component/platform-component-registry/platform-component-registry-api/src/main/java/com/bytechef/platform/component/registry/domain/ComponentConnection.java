@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.component.registry.domain;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.definition.ParameterConnection;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
@@ -41,6 +43,11 @@ public record ComponentConnection(
     @Override
     public Map<String, ?> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public <T> T getParameter(String key) {
+        return MapUtils.get(parameters, key, new TypeReference<>() {});
     }
 
     @Override
