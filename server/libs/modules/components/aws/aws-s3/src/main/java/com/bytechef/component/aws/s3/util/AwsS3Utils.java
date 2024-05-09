@@ -36,7 +36,7 @@ public class AwsS3Utils {
     public static S3Client buildS3Client(Parameters connectionParameters) {
         S3ClientBuilder builder = S3Client.builder()
             .credentialsProvider(getCredentialsProvider(connectionParameters))
-            .region(Region.of(connectionParameters.getRequiredString(REGION)));
+            .region(Region.of(connectionParameters.getString(REGION, "eu-north-1")));
 
         return builder.build();
     }
