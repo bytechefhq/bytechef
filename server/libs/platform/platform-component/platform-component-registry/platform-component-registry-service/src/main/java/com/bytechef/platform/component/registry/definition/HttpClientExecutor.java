@@ -92,16 +92,17 @@ public class HttpClientExecutor {
 
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
-        Configuration configuration, RequestMethod requestMethod, String componentName, ComponentConnection connection,
+        Configuration configuration, RequestMethod requestMethod, String componentName,
+        ComponentConnection componentConnection,
         Context context) throws Exception {
 
         HttpResponse<?> httpResponse;
 
         try (HttpClient httpClient = createHttpClient(
-            headers, queryParameters, configuration, componentName, connection, context)) {
+            headers, queryParameters, configuration, componentName, componentConnection, context)) {
 
             HttpRequest httpRequest = createHTTPRequest(
-                urlString, requestMethod, headers, queryParameters, body, componentName, connection, context);
+                urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context);
 
             if (logger.isDebugEnabled()) {
                 logger.debug(
@@ -159,7 +160,7 @@ public class HttpClientExecutor {
 
     HttpClient createHttpClient(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
-        String componentName, ComponentConnection connection, Context context) {
+        String componentName, ComponentConnection componentConnection, Context context) {
 
         Methanol.Builder builder = Methanol.newBuilder()
             .version(HttpClient.Version.HTTP_1_1);
@@ -179,7 +180,7 @@ public class HttpClientExecutor {
         }
 
         if (!configuration.isDisableAuthorization()) {
-            applyAuthorization(headers, queryParameters, componentName, connection, context);
+            applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
         }
 
         if (configuration.isFollowRedirect()) {
@@ -209,7 +210,8 @@ public class HttpClientExecutor {
 
     HttpRequest createHTTPRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Body body, String componentName, ComponentConnection connection,
+        Map<String, List<String>> queryParameters, Body body, String componentName,
+        ComponentConnection componentConnection,
         Context context) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest
@@ -224,7 +226,7 @@ public class HttpClientExecutor {
 
         httpRequestBuilder.uri(
             createURI(
-                getConnectionUrl(urlString, componentName, connection, context),
+                getConnectionUrl(urlString, componentName, componentConnection, context),
                 queryParameters == null ? Collections.emptyMap() : queryParameters));
 
         return httpRequestBuilder.build();
@@ -273,20 +275,18 @@ public class HttpClientExecutor {
 
     private void applyAuthorization(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, String componentName,
-        ComponentConnection connection, Context context) {
+        ComponentConnection componentConnection, Context context) {
 
-        if (connection != null) {
-            if (Objects.equals(connection.getAuthorizationName(), "none")) {
-                return;
-            }
+        if ((componentConnection == null) || Objects.equals(componentConnection.getAuthorizationName(), "none")) {
+            return;
+        }
 
-            ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
-                componentName, connection, context);
+        ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
+            componentName, componentConnection, context);
 
-            if (applyResponse != null) {
-                headers.putAll(applyResponse.getHeaders());
-                queryParameters.putAll(applyResponse.getQueryParameters());
-            }
+        if (applyResponse != null) {
+            headers.putAll(applyResponse.getHeaders());
+            queryParameters.putAll(applyResponse.getQueryParameters());
         }
     }
 
@@ -312,13 +312,13 @@ public class HttpClientExecutor {
     }
 
     private String getConnectionUrl(
-        String urlString, String componentName, ComponentConnection connection, Context context) {
+        String urlString, String componentName, ComponentConnection componentConnection, Context context) {
 
-        if (urlString.startsWith("http://") || urlString.startsWith("https://") || connection == null) {
+        if (urlString.startsWith("http://") || urlString.startsWith("https://") || componentConnection == null) {
             return urlString;
         } else {
             return OptionalUtils.map(
-                connectionDefinitionService.executeBaseUri(componentName, connection, context),
+                connectionDefinitionService.executeBaseUri(componentName, componentConnection, context),
                 baseUri -> baseUri + urlString);
         }
     }
