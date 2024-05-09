@@ -154,11 +154,6 @@ public class JobServiceImpl implements JobService {
         return jobRepository.save(job);
     }
 
-    @Override
-    public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
-        jobRepository.updateWorkflowId(curWorkflowId, newWorkflowId);
-    }
-
     private static boolean isRestartable(Job job) {
         return job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.FAILED;
     }

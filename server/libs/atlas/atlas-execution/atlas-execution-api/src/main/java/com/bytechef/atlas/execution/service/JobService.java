@@ -51,6 +51,4 @@ public interface JobService {
     Job setStatusToStopped(long id);
 
     Job update(Job job);
-
-    void updateWorkflowId(String curWorkflowId, String newWorkflowId);
 }

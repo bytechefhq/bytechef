@@ -136,11 +136,6 @@ public class RemoteJobServiceClient implements JobService {
             job, Job.class);
     }
 
-    @Override
-    public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
-        throw new UnsupportedOperationException();
-    }
-
     private record JobCreateRequest(JobParameters jobParameters, Workflow workflow) {
     }
 }

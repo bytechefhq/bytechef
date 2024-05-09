@@ -126,9 +126,4 @@ public class InMemoryJobRepository implements JobRepository {
 
         return job;
     }
-
-    @Override
-    public void updateWorkflowId(String curWorkflowId, String newWorkflowId) {
-        throw new UnsupportedOperationException();
-    }
 }
