@@ -17,17 +17,18 @@
 package com.bytechef.component.aws.s3.connection;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
-import static com.bytechef.component.definition.ComponentDSL.connection;
-import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.*;
 
 import com.bytechef.component.aws.s3.constant.AwsS3Constants;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 public class AwsS3Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .properties(
+        .authorizations(
+            authorization(Authorization.AuthorizationType.CUSTOM.toLowerCase(), Authorization.AuthorizationType.CUSTOM)
+                .properties(
             string(AwsS3Constants.ACCESS_KEY_ID)
                 .label("Access Key ID")
                 .required(true),
@@ -69,5 +70,5 @@ public class AwsS3Connection {
                 .defaultValue("us-east-1"),
             string(BUCKET_NAME)
                 .label("Bucket")
-                .required(true));
+                .required(true)));
 }
