@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -94,22 +95,22 @@ public final class ResendSendEmailAction {
                 .description("Reply-to email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),
-            string(CONTENT_TYPE)
+            integer(CONTENT_TYPE)
                 .label("Content type")
                 .options(
-                    option("HTML", HTML),
-                    option("Plain text", "text"))
-                .defaultValue(HTML)
+                    option("HTML", 1),
+                    option("Plain text", 2))
+                .defaultValue(1)
                 .required(true),
             string(HTML)
                 .label("HTML")
                 .description("The HTML version of the message.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, HTML))
+                .displayCondition("%s == %s".formatted(CONTENT_TYPE, 1))
                 .required(false),
             string(TEXT)
                 .label("Text")
                 .description("The plain text version of the message.")
-                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, "text"))
+                .displayCondition("%s == %s".formatted(CONTENT_TYPE, 2))
                 .required(false),
             object(HEADERS)
                 .label("Headers")
