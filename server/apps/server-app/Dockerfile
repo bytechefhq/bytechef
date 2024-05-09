@@ -1,5 +1,5 @@
 # docker/dockerfile:1
-FROM ghcr.io/graalvm/graalvm-community:21.0.2  AS bytechef-os-base
+FROM ghcr.io/graalvm/graalvm-community:21.0.2  AS bytechef-base
 
 ARG ARG_BUILD_HOME=server
 ARG ARG_APPLICATION_HOME=/opt/bytechef
@@ -25,4 +25,4 @@ ENTRYPOINT exec \
 
 EXPOSE 9555
 
-FROM bytechef-os-base AS bytechef-server
+FROM bytechef-base AS bytechef-server
