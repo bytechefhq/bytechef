@@ -50,7 +50,7 @@ components:
         credentialStatus:
           $ref: "#/components/schemas/CredentialStatus"
         environment:
-          $ref: '#/components/schemas/Environment'
+          $ref: '#/components/schemas/ConnectionEnvironment'
         id:
           description: "The id of a connection."
           type: "integer"
@@ -93,10 +93,11 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
-    Environment:
+    ConnectionEnvironment:
       description: "The environment of a connection."
       type: "string"
       enum:
+        - "DEVELOPMENT"
         - "TEST"
         - "PRODUCTION"
     Tag:
