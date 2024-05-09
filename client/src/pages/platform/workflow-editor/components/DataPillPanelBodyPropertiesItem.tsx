@@ -92,7 +92,7 @@ const DataPillPanelBodyPropertiesItem = ({
                                         />
 
                                         {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                                            <div className="flex-1 text-xs text-muted-foreground">
+                                            <div className="flex-1 overflow-hidden truncate text-xs text-muted-foreground">
                                                 {value === true ? 'true' : value === false ? false : value}
                                             </div>
                                         )}
