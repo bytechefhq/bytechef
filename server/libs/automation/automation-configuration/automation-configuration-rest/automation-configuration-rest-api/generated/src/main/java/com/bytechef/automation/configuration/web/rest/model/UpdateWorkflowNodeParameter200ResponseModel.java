@@ -1,4 +1,4 @@
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-03T12:40:20.184626+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:18:06.491822+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class UpdateWorkflowNodeParameter200ResponseModel {
 
   @Valid

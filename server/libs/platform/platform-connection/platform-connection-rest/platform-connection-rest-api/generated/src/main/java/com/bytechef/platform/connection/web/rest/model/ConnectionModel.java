@@ -2,8 +2,8 @@ package com.bytechef.platform.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;
-import com.bytechef.platform.connection.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-06T08:24:19.316799+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-09T13:40:27.296394+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
 public class ConnectionModel {
 
   private Boolean active;
@@ -50,7 +50,7 @@ public class ConnectionModel {
 
   private CredentialStatusModel credentialStatus;
 
-  private EnvironmentModel environment;
+  private ConnectionEnvironmentModel environment;
 
   private Long id;
 
@@ -222,7 +222,7 @@ public class ConnectionModel {
     this.credentialStatus = credentialStatus;
   }
 
-  public ConnectionModel environment(EnvironmentModel environment) {
+  public ConnectionModel environment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -234,11 +234,11 @@ public class ConnectionModel {
   @Valid 
   @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
+  public ConnectionEnvironmentModel getEnvironment() {
     return environment;
   }
 
-  public void setEnvironment(EnvironmentModel environment) {
+  public void setEnvironment(ConnectionEnvironmentModel environment) {
     this.environment = environment;
   }
 
