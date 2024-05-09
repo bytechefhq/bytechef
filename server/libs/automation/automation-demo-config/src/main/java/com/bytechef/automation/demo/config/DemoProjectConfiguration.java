@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,16 +46,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class DemoProjectConfiguration {
 
     private final ProjectService projectService;
+    private final ProjectWorkflowService projectWorkflowService;
     private final ResourcePatternResolver resourcePatternResolver;
     private final TagService tagService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public DemoProjectConfiguration(
-        ProjectService projectService, ResourcePatternResolver resourcePatternResolver, TagService tagService,
-        WorkflowService workflowService) {
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        ResourcePatternResolver resourcePatternResolver, TagService tagService, WorkflowService workflowService) {
 
         this.projectService = projectService;
+        this.projectWorkflowService = projectWorkflowService;
         this.resourcePatternResolver = resourcePatternResolver;
         this.tagService = tagService;
         this.workflowService = workflowService;
@@ -79,7 +82,8 @@ public class DemoProjectConfiguration {
                     Workflow workflow = workflowService.create(
                         resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.JSON, SourceType.JDBC);
 
-                    projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
+                    projectWorkflowService.addWorkflow(
+                        Validate.notNull(project.getId(), "id"), project.getLastVersion(), workflow.getId());
                 }
             }
         };
