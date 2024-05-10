@@ -24,6 +24,8 @@ interface WorkflowDataStateI {
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
+    reset: () => void;
+
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
 
@@ -42,6 +44,17 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
 
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
+
+            reset: () =>
+                set(() => ({
+                    componentActions: [],
+                    dataPills: [],
+                    workflow: {
+                        actionNames: [],
+                        componentNames: [],
+                        nodeNames: [],
+                    },
+                })),
 
             taskDispatcherDefinitions: [],
             setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>

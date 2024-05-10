@@ -14,6 +14,8 @@ import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import {RouterProvider} from 'react-router-dom';
 
+import useWorkflowDataStore from './pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from './pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {router} from './routes';
 
 window.MonacoEnvironment = {
@@ -43,6 +45,11 @@ function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
     const root = createRoot(container);
     const queryClient = new QueryClient();
+
+    router.subscribe(() => {
+        useWorkflowDataStore.getState().reset();
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+    });
 
     root.render(
         <React.StrictMode>
