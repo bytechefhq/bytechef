@@ -532,7 +532,11 @@ const Property = ({
 
         if (selectValue === '' || (selectValue === defaultValue && propertyParameterValue !== undefined)) {
             if (propertyParameterValue !== undefined) {
-                setSelectValue(propertyParameterValue.toString());
+                if (type === 'BOOLEAN') {
+                    setSelectValue(propertyParameterValue.toString());
+                } else {
+                    setSelectValue(propertyParameterValue);
+                }
             }
         }
 
