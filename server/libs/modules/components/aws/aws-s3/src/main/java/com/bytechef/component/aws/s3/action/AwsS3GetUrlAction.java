@@ -39,8 +39,9 @@ public class AwsS3GetUrlAction {
         .description("Get the url of an AWS S3 object.")
         .properties(
             string(KEY)
-                .label("Key")
-                .description("The object key.")
+                .label("Key or Entity Tag (Etag)")
+                .description("Key is most likely the name of the file.")
+                .placeholder("file.txt")
                 .required(true))
         .outputSchema(string())
         .perform(AwsS3GetUrlAction::perform);

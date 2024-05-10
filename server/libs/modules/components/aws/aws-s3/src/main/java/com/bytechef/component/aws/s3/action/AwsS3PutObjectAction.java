@@ -56,7 +56,8 @@ public class AwsS3PutObjectAction {
                 .required(true),
             string(KEY)
                 .label("Key")
-                .description("The object key.")
+                .description("Key is most likely the name of the file.")
+                .placeholder("file.txt")
                 .required(true),
             string(ACL)
                 .label("ACL")
