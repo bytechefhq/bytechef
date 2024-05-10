@@ -31,47 +31,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
-import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
-import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.petstore.PetstoreComponentHandler;
-import com.bytechef.encryption.Encryption;
-import com.bytechef.encryption.EncryptionKey;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.registry.config.ComponentRegistryConfiguration;
 import com.bytechef.platform.component.registry.config.JacksonConfiguration;
 import com.bytechef.platform.component.registry.definition.FileEntryImpl;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.registry.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.Type;
-import com.bytechef.platform.data.storage.service.DataStorageService;
-import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -84,45 +60,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@SpringBootTest(classes = ComponentRegistryConfiguration.class)
 @Import({
     JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
 })
 @WireMockTest(httpPort = 9999)
 public class OpenApiComponentTaskHandlerIntTest {
-
-    private static final FileStorageService FILE_STORAGE_SERVICE = new Base64FileStorageService();
-    private static final PetstoreComponentHandler PETSTORE_COMPONENT_HANDLER = new PetstoreComponentHandler() {
-
-        @Override
-        public ModifiableConnectionDefinition modifyConnection(
-            ModifiableConnectionDefinition modifiableConnectionDefinition) {
-
-            modifiableConnectionDefinition.baseUri((connectionParameters, context) -> "http://localhost:9999");
-
-            return modifiableConnectionDefinition;
-        }
-
-        @Override
-        public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
-            return modifiableActionDefinition.perform(
-                OpenApiComponentHandlerLoader.PERFORM_FUNCTION_FUNCTION.apply(modifiableActionDefinition));
-        }
-    };
 
     @Autowired
     private ConnectionRepository connectionRepository;
@@ -566,7 +516,8 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         openApiComponentTaskHandler = createOpenApiComponentHandler("uploadFile");
 
-        FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("data", "text.txt", "This is text");
+        FileEntry fileEntry = ComponentRegistryConfiguration.FILE_STORAGE_SERVICE.storeFileContent(
+            "data", "text.txt", "This is text");
 
         taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new FileEntryImpl(fileEntry)));
 
@@ -809,7 +760,8 @@ public class OpenApiComponentTaskHandlerIntTest {
 
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
-            actionName, actionDefinitionFacade, PETSTORE_COMPONENT_HANDLER);
+            actionName, actionDefinitionFacade,
+            ComponentRegistryConfiguration.PETSTORE_COMPONENT_HANDLER);
     }
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
@@ -829,79 +781,4 @@ public class OpenApiComponentTaskHandlerIntTest {
             .build();
     }
 
-    @ComponentScan(
-        basePackages = {
-            "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection",
-            "com.bytechef.liquibase.config"
-        })
-    @EnableAutoConfiguration
-    @Configuration
-    public static class OpenApiComponentTaskHandlerIntTestConfiguration {
-
-        @MockBean
-        DataStorageService dataStorageService;
-
-        @MockBean
-        InstanceAccessorRegistry instanceAccessorRegistry;
-
-        @MockBean
-        MessageBroker messageBroker;
-
-        @MockBean
-        OAuth2Service oAuth2Service;
-
-        @MockBean
-        TagService tagService;
-
-        @MockBean
-        WorkflowService workflowService;
-
-        @MockBean
-        WorkflowConnectionFacade workflowConnectionFacade;
-
-        @Bean
-        List<ComponentHandler> componentHandlers() {
-            return List.of(PETSTORE_COMPONENT_HANDLER);
-        }
-
-        @Bean
-        EncryptionKey encryptionKey() {
-            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-        }
-
-        @Bean
-        FileStorageService fileStorageService() {
-            return FILE_STORAGE_SERVICE;
-        }
-
-        @MockBean
-        WorkflowTestConfigurationService workflowTestConfigurationService;
-
-        @Bean
-        TaskFileStorage workflowFileStorage() {
-            return new TaskFileStorageImpl(new Base64FileStorageService());
-        }
-
-        @EnableJdbcRepositories(basePackages = "com.bytechef.platform.connection.repository")
-        public static class ConnectionIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
-
-            private final Encryption encryption;
-            private final ObjectMapper objectMapper;
-
-            @SuppressFBWarnings("EI2")
-            public ConnectionIntTestJdbcConfiguration(
-                Encryption encryption, @Qualifier("objectMapper") ObjectMapper objectMapper) {
-
-                this.encryption = encryption;
-                this.objectMapper = objectMapper;
-            }
-
-            @Override
-            protected List<?> userConverters() {
-                return Arrays.asList(
-                    new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
-                    new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
-            }
-        }
-    }
 }
