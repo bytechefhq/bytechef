@@ -3,7 +3,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ControlTypeModel} from '@/middleware/platform/configuration';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
-import {useWorkflowNodeDetailsPanelStore} from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';

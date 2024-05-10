@@ -24,7 +24,7 @@ import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getSubProperties from '../utils/getSubProperties';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentOperationSelect from './CurrentOperationSelect';

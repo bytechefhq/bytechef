@@ -18,7 +18,7 @@ import ConnectionDialog from 'pages/platform/connection/components/ConnectionDia
 import {useEffect, useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
-import {useWorkflowNodeDetailsPanelStore} from '../../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
 const ConnectionLabel = ({
     workflowConnection,

@@ -3,7 +3,7 @@ import {NodeType} from '@/types/types';
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 
-import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id']) {
     const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
