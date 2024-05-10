@@ -60,9 +60,11 @@ public class MicrosoftExcelClearWorksheetAction {
                 + getLastUsedRowIndex(inputParameters, context) + "')"
             : "usedRange(valuesOnly=true)";
 
-        context
-            .http(http -> http.post(BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) +
-                WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/" + range + "/clear"))
+        context.http(http -> http
+            .post(
+                BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) +
+                    WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/" + range +
+                    "/clear"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(
                 List.of("applyTo", "Contents")

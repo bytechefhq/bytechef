@@ -62,8 +62,8 @@ public class MicrosoftExcelFindRowByNumAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        List<Object> row =
-            getRowFromWorksheet(inputParameters, context, inputParameters.getRequiredInteger(ROW_NUMBER));
+        List<Object> row = getRowFromWorksheet(
+            inputParameters, context, inputParameters.getRequiredInteger(ROW_NUMBER));
 
         return getMapOfValuesForRow(inputParameters, context, row);
     }

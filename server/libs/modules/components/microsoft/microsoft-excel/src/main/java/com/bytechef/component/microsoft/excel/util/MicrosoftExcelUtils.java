@@ -128,6 +128,7 @@ public class MicrosoftExcelUtils {
                     .map(ignore -> integer)
                     .orElse(0);
             }
+
             return integer;
         }
 
@@ -223,6 +224,7 @@ public class MicrosoftExcelUtils {
                 }
             }
         }
+
         return options;
     }
 }
