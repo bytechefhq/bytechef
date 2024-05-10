@@ -10,7 +10,7 @@ import {FocusEventHandler, ReactNode, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-import {useWorkflowNodeDetailsPanelStore} from '../../../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 import type {OptionModel} from '@/middleware/platform/configuration';

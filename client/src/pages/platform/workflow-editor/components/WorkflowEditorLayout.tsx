@@ -13,7 +13,7 @@ import {ComponentType, UpdateWorkflowMutationType} from '@/types/types';
 import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import DataPillPanel from './DataPillPanel';
 import WorkflowEditor from './WorkflowEditor';
 
@@ -38,6 +38,9 @@ const WorkflowEditorLayout = ({
         setWorkflowNodeDetailsPanelOpen,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
+
+    // console.log('currentComponent: ', currentComponent);
+    // console.log('currentNodeName: ', currentNodeName);
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
