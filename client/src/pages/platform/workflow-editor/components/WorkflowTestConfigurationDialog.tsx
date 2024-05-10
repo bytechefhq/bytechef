@@ -177,7 +177,7 @@ const WorkflowTestConfigurationDialog = ({
         },
     });
 
-    const {formState, handleSubmit, register} = form;
+    const {control, formState, handleSubmit} = form;
 
     const inputs: WorkflowInputModel[] = workflow.inputs ?? [];
 
@@ -241,6 +241,7 @@ const WorkflowTestConfigurationDialog = ({
                                         <Label className="text-gray-500">Inputs</Label>
 
                                         <Properties
+                                            control={control}
                                             formState={formState}
                                             path="inputs"
                                             properties={inputs.map((input) => {
@@ -263,7 +264,6 @@ const WorkflowTestConfigurationDialog = ({
                                                     } as PropertyType;
                                                 }
                                             })}
-                                            register={register}
                                         />
                                     </div>
                                 )}

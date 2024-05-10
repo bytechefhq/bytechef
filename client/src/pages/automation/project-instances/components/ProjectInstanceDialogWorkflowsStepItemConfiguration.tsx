@@ -2,20 +2,19 @@ import {ProjectInstanceModel, WorkflowModel} from '@/middleware/automation/confi
 import {ControlTypeModel, PropertyTypeModel} from '@/middleware/platform/configuration';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {PropertyType} from '@/types/types';
-import {UseFormRegister} from 'react-hook-form';
 import {FieldValues} from 'react-hook-form/dist/types';
-import {FormState} from 'react-hook-form/dist/types/form';
+import {Control, FormState} from 'react-hook-form/dist/types/form';
 
 export interface ProjectInstanceDialogWorkflowsStepItemConfigurationProps {
+    control: Control<ProjectInstanceModel>;
     formState: FormState<FieldValues>;
-    register: UseFormRegister<ProjectInstanceModel>;
     workflow: WorkflowModel;
     workflowIndex: number;
 }
 
 const ProjectInstanceDialogWorkflowsStepItemConfiguration = ({
+    control,
     formState,
-    register,
     workflow,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowsStepItemConfigurationProps) => {
@@ -67,10 +66,10 @@ const ProjectInstanceDialogWorkflowsStepItemConfiguration = ({
 
     return properties?.length ? (
         <Properties
+            control={control}
             formState={formState}
             path={`projectInstanceWorkflows.${workflowIndex!}.inputs`}
             properties={properties}
-            register={register}
         />
     ) : (
         <p className="text-sm">No defined configuration inputs.</p>
