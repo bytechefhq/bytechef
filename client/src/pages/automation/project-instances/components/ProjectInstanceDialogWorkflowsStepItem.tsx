@@ -91,8 +91,8 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                         {workflow && (
                             <TabsContent className="mt-0" value="configuration">
                                 <ProjectInstanceDialogWorkflowsStepItemConfiguration
+                                    control={control}
                                     formState={formState}
-                                    register={register}
                                     workflow={workflow}
                                     workflowIndex={workflowIndex}
                                 />

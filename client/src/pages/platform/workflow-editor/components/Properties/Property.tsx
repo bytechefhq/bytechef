@@ -21,7 +21,7 @@ import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
-import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
+import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
@@ -45,24 +45,26 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
 ];
 
 interface PropertyProps {
-    operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    control?: Control<any, any>;
     customClassName?: string;
     formState?: FormState<FieldValues>;
     inputTypeSwitchButtonClassName?: string;
     objectName?: string;
+    operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     parameterValue?: any;
     path?: string;
     property: PropertyType;
-    register?: UseFormRegister<any>;
     showDeletePropertyButton?: boolean;
 }
 
 const Property = ({
     arrayIndex,
     arrayName,
+    control,
     customClassName,
     formState,
     inputTypeSwitchButtonClassName,
@@ -71,7 +73,6 @@ const Property = ({
     parameterValue,
     path = 'parameters',
     property,
-    register,
     showDeletePropertyButton = false,
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -420,7 +421,7 @@ const Property = ({
 
     // set default mentionInput state
     useEffect(() => {
-        if (register) {
+        if (control) {
             return;
         }
 
@@ -706,31 +707,96 @@ const Property = ({
 
                         {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
 
-                        {register && (isValidControlType || isNumericalInput) && (
-                            <PropertyInput
+                        {control && (isValidControlType || isNumericalInput) && (
+                            <Controller
+                                control={control}
                                 defaultValue={defaultValue}
-                                description={description}
-                                error={hasError}
-                                label={label}
-                                leadingIcon={typeIcon}
-                                placeholder={placeholder}
-                                required={required}
-                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                {...register(`${path}.${name}`, {
-                                    maxLength,
-                                    minLength,
-                                    required: required!,
-                                })}
+                                key={`${currentNode?.name}_${name}`}
+                                name={`${path}.${name}`}
+                                render={({field}) => (
+                                    <PropertyInput
+                                        description={description}
+                                        error={hasError}
+                                        label={label}
+                                        leadingIcon={typeIcon}
+                                        placeholder={placeholder}
+                                        required={required}
+                                        type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                        {...field}
+                                    />
+                                )}
                             />
                         )}
 
-                        {!register && (isValidControlType || isNumericalInput) && (
+                        {control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
+                            <Controller
+                                control={control}
+                                defaultValue={defaultValue}
+                                key={`${currentNode?.name}_${name}`}
+                                name={`${path}.${name}`}
+                                render={({field: {name, onChange}}) => (
+                                    <PropertySelect
+                                        description={description}
+                                        label={label}
+                                        leadingIcon={typeIcon}
+                                        name={name}
+                                        onValueChange={(value) => onChange(value)}
+                                        options={options as Array<SelectOptionType>}
+                                        value={selectValue}
+                                    />
+                                )}
+                            />
+                        )}
+
+                        {control && controlType === 'SELECT' && type === 'BOOLEAN' && (
+                            <Controller
+                                control={control}
+                                defaultValue={defaultValue}
+                                key={`${currentNode?.name}_${name}`}
+                                name={`${path}.${name}`}
+                                render={({field: {name, onChange}}) => (
+                                    <PropertySelect
+                                        description={description}
+                                        label={label}
+                                        leadingIcon={typeIcon}
+                                        name={name}
+                                        onValueChange={(value) => onChange(value)}
+                                        options={[
+                                            {label: 'True', value: 'true'},
+                                            {label: 'False', value: 'false'},
+                                        ]}
+                                    />
+                                )}
+                            />
+                        )}
+
+                        {control && controlType === 'TEXT_AREA' && (
+                            <Controller
+                                control={control}
+                                defaultValue={defaultValue}
+                                key={`${currentNode?.name}_${name}`}
+                                name={`${path}.${name}`}
+                                render={({field}) => (
+                                    <PropertyTextArea
+                                        description={description}
+                                        error={hasError}
+                                        label={label}
+                                        leadingIcon={typeIcon}
+                                        required={required}
+                                        {...field}
+                                    />
+                                )}
+                            />
+                        )}
+
+                        {!control && (isValidControlType || isNumericalInput) && (
                             <PropertyInput
                                 description={description}
                                 error={hasError}
                                 errorMessage={errorMessage}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
+                                key={`${currentNode?.name}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
                                 max={maxValue}
@@ -753,7 +819,7 @@ const Property = ({
                             />
                         )}
 
-                        {!register && (isValidControlType || isNumericalInput) && !!options?.length && (
+                        {!control && (isValidControlType || isNumericalInput) && !!options?.length && (
                             <PropertySelect
                                 description={description}
                                 key={`${currentNode?.name}_${name}`}
@@ -766,7 +832,7 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'SELECT' && type !== 'BOOLEAN' && (
+                        {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                             <PropertyComboBox
                                 arrayIndex={arrayIndex}
                                 description={description}
@@ -790,7 +856,7 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'SELECT' && type === 'BOOLEAN' && (
+                        {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
                             <PropertySelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
@@ -807,7 +873,7 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'TEXT_AREA' && (
+                        {!control && controlType === 'TEXT_AREA' && (
                             <PropertyTextArea
                                 description={description}
                                 error={hasError}

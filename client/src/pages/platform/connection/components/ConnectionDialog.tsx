@@ -102,7 +102,7 @@ const ConnectionDialog = ({
         },
     });
 
-    const {control, formState, getValues, handleSubmit, register, reset: formReset, setValue} = form;
+    const {control, formState, getValues, handleSubmit, reset: formReset, setValue} = form;
 
     const {
         data: componentDefinitions,
@@ -535,9 +535,9 @@ const ConnectionDialog = ({
 
                                 {showConnectionProperties && !!connectionDefinition.properties && (
                                     <Properties
+                                        control={control}
                                         formState={formState}
                                         properties={connectionDefinition?.properties}
-                                        register={register}
                                     />
                                 )}
 
@@ -593,9 +593,9 @@ const ConnectionDialog = ({
                                     !!authorizations?.length &&
                                     authorizations[0]?.properties && (
                                         <Properties
+                                            control={control}
                                             formState={formState}
                                             properties={authorizations[0]?.properties}
-                                            register={register}
                                         />
                                     )}
 
