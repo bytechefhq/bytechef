@@ -14,7 +14,6 @@
 .ql-editor {
     @apply break-all;
     @apply rounded-md;
-    @apply p-1.5;
     @apply text-sm;
     @apply leading-6;
     @apply focus:outline-none;
@@ -67,7 +66,6 @@
 .property-mention {
     @apply inline-flex;
     @apply items-center;
-    @apply h-[24px];
 }
 
 .property-mention > span {
