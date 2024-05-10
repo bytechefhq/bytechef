@@ -20,11 +20,13 @@ interface WorkflowNodeDetailsPanelStateI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFocusedInput: (focusedInput: any) => void;
 
+    reset: () => void;
+
     workflowNodeDetailsPanelOpen: boolean;
     setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 }
 
-export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
+const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
     devtools(
         (set) => ({
             currentComponent: undefined,
@@ -40,6 +42,15 @@ export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelS
             focusedInput: null,
             setFocusedInput: (focusedInput) => set((state) => ({...state, focusedInput})),
 
+            reset: () =>
+                set(() => ({
+                    currentComponent: undefined,
+                    currentComponentDefinition: undefined,
+                    currentNode: undefined,
+                    focusedInput: null,
+                    workflowNodeDetailsPanelOpen: false,
+                })),
+
             workflowNodeDetailsPanelOpen: false,
             setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen) =>
                 set((state) => ({
@@ -52,3 +63,5 @@ export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelS
         }
     )
 );
+
+export default useWorkflowNodeDetailsPanelStore;
