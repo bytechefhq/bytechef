@@ -61,9 +61,10 @@ public class MicrosoftExcelDeleteRowAction {
 
         String range = "A" + rowNumber + ":" + getLastUsedColumnLabel(inputParameters, context) + rowNumber;
 
-        context.http(http -> http.post(BASE_URL + "/" +
-            inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
-            inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')/delete"))
+        context.http(http -> http
+            .post(
+                BASE_URL + "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
+                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')/delete"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(List.of("shift", "Up")
                 .toArray()))
