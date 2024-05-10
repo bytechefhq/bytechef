@@ -39,14 +39,16 @@ public class AwsS3PresignGetObjectAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
         .title("Get Pre-signed Object")
-        .description("Get the url of an pre-signed AWS S3 object.")
+        .description("You can share an object with a pre-signed URL for up to 12 hours or until your session expires.")
         .properties(
             string(KEY)
                 .label("Key")
-                .description("The object key.")
+                .description("Key is most likely the name of the file.")
+                .placeholder("file.txt")
                 .required(true),
             string(SIGNATURE_DURATION)
                 .label("Signature Duration")
+                .description("Time interval until the pre-signed URL expires")
                 .placeholder("15M, 10H, PT-6H3M, etc.")
                 .required(true))
         .outputSchema(string())

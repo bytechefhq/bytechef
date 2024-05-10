@@ -45,11 +45,12 @@ public class AwsS3GetObjectAction {
             string(FILENAME)
                 .label("Filename")
                 .description("Filename to set for binary data.")
-                .required(true)
-                .defaultValue("file.txt"),
+                .placeholder("file.txt")
+                .required(true),
             string(KEY)
                 .label("Key")
-                .description("The object key.")
+                .description("Key is most likely the name of the file.")
+                .placeholder("file.txt")
                 .required(true))
         .outputSchema(fileEntry())
         .perform(AwsS3GetObjectAction::perform);
