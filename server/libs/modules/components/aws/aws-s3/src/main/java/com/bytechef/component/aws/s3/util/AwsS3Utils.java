@@ -44,7 +44,7 @@ public class AwsS3Utils {
     public static S3Presigner buildS3Presigner(Parameters connectionParameters) {
         S3Presigner.Builder builder = S3Presigner.builder()
             .credentialsProvider(getCredentialsProvider(connectionParameters))
-            .region(Region.of(connectionParameters.getRequiredString(REGION)));
+            .region(Region.of(connectionParameters.getString(REGION, "eu-north-1")));
 
         return builder.build();
     }
