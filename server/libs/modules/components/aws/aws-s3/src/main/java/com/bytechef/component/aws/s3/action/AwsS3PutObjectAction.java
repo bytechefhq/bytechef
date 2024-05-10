@@ -31,10 +31,14 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -79,9 +83,13 @@ public class AwsS3PutObjectAction {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
-            Path tempFilePath = Files.createTempFile("", ".tmp");
+            File directory = new File("/tmp/bytechef/AWS");
+            if(!directory.exists()) directory.mkdirs();
 
-            Files.copy((InputStream) context.file(file -> file.getStream(fileEntry)), tempFilePath);
+            Path tempFilePath = Files.createTempFile(directory.toPath(), "", ".tmp");
+
+            Files.copy((InputStream) context.file(file -> file.getStream(fileEntry)), tempFilePath,
+                StandardCopyOption.REPLACE_EXISTING);
 
             PutObjectResponse putObjectResponse = s3Client.putObject(
                 PutObjectRequest.builder()
