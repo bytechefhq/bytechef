@@ -176,69 +176,54 @@ const Property = ({
 
         let strippedValue: string | number = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
 
-        if (strippedValue.startsWith('${') && focusedInput) {
-            const editor = focusedInput.getEditor();
+        const dataValueAttributes = mentionInputValue.match(/data-value="([^"]+)"/g);
 
-            editor.deleteText(0, editor.getLength());
+        if (dataValueAttributes?.length) {
+            const dataPillValues = dataValueAttributes
+                .map((match) => match.match(/data-value="([^"]+)"/)?.[1])
+                .map((value) => `\${${value}}`);
 
-            editor.setText(' ');
+            const basicValues = mentionInputValue
+                .split(/<div[^>]*>[\s\S]*?<\/div>/g)
+                .map((value) => value.replace(/<[^>]*>?/gm, ''));
 
-            const mentionInput = editor.getModule('mention');
+            if (strippedValue.startsWith('${') && focusedInput) {
+                const editor = focusedInput.getEditor();
 
-            mentionInput.insertItem(
-                {
-                    componentIcon: currentComponentDefinition?.icon,
-                    id: currentNode?.name,
-                    value: strippedValue.replace('${', '').replace('}', '').replace('.', '/'),
-                },
-                true,
-                {blotName: 'property-mention'}
-            );
+                editor.deleteText(0, editor.getLength());
 
-            return;
-        }
+                editor.setText(' ');
 
-        if (type === 'STRING') {
-            const realValues = mentionInputValue
-                .trim()
-                .split(/<[^>]*>?/gm)
-                .filter((value) => value && (!value.startsWith('<') || !value.endsWith('>')))
-                .filter((value) => value.trim().length > 0)
-                .filter((value) => !value.startsWith('\\'))
-                .filter((value) => !value.includes('data-value'))
-                .filter((value) => !value.includes('">'));
+                const mentionInput = editor.getModule('mention');
 
-            const isRootDataPillRegEx = new RegExp(/([a-zA-Z]+_\d+)/g);
-            const isChildDataPillRegEx = new RegExp(/([a-zA-Z]+_[0-9]+.[a-zA-Z]+)/g);
+                mentionInput.insertItem(
+                    {
+                        componentIcon: currentComponentDefinition?.icon,
+                        id: currentNode?.name,
+                        value: strippedValue.replace('${', '').replace('}', '').replace('.', '/'),
+                    },
+                    true,
+                    {blotName: 'property-mention'}
+                );
 
-            strippedValue = realValues
-                .map((value) => {
-                    const isDataPillValue = isRootDataPillRegEx.test(value) || isChildDataPillRegEx.test(value);
+                return;
+            }
 
-                    if (isDataPillValue && !value.startsWith('${') && !value.endsWith('}')) {
-                        if (value.includes('\\') || value.includes('/')) {
-                            return `\${${value.replace(/\//g, '.')}}`;
-                        }
-
-                        return `\${${value}}`;
-                    }
-
-                    return value;
-                })
-                .join('');
-        } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
-            strippedValue = parseInt(strippedValue);
-        } else {
-            const dataPillValues = mentionInputValue
-                .match(/data-value="([^"]+)"/g)
-                ?.map((match) => match.match(/data-value="([^"]+)"/)?.[1]);
-
-            const dataPillValue = dataPillValues?.[0];
-
-            if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
-                strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
+            if (type === 'STRING' && dataPillValues?.length) {
+                strippedValue = basicValues.reduce(
+                    (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
+                    ''
+                );
+            } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
+                strippedValue = parseInt(strippedValue);
             } else {
-                strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
+                const dataPillValue = dataPillValues?.[0];
+
+                if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
+                    strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
+                } else {
+                    strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
+                }
             }
         }
 
