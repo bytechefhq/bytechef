@@ -18,7 +18,7 @@ const ProjectHeaderWorkflowSelect = ({
     projectId: number;
     workflowId: string;
 }) => {
-    const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId);
+    const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
 
     return (
         <Select defaultValue={workflowId} name="projectWorkflowSelect" onValueChange={onValueChange} value={workflowId}>

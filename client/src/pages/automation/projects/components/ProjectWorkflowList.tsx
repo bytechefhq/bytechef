@@ -19,7 +19,10 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
 
-    const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectWorkflowsQuery(project.id!);
+    const {data: workflows, isLoading: isProjectWorkflowsLoading} = useGetProjectWorkflowsQuery(
+        project.id!,
+        !!project.id
+    );
 
     const workflowTaskDispatcherDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
