@@ -62,11 +62,12 @@ public class AwsS3PresignGetObjectAction {
                 presignedObjectBuilder -> presignedObjectBuilder
                     .signatureDuration(
                         Duration.parse(
-                            "PT" + connectionParameters.getRequiredString(SIGNATURE_DURATION)))
+                            "PT" + inputParameters.getRequiredString(SIGNATURE_DURATION)))
                     .getObjectRequest(
                         requestBuilder -> requestBuilder
                             .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
-                            .key(inputParameters.getRequiredString(KEY))));
+                            .key(inputParameters.getRequiredString(KEY))
+                            .build()));
 
             URL url = presignedGetObjectRequest.url();
 
