@@ -46,7 +46,7 @@ public class AwsS3ListObjectsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_OBJECTS)
         .title("List Objects")
-        .description("Get the list AWS S3 objects.")
+        .description("Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.")
         .properties(
             string(PREFIX)
                 .label("Prefix")
