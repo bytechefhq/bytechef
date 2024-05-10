@@ -22,6 +22,8 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
@@ -82,6 +84,12 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private WorkflowConnectionFacade workflowConnectionFacade;
+
+    @MockBean
+    private WorkflowNodeParameterFacade workflowNodeParameterFacade;
+
+    @MockBean
+    private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @MockBean
     private WorkflowFacade workflowFacade;
