@@ -5,7 +5,7 @@ const WorkflowExecutionBadge = ({success}: {success: boolean}) => {
         <div className="flex items-center">
             <Badge
                 className="flex h-[18px] w-14 items-center justify-center rounded-sm text-[10px] font-semibold uppercase"
-                variant={success ? 'success' : 'destructive'}
+                variant={success ? 'success_outline' : 'destructive_outline'}
             >
                 <span>{success ? 'Success' : 'Failure'}</span>
             </Badge>
