@@ -32,11 +32,10 @@ public abstract class AbstractAirtableComponentHandler implements OpenApiCompone
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("airtable")
             .title("Airtable")
-            .description(
-                "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way."))
-                    .actions(modifyActions(AirtableCreateRecordAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(AirtableConnection.CONNECTION_DEFINITION))
-                    .triggers(getTriggers());
+            .description("Airtable is a user-friendly and flexible cloud-based database management tool."))
+                .actions(modifyActions(AirtableCreateRecordAction.ACTION_DEFINITION))
+                .connection(modifyConnection(AirtableConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

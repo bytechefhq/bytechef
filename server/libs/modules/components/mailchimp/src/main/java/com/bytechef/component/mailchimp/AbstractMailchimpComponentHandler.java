@@ -32,7 +32,7 @@ public abstract class AbstractMailchimpComponentHandler implements OpenApiCompon
     private final ComponentDefinition componentDefinition = modifyComponent(
         component("mailchimp")
             .title("Mailchimp")
-            .description("Mailchimp REST API documentation"))
+            .description("Mailchimp is a marketing automation and email marketing platform."))
                 .actions(modifyActions(MailchimpAddMemberToListAction.ACTION_DEFINITION))
                 .connection(modifyConnection(MailchimpConnection.CONNECTION_DEFINITION))
                 .triggers(getTriggers());

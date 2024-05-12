@@ -2,7 +2,7 @@
 openapi: "3.0.1"
 info:
   title: "The Mailchimp REST API"
-  description: "Mailchimp REST API documentation"
+  description: "Mailchimp is a marketing automation and email marketing platform."
   version: "1"
 paths:
   /lists/{listId}/members:
