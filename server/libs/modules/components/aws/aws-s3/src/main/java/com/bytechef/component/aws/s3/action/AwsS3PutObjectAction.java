@@ -31,6 +31,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +76,7 @@ public class AwsS3PutObjectAction {
         .outputSchema(string())
         .perform(AwsS3PutObjectAction::perform);
 
+    @SuppressFBWarnings("RV")
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
