@@ -112,7 +112,7 @@ export function ApiKeyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function ApiKeyModelToJSON(value?: ApiKeyModel | null): any {
+export function ApiKeyModelToJSON(value?: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null): any {
     if (value == null) {
         return value;
     }

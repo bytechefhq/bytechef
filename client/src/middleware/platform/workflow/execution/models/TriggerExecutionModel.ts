@@ -231,7 +231,7 @@ export function TriggerExecutionModelFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function TriggerExecutionModelToJSON(value?: TriggerExecutionModel | null): any {
+export function TriggerExecutionModelToJSON(value?: Omit<TriggerExecutionModel, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'type'> | null): any {
     if (value == null) {
         return value;
     }

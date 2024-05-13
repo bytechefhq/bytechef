@@ -253,7 +253,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function TaskExecutionModelToJSON(value?: TaskExecutionModel | null): any {
+export function TaskExecutionModelToJSON(value?: Omit<TaskExecutionModel, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'retryDelayMillis'|'type'> | null): any {
     if (value == null) {
         return value;
     }

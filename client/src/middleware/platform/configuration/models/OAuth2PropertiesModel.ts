@@ -55,7 +55,7 @@ export function OAuth2PropertiesModelFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function OAuth2PropertiesModelToJSON(value?: OAuth2PropertiesModel | null): any {
+export function OAuth2PropertiesModelToJSON(value?: Omit<OAuth2PropertiesModel, 'redirectUri'|'predefinedApps'> | null): any {
     if (value == null) {
         return value;
     }

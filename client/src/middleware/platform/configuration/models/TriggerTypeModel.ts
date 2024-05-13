@@ -27,6 +27,10 @@ export const TriggerTypeModel = {
 export type TriggerTypeModel = typeof TriggerTypeModel[keyof typeof TriggerTypeModel];
 
 
+export function instanceOfTriggerTypeModel(value: any): boolean {
+    return Object.values(TriggerTypeModel).includes(value);
+}
+
 export function TriggerTypeModelFromJSON(json: any): TriggerTypeModel {
     return TriggerTypeModelFromJSONTyped(json, false);
 }

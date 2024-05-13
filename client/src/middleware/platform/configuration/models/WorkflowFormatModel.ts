@@ -24,6 +24,10 @@ export const WorkflowFormatModel = {
 export type WorkflowFormatModel = typeof WorkflowFormatModel[keyof typeof WorkflowFormatModel];
 
 
+export function instanceOfWorkflowFormatModel(value: any): boolean {
+    return Object.values(WorkflowFormatModel).includes(value);
+}
+
 export function WorkflowFormatModelFromJSON(json: any): WorkflowFormatModel {
     return WorkflowFormatModelFromJSONTyped(json, false);
 }

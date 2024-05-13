@@ -139,7 +139,7 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkflowModel | null): any {
+export function ProjectInstanceWorkflowModelToJSON(value?: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }

@@ -119,7 +119,7 @@ export function ProjectInstanceProjectModelFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function ProjectInstanceProjectModelToJSON(value?: ProjectInstanceProjectModel | null): any {
+export function ProjectInstanceProjectModelToJSON(value?: Omit<ProjectInstanceProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'> | null): any {
     if (value == null) {
         return value;
     }

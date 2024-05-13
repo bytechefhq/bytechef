@@ -32,6 +32,10 @@ export const AuthorizationTypeModel = {
 export type AuthorizationTypeModel = typeof AuthorizationTypeModel[keyof typeof AuthorizationTypeModel];
 
 
+export function instanceOfAuthorizationTypeModel(value: any): boolean {
+    return Object.values(AuthorizationTypeModel).includes(value);
+}
+
 export function AuthorizationTypeModelFromJSON(json: any): AuthorizationTypeModel {
     return AuthorizationTypeModelFromJSONTyped(json, false);
 }

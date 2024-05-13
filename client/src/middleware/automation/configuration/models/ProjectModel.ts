@@ -159,7 +159,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ProjectModelToJSON(value?: ProjectModel | null): any {
+export function ProjectModelToJSON(value?: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'> | null): any {
     if (value == null) {
         return value;
     }

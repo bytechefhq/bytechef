@@ -24,6 +24,10 @@ export const ProjectStatusModel = {
 export type ProjectStatusModel = typeof ProjectStatusModel[keyof typeof ProjectStatusModel];
 
 
+export function instanceOfProjectStatusModel(value: any): boolean {
+    return Object.values(ProjectStatusModel).includes(value);
+}
+
 export function ProjectStatusModelFromJSON(json: any): ProjectStatusModel {
     return ProjectStatusModelFromJSONTyped(json, false);
 }

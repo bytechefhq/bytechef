@@ -101,7 +101,7 @@ export function WorkflowExecutionBasicModelFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function WorkflowExecutionBasicModelToJSON(value?: WorkflowExecutionBasicModel | null): any {
+export function WorkflowExecutionBasicModelToJSON(value?: Omit<WorkflowExecutionBasicModel, 'id'> | null): any {
     if (value == null) {
         return value;
     }

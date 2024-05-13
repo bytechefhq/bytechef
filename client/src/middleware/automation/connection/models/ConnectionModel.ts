@@ -168,7 +168,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
+export function ConnectionModelToJSON(value?: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }

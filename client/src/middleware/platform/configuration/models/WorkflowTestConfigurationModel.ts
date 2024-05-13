@@ -104,7 +104,7 @@ export function WorkflowTestConfigurationModelFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function WorkflowTestConfigurationModelToJSON(value?: WorkflowTestConfigurationModel | null): any {
+export function WorkflowTestConfigurationModelToJSON(value?: Omit<WorkflowTestConfigurationModel, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'> | null): any {
     if (value == null) {
         return value;
     }

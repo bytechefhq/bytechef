@@ -25,6 +25,10 @@ export const ConnectionEnvironmentModel = {
 export type ConnectionEnvironmentModel = typeof ConnectionEnvironmentModel[keyof typeof ConnectionEnvironmentModel];
 
 
+export function instanceOfConnectionEnvironmentModel(value: any): boolean {
+    return Object.values(ConnectionEnvironmentModel).includes(value);
+}
+
 export function ConnectionEnvironmentModelFromJSON(json: any): ConnectionEnvironmentModel {
     return ConnectionEnvironmentModelFromJSONTyped(json, false);
 }

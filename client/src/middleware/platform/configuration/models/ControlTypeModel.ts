@@ -39,6 +39,10 @@ export const ControlTypeModel = {
 export type ControlTypeModel = typeof ControlTypeModel[keyof typeof ControlTypeModel];
 
 
+export function instanceOfControlTypeModel(value: any): boolean {
+    return Object.values(ControlTypeModel).includes(value);
+}
+
 export function ControlTypeModelFromJSON(json: any): ControlTypeModel {
     return ControlTypeModelFromJSONTyped(json, false);
 }

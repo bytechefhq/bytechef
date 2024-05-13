@@ -91,7 +91,7 @@ export function TagModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function TagModelToJSON(value?: TagModel | null): any {
+export function TagModelToJSON(value?: Omit<TagModel, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }

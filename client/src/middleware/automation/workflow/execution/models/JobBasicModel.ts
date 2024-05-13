@@ -135,7 +135,7 @@ export function JobBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JobBasicModelToJSON(value?: JobBasicModel | null): any {
+export function JobBasicModelToJSON(value?: Omit<JobBasicModel, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'priority'|'startDate'|'status'|'workflowId'> | null): any {
     if (value == null) {
         return value;
     }

@@ -26,7 +26,7 @@ import {
 } from '../models/index';
 
 export interface CreateApiKeyRequest {
-    apiKeyModel: ApiKeyModel;
+    apiKeyModel: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 export interface DeleteApiKeyRequest {
@@ -39,7 +39,7 @@ export interface GetApiKeyRequest {
 
 export interface UpdateApiKeyRequest {
     id: number;
-    apiKeyModel: ApiKeyModel;
+    apiKeyModel: Omit<ApiKeyModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
 }
 
 /**

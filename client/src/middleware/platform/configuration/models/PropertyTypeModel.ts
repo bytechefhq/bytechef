@@ -36,6 +36,10 @@ export const PropertyTypeModel = {
 export type PropertyTypeModel = typeof PropertyTypeModel[keyof typeof PropertyTypeModel];
 
 
+export function instanceOfPropertyTypeModel(value: any): boolean {
+    return Object.values(PropertyTypeModel).includes(value);
+}
+
 export function PropertyTypeModelFromJSON(json: any): PropertyTypeModel {
     return PropertyTypeModelFromJSONTyped(json, false);
 }

@@ -76,7 +76,7 @@ export function ProjectVersionModelFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ProjectVersionModelToJSON(value?: ProjectVersionModel | null): any {
+export function ProjectVersionModelToJSON(value?: Omit<ProjectVersionModel, 'version'> | null): any {
     if (value == null) {
         return value;
     }

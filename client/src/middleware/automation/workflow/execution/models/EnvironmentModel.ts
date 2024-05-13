@@ -24,6 +24,10 @@ export const EnvironmentModel = {
 export type EnvironmentModel = typeof EnvironmentModel[keyof typeof EnvironmentModel];
 
 
+export function instanceOfEnvironmentModel(value: any): boolean {
+    return Object.values(EnvironmentModel).includes(value);
+}
+
 export function EnvironmentModelFromJSON(json: any): EnvironmentModel {
     return EnvironmentModelFromJSONTyped(json, false);
 }

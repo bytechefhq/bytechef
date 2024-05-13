@@ -114,7 +114,7 @@ export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | null): any {
+export function WorkflowExecutionModelToJSON(value?: Omit<WorkflowExecutionModel, 'id'> | null): any {
     if (value == null) {
         return value;
     }

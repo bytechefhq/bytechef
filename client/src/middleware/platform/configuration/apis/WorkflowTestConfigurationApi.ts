@@ -42,7 +42,7 @@ export interface GetWorkflowTestConfigurationConnectionsRequest {
 
 export interface SaveWorkflowTestConfigurationRequest {
     workflowId: string;
-    workflowTestConfigurationModel: WorkflowTestConfigurationModel;
+    workflowTestConfigurationModel: Omit<WorkflowTestConfigurationModel, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'>;
 }
 
 export interface SaveWorkflowTestConfigurationConnectionRequest {

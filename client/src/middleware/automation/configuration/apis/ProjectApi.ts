@@ -32,7 +32,7 @@ import {
 } from '../models/index';
 
 export interface CreateProjectRequest {
-    projectModel: ProjectModel;
+    projectModel: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'>;
 }
 
 export interface DeleteProjectRequest {
@@ -65,7 +65,7 @@ export interface PublishProjectRequest {
 
 export interface UpdateProjectRequest {
     id: number;
-    projectModel: ProjectModel;
+    projectModel: Omit<ProjectModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'>;
 }
 
 /**

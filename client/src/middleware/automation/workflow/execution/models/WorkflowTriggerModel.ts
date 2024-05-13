@@ -99,7 +99,7 @@ export function WorkflowTriggerModelFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function WorkflowTriggerModelToJSON(value?: WorkflowTriggerModel | null): any {
+export function WorkflowTriggerModelToJSON(value?: Omit<WorkflowTriggerModel, 'connections'> | null): any {
     if (value == null) {
         return value;
     }

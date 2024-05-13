@@ -133,7 +133,7 @@ export function ProjectInstanceBasicModelFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function ProjectInstanceBasicModelToJSON(value?: ProjectInstanceBasicModel | null): any {
+export function ProjectInstanceBasicModelToJSON(value?: Omit<ProjectInstanceBasicModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }

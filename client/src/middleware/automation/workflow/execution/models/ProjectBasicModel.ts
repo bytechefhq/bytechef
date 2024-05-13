@@ -119,7 +119,7 @@ export function ProjectBasicModelFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function ProjectBasicModelToJSON(value?: ProjectBasicModel | null): any {
+export function ProjectBasicModelToJSON(value?: Omit<ProjectBasicModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectVersion'> | null): any {
     if (value == null) {
         return value;
     }

@@ -132,7 +132,7 @@ export function WorkflowBasic1ModelFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function WorkflowBasic1ModelToJSON(value?: WorkflowBasic1Model | null): any {
+export function WorkflowBasic1ModelToJSON(value?: Omit<WorkflowBasic1Model, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'manualTrigger'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'> | null): any {
     if (value == null) {
         return value;
     }

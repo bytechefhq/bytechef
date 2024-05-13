@@ -24,6 +24,10 @@ export const CredentialStatusModel = {
 export type CredentialStatusModel = typeof CredentialStatusModel[keyof typeof CredentialStatusModel];
 
 
+export function instanceOfCredentialStatusModel(value: any): boolean {
+    return Object.values(CredentialStatusModel).includes(value);
+}
+
 export function CredentialStatusModelFromJSON(json: any): CredentialStatusModel {
     return CredentialStatusModelFromJSONTyped(json, false);
 }

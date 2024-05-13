@@ -91,7 +91,7 @@ export function CategoryModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function CategoryModelToJSON(value?: CategoryModel | null): any {
+export function CategoryModelToJSON(value?: Omit<CategoryModel, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }

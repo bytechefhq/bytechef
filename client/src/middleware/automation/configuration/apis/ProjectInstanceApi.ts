@@ -32,7 +32,7 @@ import {
 } from '../models/index';
 
 export interface CreateProjectInstanceRequest {
-    projectInstanceModel: ProjectInstanceModel;
+    projectInstanceModel: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface CreateProjectInstanceWorkflowJobRequest {
@@ -67,13 +67,13 @@ export interface GetProjectInstancesRequest {
 
 export interface UpdateProjectInstanceRequest {
     id: number;
-    projectInstanceModel: ProjectInstanceModel;
+    projectInstanceModel: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface UpdateProjectInstanceWorkflowRequest {
     id: number;
     projectInstanceWorkflowId: number;
-    projectInstanceWorkflowModel: ProjectInstanceWorkflowModel;
+    projectInstanceWorkflowModel: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 /**

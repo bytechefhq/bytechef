@@ -203,7 +203,7 @@ export function JobModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function JobModelToJSON(value?: JobModel | null): any {
+export function JobModelToJSON(value?: Omit<JobModel, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null): any {
     if (value == null) {
         return value;
     }

@@ -197,7 +197,7 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
+export function WorkflowModelToJSON(value?: Omit<WorkflowModel, 'createdBy'|'createdDate'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'tasks'|'triggers'> | null): any {
     if (value == null) {
         return value;
     }

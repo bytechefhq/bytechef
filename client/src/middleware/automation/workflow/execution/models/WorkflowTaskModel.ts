@@ -147,7 +147,7 @@ export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
+export function WorkflowTaskModelToJSON(value?: Omit<WorkflowTaskModel, 'connections'> | null): any {
     if (value == null) {
         return value;
     }

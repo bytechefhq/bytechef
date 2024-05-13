@@ -23,7 +23,7 @@ import {
 } from '../models/index';
 
 export interface CreateConnectionRequest {
-    connectionModel: ConnectionModel;
+    connectionModel: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface DeleteConnectionRequest {
@@ -42,7 +42,7 @@ export interface GetConnectionsRequest {
 
 export interface UpdateConnectionRequest {
     id: number;
-    connectionModel: ConnectionModel;
+    connectionModel: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 /**
