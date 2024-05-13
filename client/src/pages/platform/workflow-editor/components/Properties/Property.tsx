@@ -210,7 +210,7 @@ const Property = ({
                 return;
             }
 
-            if (type === 'STRING' && dataPillValues?.length) {
+            if (dataPillValues?.length) {
                 strippedValue = basicValues.reduce(
                     (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
                     ''
