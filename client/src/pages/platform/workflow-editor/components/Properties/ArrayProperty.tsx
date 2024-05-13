@@ -221,7 +221,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         <main className="my-2 space-y-2">
                             <PropertySelect
                                 label="Type"
-                                onValueChange={(value: keyof typeof PROPERTY_CONTROL_TYPES) => setNewItemType(value)}
+                                onValueChange={(value) => setNewItemType(value as keyof typeof PROPERTY_CONTROL_TYPES)}
                                 options={availableItemTypes}
                                 value={newItemType}
                             />

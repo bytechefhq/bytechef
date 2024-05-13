@@ -826,7 +826,7 @@ const Property = ({
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name)}
+                                onValueChange={(value) => handleSelectChange(value, name)}
                                 options={options as Array<SelectOptionType>}
                                 value={selectValue}
                             />
@@ -869,7 +869,7 @@ const Property = ({
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
-                                value={propertyParameterValue}
+                                value={selectValue}
                             />
                         )}
 
