@@ -20,6 +20,7 @@
     @apply min-w-[34px];
     @apply min-h-[34px];
     padding: 0.313rem;
+    @apply pl-3;
 }
 
 .ql-mention-list-container {
