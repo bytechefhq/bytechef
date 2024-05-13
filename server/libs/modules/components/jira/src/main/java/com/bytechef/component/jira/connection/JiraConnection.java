@@ -17,48 +17,38 @@
 package com.bytechef.component.jira.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.jira.constant.JiraConstants.YOUR_DOMAIN;
+import static com.bytechef.component.jira.util.JiraUtils.getBaseUrl;
 
-import com.bytechef.component.definition.ComponentDSL;
-import java.util.List;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
- * Provides the component connection definition.
- *
- * @generated
+ * @author Monika Domiter
  */
 public class JiraConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://your-domain.atlassian.net")
-        .authorizations(authorization(
-            AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .authorizations(
+            authorization(AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
+                    string(YOUR_DOMAIN)
+                        .label("Your domain")
+                        .description("e.g https://{yourDomain}}.atlassian.net")
+                        .required(true),
                     string(USERNAME)
-                        .label("Username")
+                        .label("Email")
+                        .description("The email used to log in to Jira")
                         .required(true),
                     string(PASSWORD)
-                        .label("Password")
-                        .required(true)),
-            authorization(
-                AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .title("OAuth2 Authorization Code")
-                    .properties(
-                        string(CLIENT_ID)
-                            .label("Client Id")
-                            .required(true),
-                        string(CLIENT_SECRET)
-                            .label("Client Secret")
-                            .required(true))
-                    .authorizationUrl((connectionParameters, context) -> "https://auth.atlassian.com/authorize")
-                    .scopes((connection, context) -> List.of("read:jira-work", "write:jira-work"))
-                    .tokenUrl((connectionParameters, context) -> "https://auth.atlassian.com/oauth/token"));
+                        .label("API token")
+                        .required(true)))
+        .baseUri((connectionParameters, context) -> getBaseUrl(connectionParameters));
 
     private JiraConnection() {
     }
