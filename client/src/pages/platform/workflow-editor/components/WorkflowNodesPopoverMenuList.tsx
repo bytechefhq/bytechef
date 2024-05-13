@@ -278,7 +278,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                         ),
                                         label: clickedItem?.title,
                                         name: workflowNodeName,
-                                        type: node.data?.type,
+                                        type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
                                     },
                                     type: 'workflow',
                                 };
