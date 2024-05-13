@@ -161,6 +161,7 @@ const PropertyMentionsInput = forwardRef(
                         renderList(matches, searchTerm);
                     }
                 },
+                spaceAfterInsert: false,
             },
             toolbar: false,
         };
