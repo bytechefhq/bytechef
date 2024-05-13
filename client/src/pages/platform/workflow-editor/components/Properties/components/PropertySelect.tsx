@@ -19,7 +19,7 @@ interface PropertySelectProps {
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
-    onValueChange?(value: string): void;
+    onValueChange?: (value: string) => void;
     placeholder?: string;
     required?: boolean;
     value?: string;
@@ -59,7 +59,7 @@ const PropertySelect = ({
         )}
 
         {options.length ? (
-            <Select defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value?.toString()}>
+            <Select defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value}>
                 <SelectTrigger aria-label="Select" className={twMerge(leadingIcon && 'relative')}>
                     <>
                         {leadingIcon ? (
