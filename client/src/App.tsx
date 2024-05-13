@@ -3,17 +3,7 @@ import useGlobalErrorInterceptor from '@/interceptors/useGlobalErrorInterceptor'
 import {DesktopSidebar} from '@/layouts/DesktopSidebar';
 import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
-import {
-    ActivityIcon,
-    FolderIcon,
-    Layers3Icon,
-    Link2Icon,
-    LucideIcon,
-    Settings2Icon,
-    SquareIcon,
-    UsersIcon,
-    ZapIcon,
-} from 'lucide-react';
+import {ActivityIcon, FolderIcon, Layers3Icon, Link2Icon, LucideIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -26,7 +16,7 @@ const user = {
     name: 'Emily Selman',
 };
 
-const automationNavigation: {
+const navigation: {
     name: string;
     href: string;
     icon: LucideIcon;
@@ -44,35 +34,6 @@ const automationNavigation: {
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
         href: '/automation/executions',
-        icon: ActivityIcon,
-        name: 'Workflow Execution History',
-    },
-];
-
-const embeddedNavigation: {
-    name: string;
-    href: string;
-    icon: LucideIcon;
-}[] = [
-    {
-        href: '/embedded/integrations',
-        icon: SquareIcon,
-        name: 'Integrations',
-    },
-    {
-        href: '/embedded/configurations',
-        icon: Settings2Icon,
-        name: 'Integration Configurations',
-    },
-    {
-        href: '/embedded/connected-users',
-        icon: UsersIcon,
-        name: 'Connected Users',
-    },
-    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
-    {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        href: '/embedded/executions',
         icon: ActivityIcon,
         name: 'Workflow Execution History',
     },
@@ -102,20 +63,12 @@ function App() {
             <TooltipProvider>
                 <MobileSidebar
                     mobileMenuOpen={mobileMenuOpen}
-                    navigation={automationNavigation}
+                    navigation={navigation}
                     setMobileMenuOpen={setMobileMenuOpen}
                     user={user}
                 />
 
-                <DesktopSidebar
-                    navigation={
-                        location.pathname.includes('automation')
-                            ? automationNavigation
-                            : location.pathname.includes('embedded')
-                              ? embeddedNavigation
-                              : []
-                    }
-                />
+                <DesktopSidebar navigation={navigation} />
 
                 <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
                     <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />

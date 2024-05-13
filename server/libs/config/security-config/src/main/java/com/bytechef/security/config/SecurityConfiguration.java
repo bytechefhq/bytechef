@@ -19,19 +19,13 @@ package com.bytechef.security.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import com.bytechef.embedded.configuration.service.ConnectedUserService;
-import com.bytechef.embedded.user.service.SigningKeyService;
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
-import com.bytechef.platform.user.service.ApiKeyService;
-import com.bytechef.security.web.rest.filter.ApiKeyAuthenticationFilter;
-import com.bytechef.security.web.rest.filter.ConnectedUserAuthenticationFilter;
 import com.bytechef.security.web.rest.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -41,7 +35,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -57,25 +50,13 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
-    private final ApiKeyService apiKeyService;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final ConnectedUserService connectedUserService;
     private final RememberMeServices rememberMeServices;
     private final SecurityProperties securityProperties;
-    private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
-    public SecurityConfiguration(
-        ApiKeyService apiKeyService, AuthenticationManagerBuilder authenticationManagerBuilder,
-        ConnectedUserService connectedUserService, RememberMeServices rememberMeServices,
-        SecurityProperties securityProperties, SigningKeyService signingKeyService) {
-
-        this.apiKeyService = apiKeyService;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.connectedUserService = connectedUserService;
+    public SecurityConfiguration(RememberMeServices rememberMeServices, SecurityProperties securityProperties) {
         this.rememberMeServices = rememberMeServices;
         this.securityProperties = securityProperties;
-        this.signingKeyService = signingKeyService;
     }
 
     @Bean
@@ -92,12 +73,6 @@ public class SecurityConfiguration {
 //                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //                // See https://stackoverflow.com/q/74447118/65681
 //                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
-            .addFilterBefore(
-                new ConnectedUserAuthenticationFilter(connectedUserService, signingKeyService),
-                UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(
-                new ApiKeyAuthenticationFilter(apiKeyService),
-                UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
 //            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
             .csrf(AbstractHttpConfigurer::disable)
@@ -139,10 +114,6 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**"))
                     .hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers(mvc.pattern("/api/embedded/public/**"))
-                    .authenticated()
-                    .requestMatchers(mvc.pattern("/api/embedded/by-user-token/**"))
-                    .authenticated()
                     .requestMatchers(mvc.pattern("/api/**"))
                     .permitAll()
 //                        .requestMatchers(mvc.pattern("/api/**")).authenticated()

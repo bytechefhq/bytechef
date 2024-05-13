@@ -1,7 +1,0 @@
-.openapi-generator-ignore
-README.md
-pom.xml
-src/main/java/com/bytechef/embedded/configuration/public_/web/rest/ApiUtil.java
-src/main/java/com/bytechef/embedded/configuration/public_/web/rest/IntegrationApi.java
-src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/EnvironmentModel.java
-src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/IntegrationModel.java

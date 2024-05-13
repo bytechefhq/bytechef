@@ -1,6 +1,0 @@
-README.md
-pom.xml
-src/main/java/com/bytechef/embedded/connection/web/rest/ApiUtil.java
-src/main/java/com/bytechef/embedded/connection/web/rest/ConnectionApi.java
-src/main/java/com/bytechef/embedded/connection/web/rest/ConnectionTagApi.java
-src/main/java/com/bytechef/embedded/connection/web/rest/model/EnvironmentModel.java

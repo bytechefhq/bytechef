@@ -1,6 +1,0 @@
-README.md
-pom.xml
-src/main/java/com/bytechef/embedded/connectivity/web/rest/ActionApi.java
-src/main/java/com/bytechef/embedded/connectivity/web/rest/ApiUtil.java
-src/main/java/com/bytechef/embedded/connectivity/web/rest/model/ExecuteAction200ResponseModel.java
-src/main/java/com/bytechef/embedded/connectivity/web/rest/model/ExecuteActionRequestModel.java
