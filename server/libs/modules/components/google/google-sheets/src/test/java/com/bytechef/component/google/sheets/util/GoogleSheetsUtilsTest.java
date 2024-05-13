@@ -18,6 +18,7 @@ package com.bytechef.component.google.sheets.util;
 
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
@@ -45,7 +46,6 @@ import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -125,9 +125,11 @@ class GoogleSheetsUtilsTest {
                 List<? extends Property.ValueProperty<?>> properties = first.getProperties().get();
 
                 assertEquals(3, properties.size());
-                assertEquals("header1", properties.getFirst().getName());
-                assertEquals("header2", properties.get(1).getName());
-                assertEquals("header3", properties.get(2).getName());
+
+                for (int i = 0; i < properties.size(); i++) {
+                    assertEquals("header" + (i + 1), properties.get(i).getName());
+                    assertEquals("", properties.get(i).getDefaultValue().get());
+                }
             }
         }
     }
@@ -219,22 +221,24 @@ class GoogleSheetsUtilsTest {
 
     @Test
     void testGetRowValuesWhereFirstSpreadsheetRowValuesHeaders() {
-        Map<String, Object> rowMap = Map.of("name", "name", "email", "email");
+        Map<String, Object> rowMap = Map.of(VALUES, Map.of("name", "name", "email", "email"));
 
-        when(mockedParameters.getRequired(VALUES))
+        when(mockedParameters.getRequiredMap(ROW, Object.class))
             .thenReturn(rowMap);
 
         List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
 
-        assertEquals(new ArrayList<>(rowMap.values()), rowValues);
+        assertEquals(List.of("name", "email"), rowValues);
     }
 
     @Test
     void testGetRowValuesWhereFirstSpreadsheetRowValuesNotHeaders() {
         List rowList = List.of("name", 1233, false);
 
-        when(mockedParameters.getRequiredList(VALUES, Object.class))
-            .thenReturn(rowList);
+        Map<String, Object> rowMap = Map.of(VALUES, rowList);
+
+        when(mockedParameters.getRequiredMap(ROW, Object.class))
+            .thenReturn(rowMap);
 
         List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
 
