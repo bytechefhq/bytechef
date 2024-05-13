@@ -23,13 +23,13 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2Properties")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class OAuth2PropertiesModel {
 
   private String redirectUri;
 
   @Valid
-  private List<String> predefinedApps;
+  private List<String> predefinedApps = new ArrayList<>();
 
   public OAuth2PropertiesModel redirectUri(String redirectUri) {
     this.redirectUri = redirectUri;

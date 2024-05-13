@@ -28,11 +28,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ComponentDefinitionModel {
 
   @Valid
-  private List<@Valid ActionDefinitionBasicModel> actions;
+  private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
   private String category;
 
@@ -49,12 +49,12 @@ public class ComponentDefinitionModel {
   private ResourcesModel resources;
 
   @Valid
-  private List<String> tags;
+  private List<String> tags = new ArrayList<>();
 
   private String title;
 
   @Valid
-  private List<@Valid TriggerDefinitionBasicModel> triggers;
+  private List<@Valid TriggerDefinitionBasicModel> triggers = new ArrayList<>();
 
   private Integer version;
 

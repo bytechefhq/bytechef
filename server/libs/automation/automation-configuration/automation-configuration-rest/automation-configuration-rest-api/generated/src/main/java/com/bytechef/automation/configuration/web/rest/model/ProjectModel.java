@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:18:06.491822+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:04.260626+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectModel {
 
   private CategoryModel category;
@@ -57,12 +57,12 @@ public class ProjectModel {
   private Integer projectVersion;
 
   @Valid
-  private List<String> projectWorkflowIds;
+  private List<String> projectWorkflowIds = new ArrayList<>();
 
   private ProjectStatusModel status;
 
   @Valid
-  private List<@Valid TagModel> tags;
+  private List<@Valid TagModel> tags = new ArrayList<>();
 
   private Integer version;
 

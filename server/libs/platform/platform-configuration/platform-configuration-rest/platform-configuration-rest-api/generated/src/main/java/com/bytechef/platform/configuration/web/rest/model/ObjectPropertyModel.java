@@ -34,11 +34,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
-  private List<@Valid PropertyModel> additionalProperties;
+  private List<@Valid PropertyModel> additionalProperties = new ArrayList<>();
 
   private Object defaultValue;
 
@@ -47,12 +47,12 @@ public class ObjectPropertyModel extends ValuePropertyModel {
   private Boolean multipleValues;
 
   @Valid
-  private List<@Valid OptionModel> options;
+  private List<@Valid OptionModel> options = new ArrayList<>();
 
   private OptionsDataSourceModel optionsDataSource;
 
   @Valid
-  private List<@Valid PropertyModel> properties;
+  private List<@Valid PropertyModel> properties = new ArrayList<>();
 
   public ObjectPropertyModel() {
     super();

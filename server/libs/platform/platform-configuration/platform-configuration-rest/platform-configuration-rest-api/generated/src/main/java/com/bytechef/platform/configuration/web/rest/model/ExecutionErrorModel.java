@@ -24,13 +24,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ExecutionErrorModel {
 
   private String message;
 
   @Valid
-  private List<String> stackTrace;
+  private List<String> stackTrace = new ArrayList<>();
 
   public ExecutionErrorModel message(String message) {
     this.message = message;

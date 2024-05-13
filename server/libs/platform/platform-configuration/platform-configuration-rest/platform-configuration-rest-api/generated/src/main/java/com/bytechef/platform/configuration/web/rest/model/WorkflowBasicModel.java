@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowBasicModel {
 
   private String createdBy;
@@ -52,10 +52,10 @@ public class WorkflowBasicModel {
   private Boolean manualTrigger;
 
   @Valid
-  private List<String> workflowTaskComponentNames;
+  private List<String> workflowTaskComponentNames = new ArrayList<>();
 
   @Valid
-  private List<String> workflowTriggerComponentNames;
+  private List<String> workflowTriggerComponentNames = new ArrayList<>();
 
   private Integer version;
 

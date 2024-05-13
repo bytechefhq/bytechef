@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow_1", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:18:06.491822+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:04.260626+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class Workflow1Model {
 
   private String createdBy;
@@ -49,7 +49,7 @@ public class Workflow1Model {
   private String id;
 
   @Valid
-  private List<@Valid WorkflowInputModel> inputs;
+  private List<@Valid WorkflowInputModel> inputs = new ArrayList<>();
 
   private String label;
 
@@ -59,7 +59,7 @@ public class Workflow1Model {
   private LocalDateTime lastModifiedDate;
 
   @Valid
-  private List<@Valid WorkflowOutputModel> outputs;
+  private List<@Valid WorkflowOutputModel> outputs = new ArrayList<>();
 
   /**
    * The type of the source which stores the workflow definition.
@@ -105,10 +105,10 @@ public class Workflow1Model {
   private Integer maxRetries;
 
   @Valid
-  private List<@Valid WorkflowTaskModel> tasks;
+  private List<@Valid WorkflowTaskModel> tasks = new ArrayList<>();
 
   @Valid
-  private List<@Valid WorkflowTriggerModel> triggers;
+  private List<@Valid WorkflowTriggerModel> triggers = new ArrayList<>();
 
   private Integer version;
 

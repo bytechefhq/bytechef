@@ -28,18 +28,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class WorkflowTaskModel {
 
   @Valid
-  private List<@Valid WorkflowConnectionModel> connections;
+  private List<@Valid WorkflowConnectionModel> connections = new ArrayList<>();
 
   private String description;
 
   private DataStreamComponentModel destination;
 
   @Valid
-  private List<@Valid WorkflowTaskModel> finalize;
+  private List<@Valid WorkflowTaskModel> finalize = new ArrayList<>();
 
   private String label;
 
@@ -51,10 +51,10 @@ public class WorkflowTaskModel {
   private Map<String, Object> parameters = new HashMap<>();
 
   @Valid
-  private List<@Valid WorkflowTaskModel> post;
+  private List<@Valid WorkflowTaskModel> post = new ArrayList<>();
 
   @Valid
-  private List<@Valid WorkflowTaskModel> pre;
+  private List<@Valid WorkflowTaskModel> pre = new ArrayList<>();
 
   private DataStreamComponentModel source;
 

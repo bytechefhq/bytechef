@@ -26,13 +26,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-10T07:12:29.331871+02:00[Europe/Zagreb]", comments = "Generator version: 7.4.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T21:52:05.180663+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
 
   @Valid
-  private List<@Valid AuthorizationModel> authorizations;
+  private List<@Valid AuthorizationModel> authorizations = new ArrayList<>();
 
   private String baseUri;
 
@@ -41,7 +41,7 @@ public class ConnectionDefinitionModel {
   private String componentName;
 
   @Valid
-  private List<@Valid PropertyModel> properties;
+  private List<@Valid PropertyModel> properties = new ArrayList<>();
 
   private String componentTitle;
 
