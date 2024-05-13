@@ -46,8 +46,6 @@ const WorkflowEditor = ({
         | undefined
     >();
 
-    // console.log('nodes: ', nodes);
-
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {componentActions, setComponentActions, setWorkflow, workflow} = useWorkflowDataStore();
 
@@ -278,7 +276,7 @@ const WorkflowEditor = ({
 
     // Save workflow definition with default parameters when a new node is added
     useEffect(() => {
-        if (!latestActionDefinition?.properties || !newNode || isSaving || !workflowComponentWithAlias) {
+        if (!latestActionDefinition?.properties || !newNode || isSaving) {
             return;
         }
 
