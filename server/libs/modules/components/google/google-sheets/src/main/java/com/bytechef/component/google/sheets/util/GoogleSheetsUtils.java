@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
@@ -78,7 +79,9 @@ public class GoogleSheetsUtils {
             List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
 
             for (Object value : firstRow) {
-                list.add(string(value.toString()));
+                list.add(
+                    string(value.toString())
+                        .defaultValue(""));
             }
 
             ModifiableObjectProperty updatedRow = object(VALUES)
@@ -137,14 +140,16 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Object> getRowValues(Parameters inputParameters) {
-        List<Object> row;
+        List<Object> row = new ArrayList<>();
 
-        Object rowMap = inputParameters.getRequired(VALUES);
+        Map<String, Object> rowMap = inputParameters.getRequiredMap(ROW, Object.class);
 
-        if (rowMap instanceof Map<?, ?> map) {
-            row = new ArrayList<>((map).values());
-        } else {
-            row = inputParameters.getRequiredList(VALUES, Object.class);
+        Object values = rowMap.get(VALUES);
+
+        if (values instanceof Map<?, ?> map) {
+            row = new ArrayList<>(map.values());
+        } else if (values instanceof List<?> list) {
+            row.addAll(list);
         }
 
         return row;

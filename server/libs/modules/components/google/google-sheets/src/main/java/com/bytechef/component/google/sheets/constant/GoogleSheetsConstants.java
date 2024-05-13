@@ -110,7 +110,7 @@ public class GoogleSheetsConstants {
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty ROW_PROPERTY = dynamicProperties(ROW)
-        .propertiesLookupDependsOn(IS_THE_FIRST_ROW_HEADER)
+        .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_ID, IS_THE_FIRST_ROW_HEADER)
         .properties(GoogleSheetsUtils::createArrayPropertyForRow)
         .required(true);
 
