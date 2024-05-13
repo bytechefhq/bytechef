@@ -629,7 +629,7 @@ const Property = ({
                             leadingIcon={typeIcon}
                             onChange={handleMentionsInputChange}
                             onKeyPress={(event: KeyboardEvent) => {
-                                if (isNumericalInput || type === 'BOOLEAN') {
+                                if (type !== 'STRING') {
                                     event.key !== '{' && event.preventDefault();
                                 }
                             }}
