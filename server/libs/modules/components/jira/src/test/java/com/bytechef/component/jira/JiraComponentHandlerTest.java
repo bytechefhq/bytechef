@@ -16,8 +16,15 @@
 
 package com.bytechef.component.jira;
 
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
 /**
- * @author Ivica Cardic
+ * @author Monika Domiter
  */
-public class JiraComponentHandlerTest extends AbstractJiraComponentHandlerTest {
+class JiraComponentHandlerTest {
+    @Test
+    void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/jira_v1.json", new JiraComponentHandler().getDefinition());
+    }
 }
