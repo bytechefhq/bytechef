@@ -19,10 +19,14 @@ package com.bytechef.component.copper.action;
 import static com.bytechef.component.copper.constant.CopperConstants.ACTIVITY_TYPE;
 import static com.bytechef.component.copper.constant.CopperConstants.BASE_URL;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
+import static com.bytechef.component.copper.constant.CopperConstants.COMPANY;
 import static com.bytechef.component.copper.constant.CopperConstants.CREATE_ACTIVITY;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
+import static com.bytechef.component.copper.constant.CopperConstants.LEAD;
+import static com.bytechef.component.copper.constant.CopperConstants.OPPORTUNITY;
 import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
+import static com.bytechef.component.copper.constant.CopperConstants.PERSON;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -32,8 +36,8 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
@@ -56,23 +60,21 @@ public class CopperCreateActivityAction {
                 .label("Details")
                 .description("Text body of this Activity.")
                 .required(true),
-            object(PARENT)
-                .label("Parent")
-                .description("Resource to which this Activity belongs.")
-                .properties(
-                    string(ID)
-                        .label("Parent ID")
-                        .required(true),
-                    string(TYPE)
-                        .label("Parent type")
-                        .options(
-                            option("Lead", "lead"),
-                            option("Person", "person"),
-                            option("Company", "company"),
-                            option("Opportunity", "opportunity"),
-                            option("Project", "project"),
-                            option("Task", "task"))
-                        .required(true))
+            string(TYPE)
+                .label("Parent type")
+                .description("Parent type to associate this Activity with.")
+                .options(
+                    option("Lead", LEAD),
+                    option("Person", PERSON),
+                    option("Company", COMPANY),
+                    option("Opportunity", OPPORTUNITY))
+                .defaultValue(PERSON)
+                .required(true),
+            string(ID)
+                .label("Parent name")
+                .description("Parent this Activity will be associated with.")
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getParentOptions)
+                .optionsLookupDependsOn(TYPE)
                 .required(true))
         .outputSchema(
             object()
@@ -100,9 +102,10 @@ public class CopperCreateActivityAction {
                 Http.Body.of(
                     TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),
                     DETAILS, inputParameters.getRequiredString(DETAILS),
-                    PARENT, inputParameters.getRequired(PARENT)))
+                    PARENT,
+                    Map.of(TYPE, inputParameters.getRequiredString(TYPE), ID, inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 }
