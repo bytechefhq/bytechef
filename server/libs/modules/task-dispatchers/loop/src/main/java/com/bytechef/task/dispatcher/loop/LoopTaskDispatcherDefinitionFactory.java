@@ -51,13 +51,16 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .description("Loops sequentially over list of items.")
         .icon("path:assets/loop.svg")
         .properties(
-            array(ITEMS).label("List of items")
+            array(ITEMS)
+                .label("List of items")
                 .description("List of items to iterate over."),
             bool(LOOP_FOREVER)
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
                 .defaultValue(false))
-        .taskProperties(array(ITERATEE).items(task()))
+        .taskProperties(
+            array(ITERATEE)
+                .items(task()))
         .variableProperties(LoopTaskDispatcherDefinitionFactory::getVariableProperties);
 
     @Override
