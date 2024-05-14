@@ -23,6 +23,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -227,12 +228,12 @@ class GoogleSheetsUtilsTest {
 
         List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
 
-        assertEquals(List.of("name", "email"), rowValues);
+        assertIterableEquals(List.of("name", "email"), rowValues);
     }
 
     @Test
     void testGetRowValuesWhereFirstSpreadsheetRowValuesNotHeaders() {
-        List rowList = List.of("name", 1233, false);
+        List<Object> rowList = List.of("name", 1233, false);
 
         Map<String, Object> rowMap = Map.of(VALUES, rowList);
 
