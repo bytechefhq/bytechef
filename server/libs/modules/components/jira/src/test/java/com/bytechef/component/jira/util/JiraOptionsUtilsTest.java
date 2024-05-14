@@ -88,8 +88,8 @@ class JiraOptionsUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(list);
 
-        result =
-            JiraOptionsUtils.getIssueTypesIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        result = JiraOptionsUtils.getIssueTypesIdOptions(
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(expectedOptions, result);
     }
@@ -129,5 +129,4 @@ class JiraOptionsUtilsTest {
 
         assertEquals(expectedOptions, result);
     }
-
 }

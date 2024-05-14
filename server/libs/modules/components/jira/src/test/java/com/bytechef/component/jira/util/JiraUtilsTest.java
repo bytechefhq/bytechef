@@ -66,6 +66,5 @@ class JiraUtilsTest {
             .thenReturn(valuesMap);
 
         assertEquals("name", JiraUtils.getProjectName(mockedParameters, mockedParameters, mockedContext));
-
     }
 }

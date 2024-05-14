@@ -52,7 +52,5 @@ class JiraSearchForissuesUsingJqlActionTest extends AbstractJiraActionTest {
         Object result = JiraSearchForIssuesUsingJqlAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(List.of(), result);
-
-
     }
 }

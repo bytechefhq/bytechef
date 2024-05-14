@@ -43,5 +43,4 @@ class JiraGetIssueActionTest extends AbstractJiraActionTest {
 
         assertEquals(responseMap, result);
     }
-
 }
