@@ -16,6 +16,10 @@
 
 package com.bytechef.component.copper.util;
 
+import static com.bytechef.component.copper.constant.CopperConstants.ID;
+import static com.bytechef.component.copper.constant.CopperConstants.LEAD;
+import static com.bytechef.component.copper.constant.CopperConstants.NAME;
+import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -39,9 +44,9 @@ import org.junit.jupiter.api.Test;
 class CopperOptionUtilsTest {
 
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
@@ -61,12 +66,12 @@ class CopperOptionUtilsTest {
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> map = new LinkedHashMap<>();
 
-        map.put("name", "ActivityName");
-        map.put("id", "ActivityId");
+        map.put(NAME, "ActivityName");
+        map.put(ID, "ActivityId");
         list.add(map);
         linkedHashMap.put("user", list);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(linkedHashMap);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -83,12 +88,12 @@ class CopperOptionUtilsTest {
 
         Map<String, String> tagMap = new LinkedHashMap<>();
 
-        tagMap.put("name", "companyName");
-        tagMap.put("id", "123");
+        tagMap.put(NAME, "companyName");
+        tagMap.put(ID, "123");
 
         linkedHashMaps.add(tagMap);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(linkedHashMaps);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -105,12 +110,12 @@ class CopperOptionUtilsTest {
 
         Map<String, Object> tagMap = new LinkedHashMap<>();
 
-        tagMap.put("name", "ContactType");
-        tagMap.put("id", "123");
+        tagMap.put(NAME, "ContactType");
+        tagMap.put(ID, "123");
 
         linkedHashMaps.add(tagMap);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(linkedHashMaps);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -123,16 +128,39 @@ class CopperOptionUtilsTest {
     }
 
     @Test
+    void testGetParentOptions() {
+        Map<String, Object> parentMap = new LinkedHashMap<>();
+
+        parentMap.put(NAME, "parentName");
+        parentMap.put(ID, "123");
+
+        List<Map<String, Object>> list = List.of(parentMap);
+
+        when(mockedParameters.getRequiredString(TYPE))
+            .thenReturn(LEAD);
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(list);
+
+        List<Option<String>> expectedOptions = new ArrayList<>();
+
+        expectedOptions.add(option("parentName", "123"));
+
+        assertEquals(expectedOptions,
+            CopperOptionUtils.getParentOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+    }
+
+    @Test
     void testGetTagsOptions() {
         List<Map<String, Object>> linkedHashMaps = new ArrayList<>();
 
         Map<String, Object> tagMap = new LinkedHashMap<>();
 
-        tagMap.put("name", "Tag1");
+        tagMap.put(NAME, "Tag1");
 
         linkedHashMaps.add(tagMap);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(linkedHashMaps);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
@@ -148,12 +176,12 @@ class CopperOptionUtilsTest {
         List<Map<String, String>> tags = new ArrayList<>();
         Map<String, String> tagMap = new LinkedHashMap<>();
 
-        tagMap.put("name", "ContactType");
-        tagMap.put("id", "123");
+        tagMap.put(NAME, "ContactType");
+        tagMap.put(ID, "123");
 
         tags.add(tagMap);
 
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(tags);
 
         List<Option<String>> expectedOptions = new ArrayList<>();
