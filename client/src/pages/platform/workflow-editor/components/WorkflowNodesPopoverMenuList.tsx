@@ -66,6 +66,17 @@ const WorkflowNodesPopoverMenuList = memo(
                 }),
             });
 
+            const getActionDefinitionRequest = {
+                actionName: clickedComponentDefinition.actions?.[0].name as string,
+                componentName: clickedItem.name,
+                componentVersion: clickedComponentDefinition?.version,
+            };
+
+            const clickedComponentActionDefinition = await queryClient.fetchQuery({
+                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+                queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+            });
+
             if (edge) {
                 const clickedEdge = getEdge(id);
 
@@ -112,17 +123,6 @@ const WorkflowNodesPopoverMenuList = memo(
                     target: clickedEdge.target,
                     type: 'workflow',
                 };
-
-                const getActionDefinitionRequest = {
-                    actionName: clickedComponentDefinition.actions?.[0].name as string,
-                    componentName: clickedItem.name,
-                    componentVersion: clickedComponentDefinition?.version,
-                };
-
-                const clickedComponentActionDefinition = await queryClient.fetchQuery({
-                    queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
-                    queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
-                });
 
                 setNodes((nodes) => {
                     const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
@@ -260,26 +260,38 @@ const WorkflowNodesPopoverMenuList = memo(
                                     nodeNames: [...workflow.nodeNames, workflowNodeName],
                                 });
 
+                                const newWorkflowNodeData = {
+                                    componentName: clickedItem.name,
+                                    icon: (
+                                        <>
+                                            {clickedItem.icon ? (
+                                                <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
+                                            ) : (
+                                                <Component1Icon className="size-9 text-gray-700" />
+                                            )}
+                                        </>
+                                    ),
+                                    label: clickedItem?.title,
+                                    name: workflowNodeName,
+                                    type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                                };
+
+                                saveWorkflowDefinition(
+                                    {
+                                        ...newWorkflowNodeData,
+                                        parameters: getParametersWithDefaultValues({
+                                            properties:
+                                                clickedComponentActionDefinition?.properties as Array<PropertyType>,
+                                        }),
+                                        type: `${clickedComponentDefinition.name}/${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
+                                    },
+                                    workflow!,
+                                    updateWorkflowMutation
+                                );
+
                                 return {
                                     ...node,
-                                    data: {
-                                        componentName: clickedItem.name,
-                                        icon: (
-                                            <>
-                                                {clickedItem.icon ? (
-                                                    <InlineSVG
-                                                        className="size-9 text-gray-700"
-                                                        src={clickedItem.icon}
-                                                    />
-                                                ) : (
-                                                    <Component1Icon className="size-9 text-gray-700" />
-                                                )}
-                                            </>
-                                        ),
-                                        label: clickedItem?.title,
-                                        name: workflowNodeName,
-                                        type: `${clickedComponentDefinition.name}/v${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
-                                    },
+                                    data: newWorkflowNodeData,
                                     type: 'workflow',
                                 };
                             }
