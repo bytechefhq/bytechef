@@ -18,6 +18,7 @@ package com.bytechef.platform.user.util;
 
 import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.security.core.Authentication;
@@ -82,9 +83,9 @@ public final class SecurityUtils {
 
         Authentication authentication = context.getAuthentication();
 
-        return (authentication != null &&
-            getAuthorities(authentication).anyMatch(authority -> Arrays.asList(authorities)
-                .contains(authority)));
+        List<String> authoritiesList = Arrays.asList(authorities);
+
+        return authentication != null && getAuthorities(authentication).anyMatch(authoritiesList::contains);
     }
 
     /**

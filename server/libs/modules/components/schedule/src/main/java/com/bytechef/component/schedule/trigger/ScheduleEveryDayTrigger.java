@@ -138,7 +138,7 @@ public class ScheduleEveryDayTrigger {
         return inputParameters.getMap(DAY_OF_WEEK)
             .entrySet()
             .stream()
-            .filter(entry -> entry.getValue() == null || !((Boolean) entry.getValue()))
+            .filter(entry -> entry.getValue() == null || !(Boolean) entry.getValue())
             .map(Map.Entry::getKey)
             .collect(Collectors.joining(","));
     }

@@ -52,6 +52,7 @@ public class CopperConnection {
     private CopperConnection() {
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
         return ApplyResponse.ofHeaders(
             Map.of(

@@ -53,8 +53,7 @@ public class WorkflowExecutionId implements Serializable {
 
         String[] items = id.split(":");
 
-        return WorkflowExecutionId.of(
-            Type.values()[Integer.parseInt(items[0])], Long.parseLong(items[1]), items[2], items[3]);
+        return of(Type.values()[Integer.parseInt(items[0])], Long.parseLong(items[1]), items[2], items[3]);
     }
 
     public long getInstanceId() {

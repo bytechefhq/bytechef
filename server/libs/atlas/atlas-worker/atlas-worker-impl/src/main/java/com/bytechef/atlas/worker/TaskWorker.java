@@ -113,7 +113,9 @@ public class TaskWorker {
                 eventPublisher.publishEvent(
                     new TaskExecutionCompleteEvent(completedTaskExecution));
             } catch (InterruptedException e) {
-                // ignore
+                if (logger.isTraceEnabled()) {
+                    logger.trace(e.getMessage(), e);
+                }
             } catch (Exception e) {
                 TaskExecutionFuture<?> taskExecutionFuture = taskExecutionFutureMap.get(taskExecution.getId());
 

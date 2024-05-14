@@ -29,7 +29,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -37,11 +36,10 @@ import org.mockito.Mockito;
 class GoogleSheetRowUtilsTest {
 
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = Mockito.mock(Sheets.Spreadsheets.class);
-    private final Sheets.Spreadsheets.Values mockedValues = Mockito.mock(Sheets.Spreadsheets.Values.class);
-    private final ValueRange mockedValueRange = Mockito.mock(ValueRange.class);
-    private final Sheets.Spreadsheets.Values.BatchGet mockedBatchGet =
-        Mockito.mock(Sheets.Spreadsheets.Values.BatchGet.class);
+    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
+    private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
+    private final ValueRange mockedValueRange = mock(ValueRange.class);
+    private final Sheets.Spreadsheets.Values.BatchGet mockedBatchGet = mock(Sheets.Spreadsheets.Values.BatchGet.class);
     private final ArgumentCaptor<String> valueRenderOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> dateTimeRenderOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> majorDimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);

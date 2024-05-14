@@ -34,7 +34,6 @@ import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 
@@ -51,13 +50,13 @@ class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         List<Option<String>> sizeOptions = OpenAIUtils.getSizeOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        Assertions.assertEquals(3, sizeOptions.size());
-        Assertions.assertEquals("256x256", sizeOptions.get(0).getLabel());
-        Assertions.assertEquals("256x256", sizeOptions.get(0).getValue());
-        Assertions.assertEquals("512x512", sizeOptions.get(1).getLabel());
-        Assertions.assertEquals("512x512", sizeOptions.get(1).getValue());
-        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.get(2).getLabel());
-        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.get(2).getValue());
+       assertEquals(3, sizeOptions.size());
+       assertEquals("256x256", sizeOptions.get(0).getLabel());
+       assertEquals("256x256", sizeOptions.get(0).getValue());
+       assertEquals("512x512", sizeOptions.get(1).getLabel());
+       assertEquals("512x512", sizeOptions.get(1).getValue());
+       assertEquals(DEFAULT_SIZE, sizeOptions.get(2).getLabel());
+       assertEquals(DEFAULT_SIZE, sizeOptions.get(2).getValue());
     }
 
     @Test
@@ -68,13 +67,13 @@ class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         List<Option<String>> sizeOptions = OpenAIUtils.getSizeOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        Assertions.assertEquals(3, sizeOptions.size());
-        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.get(0).getLabel());
-        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.get(0).getValue());
-        Assertions.assertEquals("1792x1024", sizeOptions.get(1).getLabel());
-        Assertions.assertEquals("1792x1024", sizeOptions.get(1).getValue());
-        Assertions.assertEquals("1024x1792", sizeOptions.get(2).getLabel());
-        Assertions.assertEquals("1024x1792", sizeOptions.get(2).getValue());
+       assertEquals(3, sizeOptions.size());
+       assertEquals(DEFAULT_SIZE, sizeOptions.get(0).getLabel());
+       assertEquals(DEFAULT_SIZE, sizeOptions.get(0).getValue());
+       assertEquals("1792x1024", sizeOptions.get(1).getLabel());
+       assertEquals("1792x1024", sizeOptions.get(1).getValue());
+       assertEquals("1024x1792", sizeOptions.get(2).getLabel());
+       assertEquals("1024x1792", sizeOptions.get(2).getValue());
     }
 
     @Test
@@ -85,25 +84,25 @@ class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         List<ValueProperty<?>> modelProperties = OpenAIUtils.getModelProperties(
             mockedParameters, mockedParameters, Map.of(), mockedContext);
 
-        Assertions.assertEquals(2, modelProperties.size());
+       assertEquals(2, modelProperties.size());
 
         ValueProperty<?> property = modelProperties.getFirst();
 
-        Assertions.assertEquals("Prompt", property.getLabel().get());
-        Assertions.assertEquals("A text description of the desired image(s).", property.getDescription().get());
-        Assertions.assertEquals(true, property.getRequired().get());
-        Assertions.assertEquals(1000, ((ModifiableStringProperty) property).getMaxLength().get());
+       assertEquals("Prompt", property.getLabel().get());
+       assertEquals("A text description of the desired image(s).", property.getDescription().get());
+       assertEquals(true, property.getRequired().get());
+       assertEquals(1000, ((ModifiableStringProperty) property).getMaxLength().get());
 
         property = modelProperties.get(1);
 
-        Assertions.assertEquals("n", property.getLabel().get());
-        Assertions.assertEquals(
+       assertEquals("n", property.getLabel().get());
+       assertEquals(
             "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
             property.getDescription().get());
-        Assertions.assertEquals(1L, property.getDefaultValue().get());
-        Assertions.assertEquals(false, property.getRequired().get());
-        Assertions.assertEquals(10, ((ComponentDSL.ModifiableIntegerProperty) property).getMaxValue().get());
-        Assertions.assertEquals(1, ((ComponentDSL.ModifiableIntegerProperty) property).getMinValue().get());
+       assertEquals(1L, property.getDefaultValue().get());
+       assertEquals(false, property.getRequired().get());
+       assertEquals(10, ((ComponentDSL.ModifiableIntegerProperty) property).getMaxValue().get());
+       assertEquals(1, ((ComponentDSL.ModifiableIntegerProperty) property).getMinValue().get());
     }
 
     @Test
@@ -114,28 +113,29 @@ class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         List<ValueProperty<?>> modelProperties = OpenAIUtils.getModelProperties(
             mockedParameters, mockedParameters, Map.of(), mockedContext);
 
-        Assertions.assertEquals(2, modelProperties.size());
+       assertEquals(2, modelProperties.size());
 
         ValueProperty<?> property = modelProperties.getFirst();
 
-        Assertions.assertEquals("Prompt", property.getLabel().get());
-        Assertions.assertEquals("A text description of the desired image(s).", property.getDescription().get());
-        Assertions.assertEquals(true, property.getRequired().get());
-        Assertions.assertEquals(4000, ((ModifiableStringProperty) property).getMaxLength().get());
+       assertEquals("Prompt", property.getLabel().get());
+       assertEquals("A text description of the desired image(s).", property.getDescription().get());
+       assertEquals(true, property.getRequired().get());
+       assertEquals(4000, ((ModifiableStringProperty) property).getMaxLength().get());
 
         property = modelProperties.get(1);
 
-        Assertions.assertEquals("n", property.getLabel().get());
-        Assertions.assertEquals(
+       assertEquals("n", property.getLabel().get());
+       assertEquals(
             "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
             property.getDescription().get());
-        Assertions.assertEquals(1L, property.getDefaultValue().get());
-        Assertions.assertEquals(false, property.getRequired().get());
-        Assertions.assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMaxValue());
-        Assertions.assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMinValue());
+       assertEquals(1L, property.getDefaultValue().get());
+       assertEquals(false, property.getRequired().get());
+       assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMaxValue());
+       assertEquals(Optional.empty(), ((ComponentDSL.ModifiableIntegerProperty) property).getMinValue());
     }
 
     @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testGetModelOptions() {
         Model model1 = new Model();
 

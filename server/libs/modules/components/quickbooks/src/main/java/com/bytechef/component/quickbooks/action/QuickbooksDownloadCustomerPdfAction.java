@@ -42,6 +42,7 @@ import java.util.Map;
 /**
  * @author Mario Cvjetojevic
  */
+@SuppressWarnings("PMD.UnusedFormalParameter")
 public final class QuickbooksDownloadCustomerPdfAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD_CUSTOMER_PDF)

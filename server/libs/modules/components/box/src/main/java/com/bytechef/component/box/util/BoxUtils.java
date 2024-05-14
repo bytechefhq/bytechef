@@ -56,7 +56,7 @@ public class BoxUtils {
 
         if (body.get("entries") instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map && (Objects.equals(map.get(TYPE), FILE))) {
+                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), FILE)) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }
@@ -78,7 +78,7 @@ public class BoxUtils {
 
         if (body.get("entries") instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map && (Objects.equals(map.get(TYPE), "folder"))) {
+                if (item instanceof Map<?, ?> map && Objects.equals(map.get(TYPE), "folder")) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
                 }
             }

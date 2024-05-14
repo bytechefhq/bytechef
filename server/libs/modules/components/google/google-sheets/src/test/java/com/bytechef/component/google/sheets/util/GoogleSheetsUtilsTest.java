@@ -53,7 +53,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -66,12 +65,12 @@ class GoogleSheetsUtilsTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Drive mockedDrive = mock(Drive.class);
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
-    private final Sheets.Spreadsheets.Get mockedGet = Mockito.mock(Sheets.Spreadsheets.Get.class);
+    private final Sheets.Spreadsheets.Get mockedGet = mock(Sheets.Spreadsheets.Get.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final Spreadsheet mockedSpreadsheet = Mockito.mock(Spreadsheet.class);
-    private final Sheets.Spreadsheets mockedSpreadsheets = Mockito.mock(Sheets.Spreadsheets.class);
+    private final Spreadsheet mockedSpreadsheet = mock(Spreadsheet.class);
+    private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);

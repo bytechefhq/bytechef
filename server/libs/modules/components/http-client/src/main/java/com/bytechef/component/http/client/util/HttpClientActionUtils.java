@@ -149,7 +149,7 @@ public class HttpClientActionUtils {
     }
 
     public static ActionDefinition.SingleConnectionPerformFunction getPerform(RequestMethod requestMethod) {
-        return (inputParameters, connectionParameters, context) -> HttpClientActionUtils.execute(
+        return (inputParameters, connectionParameters, context) -> execute(
             inputParameters, requestMethod, context, connectionParameters);
     }
 

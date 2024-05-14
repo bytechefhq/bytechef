@@ -24,12 +24,16 @@ import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 
 /**
  * @author Arik Cohen
  */
 public class JmsMessageBroker implements MessageBroker {
+
+    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBroker.class);
 
     private final JmsTemplate jmsTemplate;
 
@@ -53,6 +57,9 @@ public class JmsMessageBroker implements MessageBroker {
         try {
             TimeUnit.MILLISECONDS.sleep(value);
         } catch (InterruptedException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
     }
 }

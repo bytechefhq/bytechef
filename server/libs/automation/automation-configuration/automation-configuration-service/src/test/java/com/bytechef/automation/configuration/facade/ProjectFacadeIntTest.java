@@ -40,7 +40,6 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,7 +196,7 @@ public class ProjectFacadeIntTest {
 
         List<ProjectDTO> projectsDTOs = projectFacade.getProjects(null, false, null, null);
 
-        Assertions.assertThat(CollectionUtils.map(projectsDTOs, ProjectDTO::toProject))
+        assertThat(CollectionUtils.map(projectsDTOs, ProjectDTO::toProject))
             .isEqualTo(List.of(project));
 
         ProjectDTO projectDTO = projectsDTOs.get(0);

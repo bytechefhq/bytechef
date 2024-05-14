@@ -23,7 +23,6 @@ import com.bytechef.platform.category.config.CategoryIntTestConfiguration;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +56,12 @@ public class CategoryRepositoryIntTest {
     public void testDelete() {
         Category category = categoryRepository.save(new Category("name"));
 
-        Assertions.assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id")))
+        assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id")))
             .hasValue(category);
 
         categoryRepository.deleteById(Validate.notNull(category.getId(), "id"));
 
-        Assertions.assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id")))
+        assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id")))
             .isEmpty();
     }
 
@@ -70,7 +69,7 @@ public class CategoryRepositoryIntTest {
     public void testFindById() {
         Category category = categoryRepository.save(new Category("name"));
 
-        Assertions.assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id")))
+        assertThat(categoryRepository.findById(Validate.notNull(category.getId(), "id")))
             .hasValue(category);
     }
 
@@ -82,7 +81,7 @@ public class CategoryRepositoryIntTest {
 
         categoryRepository.save(category);
 
-        Assertions.assertThat(categoryRepository.findById(category.getId()))
+        assertThat(categoryRepository.findById(category.getId()))
             .hasValue(category);
     }
 }

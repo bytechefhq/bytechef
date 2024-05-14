@@ -80,8 +80,8 @@ class InfobipSendSMSActionTest extends AbstractInfobipActionTest {
 
         try (MockedConstruction<SmsApi> smsApiMockedConstruction = mockConstruction(
             SmsApi.class,
-            ((smsApi, context) -> when(smsApi.sendSmsMessage(any()))
-                .thenReturn(mockedSendSmsMessageRequest)))) {
+            (smsApi, context) -> when(smsApi.sendSmsMessage(any()))
+                .thenReturn(mockedSendSmsMessageRequest))) {
             when(mockedSendSmsMessageRequest.execute())
                 .thenReturn(mockedSmsResponse);
 

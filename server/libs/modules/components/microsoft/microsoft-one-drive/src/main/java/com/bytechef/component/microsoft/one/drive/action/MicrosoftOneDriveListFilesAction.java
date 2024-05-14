@@ -78,7 +78,7 @@ public class MicrosoftOneDriveListFilesAction {
 
         if (body.get("value") instanceof List<?> list) {
             for (Object item : list) {
-                if ((item instanceof Map<?, ?> map) && (map.containsKey("file"))) {
+                if (item instanceof Map<?, ?> map && map.containsKey("file")) {
                     files.add(map);
                 }
             }

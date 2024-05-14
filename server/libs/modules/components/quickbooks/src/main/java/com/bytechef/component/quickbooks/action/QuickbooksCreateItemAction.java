@@ -52,6 +52,7 @@ import java.util.Map;
 /**
  * @author Mario Cvjetojevic
  */
+@SuppressWarnings("PMD.UnusedFormalParameter")
 public final class QuickbooksCreateItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ITEM)

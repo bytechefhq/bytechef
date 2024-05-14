@@ -53,7 +53,7 @@ public class MicrosoftOneDriveUtils {
 
         if (body.get("value") instanceof List<?> list) {
             for (Object item : list) {
-                if ((item instanceof Map<?, ?> map) && (map.containsKey("file"))) {
+                if (item instanceof Map<?, ?> map && map.containsKey("file")) {
                     options.add(option((String) map.get("name"), (String) map.get("id")));
                 }
             }

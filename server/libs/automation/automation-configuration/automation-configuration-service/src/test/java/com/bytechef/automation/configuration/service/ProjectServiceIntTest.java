@@ -28,7 +28,6 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,7 +92,7 @@ public class ProjectServiceIntTest {
 
         projectService.delete(Validate.notNull(project.getId(), "id"));
 
-        Assertions.assertThat(projectRepository.findById(project.getId()))
+        assertThat(projectRepository.findById(project.getId()))
             .isNotPresent();
     }
 

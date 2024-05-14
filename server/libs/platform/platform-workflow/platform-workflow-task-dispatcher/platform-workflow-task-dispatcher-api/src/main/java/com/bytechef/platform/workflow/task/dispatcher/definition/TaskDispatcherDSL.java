@@ -1231,7 +1231,7 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition outputSchema(
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition outputSchema(
             ModifiableValueProperty<?, ?> outputSchema) {
 
             return output(outputSchema, null);

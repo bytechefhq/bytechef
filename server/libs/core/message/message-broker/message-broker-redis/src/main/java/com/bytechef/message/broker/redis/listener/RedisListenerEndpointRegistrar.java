@@ -141,8 +141,10 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
     private void sleep() {
         try {
             TimeUnit.MILLISECONDS.sleep(100);
-        } catch (InterruptedException ex) {
-            // ignore
+        } catch (InterruptedException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
     }
 }

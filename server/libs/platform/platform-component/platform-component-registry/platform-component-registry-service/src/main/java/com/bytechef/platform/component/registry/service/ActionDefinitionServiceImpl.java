@@ -266,8 +266,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         }
 
-        com.bytechef.component.definition.ComponentDefinition componentDefinition =
-            componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 

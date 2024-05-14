@@ -44,7 +44,5 @@ public record JobDTO(
             job.getId(), job.getInputs(), job.getLabel(), job.getLastModifiedBy(), job.getLastModifiedDate(),
             job.getMetadata(), outputs, job.getParentTaskExecutionId(), job.getPriority(), job.getStartDate(),
             job.getStatus(), taskExecutions, job.getVersion(), job.getWebhooks(), job.getWorkflowId());
-        {
-        }
     }
 }

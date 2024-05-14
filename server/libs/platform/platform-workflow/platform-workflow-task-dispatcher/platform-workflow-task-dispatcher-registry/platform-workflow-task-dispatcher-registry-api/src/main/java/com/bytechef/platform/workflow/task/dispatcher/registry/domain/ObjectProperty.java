@@ -43,7 +43,7 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> {
 
         this.additionalProperties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
+            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
         this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
         this.options = CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
         this.properties = CollectionUtils.map(

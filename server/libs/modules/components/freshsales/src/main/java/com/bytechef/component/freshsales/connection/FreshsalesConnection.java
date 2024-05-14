@@ -54,6 +54,7 @@ public class FreshsalesConnection {
     private FreshsalesConnection() {
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static Authorization.ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
         return Authorization.ApplyResponse.ofHeaders(
             Map.of("Authorization", List.of("Token token=" + connectionParameters.getRequiredString(KEY))));

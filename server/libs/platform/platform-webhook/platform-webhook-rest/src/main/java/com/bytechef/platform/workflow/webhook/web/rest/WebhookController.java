@@ -286,13 +286,17 @@ public class WebhookController {
         try {
             return Integer.parseInt(str);
         } catch (NumberFormatException e) {
-            // Not an integer
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
 
         try {
             return Double.parseDouble(str);
         } catch (NumberFormatException e) {
-            // Not a double
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
 
         if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
@@ -302,7 +306,9 @@ public class WebhookController {
         try {
             return LocalDate.parse(str);
         } catch (DateTimeParseException e) {
-            // Not a LocalDate
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
 
         return str;

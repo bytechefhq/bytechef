@@ -31,7 +31,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 public class AffinityConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(((connectionParameters, context) -> BASE_URL))
+        .baseUri((connectionParameters, context) -> BASE_URL)
         .authorizations(
             authorization(
                 BEARER_TOKEN.toLowerCase(), BEARER_TOKEN)

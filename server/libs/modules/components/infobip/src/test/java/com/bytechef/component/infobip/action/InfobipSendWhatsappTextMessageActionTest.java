@@ -85,8 +85,8 @@ class InfobipSendWhatsappTextMessageActionTest extends AbstractInfobipActionTest
 
         try (MockedConstruction<WhatsAppApi> whatsAppApiMockedConstruction = mockConstruction(
             WhatsAppApi.class,
-            ((whatsAppApi, context) -> when(whatsAppApi.sendWhatsAppTextMessage(any()))
-                .thenReturn(mockedSendSmsMessageRequest)))) {
+            (whatsAppApi, context) -> when(whatsAppApi.sendWhatsAppTextMessage(any()))
+                .thenReturn(mockedSendSmsMessageRequest))) {
             when(mockedSendSmsMessageRequest.execute())
                 .thenReturn(mockedWhatsAppSingleMessageInfo);
 

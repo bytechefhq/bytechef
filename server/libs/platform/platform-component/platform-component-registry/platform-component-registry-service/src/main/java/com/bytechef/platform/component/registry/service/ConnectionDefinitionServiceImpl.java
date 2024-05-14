@@ -368,6 +368,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             challengeMethod);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static String getDefaultRefreshUrl(
         Parameters connectionParameters, RefreshUrlFunction refreshUrlFunction, TokenUrlFunction tokenUrlFunction,
         Context context) {

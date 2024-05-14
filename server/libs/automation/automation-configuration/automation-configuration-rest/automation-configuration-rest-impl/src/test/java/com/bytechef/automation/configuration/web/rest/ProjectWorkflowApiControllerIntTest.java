@@ -153,10 +153,6 @@ public class ProjectWorkflowApiControllerIntTest {
         }
     }
 
-    private Workflow getWorkflow() {
-        return new Workflow("1", DEFINITION, Workflow.Format.JSON);
-    }
-
     private WorkflowDTO getWorkflowDTO() {
         Workflow workflow = new Workflow("1", DEFINITION, Workflow.Format.JSON);
 

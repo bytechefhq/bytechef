@@ -327,22 +327,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                             }
                         }
                     }
-                } else if (entry.getValue() instanceof List<?> curList) {
-                    if (!curList.isEmpty() && curList.getFirst() instanceof Map<?, ?>) {
-                        for (Object item : curList) {
-                            Map<String, ?> curTask = (Map<String, ?>) item;
+                } else if (entry.getValue() instanceof List<?> curList && !curList.isEmpty() &&
+                    curList.getFirst() instanceof Map<?, ?>) {
 
-                            if (!curTask.containsKey(WorkflowConstants.NAME) &&
-                                !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
+                    for (Object item : curList) {
+                        Map<String, ?> curTask = (Map<String, ?>) item;
 
-                                continue;
-                            }
+                        if (!curTask.containsKey(WorkflowConstants.NAME) &&
+                            !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
 
-                            Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of(curTask));
+                            continue;
+                        }
 
-                            if (curTaskMap != null) {
-                                return curTaskMap;
-                            }
+                        Map<String, ?> curTaskMap = getTask(workflowNodeName, List.of(curTask));
+
+                        if (curTaskMap != null) {
+                            return curTaskMap;
                         }
                     }
                 }

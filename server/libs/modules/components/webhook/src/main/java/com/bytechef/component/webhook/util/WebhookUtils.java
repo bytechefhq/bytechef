@@ -89,10 +89,8 @@ public class WebhookUtils {
     private static Object checkList(Map.Entry<String, ?> entry) {
         Object value = entry.getValue();
 
-        if (value instanceof List<?> list) {
-            if (list.size() == 1) {
-                value = list.getFirst();
-            }
+        if (value instanceof List<?> list && list.size() == 1) {
+            value = list.getFirst();
         }
 
         return value;

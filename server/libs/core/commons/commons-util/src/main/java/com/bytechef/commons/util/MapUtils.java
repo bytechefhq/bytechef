@@ -80,8 +80,10 @@ public class MapUtils {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
+    @SuppressWarnings("PMD.UselessOverridingMethod")
     public static <K, V1, V2> Map<K, V1> concatDifferentTypes(Map<K, V1> map1, Map<K, V2> map2) {
-        TypeReference<V1> elementType = new TypeReference<V1>() {
+        TypeReference<V1> elementType = new TypeReference<>() {
+
             @Override
             public Type getType() {
                 return super.getType();
@@ -515,7 +517,7 @@ public class MapUtils {
         Map<K2, ?> mapValue = getMap(map, key);
 
         if (mapValue != null) {
-            mapValue = MapUtils.toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
+            mapValue = toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
         }
 
         return mapValue;
@@ -529,7 +531,7 @@ public class MapUtils {
         if (mapValue == null) {
             mapValue = Collections.unmodifiableMap(defaultValue);
         } else {
-            mapValue = MapUtils.toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
+            mapValue = toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
         }
 
         return mapValue;

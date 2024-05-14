@@ -167,7 +167,7 @@ public class MicrosoftExcelUtils {
         Map<String, Object> rowMap = inputParameters.getRequiredMap(ROW, Object.class);
 
         if (rowMap.get(VALUES) instanceof Map<?, ?> map) {
-            row.addAll((map).values());
+            row.addAll(map.values());
         } else if (rowMap.get(VALUES) instanceof List<?> list) {
             row.addAll(list);
         }

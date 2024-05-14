@@ -24,12 +24,16 @@ import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * @author Ivica Cardic
  */
 public class RedisMessageBroker implements MessageBroker {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisMessageBroker.class);
 
     private final RedisMessageSerializer redisMessageSerializer;
     private final RedisSMQ redisSMQ;
@@ -74,6 +78,9 @@ public class RedisMessageBroker implements MessageBroker {
         try {
             TimeUnit.MILLISECONDS.sleep(value);
         } catch (InterruptedException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
         }
     }
 }

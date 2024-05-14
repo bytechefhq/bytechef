@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
  */
 public abstract class AbstractOpenAIActionTest {
 
-    protected Parameters mockedParameters = mock(Parameters.class);;
+    protected Parameters mockedParameters = mock(Parameters.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
 
     @BeforeEach

@@ -54,7 +54,7 @@ public class MicrosoftTeamsOptionUtils {
 
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
-                if ((item instanceof Map<?, ?> map)) {
+                if (item instanceof Map<?, ?> map) {
                     List<String> members = getChatMembers(context, map);
 
                     String chatName = getChatName((String) map.get("topic"), members);
@@ -103,7 +103,7 @@ public class MicrosoftTeamsOptionUtils {
 
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object item : list) {
-                if ((item instanceof Map<?, ?> map)) {
+                if (item instanceof Map<?, ?> map) {
                     options.add(option((String) map.get(DISPLAY_NAME), (String) map.get(ID)));
                 }
             }

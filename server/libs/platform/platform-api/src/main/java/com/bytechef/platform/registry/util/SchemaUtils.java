@@ -114,7 +114,9 @@ public class SchemaUtils {
             try {
                 sampleOutput = JsonUtils.readMap(string);
             } catch (Exception e) {
-                //
+                if (logger.isTraceEnabled()) {
+                    logger.trace(e.getMessage(), e);
+                }
             }
         }
 

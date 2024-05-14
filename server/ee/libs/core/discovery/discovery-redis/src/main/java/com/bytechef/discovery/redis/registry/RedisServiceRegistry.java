@@ -89,7 +89,9 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
                     try {
                         TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException ex) {
-                        // ignore
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(e.getMessage(), e);
+                        }
                     }
                 }
             }

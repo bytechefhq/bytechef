@@ -33,7 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,8 +106,6 @@ class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
                 (mock, context) -> when(
                     mock.createChatCompletion(chatCompletionRequestArgumentCaptor.capture()))
                         .thenReturn(mockedChatCompletionResult))) {
-
-            ChatCompletionResult chatCompletionResult = spy(new ChatCompletionResult());
 
             Object result = OpenAIAskChatGPTAction.perform(mockedParameters, mockedParameters, mockedContext);
 

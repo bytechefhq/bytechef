@@ -100,7 +100,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     @Column("parent_task_execution_id")
     private AggregateReference<TaskExecution, Long> parentTaskExecutionId;
 
-    private int priority = Prioritizable.DEFAULT_PRIORITY;
+    private int priority;
 
     @Column("start_date")
     private LocalDateTime startDate;

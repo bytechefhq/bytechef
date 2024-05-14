@@ -22,10 +22,7 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.util.Collections;
-import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +46,7 @@ public class ProjectRepositoryIntTest {
 
     @Test
     public void testCreate() {
-        Project project = projectRepository.save(getProject(Collections.emptyList()));
+        Project project = projectRepository.save(getProject());
 
         assertThat(project).isEqualTo(
             OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id"))));
@@ -57,7 +54,7 @@ public class ProjectRepositoryIntTest {
 
     @Test
     public void testDelete() {
-        Project project = projectRepository.save(getProject(Collections.emptyList()));
+        Project project = projectRepository.save(getProject());
 
         Project resultProject = OptionalUtils.get(
             projectRepository.findById(Validate.notNull(project.getId(), "id")));
@@ -66,13 +63,13 @@ public class ProjectRepositoryIntTest {
 
         projectRepository.deleteById(Validate.notNull(resultProject.getId(), "id"));
 
-        Assertions.assertThat(projectRepository.findById(project.getId()))
+        assertThat(projectRepository.findById(project.getId()))
             .isEmpty();
     }
 
     @Test
     public void testFindById() {
-        Project project = projectRepository.save(getProject(Collections.emptyList()));
+        Project project = projectRepository.save(getProject());
 
         Project resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
 
@@ -81,17 +78,17 @@ public class ProjectRepositoryIntTest {
 
     @Test
     public void testUpdate() {
-        Project project = projectRepository.save(getProject(List.of("workflow1")));
+        Project project = projectRepository.save(getProject());
 
         project.setName("name2");
 
         projectRepository.save(project);
 
-        Assertions.assertThat(projectRepository.findById(Validate.notNull(project.getId(), "id")))
+        assertThat(projectRepository.findById(Validate.notNull(project.getId(), "id")))
             .hasValue(project);
     }
 
-    private static Project getProject(List<String> workflowIds) {
+    private static Project getProject() {
         return Project.builder()
             .description("description")
             .name("name")

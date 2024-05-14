@@ -25,7 +25,6 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +53,13 @@ public class CategoryServiceIntTest {
     public void testGetCategories() {
         Category category = categoryService.save(new Category("name"));
 
-        Assertions.assertThat(categoryService.getCategories())
+        assertThat(categoryService.getCategories())
             .isEqualTo(List.of(category));
 
-        Assertions.assertThat(categoryService.getCategories(List.of()))
+        assertThat(categoryService.getCategories(List.of()))
             .isEmpty();
 
-        Assertions.assertThat(categoryService.getCategories(List.of(category.getId())))
+        assertThat(categoryService.getCategories(List.of(category.getId())))
             .isEqualTo(List.of(category));
     }
 

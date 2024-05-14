@@ -53,6 +53,7 @@ public class IntercomConnection {
                 .tokenUrl((connection, context) -> "https://api.intercom.io/auth/eagle/token")
                 .scopes((connection, context) -> List.of()));
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
         return ApplyResponse.ofHeaders(
             Map.of("Accept", List.of("application/json"),

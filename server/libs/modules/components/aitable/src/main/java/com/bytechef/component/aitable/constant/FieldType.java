@@ -38,7 +38,7 @@ public enum FieldType {
     }
 
     public static FieldType fromString(String text) {
-        for (FieldType fieldType : FieldType.values()) {
+        for (FieldType fieldType : values()) {
             if (fieldType.name.equalsIgnoreCase(text)) {
                 return fieldType;
             }

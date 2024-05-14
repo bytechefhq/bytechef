@@ -42,6 +42,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@SuppressWarnings("PMD.UnusedFormalParameter")
 public class PipedriveNewPersonTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("newPerson")
@@ -242,6 +243,7 @@ public class PipedriveNewPersonTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
-        return (Map<String, ?>) (body.getContent(new TypeReference<Map<String, ?>>() {})).get("current");
+        return (Map<String, ?>) body.getContent(new TypeReference<Map<String, ?>>() {})
+            .get("current");
     }
 }

@@ -55,6 +55,7 @@ public class DataStreamSyncAction {
 
     public static class SyncActionDefinition extends AbstractActionDefinitionWrapper {
 
+        @SuppressWarnings("PMD.UnusedFormalParameter")
         public SyncActionDefinition(ActionDefinition actionDefinition, JobLauncher jobLauncher) {
             super(actionDefinition);
         }

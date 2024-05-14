@@ -140,7 +140,7 @@ public class ComponentDefinitionRegistry {
                 .stream()
                 .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
                 .findFirst()
-                .orElseThrow((() -> new IllegalArgumentException("No component " + name + " version " + version)));
+                .orElseThrow(() -> new IllegalArgumentException("No component " + name + " version " + version));
         }
 
         return componentDefinition;
