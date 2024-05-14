@@ -1273,6 +1273,7 @@ components:
               type: "number"
     WorkflowBasic:
       description: "The blueprint that describe the execution of a job."
+      x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModelAware']
       allOf:
         - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
         - type: "object"

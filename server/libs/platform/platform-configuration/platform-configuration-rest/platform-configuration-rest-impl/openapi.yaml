@@ -1887,6 +1887,7 @@ components:
     WorkflowBasic:
       description: "The blueprint that describe the execution of a job."
       type: "object"
+      x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModelAware']
       properties:
         createdBy:
           description: "The created by."
