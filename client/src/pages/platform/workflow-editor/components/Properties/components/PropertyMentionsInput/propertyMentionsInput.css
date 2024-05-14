@@ -19,7 +19,7 @@
     @apply focus:outline-none;
     @apply min-w-[34px];
     @apply min-h-[34px];
-    padding: 0.313rem;
+    padding: 0.26rem;
     @apply pl-3;
 }
 

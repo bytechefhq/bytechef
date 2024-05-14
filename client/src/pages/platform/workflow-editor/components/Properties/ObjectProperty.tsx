@@ -175,7 +175,7 @@ const ObjectProperty = ({
                                 customClassName={twMerge(
                                     'w-full last-of-type:pb-0',
                                     label && 'mb-0',
-                                    name === '__item' ? 'pb-0' : 'pl-2'
+                                    name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
                                 )}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
                                 objectName={name}
