@@ -70,7 +70,7 @@ public class OpenApiClientUtils {
         if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
             Object body = response.getBody();
 
-            throw new IllegalArgumentException(body==null ? null : body.toString());
+            throw new IllegalArgumentException(body == null ? null : body.toString());
         }
 
         return response;
