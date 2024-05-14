@@ -170,12 +170,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         case SingleConnectionPerformFunction singleConnectionPerformFunction ->
                             singleConnectionPerformFunction.apply(
                                 new ParametersImpl(inputParameters),
-                                new ParametersImpl(CollectionUtils.findFirstMapOrElse(connections.values(),
-                                    (componentConnection) -> MapUtils.concatDifferentTypes(
-                                        componentConnection.getParameters(),
-                                        Map.of(Authorization.AUTHORIZATION_TYPE,
-                                            componentConnection.authorizationName())),
-                                    Map.of())),
+                                new ParametersImpl(
+                                    CollectionUtils.findFirstMapOrElse(connections.values(),
+                                        (componentConnection) -> MapUtils.concatDifferentTypes(
+                                            componentConnection.getParameters(),
+                                            componentConnection.authorizationName() == null
+                                                ? Map.of()
+                                                : Map.of(
+                                                    Authorization.AUTHORIZATION_TYPE,
+                                                    componentConnection.authorizationName())),
+                                        Map.of())),
                                 context);
                         case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
                             multipleConnectionsPerformFunction.apply(
