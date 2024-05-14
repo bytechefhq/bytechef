@@ -183,8 +183,7 @@ public class InfobipSendWhatsappTextMesageAction {
     public static WhatsAppSingleMessageInfo perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws ApiException {
 
-        ApiClient apiClient = ApiClient
-            .forApiKey(ApiKey.from(connectionParameters.getRequiredString(VALUE)))
+        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(connectionParameters.getRequiredString(VALUE)))
             .build();
 
         WhatsAppApi whatsAppApi = new WhatsAppApi(apiClient);
@@ -200,8 +199,7 @@ public class InfobipSendWhatsappTextMesageAction {
             .entityId(inputParameters.getString(ENTITY_ID))
             .applicationId(inputParameters.getString(APPLICATION_ID));
 
-        return whatsAppApi
-            .sendWhatsAppTextMessage(whatsAppTextMessage)
+        return whatsAppApi.sendWhatsAppTextMessage(whatsAppTextMessage)
             .execute();
     }
 }
