@@ -43,7 +43,7 @@ const ArrayPropertyItem = ({
 
             {arrayItem.custom && arrayName && arrayItem.name && currentComponent && (
                 <DeletePropertyButton
-                    className="mr-4 ml-2"
+                    className="ml-2 mr-4"
                     currentComponent={currentComponent}
                     onClick={handleOnDeleteClick}
                     propertyName={arrayName}
