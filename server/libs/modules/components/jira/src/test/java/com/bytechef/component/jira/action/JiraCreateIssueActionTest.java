@@ -95,6 +95,5 @@ class JiraCreateIssueActionTest extends AbstractJiraActionTest {
                     TYPE, "paragraph")),
                 TYPE, "doc",
                 "version", 1));
-
     }
 }

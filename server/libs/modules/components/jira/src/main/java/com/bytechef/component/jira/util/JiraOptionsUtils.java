@@ -154,5 +154,4 @@ public class JiraOptionsUtils {
 
         return options;
     }
-
 }
