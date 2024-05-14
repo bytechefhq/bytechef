@@ -23,7 +23,6 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,6 +50,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -228,7 +228,8 @@ class GoogleSheetsUtilsTest {
 
         List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
 
-        assertIterableEquals(List.of("name", "email"), rowValues);
+        Assertions.assertThat(List.<Object>of("name", "email"))
+            .hasSameElementsAs(rowValues);
     }
 
     @Test
