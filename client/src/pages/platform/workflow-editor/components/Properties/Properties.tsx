@@ -3,6 +3,7 @@ import {FieldValues} from 'react-hook-form/dist/types';
 import {Control, FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
 
+import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 import Property from './Property';
 
 interface PropertiesProps {
@@ -15,19 +16,35 @@ interface PropertiesProps {
     properties: Array<PropertyType>;
 }
 
-const Properties = ({control, customClassName, formState, operationName, path, properties}: PropertiesProps) => (
-    <ul className={twMerge('space-y-4', customClassName)}>
-        {properties.map((property, index) => (
-            <Property
-                control={control}
-                formState={formState}
-                key={`${property.name}_${index}`}
-                operationName={operationName}
-                path={path}
-                property={property}
-            />
-        ))}
-    </ul>
-);
+const Properties = ({control, customClassName, formState, operationName, path, properties}: PropertiesProps) => {
+    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
+
+    return (
+        <ul className={twMerge('space-y-4', customClassName)}>
+            {properties.map((property, index) => {
+                const {displayCondition, name} = property;
+
+                if (!name) {
+                    return <></>;
+                }
+
+                if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+                    return <></>;
+                }
+
+                return (
+                    <Property
+                        control={control}
+                        formState={formState}
+                        key={`${name}_${index}`}
+                        operationName={operationName}
+                        path={path}
+                        property={property}
+                    />
+                );
+            })}
+        </ul>
+    );
+};
 
 export default Properties;

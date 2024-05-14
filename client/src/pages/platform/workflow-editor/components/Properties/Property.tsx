@@ -596,14 +596,6 @@ const Property = ({
         }
     }, [controlType]);
 
-    if (property.displayCondition && !currentComponent?.displayConditions?.[property.displayCondition]) {
-        return <></>;
-    }
-
-    if (!name) {
-        return <></>;
-    }
-
     return (
         <li
             className={twMerge(
@@ -625,6 +617,7 @@ const Property = ({
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                             inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
+                            key={`${currentNode?.name}_${name}`}
                             label={label || (arrayName ? undefined : name)}
                             leadingIcon={typeIcon}
                             onChange={handleMentionsInputChange}
@@ -826,7 +819,7 @@ const Property = ({
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
-                                onValueChange={(value) => handleSelectChange(value, name)}
+                                onValueChange={(value) => handleSelectChange(value, name!)}
                                 options={options as Array<SelectOptionType>}
                                 value={selectValue}
                             />
@@ -845,7 +838,7 @@ const Property = ({
                                 )}
                                 lookupDependsOnValues={lookupDependsOnValues}
                                 name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name)}
+                                onValueChange={(value: string) => handleSelectChange(value, name!)}
                                 options={(formattedOptions as Array<OptionModel>) || undefined || []}
                                 path={path}
                                 required={required}
@@ -864,7 +857,7 @@ const Property = ({
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
-                                onValueChange={(value: string) => handleSelectChange(value, name)}
+                                onValueChange={(value: string) => handleSelectChange(value, name!)}
                                 options={[
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
