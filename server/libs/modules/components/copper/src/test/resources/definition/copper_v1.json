@@ -66,88 +66,63 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "Resource to which this Activity belongs.",
+      "description": "Parent type to associate this Activity with.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
       "required": true,
-      "name": "parent",
-      "type": "OBJECT",
+      "name": "type",
+      "type": "STRING",
+      "defaultValue": "person",
+      "exampleValue": null,
+      "label": "Parent type",
+      "placeholder": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": [ {
+        "description": null,
+        "label": "Lead",
+        "value": "lead"
+      }, {
+        "description": null,
+        "label": "Person",
+        "value": "person"
+      }, {
+        "description": null,
+        "label": "Company",
+        "value": "company"
+      }, {
+        "description": null,
+        "label": "Opportunity",
+        "value": "opportunity"
+      } ],
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "Parent this Activity will be associated with.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "id",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "label": "Parent",
+      "label": "Parent name",
       "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "id",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Parent ID",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "type",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Parent type",
-        "placeholder": null,
-        "controlType": "SELECT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": [ {
-          "description": null,
-          "label": "Lead",
-          "value": "lead"
-        }, {
-          "description": null,
-          "label": "Person",
-          "value": "person"
-        }, {
-          "description": null,
-          "label": "Company",
-          "value": "company"
-        }, {
-          "description": null,
-          "label": "Opportunity",
-          "value": "opportunity"
-        }, {
-          "description": null,
-          "label": "Project",
-          "value": "project"
-        }, {
-          "description": null,
-          "label": "Task",
-          "value": "task"
-        } ],
-        "optionsDataSource": null
-      } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": {
+        "optionsLookupDependsOn": [ "type" ],
+        "options": { }
+      }
     } ],
     "title": "Create activity",
     "workflowNodeDescriptionFunction": null,
@@ -2822,6 +2797,7 @@
     },
     "perform": { }
   } ],
+  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -2888,6 +2864,5 @@
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  },
-  "triggers": null
+  }
 }

@@ -42,8 +42,10 @@ class CopperCreateActivityActionTest extends AbstractCopperActionTest {
             .thenReturn("activityType");
         when(mockedParameters.getRequiredString(DETAILS))
             .thenReturn((String) propertyStubsMap.get(DETAILS));
-        when(mockedParameters.getRequired(PARENT))
-            .thenReturn(propertyStubsMap.get(PARENT));
+        when(mockedParameters.getRequiredString(TYPE))
+            .thenReturn("lead");
+        when(mockedParameters.getRequiredString(ID))
+            .thenReturn("id");
 
         Object result = CopperCreateActivityAction.perform(mockedParameters, mockedParameters, mockedContext);
 
@@ -59,7 +61,7 @@ class CopperCreateActivityActionTest extends AbstractCopperActionTest {
 
         propertyStubsMap.put(TYPE, Map.of("category", "user", ID, "activityType"));
         propertyStubsMap.put(DETAILS, "details");
-        propertyStubsMap.put(PARENT, Map.of("id", "id", "type", "lead"));
+        propertyStubsMap.put(PARENT, Map.of(ID, "id", TYPE, "lead"));
 
         return propertyStubsMap;
     }
