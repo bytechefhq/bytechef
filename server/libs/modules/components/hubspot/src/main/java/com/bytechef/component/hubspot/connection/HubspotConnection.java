@@ -67,7 +67,8 @@ public class HubspotConnection {
 //                    "crm.schemas.line_items.read", "crm.schemas.orders.read", "crm.schemas.orders.write",
 //                    "crm.schemas.quotes.read", "crm.schemas.subscriptions.read", "actions", "automation", "files",
 //                    "forms", "tickets"
-                )).tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
+                ))
+                .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 
     private HubspotConnection() {
     }
