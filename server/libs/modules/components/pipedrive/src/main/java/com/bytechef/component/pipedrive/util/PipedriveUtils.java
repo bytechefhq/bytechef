@@ -31,6 +31,9 @@ import java.util.Map;
  */
 public class PipedriveUtils {
 
+    private PipedriveUtils() {
+    }
+
     public static String subscribeWebhook(
         String eventObject, String eventAction, String webhookUrl, Context context) {
 
@@ -56,7 +59,6 @@ public class PipedriveUtils {
             .execute();
     }
 
-    @SuppressWarnings("unchecked")
     public static ActionOptionsFunction<String> getOptions(String path, String dependsOn) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
             Map<String, ?> response = context
@@ -73,8 +75,13 @@ public class PipedriveUtils {
 
             List<Option<String>> options = new ArrayList<>();
 
-            for (Map<?, ?> list : (List<Map<?, ?>>) response.get("data")) {
-                options.add(option((String) list.get("name"), (String) list.get("id")));
+            if (response.get("data") instanceof List<?> list) {
+                for (Object o : list) {
+                    if (o instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get("name"), map.get("id")
+                            .toString()));
+                    }
+                }
             }
 
             return options;
