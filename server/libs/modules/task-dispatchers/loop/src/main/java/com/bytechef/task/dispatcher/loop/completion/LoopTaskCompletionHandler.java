@@ -100,8 +100,9 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         int nextTaskIndex = taskExecution.getTaskNumber() + 1;
 
         if (nextTaskIndex < iterateeWorkflowTasks.size()) {
-            handleCurrentIterationNextChildTaskExecution(taskExecution, loopTaskExecution, nextTaskIndex,
-                iterateeWorkflowTasks.get(nextTaskIndex), parentContextValue);
+            handleCurrentIterationNextChildTaskExecution(
+                taskExecution, loopTaskExecution, nextTaskIndex, iterateeWorkflowTasks.get(nextTaskIndex),
+                parentContextValue);
 
             return;
         }
@@ -109,8 +110,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
         List<?> items = MapUtils.getList(loopTaskExecution.getParameters(), ITEMS, Collections.emptyList());
 
-        FileEntry contextValueFileEntry =
-            contextService.peek(Validate.notNull(taskExecution.getId(), "task execution id"), Classname.TASK_EXECUTION);
+        FileEntry contextValueFileEntry = contextService.peek(
+            Validate.notNull(taskExecution.getId(), "task execution id"), Classname.TASK_EXECUTION);
 
         Map<String, Object> newTaskExecutionContext = new HashMap<>(
             taskFileStorage.readContextValue(contextValueFileEntry));
@@ -147,8 +148,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
             Validate.notNull(parentTaskExecution.getId(), "parent id"), Classname.TASK_EXECUTION);
 
         Map<String, Object> firstChildContextValue = new HashMap<>(
-            taskFileStorage.readContextValue(
-                contextValueFileEntry));
+            taskFileStorage.readContextValue(contextValueFileEntry));
 
         Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
@@ -162,8 +162,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         firstChildContextValue.put(parentWorkflowTask.getName(), workflowTaskNameMap);
 
-        firstChildTaskExecution =
-            taskExecutionService.create(firstChildTaskExecution.evaluate(firstChildContextValue));
+        firstChildTaskExecution = taskExecutionService.create(firstChildTaskExecution.evaluate(firstChildContextValue));
 
         contextService.push(
             Validate.notNull(firstChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
@@ -196,8 +195,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 parentContextValue.get(previousChildTaskExecution.getName()));
         }
 
-        nextChildTaskExecution =
-            taskExecutionService.create(nextChildTaskExecution.evaluate(nextChildContextValue));
+        nextChildTaskExecution = taskExecutionService.create(
+            nextChildTaskExecution.evaluate(nextChildContextValue));
 
         contextService.push(
             Validate.notNull(nextChildTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
