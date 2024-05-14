@@ -39,9 +39,6 @@ const WorkflowEditorLayout = ({
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
-    // console.log('currentComponent: ', currentComponent);
-    // console.log('currentNodeName: ', currentNodeName);
-
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
@@ -135,7 +132,6 @@ const WorkflowEditorLayout = ({
             <WorkflowEditor
                 componentDefinitions={componentDefinitions}
                 taskDispatcherDefinitions={taskDispatcherDefinitions}
-                updateWorkflowMutation={updateWorkflowMutation}
             />
 
             {currentNodeName && (

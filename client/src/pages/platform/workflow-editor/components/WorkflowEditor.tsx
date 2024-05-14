@@ -1,14 +1,13 @@
 import {ActionDefinitionBasicModel} from '@/middleware/platform/configuration';
-import {useGetComponentActionDefinitionQuery} from '@/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {ComponentOperationType, UpdateWorkflowMutationType} from '@/types/types';
+import {ComponentOperationType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {usePrevious} from '@uidotdev/usehooks';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/platform/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
+import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
@@ -20,24 +19,15 @@ import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
-import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasicModel[];
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
-    updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-const WorkflowEditor = ({
-    componentDefinitions,
-    taskDispatcherDefinitions,
-    updateWorkflowMutation,
-}: WorkflowEditorProps) => {
+const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [edges, setEdges] = useState<Array<Edge>>();
-    const [isSaving, setIsSaving] = useState(false);
     const [latestComponentName, setLatestComponentName] = useState('');
-    const [newNode, setNewNode] = useState<Node | undefined>();
     const [nodeOperations, setNodeOperations] = useState<Array<ComponentOperationType>>([]);
     const [nodes, setNodes] = useState<Array<Node>>();
     const [viewportWidth, setViewportWidth] = useState(0);
@@ -84,15 +74,6 @@ const WorkflowEditor = ({
         !!latestComponentName || !!lastComponentName
     );
 
-    const {data: latestActionDefinition} = useGetComponentActionDefinitionQuery(
-        {
-            actionName: workflowComponent?.actions?.[0]?.name as string,
-            componentName: workflowComponent?.name as string,
-            componentVersion: workflowComponent?.version as number,
-        },
-        !!workflowComponent
-    );
-
     const onDrop: DragEventHandler = (event) => {
         const droppedNodeName = event.dataTransfer.getData('application/reactflow');
 
@@ -129,22 +110,6 @@ const WorkflowEditor = ({
                 }
             }
         }
-    };
-
-    const handleNodeChange = async (changes: NodeDimensionChange[]) => {
-        const changesIds = changes.map((change) => change.id);
-
-        const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
-            changesIds.includes(node?.data.name)
-        );
-
-        if (changesIncludeExistingNodes) {
-            return;
-        }
-
-        const workflowNodes = getNodes();
-
-        setNewNode(workflowNodes.find((node) => node.id === changes[0].id));
     };
 
     const defaultNodesWithWorkflowNodes: Array<Node> | undefined = useMemo(() => {
@@ -273,32 +238,6 @@ const WorkflowEditor = ({
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowComponent?.name, componentNames]);
-
-    // Save workflow definition with default parameters when a new node is added
-    useEffect(() => {
-        if (!latestActionDefinition?.properties || !newNode || isSaving) {
-            return;
-        }
-
-        setIsSaving(true);
-
-        saveWorkflowDefinition(
-            {
-                ...newNode.data,
-                parameters: getParametersWithDefaultValues({properties: latestActionDefinition?.properties}),
-                type: `${newNode.data.componentName}/${workflowComponentWithAlias?.version}/${workflowComponentWithAlias?.actions?.[0].name}`,
-            },
-            workflow!,
-            updateWorkflowMutation
-        )
-            .then(() => setIsSaving(false))
-            .catch((error) => {
-                console.error('Save workflow definition failed:', error);
-
-                setIsSaving(false);
-            });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [latestActionDefinition?.name, newNode]);
 
     // Update workflow node names when nodes change
     useEffect(() => {
@@ -440,11 +379,6 @@ const WorkflowEditor = ({
                 nodesConnectable={false}
                 nodesDraggable={false}
                 onDrop={onDrop}
-                onNodesChange={(changes) => {
-                    if (changes.length > 1) {
-                        handleNodeChange(changes as NodeDimensionChange[]);
-                    }
-                }}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
