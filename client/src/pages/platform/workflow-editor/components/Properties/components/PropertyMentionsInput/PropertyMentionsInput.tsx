@@ -20,6 +20,9 @@ import PropertyMentionsInputBlot from './PropertyMentionsInputBlot';
 
 Quill.register('formats/property-mention', PropertyMentionsInputBlot);
 
+const isAlphaNumericalKeyCode = (event: KeyboardEvent) =>
+    (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90);
+
 const MentionInputListItem = (item: DataPillType) => {
     const div = document.createElement('div');
 
@@ -176,6 +179,31 @@ const PropertyMentionsInput = forwardRef(
             setMentionOccurences(value.match(/property-mention/g)?.length || 0);
         };
 
+        const handleOnKeyDown = (event: KeyboardEvent) => {
+            if (mentionOccurences && isAlphaNumericalKeyCode(event) && singleMention) {
+                // @ts-expect-error Quill false positive
+                const editor = ref.current.getEditor();
+
+                const selection = editor.getSelection();
+
+                const [leaf] = editor.getLeaf(selection?.index || 0);
+
+                if (leaf) {
+                    const length = editor.getLength();
+
+                    editor.deleteText(0, length);
+
+                    editor.insertText(0, '');
+
+                    editor.setSelection(length);
+                }
+            }
+
+            if (singleMention && mentionOccurences) {
+                event.preventDefault();
+            }
+        };
+
         const handleOnFocus = () => {
             // @ts-expect-error Quill false positive
             if (ref?.current) {
@@ -256,6 +284,7 @@ const PropertyMentionsInput = forwardRef(
                         modules={useMemo(() => modules, [])}
                         onChange={(newValue) => handleOnChange(newValue)}
                         onFocus={handleOnFocus}
+                        onKeyDown={handleOnKeyDown}
                         onKeyPress={onKeyPress}
                         placeholder={
                             placeholder ? `${placeholder} (Show data pills using '{')` : "Show data pills using '{'"
