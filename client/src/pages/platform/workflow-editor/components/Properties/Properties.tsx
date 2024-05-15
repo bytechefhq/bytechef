@@ -1,4 +1,5 @@
 import {PropertyType} from '@/types/types';
+import {Fragment} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {Control, FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -29,7 +30,7 @@ const Properties = ({control, customClassName, formState, operationName, path, p
                 }
 
                 if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
-                    return <></>;
+                    return <Fragment key={`${name}_${index}`}></Fragment>;
                 }
 
                 return (
