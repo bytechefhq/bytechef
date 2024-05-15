@@ -12,6 +12,7 @@ import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -32,11 +33,12 @@ const WorkflowCodeEditorSheet = ({
 }: WorkflowCodeEditorSheetProps) => {
     const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
-    const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
     const {updateWorkflowMutation} = useWorkflowMutation();
+
+    const {setWorkflowTestConfigurationDialogOpen, workflowTestConfigurationDialogOpen} = useWorkflowEditorStore();
 
     const handleRunClick = () => {
         setWorkflowTestExecution(undefined);
@@ -110,7 +112,7 @@ const WorkflowCodeEditorSheet = ({
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     disabled={testConfigurationDisabled}
-                                                    onClick={() => setShowWorkflowTestConfigurationDialog(true)}
+                                                    onClick={() => setWorkflowTestConfigurationDialogOpen(true)}
                                                     variant="ghost"
                                                 >
                                                     <Settings2Icon className="mr-1 h-5" /> Test Configuration
@@ -222,9 +224,9 @@ const WorkflowCodeEditorSheet = ({
                 </SheetContent>
             </Sheet>
 
-            {showWorkflowTestConfigurationDialog && (
+            {workflowTestConfigurationDialogOpen && (
                 <WorkflowTestConfigurationDialog
-                    onClose={() => setShowWorkflowTestConfigurationDialog(false)}
+                    onClose={() => setWorkflowTestConfigurationDialogOpen(false)}
                     workflow={workflow}
                     workflowTestConfiguration={workflowTestConfiguration}
                 />
