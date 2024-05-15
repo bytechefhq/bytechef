@@ -26,8 +26,8 @@ import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.GET_ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_TYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.KEY;
 import static com.bytechef.component.jira.constant.JiraConstants.NAME;
 import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
@@ -70,7 +70,7 @@ public class JiraGetIssueAction {
                     string(KEY),
                     object(FIELDS)
                         .properties(
-                            object(ISSUE_TYPE)
+                            object(ISSUETYPE)
                                 .properties(
                                     string(ID),
                                     string(NAME)),

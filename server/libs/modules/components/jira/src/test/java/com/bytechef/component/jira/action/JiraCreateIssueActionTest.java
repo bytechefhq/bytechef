@@ -21,7 +21,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
 import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_TYPE;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
@@ -49,7 +49,7 @@ class JiraCreateIssueActionTest extends AbstractJiraActionTest {
     void testPerform() {
         when(mockedParameters.getRequiredString(PROJECT))
             .thenReturn("1");
-        when(mockedParameters.getRequiredString(ISSUE_TYPE))
+        when(mockedParameters.getRequiredString(ISSUETYPE))
             .thenReturn("1");
         when(mockedParameters.getRequiredString(SUMMARY))
             .thenReturn("summary");
@@ -85,7 +85,7 @@ class JiraCreateIssueActionTest extends AbstractJiraActionTest {
     private static Map<String, Object> getExpectedFieldsMap() {
         Map<String, String> idMap = Map.of(ID, "1");
 
-        return Map.of(PROJECT, idMap, ISSUE_TYPE, idMap, SUMMARY, "summary", ASSIGNEE, idMap, PRIORITY, idMap,
+        return Map.of(PROJECT, idMap, ISSUETYPE, idMap, SUMMARY, "summary", ASSIGNEE, idMap, PRIORITY, idMap,
             DESCRIPTION, Map.of(CONTENT, List.of(
                 Map.of(
                     CONTENT, List.of(

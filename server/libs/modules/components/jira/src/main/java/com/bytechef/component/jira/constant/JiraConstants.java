@@ -30,7 +30,7 @@ public class JiraConstants {
     public static final String ID = "id";
     public static final String ISSUES = "issues";
     public static final String ISSUE_ID = "issueId";
-    public static final String ISSUE_TYPE = "issueType";
+    public static final String ISSUETYPE = "issuetype";
     public static final String JIRA = "jira";
     public static final String JQL = "jql";
     public static final String KEY = "key";
