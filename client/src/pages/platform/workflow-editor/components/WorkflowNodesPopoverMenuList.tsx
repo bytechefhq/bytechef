@@ -44,7 +44,7 @@ const WorkflowNodesPopoverMenuList = memo(
         taskDispatcherDefinitions,
         triggerComponentDefinitions,
     }: WorkflowNodesListProps) => {
-        const {setWorkflow, workflow} = useWorkflowDataStore();
+        const {setLatestComponentDefinition, setWorkflow, workflow} = useWorkflowDataStore();
         const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
@@ -66,10 +66,16 @@ const WorkflowNodesPopoverMenuList = memo(
                 }),
             });
 
+            if (!clickedComponentDefinition) {
+                return;
+            }
+
+            setLatestComponentDefinition(clickedComponentDefinition);
+
             const getActionDefinitionRequest = {
                 actionName: clickedComponentDefinition.actions?.[0].name as string,
                 componentName: clickedItem.name,
-                componentVersion: clickedComponentDefinition?.version,
+                componentVersion: clickedComponentDefinition.version,
             };
 
             const clickedComponentActionDefinition = await queryClient.fetchQuery({
