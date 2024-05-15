@@ -25,7 +25,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.CREATE_ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_TYPE;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.KEY;
 import static com.bytechef.component.jira.constant.JiraConstants.PARENT;
 import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
@@ -65,7 +65,7 @@ public class JiraCreateIssueAction {
                 .label("Summary")
                 .description("A brief summary of the issue.")
                 .required(true),
-            string(ISSUE_TYPE)
+            string(ISSUETYPE)
                 .label("Issue type")
                 .description("The type of issue.")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
@@ -74,7 +74,7 @@ public class JiraCreateIssueAction {
             string(PARENT)
                 .label("Parent")
                 .description("")
-                .displayCondition("%s == '%s'".formatted(ISSUE_TYPE, "10003"))
+                .displayCondition("%s == '%s'".formatted(ISSUETYPE, "10003"))
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
@@ -121,7 +121,7 @@ public class JiraCreateIssueAction {
         Map<String, Object> project = new HashMap<>();
 
         project.put(PROJECT, Map.of(ID, inputParameters.getRequiredString(PROJECT)));
-        project.put(ISSUE_TYPE, Map.of(ID, inputParameters.getRequiredString(ISSUE_TYPE)));
+        project.put(ISSUETYPE, Map.of(ID, inputParameters.getRequiredString(ISSUETYPE)));
         project.put(SUMMARY, inputParameters.getRequiredString(SUMMARY));
 
         addFieldIfNotNull(project, PARENT, inputParameters.getString(PARENT));

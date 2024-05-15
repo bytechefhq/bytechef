@@ -27,7 +27,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_TYPE;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.KEY;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
@@ -79,7 +79,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                             string(KEY),
                             object(FIELDS)
                                 .properties(
-                                    object(ISSUE_TYPE)
+                                    object(ISSUETYPE)
                                         .properties(
                                             string(ID),
                                             string(NAME)),
