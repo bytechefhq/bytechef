@@ -235,7 +235,6 @@ include("server:libs:modules:task-dispatchers:fork-join")
 include("server:libs:modules:task-dispatchers:loop")
 include("server:libs:modules:task-dispatchers:map")
 include("server:libs:modules:task-dispatchers:parallel")
-include("server:libs:modules:task-dispatchers:sequence")
 include("server:libs:modules:task-dispatchers:subflow")
 
 include("server:libs:test:test-support")
