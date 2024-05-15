@@ -31,13 +31,7 @@ const WorkflowEditorLayout = ({
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
 
     const {componentActions, workflow} = useWorkflowDataStore();
-    const {
-        currentComponent,
-        currentNode,
-        setCurrentComponent,
-        setWorkflowNodeDetailsPanelOpen,
-        workflowNodeDetailsPanelOpen,
-    } = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
@@ -81,13 +75,6 @@ const WorkflowEditorLayout = ({
             setCurrentNodeName(undefined);
         }
     }, [currentNode?.name]);
-
-    useEffect(() => {
-        if (!workflowNodeDetailsPanelOpen && currentNodeName) {
-            setWorkflowNodeDetailsPanelOpen(true);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentNodeName, workflowNodeDetailsPanelOpen]);
 
     // refetch workflowNodeOutputs when a new node is added
     useEffect(() => {
