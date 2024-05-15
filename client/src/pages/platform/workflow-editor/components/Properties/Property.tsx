@@ -27,6 +27,7 @@ import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
+import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import getParameterByPath from '../../utils/getParameterByPath';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
@@ -101,6 +102,7 @@ const Property = ({
     } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
+    const {workflowTestConfigurationDialogOpen} = useWorkflowEditorStore();
 
     const defaultValue = property.defaultValue || '';
 
@@ -484,6 +486,18 @@ const Property = ({
 
     // set value to propertyParameterValue
     useEffect(() => {
+        if (propertyParameterValue === '') {
+            if (mentionInput) {
+                setMentionInputValue('');
+            } else {
+                setInputValue('');
+
+                setSelectValue('');
+
+                setNumericValue('');
+            }
+        }
+
         if (mentionInput && propertyParameterValue) {
             const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
 
@@ -595,6 +609,27 @@ const Property = ({
             setShowInputTypeSwitchButton(true);
         }
     }, [controlType]);
+
+    useEffect(() => {
+        if (!workflow.definition || !currentNode?.name || !name || !workflowTestConfigurationDialogOpen) {
+            return;
+        }
+
+        const workflowDefinition = JSON.parse(workflow.definition);
+
+        const currentWorkflowNode = [...workflowDefinition.triggers, ...workflowDefinition.tasks].find(
+            (node: any) => node.name === currentNode?.name
+        );
+
+        const value = getParameterByPath(path, currentWorkflowNode)[name];
+
+        if (value) {
+            setPropertyParameterValue(value);
+        } else {
+            setPropertyParameterValue('');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflow.definition]);
 
     return (
         <li
