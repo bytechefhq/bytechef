@@ -14,7 +14,7 @@ import {WorkflowNodeDynamicPropertyKeys} from '@/queries/platform/workflowNodeDy
 import {WorkflowNodeOptionKeys} from '@/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/queries/platform/workflowTestConfigurations.queries';
-import {DataPillType, PropertyType, UpdateWorkflowMutationType} from '@/types/types';
+import {DataPillType, PropertyType, UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
@@ -71,6 +71,7 @@ const WorkflowNodeDetailsPanel = ({
     const [activeTab, setActiveTab] = useState('description');
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyType>>([]);
+    const [workflowDefinition, setWorkflowDefinition] = useState<WorkflowDefinitionType>({});
 
     const {
         currentComponent,
@@ -420,6 +421,23 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowTestConfigurationConnections]);
+
+    // Parse the workflow definition to an object
+    useEffect(() => {
+        if (workflow.definition) {
+            setWorkflowDefinition(JSON.parse(workflow.definition));
+        }
+    }, [workflow.definition]);
+
+    // Close the panel if the current node is deleted from the workflow definition
+    useEffect(() => {
+        const taskNames = workflowDefinition.tasks?.map((task) => task.name);
+
+        if (currentNode && taskNames && !taskNames?.includes(currentNode?.name)) {
+            setWorkflowNodeDetailsPanelOpen(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentNode, workflowDefinition.tasks?.length]);
 
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentComponentDefinition) {
         return <></>;
