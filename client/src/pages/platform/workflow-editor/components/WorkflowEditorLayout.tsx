@@ -56,21 +56,23 @@ const WorkflowEditorLayout = ({
         !!componentActions?.length && !!currentNodeName && !!currentNode && !currentNode?.trigger
     );
 
-    const previousComponentDefinitions = workflowNodeOutputs
-        ? workflowNodeOutputs
-              .filter(
-                  (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
-              )
-              .map(
-                  (workflowNodeOutput) =>
-                      componentDefinitions.filter(
-                          (componentDefinition) =>
-                              componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName ||
-                              componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
-                      )[0]
-              )
-              .filter((componentDefinition) => !!componentDefinition)
-        : [];
+    const previousComponentDefinitions =
+        !currentNode?.trigger && workflowNodeOutputs
+            ? workflowNodeOutputs
+                  .filter(
+                      (workflowNodeOutput) =>
+                          workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
+                  )
+                  .map(
+                      (workflowNodeOutput) =>
+                          componentDefinitions.filter(
+                              (componentDefinition) =>
+                                  componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName ||
+                                  componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
+                          )[0]
+                  )
+                  .filter((componentDefinition) => !!componentDefinition)
+            : [];
 
     useEffect(() => {
         if (currentNode?.name) {
