@@ -40,12 +40,12 @@ import org.mockito.ArgumentCaptor;
  */
 class GithubCreateIssueActionTest {
 
-    ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    ActionContext mockedContext = mock(ActionContext.class);
-    Executor mockedExecutor = mock(Executor.class);
-    Parameters mockedParameters = mock(Parameters.class);
-    Response mockedResponse = mock(Response.class);
-    Map<String, Object> responeseMap = Map.of("key", "value");
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Executor mockedExecutor = mock(Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Response mockedResponse = mock(Response.class);
+    private final Map<String, Object> responeseMap = Map.of("key", "value");
 
     @BeforeEach
     public void beforeEach() {

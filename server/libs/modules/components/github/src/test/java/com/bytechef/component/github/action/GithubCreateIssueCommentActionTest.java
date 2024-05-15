@@ -33,7 +33,11 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Luka Ljubic
+ */
 class GithubCreateIssueCommentActionTest {
+
     ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     ActionContext mockedContext = mock(ActionContext.class);
     Executor mockedExecutor = mock(Executor.class);
