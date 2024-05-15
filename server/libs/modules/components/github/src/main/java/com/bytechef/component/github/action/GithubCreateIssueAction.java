@@ -63,12 +63,14 @@ public class GithubCreateIssueAction {
                     string(BODY)))
         .perform(GithubCreateIssueAction::perform);
 
-    public static Object
-        perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    private GithubCreateIssueAction() {
+    }
 
-        return actionContext
-            .http(http -> http.post(BASE_URL + "/repos/" + GithubUtils.getOwnerName(actionContext) + "/"
-                + inputParameters.getRequiredString(REPO) + "/issues"))
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return context
+            .http(http -> http.post(
+                BASE_URL + "/repos/" + GithubUtils.getOwnerName(context) + "/" +
+                    inputParameters.getRequiredString(REPO) + "/issues"))
             .body(
                 Body.of(
                     TITLE, inputParameters.getRequiredString(TITLE),
@@ -76,8 +78,5 @@ public class GithubCreateIssueAction {
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-    }
-
-    private GithubCreateIssueAction() {
     }
 }

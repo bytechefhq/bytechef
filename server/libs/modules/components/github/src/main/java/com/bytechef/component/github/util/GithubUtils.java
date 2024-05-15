@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Luka Ljubić
+ */
 public class GithubUtils {
 
     private GithubUtils() {
@@ -59,8 +62,8 @@ public class GithubUtils {
         ActionContext context) {
 
         List<Map<String, Object>> body = context.http(http -> http.get(
-            BASE_URL + "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPO)
-                + "/issues"))
+            BASE_URL + "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPO) +
+                "/issues"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -77,7 +80,6 @@ public class GithubUtils {
     }
 
     public static String getOwnerName(ActionContext context) {
-
         Map<String, Object> body = context
             .http(http -> http.get(BASE_URL + "/user"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

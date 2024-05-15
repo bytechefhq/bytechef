@@ -35,8 +35,7 @@ public class GithubComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GITHUB)
         .title("Github")
-        .description(
-            "Developer platform that allows developers to create, store, manage and share their code")
+        .description("Developer platform that allows developers to create, store, manage and share their code")
         .connection(CONNECTION_DEFINITION)
         .actions(
             GithubCreateIssueAction.ACTION_DEFINITION,

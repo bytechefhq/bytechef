@@ -37,6 +37,7 @@ import com.bytechef.component.github.util.GithubUtils;
  * @author Luka Ljubić
  */
 public class GithubGetIssueAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ISSUE)
         .title("Get issue")
         .description("Create a specific issue")
@@ -62,16 +63,15 @@ public class GithubGetIssueAction {
                     string("number")))
         .perform(GithubGetIssueAction::perform);
 
-    static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    private GithubGetIssueAction() {
+    }
 
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
             .http(http -> http.get(BASE_URL + "/repos/" + GithubUtils.getOwnerName(context) + "/"
                 + inputParameters.getRequiredString(REPO) + "/issues/" + inputParameters.getString(ISSUE)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-    }
-
-    private GithubGetIssueAction() {
     }
 }

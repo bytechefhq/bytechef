@@ -19,9 +19,13 @@ package com.bytechef.component.github;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Luka Ljubic
+ */
 class GithubComponentHandlerTest {
+
     @Test
-    void testGetComponentDeffinition() {
+    public void testGetComponentDefinition() {
 
         JsonFileAssert.assertEquals("definition/github_v1.json", new GithubComponentHandler().getDefinition());
     }

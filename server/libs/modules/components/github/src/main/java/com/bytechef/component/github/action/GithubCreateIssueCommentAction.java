@@ -40,6 +40,7 @@ import java.util.Map;
  * @author Luka Ljubić
  */
 public class GithubCreateIssueCommentAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION =
         action(CREATE_ISSUE_COMMENT)
             .title("Create Issue Comment")
@@ -69,8 +70,10 @@ public class GithubCreateIssueCommentAction {
                         string("body")))
             .perform(GithubCreateIssueCommentAction::perform);
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    private GithubCreateIssueCommentAction() {
+    }
 
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
             .http(http -> http.post(
                 BASE_URL + "/repos/" + GithubUtils.getOwnerName(context) + "/" + inputParameters.getRequiredString(REPO)
@@ -80,8 +83,5 @@ public class GithubCreateIssueCommentAction {
             .execute()
             .getBody(new TypeReference<>() {});
 
-    }
-
-    private GithubCreateIssueCommentAction() {
     }
 }
