@@ -76,12 +76,15 @@ const WorkflowEditorLayout = ({
         }
     }, [currentNode?.name]);
 
-    // refetch workflowNodeOutputs when a new node is added
+    // refetch workflowNodeOutputs when a task is opened
     useEffect(() => {
-        if (currentNode && !currentNode?.trigger) {
-            refetchWorkflowNodeOutputs();
+        if (!currentNode || currentNode?.trigger || workflowNodeOutputs) {
+            return;
         }
-    }, [workflow.tasks?.length, currentNode, refetchWorkflowNodeOutputs]);
+
+        refetchWorkflowNodeOutputs();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentNodeName, workflowNodeOutputs]);
 
     useEffect(() => {
         const workflowComponents = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])]?.map((operation) => {
