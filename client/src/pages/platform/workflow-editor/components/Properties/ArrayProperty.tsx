@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ArrayPropertyType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
@@ -10,19 +11,6 @@ import {useEffect, useState} from 'react';
 import getParameterByPath from '../../utils/getParameterByPath';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
-
-const PROPERTY_CONTROL_TYPES = {
-    ARRAY: 'ARRAY_BUILDER',
-    BOOLEAN: 'BOOLEAN',
-    DATE: 'DATE',
-    DATE_TIME: 'DATE_TIME',
-    INTEGER: 'INTEGER',
-    NULL: 'NULL',
-    NUMBER: 'NUMBER',
-    OBJECT: 'OBJECT_BUILDER',
-    STRING: 'TEXT',
-    TIME: 'TIME',
-};
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string, name?: string, index?: number) => void;
@@ -127,16 +115,26 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     parameterItemType = 'ARRAY';
                 } else if (typeof parameterItem === 'object') {
                     parameterItemType = 'OBJECT';
+                } else if (typeof parameterItem === 'boolean') {
+                    parameterItemType = 'BOOLEAN';
                 }
 
-                const customSubProperties = Object.keys(parameterItem).map((key) => ({
-                    controlType: 'STRING',
-                    custom: true,
-                    defaultValue: parameterItem[key as keyof ArrayPropertyType],
-                    label: key,
-                    name: key,
-                    type: 'STRING',
-                }));
+                const customSubProperties = Object.keys(parameterItem).map((key) => {
+                    const parameterItemValue = parameterItem[key as keyof ArrayPropertyType];
+
+                    const subPropertyType = typeof parameterItemValue === 'boolean' ? 'BOOLEAN' : 'STRING';
+
+                    return {
+                        controlType: PROPERTY_CONTROL_TYPES[
+                            subPropertyType as keyof typeof PROPERTY_CONTROL_TYPES
+                        ] as ControlTypeModel,
+                        custom: true,
+                        defaultValue: parameterItemValue,
+                        label: key,
+                        name: key,
+                        type: subPropertyType,
+                    };
+                });
 
                 return {
                     arrayName: name,
