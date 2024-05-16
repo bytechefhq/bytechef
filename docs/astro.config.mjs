@@ -4,12 +4,21 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
+    site: 'https://docs.bytechef.io',
 	integrations: [
 		starlight({
-			title: 'Docs with Tailwind',
+			title: 'ByteChef',
+            logo: {
+                src: './src/assets/logo.svg',
+            },
 			social: {
-				github: 'https://github.com/withastro/starlight',
+                discord: 'https://discord.gg/JcNSqJ7vK8',
+				github: 'https://github.com/bytechefhq/bytechef',
+                twitter: 'https://twitter.com/bytechefhq',
 			},
+            editLink: {
+                baseUrl: 'https://github.com/bytechefhq/bytechef/edit/master/docs/',
+            },
 			sidebar: [
 				{
 					label: 'Guides',
