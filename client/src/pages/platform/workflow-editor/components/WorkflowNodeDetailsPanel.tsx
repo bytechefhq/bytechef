@@ -16,6 +16,7 @@ import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutp
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/queries/platform/workflowTestConfigurations.queries';
 import {DataPillType, PropertyType, UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/types/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
+import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
@@ -31,7 +32,6 @@ import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
-import {TooltipPortal} from '@radix-ui/react-tooltip';
 
 const TABS = [
     {
