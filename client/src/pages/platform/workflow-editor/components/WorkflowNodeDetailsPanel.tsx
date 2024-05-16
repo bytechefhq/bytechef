@@ -31,6 +31,7 @@ import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
+import {TooltipPortal} from '@radix-ui/react-tooltip';
 
 const TABS = [
     {
@@ -469,9 +470,11 @@ const WorkflowNodeDetailsPanel = ({
                                     <InfoCircledIcon className="size-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="max-w-md" side="bottom">
-                                    {currentComponentDefinition.description}
-                                </TooltipContent>
+                                <TooltipPortal>
+                                    <TooltipContent className="max-w-md" side="bottom">
+                                        {currentComponentDefinition.description}
+                                    </TooltipContent>
+                                </TooltipPortal>
                             </Tooltip>
                         )}
 
