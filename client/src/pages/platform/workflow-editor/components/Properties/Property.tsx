@@ -380,7 +380,9 @@ const Property = ({
             return;
         } else if (!mentionInput && isNumericalInput && !numericValue) {
             return;
-        } else if (!mentionInput && !isNumericalInput && !inputValue) {
+        } else if (!mentionInput && !isNumericalInput && !selectValue && !inputValue) {
+            return;
+        } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
             return;
         }
 
@@ -888,6 +890,7 @@ const Property = ({
                             <PropertySelect
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
+                                handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -897,6 +900,7 @@ const Property = ({
                                     {label: 'True', value: 'true'},
                                     {label: 'False', value: 'false'},
                                 ]}
+                                showInputTypeSwitchButton={showInputTypeSwitchButton}
                                 value={selectValue}
                             />
                         )}
