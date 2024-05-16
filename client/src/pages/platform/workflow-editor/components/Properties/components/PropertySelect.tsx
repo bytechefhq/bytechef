@@ -5,6 +5,7 @@ import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText, Value} from '@radix-ui/react-select';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
+
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 export type SelectOptionType = {
