@@ -20,6 +20,9 @@ https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer
     --sl-color-gray-5: #353841;
     --sl-color-gray-6: #24272f;
     --sl-color-black: #17181c;
+
+    --sl-color-bg-nav: var(--sl-color-black);
+    --sl-color-bg-sidebar: var(--sl-color-black);
 }
 /* Light mode colors. */
 :root[data-theme='light'] {
@@ -35,4 +38,38 @@ https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer
     --sl-color-gray-6: #eceef2;
     --sl-color-gray-7: #f5f6f8;
     --sl-color-black: #ffffff;
+
+    --sl-color-bg-nav: var(--sl-color-bg);
+}
+
+.site-title {
+    color: var(--sl-color-white);
+}
+
+.header {
+    border-bottom: none;
+
+    .social-icons {
+        a {
+            color: var(--sl-color-white);
+        }
+    }
+}
+
+.sidebar-pane {
+    border-inline-end: none;
+}
+
+.content-panel+.content-panel {
+    border-top: none;
+}
+
+.right-sidebar {
+    border-inline-start: none;
+}
+
+.pagination-links {
+    a {
+        box-shadow: none;
+    }
 }
