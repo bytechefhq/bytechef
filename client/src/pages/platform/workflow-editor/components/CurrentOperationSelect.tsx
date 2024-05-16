@@ -3,6 +3,7 @@ import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
+import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {ActionDefinitionBasicModel, TriggerDefinitionBasicModel} from 'middleware/platform/configuration';
 import {twMerge} from 'tailwind-merge';
 
@@ -25,7 +26,9 @@ const OperationSelect = ({description, handleValueChange, operations, value}: Cu
                         <QuestionMarkCircledIcon />
                     </TooltipTrigger>
 
-                    <TooltipContent>{description}</TooltipContent>
+                    <TooltipPortal>
+                        <TooltipContent className="truncate">{description}</TooltipContent>
+                    </TooltipPortal>
                 </Tooltip>
             )}
         </Label>
