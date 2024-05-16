@@ -220,7 +220,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     displayCondition,
                     MapUtils.concat(
                         MapUtils.concat((Map<String, Object>) inputMap, (Map<String, Object>) outputs),
-                        (Map<String, Object>) parameterMap));
+                        MapUtils.toMap(
+                            parameterMap,
+                            Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
             } else {
                 result = evaluate(
                     displayCondition,
