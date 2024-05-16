@@ -431,6 +431,10 @@ const WorkflowNodeDetailsPanel = ({
 
     // Close the panel if the current node is deleted from the workflow definition
     useEffect(() => {
+        if (currentNode?.trigger) {
+            return;
+        }
+
         const taskNames = workflowDefinition.tasks?.map((task) => task.name);
 
         if (currentNode && taskNames && !taskNames?.includes(currentNode?.name)) {
