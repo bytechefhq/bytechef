@@ -81,9 +81,9 @@ const ObjectProperty = ({
 
         let value = getParameterByPath(path, currentComponent);
 
-        if (arrayName && arrayIndex) {
+        if (value && arrayName && arrayIndex) {
             value = value[arrayIndex];
-        } else {
+        } else if (value && name !== '__item') {
             value = value[name];
         }
 
