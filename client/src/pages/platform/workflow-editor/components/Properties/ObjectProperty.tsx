@@ -230,7 +230,7 @@ const ObjectProperty = ({
                                 name="additionalPropertyName"
                                 onChange={(event) => setNewPropertyName(event.target.value)}
                                 placeholder="Name for the additional property"
-                                required={true}
+                                required
                                 value={newPropertyName}
                             />
 
@@ -261,7 +261,7 @@ const ObjectProperty = ({
 
                         <footer className="flex items-center justify-end space-x-2">
                             <PopoverClose asChild>
-                                <Button onClick={handleAddItemClick} size="sm">
+                                <Button disabled={!newPropertyName} onClick={handleAddItemClick} size="sm">
                                     Add
                                 </Button>
                             </PopoverClose>
