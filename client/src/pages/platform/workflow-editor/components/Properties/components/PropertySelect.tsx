@@ -5,6 +5,7 @@ import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText, Value} from '@radix-ui/react-select';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
+import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 export type SelectOptionType = {
     description?: string;
@@ -16,18 +17,21 @@ interface PropertySelectProps {
     options: Array<SelectOptionType>;
     defaultValue?: string;
     description?: string;
+    handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
     onValueChange?: (value: string) => void;
     placeholder?: string;
     required?: boolean;
+    showInputTypeSwitchButton?: boolean;
     value?: string;
 }
 
 const PropertySelect = ({
     defaultValue,
     description,
+    handleInputTypeSwitchButtonClick,
     label,
     leadingIcon,
     name,
@@ -35,6 +39,7 @@ const PropertySelect = ({
     options,
     placeholder = 'Select...',
     required,
+    showInputTypeSwitchButton,
     value,
 }: PropertySelectProps) => (
     <fieldset className="w-full space-y-1">
@@ -54,6 +59,14 @@ const PropertySelect = ({
 
                         <TooltipContent>{description}</TooltipContent>
                     </Tooltip>
+                )}
+
+                {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                    <InputTypeSwitchButton
+                        className="ml-auto"
+                        handleClick={handleInputTypeSwitchButtonClick}
+                        mentionInput={false}
+                    />
                 )}
             </div>
         )}
