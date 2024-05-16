@@ -20,16 +20,34 @@ export default defineConfig({
                 baseUrl: 'https://github.com/bytechefhq/bytechef/edit/master/docs/',
             },
 			sidebar: [
+                { label: 'Welcome', link: '/welcome' },
 				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', link: '/guides/example/' },
-					],
+					label: 'Automation',
+                    items: [
+                        {
+                            label: 'Getting Started',
+                            items: [
+                                { label: 'Introduction', link: '/automation/getting-started/introduction' },
+                                { label: 'Quick Start', link: '/automation/getting-started/quick-start' },
+                            ],
+                        },
+                    ],
 				},
+                {
+                    label: 'Embedded',
+                    items: [
+                        {
+                            label: 'Getting Started',
+                            items: [
+                                { label: 'Introduction', link: '/embedded/getting-started/introduction' },
+                                { label: 'Quick Start', link: '/embedded/getting-started/quick-start' },
+                            ]
+                        },
+                    ],
+                },
 				{
 					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+                    autogenerate: { directory: 'reference' },
 				},
 			],
 			customCss: ['./src/tailwind.css'],
