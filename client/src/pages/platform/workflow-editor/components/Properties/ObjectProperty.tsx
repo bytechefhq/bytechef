@@ -4,27 +4,16 @@ import {ControlTypeModel} from '@/middleware/platform/configuration';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import getParameterByPath from '../../utils/getParameterByPath';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
-
-const PROPERTY_CONTROL_TYPES = {
-    ARRAY: 'ARRAY_BUILDER',
-    BOOLEAN: 'BOOLEAN',
-    DATE: 'DATE',
-    DATE_TIME: 'DATE_TIME',
-    INTEGER: 'INTEGER',
-    NULL: 'NULL',
-    NUMBER: 'NUMBER',
-    OBJECT: 'OBJECT_BUILDER',
-    STRING: 'TEXT',
-    TIME: 'TIME',
-};
 
 interface ObjectPropertyProps {
     operationName?: string;
@@ -86,17 +75,23 @@ const ObjectProperty = ({
 
     // render individual object items with data gathered from parameters
     useEffect(() => {
-        if (!name || !currentComponent?.parameters?.[name]) {
+        if (!name || !path || !currentComponent?.parameters) {
             return;
         }
 
-        const objectParameters = properties?.length
-            ? properties?.map((property) => property.name)
-            : Object.keys(currentComponent.parameters![name]);
+        let value = getParameterByPath(path, currentComponent);
 
-        if (!objectParameters.length) {
+        if (arrayName && arrayIndex) {
+            value = value[arrayIndex];
+        } else {
+            value = value[name];
+        }
+
+        if (!value) {
             return;
         }
+
+        const objectParameters = properties?.length ? properties?.map((property) => property.name) : Object.keys(value);
 
         const preexistingProperties = objectParameters.map((parameter) => {
             const matchingProperty = (properties as Array<PropertyType>)?.find(
@@ -106,13 +101,13 @@ const ObjectProperty = ({
             if (matchingProperty) {
                 return {
                     ...matchingProperty,
-                    defaultValue: currentComponent.parameters![name][parameter!],
+                    defaultValue: value[parameter!],
                 };
             } else {
                 return {
                     controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
                     custom: true,
-                    defaultValue: currentComponent.parameters![name][parameter!],
+                    defaultValue: value[parameter!],
                     name: parameter,
                     type: newPropertyType,
                 };
