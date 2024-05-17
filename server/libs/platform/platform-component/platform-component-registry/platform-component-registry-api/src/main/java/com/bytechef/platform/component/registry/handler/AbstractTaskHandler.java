@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.task.handler;
+package com.bytechef.platform.component.registry.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
@@ -27,13 +27,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
-public abstract class AbstractScriptTaskHandler implements TaskHandler<Object> {
+public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
+    private final String componentName;
+    private final int componentVersion;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final String actionName;
 
     @SuppressFBWarnings("EI")
-    protected AbstractScriptTaskHandler(String actionName, ActionDefinitionFacade actionDefinitionFacade) {
+    protected AbstractTaskHandler(
+        String componentName, int componentVersion, String actionName, ActionDefinitionFacade actionDefinitionFacade) {
+
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionName = actionName;
     }
@@ -45,8 +51,8 @@ public abstract class AbstractScriptTaskHandler implements TaskHandler<Object> {
 
         try {
             return actionDefinitionFacade.executePerform(
-                "script", 1, actionName,
-                MapUtils.getRequired(taskExecution.getMetadata(), MetadataConstants.TYPE, Type.class),
+                componentName, componentVersion, actionName,
+                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, Type.class),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap);

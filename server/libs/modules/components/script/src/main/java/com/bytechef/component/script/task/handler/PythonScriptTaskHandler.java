@@ -19,6 +19,7 @@ package com.bytechef.component.script.task.handler;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.registry.handler.AbstractTaskHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -27,10 +28,10 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(SCRIPT + "/v1/python")
-public class PythonScriptTaskHandler extends AbstractScriptTaskHandler {
+public class PythonScriptTaskHandler extends AbstractTaskHandler {
 
     @SuppressFBWarnings("EI")
     public PythonScriptTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super("python", actionDefinitionFacade);
+        super("script", 1, "python", actionDefinitionFacade);
     }
 }

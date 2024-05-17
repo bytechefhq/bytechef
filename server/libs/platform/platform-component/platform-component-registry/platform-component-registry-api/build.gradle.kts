@@ -1,6 +1,7 @@
 dependencies {
     api(project(":server:libs:platform:platform-api"))
     api(project(":sdks:backend:java:component-api"))
+    api(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")

@@ -18,43 +18,17 @@ package com.bytechef.component.data.stream.task.handler;
 
 import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
-import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.exception.TaskExecutionException;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.Type;
-import java.util.Map;
-import org.apache.commons.lang3.Validate;
+import com.bytechef.platform.component.registry.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component(DATA_STREAM + "/v1/sync")
-public class DataStreamSyncTaskHandler implements TaskHandler<Object> {
-
-    private final ActionDefinitionFacade actionDefinitionFacade;
+public class DataStreamSyncTaskHandler extends AbstractTaskHandler {
 
     public DataStreamSyncTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        this.actionDefinitionFacade = actionDefinitionFacade;
-    }
-
-    @Override
-    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        Map<String, Long> connectIdMap = MapUtils.getMap(
-            taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
-
-        try {
-            return actionDefinitionFacade.executePerform(
-                "dataStream", 1, "sync",
-                MapUtils.getRequired(taskExecution.getMetadata(), MetadataConstants.TYPE, Type.class),
-                MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
-                MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
-                Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap);
-        } catch (Exception e) {
-            throw new TaskExecutionException(e.getMessage(), e);
-        }
+        super("dataStream", 1, "sync", actionDefinitionFacade);
     }
 }
