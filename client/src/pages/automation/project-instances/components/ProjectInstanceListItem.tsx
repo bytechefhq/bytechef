@@ -1,23 +1,5 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ProjectInstanceModel, TagModel} from '@/middleware/automation/configuration';
@@ -26,10 +8,12 @@ import {
     useDeleteProjectInstanceMutation,
     useEnableProjectInstanceMutation,
 } from '@/mutations/automation/projectInstances.mutations';
+import ProjectInstanceListItemAlertDialog from '@/pages/automation/project-instances/components/ProjectInstanceListItemAlertDialog';
+import ProjectInstanceListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceListItemDropdownMenu';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
 import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.queries';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
-import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
@@ -44,6 +28,8 @@ interface ProjectInstanceListItemProps {
 const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstanceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
+
     const setProjectInstanceEnabled = useProjectInstancesEnabledStore(
         ({setProjectInstanceEnabled}) => setProjectInstanceEnabled
     );
@@ -175,68 +161,45 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
                         <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                                </Button>
-                            </DropdownMenuTrigger>
+                        <div className="w-5"></div>
 
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                    onClick={() =>
-                                        enableProjectInstanceMutation.mutate({
-                                            enable: !projectInstance.enabled,
-                                            id: projectInstance.id!,
-                                        })
-                                    }
-                                >
-                                    {projectInstance.enabled ? 'Disable' : 'Enable'}
-                                </DropdownMenuItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <ProjectInstanceListItemDropdownMenu
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={() => setShowEditDialog(true)}
+                            onEnableClick={() =>
+                                enableProjectInstanceMutation.mutate({
+                                    enable: !projectInstance.enabled,
+                                    id: projectInstance.id!,
+                                })
+                            }
+                            onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
+                            projectInstanceEnabled={projectInstance.enabled!}
+                        />
                     </div>
                 </div>
             </div>
 
-            <AlertDialog open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the project and workflows it
-                            contains.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                        <AlertDialogAction
-                            className="bg-red-600"
-                            onClick={() => {
-                                if (projectInstance.id) {
-                                    deleteProjectInstanceMutation.mutate(projectInstance.id);
-                                }
-                            }}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {showDeleteDialog && (
+                <ProjectInstanceListItemAlertDialog
+                    onCancelClick={() => setShowDeleteDialog(false)}
+                    onDeleteClick={() => {
+                        if (projectInstance.id) {
+                            deleteProjectInstanceMutation.mutate(projectInstance.id);
+                        }
+                    }}
+                />
+            )}
 
             {showEditDialog && (
                 <ProjectInstanceDialog onClose={() => setShowEditDialog(false)} projectInstance={projectInstance} />
+            )}
+
+            {showUpdateProjectVersionDialog && (
+                <ProjectInstanceDialog
+                    onClose={() => setShowUpdateProjectVersionDialog(false)}
+                    projectInstance={projectInstance}
+                    updateProjectVersion={true}
+                />
             )}
         </>
     );

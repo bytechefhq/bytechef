@@ -31,7 +31,7 @@ const ProjectInstanceEditWorkflowDialog = ({
         } as ProjectInstanceModel,
     });
 
-    const {control, formState, getValues, handleSubmit, register, setValue} = form;
+    const {control, formState, getValues, handleSubmit, setValue} = form;
 
     const queryClient = useQueryClient();
 
@@ -91,10 +91,9 @@ const ProjectInstanceEditWorkflowDialog = ({
                         formState={formState}
                         key={workflow.id!}
                         label="Enable"
-                        register={register}
                         setValue={setValue}
                         switchHidden={true}
-                        workflowId={workflow.id!}
+                        workflow={workflow}
                         workflowIndex={0}
                     />
 

@@ -1,149 +1,31 @@
-import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
+import ProjectInstanceDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectVersionsSelect';
+import ProjectInstanceDialogBasicStepProjectsComboBox from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectsComboBox';
+import ProjectInstanceDialogBasicStepTagsSelect from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
-import {useGetProjectVersionsQuery} from '@/queries/automation/projectVersions.queries';
-import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
-import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import {ProjectInstanceModel, ProjectModel, ProjectStatusModel} from 'middleware/automation/configuration';
-import {Dispatch, FocusEventHandler, SetStateAction} from 'react';
-import {Control, UseFormGetValues, UseFormRegister, UseFormReturn, UseFormSetValue} from 'react-hook-form';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {ProjectInstanceModel} from 'middleware/automation/configuration';
+import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
     control: Control<ProjectInstanceModel>;
-    errors: UseFormReturn<ProjectInstanceModel>['formState']['errors'];
     getValues: UseFormGetValues<ProjectInstanceModel>;
     projectId: number | undefined;
     projectInstance: ProjectInstanceModel | undefined;
-    register: UseFormRegister<ProjectInstanceModel>;
-    setProjectId: Dispatch<SetStateAction<number | undefined>>;
     setValue: UseFormSetValue<ProjectInstanceModel>;
-    touchedFields: UseFormReturn<ProjectInstanceModel>['formState']['touchedFields'];
+    updateProjectVersion: boolean;
 }
-
-const ProjectLabel = ({project}: {project: ProjectModel}) => (
-    <div className="flex items-center">
-        <span className="mr-1 ">{project.name}</span>
-
-        <span className="text-xs text-gray-500">{project?.tags?.map((tag) => tag.name).join(', ')}</span>
-    </div>
-);
-
-const ProjectsComboBox = ({
-    onBlur,
-    onChange,
-    value,
-}: {
-    onBlur: FocusEventHandler;
-    onChange: (item?: ComboBoxItemType) => void;
-    value?: number;
-}) => {
-    const {data: projects} = useGetProjectsQuery({status: ProjectStatusModel.Published});
-
-    return projects ? (
-        <ComboBox
-            items={projects.map(
-                (project) =>
-                    ({
-                        label: <ProjectLabel project={project} />,
-                        value: project.id,
-                    }) as ComboBoxItemType
-            )}
-            name="projectId"
-            onBlur={onBlur}
-            onChange={onChange}
-            value={value}
-        />
-    ) : (
-        <>Loading...</>
-    );
-};
-
-const ProjectVersionsSelect = ({
-    disabled,
-    onChange,
-    projectId,
-    projectVersion,
-}: {
-    disabled: boolean;
-    onChange: (value: number) => void;
-    projectId?: number;
-    projectVersion?: number;
-}) => {
-    const {data: projectVersions} = useGetProjectVersionsQuery(projectId!, !!projectId);
-
-    return (
-        <Select
-            defaultValue={projectVersion?.toString()}
-            disabled={disabled}
-            onValueChange={(value) => {
-                onChange(+value);
-            }}
-        >
-            <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select version" />
-            </SelectTrigger>
-
-            <SelectContent>
-                {projectVersions &&
-                    projectVersions.map(
-                        (projectVersion) =>
-                            projectVersion.status == ProjectStatusModel.Published && (
-                                <SelectItem key={projectVersion.version} value={projectVersion.version!.toString()}>
-                                    V{projectVersion.version}
-                                </SelectItem>
-                            )
-                    )}
-            </SelectContent>
-        </Select>
-    );
-};
-
-const TagsSelect = ({
-    field,
-    onCreateOption,
-    projectInstance,
-}: {
-    field: ControllerRenderProps<ProjectInstanceModel, 'tags'>;
-    onCreateOption: (inputValue: string) => void;
-    projectInstance?: ProjectInstanceModel;
-}) => {
-    const {data: tags} = useGetProjectInstanceTagsQuery();
-
-    const tagNames = projectInstance?.tags?.map((tag) => tag.name);
-
-    const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
-
-    return remainingTags ? (
-        <CreatableSelect
-            field={field}
-            isMulti
-            onCreateOption={onCreateOption}
-            options={remainingTags.map((tag) => {
-                return {
-                    label: tag.name,
-                    value: tag.name.toLowerCase().replace(/\W/g, ''),
-                    ...tag,
-                };
-            })}
-        />
-    ) : (
-        <>Loading....</>
-    );
-};
 
 const ProjectInstanceDialogBasicStep = ({
     control,
     getValues,
     projectId,
     projectInstance,
-    setProjectId,
     setValue,
+    updateProjectVersion,
 }: ProjectDialogBasicStepProps) => {
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
@@ -158,14 +40,13 @@ const ProjectInstanceDialogBasicStep = ({
                             <FormLabel>Project</FormLabel>
 
                             <FormControl>
-                                <ProjectsComboBox
+                                <ProjectInstanceDialogBasicStepProjectsComboBox
                                     onBlur={field.onBlur}
                                     onChange={(item) => {
                                         if (item) {
                                             resetWorkflowsEnabledStore();
-                                            setValue('projectId', item.value);
-                                            setValue('projectVersion', undefined);
-                                            setProjectId(item.value);
+                                            setValue('projectId', item.value, {shouldValidate: true});
+                                            setValue('projectVersion', undefined, {shouldValidate: true});
                                         }
                                     }}
                                     value={field.value}
@@ -180,30 +61,32 @@ const ProjectInstanceDialogBasicStep = ({
                 />
             )}
 
-            <FormField
-                control={control}
-                name="name"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Name</FormLabel>
+            {!updateProjectVersion && (
+                <FormField
+                    control={control}
+                    name="name"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
 
-                        <FormControl>
-                            <Input
-                                onChange={(value) => {
-                                    field.onChange(value);
-                                }}
-                                placeholder="My CRM Project"
-                                value={field.value}
-                            />
-                        </FormControl>
+                            <FormControl>
+                                <Input
+                                    onChange={(value) => {
+                                        field.onChange(value);
+                                    }}
+                                    placeholder="My CRM Project"
+                                    value={field.value}
+                                />
+                            </FormControl>
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-                rules={{required: true}}
-            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    rules={{required: true}}
+                />
+            )}
 
-            {!projectInstance?.id && (
+            {(!projectInstance?.id || updateProjectVersion) && (
                 <FormField
                     control={control}
                     name="projectVersion"
@@ -212,9 +95,11 @@ const ProjectInstanceDialogBasicStep = ({
                             <FormLabel>Version</FormLabel>
 
                             <FormControl>
-                                <ProjectVersionsSelect
-                                    disabled={!!projectInstance?.projectVersion}
-                                    onChange={(value) => field.onChange(value)}
+                                <ProjectInstanceDialogBasicStepProjectVersionsSelect
+                                    onChange={(value) => {
+                                        field.onChange(value);
+                                        setValue('projectInstanceWorkflows', [], {shouldValidate: true});
+                                    }}
                                     projectId={projectId}
                                     projectVersion={field.value}
                                 />
@@ -258,48 +143,52 @@ const ProjectInstanceDialogBasicStep = ({
                 />
             )}
 
-            <FormField
-                control={control}
-                name="description"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Description</FormLabel>
+            {!updateProjectVersion && (
+                <FormField
+                    control={control}
+                    name="description"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
 
-                        <FormControl>
-                            <Textarea placeholder="Cute description of your project instance" {...field} />
-                        </FormControl>
+                            <FormControl>
+                                <Textarea placeholder="Cute description of your project instance" {...field} />
+                            </FormControl>
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
 
-            <FormField
-                control={control}
-                name="tags"
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>Tags</FormLabel>
+            {!updateProjectVersion && (
+                <FormField
+                    control={control}
+                    name="tags"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Tags</FormLabel>
 
-                        <TagsSelect
-                            field={field}
-                            onCreateOption={(inputValue: string) => {
-                                setValue('tags', [
-                                    ...(getValues().tags ?? []),
-                                    {
-                                        label: inputValue,
-                                        name: inputValue,
-                                        value: inputValue,
-                                    },
-                                ] as never[]);
-                            }}
-                            projectInstance={projectInstance}
-                        />
+                            <ProjectInstanceDialogBasicStepTagsSelect
+                                field={field}
+                                onCreateOption={(inputValue: string) => {
+                                    setValue('tags', [
+                                        ...(getValues().tags ?? []),
+                                        {
+                                            label: inputValue,
+                                            name: inputValue,
+                                            value: inputValue,
+                                        },
+                                    ] as never[]);
+                                }}
+                                projectInstance={projectInstance}
+                            />
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
         </div>
     );
 };

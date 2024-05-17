@@ -9,19 +9,28 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
+import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.queries';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {EnvironmentModel, ProjectInstanceModel} from 'middleware/automation/configuration';
+import {
+    EnvironmentModel,
+    ProjectInstanceModel,
+    ProjectInstanceWorkflowConnectionModel,
+    ProjectInstanceWorkflowModel,
+    WorkflowConnectionModel,
+} from 'middleware/automation/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
 } from 'mutations/automation/projectInstances.mutations';
-import {ReactNode, useState} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import ProjectInstanceDialogBasicStep from './ProjectInstanceDialogBasicStep';
 import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflowsStep';
@@ -30,12 +39,21 @@ interface ProjectInstanceDialogProps {
     onClose?: () => void;
     projectInstance?: ProjectInstanceModel;
     triggerNode?: ReactNode;
+    updateProjectVersion?: boolean;
 }
 
-const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectInstanceDialogProps) => {
+const ProjectInstanceDialog = ({
+    onClose,
+    projectInstance,
+    triggerNode,
+    updateProjectVersion = false,
+}: ProjectInstanceDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(!triggerNode);
-    const [projectId, setProjectId] = useState<number | undefined>(projectInstance?.projectId);
+
+    const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
+        useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
+    );
 
     const form = useForm<ProjectInstanceModel>({
         defaultValues: {
@@ -54,7 +72,13 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
         },
     });
 
-    const {control, formState, getValues, handleSubmit, register, reset, setValue} = form;
+    const {control, formState, getValues, handleSubmit, reset, setValue} = form;
+
+    const {data: workflows} = useGetProjectVersionWorkflowsQuery(
+        getValues().projectId!,
+        getValues().projectVersion!,
+        !!getValues().projectId && !!getValues().projectVersion
+    );
 
     const queryClient = useQueryClient();
 
@@ -86,26 +110,22 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
             content: (
                 <ProjectInstanceDialogBasicStep
                     control={control}
-                    errors={formState.errors}
                     getValues={getValues}
-                    projectId={projectId}
+                    projectId={getValues().projectId}
                     projectInstance={projectInstance}
-                    register={register}
-                    setProjectId={setProjectId}
                     setValue={setValue}
-                    touchedFields={formState.touchedFields}
+                    updateProjectVersion={updateProjectVersion}
                 />
             ),
             name: 'Basic',
         },
         {
-            content: (
+            content: workflows && (
                 <ProjectInstanceDialogWorkflowsStep
                     control={control}
                     formState={formState}
-                    getValues={getValues}
-                    register={register}
                     setValue={setValue}
+                    workflows={workflows}
                 />
             ),
             name: 'Workflows',
@@ -122,11 +142,12 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
             });
 
             setActiveStepIndex(0);
-            setProjectId(undefined);
 
             if (onClose) {
                 onClose();
             }
+
+            resetWorkflowsEnabledStore();
         }, 300);
     }
 
@@ -165,6 +186,65 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
         setActiveStepIndex(activeStepIndex + 1);
     }
 
+    useEffect(() => {
+        if (workflows) {
+            let projectInstanceWorkflows: ProjectInstanceWorkflowModel[] = [];
+
+            for (let i = 0; i < workflows.length; i++) {
+                const workflow = workflows[i];
+
+                const projectInstanceWorkflow = projectInstance?.projectInstanceWorkflows?.find(
+                    (projectInstanceWorkflow) =>
+                        projectInstanceWorkflow.workflowReferenceCode === workflow.workflowReferenceCode
+                );
+
+                if (projectInstanceWorkflow && projectInstanceWorkflow.enabled) {
+                    setWorkflowEnabled(workflow.id!, true);
+                } else {
+                    setWorkflowEnabled(workflow.id!, false);
+                }
+
+                let newProjectInstanceWorkflowConnections: ProjectInstanceWorkflowConnectionModel[] = [];
+
+                const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+                    .flatMap((task) => task.connections ?? [])
+                    .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
+
+                for (const workflowConnection of workflowConnections) {
+                    const projectInstanceWorkflowConnection = projectInstanceWorkflow?.connections?.find(
+                        (projectInstanceWorkflowConnection) =>
+                            projectInstanceWorkflowConnection.workflowNodeName ===
+                                workflowConnection.workflowNodeName &&
+                            projectInstanceWorkflowConnection.key === workflowConnection.key
+                    );
+
+                    newProjectInstanceWorkflowConnections = [
+                        ...newProjectInstanceWorkflowConnections,
+                        projectInstanceWorkflowConnection ??
+                            ({
+                                key: workflowConnection.key,
+                                workflowNodeName: workflowConnection.workflowNodeName,
+                            } as ProjectInstanceWorkflowConnectionModel),
+                    ];
+                }
+
+                projectInstanceWorkflows = [
+                    ...projectInstanceWorkflows,
+                    {
+                        ...(projectInstanceWorkflow ?? {}),
+                        connections: newProjectInstanceWorkflowConnections,
+                        version: undefined,
+                        workflowId: workflow.id!,
+                    },
+                ];
+            }
+
+            setValue('projectInstanceWorkflows', projectInstanceWorkflows, {shouldValidate: true});
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [getValues().projectId, getValues().projectVersion, workflows]);
+
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -183,9 +263,11 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
                     <DialogHeader>
                         <div className="flex items-center justify-between">
                             <DialogTitle>
-                                {`${projectInstance?.id ? 'Edit' : 'New'} Instance ${!projectInstance?.id ? '-' : ''} ${
-                                    !projectInstance?.id ? projectInstanceDialogSteps[activeStepIndex].name : ''
-                                }`}
+                                {updateProjectVersion
+                                    ? 'Upgrade Project Version'
+                                    : `${projectInstance?.id ? 'Edit' : 'New'} Instance ${!projectInstance?.id ? '-' : ''} ${
+                                          !projectInstance?.id ? projectInstanceDialogSteps[activeStepIndex].name : ''
+                                      }`}
                             </DialogTitle>
 
                             <DialogClose asChild>
@@ -224,24 +306,21 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
 
-                                {!projectInstance?.id && <Button onClick={handleSubmit(handleNextClick)}>Next</Button>}
+                                {(!projectInstance?.id || updateProjectVersion) && (
+                                    <Button onClick={handleSubmit(handleNextClick)}>Next</Button>
+                                )}
                             </>
                         )}
 
-                        {(activeStepIndex === 1 || projectInstance?.id) && (
+                        {(activeStepIndex === 1 || (projectInstance?.id && !updateProjectVersion)) && (
                             <>
-                                {!projectInstance?.id && (
+                                {activeStepIndex === 1 && (
                                     <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
                                         Previous
                                     </Button>
                                 )}
 
-                                <Button
-                                    disabled={projectInstance?.enabled && !projectInstance?.id}
-                                    onClick={handleSubmit(saveProjectInstance)}
-                                >
-                                    Save
-                                </Button>
+                                <Button onClick={handleSubmit(saveProjectInstance)}>Save</Button>
                             </>
                         )}
                     </DialogFooter>

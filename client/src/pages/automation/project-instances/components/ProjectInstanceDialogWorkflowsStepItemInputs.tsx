@@ -12,7 +12,7 @@ export interface ProjectInstanceDialogWorkflowsStepItemConfigurationProps {
     workflowIndex: number;
 }
 
-const ProjectInstanceDialogWorkflowsStepItemConfiguration = ({
+const ProjectInstanceDialogWorkflowsStepItemInputs = ({
     control,
     formState,
     workflow,
@@ -76,4 +76,4 @@ const ProjectInstanceDialogWorkflowsStepItemConfiguration = ({
     );
 };
 
-export default ProjectInstanceDialogWorkflowsStepItemConfiguration;
+export default ProjectInstanceDialogWorkflowsStepItemInputs;

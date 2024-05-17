@@ -1,16 +1,15 @@
 import {Button} from '@/components/ui/button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import useCopyToClipboard from '@/hooks/useCopyToClipboard';
-import {ProjectInstanceApi, ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel, WorkflowBasicModel} from '@/middleware/platform/configuration';
+import {ProjectInstanceApi, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
+import ProjectInstanceWorkflowListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItemDropdownMenu';
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ClipboardIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -32,7 +31,7 @@ const ProjectInstanceWorkflowListItem = ({
     projectInstanceEnabled: boolean;
     projectInstanceId: number;
     projectInstanceWorkflow: ProjectInstanceWorkflowModel;
-    workflow: WorkflowBasicModel;
+    workflow: WorkflowModel;
     workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     };
@@ -150,8 +149,27 @@ const ProjectInstanceWorkflowListItem = ({
                 )}
 
                 {projectInstanceWorkflow && (
-                    <div className="w-8">
-                        {workflow.manualTrigger && (
+                    <div className="flex items-center gap-x-4">
+                        <Switch
+                            checked={projectInstanceWorkflow.enabled}
+                            disabled={projectInstanceEnabled}
+                            onCheckedChange={(value) => {
+                                enableProjectInstanceWorkflowMutation.mutate(
+                                    {
+                                        enable: value,
+                                        id: projectInstanceId,
+                                        workflowId: workflow.id!,
+                                    },
+                                    {
+                                        onSuccess: () => {
+                                            projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
+                                        },
+                                    }
+                                );
+                            }}
+                        />
+
+                        {workflow.triggers?.[0]?.name === 'manual' && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
                                 onClick={() => handleWorkflowRun()}
@@ -185,55 +203,19 @@ const ProjectInstanceWorkflowListItem = ({
                             </Button>
                         )}
 
-                        {!workflow.manualTrigger && !projectInstanceWorkflow.staticWebhookUrl && (
-                            <Switch
-                                checked={projectInstanceWorkflow.enabled}
-                                disabled={projectInstanceEnabled}
-                                onCheckedChange={(value) => {
-                                    enableProjectInstanceWorkflowMutation.mutate(
-                                        {
-                                            enable: value,
-                                            id: projectInstanceId,
-                                            workflowId: workflow.id!,
-                                        },
-                                        {
-                                            onSuccess: () => {
-                                                projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
-                                            },
-                                        }
-                                    );
-                                }}
-                            />
+                        {workflow.triggers?.[0]?.name !== 'manual' && !projectInstanceWorkflow.staticWebhookUrl && (
+                            <div className="w-9"></div>
                         )}
+
+                        <ProjectInstanceWorkflowListItemDropdownMenu
+                            onEditClick={() => setShowEditWorkflowDialog(true)}
+                            onEnableClick={() => handleProjectInstanceEnable()}
+                            projectInstanceEnabled={projectInstanceEnabled}
+                            projectInstanceWorkflowEnabled={projectInstanceWorkflow.enabled!}
+                            workflow={workflow}
+                        />
                     </div>
                 )}
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                        </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            disabled={
-                                projectInstanceEnabled ||
-                                (workflow.connectionsCount === 0 && workflow?.inputsCount === 0)
-                            }
-                            onClick={() => setShowEditWorkflowDialog(true)}
-                        >
-                            Edit
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                            disabled={projectInstanceEnabled}
-                            onClick={() => handleProjectInstanceEnable()}
-                        >
-                            {projectInstanceWorkflow.enabled ? 'Disable' : 'Enable'}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
 
             {showEditWorkflowDialog && projectInstanceWorkflow && (
