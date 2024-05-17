@@ -296,7 +296,7 @@ const Property = ({
         });
     }, 200);
 
-    const handleDelete = (path: string, name?: string, arrayIndex?: number) => {
+    const handleDeleteCustomPropertyClick = (path: string, name?: string, arrayIndex?: number) => {
         deleteProperty(
             workflow.id!,
             path,
@@ -725,14 +725,18 @@ const Property = ({
                         )}
 
                         {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
-                            <ArrayProperty onDeleteClick={handleDelete} path={path} property={property} />
+                            <ArrayProperty
+                                onDeleteClick={handleDeleteCustomPropertyClick}
+                                path={path}
+                                property={property}
+                            />
                         )}
 
                         {controlType === 'OBJECT_BUILDER' && (
                             <ObjectProperty
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
-                                onDeleteClick={handleDelete}
+                                onDeleteClick={handleDeleteCustomPropertyClick}
                                 operationName={operationName}
                                 parameterValue={propertyParameterValue}
                                 path={path}
@@ -838,7 +842,7 @@ const Property = ({
                                 maxLength={maxLength}
                                 min={minValue}
                                 minLength={minLength}
-                                name={`${path}.${name}` || name || `${arrayName}_0`}
+                                name={arrayName ? `${arrayName}_${arrayIndex}` : `${path}.${name}`}
                                 onChange={handleInputChange}
                                 placeholder={
                                     isNumericalInput && minValue && maxValue
