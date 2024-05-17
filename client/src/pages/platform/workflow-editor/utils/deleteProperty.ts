@@ -21,7 +21,7 @@ export default function deleteProperty(
 
     path = path.replace('parameters.', '').replace('parameters', '');
 
-    if (arrayIndex !== undefined && path.endsWith('_' + arrayIndex)) {
+    if (arrayIndex !== undefined && path.endsWith(arrayIndex.toString())) {
         path = path.substring(0, path.lastIndexOf('.'));
     }
 
@@ -31,23 +31,18 @@ export default function deleteProperty(
         {
             deleteWorkflowNodeParameterRequestModel: {
                 arrayIndex,
-                name: !name || name.endsWith('_' + arrayIndex) ? undefined : name,
+                name: name === arrayIndex?.toString() ? undefined : name,
                 path,
                 workflowNodeName,
             },
             id: workflowId,
         },
         {
-            onSuccess: (response) => {
-                const parameters = response.parameters;
-
-                currentComponent = {
+            onSuccess: (response) =>
+                setCurrentComponent({
                     ...currentComponent,
-                    parameters,
-                };
-
-                setCurrentComponent(currentComponent);
-            },
+                    parameters: response.parameters,
+                }),
         }
     );
 }

@@ -50,11 +50,11 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     };
 
     const handleDeleteClick = (path: string, name: string, index: number) => {
-        setArrayItems((subProperties) =>
-            subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)
-        );
+        const clickedItemParameter = getParameterByPath(path, currentComponent)[index];
 
-        onDeleteClick(path, undefined, index);
+        if (clickedItemParameter) {
+            onDeleteClick(path, undefined, index);
+        }
     };
 
     const availableItemTypes = items?.length
@@ -108,7 +108,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     properties: subProperties,
                 };
             });
-
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
