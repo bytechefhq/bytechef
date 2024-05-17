@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -33,7 +34,9 @@ const InputTypeSwitchButton = ({
                     <FunctionSquareIcon className="size-5 text-gray-800" />
                 </TooltipTrigger>
 
-                <TooltipContent>Switch to dynamic value</TooltipContent>
+                <TooltipPortal>
+                    <TooltipContent>Switch to dynamic value</TooltipContent>
+                </TooltipPortal>
             </Tooltip>
         )}
     </Button>
