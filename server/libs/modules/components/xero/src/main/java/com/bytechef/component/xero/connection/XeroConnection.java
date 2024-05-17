@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE;
+import static com.bytechef.component.definition.Authorization.BEARER;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
@@ -27,7 +28,7 @@ import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.Authorization.ApplyResponse;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -38,7 +39,8 @@ import java.util.Map;
  * @author Mario Cvjetojevic
  */
 public class XeroConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
             authorization(OAUTH2_AUTHORIZATION_CODE.toLowerCase(), OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
@@ -51,28 +53,29 @@ public class XeroConnection {
                         .required(true))
                 .apply(XeroConnection::getApplyResponse)
                 .authorizationUrl((connection, context) -> "https://login.xero.com/identity/connect/authorize")
-                .scopes((connection, context) -> List.of("accounting.contacts", "accounting.transactions"))
+                .scopes((connection, context) -> List.of(
+                    "accounting.contacts", "accounting.transactions", "accounting.settings.read"))
                 .tokenUrl((connection, context) -> "https://identity.xero.com/connect/token"));
 
     private static ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
         return ofHeaders(
             Map.of(
-                AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN)),
+                AUTHORIZATION, List.of(BEARER + " " + connectionParameters.getRequiredString(ACCESS_TOKEN)),
                 "Xero-tenant-id", List.of(getTenantId(connectionParameters.getRequiredString(ACCESS_TOKEN), context))));
     }
 
     private XeroConnection() {
     }
 
-    public static String getTenantId(String accessToken, Context context) {
+    private static String getTenantId(String accessToken, Context context) {
         Http.Response response = context
             .http(http -> http.get("https://api.xero.com/connections"))
             .body(
                 Http.Body.of(
                     Map.of(
-                        "Authorization", "Bearer " + accessToken,
+                        "Authorization", BEARER + " " + accessToken,
                         "Content-Type", "application/json")))
-            .header(AUTHORIZATION, "Bearer " + accessToken)
+            .header(AUTHORIZATION, BEARER + " " + accessToken)
             .configuration(
                 Http
                     .responseType(Http.ResponseType.JSON)
