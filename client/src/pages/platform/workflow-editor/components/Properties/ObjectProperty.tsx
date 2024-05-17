@@ -172,7 +172,7 @@ const ObjectProperty = ({
                                     label && 'mb-0',
                                     name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
                                 )}
-                                inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : undefined}
+                                inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
                                 objectName={name}
                                 operationName={operationName}
                                 parameterValue={subPropertyDefaultValue}
@@ -181,7 +181,7 @@ const ObjectProperty = ({
                                     ...subProperty,
                                     name: subProperty.name,
                                 }}
-                                showDeletePropertyButton={true}
+                                showDeletePropertyButton
                             />
 
                             {subProperty.custom && name && subProperty.name && currentComponent && (
