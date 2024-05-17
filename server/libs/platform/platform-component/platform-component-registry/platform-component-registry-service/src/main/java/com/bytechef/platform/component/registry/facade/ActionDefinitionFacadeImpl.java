@@ -65,7 +65,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
             componentConnection,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
+                componentName, componentVersion, actionName, null, null, null, componentConnection));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             searchText,
             componentConnection,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
+                componentName, componentVersion, actionName, null, null, null, componentConnection));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return actionDefinitionService.executeOutput(
             componentName, componentVersion, actionName, inputParameters, componentConnections,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null,
+                componentName, componentVersion, actionName, null, null, null,
                 entries.size() == 1
                     ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
                     : null));
@@ -115,7 +115,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return actionDefinitionService.executePerform(
             componentName, componentVersion, actionName, inputParameters, componentConnections,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
+                componentName, componentVersion, actionName, type, workflowId, jobId,
                 entries.size() == 1
                     ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
                     : null));
@@ -128,8 +128,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         return actionDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, actionName, inputParameters,
-            contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null));
+            contextFactory.createActionContext(componentName, componentVersion, actionName, null, null, null, null));
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

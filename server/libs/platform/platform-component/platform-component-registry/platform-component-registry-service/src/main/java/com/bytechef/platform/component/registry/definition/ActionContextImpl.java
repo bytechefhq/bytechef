@@ -46,7 +46,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, Long instanceId, Type type,
+        String componentName, int componentVersion, String actionName, Type type,
         String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
@@ -54,7 +54,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         super(componentName, actionName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, actionName, instanceId, type, workflowId, jobId,
+            componentName, componentVersion, actionName, type, workflowId, jobId,
             dataStorageService);
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
@@ -84,7 +84,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, Long instanceId, Type type,
+        String componentName, Integer componentVersion, String actionName, Type type,
         String workflowId, Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
