@@ -31,12 +31,12 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-impl"))
 
-    implementation(project(":server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
 
     implementation(project(":server:libs:modules:components:accelo"))
