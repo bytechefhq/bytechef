@@ -897,6 +897,7 @@ const Property = ({
                                 defaultValue={defaultValue?.toString()}
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                                inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                                 key={`${currentNode?.name}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
