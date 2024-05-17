@@ -19,10 +19,12 @@ interface PropertySelectProps {
     defaultValue?: string;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
+    inputTypeSwitchButtonClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
     onValueChange?: (value: string) => void;
+    options: Array<SelectOptionType>;
     placeholder?: string;
     required?: boolean;
     showInputTypeSwitchButton?: boolean;
@@ -33,6 +35,7 @@ const PropertySelect = ({
     defaultValue,
     description,
     handleInputTypeSwitchButtonClick,
+    inputTypeSwitchButtonClassName,
     label,
     leadingIcon,
     name,
@@ -64,7 +67,7 @@ const PropertySelect = ({
 
                 {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                     <InputTypeSwitchButton
-                        className="ml-auto"
+                        className={twMerge('ml-auto', inputTypeSwitchButtonClassName)}
                         handleClick={handleInputTypeSwitchButtonClick}
                         mentionInput={false}
                     />
