@@ -1,5 +1,6 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentType} from '@/types/types';
+import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -23,7 +24,9 @@ const DeletePropertyButton = ({className, onClick}: DeletePropertyButtonProps) =
                 </div>
             </TooltipTrigger>
 
-            <TooltipContent>Delete</TooltipContent>
+            <TooltipPortal>
+                <TooltipContent>Delete</TooltipContent>
+            </TooltipPortal>
         </Tooltip>
     );
 };

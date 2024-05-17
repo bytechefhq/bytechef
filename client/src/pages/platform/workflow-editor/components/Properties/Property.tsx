@@ -20,6 +20,7 @@ import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTM
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -698,7 +699,11 @@ const Property = ({
                                                         <QuestionMarkCircledIcon className="ml-1" />
                                                     </TooltipTrigger>
 
-                                                    <TooltipContent className="max-w-md">{description}</TooltipContent>
+                                                    <TooltipPortal>
+                                                        <TooltipContent className="max-w-md">
+                                                            {description}
+                                                        </TooltipContent>
+                                                    </TooltipPortal>
                                                 </Tooltip>
                                             )}
                                         </div>
