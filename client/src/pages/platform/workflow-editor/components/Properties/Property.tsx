@@ -631,6 +631,15 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);
 
+    // reset all values when currentNode.operationName changes
+    useEffect(() => {
+        setPropertyParameterValue('');
+        setInputValue('');
+        setMentionInputValue('');
+        setSelectValue('');
+        setNumericValue('');
+    }, [currentNode?.operationName]);
+
     return (
         <li
             className={twMerge(
@@ -652,7 +661,7 @@ const Property = ({
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                             inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                            key={`${currentNode?.name}_${name}`}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || (arrayName ? undefined : name)}
                             leadingIcon={typeIcon}
                             onChange={handleMentionsInputChange}
@@ -747,7 +756,7 @@ const Property = ({
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 name={`${path}.${name}`}
                                 render={({field}) => (
                                     <PropertyInput
@@ -768,7 +777,7 @@ const Property = ({
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 name={`${path}.${name}`}
                                 render={({field: {name, onChange}}) => (
                                     <PropertySelect
@@ -788,7 +797,7 @@ const Property = ({
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 name={`${path}.${name}`}
                                 render={({field: {name, onChange}}) => (
                                     <PropertySelect
@@ -810,7 +819,7 @@ const Property = ({
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 name={`${path}.${name}`}
                                 render={({field}) => (
                                     <PropertyTextArea
@@ -832,7 +841,7 @@ const Property = ({
                                 errorMessage={errorMessage}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={arrayName ? undefined : label || name}
                                 leadingIcon={typeIcon}
                                 max={maxValue}
@@ -858,7 +867,7 @@ const Property = ({
                         {!control && (isValidControlType || isNumericalInput) && !!options?.length && (
                             <PropertySelect
                                 description={description}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
@@ -873,7 +882,7 @@ const Property = ({
                                 arrayIndex={arrayIndex}
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map((path) =>
@@ -898,7 +907,7 @@ const Property = ({
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name}
@@ -916,7 +925,7 @@ const Property = ({
                             <PropertyTextArea
                                 description={description}
                                 error={hasError}
-                                key={`${currentNode?.name}_${name}`}
+                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 name={name!}
@@ -944,7 +953,7 @@ const Property = ({
                     <PropertyCodeEditor
                         defaultValue={defaultValue}
                         description={description}
-                        key={`${currentNode?.name}_${name}`}
+                        key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                         label={label}
                         language={languageId!}
                         leadingIcon={typeIcon}
