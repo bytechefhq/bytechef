@@ -20,7 +20,9 @@ interface ArrayPropertyProps {
 
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
-    const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>('STRING');
+    const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES | undefined>(
+        property.items?.[0]?.type as keyof typeof PROPERTY_CONTROL_TYPES
+    );
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
@@ -35,10 +37,13 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         const newItem: ArrayPropertyType = {
             ...matchingItem,
-            controlType: PROPERTY_CONTROL_TYPES[newItemType] as ControlTypeModel,
+            controlType: matchingItem
+                ? matchingItem?.controlType
+                : (PROPERTY_CONTROL_TYPES[newItemType!] as ControlTypeModel),
             custom: true,
+            label: '',
             name: arrayItems.length.toString(),
-            type: newItemType,
+            type: matchingItem?.type || newItemType || 'STRING',
         };
 
         setArrayItems([...arrayItems, newItem]);
@@ -109,6 +114,10 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             }
         } else if (name && params?.[name]) {
             const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => {
+                if (!parameterItem) {
+                    return;
+                }
+
                 let parameterItemType = 'STRING';
 
                 if (Array.isArray(parameterItem)) {
@@ -123,7 +132,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     const parameterItemValue = parameterItem[key as keyof ArrayPropertyType];
 
                     const subPropertyType = typeof parameterItemValue === 'boolean' ? 'BOOLEAN' : 'STRING';
-
                     return {
                         controlType: PROPERTY_CONTROL_TYPES[
                             subPropertyType as keyof typeof PROPERTY_CONTROL_TYPES
@@ -156,12 +164,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (availableItemTypes.length === 1) {
-            setNewItemType(availableItemTypes[0].value as keyof typeof PROPERTY_CONTROL_TYPES);
-        }
-    }, [availableItemTypes]);
 
     return (
         <>
