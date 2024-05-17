@@ -28,8 +28,12 @@ dependencies {
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-impl"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest"))
 
+    implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
+
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
-    implementation(project(":server:ee:libs:atlas:atlas-worker:atlas-worker-remote-client"))
+    implementation(project(":server:ee:libs:atlas:atlas-worker:atlas-worker-remote-config"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
