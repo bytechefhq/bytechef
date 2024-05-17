@@ -480,10 +480,6 @@ const Property = ({
 
             setPropertyParameterValue(name ? (params?.[name] as unknown as string) : '');
         }
-
-        if (name === '0' && defaultValue) {
-            setPropertyParameterValue(defaultValue);
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -613,6 +609,7 @@ const Property = ({
         }
     }, [controlType]);
 
+    // update propertyParameterValue when workflow definition changes
     useEffect(() => {
         if (!workflow.definition || !currentNode?.name || !name || !workflowTestConfigurationDialogOpen) {
             return;
