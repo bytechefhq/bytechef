@@ -15,7 +15,6 @@ export type SelectOptionType = {
 };
 
 interface PropertySelectProps {
-    options: Array<SelectOptionType>;
     defaultValue?: string;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
