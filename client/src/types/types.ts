@@ -69,6 +69,7 @@ export type NodeType = {
     id: string;
     label?: string;
     name: string;
+    operationName?: string;
     trigger?: boolean;
     type: 'component' | 'flowControl';
     version: number;
