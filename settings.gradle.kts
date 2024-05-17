@@ -268,8 +268,6 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 
 include("server:ee:libs:core:commons:commons-discovery")
 include("server:ee:libs:core:commons:commons-rest-client")
-include("server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-rest")
-include("server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-client")
 include("server:ee:libs:core:discovery:discovery-metadata-api")
 include("server:ee:libs:core:discovery:discovery-redis")
 
@@ -279,6 +277,8 @@ include("server:ee:libs:platform:platform-configuration:platform-configuration-r
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-client")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-rest")
+include("server:ee:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-remote-rest")
+include("server:ee:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-remote-client")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client")

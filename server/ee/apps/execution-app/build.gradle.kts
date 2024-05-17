@@ -46,11 +46,11 @@ dependencies {
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
-    implementation(project(":server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
