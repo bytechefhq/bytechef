@@ -444,6 +444,17 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode, workflowDefinition.tasks?.length]);
 
+    // Store new operationName into currentNode
+    useEffect(() => {
+        if (currentNode && currentOperationName) {
+            setCurrentNode({
+                ...currentNode,
+                operationName: currentOperationName,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentOperationName]);
+
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentComponentDefinition) {
         return <></>;
     }
