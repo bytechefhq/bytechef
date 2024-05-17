@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
+import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ArrayPropertyType, PropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
@@ -20,8 +20,8 @@ interface ArrayPropertyProps {
 
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
-    const [newItemType, setNewItemType] = useState<keyof typeof PROPERTY_CONTROL_TYPES | undefined>(
-        property.items?.[0]?.type as keyof typeof PROPERTY_CONTROL_TYPES
+    const [newItemType, setNewItemType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES | undefined>(
+        property.items?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
     );
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
@@ -39,7 +39,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             ...matchingItem,
             controlType: matchingItem
                 ? matchingItem?.controlType
-                : (PROPERTY_CONTROL_TYPES[newItemType!] as ControlTypeModel),
+                : (VALUE_PROPERTY_CONTROL_TYPES[newItemType!] as ControlTypeModel),
             custom: true,
             label: '',
             name: arrayItems.length.toString(),
@@ -68,7 +68,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
               return types;
           }, [])
-        : Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
+        : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
               label: type,
               value: type,
           }));
@@ -132,8 +132,8 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
                     const subPropertyType = typeof parameterItemValue === 'boolean' ? 'BOOLEAN' : 'STRING';
                     return {
-                        controlType: PROPERTY_CONTROL_TYPES[
-                            subPropertyType as keyof typeof PROPERTY_CONTROL_TYPES
+                        controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                            subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                         ] as ControlTypeModel,
                         custom: true,
                         defaultValue: parameterItemValue,
@@ -145,8 +145,8 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
                 return {
                     arrayName: name,
-                    controlType: PROPERTY_CONTROL_TYPES[
-                        parameterItemType as keyof typeof PROPERTY_CONTROL_TYPES
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                        parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                     ] as ControlTypeModel,
                     custom: true,
                     defaultValue: parameterItem,
@@ -220,7 +220,9 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         <main className="my-2 space-y-2">
                             <PropertySelect
                                 label="Type"
-                                onValueChange={(value) => setNewItemType(value as keyof typeof PROPERTY_CONTROL_TYPES)}
+                                onValueChange={(value) =>
+                                    setNewItemType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
+                                }
                                 options={availableItemTypes}
                                 value={newItemType}
                             />

@@ -4,7 +4,7 @@ import {ControlTypeModel} from '@/middleware/platform/configuration';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {PROPERTY_CONTROL_TYPES} from '@/shared/constants';
+import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {PropertyType, SubPropertyType} from '@/types/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
@@ -39,8 +39,8 @@ const ObjectProperty = ({
         (property.properties as Array<PropertyType>) || []
     );
     const [newPropertyName, setNewPropertyName] = useState('');
-    const [newPropertyType, setNewPropertyType] = useState<keyof typeof PROPERTY_CONTROL_TYPES>(
-        (property.additionalProperties?.[0]?.type as keyof typeof PROPERTY_CONTROL_TYPES) || 'STRING'
+    const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
+        (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
@@ -50,14 +50,14 @@ const ObjectProperty = ({
     const handleAddItemClick = () => {
         const newItem: SubPropertyType = {
             additionalProperties,
-            controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
+            controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
             custom: true,
             expressionEnabled: true,
             label: newPropertyName,
             name: newPropertyName,
             type: (newPropertyType ||
                 additionalProperties?.[0].type ||
-                'STRING') as keyof typeof PROPERTY_CONTROL_TYPES,
+                'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
         };
 
         setSubProperties([...subProperties, newItem]);
@@ -105,7 +105,7 @@ const ObjectProperty = ({
                 };
             } else {
                 return {
-                    controlType: PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
                     custom: true,
                     defaultValue: value[parameter!],
                     name: parameter,
@@ -132,7 +132,7 @@ const ObjectProperty = ({
 
               return types;
           }, [])
-        : Object.keys(PROPERTY_CONTROL_TYPES).map((type) => ({
+        : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
               label: type,
               value: type,
           }));
@@ -238,7 +238,7 @@ const ObjectProperty = ({
                                 <PropertySelect
                                     label="Type"
                                     onValueChange={(value) =>
-                                        setNewPropertyType(value as keyof typeof PROPERTY_CONTROL_TYPES)
+                                        setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
                                     }
                                     options={availablePropertyTypes.map((property) => ({
                                         label: property.value!,
