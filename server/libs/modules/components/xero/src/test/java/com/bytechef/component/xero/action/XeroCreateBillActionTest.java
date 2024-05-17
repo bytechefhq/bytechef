@@ -16,7 +16,7 @@
 
 package com.bytechef.component.xero.action;
 
-import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
+import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -28,7 +28,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Domiter
  */
-class XeroCreateInvoiceActionTest extends AbstractXeroActionTest {
+class XeroCreateBillActionTest extends AbstractXeroActionTest {
 
     private final Object mockedObject = mock(Object.class);
 
@@ -37,10 +37,10 @@ class XeroCreateInvoiceActionTest extends AbstractXeroActionTest {
         try (MockedStatic<XeroUtils> xeroUtilsMockedStatic = mockStatic(XeroUtils.class)) {
             xeroUtilsMockedStatic
                 .when(() -> XeroUtils.createInvoice(mockedParameters, mockedContext,
-                    XeroCreateInvoiceAction.POST_INVOICES_CONTEXT_FUNCTION, ACCREC))
+                    XeroCreateInvoiceAction.POST_INVOICES_CONTEXT_FUNCTION, ACCPAY))
                 .thenReturn(mockedObject);
 
-            Object result = XeroCreateInvoiceAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result = XeroCreateBillAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedObject, result);
         }

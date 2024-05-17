@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xero;
+package com.bytechef.component.xero.action;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
-class XeroComponentHandlerTest {
+public abstract class AbstractXeroActionTest {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/xero_v1.json", new XeroComponentHandler().getDefinition());
-    }
+    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Http.Response mockedResponse = mock(Http.Response.class);
+
 }
