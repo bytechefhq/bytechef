@@ -47,6 +47,12 @@ import java.util.Map;
  */
 public class XeroUtils {
 
+    protected static final ContextFunction<Http, Http.Executor> GET_ACCOUNTS_CONTEXT_FUNCTION =
+        http -> http.get(BASE_URL + "/Accounts");
+
+    protected static final ContextFunction<Http, Http.Executor> GET_BRANDING_THEME_CONTEXT_FUNCTION =
+        http -> http.get(BASE_URL + "/BrandingTheme");
+
     protected static final ContextFunction<Http, Http.Executor> GET_CONTACTS_CONTEXT_FUNCTION =
         http -> http.get(BASE_URL + "/" + CONTACTS);
 
@@ -79,6 +85,52 @@ public class XeroUtils {
         } else {
             return body.get(MESSAGE);
         }
+    }
+
+    public static List<Option<String>> getAccountCodeOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body = context
+            .http(GET_ACCOUNTS_CONTEXT_FUNCTION)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("Accounts") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(CODE)));
+                }
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getBrandingThemeIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body = context
+            .http(GET_BRANDING_THEME_CONTEXT_FUNCTION)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("BrandingThemes") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get("BrandingThemeID")));
+                }
+            }
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getContactIdOptions(

@@ -21,13 +21,16 @@ import static com.bytechef.component.xero.constant.XeroConstants.XERO;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.xero.action.XeroCreateBillAction;
 import com.bytechef.component.xero.action.XeroCreateContactAction;
 import com.bytechef.component.xero.action.XeroCreateInvoiceAction;
+import com.bytechef.component.xero.action.XeroCreateQuoteAction;
 import com.bytechef.component.xero.connection.XeroConnection;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Monika Domiter
  */
 @AutoService(ComponentHandler.class)
 public class XeroComponentHandler implements ComponentHandler {
@@ -40,8 +43,10 @@ public class XeroComponentHandler implements ComponentHandler {
         .icon("path:assets/xero.svg")
         .connection(XeroConnection.CONNECTION_DEFINITION)
         .actions(
+            XeroCreateBillAction.ACTION_DEFINITION,
             XeroCreateContactAction.ACTION_DEFINITION,
-            XeroCreateInvoiceAction.ACTION_DEFINITION);
+            XeroCreateInvoiceAction.ACTION_DEFINITION,
+            XeroCreateQuoteAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

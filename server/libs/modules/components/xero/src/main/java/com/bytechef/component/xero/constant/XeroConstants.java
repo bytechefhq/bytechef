@@ -33,12 +33,15 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
  */
 public final class XeroConstants {
 
+    public static final String ACCOUNT_CODE = "AccountCode";
     public static final String ACCOUNT_NUMBER = "AccountNumber";
+    public static final String ACCPAY = "ACCPAY";
     public static final String ACCREC = "ACCREC";
     public static final String ADDRESSES = "Addresses";
     public static final String ADDRESS_TYPE = "AddressType";
     public static final String BANK_ACCOUNT_DETAILS = "BankAccountDetails";
     public static final String BASE_URL = "https://api.xero.com/api.xro/2.0";
+    public static final String BRANDING_THEME_ID = "BrandingThemeID";
     public static final String CITY = "City";
     public static final String CODE = "Code";
     public static final String COMPANY_NUMBER = "CompanyNumber";
@@ -47,18 +50,22 @@ public final class XeroConstants {
     public static final String CONTACT = "Contact";
     public static final String CONTACTS = "Contacts";
     public static final String COUNTRY = "Country";
+    public static final String CREATE_BILL = "createBill";
     public static final String CREATE_CONTACT = "createContact";
     public static final String CREATE_SALES_INVOICE = "createSalesInvoice";
+    public static final String CREATE_QUOTE = "createQuote";
     public static final String CURRENCY_CODE = "CurrencyCode";
     public static final String DATE = "Date";
     public static final String DESCRIPTION = "Description";
     public static final String DISCOUNT_RATE = "DiscountRate";
     public static final String DUE_DATE = "DueDate";
     public static final String EMAIL_ADDRESS = "EmailAddress";
+    public static final String EXPIRY_DATE = "ExpiryDate";
     public static final String FIRST_NAME = "FirstName";
     public static final String LAST_NAME = "LastName";
     public static final String LINE_AMOUNT_TYPES = "LineAmountTypes";
     public static final String LINE_ITEMS = "LineItems";
+    public static final String LINE_ITEM = "LineItem";
     public static final String MESSAGE = "Message";
     public static final String NAME = "Name";
     public static final String PHONES = "Phones";
@@ -68,10 +75,14 @@ public final class XeroConstants {
     public static final String PHONE_COUNTRY_CODE = "PhoneCountryCode";
     public static final String POSTAL_CODE = "PostalCode";
     public static final String QUANTITY = "Quantity";
+    public static final String QUOTE_NUMBER = "QuoteNumber";
     public static final String REFERENCE = "Reference";
     public static final String REGION = "Region";
     public static final String STATUS = "Status";
+    public static final String SUMMARY = "Summary";
     public static final String TAX_NUMBER = "TaxNumber";
+    public static final String TERMS = "Terms";
+    public static final String TITLE = "Title";
     public static final String TYPE = "Type";
     public static final String UNIT_AMOUNT = "UnitAmount";
     public static final String XERO = "xero";
