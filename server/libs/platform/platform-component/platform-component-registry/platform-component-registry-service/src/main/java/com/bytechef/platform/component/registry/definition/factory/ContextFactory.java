@@ -57,11 +57,10 @@ public class ContextFactory {
 
     public ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable Type type,
-        @Nullable Long instanceId, @Nullable String workflowId, @Nullable Long jobId,
-        @Nullable ComponentConnection connection) {
+        @Nullable String workflowId, @Nullable Long jobId, @Nullable ComponentConnection connection) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, instanceId, type, workflowId, jobId,
+            componentName, componentVersion, actionName, type, workflowId, jobId,
             connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor);
     }
 
@@ -71,11 +70,10 @@ public class ContextFactory {
 
     public TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @Nullable Type type,
-        @Nullable Long instanceId, @Nullable String workflowId, @Nullable Long jobId,
-        @Nullable ComponentConnection connection) {
+        @Nullable String workflowId, @Nullable Long jobId, @Nullable ComponentConnection connection) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, instanceId, type, workflowId, jobId,
+            componentName, componentVersion, triggerName, type, workflowId, jobId,
             connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor);
     }
 }

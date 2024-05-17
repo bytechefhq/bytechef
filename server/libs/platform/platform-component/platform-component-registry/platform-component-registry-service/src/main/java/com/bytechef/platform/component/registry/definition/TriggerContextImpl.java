@@ -47,7 +47,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, Long instanceId, Type type,
+        String componentName, int componentVersion, String triggerName, Type type,
         String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
@@ -55,7 +55,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         super(componentName, triggerName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, triggerName, instanceId, type, workflowId, jobId,
+            componentName, componentVersion, triggerName, type, workflowId, jobId,
             dataStorageService);
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
@@ -85,7 +85,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String triggerName, Long instanceId, Type type,
+        String componentName, Integer componentVersion, String triggerName, Type type,
         String workflowId, Long jobId, DataStorageService dataStorageService) implements ActionContext.Data {
 
         @Override
