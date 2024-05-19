@@ -59,13 +59,12 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         if (webhookExpirationDate != null) {
             Scheduler scheduler = context.getScheduler();
             try {
-                TriggerKey triggerKey = TriggerKey.triggerKey(
-                    workflowExecutionId, "DynamicWebhookTriggerRefresh");
+                TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId, "DynamicWebhookTriggerRefresh");
 
                 scheduler.rescheduleJob(
                     triggerKey,
                     TriggerBuilder.newTrigger()
-                        .withIdentity(TriggerKey.triggerKey("myTrigger", "myTriggerGroup"))
+                        .withIdentity(triggerKey)
                         .startAt(DateUtils.getDate(webhookExpirationDate))
                         .build());
             } catch (SchedulerException e) {
