@@ -32,12 +32,6 @@ export interface WorkflowBasicModel {
      */
     readonly createdDate?: Date;
     /**
-     * The number of workflow connections
-     * @type {number}
-     * @memberof WorkflowBasicModel
-     */
-    readonly connectionsCount?: number;
-    /**
      * The description of a workflow.
      * @type {string}
      * @memberof WorkflowBasicModel
@@ -49,12 +43,6 @@ export interface WorkflowBasicModel {
      * @memberof WorkflowBasicModel
      */
     readonly id?: string;
-    /**
-     * The number of workflow inputs
-     * @type {number}
-     * @memberof WorkflowBasicModel
-     */
-    readonly inputsCount?: number;
     /**
      * The descriptive name for the workflow
      * @type {string}
@@ -74,24 +62,6 @@ export interface WorkflowBasicModel {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * Does this workflow have a manual trigger or not
-     * @type {boolean}
-     * @memberof WorkflowBasicModel
-     */
-    readonly manualTrigger?: boolean;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof WorkflowBasicModel
-     */
-    readonly workflowTaskComponentNames?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof WorkflowBasicModel
-     */
-    readonly workflowTriggerComponentNames?: Array<string>;
-    /**
      * 
      * @type {number}
      * @memberof WorkflowBasicModel
@@ -102,7 +72,13 @@ export interface WorkflowBasicModel {
      * @type {number}
      * @memberof WorkflowBasicModel
      */
-    projectWorkflowId?: number;
+    readonly projectWorkflowId?: number;
+    /**
+     * The workflow reference code
+     * @type {string}
+     * @memberof WorkflowBasicModel
+     */
+    readonly workflowReferenceCode?: string;
 }
 
 /**
@@ -124,22 +100,18 @@ export function WorkflowBasicModelFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
-        'connectionsCount': json['connectionsCount'] == null ? undefined : json['connectionsCount'],
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
-        'inputsCount': json['inputsCount'] == null ? undefined : json['inputsCount'],
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'manualTrigger': json['manualTrigger'] == null ? undefined : json['manualTrigger'],
-        'workflowTaskComponentNames': json['workflowTaskComponentNames'] == null ? undefined : json['workflowTaskComponentNames'],
-        'workflowTriggerComponentNames': json['workflowTriggerComponentNames'] == null ? undefined : json['workflowTriggerComponentNames'],
         'version': json['__version'] == null ? undefined : json['__version'],
         'projectWorkflowId': json['projectWorkflowId'] == null ? undefined : json['projectWorkflowId'],
+        'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
     };
 }
 
-export function WorkflowBasicModelToJSON(value?: Omit<WorkflowBasicModel, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'manualTrigger'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'> | null): any {
+export function WorkflowBasicModelToJSON(value?: Omit<WorkflowBasicModel, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'|'projectWorkflowId'|'workflowReferenceCode'> | null): any {
     if (value == null) {
         return value;
     }
@@ -147,7 +119,6 @@ export function WorkflowBasicModelToJSON(value?: Omit<WorkflowBasicModel, 'creat
         
         'description': value['description'],
         '__version': value['version'],
-        'projectWorkflowId': value['projectWorkflowId'],
     };
 }
 

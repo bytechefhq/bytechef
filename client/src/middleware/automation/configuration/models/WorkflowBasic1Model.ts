@@ -32,12 +32,6 @@ export interface WorkflowBasic1Model {
      */
     readonly createdDate?: Date;
     /**
-     * The number of workflow connections
-     * @type {number}
-     * @memberof WorkflowBasic1Model
-     */
-    readonly connectionsCount?: number;
-    /**
      * The description of a workflow.
      * @type {string}
      * @memberof WorkflowBasic1Model
@@ -49,12 +43,6 @@ export interface WorkflowBasic1Model {
      * @memberof WorkflowBasic1Model
      */
     readonly id?: string;
-    /**
-     * The number of workflow inputs
-     * @type {number}
-     * @memberof WorkflowBasic1Model
-     */
-    readonly inputsCount?: number;
     /**
      * The descriptive name for the workflow
      * @type {string}
@@ -73,24 +61,6 @@ export interface WorkflowBasic1Model {
      * @memberof WorkflowBasic1Model
      */
     readonly lastModifiedDate?: Date;
-    /**
-     * Does this workflow have a manual trigger or not
-     * @type {boolean}
-     * @memberof WorkflowBasic1Model
-     */
-    readonly manualTrigger?: boolean;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof WorkflowBasic1Model
-     */
-    readonly workflowTaskComponentNames?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof WorkflowBasic1Model
-     */
-    readonly workflowTriggerComponentNames?: Array<string>;
     /**
      * 
      * @type {number}
@@ -118,21 +88,16 @@ export function WorkflowBasic1ModelFromJSONTyped(json: any, ignoreDiscriminator:
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
-        'connectionsCount': json['connectionsCount'] == null ? undefined : json['connectionsCount'],
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
-        'inputsCount': json['inputsCount'] == null ? undefined : json['inputsCount'],
         'label': json['label'] == null ? undefined : json['label'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'manualTrigger': json['manualTrigger'] == null ? undefined : json['manualTrigger'],
-        'workflowTaskComponentNames': json['workflowTaskComponentNames'] == null ? undefined : json['workflowTaskComponentNames'],
-        'workflowTriggerComponentNames': json['workflowTriggerComponentNames'] == null ? undefined : json['workflowTriggerComponentNames'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function WorkflowBasic1ModelToJSON(value?: Omit<WorkflowBasic1Model, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'manualTrigger'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'> | null): any {
+export function WorkflowBasic1ModelToJSON(value?: Omit<WorkflowBasic1Model, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }

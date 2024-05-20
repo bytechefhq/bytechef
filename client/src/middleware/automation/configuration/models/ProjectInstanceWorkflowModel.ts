@@ -57,7 +57,7 @@ export interface ProjectInstanceWorkflowModel {
      */
     enabled?: boolean;
     /**
-     * The id of a project instance.
+     * The id of a project instance workflow.
      * @type {number}
      * @memberof ProjectInstanceWorkflowModel
      */
@@ -99,6 +99,12 @@ export interface ProjectInstanceWorkflowModel {
      */
     workflowId?: string;
     /**
+     * The workflow reference code
+     * @type {string}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    readonly workflowReferenceCode?: string;
+    /**
      * 
      * @type {number}
      * @memberof ProjectInstanceWorkflowModel
@@ -135,11 +141,12 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
         'projectInstanceId': json['projectInstanceId'] == null ? undefined : json['projectInstanceId'],
         'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
+        'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function ProjectInstanceWorkflowModelToJSON(value?: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function ProjectInstanceWorkflowModelToJSON(value?: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null): any {
     if (value == null) {
         return value;
     }

@@ -73,7 +73,7 @@ export interface UpdateProjectInstanceRequest {
 export interface UpdateProjectInstanceWorkflowRequest {
     id: number;
     projectInstanceWorkflowId: number;
-    projectInstanceWorkflowModel: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    projectInstanceWorkflowModel: Omit<ProjectInstanceWorkflowModel, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'>;
 }
 
 /**

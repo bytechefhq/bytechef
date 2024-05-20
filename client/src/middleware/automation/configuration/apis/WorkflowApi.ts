@@ -15,12 +15,9 @@
 
 import * as runtime from '../runtime';
 import type {
-  WorkflowBasicModel,
   WorkflowModel,
 } from '../models/index';
 import {
-    WorkflowBasicModelFromJSON,
-    WorkflowBasicModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models/index';
@@ -195,7 +192,7 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Get workflows for particular project version.
      * Get workflows for particular project version.
      */
-    async getProjectVersionWorkflowsRaw(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowBasicModel>>> {
+    async getProjectVersionWorkflowsRaw(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -221,14 +218,14 @@ export class WorkflowApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowModelFromJSON));
     }
 
     /**
      * Get workflows for particular project version.
      * Get workflows for particular project version.
      */
-    async getProjectVersionWorkflows(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowBasicModel>> {
+    async getProjectVersionWorkflows(requestParameters: GetProjectVersionWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
         const response = await this.getProjectVersionWorkflowsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -272,7 +269,7 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Get workflows for particular project.
      * Get workflows for particular project.
      */
-    async getProjectWorkflowsRaw(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowBasicModel>>> {
+    async getProjectWorkflowsRaw(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -291,14 +288,14 @@ export class WorkflowApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowBasicModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowModelFromJSON));
     }
 
     /**
      * Get workflows for particular project.
      * Get workflows for particular project.
      */
-    async getProjectWorkflows(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowBasicModel>> {
+    async getProjectWorkflows(requestParameters: GetProjectWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
         const response = await this.getProjectWorkflowsRaw(requestParameters, initOverrides);
         return await response.value();
     }
