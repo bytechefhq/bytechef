@@ -650,6 +650,7 @@ const Property = ({
             setNumericValue('');
         }
     }, [currentNode?.operationName, previousOperationName]);
+
     return (
         <li
             className={twMerge(
