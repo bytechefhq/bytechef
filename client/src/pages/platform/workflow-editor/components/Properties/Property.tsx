@@ -437,12 +437,13 @@ const Property = ({
             setMentionInput(true);
         }
 
-        if (
-            (type === 'STRING' || type === 'NUMBER' || type === 'INTEGER') &&
-            controlType !== 'SELECT' &&
-            typeof propertyParameterValue === 'string' &&
-            propertyParameterValue.includes('${')
-        ) {
+        if (propertyParameterValue) {
+            if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
+                setMentionInput(true);
+            } else {
+                setMentionInput(false);
+            }
+        } else if ((type === 'STRING' || type === 'NUMBER' || type === 'INTEGER') && controlType !== 'SELECT') {
             setMentionInput(true);
         }
 
@@ -543,11 +544,7 @@ const Property = ({
                 });
 
                 setMentionInputValue(mentionInputNodes.join(''));
-
-                setMentionInput(true);
             } else {
-                setMentionInput(false);
-
                 setMentionInputValue(propertyParameterValue);
             }
         }
@@ -726,8 +723,6 @@ const Property = ({
                                                 </Tooltip>
                                             )}
                                         </div>
-
-                                        <span>foo</span>
 
                                         {showInputTypeSwitchButton && (
                                             <InputTypeSwitchButton
