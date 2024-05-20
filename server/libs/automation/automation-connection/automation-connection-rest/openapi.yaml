@@ -47,25 +47,6 @@ paths:
                 type: "array"
                 items:
                   $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
-    post:
-      description: "Create a new connection."
-      summary: "Create a new connection"
-      tags:
-      - "connection"
-      operationId: "createConnection"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
-        required: true
-      responses:
-        "200":
-          description: "The connection object."
-          content:
-            application/json:
-              schema:
-                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
   /connections/tags:
     get:
       description: "Get connection tags."
@@ -173,3 +154,73 @@ paths:
       responses:
         "200":
           description: "Successful operation."
+  /workspaces/{id}/connections:
+    post:
+      description: "Create a new connection."
+      summary: "Create a new connection"
+      tags:
+        - "connection"
+      operationId: "createWorkspaceConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+    get:
+      description: "Get all workspace connections."
+      summary: "Get all workspace connections"
+      tags:
+        - "connection"
+      operationId: "getWorkspaceConnections"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "componentName"
+          description: "The component name used for filtering connections."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "connectionVersion"
+          description: "The connection version."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+        - name: "tagId"
+          description: "The tag id of used for filtering connections."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"

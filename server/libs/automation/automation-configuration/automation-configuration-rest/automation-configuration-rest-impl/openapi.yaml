@@ -18,6 +18,8 @@ tags:
   description: "The Automation Project API"
 - name: "workflow"
   description: "The Automation Workflow API"
+- name: "workspace"
+  description: "The Automation Workspace API"
 paths:
   /project-instances:
     get:
@@ -855,6 +857,201 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /workspaces:
+    get:
+      description: "Get workspaces."
+      summary: "Get workspaces"
+      tags:
+        - "workspace"
+      operationId: "getWorkspaces"
+      responses:
+        "200":
+          description: "A list of workspaces."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workspace"
+    post:
+      description: "Create a workspace event."
+      summary: "Create a new workspace"
+      tags:
+        - "workspace"
+      operationId: "createWorkspace"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Workspace"
+        required: true
+      responses:
+        "200":
+          description: "The workspace object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+  /workspaces/{id}:
+    delete:
+      description: "Delete a workspace."
+      summary: "Delete a workspace"
+      tags:
+        - "workspace"
+      operationId: "deleteWorkspace"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get a workspace by id."
+      summary: "Get a workspace by id"
+      tags:
+        - "workspace"
+      operationId: "getWorkspace"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The workspace object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+  /workspaces/{id}/project-instances:
+    get:
+      description: "Get project instances."
+      summary: "Get project instances"
+      tags:
+        - "project-instance"
+      operationId: "getWorkspaceProjectInstances"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "environment"
+          description: "The environment."
+          in: "query"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "projectId"
+          description: "The project ids used for filtering project instances."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "tagId"
+          description: "The tag id of used for filtering project instances."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of project instances."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProjectInstance"
+  /workspaces/{id}/projects:
+    get:
+      description: "Get projects by workspace id."
+      summary: "Get projects by workspace id"
+      tags:
+        - "project"
+      operationId: "getWorkspaceProjects"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "categoryId"
+          description: "The category id used for filtering projects."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectInstances"
+          description: "Use for filtering projects for which project instances exist."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "tagId"
+          description: "The tag id of used for filtering projects."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "status"
+          description: "Use for filtering projects per status."
+          in: "query"
+          required: false
+          schema:
+            $ref: '#/components/schemas/ProjectStatus'
+      responses:
+        "200":
+          description: "The list of projects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Project"
+    put:
+      description: "Update an existing workspace."
+      summary: "Update an existing workspace"
+      tags:
+        - "workspace"
+      operationId: "updateWorkspace"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Workspace"
+        required: true
+      responses:
+        "200":
+          description: "The updated workspace object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
 components:
   schemas:
     Category:
@@ -901,6 +1098,7 @@ components:
       type: "object"
       required:
         - "name"
+        - "workspaceId"
       properties:
         category:
           $ref: "#/components/schemas/Category"
@@ -952,6 +1150,10 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
+        workspaceId:
+          description: "The workspace id."
+          type: "integer"
+          format: "int64"
         __version:
           type: "integer"
     ProjectBasic:
@@ -1295,3 +1497,39 @@ components:
               description: "The workflow reference code"
               type: "string"
               readOnly: true
+    Workspace:
+      description: "A workspace."
+      required:
+        - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of a workspace."
+          type: "string"
+        id:
+          description: "The id of the category."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of the category."
+          type: "string"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        __version:
+          type: "integer"
+          format: "int32"
