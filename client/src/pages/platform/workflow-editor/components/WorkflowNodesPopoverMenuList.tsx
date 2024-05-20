@@ -72,6 +72,59 @@ const WorkflowNodesPopoverMenuList = memo(
 
             setLatestComponentDefinition(clickedComponentDefinition);
 
+            if (clickedItem.trigger) {
+                const placeholderNode = getNode(id);
+
+                setNodes((nodes: Node[]) =>
+                    nodes.map((node) => {
+                        if (node.id === placeholderNode?.id) {
+                            setWorkflow({
+                                ...workflow,
+                                componentNames: [clickedItem.name, ...componentNames.slice(1)],
+                            });
+
+                            const newTriggerNode = {
+                                ...node,
+                                data: {
+                                    ...node.data,
+                                    componentName: clickedItem.name,
+                                    connections: undefined,
+                                    description: clickedItem.description,
+                                    icon: (
+                                        <>
+                                            {clickedItem.icon ? (
+                                                <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
+                                            ) : (
+                                                <Component1Icon className="size-9 text-gray-700" />
+                                            )}
+                                        </>
+                                    ),
+                                    id: getFormattedName(clickedItem.name!, nodes),
+                                    label: clickedItem?.title,
+                                    name: getFormattedName(clickedItem.name!, nodes),
+                                    operationName: clickedComponentDefinition.triggers?.[0].name,
+                                    parameters: undefined,
+                                    trigger: true,
+                                    type: `${clickedItem.name}/v1/${clickedComponentDefinition.triggers?.[0].name}`,
+                                },
+                                id: getFormattedName(clickedItem.name!, nodes),
+                                type: 'workflow',
+                            };
+
+                            setCurrentNode(newTriggerNode.data);
+
+                            saveWorkflowDefinition(newTriggerNode.data, workflow, updateWorkflowMutation);
+
+                            return newTriggerNode;
+                        }
+
+                        return node;
+                    })
+                );
+
+                return;
+            }
+
             const getActionDefinitionRequest = {
                 actionName: clickedComponentDefinition.actions?.[0].name as string,
                 componentName: clickedItem.name,
@@ -174,60 +227,6 @@ const WorkflowNodesPopoverMenuList = memo(
                 const placeholderNode = getNode(id);
 
                 if (!placeholderNode) {
-                    return;
-                }
-
-                if (clickedItem.trigger) {
-                    setNodes((nodes: Node[]) =>
-                        nodes.map((node) => {
-                            if (node.id === placeholderNode.id) {
-                                setWorkflow({
-                                    ...workflow,
-                                    componentNames: [clickedItem.name, ...componentNames.slice(1)],
-                                });
-
-                                const newTriggerNode = {
-                                    ...node,
-                                    data: {
-                                        ...node.data,
-                                        componentName: clickedItem.name,
-                                        connections: undefined,
-                                        description: clickedItem.description,
-                                        icon: (
-                                            <>
-                                                {clickedItem.icon ? (
-                                                    <InlineSVG
-                                                        className="size-9 text-gray-700"
-                                                        src={clickedItem.icon}
-                                                    />
-                                                ) : (
-                                                    <Component1Icon className="size-9 text-gray-700" />
-                                                )}
-                                            </>
-                                        ),
-                                        id: getFormattedName(clickedItem.name!, nodes),
-                                        label: clickedItem?.title,
-                                        name: getFormattedName(clickedItem.name!, nodes),
-                                        operationName: clickedComponentDefinition.triggers?.[0].name,
-                                        parameters: undefined,
-                                        trigger: true,
-                                        type: `${clickedItem.name}/v1/${clickedComponentDefinition.triggers?.[0].name}`,
-                                    },
-                                    id: getFormattedName(clickedItem.name!, nodes),
-                                    type: 'workflow',
-                                };
-
-                                setCurrentNode(newTriggerNode.data);
-
-                                saveWorkflowDefinition(newTriggerNode.data, workflow, updateWorkflowMutation);
-
-                                return newTriggerNode;
-                            }
-
-                            return node;
-                        })
-                    );
-
                     return;
                 }
 
