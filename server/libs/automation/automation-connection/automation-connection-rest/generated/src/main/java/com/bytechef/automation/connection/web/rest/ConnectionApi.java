@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-18T09:37:25.056080+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:26.906430+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 @Validated
 @Tag(name = "connection", description = "The Automation Connection API")
 public interface ConnectionApi {
@@ -41,14 +41,15 @@ public interface ConnectionApi {
     }
 
     /**
-     * POST /connections : Create a new connection
+     * POST /workspaces/{id}/connections : Create a new connection
      * Create a new connection.
      *
+     * @param id The id of a workspace. (required)
      * @param comBytechefPlatformConnectionWebRestModelConnectionModel  (required)
      * @return The connection object. (status code 200)
      */
     @Operation(
-        operationId = "createConnection",
+        operationId = "createWorkspaceConnection",
         summary = "Create a new connection",
         description = "Create a new connection.",
         tags = { "connection" },
@@ -60,12 +61,13 @@ public interface ConnectionApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connections",
+        value = "/workspaces/{id}/connections",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<com.bytechef.platform.connection.web.rest.model.ConnectionModel> createConnection(
+    default ResponseEntity<com.bytechef.platform.connection.web.rest.model.ConnectionModel> createWorkspaceConnection(
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "com.bytechef.platform.connection.web.rest.model.ConnectionModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.connection.web.rest.model.ConnectionModel comBytechefPlatformConnectionWebRestModelConnectionModel
     ) {
         getRequest().ifPresent(request -> {
@@ -179,6 +181,53 @@ public interface ConnectionApi {
     )
     
     default ResponseEntity<List<com.bytechef.platform.connection.web.rest.model.ConnectionModel>> getConnections(
+        @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
+        @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
+        @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0 }, { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /workspaces/{id}/connections : Get all workspace connections
+     * Get all workspace connections.
+     *
+     * @param id The id of a workspace. (required)
+     * @param componentName The component name used for filtering connections. (optional)
+     * @param connectionVersion The connection version. (optional)
+     * @param tagId The tag id of used for filtering connections. (optional)
+     * @return The list of connections. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkspaceConnections",
+        summary = "Get all workspace connections",
+        description = "Get all workspace connections.",
+        tags = { "connection" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of connections.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.ConnectionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workspaces/{id}/connections",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<com.bytechef.platform.connection.web.rest.model.ConnectionModel>> getWorkspaceConnections(
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId

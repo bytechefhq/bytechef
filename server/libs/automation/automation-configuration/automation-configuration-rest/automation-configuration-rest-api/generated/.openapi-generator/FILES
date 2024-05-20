@@ -8,6 +8,7 @@ src/main/java/com/bytechef/automation/configuration/web/rest/ProjectInstanceTagA
 src/main/java/com/bytechef/automation/configuration/web/rest/ProjectTagApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowNodeParameterApi.java
+src/main/java/com/bytechef/automation/configuration/web/rest/WorkspaceApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/DeleteWorkflowNodeParameter200ResponseModel.java
@@ -37,3 +38,4 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowModel
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowOutputModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowTaskModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowTriggerModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkspaceModel.java

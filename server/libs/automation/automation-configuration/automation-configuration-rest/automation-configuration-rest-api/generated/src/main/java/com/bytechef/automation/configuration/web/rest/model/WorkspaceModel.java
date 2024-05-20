@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -19,13 +18,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The blueprint that describe the execution of a job.
+ * A workspace.
  */
 
-@Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
-@JsonTypeName("WorkflowBasic")
+@Schema(name = "Workspace", description = "A workspace.")
+@JsonTypeName("Workspace")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:27.360237+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public class WorkflowBasicModel {
+public class WorkspaceModel {
 
   private String createdBy;
 
@@ -34,9 +33,9 @@ public class WorkflowBasicModel {
 
   private String description;
 
-  private String id;
+  private Long id;
 
-  private String label;
+  private String name;
 
   private String lastModifiedBy;
 
@@ -45,11 +44,18 @@ public class WorkflowBasicModel {
 
   private Integer version;
 
-  private BigDecimal projectWorkflowId;
+  public WorkspaceModel() {
+    super();
+  }
 
-  private String workflowReferenceCode;
+  /**
+   * Constructor with only required parameters
+   */
+  public WorkspaceModel(String name) {
+    this.name = name;
+  }
 
-  public WorkflowBasicModel createdBy(String createdBy) {
+  public WorkspaceModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -69,7 +75,7 @@ public class WorkflowBasicModel {
     this.createdBy = createdBy;
   }
 
-  public WorkflowBasicModel createdDate(LocalDateTime createdDate) {
+  public WorkspaceModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -89,17 +95,17 @@ public class WorkflowBasicModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowBasicModel description(String description) {
+  public WorkspaceModel description(String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * The description of a workflow.
+   * The description of a workspace.
    * @return description
   */
   
-  @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a workspace.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -109,47 +115,47 @@ public class WorkflowBasicModel {
     this.description = description;
   }
 
-  public WorkflowBasicModel id(String id) {
+  public WorkspaceModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of a workflow.
+   * The id of the category.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", description = "The id of the category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public WorkflowBasicModel label(String label) {
-    this.label = label;
+  public WorkspaceModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * The descriptive name for the workflow
-   * @return label
+   * The name of the category.
+   * @return name
   */
-  
-  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("label")
-  public String getLabel() {
-    return label;
+  @NotNull 
+  @Schema(name = "name", description = "The name of the category.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public WorkflowBasicModel lastModifiedBy(String lastModifiedBy) {
+  public WorkspaceModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -169,7 +175,7 @@ public class WorkflowBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public WorkflowBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public WorkspaceModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -189,7 +195,7 @@ public class WorkflowBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public WorkflowBasicModel version(Integer version) {
+  public WorkspaceModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -209,46 +215,6 @@ public class WorkflowBasicModel {
     this.version = version;
   }
 
-  public WorkflowBasicModel projectWorkflowId(BigDecimal projectWorkflowId) {
-    this.projectWorkflowId = projectWorkflowId;
-    return this;
-  }
-
-  /**
-   * The project workflow id
-   * @return projectWorkflowId
-  */
-  @Valid 
-  @Schema(name = "projectWorkflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The project workflow id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectWorkflowId")
-  public BigDecimal getProjectWorkflowId() {
-    return projectWorkflowId;
-  }
-
-  public void setProjectWorkflowId(BigDecimal projectWorkflowId) {
-    this.projectWorkflowId = projectWorkflowId;
-  }
-
-  public WorkflowBasicModel workflowReferenceCode(String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
-    return this;
-  }
-
-  /**
-   * The workflow reference code
-   * @return workflowReferenceCode
-  */
-  
-  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowReferenceCode")
-  public String getWorkflowReferenceCode() {
-    return workflowReferenceCode;
-  }
-
-  public void setWorkflowReferenceCode(String workflowReferenceCode) {
-    this.workflowReferenceCode = workflowReferenceCode;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -257,38 +223,34 @@ public class WorkflowBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowBasicModel workflowBasic = (WorkflowBasicModel) o;
-    return Objects.equals(this.createdBy, workflowBasic.createdBy) &&
-        Objects.equals(this.createdDate, workflowBasic.createdDate) &&
-        Objects.equals(this.description, workflowBasic.description) &&
-        Objects.equals(this.id, workflowBasic.id) &&
-        Objects.equals(this.label, workflowBasic.label) &&
-        Objects.equals(this.lastModifiedBy, workflowBasic.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, workflowBasic.lastModifiedDate) &&
-        Objects.equals(this.version, workflowBasic.version) &&
-        Objects.equals(this.projectWorkflowId, workflowBasic.projectWorkflowId) &&
-        Objects.equals(this.workflowReferenceCode, workflowBasic.workflowReferenceCode);
+    WorkspaceModel workspace = (WorkspaceModel) o;
+    return Objects.equals(this.createdBy, workspace.createdBy) &&
+        Objects.equals(this.createdDate, workspace.createdDate) &&
+        Objects.equals(this.description, workspace.description) &&
+        Objects.equals(this.id, workspace.id) &&
+        Objects.equals(this.name, workspace.name) &&
+        Objects.equals(this.lastModifiedBy, workspace.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, workspace.lastModifiedDate) &&
+        Objects.equals(this.version, workspace.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, label, lastModifiedBy, lastModifiedDate, version, projectWorkflowId, workflowReferenceCode);
+    return Objects.hash(createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowBasicModel {\n");
+    sb.append("class WorkspaceModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
-    sb.append("    projectWorkflowId: ").append(toIndentedString(projectWorkflowId)).append("\n");
-    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
     sb.append("}");
     return sb.toString();
   }

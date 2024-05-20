@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-20T08:44:22.186409+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:27.360237+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectModel {
 
   private CategoryModel category;
@@ -64,6 +64,8 @@ public class ProjectModel {
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
+  private Long workspaceId;
+
   private Integer version;
 
   public ProjectModel() {
@@ -73,8 +75,9 @@ public class ProjectModel {
   /**
    * Constructor with only required parameters
    */
-  public ProjectModel(String name) {
+  public ProjectModel(String name, Long workspaceId) {
     this.name = name;
+    this.workspaceId = workspaceId;
   }
 
   public ProjectModel category(CategoryModel category) {
@@ -353,6 +356,26 @@ public class ProjectModel {
     this.tags = tags;
   }
 
+  public ProjectModel workspaceId(Long workspaceId) {
+    this.workspaceId = workspaceId;
+    return this;
+  }
+
+  /**
+   * The workspace id.
+   * @return workspaceId
+  */
+  @NotNull 
+  @Schema(name = "workspaceId", description = "The workspace id.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workspaceId")
+  public Long getWorkspaceId() {
+    return workspaceId;
+  }
+
+  public void setWorkspaceId(Long workspaceId) {
+    this.workspaceId = workspaceId;
+  }
+
   public ProjectModel version(Integer version) {
     this.version = version;
     return this;
@@ -395,12 +418,13 @@ public class ProjectModel {
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.status, project.status) &&
         Objects.equals(this.tags, project.tags) &&
+        Objects.equals(this.workspaceId, project.workspaceId) &&
         Objects.equals(this.version, project.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, projectWorkflowIds, status, tags, version);
+    return Objects.hash(category, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, projectWorkflowIds, status, tags, workspaceId, version);
   }
 
   @Override
@@ -420,6 +444,7 @@ public class ProjectModel {
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateProperty", description = "A date property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-22T22:26:47.078102+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:28.229666+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class DatePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
