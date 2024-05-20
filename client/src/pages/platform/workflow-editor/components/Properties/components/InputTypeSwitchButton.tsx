@@ -26,7 +26,9 @@ const InputTypeSwitchButton = ({
                     <FormInputIcon className="size-5 text-gray-800" />
                 </TooltipTrigger>
 
-                <TooltipContent>Switch to constant value</TooltipContent>
+                <TooltipPortal>
+                    <TooltipContent>Switch to constant value</TooltipContent>
+                </TooltipPortal>
             </Tooltip>
         ) : (
             <Tooltip>
