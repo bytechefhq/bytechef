@@ -84,7 +84,11 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             taskExecution.setId(RANDOM.nextLong());
         }
 
-        taskExecutions.put(taskExecution.getId(), taskExecution);
+        try {
+            taskExecutions.put(taskExecution.getId(), taskExecution.clone());
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
 
         return taskExecution;
     }

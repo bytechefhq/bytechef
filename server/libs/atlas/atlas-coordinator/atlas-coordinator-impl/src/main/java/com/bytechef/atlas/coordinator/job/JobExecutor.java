@@ -82,9 +82,7 @@ public class JobExecutor {
             contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
-        nextTaskExecution = taskExecutionService.create(nextTaskExecution);
-
-        nextTaskExecution.evaluate(context);
+        nextTaskExecution = taskExecutionService.create(nextTaskExecution.evaluate(context));
 
         contextService.push(
             Validate.notNull(nextTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
