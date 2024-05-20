@@ -79,19 +79,21 @@ const ObjectProperty = ({
             return;
         }
 
-        let value = getParameterByPath(path, currentComponent);
+        let parameterObject = getParameterByPath(path, currentComponent);
 
-        if (value && arrayName && arrayIndex) {
-            value = value[arrayIndex];
-        } else if (value && name !== '__item') {
-            value = value[name];
+        if (parameterObject && arrayName && arrayIndex) {
+            parameterObject = parameterObject[arrayIndex];
+        } else if (parameterObject && name !== '__item') {
+            parameterObject = parameterObject[name];
         }
 
-        if (!value) {
+        if (!parameterObject) {
             return;
         }
 
-        const objectParameters = properties?.length ? properties?.map((property) => property.name) : Object.keys(value);
+        const objectParameters = properties?.length
+            ? properties?.map((property) => property.name)
+            : Object.keys(parameterObject);
 
         const preexistingProperties = objectParameters.map((parameter) => {
             const matchingProperty = (properties as Array<PropertyType>)?.find(
@@ -101,13 +103,13 @@ const ObjectProperty = ({
             if (matchingProperty) {
                 return {
                     ...matchingProperty,
-                    defaultValue: value[parameter!],
+                    defaultValue: parameterObject[parameter!],
                 };
             } else {
                 return {
                     controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
                     custom: true,
-                    defaultValue: value[parameter!],
+                    defaultValue: parameterObject[parameter!],
                     name: parameter,
                     type: newPropertyType,
                 };
