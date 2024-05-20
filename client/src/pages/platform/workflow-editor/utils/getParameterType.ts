@@ -1,4 +1,6 @@
-export default function getParameterType(parameterValue: unknown) {
+import {PropertyTypeModel} from '@/middleware/platform/configuration';
+
+export default function getParameterType(parameterValue: unknown): PropertyTypeModel {
     let parameterType = 'STRING';
 
     if (Array.isArray(parameterValue)) {
@@ -15,5 +17,5 @@ export default function getParameterType(parameterValue: unknown) {
         }
     }
 
-    return parameterType;
+    return parameterType as PropertyTypeModel;
 }

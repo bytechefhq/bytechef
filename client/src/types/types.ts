@@ -161,6 +161,7 @@ type PropertyTypeAllType = ArrayPropertyModel &
 export type PropertyType = Omit<PropertyTypeAllType, 'controlType'> & {
     controlType?: ControlTypeModel;
     custom?: boolean;
+    expressionEnabled?: boolean;
 };
 
 export type UpdateWorkflowMutationType = UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequestI, unknown>;
