@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T22:09:03.739678+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-20T08:44:22.186409+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ProjectInstanceWorkflowModel {
 
   private String createdBy;
@@ -60,6 +60,8 @@ public class ProjectInstanceWorkflowModel {
   private String staticWebhookUrl;
 
   private String workflowId;
+
+  private String workflowReferenceCode;
 
   private Integer version;
 
@@ -185,11 +187,11 @@ public class ProjectInstanceWorkflowModel {
   }
 
   /**
-   * The id of a project instance.
+   * The id of a project instance workflow.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;
@@ -319,6 +321,26 @@ public class ProjectInstanceWorkflowModel {
     this.workflowId = workflowId;
   }
 
+  public ProjectInstanceWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+    this.workflowReferenceCode = workflowReferenceCode;
+    return this;
+  }
+
+  /**
+   * The workflow reference code
+   * @return workflowReferenceCode
+  */
+  
+  @Schema(name = "workflowReferenceCode", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow reference code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowReferenceCode")
+  public String getWorkflowReferenceCode() {
+    return workflowReferenceCode;
+  }
+
+  public void setWorkflowReferenceCode(String workflowReferenceCode) {
+    this.workflowReferenceCode = workflowReferenceCode;
+  }
+
   public ProjectInstanceWorkflowModel version(Integer version) {
     this.version = version;
     return this;
@@ -360,12 +382,13 @@ public class ProjectInstanceWorkflowModel {
         Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
         Objects.equals(this.staticWebhookUrl, projectInstanceWorkflow.staticWebhookUrl) &&
         Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
+        Objects.equals(this.workflowReferenceCode, projectInstanceWorkflow.workflowReferenceCode) &&
         Objects.equals(this.version, projectInstanceWorkflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstanceId, staticWebhookUrl, workflowId, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstanceId, staticWebhookUrl, workflowId, workflowReferenceCode, version);
   }
 
   @Override
@@ -384,6 +407,7 @@ public class ProjectInstanceWorkflowModel {
     sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
     sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
+    sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
