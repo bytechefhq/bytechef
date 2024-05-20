@@ -11,6 +11,7 @@ import {useEffect, useState} from 'react';
 import getParameterByPath from '../../utils/getParameterByPath';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
+import getParameterType from '../../utils/getParameterType';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string, name?: string, index?: number) => void;
@@ -119,21 +120,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     return;
                 }
 
-                let parameterItemType = 'STRING';
-
-                if (Array.isArray(parameterItemValue)) {
-                    parameterItemType = 'ARRAY';
-                } else if (typeof parameterItemValue === 'object') {
-                    parameterItemType = 'OBJECT';
-                } else if (typeof parameterItemValue === 'boolean') {
-                    parameterItemType = 'BOOLEAN';
-                } else if (typeof parameterItemValue === 'number') {
-                    parameterItemType = 'NUMBER';
-
-                    if (Number.isInteger(parameterItemValue)) {
-                        parameterItemType = 'INTEGER';
-                    }
-                }
+                const parameterItemType = getParameterType(parameterItemValue);
 
                 const customSubProperties = Object.keys(parameterItemValue).map((key) => {
                     const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
