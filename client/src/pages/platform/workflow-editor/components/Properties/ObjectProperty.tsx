@@ -48,6 +48,30 @@ const ObjectProperty = ({
 
     const {additionalProperties, label, name, properties} = property;
 
+    let availablePropertyTypes = additionalProperties?.length
+        ? additionalProperties?.reduce((types: Array<{label: string; value: string}>, property) => {
+              if (property.type) {
+                  types.push({
+                      label: property.type,
+                      value: property.type,
+                  });
+              }
+
+              return types;
+          }, [])
+        : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
+              label: type,
+              value: type,
+          }));
+
+    if (properties?.length) {
+        const hasCustomProperty = (properties as Array<PropertyType>).find((property) => property.custom);
+
+        if (!hasCustomProperty) {
+            availablePropertyTypes = [];
+        }
+    }
+
     const handleAddItemClick = () => {
         const newItem: SubPropertyType = {
             additionalProperties,
@@ -128,30 +152,6 @@ const ObjectProperty = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    let availablePropertyTypes = additionalProperties?.length
-        ? additionalProperties?.reduce((types: Array<{label: string; value: string}>, property) => {
-              if (property.type) {
-                  types.push({
-                      label: property.type,
-                      value: property.type,
-                  });
-              }
-
-              return types;
-          }, [])
-        : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
-              label: type,
-              value: type,
-          }));
-
-    if (properties?.length) {
-        const hasCustomProperty = (properties as Array<PropertyType>).find((property) => property.custom);
-
-        if (!hasCustomProperty) {
-            availablePropertyTypes = [];
-        }
-    }
 
     return (
         <>
