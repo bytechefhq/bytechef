@@ -38,6 +38,7 @@ const ArrayPropertyItem = ({
                 arrayName={arrayName}
                 customClassName="pl-2 w-full"
                 inputTypeSwitchButtonClassName="ml-auto"
+                parameterValue={arrayItem.defaultValue}
                 path={`${path}.${arrayName}`}
                 property={arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
             />
