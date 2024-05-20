@@ -12,6 +12,7 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import getParameterByPath from '../../utils/getParameterByPath';
+import getParameterType from '../../utils/getParameterType';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
 
@@ -106,12 +107,17 @@ const ObjectProperty = ({
                     defaultValue: parameterObject[parameter!],
                 };
             } else {
+                const parameterItemType = getParameterType(parameterObject[parameter!]);
+
                 return {
-                    controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlTypeModel,
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                        parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                    ] as ControlTypeModel,
                     custom: true,
                     defaultValue: parameterObject[parameter!],
+                    expressionEnabled: true,
                     name: parameter,
-                    type: newPropertyType,
+                    type: parameterItemType,
                 };
             }
         });

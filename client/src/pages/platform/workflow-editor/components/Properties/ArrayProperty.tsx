@@ -9,9 +9,9 @@ import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 
 import getParameterByPath from '../../utils/getParameterByPath';
+import getParameterType from '../../utils/getParameterType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
-import getParameterType from '../../utils/getParameterType';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string, name?: string, index?: number) => void;
