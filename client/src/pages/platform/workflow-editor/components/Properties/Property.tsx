@@ -21,6 +21,7 @@ import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {PropertyType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
+import {usePrevious} from '@uidotdev/usehooks';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -104,6 +105,8 @@ const Property = ({
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
     const {workflowTestConfigurationDialogOpen} = useWorkflowEditorStore();
+
+    const previousOperationName = usePrevious(currentNode?.operationName);
 
     const defaultValue = property.defaultValue || '';
 
@@ -434,7 +437,12 @@ const Property = ({
             setMentionInput(true);
         }
 
-        if ((type === 'STRING' || type === 'NUMBER' || type === 'INTEGER') && controlType !== 'SELECT') {
+        if (
+            (type === 'STRING' || type === 'NUMBER' || type === 'INTEGER') &&
+            controlType !== 'SELECT' &&
+            typeof propertyParameterValue === 'string' &&
+            propertyParameterValue.includes('${')
+        ) {
             setMentionInput(true);
         }
 
@@ -535,7 +543,11 @@ const Property = ({
                 });
 
                 setMentionInputValue(mentionInputNodes.join(''));
+
+                setMentionInput(true);
             } else {
+                setMentionInput(false);
+
                 setMentionInputValue(propertyParameterValue);
             }
         }
@@ -554,7 +566,7 @@ const Property = ({
             }
         }
 
-        if (numericValue === '' && propertyParameterValue) {
+        if (isNumericalInput && !numericValue && propertyParameterValue) {
             setNumericValue(propertyParameterValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -633,13 +645,14 @@ const Property = ({
 
     // reset all values when currentNode.operationName changes
     useEffect(() => {
-        setPropertyParameterValue('');
-        setInputValue('');
-        setMentionInputValue('');
-        setSelectValue('');
-        setNumericValue('');
-    }, [currentNode?.operationName]);
-
+        if (previousOperationName) {
+            setPropertyParameterValue('');
+            setInputValue('');
+            setMentionInputValue('');
+            setSelectValue('');
+            setNumericValue('');
+        }
+    }, [currentNode?.operationName, previousOperationName]);
     return (
         <li
             className={twMerge(
@@ -713,6 +726,8 @@ const Property = ({
                                                 </Tooltip>
                                             )}
                                         </div>
+
+                                        <span>foo</span>
 
                                         {showInputTypeSwitchButton && (
                                             <InputTypeSwitchButton
