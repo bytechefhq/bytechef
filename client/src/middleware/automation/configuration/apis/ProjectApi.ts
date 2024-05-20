@@ -58,6 +58,14 @@ export interface GetProjectsRequest {
     status?: ProjectStatusModel;
 }
 
+export interface GetWorkspaceProjectsRequest {
+    id: number;
+    categoryId?: number;
+    projectInstances?: boolean;
+    tagId?: number;
+    status?: ProjectStatusModel;
+}
+
 export interface PublishProjectRequest {
     id: number;
     publishProjectRequestModel?: PublishProjectRequestModel;
@@ -291,6 +299,57 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async getProjects(requestParameters: GetProjectsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectModel>> {
         const response = await this.getProjectsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get projects by workspace id.
+     * Get projects by workspace id
+     */
+    async getWorkspaceProjectsRaw(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectModel>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkspaceProjects().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['categoryId'] != null) {
+            queryParameters['categoryId'] = requestParameters['categoryId'];
+        }
+
+        if (requestParameters['projectInstances'] != null) {
+            queryParameters['projectInstances'] = requestParameters['projectInstances'];
+        }
+
+        if (requestParameters['tagId'] != null) {
+            queryParameters['tagId'] = requestParameters['tagId'];
+        }
+
+        if (requestParameters['status'] != null) {
+            queryParameters['status'] = requestParameters['status'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workspaces/{id}/projects`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectModelFromJSON));
+    }
+
+    /**
+     * Get projects by workspace id.
+     * Get projects by workspace id
+     */
+    async getWorkspaceProjects(requestParameters: GetWorkspaceProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectModel>> {
+        const response = await this.getWorkspaceProjectsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

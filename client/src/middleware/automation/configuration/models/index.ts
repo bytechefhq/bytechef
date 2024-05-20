@@ -30,3 +30,4 @@ export * from './WorkflowModel';
 export * from './WorkflowOutputModel';
 export * from './WorkflowTaskModel';
 export * from './WorkflowTriggerModel';
+export * from './WorkspaceModel';

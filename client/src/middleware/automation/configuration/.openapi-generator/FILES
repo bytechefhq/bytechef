@@ -5,6 +5,7 @@ apis/ProjectInstanceTagApi.ts
 apis/ProjectTagApi.ts
 apis/WorkflowApi.ts
 apis/WorkflowNodeParameterApi.ts
+apis/WorkspaceApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
@@ -37,5 +38,6 @@ models/WorkflowModel.ts
 models/WorkflowOutputModel.ts
 models/WorkflowTaskModel.ts
 models/WorkflowTriggerModel.ts
+models/WorkspaceModel.ts
 models/index.ts
 runtime.ts

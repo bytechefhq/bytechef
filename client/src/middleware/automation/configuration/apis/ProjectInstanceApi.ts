@@ -65,6 +65,13 @@ export interface GetProjectInstancesRequest {
     tagId?: number;
 }
 
+export interface GetWorkspaceProjectInstancesRequest {
+    id: number;
+    environment?: EnvironmentModel;
+    projectId?: number;
+    tagId?: number;
+}
+
 export interface UpdateProjectInstanceRequest {
     id: number;
     projectInstanceModel: Omit<ProjectInstanceModel, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'>;
@@ -356,6 +363,53 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
      */
     async getProjectInstances(requestParameters: GetProjectInstancesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstanceModel>> {
         const response = await this.getProjectInstancesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get project instances.
+     * Get project instances
+     */
+    async getWorkspaceProjectInstancesRaw(requestParameters: GetWorkspaceProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkspaceProjectInstances().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['environment'] != null) {
+            queryParameters['environment'] = requestParameters['environment'];
+        }
+
+        if (requestParameters['projectId'] != null) {
+            queryParameters['projectId'] = requestParameters['projectId'];
+        }
+
+        if (requestParameters['tagId'] != null) {
+            queryParameters['tagId'] = requestParameters['tagId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workspaces/{id}/project-instances`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProjectInstanceModelFromJSON));
+    }
+
+    /**
+     * Get project instances.
+     * Get project instances
+     */
+    async getWorkspaceProjectInstances(requestParameters: GetWorkspaceProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstanceModel>> {
+        const response = await this.getWorkspaceProjectInstancesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

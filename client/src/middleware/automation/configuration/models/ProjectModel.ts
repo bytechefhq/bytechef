@@ -117,6 +117,12 @@ export interface ProjectModel {
      */
     tags?: Array<TagModel>;
     /**
+     * The workspace id.
+     * @type {number}
+     * @memberof ProjectModel
+     */
+    workspaceId: number;
+    /**
      * 
      * @type {number}
      * @memberof ProjectModel
@@ -129,6 +135,7 @@ export interface ProjectModel {
  */
 export function instanceOfProjectModel(value: object): boolean {
     if (!('name' in value)) return false;
+    if (!('workspaceId' in value)) return false;
     return true;
 }
 
@@ -155,6 +162,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'status': json['status'] == null ? undefined : ProjectStatusModelFromJSON(json['status']),
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
+        'workspaceId': json['workspaceId'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -172,6 +180,7 @@ export function ProjectModelToJSON(value?: Omit<ProjectModel, 'createdBy'|'creat
         'projectWorkflowIds': value['projectWorkflowIds'],
         'status': ProjectStatusModelToJSON(value['status']),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagModelToJSON)),
+        'workspaceId': value['workspaceId'],
         '__version': value['version'],
     };
 }

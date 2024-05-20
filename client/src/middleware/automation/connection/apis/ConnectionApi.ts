@@ -22,7 +22,8 @@ import {
     ConnectionModelToJSON,
 } from '../models/index';
 
-export interface CreateConnectionRequest {
+export interface CreateWorkspaceConnectionRequest {
+    id: number;
     connectionModel: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
@@ -35,6 +36,13 @@ export interface GetConnectionRequest {
 }
 
 export interface GetConnectionsRequest {
+    componentName?: string;
+    connectionVersion?: number;
+    tagId?: number;
+}
+
+export interface GetWorkspaceConnectionsRequest {
+    id: number;
     componentName?: string;
     connectionVersion?: number;
     tagId?: number;
@@ -54,11 +62,18 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Create a new connection.
      * Create a new connection
      */
-    async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
+    async createWorkspaceConnectionRaw(requestParameters: CreateWorkspaceConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionModel>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling createWorkspaceConnection().'
+            );
+        }
+
         if (requestParameters['connectionModel'] == null) {
             throw new runtime.RequiredError(
                 'connectionModel',
-                'Required parameter "connectionModel" was null or undefined when calling createConnection().'
+                'Required parameter "connectionModel" was null or undefined when calling createWorkspaceConnection().'
             );
         }
 
@@ -69,7 +84,7 @@ export class ConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/connections`,
+            path: `/workspaces/{id}/connections`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -83,8 +98,8 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Create a new connection.
      * Create a new connection
      */
-    async createConnection(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
-        const response = await this.createConnectionRaw(requestParameters, initOverrides);
+    async createWorkspaceConnection(requestParameters: CreateWorkspaceConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
+        const response = await this.createWorkspaceConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -194,6 +209,53 @@ export class ConnectionApi extends runtime.BaseAPI {
      */
     async getConnections(requestParameters: GetConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
         const response = await this.getConnectionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all workspace connections.
+     * Get all workspace connections
+     */
+    async getWorkspaceConnectionsRaw(requestParameters: GetWorkspaceConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkspaceConnections().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['componentName'] != null) {
+            queryParameters['componentName'] = requestParameters['componentName'];
+        }
+
+        if (requestParameters['connectionVersion'] != null) {
+            queryParameters['connectionVersion'] = requestParameters['connectionVersion'];
+        }
+
+        if (requestParameters['tagId'] != null) {
+            queryParameters['tagId'] = requestParameters['tagId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workspaces/{id}/connections`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionModelFromJSON));
+    }
+
+    /**
+     * Get all workspace connections.
+     * Get all workspace connections
+     */
+    async getWorkspaceConnections(requestParameters: GetWorkspaceConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
+        const response = await this.getWorkspaceConnectionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

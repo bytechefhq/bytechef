@@ -7,3 +7,4 @@ export * from './ProjectInstanceTagApi';
 export * from './ProjectTagApi';
 export * from './WorkflowApi';
 export * from './WorkflowNodeParameterApi';
+export * from './WorkspaceApi';
