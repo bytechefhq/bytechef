@@ -568,7 +568,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/WorkflowBasic"
+                  $ref: "#/components/schemas/Workflow"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -616,7 +616,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/WorkflowBasic"
+                  $ref: "#/components/schemas/Workflow"
     post:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
@@ -1151,7 +1151,7 @@ components:
           description: "If a workflow is enabled or not in the project instance workflow."
           type: "boolean"
         id:
-          description: "The id of a project instance."
+          description: "The id of a project instance workflow."
           type: "integer"
           format: "int64"
           readOnly: true
@@ -1178,6 +1178,10 @@ components:
         workflowId:
           description: "The id of a workflow."
           type: "string"
+        workflowReferenceCode:
+          description: "The workflow reference code"
+          type: "string"
+          readOnly: true
         __version:
           type: "integer"
     ProjectInstanceWorkflowConnection:
@@ -1264,6 +1268,7 @@ components:
             $ref: "#/components/schemas/Tag"
     Workflow:
       description: "The blueprint that describe the execution of a job."
+      x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware']
       allOf:
         - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
         - type: "object"
@@ -1271,9 +1276,13 @@ components:
             projectWorkflowId:
               description: "The project workflow id"
               type: "number"
+              readOnly: true
+            workflowReferenceCode:
+              description: "The workflow reference code"
+              type: "string"
+              readOnly: true
     WorkflowBasic:
       description: "The blueprint that describe the execution of a job."
-      x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModelAware']
       allOf:
         - $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
         - type: "object"
@@ -1281,3 +1290,8 @@ components:
             projectWorkflowId:
               description: "The project workflow id"
               type: "number"
+              readOnly: true
+            workflowReferenceCode:
+              description: "The workflow reference code"
+              type: "string"
+              readOnly: true

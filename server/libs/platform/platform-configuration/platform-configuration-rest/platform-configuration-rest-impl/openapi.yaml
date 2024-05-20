@@ -1812,6 +1812,7 @@ components:
     Workflow:
       description: "The blueprint that describe the execution of a job."
       type: "object"
+      x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware']
       properties:
         createdBy:
           description: "The created by."
@@ -1821,6 +1822,10 @@ components:
           description: "The created date."
           type: "string"
           format: "date-time"
+          readOnly: true
+        connectionsCount:
+          description: "The number of workflow connections"
+          type: "integer"
           readOnly: true
         definition:
           description: "The definition of a workflow."
@@ -1841,6 +1846,10 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/WorkflowInput"
+          readOnly: true
+        inputsCount:
+          description: "The number of workflow inputs"
+          type: "integer"
           readOnly: true
         label:
           description: "The descriptive name for the workflow"
@@ -1874,6 +1883,20 @@ components:
           type: "integer"
           format: "int32"
           readOnly: true
+#        manualTrigger:
+#          description: "Does this workflow have a manual trigger or not"
+#          type: "boolean"
+#          readOnly: true
+        workflowTaskComponentNames:
+          type: "array"
+          items:
+            type: "string"
+          readOnly: true
+        workflowTriggerComponentNames:
+          type: "array"
+          items:
+            type: "string"
+          readOnly: true
         tasks:
           description: "The steps that make up the workflow."
           type: "array"
@@ -1891,7 +1914,6 @@ components:
     WorkflowBasic:
       description: "The blueprint that describe the execution of a job."
       type: "object"
-      x-implements: ['com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModelAware']
       properties:
         createdBy:
           description: "The created by."
@@ -1902,10 +1924,6 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        connectionsCount:
-          description: "The number of workflow connections"
-          type: "integer"
-          readOnly: true
         description:
           description: "The description of a workflow."
           type: "string"
@@ -1913,10 +1931,6 @@ components:
         id:
           description: "The id of a workflow."
           type: "string"
-          readOnly: true
-        inputsCount:
-          description: "The number of workflow inputs"
-          type: "integer"
           readOnly: true
         label:
           description: "The descriptive name for the workflow"
@@ -1930,20 +1944,6 @@ components:
           description: "The last modified date."
           type: "string"
           format: "date-time"
-          readOnly: true
-        manualTrigger:
-          description: "Does this workflow have a manual trigger or not"
-          type: "boolean"
-          readOnly: true
-        workflowTaskComponentNames:
-          type: "array"
-          items:
-            type: "string"
-          readOnly: true
-        workflowTriggerComponentNames:
-          type: "array"
-          items:
-            type: "string"
           readOnly: true
         __version:
           type: "integer"
