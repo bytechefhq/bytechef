@@ -109,35 +109,43 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     properties: subProperties,
                 };
             });
+
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
         } else if (name && params?.[name]) {
-            const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => {
-                if (!parameterItem) {
+            const parameterArrayItems = params[name].map((parameterItemValue: ArrayPropertyType, index: number) => {
+                if (!parameterItemValue) {
                     return;
                 }
 
                 let parameterItemType = 'STRING';
 
-                if (Array.isArray(parameterItem)) {
+                if (Array.isArray(parameterItemValue)) {
                     parameterItemType = 'ARRAY';
-                } else if (typeof parameterItem === 'object') {
+                } else if (typeof parameterItemValue === 'object') {
                     parameterItemType = 'OBJECT';
-                } else if (typeof parameterItem === 'boolean') {
+                } else if (typeof parameterItemValue === 'boolean') {
                     parameterItemType = 'BOOLEAN';
+                } else if (typeof parameterItemValue === 'number') {
+                    parameterItemType = 'NUMBER';
+
+                    if (Number.isInteger(parameterItemValue)) {
+                        parameterItemType = 'INTEGER';
+                    }
                 }
 
-                const customSubProperties = Object.keys(parameterItem).map((key) => {
-                    const parameterItemValue = parameterItem[key as keyof ArrayPropertyType];
+                const customSubProperties = Object.keys(parameterItemValue).map((key) => {
+                    const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
-                    const subPropertyType = typeof parameterItemValue === 'boolean' ? 'BOOLEAN' : 'STRING';
+                    const subPropertyType = typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING';
+
                     return {
                         controlType: VALUE_PROPERTY_CONTROL_TYPES[
                             subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                         ] as ControlTypeModel,
                         custom: true,
-                        defaultValue: parameterItemValue,
+                        defaultValue: subPropertyParameterValue,
                         label: key,
                         name: key,
                         type: subPropertyType,
@@ -150,7 +158,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                     ] as ControlTypeModel,
                     custom: true,
-                    defaultValue: parameterItem,
+                    defaultValue: parameterItemValue,
                     name: index.toString(),
                     properties: parameterItemType === 'OBJECT' ? customSubProperties : undefined,
                     type: parameterItemType,
