@@ -83,7 +83,7 @@ const Property = ({
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
-    const [mentionInput, setMentionInput] = useState(false);
+    const [mentionInput, setMentionInput] = useState(property.controlType === 'TEXT' ? true : false);
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
@@ -438,13 +438,23 @@ const Property = ({
         }
 
         if (propertyParameterValue) {
+            setMentionInput(false);
+
             if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
                 setMentionInput(true);
-            } else {
-                setMentionInput(false);
             }
-        } else if ((type === 'STRING' || type === 'NUMBER' || type === 'INTEGER') && controlType !== 'SELECT') {
-            setMentionInput(true);
+        }
+
+        if (controlType === 'SELECT') {
+            setMentionInput(false);
+
+            if (
+                propertyParameterValue &&
+                typeof propertyParameterValue === 'string' &&
+                propertyParameterValue.includes('${')
+            ) {
+                setMentionInput(true);
+            }
         }
 
         if (controlType === 'ARRAY_BUILDER') {
@@ -455,7 +465,7 @@ const Property = ({
             setMentionInput(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [controlType, properties?.length]);
+    }, [controlType, properties?.length, propertyParameterValue]);
 
     useEffect(() => {
         if (formState && name) {
