@@ -41,6 +41,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 ? matchingItem?.controlType
                 : (VALUE_PROPERTY_CONTROL_TYPES[newItemType!] as ControlTypeModel),
             custom: true,
+            expressionEnabled: true,
             label: '',
             name: arrayItems.length.toString(),
             type: matchingItem?.type || newItemType || 'STRING',

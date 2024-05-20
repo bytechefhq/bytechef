@@ -87,7 +87,7 @@ const Property = ({
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
-        (property.type !== 'STRING' && !!property.name && property.expressionEnabled) || false
+        (property.type !== 'STRING' && property.expressionEnabled) || false
     );
 
     const editorRef = useRef<ReactQuill>(null);
