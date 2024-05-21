@@ -18,8 +18,10 @@ package com.bytechef.component.data.storage.action;
 
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.array;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -35,19 +37,20 @@ public class DataStorageGetAllEntriesAction {
         .description(
             "Retrieve all the currently existing keys from storage, along with their values within the provided scope.")
         .properties(
-            integer(SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description("The namespace to get keys from.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .output()
+        .outputSchema(
+            array().items(
+                object()))
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
-
-        return null;
+        return context
+            .data(data -> data.getAll(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE))));
     }
 }

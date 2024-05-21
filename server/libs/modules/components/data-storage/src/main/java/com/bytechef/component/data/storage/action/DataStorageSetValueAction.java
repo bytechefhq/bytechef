@@ -52,7 +52,7 @@ public class DataStorageSetValueAction {
                 .description(
                     "The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.")
                 .required(true),
-            integer(SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description(
                     "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
@@ -117,8 +117,45 @@ public class DataStorageSetValueAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
+        Object value = null;
+        switch (inputParameters.getRequiredInteger(TYPE)) {
+            case 1:
+                value = inputParameters.getRequiredArray(VALUE);
+                break;
+            case 2:
+                value = inputParameters.getRequiredBoolean(VALUE);
+                break;
+            case 3:
+                value = inputParameters.getRequiredLocalDate(VALUE);
+                break;
+            case 4:
+                value = inputParameters.getRequiredLocalDateTime(VALUE);
+                break;
+            case 5:
+                value = inputParameters.getRequiredInteger(VALUE);
+                break;
+            case 6:
+                value = nullable();
+                break;
+            case 7:
+                value = inputParameters.getRequiredDouble(VALUE);
+                break;
+            case 8:
+                value = inputParameters.getRequiredMap(VALUE);
+                break;
+            case 9:
+                value = inputParameters.getRequiredString(VALUE);
+                break;
+            case 10:
+                value = inputParameters.getRequiredLocalTime(VALUE);
+                break;
+            default:
+                break;
+        }
 
-        return null;
+        Object finalValue = value;
+        return context
+            .data(data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY), finalValue));
     }
 }

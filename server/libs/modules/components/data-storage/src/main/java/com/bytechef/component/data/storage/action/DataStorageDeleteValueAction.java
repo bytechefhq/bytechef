@@ -16,8 +16,9 @@
 
 package com.bytechef.component.data.storage.action;
 
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.data.storage.constant.DataStorageConstants;
@@ -38,7 +39,7 @@ public class DataStorageDeleteValueAction {
                 .label("Key")
                 .description("The identifier of a value to delete, stored earlier in the selected scope.")
                 .required(true),
-            integer(DataStorageConstants.SCOPE)
+            string(DataStorageConstants.SCOPE)
                 .label("Scope")
                 .description(
                     "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
@@ -49,8 +50,8 @@ public class DataStorageDeleteValueAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
-
-        return null;
+        return context
+            .data(data -> data.deleteValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY)));
     }
 }

@@ -29,10 +29,12 @@ import com.bytechef.component.data.storage.action.DataStorageGetValueAction;
 import com.bytechef.component.data.storage.action.DataStorageSetValueAction;
 import com.bytechef.component.data.storage.action.DataStorageSetValueInListAction;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class DataStorageComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("dataStorage")

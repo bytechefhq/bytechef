@@ -20,6 +20,7 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
+import static com.bytechef.component.data.storage.util.DataStorageUtils.LOCKER;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -27,6 +28,8 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +45,7 @@ public class DataStorageAtomicIncrementAction {
                 .label("Key")
                 .description("The identifier of a value to increment.")
                 .required(true),
-            integer(SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description("The namespace to obtain a value from.")
                 .options(SCOPE_OPTIONS)
@@ -52,14 +55,36 @@ public class DataStorageAtomicIncrementAction {
                 .description(
                     "The value that can be added to the existing numeric value, which may have a negative value.")
                 .defaultValue(1))
-        .output()
+        .outputSchema(integer())
         .perform(DataStorageAtomicIncrementAction::perform);
 
-    protected static Object perform(
+    protected static Integer perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
+        Integer number = null;
+        try {
+            if (LOCKER.tryLock(10, TimeUnit.SECONDS)) {
+                Optional<Object> optionalList = context.data(
+                    data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                        inputParameters.getRequiredString(KEY)));
+                if (optionalList.isPresent() && optionalList.get() instanceof Number)
+                    number = (Integer) optionalList.get();
+                else
+                    return null;
 
-        return null;
+                number += inputParameters.getRequiredInteger(VALUE_TO_ADD);
+
+                Integer finalNumber = number;
+                context.data(
+                    data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                        inputParameters.getRequiredString(KEY), finalNumber));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            LOCKER.unlock();
+        }
+
+        return number;
     }
 }
