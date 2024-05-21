@@ -23,7 +23,11 @@ import com.bytechef.platform.data.storage.db.domain.DataEntry;
 import com.bytechef.platform.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -43,30 +47,41 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> Optional<T> fetch(
-        String componentName, String actionName, Scope scope, String scopeId, String key,
+        String componentName, Scope scope, String scopeId, String key,
         Type type) {
 
-        return dataStorageRepository.findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
-            componentName, actionName, scope, scopeId, key, type.ordinal())
+        return dataStorageRepository.findByComponentNameAndScopeAndScopeIdAndKeyAndType(
+            componentName, scope, scopeId, key, type.ordinal())
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
     @Override
     public <T> T get(
-        String componentName, String actionName, Scope scope, String scopeId, String key,
+        String componentName, Scope scope, String scopeId, String key,
         Type type) {
 
-        return OptionalUtils.get(fetch(componentName, actionName, scope, scopeId, key, type));
+        return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
+    }
+
+    @Override
+    public <T> Map<String, T> getAll(
+        String componentName, Scope scope, String scopeId, Type type) {
+        return OptionalUtils.get(dataStorageRepository
+                .findByComponentNameAndScopeAndScopeIdAndType(
+                    componentName, scope, scopeId, type.ordinal()))
+            .stream()
+            .collect(Collectors.toMap(dataEntry -> String.valueOf(dataEntry.getKey()),
+                dataEntry -> (T) dataEntry.getValue()));
     }
 
     @Override
     public void put(
-        String componentName, String actionName, Scope scope, String scopeId, String key,
+        String componentName, Scope scope, String scopeId, String key,
         Type type, Object value) {
 
         dataStorageRepository
-            .findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
-                componentName, actionName, scope, scopeId, key, type.ordinal())
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
+                componentName, scope, scopeId, key, type.ordinal())
             .ifPresentOrElse(
                 dataEntry -> {
                     dataEntry.setValue(value);
@@ -74,6 +89,17 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
                     dataStorageRepository.save(dataEntry);
                 },
                 () -> dataStorageRepository.save(
-                    new DataEntry(componentName, actionName, scope, scopeId, key, value, type)));
+                    new DataEntry(componentName, scope, scopeId, key, value, type)));
+    }
+
+    @Override
+    public void delete(
+        String componentName, Scope scope, String scopeId, String key,
+        Type type) {
+
+        dataStorageRepository
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
+                componentName, scope, scopeId, key, type.ordinal())
+            .ifPresentOrElse(dataStorageRepository::delete, null);
     }
 }

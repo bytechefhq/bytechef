@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
@@ -47,14 +48,14 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, Type type,
-        String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
+        String projectWorkflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
 
         super(componentName, actionName, connection, httpClientExecutor);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, actionName, type, workflowId, jobId,
+            componentName, componentVersion, actionName, type, projectWorkflowId, jobId,
             dataStorageService);
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
@@ -85,24 +86,38 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String actionName, Type type,
-        String workflowId, Long jobId, DataStorageService dataStorageService) implements Data {
+        String projectWorkflowId, Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
             return dataStorageService.fetch(
-                componentName, actionName, scope, getScopeId(scope), key, type);
+                componentName, scope, getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
             return dataStorageService.get(
-                componentName, actionName, scope, getScopeId(scope), key, type);
+                componentName, scope, getScopeId(scope), key, type);
+        }
+
+        @Override
+        public <T> Map<String, T> getAll(Scope scope) {
+            return dataStorageService.getAll(
+                componentName, scope, getScopeId(scope), type);
         }
 
         @Override
         public Void setValue(Scope scope, String key, Object value) {
             dataStorageService.put(
-                componentName, actionName, scope, getScopeId(scope), key, type, value);
+                componentName, scope, getScopeId(scope), key, type, value);
+
+            return null;
+        }
+
+        @Override
+        public Void deleteValue(Scope scope, String key) {
+            dataStorageService.delete(
+                componentName, scope, getScopeId(scope), key, type);
 
             return null;
         }
@@ -111,8 +126,8 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
             return Validate.notNull(
                 switch (scope) {
                     case CURRENT_EXECUTION -> String.valueOf(jobId);
-                    case WORKFLOW -> workflowId;
-                    case ACCOUNT -> null;
+                    case WORKFLOW -> projectWorkflowId;
+                    case ACCOUNT -> "";
                 }, "scope");
         }
     }
@@ -206,7 +221,17 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         @Override
+        public <T> Map<String, T> getAll(Scope scope) {
+            return null;
+        }
+
+        @Override
         public Void setValue(Scope scope, String key, Object data) {
+            return null;
+        }
+
+        @Override
+        public Void deleteValue(Scope scope, String key) {
             return null;
         }
     }
