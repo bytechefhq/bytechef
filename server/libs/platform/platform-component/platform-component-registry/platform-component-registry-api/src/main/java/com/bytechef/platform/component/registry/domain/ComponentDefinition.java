@@ -19,6 +19,7 @@ package com.bytechef.platform.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ComponentCategory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +34,7 @@ import org.springframework.lang.Nullable;
 public class ComponentDefinition {
 
     private List<ActionDefinitionBasic> actions;
-    private String category;
+    private List<ComponentCategory> categories;
     private ConnectionDefinitionBasic connection;
     private boolean connectionRequired;
     private String description;
@@ -57,7 +58,7 @@ public class ComponentDefinition {
 
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
-        this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
+        this.categories = OptionalUtils.orElse(componentDefinition.getCategories(), List.of());
         this.connection = getConnection(componentDefinition);
         this.connectionRequired = componentDefinition
             .getConnection()
@@ -89,8 +90,8 @@ public class ComponentDefinition {
         return actions.size();
     }
 
-    public String getCategory() {
-        return category;
+    public List<ComponentCategory> getCategories() {
+        return categories;
     }
 
     @Nullable
@@ -148,7 +149,7 @@ public class ComponentDefinition {
             return false;
         }
 
-        return Objects.equals(actions, that.actions) && Objects.equals(category, that.category) &&
+        return Objects.equals(actions, that.actions) && Objects.equals(categories, that.categories) &&
             Objects.equals(connection, that.connection) && connectionRequired == that.connectionRequired &&
             Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
             Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
@@ -159,7 +160,7 @@ public class ComponentDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, category, connection, connectionRequired, description, icon, name, resources, tags, triggers,
+            actions, categories, connection, connectionRequired, description, icon, name, resources, tags, triggers,
             title, version);
     }
 
@@ -167,7 +168,7 @@ public class ComponentDefinition {
     public String toString() {
         return "ComponentDefinition{" +
             "actions=" + actions +
-            ", category='" + category + '\'' +
+            ", categories='" + categories + '\'' +
             ", connection=" + connection +
             ", connectionRequired=" + connectionRequired +
             ", description='" + description + '\'' +

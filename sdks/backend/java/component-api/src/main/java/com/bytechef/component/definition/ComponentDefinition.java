@@ -38,7 +38,7 @@ public interface ComponentDefinition {
      *
      * @return
      */
-    Optional<String> getCategory();
+    Optional<List<ComponentCategory>> getCategories();
 
     /**
      *

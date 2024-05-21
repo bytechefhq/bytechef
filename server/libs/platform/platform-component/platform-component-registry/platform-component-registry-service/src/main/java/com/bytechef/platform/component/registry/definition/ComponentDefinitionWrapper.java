@@ -61,7 +61,7 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
             ", connection=" + connection +
-            ", category='" + category + '\'' +
+            ", categories='" + categories + '\'' +
             ", customAction=" + customAction +
             ", customActionHelp=" + customActionHelp +
             ", actions=" + actions +
