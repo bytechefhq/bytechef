@@ -352,9 +352,9 @@ const Property = ({
     };
 
     const handleMentionsInputChange = (value: string) => {
-        const objectParameterValue = getParameterByPath(path, currentComponent);
+        const parentParameterValue = getParameterByPath(path, currentComponent);
 
-        if (!objectParameterValue && !parameterValue && propertyParameterValue) {
+        if (!parentParameterValue && !parameterValue && propertyParameterValue) {
             setMentionInputValue('');
 
             return;
@@ -390,7 +390,7 @@ const Property = ({
             return;
         }
 
-        const objectParameterValue = getParameterByPath(path, currentComponent);
+        const parentParameterValue = getParameterByPath(path, currentComponent);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -401,7 +401,7 @@ const Property = ({
             !isNumericalInput &&
             !selectValue &&
             !inputValue &&
-            !Object.keys(objectParameterValue[name] ?? {}).length
+            (!Object.keys(parentParameterValue[name] ?? {}).length || (arrayIndex && !parentParameterValue[arrayIndex]))
         ) {
             return;
         } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
@@ -409,6 +409,7 @@ const Property = ({
         }
 
         saveProperty({
+            arrayIndex,
             currentComponent,
             name,
             path,
