@@ -51,6 +51,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -248,13 +249,16 @@ public class CopperCreatePersonAction {
                                     string(CATEGORY)))))
         .perform(CopperCreatePersonAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_PEOPLE_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/people");
+
     private CopperCreatePersonAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/people"))
+        return actionContext.http(POST_PEOPLE_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
@@ -268,7 +272,7 @@ public class CopperCreatePersonAction {
                     SOCIALS, inputParameters.getList(SOCIALS),
                     WEBSITES, inputParameters.getList(WEBSITES),
                     ADDRESS, inputParameters.get(ADDRESS),
-                    TAGS, inputParameters.getList(TAGS)))
+                    TAGS, inputParameters.getList(TAGS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

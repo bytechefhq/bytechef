@@ -48,6 +48,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -212,13 +213,16 @@ public class CopperCreateCompanyAction {
                                     string(CATEGORY)))))
         .perform(CopperCreateCompanyAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_COMPANIES_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/companies");
+
     private CopperCreateCompanyAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/companies"))
+        return actionContext.http(POST_COMPANIES_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
@@ -230,7 +234,7 @@ public class CopperCreateCompanyAction {
                     SOCIALS, inputParameters.getList(SOCIALS),
                     WEBSITES, inputParameters.getList(WEBSITES),
                     ADDRESS, inputParameters.get(ADDRESS),
-                    TAGS, inputParameters.getList(TAGS)))
+                    TAGS, inputParameters.getList(TAGS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
