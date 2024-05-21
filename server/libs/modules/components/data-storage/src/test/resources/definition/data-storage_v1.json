@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Data Storage",
-  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -31,31 +30,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -330,30 +326,6 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": null,
-      "name": "createValueIfMissing",
-      "type": "BOOLEAN",
-      "defaultValue": null,
-      "exampleValue": null,
-      "label": "Create value if missing",
-      "placeholder": null,
-      "options": [ {
-        "description": null,
-        "label": "True",
-        "value": true
-      }, {
-        "description": null,
-        "label": "False",
-        "value": false
-      } ],
-      "controlType": "SELECT"
-    }, {
-      "advancedOption": null,
       "description": "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -419,31 +391,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -467,17 +436,39 @@
     } ],
     "title": "Atomic Increment",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
+    "output": {
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "INTEGER",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "controlType": "INTEGER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
+    },
     "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
+    "defaultOutputFunction": false,
     "deprecated": null,
-    "description": "",
+    "description": "Wait for a value under a specified key, until it's available.",
     "help": null,
     "metadata": null,
     "name": "awaitGetValue",
-    "outputFunction": null,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to wait for.",
@@ -507,31 +498,279 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
+      "placeholder": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": [ {
+        "description": null,
+        "label": "Current Execution",
+        "value": "CURRENT_EXECUTION"
+      }, {
+        "description": null,
+        "label": "Workflow",
+        "value": "WORKFLOW"
+      }, {
+        "description": null,
+        "label": "Account",
+        "value": "ACCOUNT"
+      } ],
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The value type.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "type",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Type",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
       "options": [ {
         "description": null,
-        "label": "Current Execution",
+        "label": "Array",
         "value": 1
       }, {
         "description": null,
-        "label": "Workflow Instance",
+        "label": "Boolean",
         "value": 2
       }, {
         "description": null,
-        "label": "Workflow",
+        "label": "Date",
         "value": 3
       }, {
         "description": null,
-        "label": "Account",
+        "label": "Date Time",
         "value": 4
+      }, {
+        "description": null,
+        "label": "Integer",
+        "value": 5
+      }, {
+        "description": null,
+        "label": "Nullable",
+        "value": 6
+      }, {
+        "description": null,
+        "label": "Number",
+        "value": 7
+      }, {
+        "description": null,
+        "label": "Object",
+        "value": 8
+      }, {
+        "description": null,
+        "label": "String",
+        "value": 9
+      }, {
+        "description": null,
+        "label": "Time",
+        "value": 10
       } ],
       "controlType": "SELECT",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 1",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "items": null,
+      "maxItems": null,
+      "minItems": null,
+      "multipleValues": null,
+      "options": null,
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 2",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "BOOLEAN",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "controlType": "SELECT"
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 3",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "DATE",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "options": null,
+      "controlType": "DATE",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 4",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "DATE_TIME",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "options": null,
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 5",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "controlType": "INTEGER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 6",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "NULL",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "controlType": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 7",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "NUMBER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "maxNumberPrecision": null,
+      "maxValue": null,
+      "minNumberPrecision": null,
+      "minValue": null,
+      "numberPrecision": null,
+      "options": null,
+      "controlType": "NUMBER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 8",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "additionalProperties": null,
+      "multipleValues": null,
+      "options": null,
+      "properties": null,
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 9",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": "type == 10",
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": true,
+      "name": "defaultValue",
+      "type": "TIME",
+      "defaultValue": null,
+      "exampleValue": null,
+      "label": "Default value",
+      "placeholder": null,
+      "options": null,
+      "controlType": "TIME",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -595,31 +834,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     } ],
     "title": "Delete Value",
@@ -664,31 +900,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -732,46 +965,87 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     } ],
     "title": "Get All Entries(Keys and Values)",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
+    "output": {
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "ARRAY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "items": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": null,
+          "name": null,
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
+          "options": null,
+          "properties": null,
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
+        } ],
+        "maxItems": null,
+        "minItems": null,
+        "multipleValues": null,
+        "options": null,
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
+    },
     "perform": { }
   }, {
     "batch": null,
-    "defaultOutputFunction": true,
+    "defaultOutputFunction": false,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
     "help": null,
     "metadata": null,
     "name": "getValue",
-    "outputFunction": null,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to get, stored earlier in the selected scope.",
@@ -801,31 +1075,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -1121,31 +1392,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -1441,31 +1709,28 @@
       "metadata": { },
       "required": true,
       "name": "scope",
-      "type": "INTEGER",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Scope",
       "placeholder": null,
-      "maxValue": null,
-      "minValue": null,
+      "controlType": "SELECT",
+      "languageId": null,
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "label": "Current Execution",
-        "value": 1
-      }, {
-        "description": null,
-        "label": "Workflow Instance",
-        "value": 2
+        "value": "CURRENT_EXECUTION"
       }, {
         "description": null,
         "label": "Workflow",
-        "value": 3
+        "value": "WORKFLOW"
       }, {
         "description": null,
         "label": "Account",
-        "value": 4
+        "value": "ACCOUNT"
       } ],
-      "controlType": "SELECT",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -1743,5 +2008,6 @@
     "output": null,
     "perform": { }
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": null
 }
