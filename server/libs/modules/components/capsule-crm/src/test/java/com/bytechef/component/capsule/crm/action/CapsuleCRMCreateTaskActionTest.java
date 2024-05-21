@@ -16,11 +16,14 @@
 
 package com.bytechef.component.capsule.crm.action;
 
+import static com.bytechef.component.capsule.crm.action.CapsuleCRMCreateTaskAction.POST_TASKS_CONTEXT_FUNCTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CATEGORY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DESCRIPTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DETAIL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DUE_ON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -51,6 +54,8 @@ class CapsuleCRMCreateTaskActionTest extends AbstractCapsuleCRMActionTest {
 
         assertEquals(responeseMap, result);
 
+        verify(mockedContext, times(1)).http(POST_TASKS_CONTEXT_FUNCTION);
+
         Context.Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("task", propertyStubsMap), body.getContent());
@@ -66,5 +71,4 @@ class CapsuleCRMCreateTaskActionTest extends AbstractCapsuleCRMActionTest {
 
         return propertyStubsMap;
     }
-
 }
