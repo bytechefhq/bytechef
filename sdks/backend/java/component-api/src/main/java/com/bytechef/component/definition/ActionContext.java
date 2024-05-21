@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -88,10 +89,23 @@ public interface ActionContext extends Context {
         <T> T getValue(Data.Scope scope, String key);
 
         /**
+         * @param <T>
+         * @param scope
+         * @return
+         */
+        <T> Map<String, T> getAll(Data.Scope scope);
+
+        /**
          * @param scope
          * @param key
          * @param data
          */
         Void setValue(Data.Scope scope, String key, Object data);
+
+        /**
+         * @param scope
+         * @param key
+         */
+        Void deleteValue(Data.Scope scope, String key);
     }
 }

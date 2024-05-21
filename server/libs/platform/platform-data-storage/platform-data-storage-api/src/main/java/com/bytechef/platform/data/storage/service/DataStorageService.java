@@ -18,6 +18,9 @@ package com.bytechef.platform.data.storage.service;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.Type;
+
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -25,9 +28,13 @@ import java.util.Optional;
  */
 public interface DataStorageService {
 
-    <T> Optional<T> fetch(String componentName, String actionName, Scope scope, String scopeId, String key, Type type);
+    <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, Type type);
 
-    <T> T get(String componentName, String actionName, Scope scope, String scopeId, String key, Type type);
+    <T> T get(String componentName, Scope scope, String scopeId, String key, Type type);
 
-    void put(String componentName, String actionName, Scope scope, String scopeId, String key, Type type, Object value);
+    <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type);
+
+    void put(String componentName, Scope scope, String scopeId, String key, Type type, Object value);
+
+    void delete(String componentName, Scope scope, String scopeId, String key, Type type);
 }

@@ -18,6 +18,8 @@ package com.bytechef.platform.data.storage.db.repository;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.data.storage.db.domain.DataEntry;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.relational.core.sql.LockMode;
 import org.springframework.data.relational.repository.Lock;
@@ -33,6 +35,10 @@ public interface DataStorageRepository
     extends ListPagingAndSortingRepository<DataEntry, Long>, ListCrudRepository<DataEntry, Long> {
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
-    Optional<DataEntry> findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
-        String componentName, String actionName, Scope scope, String scopeId, String key, int type);
+    Optional<DataEntry> findByComponentNameAndScopeAndScopeIdAndKeyAndType(
+        String componentName, Scope scope, String scopeId, String key, int type);
+
+    @Lock(LockMode.PESSIMISTIC_WRITE)
+    Optional<List<DataEntry>> findByComponentNameAndScopeAndScopeIdAndType(
+        String componentName, Scope scope, String scopeId, int type);
 }
