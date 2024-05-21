@@ -29,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
@@ -65,18 +66,21 @@ public class AffinityCreatePersonAction {
                         .items(string())))
         .perform(AffinityCreatePersonAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_PERSONS_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "persons");
+
     private AffinityCreatePersonAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "persons"))
+        return actionContext.http(POST_PERSONS_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
                     LAST_NAME, inputParameters.getRequiredString(LAST_NAME),
-                    EMAILS, inputParameters.getList(EMAILS)))
+                    EMAILS, inputParameters.getList(EMAILS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
