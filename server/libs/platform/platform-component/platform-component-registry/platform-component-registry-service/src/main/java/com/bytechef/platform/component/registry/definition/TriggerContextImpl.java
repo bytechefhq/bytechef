@@ -41,7 +41,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
-    private final ActionContextImpl.Data data;
+    private final Data data;
     private final ActionContext.Event event;
     private final File file;
 
@@ -62,7 +62,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     }
 
     @Override
-    public <R> R data(ContextFunction<ActionContextImpl.Data, R> dataFunction) {
+    public <R> R data(ContextFunction<Data, R> dataFunction) {
         try {
             return dataFunction.apply(data);
         } catch (Exception e) {
@@ -86,32 +86,39 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String triggerName, Type type,
-        String workflowId, Long jobId, DataStorageService dataStorageService) implements ActionContext.Data {
+        String workflowId, Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(ActionContextImpl.Data.Scope scope, String key) {
+        public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
             return dataStorageService.fetch(
-                componentName, triggerName, scope, getScopeId(scope), key, type);
+                componentName, scope.toActionScope(), getScopeId(scope), key, type);
         }
 
         @Override
-        public <T> T getValue(ActionContextImpl.Data.Scope scope, String key) {
+        public <T> T getValue(Data.Scope scope, String key) {
             return dataStorageService.get(
-                componentName, triggerName, scope, getScopeId(scope), key, type);
+                componentName, scope.toActionScope(), getScopeId(scope), key, type);
         }
 
         @Override
-        public Void setValue(ActionContextImpl.Data.Scope scope, String key, Object value) {
+        public Void setValue(Data.Scope scope, String key, Object value) {
             dataStorageService.put(
-                componentName, triggerName, scope, getScopeId(scope), key, type, value);
+                componentName, scope.toActionScope(), getScopeId(scope), key, type, value);
 
             return null;
         }
 
-        private String getScopeId(ActionContextImpl.Data.Scope scope) {
+        @Override
+        public Void deleteValue(Data.Scope scope, String key) {
+            dataStorageService.delete(
+                componentName, scope.toActionScope(), getScopeId(scope), key, type);
+
+            return null;
+        }
+
+        private String getScopeId(Data.Scope scope) {
             return Validate.notNull(
                 switch (scope) {
-                    case CURRENT_EXECUTION -> String.valueOf(jobId);
                     case WORKFLOW -> workflowId;
                     case ACCOUNT -> null;
                 }, "scope");
@@ -195,20 +202,23 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         }
     }
 
-    private record NoOpDataImpl() implements ActionContext.Data {
+    private record NoOpDataImpl() implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(ActionContextImpl.Data.Scope scope, String key) {
+        public <T> Optional<T> fetchValue(Data.Scope scope, String key) {
             return Optional.empty();
         }
 
         @Override
-        public <T> T getValue(ActionContextImpl.Data.Scope scope, String key) {
+        public <T> T getValue(Data.Scope scope, String key) {
             return null;
         }
 
         @Override
-        public Void setValue(ActionContextImpl.Data.Scope scope, String key, Object data) {
+        public Void setValue(Data.Scope scope, String key, Object data) {
+            return null;
+        }
+        public Void deleteValue(Data.Scope scope, String key) {
             return null;
         }
     }
