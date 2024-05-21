@@ -247,20 +247,22 @@ const Property = ({
                 currentValue = parameters[arrayName];
             }
         } else if (objectName && parameters && path) {
-            const matchingObject = path.split('.').reduce((acc, key) => {
-                if (key !== 'parameters') {
-                    if (acc && acc[key] === undefined) {
-                        acc[key] = {};
-                    }
-
-                    return acc && acc[key];
-                } else {
-                    return acc;
-                }
-            }, parameters);
+            const matchingObject = getParameterByPath(path, currentComponent);
 
             if (matchingObject) {
-                currentValue = matchingObject[name as string];
+                currentValue = matchingObject[name];
+            } else {
+                saveProperty({
+                    currentComponent,
+                    name,
+                    path,
+                    setCurrentComponent,
+                    updateWorkflowNodeParameterMutation,
+                    value: null,
+                    workflowId: workflow.id!,
+                });
+
+                return;
             }
         } else {
             currentValue = parameters[name as string];
@@ -350,6 +352,14 @@ const Property = ({
     };
 
     const handleMentionsInputChange = (value: string) => {
+        const objectParameterValue = getParameterByPath(path, currentComponent);
+
+        if (!objectParameterValue && !parameterValue && propertyParameterValue) {
+            setMentionInputValue('');
+
+            return;
+        }
+
         setMentionInputValue(value);
 
         saveMentionInputValue();
@@ -380,11 +390,19 @@ const Property = ({
             return;
         }
 
+        const objectParameterValue = getParameterByPath(path, currentComponent);
+
         if (mentionInput && !mentionInputValue) {
             return;
         } else if (!mentionInput && isNumericalInput && !numericValue) {
             return;
-        } else if (!mentionInput && !isNumericalInput && !selectValue && !inputValue) {
+        } else if (
+            !mentionInput &&
+            !isNumericalInput &&
+            !selectValue &&
+            !inputValue &&
+            !Object.keys(objectParameterValue[name] ?? {}).length
+        ) {
             return;
         } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
             return;
@@ -446,8 +464,6 @@ const Property = ({
         }
 
         if (controlType === 'SELECT') {
-            setMentionInput(false);
-
             if (
                 propertyParameterValue &&
                 typeof propertyParameterValue === 'string' &&
@@ -457,12 +473,14 @@ const Property = ({
             }
         }
 
-        if (controlType === 'ARRAY_BUILDER') {
-            setMentionInput(false);
-        }
-
         if (controlType === 'OBJECT_BUILDER') {
-            setMentionInput(false);
+            if (
+                propertyParameterValue &&
+                typeof propertyParameterValue === 'string' &&
+                propertyParameterValue.includes('${')
+            ) {
+                setMentionInput(true);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [controlType, properties?.length, propertyParameterValue]);
@@ -573,7 +591,7 @@ const Property = ({
             }
         }
 
-        if (isNumericalInput && !numericValue && propertyParameterValue) {
+        if (isNumericalInput && !numericValue && propertyParameterValue && parameterValue) {
             setNumericValue(propertyParameterValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
