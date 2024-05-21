@@ -36,9 +36,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("data_entry")
 public class DataEntry {
 
-    @Column("action_name")
-    private String actionName;
-
     @Column("component_name")
     private String componentName;
 
@@ -83,19 +80,14 @@ public class DataEntry {
     }
 
     public DataEntry(
-        String componentName, String actionName, Scope scope, String scopeId, String key, Object value, Type type) {
+        String componentName, Scope scope, String scopeId, String key, Object value, Type type) {
 
-        this.actionName = actionName;
         this.componentName = componentName;
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
         this.type = type.ordinal();
         this.value = new ValueWrapper(value, value.getClass());
-    }
-
-    public String getActionName() {
-        return actionName;
     }
 
     public String getComponentName() {
@@ -181,7 +173,6 @@ public class DataEntry {
         return "DataEntry{" +
             "id=" + id +
             ", componentName='" + componentName + '\'' +
-            ", actionName='" + actionName + '\'' +
             ", scope=" + scope +
             ", scopeId='" + scopeId + '\'' +
             ", key='" + key + '\'' +
