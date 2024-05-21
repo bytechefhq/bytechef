@@ -20,7 +20,7 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
-import static com.bytechef.component.data.storage.util.DataStorageUtils.LOCKER;
+import static com.bytechef.component.data.storage.util.DataStorageUtils.locker;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -63,7 +63,7 @@ public class DataStorageAtomicIncrementAction {
 
         Integer number = null;
         try {
-            if (LOCKER.tryLock(10, TimeUnit.SECONDS)) {
+            if (locker.tryLock(10, TimeUnit.SECONDS)) {
                 Optional<Object> optionalList = context.data(
                     data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
                         inputParameters.getRequiredString(KEY)));
@@ -82,7 +82,7 @@ public class DataStorageAtomicIncrementAction {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            LOCKER.unlock();
+            locker.unlock();
         }
 
         return number;

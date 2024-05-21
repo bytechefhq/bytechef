@@ -16,22 +16,22 @@
 
 package com.bytechef.component.data.storage.action;
 
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.DEFAULT_VALUE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TIMEOUT;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
-import static com.bytechef.component.data.storage.constant.DataStorageConstants.DEFAULT_VALUE;
-import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.date;
-import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.nullable;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
-import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.commons.util.ConvertUtils;
@@ -63,56 +63,56 @@ public class DataStorageAwaitGetValueAction {
                 .description("The namespace to obtain a value from.")
                 .options(SCOPE_OPTIONS)
                 .required(true),
-            integer(DataStorageConstants.TYPE)
+            integer(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(DataStorageConstants.TYPE_OPTIONS),
-            array(DataStorageConstants.DEFAULT_VALUE)
+            array(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 1")
                 .required(true),
-            bool(DataStorageConstants.DEFAULT_VALUE)
+            bool(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 2")
                 .required(true),
-            date(DataStorageConstants.DEFAULT_VALUE)
+            date(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 3")
                 .required(true),
-            dateTime(DataStorageConstants.DEFAULT_VALUE)
+            dateTime(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 4")
                 .required(true),
-            integer(DataStorageConstants.DEFAULT_VALUE)
+            integer(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 5")
                 .required(true),
-            nullable(DataStorageConstants.DEFAULT_VALUE)
+            nullable(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 6")
                 .required(true),
-            number(DataStorageConstants.DEFAULT_VALUE)
+            number(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 7")
                 .required(true),
-            object(DataStorageConstants.DEFAULT_VALUE)
+            object(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 8")
                 .required(true),
-            string(DataStorageConstants.DEFAULT_VALUE)
+            string(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 9")
                 .required(true),
-            time(DataStorageConstants.DEFAULT_VALUE)
+            time(DEFAULT_VALUE)
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 10")
@@ -135,16 +135,36 @@ public class DataStorageAwaitGetValueAction {
 
         Class<?> cls = null;
         switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1 -> cls = ArrayList.class;
-            case 2 -> cls = Boolean.class;
-            case 3 -> cls = LocalDate.class;
-            case 4 -> cls = LocalDateTime.class;
-            case 5 -> cls = Integer.class;
-            case 6 -> cls = nullable().getClass();
-            case 7 -> cls = Number.class;
-            case 8 -> cls = Object.class;
-            case 9 -> cls = String.class;
-            case 10 -> cls = LocalTime.class;
+            case 1:
+                cls = ArrayList.class;
+                break;
+            case 2:
+                cls = Boolean.class;
+                break;
+            case 3:
+                cls = LocalDate.class;
+                break;
+            case 4:
+                cls = LocalDateTime.class;
+                break;
+            case 5:
+                cls = Integer.class;
+                break;
+            case 7:
+                cls = Number.class;
+                break;
+            case 8:
+                cls = Object.class;
+                break;
+            case 9:
+                cls = String.class;
+                break;
+            case 10:
+                cls = LocalTime.class;
+                break;
+            default:
+                cls = nullable().getClass();
+                break;
         }
 
         Optional<Object> optional = Optional.empty();

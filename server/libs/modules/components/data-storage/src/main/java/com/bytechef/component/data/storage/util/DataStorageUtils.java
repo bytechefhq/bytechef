@@ -20,5 +20,5 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataStorageUtils {
-    public static Lock LOCKER = new ReentrantLock();
+    public static final Lock locker = new ReentrantLock();
 }
