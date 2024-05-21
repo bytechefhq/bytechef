@@ -36,6 +36,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -91,13 +92,16 @@ public class CopperCreateActivityAction {
                             string(ID))))
         .perform(CopperCreateActivityAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_ACTIVITIES_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/activities");
+
     private CopperCreateActivityAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/activities"))
+        return actionContext.http(POST_ACTIVITIES_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),
