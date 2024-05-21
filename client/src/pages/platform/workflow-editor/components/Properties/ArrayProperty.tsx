@@ -116,7 +116,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             }
         } else if (name && params?.[name]) {
             const parameterArrayItems = params[name].map((parameterItemValue: ArrayPropertyType, index: number) => {
-                if (!parameterItemValue) {
+                if (parameterItemValue === null || parameterItemValue === undefined) {
                     return;
                 }
 
