@@ -39,30 +39,30 @@ public class RemoteDbDataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-value/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}",
+        value = "/fetch-value/{componentName}/{scope}/{scopeId}/{key}/{type}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(
-        @PathVariable String componentName, @PathVariable String actionName, @PathVariable Scope scope,
+        @PathVariable String componentName, @PathVariable Scope scope,
         @PathVariable String scopeId, @PathVariable String key, @PathVariable Type type) {
 
         return ResponseEntity.ok(
             OptionalUtils.orElse(dataStorageService.fetch(
-                componentName, actionName, scope, scopeId, key, type), null));
+                componentName, scope, scopeId, key, type), null));
     }
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/save/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}",
+        value = "/save/{componentName}/{scope}/{scopeId}/{key}/{type}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable String componentName, @PathVariable String actionName, @PathVariable Scope scope,
+        @PathVariable String componentName, @PathVariable Scope scope,
         @PathVariable String scopeId, @PathVariable String key, @PathVariable Type type, @RequestBody Object data) {
 
-        dataStorageService.put(componentName, actionName, scope, scopeId, key, type, data);
+        dataStorageService.put(componentName, scope, scopeId, key, type, data);
 
         return ResponseEntity.noContent()
             .build();

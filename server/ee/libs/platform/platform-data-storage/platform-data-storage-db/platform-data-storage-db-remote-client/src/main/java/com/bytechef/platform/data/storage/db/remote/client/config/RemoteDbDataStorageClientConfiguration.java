@@ -13,6 +13,7 @@ import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.data.storage.db.remote.client.service.RemoteDbDataStorageServiceClient;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import com.bytechef.platform.data.storage.service.DataStorageService;
+import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,26 +53,36 @@ public class RemoteDbDataStorageClientConfiguration {
 
         @Override
         public <T> Optional<T> fetch(
-            String componentName, String actionName, Scope scope, String scopeId, String key,
+            String componentName, Scope scope, String scopeId, String key,
             Type type) {
 
-            return dbDataStorageService.fetch(componentName, actionName, scope, scopeId, key, type);
+            return dbDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
 
         @Override
         public <T> T get(
-            String componentName, String actionName, Scope scope, String scopeId, String key,
+            String componentName, Scope scope, String scopeId, String key,
             Type type) {
 
-            return dbDataStorageService.get(componentName, actionName, scope, scopeId, key, type);
+            return dbDataStorageService.get(componentName, scope, scopeId, key, type);
+        }
+
+        @Override
+        public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type) {
+            return dbDataStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
         public void put(
-            String componentName, String actionName, Scope scope, String scopeId, String key,
+            String componentName, Scope scope, String scopeId, String key,
             Type type, Object value) {
 
-            dbDataStorageService.put(componentName, actionName, scope, scopeId, key, type, value);
+            dbDataStorageService.put(componentName, scope, scopeId, key, type, value);
+        }
+
+        @Override
+        public void delete(String componentName, Scope scope, String scopeId, String key, Type type) {
+            dbDataStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }
 }

@@ -12,6 +12,7 @@ import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -33,48 +34,60 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     @Override
     public <T> Optional<T> fetch(
-        String componentName, String actionName, Scope scope, String scopeId, String key,
+        String componentName, Scope scope, String scopeId, String key,
         Type type) {
 
         return Optional.ofNullable(
-            get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}));
+            get(componentName, scope, scopeId, key, type));
     }
 
     @Override
     public <T> T get(
-        String componentName, String actionName, Scope scope, String scopeId, String key,
+        String componentName, Scope scope, String scopeId, String key,
         Type type) {
 
-        return Optional
-            .ofNullable(
-                get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}))
-            .orElseThrow();
+        return get(componentName, scope, scopeId, key, type);
+    }
+
+    @Override
+    public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type) {
+        return getAll(componentName, scope, scopeId, type);
     }
 
     @Override
     public void put(
-        String componentName, String actionName, Scope scope, String scopeId, String key,
+        String componentName, Scope scope, String scopeId, String key,
         Type type, Object value) {
 
         loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE
-                    + "/save/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}")
-                .build(componentName, actionName, scope, scopeId, key, type),
+                    + "/save/{componentName}/{scope}/{scopeId}/{key}/{type}")
+                .build(componentName, scope, scopeId, key, type),
             value);
     }
 
+    @Override
+    public void delete(String componentName, Scope scope, String scopeId, String key, Type type) {
+        loadBalancedRestClient.delete(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(DATA_STORAGE_SERVICE
+                    + "/delete/{componentName}/{scope}/{scopeId}/{key}/{type}")
+                .build(componentName, scope, scopeId, key, type));
+    }
+
     private <T> T get(
-        String componentName, String actionName, Scope scope, String scopeId, String key, Type type,
+        String componentName, Scope scope, String scopeId, String key, Type type,
         ParameterizedTypeReference<T> responseTypeRef) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE
-                    + "/fetch-value/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}")
-                .build(componentName, actionName, scope, scopeId, key, type),
+                    + "/fetch-value/{componentName}/{scope}/{scopeId}/{key}/{type}")
+                .build(componentName, scope, scopeId, key, type),
             responseTypeRef);
     }
 }
