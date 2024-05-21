@@ -92,8 +92,10 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             params = getParameterByPath(path, currentComponent);
         }
 
+        const currentParams = params[name].filter((param: ArrayPropertyType) => param !== null);
+
         if (items?.length && name && items[0].type === 'OBJECT' && Array.isArray(params?.[name])) {
-            const parameterArrayItems = params[name].map((parameterItem: ArrayPropertyType, index: number) => {
+            const parameterArrayItems = currentParams.map((parameterItem: ArrayPropertyType, index: number) => {
                 const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                         ? {
@@ -115,11 +117,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 setArrayItems(parameterArrayItems);
             }
         } else if (name && Array.isArray(params?.[name])) {
-            const parameterArrayItems = params[name].map((parameterItemValue: ArrayPropertyType, index: number) => {
-                if (parameterItemValue === null || parameterItemValue === undefined) {
-                    return;
-                }
-
+            const parameterArrayItems = currentParams.map((parameterItemValue: ArrayPropertyType, index: number) => {
                 const parameterItemType = getParameterType(parameterItemValue);
 
                 const customSubProperties = Object.keys(parameterItemValue).map((key) => {
