@@ -19,6 +19,8 @@ package com.bytechef.component.affinity.action;
 import static com.bytechef.component.affinity.constant.AffinityConstants.DOMAIN;
 import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
@@ -43,6 +45,8 @@ class AffinityCreateOrganizationActionTest extends AbstractAffinityActionTest {
         Object result = AffinityCreateOrganizationAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
+
+        verify(mockedContext, times(1)).http(AffinityCreateOrganizationAction.POST_ORGANIZATIONS_CONTEXT_FUNCTION);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 

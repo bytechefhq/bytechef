@@ -20,10 +20,13 @@ import static com.bytechef.component.affinity.constant.AffinityConstants.EMAILS;
 import static com.bytechef.component.affinity.constant.AffinityConstants.FIRST_NAME;
 import static com.bytechef.component.affinity.constant.AffinityConstants.LAST_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +34,8 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  */
 class AffinityCreatePersonActionTest extends AbstractAffinityActionTest {
+
+    private static final List<String> emails = List.of("test@mail.com", "test2@mail.com");
 
     @Test
     void testPerform() {
@@ -40,12 +45,14 @@ class AffinityCreatePersonActionTest extends AbstractAffinityActionTest {
             .thenReturn((String) propertyStubsMap.get(FIRST_NAME));
         when(mockedParameters.getRequiredString(LAST_NAME))
             .thenReturn((String) propertyStubsMap.get(LAST_NAME));
-        when(mockedParameters.getList(EMAILS))
-            .thenReturn(null);
+        when(mockedParameters.getList(EMAILS, String.class))
+            .thenReturn(emails);
 
         Object result = AffinityCreatePersonAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
+
+        verify(mockedContext, times(1)).http(AffinityCreatePersonAction.POST_PERSONS_CONTEXT_FUNCTION);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
@@ -57,6 +64,7 @@ class AffinityCreatePersonActionTest extends AbstractAffinityActionTest {
 
         propertyStubsMap.put(FIRST_NAME, "firstName");
         propertyStubsMap.put(LAST_NAME, "lastName");
+        propertyStubsMap.put(EMAILS, emails);
 
         return propertyStubsMap;
     }

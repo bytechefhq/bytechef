@@ -18,6 +18,8 @@ package com.bytechef.component.affinity.action;
 
 import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
@@ -37,9 +39,11 @@ class AffinityCreateOpportunityActionTest extends AbstractAffinityActionTest {
         when(mockedParameters.getRequiredString(NAME))
             .thenReturn(propertyStubsMap.get(NAME));
 
-        Object result = AffinityCreateOrganizationAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = AffinityCreateOpportunityAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
+
+        verify(mockedContext, times(1)).http(AffinityCreateOpportunityAction.POST_OPPORTUNITIES_CONTEXT_FUNCTION);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
