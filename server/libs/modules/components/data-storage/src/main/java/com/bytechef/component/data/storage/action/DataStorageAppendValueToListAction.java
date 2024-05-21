@@ -16,8 +16,12 @@
 
 package com.bytechef.component.data.storage.action;
 
-import static com.bytechef.component.data.storage.constant.DataStorageConstants.*;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE_OPTIONS;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -48,71 +52,71 @@ public class DataStorageAppendValueToListAction {
         .title("Append Value to List")
         .description("Append value to the end of a list. If the list does not exist, it will be created.")
         .properties(
-            string(DataStorageConstants.SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description("The namespace for appending a value.")
                 .options(DataStorageConstants.SCOPE_OPTIONS)
                 .required(true),
-            string(DataStorageConstants.KEY)
+            string(KEY)
                 .label("Key")
                 .description(
                     "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.")
                 .required(true),
-            integer(DataStorageConstants.TYPE)
+            integer(TYPE)
                 .label("Type")
                 .description("The value type.")
-                .options(DataStorageConstants.TYPE_OPTIONS),
-            array(DataStorageConstants.VALUE)
+                .options(TYPE_OPTIONS),
+            array(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 1")
                 .required(true),
-            bool(DataStorageConstants.VALUE)
+            bool(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 2")
                 .required(true),
-            date(DataStorageConstants.VALUE)
+            date(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 3")
                 .required(true),
-            dateTime(DataStorageConstants.VALUE)
+            dateTime(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 4")
                 .required(true),
-            integer(DataStorageConstants.VALUE)
+            integer(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 5")
                 .required(true),
-            nullable(DataStorageConstants.VALUE)
+            nullable(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 6")
                 .required(true),
-            number(DataStorageConstants.VALUE)
+            number(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 7")
                 .required(true),
-            object(DataStorageConstants.VALUE)
+            object(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 8")
                 .required(true),
-            string(DataStorageConstants.VALUE)
+            string(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 9")
                 .required(true),
-            time(DataStorageConstants.VALUE)
+            time(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == 10")
                 .required(true),
-            bool(DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM)
+            bool(APPEND_LIST_AS_SINGLE_ITEM)
                 .label("Append a list as a single item")
                 .description(
                     "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists."))

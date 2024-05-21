@@ -16,11 +16,13 @@
 
 package com.bytechef.component.data.storage.action;
 
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.INDEX;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE;
-import static com.bytechef.component.data.storage.constant.DataStorageConstants.INDEX;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -33,7 +35,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
-import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -49,71 +50,71 @@ public class DataStorageSetValueInListAction {
         .title("Set Value in List")
         .description("Set value under a specified index in a list.")
         .properties(
-            string(DataStorageConstants.KEY)
+            string(KEY)
                 .label("Key")
                 .description(
                     "The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.")
                 .required(true),
-            string(DataStorageConstants.SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description(
                     "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
-                .options(DataStorageConstants.SCOPE_OPTIONS)
+                .options(SCOPE_OPTIONS)
                 .required(true),
-            integer(DataStorageConstants.INDEX)
+            integer(INDEX)
                 .label("Index")
                 .description("The index in a list to set a value under. The previous value will be overridden.")
                 .required(true),
-            integer(DataStorageConstants.TYPE)
+            integer(TYPE)
                 .label("Type")
                 .description("The value type.")
-                .options(DataStorageConstants.TYPE_OPTIONS),
-            array(DataStorageConstants.VALUE)
+                .options(TYPE_OPTIONS),
+            array(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 1")
                 .required(true),
-            bool(DataStorageConstants.VALUE)
+            bool(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 2")
                 .required(true),
-            date(DataStorageConstants.VALUE)
+            date(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 3")
                 .required(true),
-            dateTime(DataStorageConstants.VALUE)
+            dateTime(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 4")
                 .required(true),
-            integer(DataStorageConstants.VALUE)
+            integer(VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
                 .displayCondition("type == 5")
                 .required(true),
-            nullable(DataStorageConstants.VALUE)
+            nullable(VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
                 .displayCondition("type == 6")
                 .required(true),
-            number(DataStorageConstants.VALUE)
+            number(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 7")
                 .required(true),
-            object(DataStorageConstants.VALUE)
+            object(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 8")
                 .required(true),
-            string(DataStorageConstants.VALUE)
+            string(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 9")
                 .required(true),
-            time(DataStorageConstants.VALUE)
+            time(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type == 10")
