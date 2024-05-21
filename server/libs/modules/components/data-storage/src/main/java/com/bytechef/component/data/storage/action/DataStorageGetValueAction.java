@@ -16,6 +16,10 @@
 
 package com.bytechef.component.data.storage.action;
 
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.DEFAULT_VALUE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -28,10 +32,16 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -46,7 +56,7 @@ public class DataStorageGetValueAction {
                 .label("Key")
                 .description("The identifier of a value to get, stored earlier in the selected scope.")
                 .required(true),
-            integer(DataStorageConstants.SCOPE)
+            string(DataStorageConstants.SCOPE)
                 .label("Scope")
                 .description(
                     "The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
@@ -106,14 +116,43 @@ public class DataStorageGetValueAction {
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 10")
                 .required(true))
-        .output()
+        .output(
+            (inputParameters, connectionParameters, context) -> context
+                .output(output -> output.get(inputParameters.getRequired(DEFAULT_VALUE))))
         .perform(DataStorageGetValueAction::perform);
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws ClassNotFoundException {
 
-        // TODO
+        Class<?> cls = null;
+        switch (inputParameters.getRequiredInteger(TYPE)) {
+            case 1 -> cls = ArrayList.class;
+            case 2 -> cls = Boolean.class;
+            case 3 -> cls = LocalDate.class;
+            case 4 -> cls = LocalDateTime.class;
+            case 5 -> cls = Integer.class;
+            case 6 -> cls = nullable().getClass();
+            case 7 -> cls = Number.class;
+            case 8 -> cls = Object.class;
+            case 9 -> cls = String.class;
+            case 10 -> cls = LocalTime.class;
+        }
 
-        return null;
+        Optional<Object> optional = context
+            .data(data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY)));
+
+        if (optional.isEmpty()) {
+            if (ConvertUtils.canConvert(optional.get(), cls))
+                return ConvertUtils.convertValue(inputParameters.getRequiredString(DEFAULT_VALUE), cls);
+
+            return inputParameters.getRequiredString(DEFAULT_VALUE);
+        }
+
+        if (ConvertUtils.canConvert(optional.get(), cls))
+            return ConvertUtils.convertValue(optional.get(), cls);
+
+        return optional.get();
     }
 }

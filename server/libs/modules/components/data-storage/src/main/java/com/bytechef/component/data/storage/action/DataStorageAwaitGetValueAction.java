@@ -20,13 +20,30 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TIMEOUT;
-import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.DEFAULT_VALUE;
 import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.nullable;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.time;
 
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -35,16 +52,70 @@ public class DataStorageAwaitGetValueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("awaitGetValue")
         .title("Await Get Value")
-        .description("")
+        .description("Wait for a value under a specified key, until it's available.")
         .properties(
             string(KEY)
                 .label("Key")
                 .description("The identifier of a value to wait for.")
                 .required(true),
-            integer(SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description("The namespace to obtain a value from.")
                 .options(SCOPE_OPTIONS)
+                .required(true),
+            integer(DataStorageConstants.TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(DataStorageConstants.TYPE_OPTIONS),
+            array(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 1")
+                .required(true),
+            bool(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 2")
+                .required(true),
+            date(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 3")
+                .required(true),
+            dateTime(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 4")
+                .required(true),
+            integer(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 5")
+                .required(true),
+            nullable(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 6")
+                .required(true),
+            number(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 7")
+                .required(true),
+            object(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 8")
+                .required(true),
+            string(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 9")
+                .required(true),
+            time(DataStorageConstants.DEFAULT_VALUE)
+                .label("Default value")
+                .description("The default value to return if no value exists under the given key.")
+                .displayCondition("type == 10")
                 .required(true),
             integer(TIMEOUT)
                 .label("Timeout (1 to 300 sec)")
@@ -53,14 +124,50 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
-        .output()
+        .output(
+            (inputParameters, connectionParameters, context) -> context
+                .output(output -> output.get(inputParameters.getRequired(DEFAULT_VALUE))))
         .perform(DataStorageAwaitGetValueAction::perform);
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws InterruptedException {
 
-        // TODO
+        Class<?> cls = null;
+        switch (inputParameters.getRequiredInteger(TYPE)) {
+            case 1 -> cls = ArrayList.class;
+            case 2 -> cls = Boolean.class;
+            case 3 -> cls = LocalDate.class;
+            case 4 -> cls = LocalDateTime.class;
+            case 5 -> cls = Integer.class;
+            case 6 -> cls = nullable().getClass();
+            case 7 -> cls = Number.class;
+            case 8 -> cls = Object.class;
+            case 9 -> cls = String.class;
+            case 10 -> cls = LocalTime.class;
+        }
 
-        return null;
+        Optional<Object> optional = Optional.empty();
+
+        for (int i = 0; i < inputParameters.getRequiredInteger(TIMEOUT); i = i + 5) {
+            optional = context.data(
+                data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                    inputParameters.getRequiredString(KEY)));
+            if (optional.isPresent())
+                break;
+            Thread.sleep(5000);
+        }
+
+        if (optional.isEmpty()) {
+            if (ConvertUtils.canConvert(optional.get(), cls))
+                return ConvertUtils.convertValue(inputParameters.getRequiredString(DEFAULT_VALUE), cls);
+
+            return inputParameters.getRequiredString(DEFAULT_VALUE);
+        }
+
+        if (ConvertUtils.canConvert(optional.get(), cls))
+            return ConvertUtils.convertValue(optional.get(), cls);
+
+        return optional.get();
     }
 }

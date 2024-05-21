@@ -16,6 +16,8 @@
 
 package com.bytechef.component.data.storage.action;
 
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.*;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
@@ -32,6 +34,10 @@ import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +48,7 @@ public class DataStorageAppendValueToListAction {
         .title("Append Value to List")
         .description("Append value to the end of a list. If the list does not exist, it will be created.")
         .properties(
-            integer(DataStorageConstants.SCOPE)
+            string(DataStorageConstants.SCOPE)
                 .label("Scope")
                 .description("The namespace for appending a value.")
                 .options(DataStorageConstants.SCOPE_OPTIONS)
@@ -106,10 +112,6 @@ public class DataStorageAppendValueToListAction {
                 .description("The value to set under given key.")
                 .displayCondition("type == 10")
                 .required(true),
-            bool(DataStorageConstants.CREATE_VALUE_IF_MISSING)
-                .label("Create value if missing")
-                .description(
-                    "When the specified list doesn't exist, it will be created with the provided value during the append operation."),
             bool(DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM)
                 .label("Append a list as a single item")
                 .description(
@@ -119,8 +121,59 @@ public class DataStorageAppendValueToListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
+        Object value = null;
+        switch (inputParameters.getRequiredInteger(TYPE)) {
+            case 1:
+                value = inputParameters.getRequiredArray(VALUE);
+                break;
+            case 2:
+                value = inputParameters.getRequiredBoolean(VALUE);
+                break;
+            case 3:
+                value = inputParameters.getRequiredLocalDate(VALUE);
+                break;
+            case 4:
+                value = inputParameters.getRequiredLocalDateTime(VALUE);
+                break;
+            case 5:
+                value = inputParameters.getRequiredInteger(VALUE);
+                break;
+            case 6:
+                value = nullable();
+                break;
+            case 7:
+                value = inputParameters.getRequiredDouble(VALUE);
+                break;
+            case 8:
+                value = inputParameters.getRequiredMap(VALUE);
+                break;
+            case 9:
+                value = inputParameters.getRequiredString(VALUE);
+                break;
+            case 10:
+                value = inputParameters.getRequiredLocalTime(VALUE);
+                break;
+            default:
+                break;
+        }
 
-        return null;
+        List<Object> list = null;
+        Optional<Object> optionalList = context
+            .data(data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY)));
+        if (optionalList.isPresent() && optionalList.get() instanceof List)
+            list = (List<Object>) optionalList.get();
+        else
+            list = new ArrayList<>();
+
+        if (value instanceof Object[] && !inputParameters.getRequiredBoolean(APPEND_LIST_AS_SINGLE_ITEM))
+            list.addAll(Arrays.asList((Object[]) value));
+        else
+            list.add(value);
+
+        List<Object> finalList = list;
+        return context
+            .data(data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY), finalList));
     }
 }

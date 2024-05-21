@@ -27,6 +27,8 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +43,7 @@ public class DataStorageDeleteValueFromListAction {
                 .label("Key")
                 .description("The identifier of a list to delete value from, stored earlier in the selected scope.")
                 .required(true),
-            integer(SCOPE)
+            string(SCOPE)
                 .label("Scope")
                 .description(
                     "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
@@ -57,8 +59,20 @@ public class DataStorageDeleteValueFromListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        // TODO
+        List<Object> list = null;
+        Optional<Object> optionalList = context
+            .data(data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY)));
+        if (optionalList.isPresent() && optionalList.get() instanceof List)
+            list = (List<Object>) optionalList.get();
+        else
+            return null;
 
-        return null;
+        list.remove(inputParameters.getRequiredInteger(INDEX));
+
+        List<Object> finalList = list;
+        return context
+            .data(data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY), finalList));
     }
 }

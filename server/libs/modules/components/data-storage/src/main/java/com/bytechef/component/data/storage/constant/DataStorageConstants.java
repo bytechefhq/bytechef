@@ -28,7 +28,6 @@ import java.util.List;
 public class DataStorageConstants {
 
     public static final String APPEND_LIST_AS_SINGLE_ITEM = "appendListAsSingleItem";
-    public static final String CREATE_VALUE_IF_MISSING = "createValueIfMissing";
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String INDEX = "index";
     public static final String KEY = "key";
@@ -39,11 +38,10 @@ public class DataStorageConstants {
     public static final String TYPE = "type";
 
     @SuppressFBWarnings("MS")
-    public static final List<Option<Long>> SCOPE_OPTIONS = List.of(
-        option("Current Execution", 1),
-        option("Workflow Instance", 2),
-        option("Workflow", 3),
-        option("Account", 4));
+    public static final List<Option<String>> SCOPE_OPTIONS = List.of(
+        option("Current Execution", "CURRENT_EXECUTION"),
+        option("Workflow", "WORKFLOW"),
+        option("Account", "ACCOUNT"));
 
     public static final List<Option<Long>> TYPE_OPTIONS = List.of(
         option("Array", 1),
