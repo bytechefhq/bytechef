@@ -218,6 +218,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
         public Void setValue(Data.Scope scope, String key, Object data) {
             return null;
         }
+
         public Void deleteValue(Data.Scope scope, String key) {
             return null;
         }

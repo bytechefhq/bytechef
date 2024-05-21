@@ -164,14 +164,16 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         } else {
             Object sampleOutput = actionDefinitionFacade.executePerform(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), null, null, Long.valueOf(projectWorkflowId), null, inputParameters,
+                workflowNodeType.componentOperationName(), null, null, Long.valueOf(projectWorkflowId), null,
+                inputParameters,
                 connectionIds);
 
             if (sampleOutput == null) {
                 return null;
             }
 
-            return workflowNodeTestOutputService.save(projectWorkflowId, workflowNodeName, workflowNodeType, sampleOutput);
+            return workflowNodeTestOutputService.save(projectWorkflowId, workflowNodeName, workflowNodeType,
+                sampleOutput);
         }
     }
 }

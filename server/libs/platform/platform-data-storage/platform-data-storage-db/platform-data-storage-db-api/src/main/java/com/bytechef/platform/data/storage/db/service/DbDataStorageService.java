@@ -18,7 +18,6 @@ package com.bytechef.platform.data.storage.db.service;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.constant.Type;
-
 import java.util.Map;
 import java.util.Optional;
 
