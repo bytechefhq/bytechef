@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ControlTypeModel, ObjectPropertyModel} from '@/middleware/platform/configuration';
+import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/middleware/platform/configuration';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ArrayPropertyType, PropertyType} from '@/types/types';
@@ -92,9 +92,11 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             params = getParameterByPath(path, currentComponent);
         }
 
-        const currentParams = params[name].filter((param: ArrayPropertyType) => param !== null);
+        const currentParams: Array<ArrayPropertyType> = params[name]?.filter(
+            (param: ArrayPropertyType) => param !== null
+        );
 
-        if (items?.length && name && items[0].type === 'OBJECT' && Array.isArray(params?.[name])) {
+        if (items?.length && name && items[0].type === 'OBJECT' && Array.isArray(currentParams)) {
             const parameterArrayItems = currentParams.map((parameterItem: ArrayPropertyType, index: number) => {
                 const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
@@ -116,7 +118,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
-        } else if (name && Array.isArray(params?.[name])) {
+        } else if (name && Array.isArray(currentParams)) {
             const parameterArrayItems = currentParams.map((parameterItemValue: ArrayPropertyType, index: number) => {
                 const parameterItemType = getParameterType(parameterItemValue);
 
@@ -131,9 +133,10 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         ] as ControlTypeModel,
                         custom: true,
                         defaultValue: subPropertyParameterValue,
+                        expressionEnabled: true,
                         label: key,
                         name: key,
-                        type: subPropertyType,
+                        type: subPropertyType as PropertyTypeModel,
                     };
                 });
 
@@ -144,6 +147,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     ] as ControlTypeModel,
                     custom: true,
                     defaultValue: parameterItemValue,
+                    expressionEnabled: true,
                     name: index.toString(),
                     properties: parameterItemType === 'OBJECT' ? customSubProperties : undefined,
                     type: parameterItemType,

@@ -137,7 +137,8 @@ export type WorkflowConnectionType = {
 export type ArrayPropertyType = PropertyModel & {
     controlType?: ControlTypeModel;
     custom?: boolean;
-    defaultValue?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    defaultValue?: any;
     label?: string;
     properties?: Array<PropertyType>;
 };
