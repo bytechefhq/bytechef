@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.sheets.trigger;
 
-import static com.bytechef.component.definition.ActionContext.Data.Scope.WORKFLOW;
+import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;

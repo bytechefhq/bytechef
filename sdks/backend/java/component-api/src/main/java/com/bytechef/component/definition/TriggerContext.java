@@ -29,7 +29,7 @@ public interface TriggerContext extends Context {
      * @param <R>
      * @return
      */
-    <R> R data(ContextFunction<ActionContext.Data, R> dataFunction);
+    <R> R data(ContextFunction<Data, R> dataFunction);
 
     /**
      * @param eventConsumer
@@ -58,6 +58,10 @@ public interface TriggerContext extends Context {
             public String getLabel() {
                 return label;
             }
+
+            public ActionContext.Data.Scope toActionScope(){
+                return ActionContext.Data.Scope.valueOf(label.toUpperCase());
+            }
         }
 
         /**
@@ -66,7 +70,7 @@ public interface TriggerContext extends Context {
          * @param key
          * @return
          */
-        <T> Optional<T> fetchValue(ActionContext.Data.Scope scope, String key);
+        <T> Optional<T> fetchValue(Data.Scope scope, String key);
 
         /**
          * @param <T>
@@ -74,13 +78,18 @@ public interface TriggerContext extends Context {
          * @param key
          * @return
          */
-        <T> T getValue(ActionContext.Data.Scope scope, String key);
+        <T> T getValue(Data.Scope scope, String key);
 
         /**
          * @param scope
          * @param key
          * @param data
          */
-        Void setValue(ActionContext.Data.Scope scope, String key, Object data);
+        Void setValue(Data.Scope scope, String key, Object data);
+        /**
+         * @param scope
+         * @param key
+         */
+        Void deleteValue(Data.Scope scope, String key);
     }
 }
