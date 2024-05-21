@@ -16,6 +16,7 @@
 
 package com.bytechef.component.capsule.crm.util;
 
+import static com.bytechef.component.capsule.crm.util.CapsuleCRMUtils.GET_COUNTRIES_CONTEXT_FUNCTION;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,9 +55,7 @@ class CapsuleCRMUtilsTest {
 
         map.put("countries", countries);
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
+        when(mockedContext.http(GET_COUNTRIES_CONTEXT_FUNCTION))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -72,5 +71,6 @@ class CapsuleCRMUtilsTest {
         assertEquals(
             expectedOptions,
             CapsuleCRMUtils.getCountryOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+
     }
 }
