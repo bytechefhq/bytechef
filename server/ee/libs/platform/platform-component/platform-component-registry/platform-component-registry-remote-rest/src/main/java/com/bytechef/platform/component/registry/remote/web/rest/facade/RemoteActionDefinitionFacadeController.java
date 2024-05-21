@@ -95,7 +95,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
-                performRequest.type, performRequest.instanceId, performRequest.workflowId,
+                performRequest.type, performRequest.instanceId, Long.getLong(performRequest.workflowId),
                 performRequest.jobId, performRequest.inputParameters, performRequest.connectionIds));
     }
 
