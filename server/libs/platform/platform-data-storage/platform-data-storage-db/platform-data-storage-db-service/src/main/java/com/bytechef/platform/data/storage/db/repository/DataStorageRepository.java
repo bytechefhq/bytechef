@@ -18,7 +18,6 @@ package com.bytechef.platform.data.storage.db.repository;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.platform.data.storage.db.domain.DataEntry;
-
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.relational.core.sql.LockMode;

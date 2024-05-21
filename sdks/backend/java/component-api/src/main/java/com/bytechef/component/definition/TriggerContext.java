@@ -59,7 +59,7 @@ public interface TriggerContext extends Context {
                 return label;
             }
 
-            public ActionContext.Data.Scope toActionScope(){
+            public ActionContext.Data.Scope toActionScope() {
                 return ActionContext.Data.Scope.valueOf(label.toUpperCase());
             }
         }
@@ -86,6 +86,7 @@ public interface TriggerContext extends Context {
          * @param data
          */
         Void setValue(Data.Scope scope, String key, Object data);
+
         /**
          * @param scope
          * @param key

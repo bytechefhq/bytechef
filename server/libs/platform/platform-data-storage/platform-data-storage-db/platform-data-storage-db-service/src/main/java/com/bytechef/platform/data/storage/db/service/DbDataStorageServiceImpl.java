@@ -23,11 +23,9 @@ import com.bytechef.platform.data.storage.db.domain.DataEntry;
 import com.bytechef.platform.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -67,8 +65,8 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     public <T> Map<String, T> getAll(
         String componentName, Scope scope, String scopeId, Type type) {
         return OptionalUtils.get(dataStorageRepository
-                .findByComponentNameAndScopeAndScopeIdAndType(
-                    componentName, scope, scopeId, type.ordinal()))
+            .findByComponentNameAndScopeAndScopeIdAndType(
+                componentName, scope, scopeId, type.ordinal()))
             .stream()
             .collect(Collectors.toMap(dataEntry -> String.valueOf(dataEntry.getKey()),
                 dataEntry -> (T) dataEntry.getValue()));

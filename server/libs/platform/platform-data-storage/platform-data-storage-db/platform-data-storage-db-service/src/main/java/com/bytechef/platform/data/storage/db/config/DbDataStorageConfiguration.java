@@ -22,7 +22,6 @@ import com.bytechef.platform.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageServiceImpl;
 import com.bytechef.platform.data.storage.service.DataStorageService;
-
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public class DbDataStorageConfiguration {
 
         @Override
         public <T> T get(
-            String componentName,  Scope scope, String scopeId, String key,
+            String componentName, Scope scope, String scopeId, String key,
             Type type) {
 
             return dbDataStorageService.get(componentName, scope, scopeId, key, type);
