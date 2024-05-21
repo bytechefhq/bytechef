@@ -32,6 +32,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
@@ -85,13 +86,16 @@ public class CapsuleCRMCreateTaskAction {
                             string(COLOUR))))
         .perform(CapsuleCRMCreateTaskAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_TASKS_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/tasks");
+
     private CapsuleCRMCreateTaskAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/tasks"))
+        return actionContext.http(POST_TASKS_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     "task",

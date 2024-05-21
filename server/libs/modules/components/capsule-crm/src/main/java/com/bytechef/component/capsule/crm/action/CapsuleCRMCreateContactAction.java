@@ -51,6 +51,7 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import com.bytechef.component.capsule.crm.util.CapsuleCRMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -174,13 +175,16 @@ public class CapsuleCRMCreateContactAction {
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
         .perform(CapsuleCRMCreateContactAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_PARTIES_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/parties");
+
     private CapsuleCRMCreateContactAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/parties"))
+        return actionContext.http(POST_PARTIES_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     "party",
