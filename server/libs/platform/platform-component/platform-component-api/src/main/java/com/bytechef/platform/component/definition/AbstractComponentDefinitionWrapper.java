@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.DataStreamItemReader;
@@ -39,7 +40,7 @@ import java.util.Optional;
 public abstract class AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
     protected final List<? extends ActionDefinition> actions;
-    protected final String category;
+    protected final List<ComponentCategory> categories;
     protected final ConnectionDefinition connection;
     protected final Boolean customAction;
     protected final Help customActionHelp;
@@ -57,7 +58,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
 
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
         this.actions = OptionalUtils.orElse(componentDefinition.getActions(), List.of());
-        this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
+        this.categories = OptionalUtils.orElse(componentDefinition.getCategories(), List.of());
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
         this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
@@ -80,8 +81,8 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<String> getCategory() {
-        return Optional.ofNullable(category);
+    public Optional<List<ComponentCategory>> getCategories() {
+        return Optional.ofNullable(categories == null ? null : new ArrayList<>(categories));
     }
 
     @Override

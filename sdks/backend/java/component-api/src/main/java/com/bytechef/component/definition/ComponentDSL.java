@@ -1048,7 +1048,7 @@ public final class ComponentDSL {
 
         private List<? extends ActionDefinition> actionDefinitions;
         private Boolean additionalConnections;
-        private String category;
+        private List<ComponentCategory> categories;
         private ConnectionDefinition connectionDefinition;
         private Boolean connectionRequired;
         private Boolean customAction;
@@ -1093,8 +1093,14 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition category(String category) {
-            this.category = category;
+        public ModifiableComponentDefinition categories(List<ComponentCategory> categories) {
+            this.categories = categories;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition categories(ComponentCategory... category) {
+            this.categories = List.of(category);
 
             return this;
         }
@@ -1235,8 +1241,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<String> getCategory() {
-            return Optional.ofNullable(category);
+        public Optional<List<ComponentCategory>> getCategories() {
+            return Optional.ofNullable(categories);
         }
 
         @Override
@@ -1322,7 +1328,7 @@ public final class ComponentDSL {
 
             return Objects.equals(actionDefinitions, that.actionDefinitions)
                 && Objects.equals(additionalConnections, that.additionalConnections)
-                && Objects.equals(category, that.category)
+                && Objects.equals(categories, that.categories)
                 && Objects.equals(connectionDefinition, that.connectionDefinition)
                 && Objects.equals(connectionRequired, that.connectionRequired)
                 && Objects.equals(customAction, that.customAction)
@@ -1337,7 +1343,7 @@ public final class ComponentDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(actionDefinitions, category, connectionDefinition, customAction, customActionHelp,
+            return Objects.hash(actionDefinitions, categories, connectionDefinition, customAction, customActionHelp,
                 description, icon, tags, metadata, name, resources, version, title, triggerDefinitions,
                 workflowConnectionKeys);
         }
@@ -1351,7 +1357,7 @@ public final class ComponentDSL {
                 ", description='" + description + '\'' +
                 ", connectionDefinition=" + connectionDefinition +
                 ", additionalConnections=" + additionalConnections +
-                ", category='" + category + '\'' +
+                ", categories='" + categories + '\'' +
                 ", connectionRequired=" + connectionRequired +
                 ", customAction=" + customAction +
                 ", customActionHelp=" + customActionHelp +
