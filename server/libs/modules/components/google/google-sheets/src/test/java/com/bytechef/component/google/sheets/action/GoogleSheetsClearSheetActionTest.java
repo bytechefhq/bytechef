@@ -27,7 +27,6 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,7 +44,7 @@ class GoogleSheetsClearSheetActionTest extends AbstractGoogleSheetsActionTest {
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
 
     @Test
-    void perform() throws IOException {
+    void perform() throws Exception {
 
         when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
             .thenReturn(true);

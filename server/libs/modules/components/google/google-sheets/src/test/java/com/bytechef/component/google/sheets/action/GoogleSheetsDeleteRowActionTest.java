@@ -27,7 +27,6 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
 import com.google.api.services.sheets.v4.model.Request;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,7 +44,7 @@ class GoogleSheetsDeleteRowActionTest extends AbstractGoogleSheetsActionTest {
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
 
     @Test
-    void perform() throws IOException {
+    void perform() throws Exception {
 
         when(mockedParameters.getRequiredInteger(ROW_NUMBER))
             .thenReturn(2);
