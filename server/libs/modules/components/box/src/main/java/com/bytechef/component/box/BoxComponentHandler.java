@@ -24,6 +24,7 @@ import com.bytechef.component.box.action.BoxCreateFolderAction;
 import com.bytechef.component.box.action.BoxDownloadFileAction;
 import com.bytechef.component.box.action.BoxUploadFileAction;
 import com.bytechef.component.box.connection.BoxConnection;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class BoxComponentHandler implements ComponentHandler {
             "Box is a cloud content management and file sharing service that enables businesses to securely " +
                 "store, manage, and collaborate on documents.")
         .icon("path:assets/box.svg")
+        .categories(ComponentCategory.FILE_STORAGE)
         .connection(BoxConnection.CONNECTION_DEFINITION)
         .actions(
             BoxCreateFolderAction.ACTION_DEFINITION,

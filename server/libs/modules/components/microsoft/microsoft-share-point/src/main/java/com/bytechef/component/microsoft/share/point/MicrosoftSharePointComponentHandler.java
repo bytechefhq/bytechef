@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.MICROSOFT_SHARE_POINT;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateFolderAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateListAction;
@@ -40,6 +41,7 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, " +
                 "providing document management, intranet, and content management features for organizations.")
         .icon("path:assets/microsoft-share-point.svg")
+        .categories(ComponentCategory.FILE_STORAGE, ComponentCategory.COMMUNICATION)
         .connection(MicrosoftSharePointConnection.CONNECTION_DEFINITION)
         .actions(
             MicrosoftSharePointCreateFolderAction.ACTION_DEFINITION,

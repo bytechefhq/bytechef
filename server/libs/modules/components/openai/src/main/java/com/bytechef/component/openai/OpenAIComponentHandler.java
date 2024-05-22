@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.openai.constant.OpenAIConstants.OPENAI;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.openai.action.OpenAIAskChatGPTAction;
 import com.bytechef.component.openai.action.OpenAICreateAssistantAction;
@@ -43,6 +44,7 @@ public class OpenAIComponentHandler implements ComponentHandler {
             "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
                 "that benefit humanity as a whole.")
         .icon("path:assets/openai.svg")
+        .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenAIConnection.CONNECTION_DEFINITION)
         .actions(
             OpenAIAskChatGPTAction.ACTION_DEFINITION,

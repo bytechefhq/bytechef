@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.MICROSOFT_ONEDRIVE;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveDownloadFileAction;
 import com.bytechef.component.microsoft.one.drive.action.MicrosoftOneDriveListFilesAction;
@@ -40,6 +41,7 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
             "Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing " +
                 "files online.")
         .icon("path:assets/microsoft-one-drive.svg")
+        .categories(ComponentCategory.FILE_STORAGE)
         .connection(MicrosoftOneDriveConnection.CONNECTION_DEFINITION)
         .actions(
             MicrosoftOneDriveDownloadFileAction.ACTION_DEFINITION,

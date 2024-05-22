@@ -21,6 +21,7 @@ import static com.bytechef.component.google.drive.connection.GoogleDriveConnecti
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_DRIVE;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.drive.action.GoogleDriveCreateNewFolderAction;
 import com.bytechef.component.google.drive.action.GoogleDriveCreateNewTextFileAction;
@@ -41,6 +42,7 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and " +
                 "collaborate online.")
         .icon("path:assets/google-drive.svg")
+        .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleDriveUploadFileAction.ACTION_DEFINITION,

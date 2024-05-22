@@ -21,6 +21,7 @@ import static com.bytechef.component.google.sheets.connection.GoogleSheetsConnec
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.GOOGLE_SHEETS;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.sheets.action.GoogleSheetsClearSheetAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteRowAction;
@@ -42,6 +43,7 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
             "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate " +
                 "on spreadsheets in real-time.")
         .icon("path:assets/google-sheets.svg")
+        .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleSheetsClearSheetAction.ACTION_DEFINITION,

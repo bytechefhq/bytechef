@@ -26,6 +26,7 @@ import com.bytechef.component.aws.s3.action.AwsS3ListObjectsAction;
 import com.bytechef.component.aws.s3.action.AwsS3PresignGetObjectAction;
 import com.bytechef.component.aws.s3.action.AwsS3PutObjectAction;
 import com.bytechef.component.aws.s3.connection.AwsS3Connection;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         .title("AWS S3")
         .description("AWS S3 is a simple object storage service provided by Amazon Web Services.")
         .icon("path:assets/aws-s3.svg")
+        .categories(ComponentCategory.DEVELOPER_TOOLS, ComponentCategory.FILE_STORAGE)
         .actions(
             AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
             AwsS3ListObjectsAction.ACTION_DEFINITION,

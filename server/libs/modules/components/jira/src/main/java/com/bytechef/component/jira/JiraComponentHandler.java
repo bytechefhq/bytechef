@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.jira.constant.JiraConstants.JIRA;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.jira.action.JiraCreateIssueAction;
 import com.bytechef.component.jira.action.JiraGetIssueAction;
@@ -39,6 +40,7 @@ public class JiraComponentHandler implements ComponentHandler {
             "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and " +
                 "agile project management.")
         .icon("path:assets/jira.svg")
+        .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(JiraConnection.CONNECTION_DEFINITION)
         .actions(
             JiraCreateIssueAction.ACTION_DEFINITION,

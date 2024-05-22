@@ -19,6 +19,7 @@ package com.bytechef.component.email;
 import static com.bytechef.component.email.constant.EmailConstants.EMAIL;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.email.action.SendEmailAction;
@@ -36,6 +37,7 @@ public class EmailComponentHandler implements ComponentHandler {
         .description("The Email connector sends emails using an SMTP email server.")
         .connection(EmailConnection.CONNECTION_DEFINITION)
         .icon("path:assets/email.svg")
+        .categories(ComponentCategory.COMMUNICATION, ComponentCategory.HELPERS)
         .actions(SendEmailAction.ACTION_DEFINITION);
 
     @Override

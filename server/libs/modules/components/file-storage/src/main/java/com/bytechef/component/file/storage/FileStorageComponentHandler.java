@@ -19,6 +19,7 @@ package com.bytechef.component.file.storage;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.file.storage.action.FileStorageDownloadAction;
 import com.bytechef.component.file.storage.action.FileStorageReadAction;
@@ -36,6 +37,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
         .title("File Storage")
         .description("Reads and writes data from a file stored inside the file storage.")
         .icon("path:assets/file-storage.svg")
+        .categories(ComponentCategory.FILE_STORAGE, ComponentCategory.HELPERS)
         .actions(
             FileStorageReadAction.ACTION_DEFINITION,
             FileStorageWriteAction.ACTION_DEFINITION,

@@ -31,6 +31,7 @@ import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
@@ -84,7 +85,8 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/discord.svg");
+            .icon("path:assets/discord.svg")
+            .categories(ComponentCategory.COMMUNICATION);
     }
 
     @Override

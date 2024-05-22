@@ -23,9 +23,11 @@ import static com.bytechef.component.insightly.constant.InsightlyConstants.POD;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
  * @author Monika Domiter
@@ -37,7 +39,8 @@ public class InsightlyComponentHandler extends AbstractInsightlyComponentHandler
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/insightly.svg");
+            .icon("path:assets/insightly.svg")
+            .categories(List.of(ComponentCategory.CRM));
     }
 
     @Override

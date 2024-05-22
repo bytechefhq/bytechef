@@ -17,6 +17,7 @@
 package com.bytechef.component.salesflare;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -30,6 +31,7 @@ public class SalesflareComponentHandler extends AbstractSalesflareComponentHandl
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/salesflare.svg");
+            .icon("path:assets/salesflare.svg")
+            .categories(ComponentCategory.CRM);
     }
 }

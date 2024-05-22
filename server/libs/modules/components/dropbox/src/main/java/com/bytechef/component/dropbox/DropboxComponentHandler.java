@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DROPBOX;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.dropbox.action.DropboxCopyAction;
 import com.bytechef.component.dropbox.action.DropboxCreateNewFolderAction;
@@ -45,6 +46,7 @@ public class DropboxComponentHandler implements ComponentHandler {
             "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, " +
                 "and client software.")
         .icon("path:assets/dropbox.svg")
+        .categories(ComponentCategory.FILE_STORAGE)
         .connection(DropboxConnection.CONNECTION_DEFINITION)
         .actions(
             DropboxCopyAction.ACTION_DEFINITION,

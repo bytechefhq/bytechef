@@ -26,6 +26,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.active.campaign.util.ActiveCampaignUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
@@ -49,7 +50,8 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/active-campaign.svg");
+            .icon("path:assets/active-campaign.svg")
+            .categories(ComponentCategory.CRM, ComponentCategory.MARKETING_AUTOMATION);
     }
 
     @Override

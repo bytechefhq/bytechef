@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
@@ -47,7 +48,8 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/mailchimp.svg");
+            .icon("path:assets/mailchimp.svg")
+            .categories(ComponentCategory.MARKETING_AUTOMATION);
     }
 
     @Override

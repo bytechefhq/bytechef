@@ -23,6 +23,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
@@ -50,6 +51,7 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/airtable.svg")
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
             .dataStreamItemReader(new DataStreamItemReader() {});
     }
 

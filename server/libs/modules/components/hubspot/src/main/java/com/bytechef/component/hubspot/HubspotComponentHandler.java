@@ -17,6 +17,7 @@
 package com.bytechef.component.hubspot;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.hubspot.trigger.HubspotSubscribeTrigger;
@@ -38,6 +39,7 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/hubspot.svg");
+            .icon("path:assets/hubspot.svg")
+            .categories(ComponentCategory.MARKETING_AUTOMATION);
     }
 }

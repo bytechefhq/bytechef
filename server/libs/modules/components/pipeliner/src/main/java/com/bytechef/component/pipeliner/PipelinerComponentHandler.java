@@ -27,6 +27,7 @@ import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SPACE
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
@@ -48,7 +49,8 @@ public class PipelinerComponentHandler extends AbstractPipelinerComponentHandler
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/pipeliner.svg");
+            .icon("path:assets/pipeliner.svg")
+            .categories(ComponentCategory.CRM);
     }
 
     @Override

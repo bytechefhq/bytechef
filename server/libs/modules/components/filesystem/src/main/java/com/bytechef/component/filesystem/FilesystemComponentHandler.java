@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILESYSTEM;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.filesystem.action.FilesystemCreateTempDirAction;
 import com.bytechef.component.filesystem.action.FilesystemGetFilePathAction;
@@ -40,6 +41,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
         .title("Filesystem")
         .description("Allows multiple operations over files on the filesystem.")
         .icon("path:assets/filesystem.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             FilesystemReadFileAction.ACTION_DEFINITION,
             FilesystemWriteFileAction.ACTION_DEFINITION,

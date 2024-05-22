@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.MICROSOFT_TEAMS;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsCreateChannelAction;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendChannelMessageAction;
@@ -39,6 +40,7 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
             "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, " +
                 "and application integration.")
         .icon("path:assets/microsoft-teams.svg")
+        .categories(ComponentCategory.COMMUNICATION)
         .connection(MicrosoftTeamsConnection.CONNECTION_DEFINITION)
         .actions(
             MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION,

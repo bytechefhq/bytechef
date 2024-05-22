@@ -18,6 +18,7 @@ package com.bytechef.component.keap;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
@@ -37,7 +38,8 @@ public class KeapComponentHandler extends AbstractKeapComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/keap.svg");
+            .icon("path:assets/keap.svg")
+            .categories(ComponentCategory.CRM);
     }
 
     @Override

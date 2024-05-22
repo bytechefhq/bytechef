@@ -19,6 +19,7 @@ package com.bytechef.component.webhook;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.webhook.constant.WebhookConstants;
 import com.bytechef.component.webhook.trigger.WebhookAutoRespondWithHTTP200Trigger;
@@ -37,6 +38,7 @@ public class WebhookComponentHandler implements ComponentHandler {
         .description(
             "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.")
         .icon("path:assets/webhook.svg")
+        .categories(ComponentCategory.HELPERS)
         .triggers(
             WebhookAutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
             WebhookValidateAndRespondTrigger.TRIGGER_DEFINITION,

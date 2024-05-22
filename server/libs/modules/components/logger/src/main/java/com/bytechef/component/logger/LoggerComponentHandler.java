@@ -19,6 +19,7 @@ package com.bytechef.component.logger;
 import static com.bytechef.component.logger.constant.LoggerConstants.LOGGER;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.logger.action.LoggerDebugAction;
@@ -37,6 +38,7 @@ public class LoggerComponentHandler implements ComponentHandler {
         .title("Logger")
         .description("Logs a value to the system log.")
         .icon("path:assets/logger.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(LoggerDebugAction.ACTION_DEFINITION, LoggerErrorAction.ACTION_DEFINITION,
             LoggerInfoAction.ACTION_DEFINITION,
             LoggerWarnAction.ACTION_DEFINITION);

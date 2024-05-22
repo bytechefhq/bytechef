@@ -21,6 +21,7 @@ import static com.bytechef.component.github.connection.GithubConnection.CONNECTI
 import static com.bytechef.component.github.constant.GithubConstants.GITHUB;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubCreateIssueCommentAction;
@@ -36,6 +37,7 @@ public class GithubComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GITHUB)
         .title("Github")
         .description("Developer platform that allows developers to create, store, manage and share their code")
+        .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GithubCreateIssueAction.ACTION_DEFINITION,

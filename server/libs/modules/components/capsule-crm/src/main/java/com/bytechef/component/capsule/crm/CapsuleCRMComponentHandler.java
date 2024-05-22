@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.capsule.crm.action.CapsuleCRMCreateContactAction;
 import com.bytechef.component.capsule.crm.action.CapsuleCRMCreateTaskAction;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class CapsuleCRMComponentHandler implements ComponentHandler {
                 "manage contacts, track sales opportunities, and collaborate with their teams efficiently.")
         .icon("path:assets/capsule-crm.svg")
         .connection(CONNECTION_DEFINITION)
+        .categories(ComponentCategory.CRM)
         .actions(
             CapsuleCRMCreateContactAction.ACTION_DEFINITION,
             CapsuleCRMCreateTaskAction.ACTION_DEFINITION);

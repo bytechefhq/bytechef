@@ -19,6 +19,7 @@ package com.bytechef.component.http.client;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.http.client.action.HttpClientDeleteAction;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
@@ -40,6 +41,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
         .title("HTTP Client")
         .description("Makes an HTTP request and returns the response data.")
         .icon("path:assets/http-client.svg")
+        .categories(ComponentCategory.HELPERS)
         .connection(HttpClientConnection.CONNECTION_DEFINITION)
         .actions(
             HttpClientGetAction.ACTION_DEFINITION,

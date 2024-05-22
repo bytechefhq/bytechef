@@ -28,6 +28,7 @@ import com.bytechef.component.data.storage.action.DataStorageGetAllEntriesAction
 import com.bytechef.component.data.storage.action.DataStorageGetValueAction;
 import com.bytechef.component.data.storage.action.DataStorageSetValueAction;
 import com.bytechef.component.data.storage.action.DataStorageSetValueInListAction;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -42,6 +43,7 @@ public class DataStorageComponentHandler implements ComponentHandler {
         .description(
             "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.")
         .icon("path:assets/data-storage.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             DataStorageAppendValueToListAction.ACTION_DEFINITION,
             DataStorageAtomicIncrementAction.ACTION_DEFINITION,

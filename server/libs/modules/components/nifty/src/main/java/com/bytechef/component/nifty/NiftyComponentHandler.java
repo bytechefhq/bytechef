@@ -21,6 +21,7 @@ import static com.bytechef.component.nifty.connection.NiftyConnection.CONNECTION
 import static com.bytechef.component.nifty.constant.NiftyConstants.NIFTY;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.nifty.action.NiftyCreateTaskAction;
 import com.google.auto.service.AutoService;
@@ -36,6 +37,7 @@ public class NiftyComponentHandler implements ComponentHandler {
         .description(
             "Nifty Project Management tool is a software designed to aid project managers in organizing, planning, " +
                 "and tracking tasks and resources within a project")
+        .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(CONNECTION_DEFINITION)
         .actions(NiftyCreateTaskAction.ACTION_DEFINITION)
         .icon("path:assets/nifty.svg");

@@ -26,6 +26,7 @@ import com.bytechef.component.data.mapper.action.DataMapperMapObjectsAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToListAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapOneValueAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapValuesAction;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class DataMapperComponentHandler implements ComponentHandler {
         .title("Data Mapper")
         .description("The Data Mapper enables you to configure data mappings.")
         .icon("path:assets/data-mapper.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             DataMapperMapKeysAction.ACTION_DEFINITION,
             DataMapperMapListToObjectAction.ACTION_DEFINITION,

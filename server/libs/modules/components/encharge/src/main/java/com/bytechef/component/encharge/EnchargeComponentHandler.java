@@ -20,6 +20,7 @@ import static com.bytechef.component.encharge.constant.EnchargeConstants.EMAIL;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
@@ -43,7 +44,8 @@ public class EnchargeComponentHandler extends AbstractEnchargeComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/encharge.svg");
+            .icon("path:assets/encharge.svg")
+            .categories(ComponentCategory.MARKETING_AUTOMATION);
     }
 
     @Override
