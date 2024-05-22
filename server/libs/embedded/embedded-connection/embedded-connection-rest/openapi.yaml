@@ -1,0 +1,175 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Project Connection API"
+  version: "1"
+servers:
+- url: "/api/embedded"
+tags:
+- name: "connection-tag"
+  description: "The Embedded Connection Tag API"
+- name: "connection"
+  description: "The Embedded Connection API"
+paths:
+  /connections:
+    get:
+      description: "Get all connections."
+      summary: "Get all connections"
+      tags:
+      - "connection"
+      operationId: "getConnections"
+      parameters:
+      - name: "componentName"
+        description: "The component name used for filtering connections."
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+      - name: "connectionVersion"
+        description: "The connection version."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "tagId"
+        description: "The tag id of used for filtering connections."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "A list of connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+    post:
+      description: "Create a new connection."
+      summary: "Create a new connection"
+      tags:
+      - "connection"
+      operationId: "createConnection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+  /connections/tags:
+    get:
+      description: "Get connection tags."
+      summary: "Get connection tags"
+      tags:
+      - "connection-tag"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "A list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Tag"
+  /connections/{id}:
+    delete:
+      description: "Delete a connection."
+      summary: "Delete a connection"
+      tags:
+        - "connection"
+      operationId: "deleteConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get a connection by id."
+      summary: "Get a connection by id"
+      tags:
+        - "connection"
+      operationId: "getConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+    put:
+      description: "Update an existing connection."
+      summary: "Update an existing connection"
+      tags:
+        - "connection"
+      operationId: "updateConnection"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The updated connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+  /connections/{id}/tags:
+    put:
+      description: "Updates tags of an existing connection."
+      summary: "Updates tags of an existing connection"
+      tags:
+        - "connection-tag"
+      operationId: "updateConnectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of the connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
