@@ -20,7 +20,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.platform.constant.Type;
 import java.util.Objects;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -29,7 +28,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("instance_job")
-public class InstanceJob implements Persistable<Long> {
+public class InstanceJob {
 
     @Id
     private Long id;
@@ -72,7 +71,6 @@ public class InstanceJob implements Persistable<Long> {
         return getClass().hashCode();
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -87,11 +85,6 @@ public class InstanceJob implements Persistable<Long> {
 
     public Type getType() {
         return Type.values()[type];
-    }
-
-    @Override
-    public boolean isNew() {
-        return id == null;
     }
 
     @Override
