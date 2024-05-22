@@ -6,6 +6,7 @@ import useOAuth2, {CodePayloadI, TokenPayloadI} from './oauth2/useOAuth2';
 interface OAuth2ButtonProps {
     authorizationUrl: string;
     clientId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extraQueryParameters?: Record<string, any>;
     redirectUri: string;
     responseType: 'code' | 'token';
@@ -19,7 +20,7 @@ interface OAuth2ButtonProps {
 const OAuth2Button = ({
     authorizationUrl,
     clientId,
-                          extraQueryParameters,
+    extraQueryParameters,
     onClick,
     onCodeSuccess,
     onError,

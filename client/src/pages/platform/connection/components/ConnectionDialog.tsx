@@ -719,7 +719,9 @@ const ConnectionDialog = ({
                                             <OAuth2Button
                                                 authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                                                 clientId={oAuth2AuthorizationParameters.clientId}
-                                                extraQueryParameters={oAuth2AuthorizationParameters?.extraQueryParameters}
+                                                extraQueryParameters={
+                                                    oAuth2AuthorizationParameters?.extraQueryParameters
+                                                }
                                                 onClick={(getAuth: () => void) => {
                                                     getAuth();
                                                 }}

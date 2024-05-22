@@ -103,7 +103,7 @@ const useOAuth2 = (props: Oauth2Props) => {
     const {
         authorizationUrl,
         clientId,
-        extraQueryParameters ,
+        extraQueryParameters,
         onCodeSuccess,
         onError,
         onTokenSuccess,
