@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Microsoft Outlook 365",
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -82,17 +81,18 @@
       "refreshOn": null,
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
-      "apply": null,
+      "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": { },
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "acquire": null
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -135,7 +135,6 @@
     } ],
     "title": "Get Mail",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -351,7 +350,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -447,7 +447,6 @@
     } ],
     "title": "Search Email",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -663,7 +662,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1268,7 +1268,8 @@
     } ],
     "title": "Send Email",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
-  } ]
+    "output": null,
+    "perform": { }
+  } ],
+  "triggers": null
 }

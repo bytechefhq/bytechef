@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "XLSX File",
-  "triggers": null,
   "connection": null,
   "actions": [ {
     "batch": null,
@@ -252,8 +251,8 @@
     } ],
     "title": "Read from file",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -498,6 +497,7 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -597,7 +597,7 @@
         "controlType": "FILE_ENTRY"
       },
       "sampleOutput": null
-    },
-    "perform": { }
-  } ]
+    }
+  } ],
+  "triggers": null
 }

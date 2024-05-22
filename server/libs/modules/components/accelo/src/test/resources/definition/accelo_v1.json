@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Accelo",
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -82,17 +81,18 @@
       "refreshOn": null,
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
-      "apply": null,
-      "authorizationCallback": null,
+      "acquire": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "acquire": null
+      "authorizationCallback": null
     } ],
     "properties": null,
     "version": 1,
@@ -192,7 +192,6 @@
     } ],
     "title": "Create company",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -269,8 +268,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -349,14 +348,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -492,7 +492,6 @@
     } ],
     "title": "Create contact",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -609,8 +608,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -689,14 +688,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -792,12 +792,11 @@
       "label": "Start date",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     } ],
     "title": "Create task",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -874,8 +873,8 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -954,13 +953,15 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    }
-  } ]
+    },
+    "perform": { }
+  } ],
+  "triggers": null
 }

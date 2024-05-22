@@ -64,6 +64,7 @@
       "acquire": null,
       "authorizationUrl": { },
       "clientSecret": null,
+      "refreshToken": null,
       "apply": { },
       "clientId": null,
       "pkce": null,

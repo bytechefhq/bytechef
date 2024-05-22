@@ -377,13 +377,19 @@
       } ],
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": null,
     "title": "Every day",
     "type": "LISTENER",
     "webhookRawBody": null,
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -674,14 +680,8 @@
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "poll": null,
     "webhookValidate": null
   }, {
     "batch": null,
@@ -905,13 +905,19 @@
       } ],
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": null,
     "title": "Every week",
     "type": "LISTENER",
     "webhookRawBody": null,
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1033,14 +1039,8 @@
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "poll": null,
     "webhookValidate": null
   }, {
     "batch": null,
@@ -1236,13 +1236,19 @@
       } ],
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": null,
     "title": "Every month",
     "type": "LISTENER",
     "webhookRawBody": null,
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1364,14 +1370,8 @@
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "poll": null,
     "webhookValidate": null
   }, {
     "batch": null,
@@ -1436,13 +1436,19 @@
       "controlType": "SELECT",
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": null,
     "title": "Interval",
     "type": "LISTENER",
     "webhookRawBody": null,
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1525,14 +1531,8 @@
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "poll": null,
     "webhookValidate": null
   }, {
     "batch": null,
@@ -1691,13 +1691,19 @@
       } ],
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": null,
     "title": "Cron",
     "type": "LISTENER",
     "webhookRawBody": null,
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "staticWebhookRequest": null,
+    "deduplicate": null,
+    "poll": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1782,14 +1788,8 @@
       },
       "sampleOutput": null
     },
-    "deduplicate": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "poll": null,
     "webhookValidate": null
   } ]
 }

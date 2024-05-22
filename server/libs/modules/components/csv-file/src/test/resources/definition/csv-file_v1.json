@@ -13,7 +13,6 @@
   "version": 1,
   "title": "CSV File",
   "connection": null,
-  "triggers": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -511,5 +510,6 @@
       "sampleOutput": null
     },
     "perform": { }
-  } ]
+  } ],
+  "triggers": null
 }

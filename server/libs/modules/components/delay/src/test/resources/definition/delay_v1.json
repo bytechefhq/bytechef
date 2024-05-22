@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Delay",
-  "triggers": null,
   "connection": null,
   "actions": [ {
     "batch": null,
@@ -40,12 +39,13 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Sleep",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
-  } ]
+    "output": null,
+    "perform": { }
+  } ],
+  "triggers": null
 }

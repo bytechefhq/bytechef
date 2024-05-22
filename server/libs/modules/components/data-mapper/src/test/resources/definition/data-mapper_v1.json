@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Data Mapper",
-  "triggers": null,
   "connection": null,
   "actions": [ {
     "batch": null,
@@ -127,8 +126,8 @@
     } ],
     "title": "Map Keys",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -202,8 +201,8 @@
     } ],
     "title": "Map list to object",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -337,8 +336,8 @@
     } ],
     "title": "Map multiple values between objects\n",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -613,8 +612,8 @@
     } ],
     "title": "Map objects",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -735,8 +734,8 @@
     } ],
     "title": "Map objects to list",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1809,8 +1808,8 @@
     } ],
     "title": "Map one value",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -2316,7 +2315,8 @@
     } ],
     "title": "Map values",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
-  } ]
+    "perform": { },
+    "output": null
+  } ],
+  "triggers": null
 }

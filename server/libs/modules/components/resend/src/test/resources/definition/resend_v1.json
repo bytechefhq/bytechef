@@ -44,6 +44,7 @@
       "acquire": null,
       "authorizationUrl": null,
       "clientSecret": null,
+      "refreshToken": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -580,6 +581,7 @@
     } ],
     "title": "Send Email",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -623,8 +625,7 @@
         "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "triggers": null
 }

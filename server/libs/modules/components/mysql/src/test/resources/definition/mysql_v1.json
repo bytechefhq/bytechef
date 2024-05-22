@@ -119,7 +119,6 @@
     "baseUri": null,
     "test": null
   },
-  "triggers": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -255,8 +254,8 @@
     } ],
     "title": "Query",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -583,8 +582,8 @@
     } ],
     "title": "Insert",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -931,8 +930,8 @@
     } ],
     "title": "Update",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1238,8 +1237,8 @@
     } ],
     "title": "Delete",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1608,7 +1607,8 @@
     } ],
     "title": "Execute",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
-  } ]
+    "perform": { },
+    "output": null
+  } ],
+  "triggers": null
 }
