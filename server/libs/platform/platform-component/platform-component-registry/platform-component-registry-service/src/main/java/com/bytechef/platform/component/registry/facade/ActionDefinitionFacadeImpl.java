@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
@@ -169,12 +168,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         Authorization.RefreshTokenResponse refreshTokenResponse =
             connectionDefinitionService.executeRefresh(componentName, componentConnection, actionContext);
 
-        Map<String, ?> refreshTokenResponseResult = refreshTokenResponse.result();
-
-        String accessToken = MapUtils.getRequiredString(refreshTokenResponseResult, "access_token");
-
         Connection connection = connectionService.updateConnectionParameter(
-            connectionId, "access_token", accessToken);
+            connectionId, "access_token", Objects.requireNonNull(refreshTokenResponse.accessToken()));
 
         return new ComponentConnection(
             componentName, connection.getVersion(), connection.getParameters(), connection.getAuthorizationName());

@@ -796,6 +796,14 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableAuthorization refreshTokenFunction(RefreshTokenFunction refreshTokenFunction) {
+            if (refreshTokenFunction != null) {
+                this.refreshTokenFunction = refreshTokenFunction;
+            }
+
+            return this;
+        }
+
         public ModifiableAuthorization pkce(PkceFunction pkce) {
             this.pkceFunction = Objects.requireNonNull(pkce);
 
