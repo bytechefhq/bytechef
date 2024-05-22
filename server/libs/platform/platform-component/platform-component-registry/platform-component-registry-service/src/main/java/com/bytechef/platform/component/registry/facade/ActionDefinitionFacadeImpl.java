@@ -123,7 +123,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull Type type,
-        Long instanceId, String workflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
+        Long instanceId, Long projectWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds) {
 
         Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);

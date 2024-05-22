@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.commons.util.MapUtils;
@@ -85,8 +86,12 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
+        ProjectInstanceWorkflow projectInstanceWorkflow =
+            this.projectInstanceWorkflowService.getProjectInstanceWorkflow(projectInstanceId, job.getWorkflowId());
+
         taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
+        taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, projectInstanceWorkflow.getId());
 
         return taskExecution;
     }
