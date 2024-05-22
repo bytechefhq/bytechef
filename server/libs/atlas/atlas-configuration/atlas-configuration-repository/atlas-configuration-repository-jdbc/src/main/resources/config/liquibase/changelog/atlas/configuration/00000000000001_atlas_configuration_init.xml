@@ -3,12 +3,15 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="202308070817" author="Ivica Cardic">
-        <createTable tableName="tag">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="workflow">
+            <column name="id" type="VARCHAR(256)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="VARCHAR(256)">
+            <column name="definition" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="format" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="TIMESTAMP">
@@ -27,7 +30,5 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-
-        <addUniqueConstraint constraintName="uk_tag_name" tableName="tag" columnNames="name" />
     </changeSet>
 </databaseChangeLog>

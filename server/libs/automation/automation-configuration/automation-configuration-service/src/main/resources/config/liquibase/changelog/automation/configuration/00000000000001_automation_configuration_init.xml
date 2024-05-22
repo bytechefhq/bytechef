@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="202308070817" author="Ivica Cardic">
+    <changeSet id="00000000000001" author="Ivica Cardic">
         <createTable tableName="project">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
@@ -301,7 +301,7 @@
         </insert>
     </changeSet>
 
-    <changeSet id="202308070818" author="Ivica Cardic" contextFilter="mono">
+    <changeSet id="00000000000001-1" author="Ivica Cardic" contextFilter="mono">
         <addForeignKeyConstraint
             baseTableName="project_instance_workflow_connection"
             baseColumnNames="connection_id"

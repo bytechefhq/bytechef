@@ -3,16 +3,16 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="202308070817" author="Ivica Cardic">
-        <createTable tableName="category">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="workspace_connection">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="VARCHAR(256)">
+            <column name="workspace_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="TEXT">
-                <constraints nullable="true"/>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
@@ -30,7 +30,14 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
 
-        <addUniqueConstraint constraintName="uk_category_name" tableName="category" columnNames="name" />
+    <changeSet id="20230807081736-1" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseTableName="workspace_connection"
+            baseColumnNames="connection_id"
+            constraintName="workspace_connection_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"/>
     </changeSet>
 </databaseChangeLog>

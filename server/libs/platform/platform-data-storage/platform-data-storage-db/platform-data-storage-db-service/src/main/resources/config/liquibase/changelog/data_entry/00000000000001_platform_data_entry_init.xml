@@ -3,15 +3,30 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-    <changeSet id="202308070817" author="Ivica Cardic">
-        <createTable tableName="workspace_connection">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="data_entry">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="workspace_id" type="BIGINT">
+            <column name="component_name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
-            <column name="connection_id" type="BIGINT">
+            <column name="action_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scope" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scope_id" type="VARCHAR(256)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="key" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="TIMESTAMP">
@@ -30,14 +45,7 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-    </changeSet>
 
-    <changeSet id="202308070818" author="Ivica Cardic" contextFilter="mono">
-        <addForeignKeyConstraint
-            baseTableName="workspace_connection"
-            baseColumnNames="connection_id"
-            constraintName="workspace_connection_connection"
-            referencedTableName="connection"
-            referencedColumnNames="id"/>
+        <addUniqueConstraint constraintName="uk_data_entry_key" tableName="data_entry" columnNames="key, scope" />
     </changeSet>
 </databaseChangeLog>
