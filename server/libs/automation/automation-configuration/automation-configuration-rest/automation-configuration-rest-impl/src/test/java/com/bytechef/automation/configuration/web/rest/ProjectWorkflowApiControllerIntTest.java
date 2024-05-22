@@ -21,10 +21,12 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
@@ -85,6 +87,9 @@ public class ProjectWorkflowApiControllerIntTest {
 
     @MockBean
     private WorkflowConnectionFacade workflowConnectionFacade;
+
+    @MockBean
+    private WorkspaceService workspaceService;
 
     @BeforeEach
     public void setup() {
@@ -161,6 +166,6 @@ public class ProjectWorkflowApiControllerIntTest {
         return new WorkflowDTO(
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), List.of(), null)), List.of()),
-            0);
+            new ProjectWorkflow(1));
     }
 }

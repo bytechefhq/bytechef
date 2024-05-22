@@ -39,13 +39,21 @@ public final class ProjectWorkflow {
     @Column("workflow_id")
     private String workflowId;
 
+    @Column("workflow_reference_code")
+    private String workflowReferenceCode;
+
     public ProjectWorkflow() {
     }
 
-    public ProjectWorkflow(long projectId, int projectVersion, String workflowId) {
+    public ProjectWorkflow(long id) {
+        this.id = id;
+    }
+
+    public ProjectWorkflow(long projectId, int projectVersion, String workflowId, String workflowReferenceCode) {
         this.projectId = projectId;
         this.projectVersion = projectVersion;
         this.workflowId = workflowId;
+        this.workflowReferenceCode = workflowReferenceCode;
     }
 
     @Override
@@ -84,12 +92,20 @@ public final class ProjectWorkflow {
         return workflowId;
     }
 
+    public String getWorkflowReferenceCode() {
+        return workflowReferenceCode;
+    }
+
     public void setProjectVersion(int projectVersion) {
         this.projectVersion = projectVersion;
     }
 
     public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
+    }
+
+    public void setWorkflowReferenceCode(String workflowReferenceCode) {
+        this.workflowReferenceCode = workflowReferenceCode;
     }
 
     @Override
@@ -99,6 +115,7 @@ public final class ProjectWorkflow {
             ", projectId=" + projectId +
             ", projectVersion=" + projectVersion +
             ", workflowId='" + workflowId + '\'' +
+            ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
             '}';
     }
 }

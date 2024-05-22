@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.instance.accessor;
+package com.bytechef.platform.configuration.web.rest.model;
 
-import com.bytechef.platform.constant.Type;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceAccessor {
+public interface WorkflowModelAware {
 
-    boolean isConnectionUsed(long connectionId);
+    void setInputsCount(Integer inputsCount);
 
-    boolean isWorkflowEnabled(long instanceId, String workflowReferenceCode);
+    void setConnectionsCount(Integer connectionsCount);
 
-    Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode);
+//    void setManualTrigger(Boolean manual);
 
-    Type getType();
+    void setWorkflowTaskComponentNames(List<String> workflowTaskComponentNames);
 
-    String getWorkflowId(long instanceId, String workflowReferenceCode);
+    void setWorkflowTriggerComponentNames(List<String> workflowTriggerComponentNames);
 }

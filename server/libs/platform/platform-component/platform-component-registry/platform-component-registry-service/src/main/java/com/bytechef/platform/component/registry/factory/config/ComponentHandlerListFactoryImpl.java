@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest.model;
+package com.bytechef.platform.component.registry.factory.config;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowBasicModelAware {
+public record ComponentHandlerListFactoryImpl(List<? extends ComponentHandler> componentHandlers)
+    implements ComponentHandlerListFactory {
 
-    void setInputsCount(Integer inputsCount);
-
-    void setConnectionsCount(Integer connectionsCount);
-
-    void setManualTrigger(Boolean manual);
-
-    void setWorkflowTaskComponentNames(List<String> workflowTaskComponentNames);
-
-    void setWorkflowTriggerComponentNames(List<String> workflowTriggerComponentNames);
+    @Override
+    public List<? extends ComponentHandler> getComponentHandlers() {
+        return componentHandlers;
+    }
 }

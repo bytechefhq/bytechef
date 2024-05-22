@@ -39,19 +39,16 @@ public abstract class WorkflowMapper {
     public abstract static class WorkflowToWorkflowModelMapper implements Converter<Workflow, WorkflowModel> {
 
         @Override
+        @Mapping(target = "connectionsCount", ignore = true)
+        @Mapping(target = "inputsCount", ignore = true)
         @Mapping(target = "triggers", ignore = true)
+        @Mapping(target = "workflowTaskComponentNames", ignore = true)
+        @Mapping(target = "workflowTriggerComponentNames", ignore = true)
         public abstract WorkflowModel convert(Workflow workflow);
     }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public abstract static class WorkflowDTOToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
-
-        @Override
-        public abstract WorkflowModel convert(WorkflowDTO workflowDTO);
-    }
-
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public abstract static class WorkflowModelToWorkflowBasicModel implements Converter<Workflow, WorkflowBasicModel> {
 
         @Autowired
         private WorkflowConnectionFacade workflowConnectionFacade;
@@ -59,14 +56,20 @@ public abstract class WorkflowMapper {
         @Override
         @Mapping(target = "connectionsCount", ignore = true)
         @Mapping(target = "inputsCount", ignore = true)
-        @Mapping(target = "manualTrigger", ignore = true)
         @Mapping(target = "workflowTaskComponentNames", ignore = true)
         @Mapping(target = "workflowTriggerComponentNames", ignore = true)
-        public abstract WorkflowBasicModel convert(Workflow source);
+        public abstract WorkflowModel convert(WorkflowDTO workflowDTO);
 
         @AfterMapping
-        public void afterMapping(Workflow workflow, @MappingTarget WorkflowBasicModel workflowBasicModel) {
-            WorkflowMapperUtils.afterMapping(workflow, workflowBasicModel, workflowConnectionFacade);
+        public void afterMapping(Workflow workflow, @MappingTarget WorkflowModel workflowModel) {
+            WorkflowMapperUtils.afterMapping(workflow, workflowModel, workflowConnectionFacade);
         }
+    }
+
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public abstract static class WorkflowModelToWorkflowBasicModel implements Converter<Workflow, WorkflowBasicModel> {
+
+        @Override
+        public abstract WorkflowBasicModel convert(Workflow source);
     }
 }

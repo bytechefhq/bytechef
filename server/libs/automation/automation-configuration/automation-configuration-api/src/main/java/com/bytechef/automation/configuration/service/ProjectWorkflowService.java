@@ -26,9 +26,13 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId);
 
+    ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, String workflowReferenceCode);
+
     void deleteProjectWorkflows(List<Long> ids);
 
     ProjectWorkflow getProjectWorkflow(long id);
+
+    String getProjectWorkflowId(long projectInstanceId, String workflowReferenceCode);
 
     List<Long> getProjectWorkflowIds(long projectId, int projectVersion);
 

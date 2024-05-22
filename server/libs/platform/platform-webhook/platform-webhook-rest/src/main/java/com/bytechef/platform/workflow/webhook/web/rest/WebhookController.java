@@ -315,7 +315,7 @@ public class WebhookController {
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
@@ -357,7 +357,14 @@ public class WebhookController {
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.isWorkflowEnabled(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+            workflowExecutionId.getInstanceId(), getWorkflowId(workflowExecutionId));
+    }
+
+    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        return instanceAccessor.getWorkflowId(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private static List<String> toList(Enumeration<String> enumeration) {

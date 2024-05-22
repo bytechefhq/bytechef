@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
@@ -110,19 +109,19 @@ public class ProjectWorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    public ResponseEntity<List<WorkflowBasicModel>> getProjectWorkflows(Long id) {
+    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 projectFacade.getProjectWorkflows(id),
-                workflow -> conversionService.convert(workflow, WorkflowBasicModel.class)));
+                workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
     @Override
-    public ResponseEntity<List<WorkflowBasicModel>> getProjectVersionWorkflows(Long id, Integer projectVersion) {
+    public ResponseEntity<List<WorkflowModel>> getProjectVersionWorkflows(Long id, Integer projectVersion) {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 projectFacade.getProjectVersionWorkflows(id, projectVersion),
-                workflow -> conversionService.convert(workflow, WorkflowBasicModel.class)));
+                workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
     @Override

@@ -38,28 +38,27 @@ public abstract class ProjectWorkflowMapper {
     public abstract static class ProjectWorkflowDTOToWorkflowModelMapper
         implements Converter<WorkflowDTO, WorkflowModel> {
 
-        @Override
-        public abstract WorkflowModel convert(WorkflowDTO workflowDTO);
-    }
-
-    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
-    public abstract static class ProjectWorkflowModelToWorkflowBasicModel
-        implements Converter<WorkflowDTO, WorkflowBasicModel> {
-
         @Autowired
         private WorkflowConnectionFacade workflowConnectionFacade;
 
         @Override
         @Mapping(target = "connectionsCount", ignore = true)
         @Mapping(target = "inputsCount", ignore = true)
-        @Mapping(target = "manualTrigger", ignore = true)
         @Mapping(target = "workflowTaskComponentNames", ignore = true)
         @Mapping(target = "workflowTriggerComponentNames", ignore = true)
-        public abstract WorkflowBasicModel convert(WorkflowDTO workflowDTO);
+        public abstract WorkflowModel convert(WorkflowDTO workflowDTO);
 
         @AfterMapping
-        public void afterMapping(WorkflowDTO workflowDTO, @MappingTarget WorkflowBasicModel workflowBasicModel) {
-            WorkflowMapperUtils.afterMapping(workflowDTO.workflow(), workflowBasicModel, workflowConnectionFacade);
+        public void afterMapping(WorkflowDTO workflowDTO, @MappingTarget WorkflowModel workflowModel) {
+            WorkflowMapperUtils.afterMapping(workflowDTO.workflow(), workflowModel, workflowConnectionFacade);
         }
+    }
+
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+    public abstract static class ProjectWorkflowModelToWorkflowBasicModel
+        implements Converter<WorkflowDTO, WorkflowBasicModel> {
+
+        @Override
+        public abstract WorkflowBasicModel convert(WorkflowDTO workflowDTO);
     }
 }

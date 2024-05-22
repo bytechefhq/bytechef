@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.exception.ConfigurationException;
 import java.util.List;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +42,16 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
     @Override
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
+        return addWorkflow(projectId, projectVersion, workflowId, String.valueOf(UUID.randomUUID()));
+    }
+
+    @Override
+    public ProjectWorkflow addWorkflow(
+        long projectId, int projectVersion, String workflowId, String workflowReferenceCode) {
+
         Validate.notNull(workflowId, "'workflowId' must not be null");
 
-        ProjectWorkflow project = new ProjectWorkflow(projectId, projectVersion, workflowId);
+        ProjectWorkflow project = new ProjectWorkflow(projectId, projectVersion, workflowId, workflowReferenceCode);
 
         return projectWorkflowRepository.save(project);
     }
@@ -56,6 +64,14 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     @Override
     public ProjectWorkflow getProjectWorkflow(long id) {
         return OptionalUtils.get(projectWorkflowRepository.findById(id));
+    }
+
+    @Override
+    public String getProjectWorkflowId(long projectInstanceId, String workflowReferenceCode) {
+        return OptionalUtils.get(
+            projectWorkflowRepository
+                .findByProjectInstanceIdAndWorkflowReferenceCode(projectInstanceId, workflowReferenceCode)
+                .map(ProjectWorkflow::getWorkflowId));
     }
 
     @Override

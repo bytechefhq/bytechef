@@ -30,7 +30,9 @@ public interface ProjectInstanceWorkflowService {
 
     List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
-    void delete(Long id);
+    void delete(long id);
+
+    void deleteProjectInstanceWorkflows(long projectInstanceId);
 
     Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
         long projectInstanceOd, String workflowId, String workflowNodeName, String workflowConnectionKey);

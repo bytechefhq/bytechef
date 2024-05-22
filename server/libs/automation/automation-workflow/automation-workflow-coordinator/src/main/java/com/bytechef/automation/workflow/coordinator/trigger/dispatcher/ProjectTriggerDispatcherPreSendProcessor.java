@@ -17,6 +17,7 @@
 package com.bytechef.automation.workflow.coordinator.trigger.dispatcher;
 
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -33,19 +34,26 @@ import org.springframework.stereotype.Component;
 public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TriggerDispatcherPreSendProcessor {
 
+    private final ProjectWorkflowService projectWorkflowService;
+
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
-        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectWorkflowService projectWorkflowService) {
 
         super(projectInstanceWorkflowService);
+
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
     public TriggerExecution process(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
+        String workflowId = projectWorkflowService.getProjectWorkflowId(
+            triggerExecution.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            workflowExecutionId.getInstanceId(), triggerExecution.getWorkflowId(), triggerExecution.getName());
+            workflowExecutionId.getInstanceId(), workflowId, triggerExecution.getName());
 
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);

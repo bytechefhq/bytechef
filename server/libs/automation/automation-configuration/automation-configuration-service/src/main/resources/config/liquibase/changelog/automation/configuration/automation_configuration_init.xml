@@ -159,6 +159,9 @@
             <column name="workflow_id" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
+            <column name="workflow_reference_code" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
             <column name="project_version" type="INT">
                 <constraints nullable="false"/>
             </column>

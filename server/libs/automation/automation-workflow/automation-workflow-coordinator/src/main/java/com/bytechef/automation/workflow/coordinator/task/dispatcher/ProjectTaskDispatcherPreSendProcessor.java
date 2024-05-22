@@ -66,7 +66,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, projectInstanceId);
         }
 
-        Map<String, Long> connectionIdMap;
+        Map<String, Long> connectionIdMap = Map.of();
         Map<String, Map<String, Long>> connectionIdsMap = MapUtils.getMap(
             job.getMetadata(), MetadataConstants.CONNECTION_IDS, new TypeReference<>() {}, Map.of());
 
@@ -75,11 +75,10 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             // directly coming from .../jobs POST endpoint
 
             connectionIdMap = connectionIdsMap.get(taskExecution.getName());
-        } else {
+        } else if (projectInstanceId != null) {
             // check if stored in workflow connections or defined in the workflow definition
 
-            connectionIdMap = getConnectionIdMap(
-                projectInstanceId, job.getWorkflowId(), taskExecution.getName());
+            connectionIdMap = getConnectionIdMap(projectInstanceId, job.getWorkflowId(), taskExecution.getName());
         }
 
         if (!connectionIdMap.isEmpty()) {

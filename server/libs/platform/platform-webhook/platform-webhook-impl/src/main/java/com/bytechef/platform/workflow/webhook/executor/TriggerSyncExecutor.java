@@ -74,10 +74,12 @@ public class TriggerSyncExecutor {
     }
 
     public TriggerOutput execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        String workflowId = getWorkflowId(workflowExecutionId);
+
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookRequest))
             .workflowExecutionId(workflowExecutionId)
-            .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+            .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
             .build();
 
         triggerExecution = triggerExecutionService.create(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
@@ -86,7 +88,7 @@ public class TriggerSyncExecutor {
 
         triggerExecution = preProcess(triggerExecution);
 
-        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId, workflowId);
 
         Map<String, Long> connectIdMap = MapUtils.getMap(
             triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
@@ -94,7 +96,7 @@ public class TriggerSyncExecutor {
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName(), workflowExecutionId.getType(),
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId(), null,
+            workflowExecutionId.getInstanceId(), workflowId, null,
             triggerExecution.getParameters(), triggerExecution.getState(),
             MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
             OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
@@ -116,15 +118,17 @@ public class TriggerSyncExecutor {
     }
 
     public boolean validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        String workflowId = getWorkflowId(workflowExecutionId);
+
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookRequest))
             .workflowExecutionId(workflowExecutionId)
-            .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
+            .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
             .build();
 
         triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
 
-        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId, workflowId);
 
         Map<String, Long> connectIdMap = MapUtils.getMap(
             triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
@@ -136,8 +140,8 @@ public class TriggerSyncExecutor {
             OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
     }
 
-    private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+    private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId, String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
@@ -148,11 +152,18 @@ public class TriggerSyncExecutor {
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.getInputMap(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
-    private WorkflowTrigger getWorkflowTrigger(WorkflowExecutionId workflowExecutionId) {
-        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        return instanceAccessor.getWorkflowId(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+    }
+
+    private WorkflowTrigger getWorkflowTrigger(WorkflowExecutionId workflowExecutionId, String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return CollectionUtils.getFirst(
             WorkflowTrigger.of(workflow),

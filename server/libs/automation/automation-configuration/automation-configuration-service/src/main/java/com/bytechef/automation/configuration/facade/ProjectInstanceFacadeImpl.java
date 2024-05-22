@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
@@ -142,8 +143,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         projectInstance = projectInstanceService.create(projectInstance);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
-            projectInstance, CollectionUtils.map(
+            projectInstance,
+            CollectionUtils.map(
                 projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
+
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+            projectInstanceDTO.projectId(), projectInstanceDTO.projectVersion());
 
         return new ProjectInstanceDTO(
             projectInstance,
@@ -152,32 +157,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
                     projectInstanceWorkflow, getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
                     getStaticWebhookUrl(
-                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()))),
+                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()),
+                    getWorkflowReferenceCode(
+                        projectInstanceWorkflow.getWorkflowId(), projectInstanceDTO.projectVersion(),
+                        projectWorkflows))),
             projectService.getProject(projectInstance.getProjectId()),
             getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), tags);
-    }
-
-    private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
-        ProjectInstance projectInstance, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
-
-        projectInstanceWorkflows = projectInstanceWorkflowService.create(
-            projectInstanceWorkflows
-                .stream()
-                .peek(projectInstanceWorkflow -> {
-                    if (projectInstanceWorkflow.isEnabled()) {
-                        List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections =
-                            projectInstanceWorkflow.getConnections();
-                        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
-
-                        validateConnections(projectInstanceWorkflowConnections, workflow);
-                        validateInputs(projectInstanceWorkflow.getInputs(), workflow);
-                    }
-
-                    projectInstanceWorkflow.setProjectInstanceId(Validate.notNull(projectInstance.getId(), "id"));
-                })
-                .toList());
-
-        return projectInstanceWorkflows;
     }
 
     @Override
@@ -267,6 +252,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     public ProjectInstanceDTO getProjectInstance(long id) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+            projectInstance.getProjectId(), projectInstance.getProjectVersion());
         List<String> workflowIds = projectWorkflowService.getWorkflowIds(
             projectInstance.getProjectId(), projectInstance.getProjectVersion());
 
@@ -280,7 +267,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     projectInstanceWorkflow,
                     getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
                     getStaticWebhookUrl(
-                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()))),
+                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()),
+                    getWorkflowReferenceCode(
+                        projectInstanceWorkflow.getWorkflowId(), projectInstance.getProjectVersion(),
+                        projectWorkflows))),
             projectService.getProject(projectInstance.getProjectId()),
             getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
             tagService.getTags(projectInstance.getTagIds()));
@@ -319,6 +309,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 List<String> workflowIds = projectWorkflowService.getWorkflowIds(
                     projectInstance.getProjectId(), projectInstance.getProjectVersion());
 
+                List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+                    projectInstance.getProjectId());
+
                 return new ProjectInstanceDTO(
                     projectInstance,
                     CollectionUtils.map(
@@ -332,7 +325,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                             getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
                             getStaticWebhookUrl(
                                 projectInstanceWorkflow.getProjectInstanceId(),
-                                projectInstanceWorkflow.getWorkflowId()))),
+                                projectInstanceWorkflow.getWorkflowId()),
+                            getWorkflowReferenceCode(
+                                projectInstanceWorkflow.getWorkflowId(), projectInstance.getProjectVersion(),
+                                projectWorkflows))),
                     project, getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
                     filterTags(tags, projectInstance));
             });
@@ -340,26 +336,31 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceDTO
-            .projectInstanceWorkflows()
-            .stream()
-            .map(ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow)
-            .peek(this::validateInputs)
-            .toList();
+        ProjectInstance projectInstance = projectInstanceService.update(projectInstanceDTO.toProjectInstance());
 
-        projectInstanceWorkflows = projectInstanceWorkflowService.update(projectInstanceWorkflows);
+        projectInstanceWorkflowService.deleteProjectInstanceWorkflows(projectInstance.getId());
 
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
+            projectInstance,
+            CollectionUtils.map(
+                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
+
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+            projectInstanceDTO.projectId(), projectInstanceDTO.projectVersion());
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
 
         return new ProjectInstanceDTO(
-            projectInstanceService.update(projectInstanceDTO.toProjectInstance()),
+            projectInstance,
             CollectionUtils.map(
                 projectInstanceWorkflows,
                 projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
                     projectInstanceWorkflow,
                     getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
                     getStaticWebhookUrl(
-                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()))),
+                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()),
+                    getWorkflowReferenceCode(
+                        projectInstanceWorkflow.getWorkflowId(), projectInstanceDTO.projectVersion(),
+                        projectWorkflows))),
             projectService.getProject(projectInstanceDTO.projectId()),
             getProjectInstanceLastExecutionDate(projectInstanceDTO.id()), tags);
     }
@@ -374,6 +375,28 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         validateInputs(projectInstanceWorkflow);
 
         return projectInstanceWorkflowService.update(projectInstanceWorkflow);
+    }
+
+    private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
+        ProjectInstance projectInstance, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+
+        projectInstanceWorkflows = projectInstanceWorkflowService.create(
+            projectInstanceWorkflows.stream()
+                .peek(projectInstanceWorkflow -> {
+                    if (projectInstanceWorkflow.isEnabled()) {
+                        List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections =
+                            projectInstanceWorkflow.getConnections();
+                        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+                        validateConnections(projectInstanceWorkflowConnections, workflow);
+                        validateInputs(projectInstanceWorkflow.getInputs(), workflow);
+                    }
+
+                    projectInstanceWorkflow.setProjectInstanceId(Validate.notNull(projectInstance.getId(), "id"));
+                })
+                .toList());
+
+        return projectInstanceWorkflows;
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -392,9 +415,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                Type.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(),
-                workflowTrigger.getName());
+                Type.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
+                projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
@@ -411,9 +436,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                Type.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(),
-                workflowTrigger.getName());
+                Type.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
+                projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
@@ -482,9 +509,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
                 !Objects.equals(triggerDefinition.getName(), "manual")) {
 
+                ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        Type.AUTOMATION, projectInstanceId, workflow.getId(), workflowTrigger.getName()));
+                        Type.AUTOMATION, projectInstanceId, projectWorkflow.getWorkflowReferenceCode(),
+                        workflowTrigger.getName()));
             }
         }
 
@@ -509,6 +539,17 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             jobService.fetchLastWorkflowJob(workflowId),
             Job::getEndDate,
             null);
+    }
+
+    private String getWorkflowReferenceCode(
+        String workflowId, int projectVersion, List<ProjectWorkflow> projectWorkflows) {
+
+        return projectWorkflows.stream()
+            .filter(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId) &&
+                projectWorkflow.getProjectVersion() == projectVersion)
+            .findFirst()
+            .map(ProjectWorkflow::getWorkflowReferenceCode)
+            .orElseThrow();
     }
 
     private void validateConnections(

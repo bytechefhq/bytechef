@@ -363,11 +363,6 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
         return workflowExecutionId;
     }
 
-    @JsonIgnore
-    public String getWorkflowId() {
-        return workflowExecutionId.getWorkflowId();
-    }
-
     public WorkflowTrigger getWorkflowTrigger() {
         return workflowTrigger;
     }

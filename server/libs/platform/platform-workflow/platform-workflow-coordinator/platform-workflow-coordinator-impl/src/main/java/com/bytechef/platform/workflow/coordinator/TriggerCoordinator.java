@@ -218,7 +218,7 @@ public class TriggerCoordinator {
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
                 instanceAccessor.getInputMap(
-                    workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())));
+                    workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
 
@@ -244,11 +244,17 @@ public class TriggerCoordinator {
     }
 
     private WorkflowTrigger getWorkflowTrigger(WorkflowExecutionId workflowExecutionId) {
-        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
 
         return CollectionUtils.getFirst(
             WorkflowTrigger.of(workflow),
             workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getTriggerName()));
     }
 
+    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        return instanceAccessor.getWorkflowId(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+    }
 }

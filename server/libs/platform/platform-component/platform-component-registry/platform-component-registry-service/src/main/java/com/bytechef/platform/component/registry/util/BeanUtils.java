@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.instance.accessor;
-
-import com.bytechef.platform.constant.Type;
-import java.util.Map;
+package com.bytechef.platform.component.registry.util;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceAccessor {
+public class BeanUtils {
 
-    boolean isConnectionUsed(long connectionId);
-
-    boolean isWorkflowEnabled(long instanceId, String workflowReferenceCode);
-
-    Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode);
-
-    Type getType();
-
-    String getWorkflowId(long instanceId, String workflowReferenceCode);
+    public static String getBeanName(String componentName, int componentVersion, String componentOperationName) {
+        return componentName + '/' + "v" + componentVersion + '/' + componentOperationName;
+    }
 }

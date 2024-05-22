@@ -28,24 +28,24 @@ public class WorkflowExecutionId implements Serializable {
 
     private long instanceId;
     private Type type;
-    private String workflowId;
+    private String workflowReferenceCode;
     private String triggerName;
 
     private WorkflowExecutionId() {
     }
 
-    private WorkflowExecutionId(Type type, long instanceId, String workflowId, String triggerName) {
+    private WorkflowExecutionId(Type type, long instanceId, String workflowReferenceCode, String triggerName) {
         this.instanceId = instanceId;
         this.triggerName = triggerName;
         this.type = type;
-        this.workflowId = workflowId;
+        this.workflowReferenceCode = workflowReferenceCode;
     }
 
-    public static WorkflowExecutionId of(Type type, long instanceId, String workflowId, String triggerName) {
-        Validate.notBlank(workflowId, "'workflowId' must not be null");
+    public static WorkflowExecutionId of(Type type, long instanceId, String workflowReferenceCode, String triggerName) {
+        Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
-        return new WorkflowExecutionId(type, instanceId, workflowId, triggerName);
+        return new WorkflowExecutionId(type, instanceId, workflowReferenceCode, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -64,8 +64,8 @@ public class WorkflowExecutionId implements Serializable {
         return type;
     }
 
-    public String getWorkflowId() {
-        return workflowId;
+    public String getWorkflowReferenceCode() {
+        return workflowReferenceCode;
     }
 
     public String getTriggerName() {
@@ -79,7 +79,7 @@ public class WorkflowExecutionId implements Serializable {
                 ":" +
                 instanceId +
                 ":" +
-                workflowId +
+                workflowReferenceCode +
                 ":" +
                 triggerName);
     }

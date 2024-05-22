@@ -287,18 +287,23 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public boolean isWorkflowEnabled(long instanceId, String workflowId) {
+                public boolean isWorkflowEnabled(long instanceId, String workflowReferenceCode) {
                     return false;
                 }
 
                 @Override
-                public Map<String, ?> getInputMap(long instanceId, String workflowId) {
+                public Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode) {
                     return Map.of();
                 }
 
                 @Override
                 public Type getType() {
                     return Type.AUTOMATION;
+                }
+
+                @Override
+                public String getWorkflowId(long instanceId, String workflowReferenceCode) {
+                    return "";
                 }
             };
         }

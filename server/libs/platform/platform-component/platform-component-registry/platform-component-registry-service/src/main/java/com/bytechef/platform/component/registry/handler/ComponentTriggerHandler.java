@@ -23,6 +23,8 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.trigger.exception.TriggerExecutionException;
@@ -37,16 +39,18 @@ public class ComponentTriggerHandler implements TriggerHandler {
 
     private final String componentName;
     private final int componentVersion;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final String triggerName;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
 
     @SuppressFBWarnings("EI")
     public ComponentTriggerHandler(
         String componentName, int componentVersion, String triggerName,
-        TriggerDefinitionFacade triggerDefinitionFacade) {
+        InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerName = triggerName;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
     }
@@ -61,13 +65,19 @@ public class ComponentTriggerHandler implements TriggerHandler {
         try {
             return triggerDefinitionFacade.executeTrigger(
                 componentName, componentVersion, triggerName,
-                workflowExecutionId.getType(), workflowExecutionId.getInstanceId(),
-                workflowExecutionId.getWorkflowId(), null,
-                triggerExecution.getParameters(), triggerExecution.getState(),
+                workflowExecutionId.getType(), workflowExecutionId.getInstanceId(), getWorkflowId(workflowExecutionId),
+                null, triggerExecution.getParameters(), triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }
+    }
+
+    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        return instanceAccessor.getWorkflowId(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

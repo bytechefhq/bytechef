@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.instance.accessor;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,13 +34,16 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
 
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceAccessor(
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectWorkflowService projectWorkflowService) {
 
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
@@ -48,11 +52,12 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public boolean isWorkflowEnabled(long instanceId, String workflowId) {
+    public boolean isWorkflowEnabled(long instanceId, String workflowReferenceCode) {
         boolean workflowEnabled = false;
 
         if (projectInstanceService.isProjectInstanceEnabled(instanceId) &&
-            projectInstanceWorkflowService.isProjectInstanceWorkflowEnabled(instanceId, workflowId)) {
+            projectInstanceWorkflowService.isProjectInstanceWorkflowEnabled(
+                instanceId, getWorkflowId(instanceId, workflowReferenceCode))) {
 
             workflowEnabled = true;
         }
@@ -61,9 +66,9 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public Map<String, ?> getInputMap(long instanceId, String workflowId) {
+    public Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode) {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            instanceId, workflowId);
+            instanceId, getWorkflowId(instanceId, workflowReferenceCode));
 
         return projectInstanceWorkflow.getInputs();
     }
@@ -71,5 +76,10 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     @Override
     public Type getType() {
         return Type.AUTOMATION;
+    }
+
+    @Override
+    public String getWorkflowId(long instanceId, String workflowReferenceCode) {
+        return projectWorkflowService.getProjectWorkflowId(instanceId, workflowReferenceCode);
     }
 }

@@ -21,7 +21,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModelAware;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import java.util.List;
 
@@ -31,22 +31,21 @@ import java.util.List;
 public class WorkflowMapperUtils {
 
     public static void afterMapping(
-        Workflow workflow, WorkflowBasicModelAware workflowBasicModel,
-        WorkflowConnectionFacade workflowConnectionFacade) {
+        Workflow workflow, WorkflowModelAware workflowModel, WorkflowConnectionFacade workflowConnectionFacade) {
 
         List<WorkflowTask> workflowTasks = workflow.getAllTasks();
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-        workflowBasicModel.setConnectionsCount(
+        workflowModel.setConnectionsCount(
             (int) getWorkflowTaskConnectionsCount(workflowTasks, workflowConnectionFacade) +
                 (int) getWorkflowTriggerConnectionsCount(workflowTriggers, workflowConnectionFacade));
-        workflowBasicModel.setInputsCount(CollectionUtils.size(workflow.getInputs()));
-        workflowBasicModel.setManualTrigger(
-            CollectionUtils.isEmpty(workflowTriggers) ||
-                CollectionUtils.contains(
-                    CollectionUtils.map(workflowTriggers, WorkflowTrigger::getName),
-                    "manual"));
-        workflowBasicModel.setWorkflowTaskComponentNames(
+        workflowModel.setInputsCount(CollectionUtils.size(workflow.getInputs()));
+//        workflowBasicModel.setManualTrigger(
+//            CollectionUtils.isEmpty(workflowTriggers) ||
+//                CollectionUtils.contains(
+//                    CollectionUtils.map(workflowTriggers, WorkflowTrigger::getName),
+//                    "manual"));
+        workflowModel.setWorkflowTaskComponentNames(
             workflowTasks
                 .stream()
                 .map(workflowTask -> WorkflowNodeType.ofType(workflowTask.getType()))
@@ -59,7 +58,7 @@ public class WorkflowMapperUtils {
             .map(WorkflowNodeType::componentName)
             .toList();
 
-        workflowBasicModel.setWorkflowTriggerComponentNames(
+        workflowModel.setWorkflowTriggerComponentNames(
             workflowTriggerComponentNames.isEmpty() ? List.of("manual") : workflowTriggerComponentNames);
     }
 

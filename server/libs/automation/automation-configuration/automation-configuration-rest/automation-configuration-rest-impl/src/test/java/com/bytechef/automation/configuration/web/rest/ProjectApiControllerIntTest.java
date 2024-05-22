@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -178,7 +179,7 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            WorkflowDTO workflow = new WorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), 0);
+            WorkflowDTO workflow = new WorkflowDTO(new Workflow("workflow1", "{}", Format.JSON), new ProjectWorkflow());
 
             when(projectFacade.getProjectWorkflows(1L))
                 .thenReturn(List.of(workflow));
@@ -303,7 +304,7 @@ public class ProjectApiControllerIntTest {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-        WorkflowDTO workflow = new WorkflowDTO(new Workflow("id", definition, Format.JSON), 0);
+        WorkflowDTO workflow = new WorkflowDTO(new Workflow("id", definition, Format.JSON), new ProjectWorkflow());
 
         when(projectFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);

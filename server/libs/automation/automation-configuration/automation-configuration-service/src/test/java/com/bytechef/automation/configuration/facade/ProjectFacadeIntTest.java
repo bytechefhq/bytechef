@@ -34,6 +34,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -76,6 +78,9 @@ public class ProjectFacadeIntTest {
     TagRepository tagRepository;
 
     @Autowired
+    private WorkflowFacade workflowFacade;
+
+    @Autowired
     private WorkflowCrudRepository workflowRepository;
 
     @AfterEach
@@ -95,12 +100,21 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        WorkflowDTO workflow = projectFacade.addWorkflow(
+        // TODO remove
+        Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
+            .thenReturn(
+                new com.bytechef.platform.configuration.dto.WorkflowDTO(
+                    new Workflow(
+                        "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}",
+                        Workflow.Format.JSON),
+                    List.of(), List.of()));
+
+        WorkflowDTO workflowDTO = projectFacade.addWorkflow(
             Validate.notNull(project.getId(), "id"),
             "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
 
-        assertThat(workflow.description()).isEqualTo("Description");
-        assertThat(workflow.label()).isEqualTo("New Workflow");
+        assertThat(workflowDTO.description()).isEqualTo("Description");
+        assertThat(workflowDTO.label()).isEqualTo("New Workflow");
     }
 
     @Test
@@ -262,7 +276,13 @@ public class ProjectFacadeIntTest {
         project = projectRepository.save(project);
 
         projectWorkflowRepository.save(
-            new ProjectWorkflow(project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id")));
+            new ProjectWorkflow(
+                project.getId(), project.getLastVersion(), Validate.notNull(workflow.getId(), "id"),
+                "workflowReferenceCode"));
+
+        // TODO remove
+        Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
+            .thenReturn(new com.bytechef.platform.configuration.dto.WorkflowDTO(workflow, List.of(), List.of()));
 
         List<WorkflowDTO> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 

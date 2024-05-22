@@ -194,11 +194,11 @@ public class ProjectInstanceWorkflow implements Comparable<ProjectInstanceWorkfl
 
     @Override
     public String toString() {
-        return "ProjectInstanceWorkflow{" + ", id='"
-            + id + '\'' + ", workflowId='"
-            + workflowId + '\'' + ", inputs="
-            + inputs + ", projectInstanceWorkflowConnections="
-            + connections + ", enabled="
-            + enabled + '}';
+        return "ProjectInstanceWorkflow{"
+            + ", id='" + id + '\'' +
+            ", workflowId='" + workflowId + '\'' +
+            ", inputs=" + inputs +
+            ", connections=" + connections +
+            ", enabled=" + enabled + '}';
     }
 }

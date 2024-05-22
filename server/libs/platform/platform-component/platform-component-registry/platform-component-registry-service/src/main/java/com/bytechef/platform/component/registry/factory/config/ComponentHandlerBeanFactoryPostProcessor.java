@@ -16,27 +16,12 @@
 
 package com.bytechef.platform.component.registry.factory.config;
 
-import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.TriggerDefinition;
-import com.bytechef.platform.component.factory.ComponentHandlerListFactory;
-import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.registry.handler.ComponentTriggerHandler;
 import com.bytechef.platform.component.registry.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.registry.handler.loader.DefaultComponentHandlerLoader;
 import com.bytechef.platform.component.registry.jdbc.handler.loader.JdbcComponentHandlerLoader;
 import com.bytechef.platform.component.registry.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.platform.workflow.worker.trigger.factory.TriggerHandlerMapFactory;
-import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -80,86 +65,8 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             "componentTriggerHandlerMapFactory",
             BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerMapFactory.class)
                 .addConstructorArgValue(componentHandlerEntries)
+                .addConstructorArgReference("instanceAccessorRegistry")
                 .addConstructorArgReference("triggerDefinitionFacade")
                 .getBeanDefinition());
-    }
-
-    private static String getBeanName(String componentName, int componentVersion, String componentOperationName) {
-        return componentName + '/' + "v" + componentVersion + '/' + componentOperationName;
-    }
-
-    private record ComponentTaskHandlerMapFactory(
-        List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
-        ActionDefinitionFacade actionDefinitionFacade)
-        implements TaskHandlerMapFactory {
-
-        @Override
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
-        public Map<String, TaskHandler<?>> getTaskHandlerMap() {
-            return (Map) componentHandlerEntries
-                .stream()
-                .map(componentHandlerEntry -> {
-                    ComponentHandler componentHandler = componentHandlerEntry.componentHandler();
-
-                    ComponentDefinition componentDefinition = componentHandler.getDefinition();
-
-                    return OptionalUtils.orElse(componentDefinition.getActions(), List.of())
-                        .stream()
-                        .collect(
-                            Collectors.toMap(
-                                actionDefinition -> getBeanName(
-                                    componentDefinition.getName(), componentDefinition.getVersion(),
-                                    actionDefinition.getName()),
-                                actionDefinition -> {
-                                    ComponentHandlerLoader.ComponentTaskHandlerFunction componentTaskHandlerFunction =
-                                        componentHandlerEntry.componentTaskHandlerFunction();
-
-                                    return componentTaskHandlerFunction.apply(
-                                        actionDefinition.getName(), actionDefinitionFacade);
-                                }));
-                })
-                .reduce(Map.of(), MapUtils::concat);
-        }
-    }
-
-    private record ComponentTriggerHandlerMapFactory(
-        List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
-        TriggerDefinitionFacade triggerDefinitionFacade)
-        implements TriggerHandlerMapFactory {
-
-        @Override
-        public Map<String, TriggerHandler> getTriggerHandlerMap() {
-            return componentHandlerEntries.stream()
-                .map(ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)
-                .map(ComponentHandler::getDefinition)
-                .map(this::collect)
-                .reduce(Map.of(), MapUtils::concat);
-        }
-
-        private Map<String, TriggerHandler> collect(ComponentDefinition componentDefinition) {
-            return OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())
-                .stream()
-                .filter(triggerDefinition -> triggerDefinition != null &&
-                    triggerDefinition.getType() != TriggerDefinition.TriggerType.LISTENER)
-                .collect(
-                    Collectors.toMap(
-                        (TriggerDefinition triggerDefinition) -> getBeanName(
-                            componentDefinition.getName(), componentDefinition.getVersion(),
-                            triggerDefinition.getName()),
-                        triggerDefinition -> new ComponentTriggerHandler(
-                            componentDefinition.getName(), componentDefinition.getVersion(),
-                            triggerDefinition.getName(), triggerDefinitionFacade)));
-        }
-    }
-
-    private record ComponentHandlerListFactoryImpl(List<? extends ComponentHandler> componentHandlers)
-        implements ComponentHandlerListFactory {
-
-        @Override
-        public List<? extends ComponentHandler> getComponentHandlers() {
-            return componentHandlers;
-        }
     }
 }

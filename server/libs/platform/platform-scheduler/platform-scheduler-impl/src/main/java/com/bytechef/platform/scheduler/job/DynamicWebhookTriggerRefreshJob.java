@@ -23,6 +23,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -43,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DynamicWebhookTriggerRefreshJob implements Job {
 
+    private InstanceAccessorRegistry instanceAccessorRegistry;
     private TriggerDefinitionFacade remoteTriggerDefinitionFacade;
     private TriggerStateService triggerStateService;
     private WorkflowService workflowService;
@@ -75,6 +78,12 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     @Autowired
     @SuppressFBWarnings("EI")
+    public void setInstanceAccessorRegistry(InstanceAccessorRegistry instanceAccessorRegistry) {
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
+    }
+
+    @Autowired
+    @SuppressFBWarnings("EI")
     public void setRemoteTriggerDefinitionFacade(TriggerDefinitionFacade triggerDefinitionService) {
         this.remoteTriggerDefinitionFacade = triggerDefinitionService;
     }
@@ -92,7 +101,12 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        String workflowId = instanceAccessor.getWorkflowId(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 

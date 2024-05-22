@@ -47,7 +47,6 @@ import com.bytechef.platform.tag.service.TagService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +132,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             projectInstanceWorkflowService.create(projectInstanceWorkflow);
         }
 
-        return new WorkflowDTO(workflow, projectWorkflow.getId());
+        return new WorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), projectWorkflow);
     }
 
     @Override
@@ -290,11 +289,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<Project> projects = projectService.getProjects();
 
         return categoryService.getCategories(
-            projects
-                .stream()
-                .map(Project::getCategoryId)
-                .filter(Objects::nonNull)
-                .toList());
+            CollectionUtils.filter(CollectionUtils.map(projects, Project::getCategoryId), Objects::nonNull));
     }
 
     @Override
@@ -302,40 +297,30 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<Tag> getProjectTags() {
         List<Project> projects = projectService.getProjects();
 
-        List<Long> tagIds = projects
-            .stream()
-            .map(Project::getTagIds)
-            .flatMap(Collection::stream)
-            .toList();
-
-        return tagService.getTags(tagIds);
+        return tagService.getTags(CollectionUtils.flatMap(projects, Project::getTagIds));
     }
 
     @Override
     public WorkflowDTO getProjectWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        return new WorkflowDTO(workflowFacade.getWorkflow(workflowId), projectWorkflow.getId());
+        return new WorkflowDTO(workflowFacade.getWorkflow(workflowId), projectWorkflow);
     }
 
     @Override
     public WorkflowDTO getProjectWorkflow(long projectWorkflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(projectWorkflowId);
 
-        return new WorkflowDTO(workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow.getId());
+        return new WorkflowDTO(workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<WorkflowDTO> getProjectWorkflows() {
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows();
-
-        return workflowService.getWorkflows(
-            projectWorkflows.stream()
-                .map(ProjectWorkflow::getWorkflowId)
-                .toList())
+        return projectWorkflowService.getProjectWorkflows()
             .stream()
-            .map(workflow -> new WorkflowDTO(workflow, getProjectWorkflowId(workflow, projectWorkflows)))
+            .map(projectWorkflow -> new WorkflowDTO(
+                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
             .toList();
     }
 
@@ -344,28 +329,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<WorkflowDTO> getProjectWorkflows(long id) {
         Project project = projectService.getProject(id);
 
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            project.getId(), project.getLastVersion());
-
-        return workflowService.getWorkflows(
-            projectWorkflows.stream()
-                .map(ProjectWorkflow::getWorkflowId)
-                .toList())
+        return projectWorkflowService
+            .getProjectWorkflows(project.getId(), project.getLastVersion())
             .stream()
-            .map(workflow -> new WorkflowDTO(workflow, getProjectWorkflowId(workflow, projectWorkflows)))
+            .map(projectWorkflow -> new WorkflowDTO(
+                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
             .toList();
     }
 
     @Override
     public List<WorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion) {
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(id, projectVersion);
-
-        return workflowService.getWorkflows(
-            projectWorkflows.stream()
-                .map(ProjectWorkflow::getWorkflowId)
-                .toList())
+        return projectWorkflowService.getProjectWorkflows(id, projectVersion)
             .stream()
-            .map(workflow -> new WorkflowDTO(workflow, getProjectWorkflowId(workflow, projectWorkflows)))
+            .map(projectWorkflow -> new WorkflowDTO(
+                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
             .toList();
     }
 
@@ -436,7 +413,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             version = projectWorkflowStatusResult.version;
         }
 
-        return new WorkflowDTO(workflowFacade.update(workflowId, definition, version), projectWorkflow.getId());
+        return new WorkflowDTO(workflowFacade.update(workflowId, definition, version), projectWorkflow);
     }
 
     @Override
@@ -490,7 +467,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 projectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
 
                 projectWorkflowService.update(projectWorkflow);
-                projectWorkflowService.addWorkflow(project.getId(), lastVersion, oldWorkflowId);
+                projectWorkflowService.addWorkflow(
+                    project.getId(), lastVersion, oldWorkflowId, projectWorkflow.getWorkflowReferenceCode());
                 workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             }
         }
@@ -534,13 +512,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private Category getCategory(Project project) {
         return project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId());
-    }
-
-    private static Long getProjectWorkflowId(Workflow workflow, List<ProjectWorkflow> projectWorkflows) {
-        return CollectionUtils.getFirst(
-            projectWorkflows,
-            projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflow.getId()))
-            .getId();
     }
 
     private ProjectDTO toProjectDTO(Project project) {

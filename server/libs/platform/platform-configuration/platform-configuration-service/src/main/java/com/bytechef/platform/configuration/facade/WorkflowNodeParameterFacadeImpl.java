@@ -151,11 +151,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflow.getId());
 
         displayConditionMap = checkDisplayConditionsParameters(
-            workflowNodeName, name, result.properties, workflow, result.parameterMap, inputMap,
-            result.taskParameters);
+            workflowNodeName, name, result.properties, workflow, result.parameterMap, inputMap, result.taskParameters);
 
-        workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
-            workflow.getVersion());
+        workflowService.update(
+            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
         return new UpdateParameterResultDTO(displayConditionMap, result.parameterMap);
     }

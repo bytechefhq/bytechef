@@ -86,15 +86,13 @@ public class TriggerCompletionHandler {
             triggerStateService.save(workflowExecutionId, triggerExecution.getState());
         }
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
-
-        Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
+        Map<String, Object> inputMap = (Map<String, Object>) getInputMap(workflowExecutionId);
+        String workflowId = getWorkflowId(workflowExecutionId);
 
         if (triggerExecution.getOutput() == null) {
             triggerExecution.addJobId(
                 createJob(
-                    workflowExecutionId,
+                    workflowId,
                     MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
                     workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
         } else {
@@ -104,14 +102,14 @@ public class TriggerCompletionHandler {
                 for (Object triggerOutputValue : triggerOutputValues) {
                     triggerExecution.addJobId(
                         createJob(
-                            workflowExecutionId,
+                            workflowId,
                             MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
                             workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
                 }
             } else {
                 triggerExecution.addJobId(
                     createJob(
-                        workflowExecutionId,
+                        workflowId,
                         MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
                         workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
             }
@@ -126,10 +124,21 @@ public class TriggerCompletionHandler {
         }
     }
 
-    private long createJob(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, Type type) {
+    private long createJob(String workflowId, Map<String, ?> inpputMap, long instanceId, Type type) {
+        return instanceJobFacade.createJob(new JobParameters(workflowId, inpputMap), instanceId, type);
+    }
 
-        return instanceJobFacade.createJob(
-            new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap), instanceId, type);
+    private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        return instanceAccessor.getInputMap(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+    }
+
+    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+
+        return instanceAccessor.getWorkflowId(
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

@@ -30,11 +30,13 @@ import java.util.Map;
 public record ProjectInstanceWorkflowDTO(
     List<ProjectInstanceWorkflowConnection> connections, String createdBy, LocalDateTime createdDate,
     Map<String, ?> inputs, boolean enabled, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, Long projectInstanceId, String staticWebhookUrl, int version, String workflowId)
+    LocalDateTime lastModifiedDate, Long projectInstanceId, String staticWebhookUrl, int version, String workflowId,
+    String workflowReferenceCode)
     implements Comparable<ProjectInstanceWorkflowDTO> {
 
     public ProjectInstanceWorkflowDTO(
-        ProjectInstanceWorkflow projectInstanceWorkflow, LocalDateTime lastExecutionDate, String staticWebhookUrl) {
+        ProjectInstanceWorkflow projectInstanceWorkflow, LocalDateTime lastExecutionDate, String staticWebhookUrl,
+        String workflowReferenceCode) {
 
         this(
             projectInstanceWorkflow.getConnections(), projectInstanceWorkflow.getCreatedBy(),
@@ -42,7 +44,8 @@ public record ProjectInstanceWorkflowDTO(
             projectInstanceWorkflow.isEnabled(), projectInstanceWorkflow.getId(),
             lastExecutionDate, projectInstanceWorkflow.getLastModifiedBy(),
             projectInstanceWorkflow.getLastModifiedDate(), projectInstanceWorkflow.getProjectInstanceId(),
-            staticWebhookUrl, projectInstanceWorkflow.getVersion(), projectInstanceWorkflow.getWorkflowId());
+            staticWebhookUrl, projectInstanceWorkflow.getVersion(), projectInstanceWorkflow.getWorkflowId(),
+            workflowReferenceCode);
     }
 
     @Override

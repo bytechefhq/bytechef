@@ -45,7 +45,12 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteProjectInstanceWorkflows(long projectInstanceId) {
         throw new UnsupportedOperationException();
     }
 

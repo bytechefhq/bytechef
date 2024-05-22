@@ -113,8 +113,9 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
         ProjectInstance curProjectInstance = getProjectInstance(Validate.notNull(projectInstance.getId(), "id"));
 
         curProjectInstance.setDescription(projectInstance.getDescription());
-        curProjectInstance.setName(projectInstance.getName());
         curProjectInstance.setEnabled(projectInstance.isEnabled());
+        curProjectInstance.setName(projectInstance.getName());
+        curProjectInstance.setProjectVersion(projectInstance.getProjectVersion());
         curProjectInstance.setTagIds(projectInstance.getTagIds());
         curProjectInstance.setVersion(projectInstance.getVersion());
 
