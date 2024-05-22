@@ -13,6 +13,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
@@ -132,5 +133,11 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
             .join();
 
         return CollectionUtils.map(completableFutures, CompletableFuture::join);
+    }
+
+    @Override
+    public RefreshTokenResponse
+        executeRefresh(String componentName, ComponentConnection connection, Context context) {
+        throw new UnsupportedOperationException("This method is still under development");
     }
 }
