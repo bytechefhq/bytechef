@@ -21,6 +21,7 @@ import static com.bytechef.component.google.calendar.connection.GoogleCalendarCo
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GOOGLE_CALENDAR;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateQuickEventAction;
@@ -39,6 +40,7 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
             "Google Calendar is a web-based application that allows users to schedule and organize events, " +
                 "appointments, and reminders, synchronizing across multiple devices.")
         .icon("path:assets/google-calendar.svg")
+        .categories(ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleCalendarCreateEventAction.ACTION_DEFINITION,

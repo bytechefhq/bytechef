@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.JSON_FILE;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.json.file.action.JsonFileReadAction;
 import com.bytechef.component.json.file.action.JsonFileWriteAction;
@@ -35,6 +36,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
         .title("JSON File")
         .description("Reads and writes data from a JSON file.")
         .icon("path:assets/jsonfile.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             JsonFileReadAction.ACTION_DEFINITION,
             JsonFileWriteAction.ACTION_DEFINITION);

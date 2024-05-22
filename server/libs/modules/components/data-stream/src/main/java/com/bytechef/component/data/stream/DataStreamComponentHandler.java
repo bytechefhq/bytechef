@@ -21,6 +21,7 @@ import static com.bytechef.platform.component.definition.DataStreamComponentDefi
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.stream.action.DataStreamSyncAction;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
@@ -41,6 +42,7 @@ public class DataStreamComponentHandler implements ComponentHandler {
                 .title("Data Stream")
                 .description("With the Data Stream, you can transfer large amounts of data efficiently.")
                 .icon("path:assets/data-stream.svg")
+                .categories(ComponentCategory.HELPERS)
                 .actions(new DataStreamSyncAction(jobLauncher).actionDefinition)
                 .workflowConnectionKeys("source", "destination"));
     }

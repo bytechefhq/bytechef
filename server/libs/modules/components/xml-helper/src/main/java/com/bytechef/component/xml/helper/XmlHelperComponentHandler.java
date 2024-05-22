@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.XML_HELPER;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.xml.helper.action.XmlHelperParseAction;
 import com.bytechef.component.xml.helper.action.XmlHelperStringifyAction;
@@ -35,6 +36,7 @@ public class XmlHelperComponentHandler implements ComponentHandler {
         .title("XML Helper")
         .description("Converts between XML string and object/array.")
         .icon("path:assets/xml-helper.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             XmlHelperParseAction.ACTION_DEFINITION,
             XmlHelperStringifyAction.ACTION_DEFINITION);

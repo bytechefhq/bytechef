@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.intercom.constant.IntercomConstants.INTERCOM;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.intercom.action.IntercomCreateContactAction;
 import com.bytechef.component.intercom.action.IntercomGetContactAction;
@@ -38,6 +39,7 @@ public class IntercomComponentHandler implements ComponentHandler {
         .description(
             "Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...")
         .icon("path:assets/intercom.svg")
+        .categories(ComponentCategory.CUSTOMER_SUPPORT)
         .connection(IntercomConnection.CONNECTION_DEFINITION)
         .actions(
             IntercomCreateContactAction.ACTION_DEFINITION,

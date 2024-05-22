@@ -21,6 +21,7 @@ import static com.bytechef.component.google.contacts.connection.GoogleContactsCo
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GOOGLE_CONTACTS;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.contacts.action.GoogleContactsCreateContactAction;
 import com.bytechef.component.google.contacts.action.GoogleContactsCreateGroupAction;
@@ -38,6 +39,7 @@ public class GoogleContactsComponentHandler implements ComponentHandler {
             "Google Contacts is a cloud-based address book service provided by Google, allowing users to store, " +
                 "manage, and synchronize their contact information across multiple devices and platforms.")
         .icon("path:assets/google-contacts.svg")
+        .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleContactsCreateContactAction.ACTION_DEFINITION,

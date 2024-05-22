@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.xero.constant.XeroConstants.XERO;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.xero.action.XeroCreateBillAction;
 import com.bytechef.component.xero.action.XeroCreateContactAction;
@@ -41,6 +42,7 @@ public class XeroComponentHandler implements ComponentHandler {
             "Xero is an online accounting software platform designed for small businesses and accountants to manage " +
                 "finances efficiently.")
         .icon("path:assets/xero.svg")
+        .categories(ComponentCategory.ACCOUNTING)
         .connection(XeroConnection.CONNECTION_DEFINITION)
         .actions(
             XeroCreateBillAction.ACTION_DEFINITION,

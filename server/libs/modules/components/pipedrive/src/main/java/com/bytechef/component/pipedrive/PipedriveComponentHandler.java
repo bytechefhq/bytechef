@@ -18,6 +18,7 @@ package com.bytechef.component.pipedrive;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
@@ -48,7 +49,8 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
         return modifiableComponentDefinition
             .description("The first CRM designed by salespeople, for salespeople. Do more to grow your business.")
             .customAction(true)
-            .icon("path:assets/pipedrive.svg");
+            .icon("path:assets/pipedrive.svg")
+            .categories(ComponentCategory.CRM);
     }
 
     @Override

@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.RANDOM_HELPER;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.random.helper.action.RandomHelperRandomFloatAction;
 import com.bytechef.component.random.helper.action.RandomHelperRandomIntAction;
@@ -35,6 +36,7 @@ public class RandomHelperComponentHandler implements ComponentHandler {
         .title("Random Helper")
         .description("The Random Helper allows you to generate random values.")
         .icon("path:assets/random-helper.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             RandomHelperRandomIntAction.ACTION_DEFINITION,
             RandomHelperRandomFloatAction.ACTION_DEFINITION);

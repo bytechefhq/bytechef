@@ -25,6 +25,7 @@ import static com.bytechef.component.freshdesk.constant.FreshdeskConstants.DOMAI
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
@@ -47,7 +48,8 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/freshdesk.svg");
+            .icon("path:assets/freshdesk.svg")
+            .categories(ComponentCategory.CUSTOMER_SUPPORT);
     }
 
     @Override

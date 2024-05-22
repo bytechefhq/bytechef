@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.util.AsanaUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
@@ -49,7 +50,8 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/asana.svg");
+            .icon("path:assets/asana.svg")
+            .categories(ComponentCategory.PROJECT_MANAGEMENT);
     }
 
     @Override

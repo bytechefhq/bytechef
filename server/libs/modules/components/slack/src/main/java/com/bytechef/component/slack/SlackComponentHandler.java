@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.slack.constant.SlackConstants.SLACK;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.action.SlackSendMessageAction;
@@ -36,6 +37,7 @@ public final class SlackComponentHandler implements ComponentHandler {
         .title("Slack")
         .description("Slack is a messaging platform for teams to communicate and collaborate.")
         .icon("path:assets/slack.svg")
+        .categories(ComponentCategory.COMMUNICATION, ComponentCategory.DEVELOPER_TOOLS)
         .connection(SlackConnection.CONNECTION_DEFINITION)
         .actions(
             SlackSendMessageAction.ACTION_DEFINITION,

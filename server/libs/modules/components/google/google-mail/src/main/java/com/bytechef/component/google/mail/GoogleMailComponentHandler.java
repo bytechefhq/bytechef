@@ -21,6 +21,7 @@ import static com.bytechef.component.google.mail.connection.GoogleMailConnection
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GOOGLE_MAIL;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
@@ -41,6 +42,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
                 "feature-rich communication, organization, and storage capabilities accessible through web browsers " +
                 "and mobile apps.")
         .icon("path:assets/google-mail.svg")
+        .categories(ComponentCategory.COMMUNICATION)
         .connection(CONNECTION_DEFINITION)
         .actions(GoogleMailGetMailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,

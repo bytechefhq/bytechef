@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.MICROSOFT_EXCEL;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelAppendRowAction;
 import com.bytechef.component.microsoft.excel.action.MicrosoftExcelClearWorksheetAction;
@@ -41,6 +42,7 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
             "Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in " +
                 "tabular form.")
         .icon("path:assets/microsoft-excel.svg")
+        .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(MicrosoftExcelConnection.CONNECTION_DEFINITION)
         .actions(
             MicrosoftExcelAppendRowAction.ACTION_DEFINITION,

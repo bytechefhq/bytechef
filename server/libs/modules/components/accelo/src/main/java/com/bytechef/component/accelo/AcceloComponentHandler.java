@@ -24,6 +24,7 @@ import com.bytechef.component.accelo.action.AcceloCreateCompanyAction;
 import com.bytechef.component.accelo.action.AcceloCreateContactAction;
 import com.bytechef.component.accelo.action.AcceloCreateTaskAction;
 import com.bytechef.component.accelo.connection.AcceloConnection;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class AcceloComponentHandler implements ComponentHandler {
             "Accelo is a cloud-based platform designed to streamline operations for service businesses by " +
                 "integrating project management, CRM, and billing functionalities into one unified system.")
         .icon("path:assets/accelo.svg")
+        .categories(ComponentCategory.CRM, ComponentCategory.PROJECT_MANAGEMENT)
         .connection(AcceloConnection.CONNECTION_DEFINITION)
         .actions(
             AcceloCreateCompanyAction.ACTION_DEFINITION,

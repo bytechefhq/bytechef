@@ -21,6 +21,7 @@ import static com.bytechef.component.google.docs.connection.GoogleDocsConnection
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.GOOGLE_DOCS;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentAction;
 import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentBasedOnTemplateAction;
@@ -39,6 +40,7 @@ public class GoogleDocsComponentHandler implements ComponentHandler {
             "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to " +
                 "create, edit, and share documents in real-time.")
         .icon("path:assets/google-docs.svg")
+        .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleDocsCreateDocumentAction.ACTION_DEFINITION,

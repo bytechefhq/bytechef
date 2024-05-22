@@ -21,6 +21,7 @@ import static com.bytechef.component.freshsales.connection.FreshsalesConnection.
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FRESHSALES;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.freshsales.action.FreshsalesCreateAccountAction;
 import com.bytechef.component.freshsales.action.FreshsalesCreateContactAction;
@@ -39,6 +40,7 @@ public class FreshsalesComponentHandler implements ComponentHandler {
             "Freshsales is a customer relationship management (CRM) software designed to help businesses streamline " +
                 "sales processes and manage customer interactions effectively.")
         .icon("path:assets/freshsales.svg")
+        .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
         .actions(
             FreshsalesCreateAccountAction.ACTION_DEFINITION,

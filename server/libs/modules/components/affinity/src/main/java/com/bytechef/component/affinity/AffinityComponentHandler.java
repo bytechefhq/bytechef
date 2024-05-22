@@ -24,6 +24,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.affinity.action.AffinityCreateOpportunityAction;
 import com.bytechef.component.affinity.action.AffinityCreateOrganizationAction;
 import com.bytechef.component.affinity.action.AffinityCreatePersonAction;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class AffinityComponentHandler implements ComponentHandler {
             "Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence " +
                 "to help businesses strengthen connections and drive engagement with client and prospects.")
         .icon("path:assets/affinity.svg")
+        .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
         .actions(
             AffinityCreateOpportunityAction.ACTION_DEFINITION,

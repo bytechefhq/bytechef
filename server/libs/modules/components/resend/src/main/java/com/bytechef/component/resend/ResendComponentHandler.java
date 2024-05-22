@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.resend.constant.ResendConstants.RESEND;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.resend.action.ResendSendEmailAction;
 import com.bytechef.component.resend.connection.ResendConnection;
@@ -35,6 +36,7 @@ public class ResendComponentHandler implements ComponentHandler {
         .title("Resend")
         .description("Resend is the email API for developers.")
         .icon("path:assets/resend.svg")
+        .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(ResendConnection.CONNECTION_DEFINITION)
         .actions(ResendSendEmailAction.ACTION_DEFINITION);
 

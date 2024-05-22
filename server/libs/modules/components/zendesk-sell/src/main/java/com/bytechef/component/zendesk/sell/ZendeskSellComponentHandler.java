@@ -21,6 +21,7 @@ import static com.bytechef.component.zendesk.sell.connection.ZendeskSellConnecti
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.ZENDESK_SELL;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.zendesk.sell.action.ZendeskSellCreateContactAction;
 import com.bytechef.component.zendesk.sell.action.ZendeskSellCreateTaskAction;
@@ -37,6 +38,7 @@ public class ZendeskSellComponentHandler implements ComponentHandler {
         .description(
             "Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently.")
         .icon("path:assets/zendesk-sell.svg")
+        .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
         .actions(
             ZendeskSellCreateContactAction.ACTION_DEFINITION,

@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.infobip.constant.InfobipConstants.INFOBIP;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.infobip.action.InfobipSendSMSAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsappTextMesageAction;
@@ -38,6 +39,7 @@ public class InfobipComponentHandler implements ComponentHandler {
             "Infobip is a global communications platform that provide cloud-based messaging and omnichannel " +
                 "communication solutions for businesses.")
         .icon("path:assets/infobip.svg")
+        .categories(ComponentCategory.COMMUNICATION)
         .connection(InfobipConnection.CONNECTION_DEFINITION)
         .actions(
             InfobipSendSMSAction.ACTION_DEFINITION,

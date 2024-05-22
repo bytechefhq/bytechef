@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MICROSOFT_OUTLOOK_365;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetMailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SearchEmailAction;
@@ -39,6 +40,7 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, " +
                 "calendar, contacts, and tasks to streamline communication and organization.")
         .icon("path:assets/microsoft-outlook-365.svg")
+        .categories(ComponentCategory.COMMUNICATION, ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(MicrosoftOutlook365Connection.CONNECTION_DEFINITION)
         .actions(
             MicrosoftOutlook365GetMailAction.ACTION_DEFINITION,

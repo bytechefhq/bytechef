@@ -27,6 +27,7 @@ import static com.bytechef.component.shopify.util.ShopifyUtils.getBaseUrl;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
@@ -52,7 +53,8 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/shopify.svg");
+            .icon("path:assets/shopify.svg")
+            .categories(ComponentCategory.E_COMMERCE);
     }
 
     @Override

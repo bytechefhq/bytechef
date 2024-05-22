@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TWILIO;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.twilio.action.TwilioSendSMSAction;
 import com.bytechef.component.twilio.connection.TwilioConnection;
@@ -37,6 +38,7 @@ public class TwilioComponentHandler implements ComponentHandler {
             "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and" +
                 " video capabilities into their applications.")
         .icon("path:assets/twilio.svg")
+        .categories(ComponentCategory.COMMUNICATION)
         .connection(TwilioConnection.CONNECTION_DEFINITION)
         .actions(TwilioSendSMSAction.ACTION_DEFINITION);
 

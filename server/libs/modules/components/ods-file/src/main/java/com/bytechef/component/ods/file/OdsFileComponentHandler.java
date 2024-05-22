@@ -19,6 +19,7 @@ package com.bytechef.component.ods.file;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.ods.file.action.OdsFileReadAction;
 import com.bytechef.component.ods.file.action.OdsFileWriteAction;
@@ -36,6 +37,7 @@ public class OdsFileComponentHandler implements ComponentHandler {
         .title("ODS File")
         .description("Reads and writes data from a ODS file.")
         .icon("path:assets/ods-file.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             OdsFileReadAction.ACTION_DEFINITION,
             OdsFileWriteAction.ACTION_DEFINITION);

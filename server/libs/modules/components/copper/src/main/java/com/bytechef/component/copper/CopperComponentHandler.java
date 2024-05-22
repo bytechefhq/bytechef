@@ -24,6 +24,7 @@ import com.bytechef.component.copper.action.CopperCreateActivityAction;
 import com.bytechef.component.copper.action.CopperCreateCompanyAction;
 import com.bytechef.component.copper.action.CopperCreatePersonAction;
 import com.bytechef.component.copper.connection.CopperConnection;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -40,6 +41,7 @@ public class CopperComponentHandler implements ComponentHandler {
                 "processes, providing tools for managing contact, leads, opportunities, and communications in one " +
                 "centralized platform.")
         .icon("path:assets/copper.svg")
+        .categories(ComponentCategory.CRM)
         .connection(CopperConnection.CONNECTION_DEFINITION)
         .actions(
             CopperCreateActivityAction.ACTION_DEFINITION,

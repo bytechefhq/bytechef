@@ -19,6 +19,7 @@ package com.bytechef.component.xml.file;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.xml.file.action.XmlFileReadAction;
 import com.bytechef.component.xml.file.action.XmlFileWriteAction;
@@ -35,6 +36,7 @@ public class XmlFileComponentHandler implements ComponentHandler {
         .title("XML File")
         .description("Reads and writes data from a XML file.")
         .icon("path:assets/xml-file.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             XmlFileReadAction.ACTION_DEFINITION,
             XmlFileWriteAction.ACTION_DEFINITION);

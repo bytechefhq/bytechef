@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.schedule.trigger.ScheduleCronTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleEveryDayTrigger;
@@ -57,6 +58,7 @@ public class ScheduleComponentHandler implements ComponentHandler {
                 .description(
                     "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.")
                 .icon("path:assets/schedule.svg")
+                .categories(ComponentCategory.HELPERS)
                 .triggers(
                     new ScheduleEveryDayTrigger(triggerScheduler).triggerDefinition,
                     new ScheduleEveryWeekTrigger(triggerScheduler).triggerDefinition,

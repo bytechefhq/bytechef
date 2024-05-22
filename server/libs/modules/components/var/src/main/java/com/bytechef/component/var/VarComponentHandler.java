@@ -19,6 +19,7 @@ package com.bytechef.component.var;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.var.action.VarSetAction;
 import com.bytechef.component.var.constant.VarConstants;
@@ -34,6 +35,7 @@ public class VarComponentHandler implements ComponentHandler {
         .title("Var")
         .description("Sets a value which can then be referenced in other tasks.")
         .icon("path:assets/var.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(VarSetAction.ACTION_DEFINITION);
 
     @Override

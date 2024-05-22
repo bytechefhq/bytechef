@@ -19,6 +19,7 @@ package com.bytechef.component.object.helper;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.object.helper.action.ObjectHelperParseAction;
 import com.bytechef.component.object.helper.action.ObjectHelperStringifyAction;
@@ -35,6 +36,7 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
         .title("Object Helper")
         .description("Object Helper allows you to do various operations on objects.")
         .icon("path:assets/object-helper.svg")
+        .categories(ComponentCategory.HELPERS)
         .actions(
             ObjectHelperParseAction.ACTION_DEFINITION,
             ObjectHelperStringifyAction.ACTION_DEFINITION);

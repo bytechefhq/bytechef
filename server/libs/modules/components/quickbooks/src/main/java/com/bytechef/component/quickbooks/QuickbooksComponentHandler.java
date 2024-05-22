@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUICKBOOKS;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
@@ -41,6 +42,7 @@ public class QuickbooksComponentHandler implements ComponentHandler {
                 "cloud-based versions that accept business payments, manage and pay bills, and payroll functions.")
         .icon("path:assets/quickbooks.svg")
         .connection(QuickbooksConnection.CONNECTION_DEFINITION)
+        .categories(ComponentCategory.ACCOUNTING)
         .actions(
             QuickbooksCreateCustomerAction.ACTION_DEFINITION,
             QuickbooksCreateItemAction.ACTION_DEFINITION,

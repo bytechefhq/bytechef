@@ -25,6 +25,7 @@ import static com.bytechef.component.teamwork.util.TeamworkUtils.getBaseUrl;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
@@ -44,7 +45,8 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
-            .icon("path:assets/teamwork.svg");
+            .icon("path:assets/teamwork.svg")
+            .categories(ComponentCategory.CRM, ComponentCategory.PROJECT_MANAGEMENT);
     }
 
     @Override

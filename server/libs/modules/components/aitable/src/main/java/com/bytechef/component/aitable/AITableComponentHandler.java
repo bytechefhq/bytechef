@@ -24,6 +24,7 @@ import com.bytechef.component.aitable.action.AITableCreateRecordAction;
 import com.bytechef.component.aitable.action.AITableFindRecordsAction;
 import com.bytechef.component.aitable.action.AITableUpdateRecordAction;
 import com.bytechef.component.aitable.connection.AITableConnection;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -39,6 +40,7 @@ public class AITableComponentHandler implements ComponentHandler {
             "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data " +
                 "visualization and analysis without requiring coding skills.")
         .icon("path:assets/aitable.svg")
+        .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(AITableConnection.CONNECTION_DEFINITION)
         .actions(
             AITableFindRecordsAction.ACTION_DEFINITION,
