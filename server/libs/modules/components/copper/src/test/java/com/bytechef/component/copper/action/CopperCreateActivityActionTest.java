@@ -16,15 +16,18 @@
 
 package com.bytechef.component.copper.action;
 
+import static com.bytechef.component.copper.action.CopperCreateActivityAction.POST_ACTIVITIES_CONTEXT_FUNCTION;
 import static com.bytechef.component.copper.constant.CopperConstants.ACTIVITY_TYPE;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -51,7 +54,9 @@ class CopperCreateActivityActionTest extends AbstractCopperActionTest {
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        verify(mockedContext, times(1)).http(POST_ACTIVITIES_CONTEXT_FUNCTION);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }
