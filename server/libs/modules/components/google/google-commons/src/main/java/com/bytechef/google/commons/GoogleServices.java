@@ -37,6 +37,7 @@ import com.google.api.services.sheets.v4.Sheets;
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
  * @author Monika Domiter
+ * @author Igor Beslic
  */
 public class GoogleServices {
 
@@ -47,7 +48,7 @@ public class GoogleServices {
         return new Calendar.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+            new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google Calendar Component")
                 .build();
     }
@@ -56,7 +57,7 @@ public class GoogleServices {
         return new Docs.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+            new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google Docs Component")
                 .build();
     }
@@ -65,7 +66,7 @@ public class GoogleServices {
         return new Drive.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+            new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google Drive Component")
                 .build();
     }
@@ -74,7 +75,7 @@ public class GoogleServices {
         return new Gmail.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+            new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google Mail Component")
                 .build();
     }
@@ -83,25 +84,26 @@ public class GoogleServices {
         return new PeopleService.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+            new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google People Component")
                 .build();
     }
 
-    public static Sheets getSheets(Parameters connectionParameters) {
+    public static Sheets getSheets(Parameters connectionParameters) throws Exception {
         return new Sheets.Builder(
             new NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+            GsonFactory.getDefaultInstance(), new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google Sheets Component")
                 .build();
     }
 
-    private record OAuthAuthentication(String token)
+    private record OAuthAuthentication(Parameters parameters)
         implements HttpRequestInitializer, HttpExecuteInterceptor {
 
-        private OAuthAuthentication(String token) {
-            this.token = Preconditions.checkNotNull(token);
+        private OAuthAuthentication(Parameters parameters) {
+            this.parameters = Preconditions.checkNotNull(parameters);
+
+            Preconditions.checkNotNull(parameters.getRequiredString(ACCESS_TOKEN));
         }
 
         public void initialize(HttpRequest request) {
@@ -111,7 +113,7 @@ public class GoogleServices {
         public void intercept(HttpRequest request) {
             HttpHeaders httpHeaders = request.getHeaders();
 
-            httpHeaders.set("Authorization", "Bearer " + token);
+            httpHeaders.set("Authorization", "Bearer " + parameters.getRequiredString(ACCESS_TOKEN));
         }
     }
 }
