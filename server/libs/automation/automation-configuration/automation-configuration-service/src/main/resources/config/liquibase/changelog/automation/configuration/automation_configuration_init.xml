@@ -5,7 +5,7 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="202308070817" author="Ivica Cardic">
         <createTable tableName="project">
-            <column name="id" type="BIGINT" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(256)">
@@ -31,7 +31,7 @@
         </createTable>
 
         <createTable tableName="project_instance">
-            <column name="id" type="BIGINT" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="project_id" type="BIGINT">
