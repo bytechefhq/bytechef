@@ -38,7 +38,6 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +67,7 @@ public class GoogleSheetsFindRowByNumAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 

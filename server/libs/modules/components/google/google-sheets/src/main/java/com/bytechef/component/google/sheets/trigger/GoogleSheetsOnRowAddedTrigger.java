@@ -127,7 +127,7 @@ public class GoogleSheetsOnRowAddedTrigger {
     protected static List<Map<String, Object>> dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
-        TriggerContext context) throws IOException {
+        TriggerContext context) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 

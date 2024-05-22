@@ -35,7 +35,6 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -57,7 +56,7 @@ public class GoogleSheetsClearSheetAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         Integer startRowIndex = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER) ? 1 : 0;

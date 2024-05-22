@@ -35,7 +35,6 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
 import com.google.api.services.sheets.v4.model.DimensionRange;
 import com.google.api.services.sheets.v4.model.Request;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -61,7 +60,7 @@ public class GoogleSheetsDeleteRowAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         DimensionRange dimensionRange = new DimensionRange()
