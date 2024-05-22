@@ -719,6 +719,7 @@ public final class ComponentDSL {
         private AuthorizationUrlFunction authorizationUrlFunction;
         private ClientIdFunction clientIdFunction;
         private ClientSecretFunction clientSecretFunction;
+        private RefreshTokenFunction refreshTokenFunction;
         private List<Object> detectOn;
         private String description;
         private final String name;
@@ -918,6 +919,11 @@ public final class ComponentDSL {
         @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
+        }
+
+        @Override
+        public Optional<RefreshTokenFunction> getRefreshToken() {
+            return Optional.ofNullable(refreshTokenFunction);
         }
 
         @Override
