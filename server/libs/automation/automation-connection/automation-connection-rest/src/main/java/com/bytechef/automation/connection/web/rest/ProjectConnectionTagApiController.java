@@ -32,16 +32,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.connection.web.rest.ConnectionTagApiController")
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class ConnectionTagApiController implements ConnectionTagApi {
+public class ProjectConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public ProjectConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }

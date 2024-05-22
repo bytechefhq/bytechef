@@ -53,8 +53,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(value = ConnectionApiController.class)
-public class ConnectionApiControllerIntTest {
+@WebMvcTest(value = ProjectConnectionApiController.class)
+public class ProjectConnectionApiControllerIntTest {
 
     @MockBean
     private ConnectionFacade connectionFacade;

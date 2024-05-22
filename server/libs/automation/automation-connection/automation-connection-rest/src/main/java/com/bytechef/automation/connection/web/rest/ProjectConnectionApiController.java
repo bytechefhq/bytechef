@@ -16,11 +16,11 @@
 
 package com.bytechef.automation.connection.web.rest;
 
+import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
-import com.bytechef.platform.connection.web.rest.util.ConnectionApiControllerUtils;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,42 +33,49 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.connection.web.rest.ConnectionApiController")
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class ConnectionApiController implements ConnectionApi {
+public class ProjectConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
+    private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public ProjectConnectionApiController(
+        ConnectionFacade connectionFacade, ConversionService conversionService,
+        WorkspaceConnectionFacade workspaceConnectionFacade) {
+
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
+        this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
+    public ResponseEntity<ConnectionModel> createWorkspaceConnection(Long id, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                connectionFacade.create(
-                    conversionService.convert(connectionModel, ConnectionDTO.class), Type.AUTOMATION),
+                workspaceConnectionFacade.create(
+                    id, conversionService.convert(connectionModel, ConnectionDTO.class)),
                 ConnectionModel.class));
     }
 
     @Override
     public ResponseEntity<Void> deleteConnection(Long id) {
-        return ConnectionApiControllerUtils.deleteConnection(id, connectionFacade);
+        workspaceConnectionFacade.delete(id);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
-        return ResponseEntity.ok(
-            Validate.notNull(
-                conversionService.convert(
-                    connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class),
-                "connection")
-                .parameters(null));
+        ConnectionModel connectionModel = conversionService.convert(
+            connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class);
+
+        return ResponseEntity.ok(Validate.notNull(connectionModel, "connectionModel")
+            .parameters(null));
     }
 
     @Override
@@ -77,6 +84,18 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectionFacade.getConnections(componentName, connectionVersion, tagId, Type.AUTOMATION)
+                .stream()
+                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
+                    .parameters(null))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
+        Long id, String componentName, Integer connectionVersion, Long tagId) {
+
+        return ResponseEntity.ok(
+            workspaceConnectionFacade.getConnections(id, componentName, connectionVersion, tagId)
                 .stream()
                 .map(connection -> conversionService.convert(connection, ConnectionModel.class)
                     .parameters(null))
