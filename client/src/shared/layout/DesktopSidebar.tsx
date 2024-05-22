@@ -18,14 +18,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import DesktopSidebarNavigationMenu from '@/shared/layout/DesktopSidebarNavigationMenu';
 import {useGetWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import React, {useEffect} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import reactLogo from '../../assets/logo.svg';
 
 export function DesktopSidebar({
+    className,
     navigation,
 }: {
+    className?: string;
     navigation: {
         name: string;
         href: string;
@@ -55,15 +59,15 @@ export function DesktopSidebar({
     }, [currentWorkspaceId, workspaces, setCurrentWorkspaceId]);
 
     return (
-        <aside className="hidden border-r bg-muted lg:flex lg:shrink-0">
+        <aside className={twMerge('hidden border-r bg-muted lg:flex lg:shrink-0', className)}>
             <div className="flex w-[56px]">
                 <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">
-                        <Link to="">
-                            <div className="flex items-center justify-center py-4">
+                        <div className="flex items-center justify-center py-4">
+                            <DesktopSidebarNavigationMenu>
                                 <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
-                            </div>
-                        </Link>
+                            </DesktopSidebarNavigationMenu>
+                        </div>
 
                         <nav aria-label="Sidebar" className="flex flex-col items-center overflow-y-auto">
                             {navigation.map((item) => (
@@ -126,7 +130,11 @@ export function DesktopSidebar({
 
                                     <DropdownMenuItem
                                         className="cursor-pointer font-semibold"
-                                        onClick={() => navigate('/automation/settings')}
+                                        onClick={() =>
+                                            navigate(
+                                                `${pathname.startsWith('/automation') ? '/automation' : '/embedded'}/settings`
+                                            )
+                                        }
                                     >
                                         Settings
                                     </DropdownMenuItem>
