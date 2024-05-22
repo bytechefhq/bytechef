@@ -247,9 +247,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return new OAuth2AuthorizationParameters(
                 authorizationUrlFunction.apply(connectionParameters, context),
-                clientIdFunction.apply(connectionParameters, context),
-                scopesFunction.apply(connectionParameters, context),
-                "offline");
+                clientIdFunction.apply(connectionParameters, context), Map.of("access_type", "offline"),
+                scopesFunction.apply(connectionParameters, context));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
         }
