@@ -135,7 +135,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @SuppressWarnings("unchecked")
     private WorkflowNodeTestOutput saveActionWorkflowNodeTestOutput(
-        String projectWorkflowId, String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
+        String workflowId, String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
@@ -144,9 +144,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName());
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(projectWorkflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
         Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
-            projectWorkflowId, workflowTask.getName());
+            workflowId, workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
@@ -160,19 +160,17 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 return null;
             }
 
-            return workflowNodeTestOutputService.save(projectWorkflowId, workflowNodeName, workflowNodeType, output);
+            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, output);
         } else {
             Object sampleOutput = actionDefinitionFacade.executePerform(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), null, null, Long.valueOf(projectWorkflowId), null,
-                inputParameters,
-                connectionIds);
+                workflowNodeType.componentOperationName(), null, null, null, null, inputParameters, connectionIds);
 
             if (sampleOutput == null) {
                 return null;
             }
 
-            return workflowNodeTestOutputService.save(projectWorkflowId, workflowNodeName, workflowNodeType,
+            return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType,
                 sampleOutput);
         }
     }

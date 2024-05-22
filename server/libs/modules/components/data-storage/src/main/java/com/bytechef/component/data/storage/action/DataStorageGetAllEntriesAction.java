@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 
@@ -43,14 +44,14 @@ public class DataStorageGetAllEntriesAction {
                 .options(SCOPE_OPTIONS)
                 .required(true))
         .outputSchema(
-            array().items(
-                object()))
+            array()
+                .items(
+                    object()))
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context
-            .data(data -> data.getAll(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE))));
+        return context.data(data -> data.getAll(Scope.valueOf(inputParameters.getRequiredString(SCOPE))));
     }
 }

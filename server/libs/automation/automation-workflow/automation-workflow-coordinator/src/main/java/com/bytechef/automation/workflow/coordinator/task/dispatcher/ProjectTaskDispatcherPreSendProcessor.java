@@ -86,12 +86,15 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        ProjectInstanceWorkflow projectInstanceWorkflow =
-            this.projectInstanceWorkflowService.getProjectInstanceWorkflow(projectInstanceId, job.getWorkflowId());
-
         taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
-        taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, projectInstanceWorkflow.getId());
+
+        if (projectInstanceId != null) {
+            ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+                projectInstanceId, job.getWorkflowId());
+
+            taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, projectInstanceWorkflow.getId());
+        }
 
         return taskExecution;
     }

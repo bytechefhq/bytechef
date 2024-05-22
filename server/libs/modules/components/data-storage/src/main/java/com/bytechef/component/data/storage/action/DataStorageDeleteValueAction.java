@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 
@@ -50,8 +51,7 @@ public class DataStorageDeleteValueAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context
-            .data(data -> data.deleteValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY)));
+        return context.data(data -> data.deleteValue(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
     }
 }

@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -59,20 +60,26 @@ public class DataStorageDeleteValueFromListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        List<Object> list = null;
+        return context.data(data -> data.setValue(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+            inputParameters.getRequiredString(KEY), getValues(inputParameters, context)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> getValues(Parameters inputParameters, ActionContext context) {
+        List<Object> list;
+
         Optional<Object> optionalList = context
-            .data(data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+            .data(data -> data.fetchValue(Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
                 inputParameters.getRequiredString(KEY)));
-        if (optionalList.isPresent() && optionalList.get() instanceof List)
-            list = (List<Object>) optionalList.get();
-        else
+        if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
+            list = (List<Object>) curList;
+        } else {
             return null;
+        }
 
         list.remove(inputParameters.getRequiredInteger(INDEX));
 
-        List<Object> finalList = list;
-        return context
-            .data(data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY), finalList));
+        return list;
     }
 }

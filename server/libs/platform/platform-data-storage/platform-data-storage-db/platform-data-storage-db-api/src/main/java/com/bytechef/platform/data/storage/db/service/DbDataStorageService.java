@@ -26,6 +26,8 @@ import java.util.Optional;
  */
 public interface DbDataStorageService {
 
+    void delete(String componentName, Scope scope, String scopeId, String key, Type type);
+
     <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, Type type);
 
     <T> T get(String componentName, Scope scope, String scopeId, String key, Type type);
@@ -33,6 +35,4 @@ public interface DbDataStorageService {
     <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type);
 
     void put(String componentName, Scope scope, String scopeId, String key, Type type, Object value);
-
-    void delete(String componentName, Scope scope, String scopeId, String key, Type type);
 }

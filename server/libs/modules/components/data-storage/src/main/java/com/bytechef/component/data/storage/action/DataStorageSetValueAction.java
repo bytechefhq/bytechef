@@ -34,7 +34,9 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
+import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 
@@ -117,45 +119,10 @@ public class DataStorageSetValueAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Object value = null;
-        switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1:
-                value = inputParameters.getRequiredArray(VALUE);
-                break;
-            case 2:
-                value = inputParameters.getRequiredBoolean(VALUE);
-                break;
-            case 3:
-                value = inputParameters.getRequiredLocalDate(VALUE);
-                break;
-            case 4:
-                value = inputParameters.getRequiredLocalDateTime(VALUE);
-                break;
-            case 5:
-                value = inputParameters.getRequiredInteger(VALUE);
-                break;
-            case 6:
-                value = nullable();
-                break;
-            case 7:
-                value = inputParameters.getRequiredDouble(VALUE);
-                break;
-            case 8:
-                value = inputParameters.getRequiredMap(VALUE);
-                break;
-            case 9:
-                value = inputParameters.getRequiredString(VALUE);
-                break;
-            case 10:
-                value = inputParameters.getRequiredLocalTime(VALUE);
-                break;
-            default:
-                break;
-        }
+        context.data(data -> data.setValue(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
+            DataStorageUtils.getValue(inputParameters)));
 
-        Object finalValue = value;
-        return context
-            .data(data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY), finalValue));
+        return null;
     }
 }

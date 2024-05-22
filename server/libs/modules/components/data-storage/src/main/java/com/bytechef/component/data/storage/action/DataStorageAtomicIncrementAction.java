@@ -20,21 +20,25 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
-import static com.bytechef.component.data.storage.util.DataStorageUtils.locker;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Ivica Cardic
  */
 public class DataStorageAtomicIncrementAction {
+
+    private static final Lock LOCK = new ReentrantLock();
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("atomicIncrement")
         .title("Atomic Increment")
@@ -62,28 +66,43 @@ public class DataStorageAtomicIncrementAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Integer number = null;
+
         try {
-            if (locker.tryLock(10, TimeUnit.SECONDS)) {
-                Optional<Object> optionalList = context.data(
-                    data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                        inputParameters.getRequiredString(KEY)));
-                if (optionalList.isPresent() && optionalList.get() instanceof Number)
-                    number = (Integer) optionalList.get();
-                else
-                    return null;
+            if (LOCK.tryLock(10, TimeUnit.SECONDS)) {
+                Integer value = getValue(inputParameters, context);
 
-                number += inputParameters.getRequiredInteger(VALUE_TO_ADD);
+                if (value != null) {
+                    context.data(
+                        data -> data.setValue(
+                            Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                            inputParameters.getRequiredString(KEY), value));
 
-                Integer finalNumber = number;
-                context.data(
-                    data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                        inputParameters.getRequiredString(KEY), finalNumber));
+                    number = value;
+                }
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            context.logger(logger -> logger.error(e.getMessage(), e));
         } finally {
-            locker.unlock();
+            LOCK.unlock();
         }
+
+        return number;
+    }
+
+    private static Integer getValue(Parameters inputParameters, ActionContext context) {
+        int number;
+
+        Optional<Object> optionalList = context.data(
+            data -> data.fetchValue(
+                Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
+                inputParameters.getRequiredString(KEY)));
+        if (optionalList.isPresent() && optionalList.get() instanceof Number cuNumber) {
+            number = (Integer) cuNumber;
+        } else {
+            return null;
+        }
+
+        number += inputParameters.getRequiredInteger(VALUE_TO_ADD);
 
         return number;
     }

@@ -35,13 +35,11 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -117,62 +115,29 @@ public class DataStorageGetValueAction {
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 10")
                 .required(true))
-        .output(
-            (inputParameters, connectionParameters, context) -> context
-                .output(output -> output.get(inputParameters.getRequired(DEFAULT_VALUE))))
+        .output((inputParameters, connectionParameters, context) -> context.output(
+            output -> output.get(inputParameters.getRequired(DEFAULT_VALUE))))
         .perform(DataStorageGetValueAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws ClassNotFoundException {
 
-        Class<?> cls = null;
-        switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1:
-                cls = ArrayList.class;
-                break;
-            case 2:
-                cls = Boolean.class;
-                break;
-            case 3:
-                cls = LocalDate.class;
-                break;
-            case 4:
-                cls = LocalDateTime.class;
-                break;
-            case 5:
-                cls = Integer.class;
-                break;
-            case 7:
-                cls = Number.class;
-                break;
-            case 8:
-                cls = Object.class;
-                break;
-            case 9:
-                cls = String.class;
-                break;
-            case 10:
-                cls = LocalTime.class;
-                break;
-            default:
-                cls = nullable().getClass();
-                break;
-        }
+        Class<?> type = DataStorageUtils.getType(inputParameters);
 
-        Optional<Object> optional = context
-            .data(data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY)));
+        Optional<Object> optional = context.data(data -> data.fetchValue(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optional.isEmpty()) {
-            if (ConvertUtils.canConvert(optional.get(), cls))
-                return ConvertUtils.convertValue(inputParameters.getRequiredString(DEFAULT_VALUE), cls);
+            if (ConvertUtils.canConvert(inputParameters.getRequiredString(DEFAULT_VALUE), type))
+                return ConvertUtils.convertValue(inputParameters.getRequiredString(DEFAULT_VALUE), type);
 
             return inputParameters.getRequiredString(DEFAULT_VALUE);
         }
 
-        if (ConvertUtils.canConvert(optional.get(), cls))
-            return ConvertUtils.convertValue(optional.get(), cls);
+        if (ConvertUtils.canConvert(optional.get(), type)) {
+            return ConvertUtils.convertValue(optional.get(), type);
+        }
 
         return optional.get();
     }
