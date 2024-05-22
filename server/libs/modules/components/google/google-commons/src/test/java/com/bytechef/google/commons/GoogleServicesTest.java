@@ -77,7 +77,7 @@ public class GoogleServicesTest {
     }
 
     @Test
-    void getSheets() {
+    void getSheets() throws Exception {
         Sheets sheets = GoogleServices.getSheets(mockedParameters);
 
         assertEquals("Google Sheets Component", sheets.getApplicationName());

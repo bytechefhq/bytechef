@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.google.api.services.sheets.v4.Sheets;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class GoogleSheetsFindRowByNumActionTest extends AbstractGoogleSheetsActionTest 
     private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void perform() throws IOException {
+    void perform() throws Exception {
         List<Object> row = List.of("1", 2, false);
 
         when(mockedParameters.getRequiredInteger(ROW_NUMBER))

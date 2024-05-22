@@ -92,7 +92,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
-    void testCreateArrayPropertyForRowWhereFirstRowIsHeader() throws IOException {
+    void testCreateArrayPropertyForRowWhereFirstRowIsHeader() throws Exception {
         when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
             .thenReturn(true);
         when(mockedParameters.getRequiredString(SPREADSHEET_ID))
@@ -135,7 +135,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
-    void testCreateArrayPropertyForRowWhereFirstRowNotHeader() throws IOException {
+    void testCreateArrayPropertyForRowWhereFirstRowNotHeader() throws Exception {
         when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
             .thenReturn(false);
         when(mockedParameters.getRequiredString(SPREADSHEET_ID))
@@ -247,7 +247,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
-    void testGetSheetIdOptions() throws IOException {
+    void testGetSheetIdOptions() throws Exception {
         List<Sheet> sheetsList = getSheetList();
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
@@ -283,7 +283,7 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
-    void testGetSheetNameOptions() throws IOException {
+    void testGetSheetNameOptions() throws Exception {
         List<Sheet> sheetsList = getSheetList();
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {

@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ class GoogleSheetsUpdateRowActionTest extends AbstractGoogleSheetsActionTest {
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform() throws Exception {
         List<Object> row = List.of("abc", "sheetName", false);
 
         when(mockedParameters.getRequiredInteger(ROW_NUMBER))
