@@ -1,18 +1,23 @@
 package com.bytechef.platform.configuration.web.rest.model;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -20,38 +25,20 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2AuthorizationParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-13T22:08:56.346286+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-22T22:26:47.078102+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class OAuth2AuthorizationParametersModel {
 
   private String authorizationUrl;
+
+  @Valid
+  private Map<String, String> extraQueryParameters = new HashMap<>();
 
   private String clientId;
 
   @Valid
   private List<String> scopes = new ArrayList<>();
 
-  private Map<String, String> extraQueryParameters;
-
-    private void putExtraQueryParameter(String name, String value) {
-        if (extraQueryParameters == null) {
-            extraQueryParameters = new HashMap<>();
-        }
-
-        extraQueryParameters.put(name, value);
-    }
-
-    public OAuth2AuthorizationParametersModel accessType(String accessType) {
-        putExtraQueryParameter("access_type", accessType);
-        return this;
-    }
-
-    @Schema(name = "extraQueryParameters", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("extraQueryParameters")
-    public Map<String, String> getExtraQueryParameters() {
-        return Collections.unmodifiableMap(extraQueryParameters);
-    }
-
-    public OAuth2AuthorizationParametersModel authorizationUrl(String authorizationUrl) {
+  public OAuth2AuthorizationParametersModel authorizationUrl(String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
     return this;
   }
@@ -60,7 +47,7 @@ public class OAuth2AuthorizationParametersModel {
    * Get authorizationUrl
    * @return authorizationUrl
   */
-
+  
   @Schema(name = "authorizationUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationUrl")
   public String getAuthorizationUrl() {
@@ -69,6 +56,34 @@ public class OAuth2AuthorizationParametersModel {
 
   public void setAuthorizationUrl(String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
+  }
+
+  public OAuth2AuthorizationParametersModel extraQueryParameters(Map<String, String> extraQueryParameters) {
+    this.extraQueryParameters = extraQueryParameters;
+    return this;
+  }
+
+  public OAuth2AuthorizationParametersModel putExtraQueryParametersItem(String key, String extraQueryParametersItem) {
+    if (this.extraQueryParameters == null) {
+      this.extraQueryParameters = new HashMap<>();
+    }
+    this.extraQueryParameters.put(key, extraQueryParametersItem);
+    return this;
+  }
+
+  /**
+   * Get extraQueryParameters
+   * @return extraQueryParameters
+  */
+  
+  @Schema(name = "extraQueryParameters", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("extraQueryParameters")
+  public Map<String, String> getExtraQueryParameters() {
+    return extraQueryParameters;
+  }
+
+  public void setExtraQueryParameters(Map<String, String> extraQueryParameters) {
+    this.extraQueryParameters = extraQueryParameters;
   }
 
   public OAuth2AuthorizationParametersModel clientId(String clientId) {
@@ -80,7 +95,7 @@ public class OAuth2AuthorizationParametersModel {
    * Get clientId
    * @return clientId
   */
-
+  
   @Schema(name = "clientId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clientId")
   public String getClientId() {
@@ -108,7 +123,7 @@ public class OAuth2AuthorizationParametersModel {
    * Get scopes
    * @return scopes
   */
-
+  
   @Schema(name = "scopes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("scopes")
   public List<String> getScopes() {
@@ -129,13 +144,14 @@ public class OAuth2AuthorizationParametersModel {
     }
     OAuth2AuthorizationParametersModel oauth2AuthorizationParameters = (OAuth2AuthorizationParametersModel) o;
     return Objects.equals(this.authorizationUrl, oauth2AuthorizationParameters.authorizationUrl) &&
+        Objects.equals(this.extraQueryParameters, oauth2AuthorizationParameters.extraQueryParameters) &&
         Objects.equals(this.clientId, oauth2AuthorizationParameters.clientId) &&
         Objects.equals(this.scopes, oauth2AuthorizationParameters.scopes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationUrl, clientId, scopes);
+    return Objects.hash(authorizationUrl, extraQueryParameters, clientId, scopes);
   }
 
   @Override
@@ -143,6 +159,7 @@ public class OAuth2AuthorizationParametersModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class OAuth2AuthorizationParametersModel {\n");
     sb.append("    authorizationUrl: ").append(toIndentedString(authorizationUrl)).append("\n");
+    sb.append("    extraQueryParameters: ").append(toIndentedString(extraQueryParameters)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
     sb.append("}");
