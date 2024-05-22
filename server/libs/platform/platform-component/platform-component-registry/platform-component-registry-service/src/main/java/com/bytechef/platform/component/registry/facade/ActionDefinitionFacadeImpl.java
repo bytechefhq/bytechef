@@ -17,41 +17,52 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
+import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.exception.PartyAccessException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Service("actionDefinitionFacade")
 public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     private final ConnectionService connectionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ContextFactory contextFactory;
     private final ActionDefinitionService actionDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        ConnectionService connectionService, ContextFactory contextFactory,
+        ConnectionService connectionService, ConnectionDefinitionService connectionDefinitionService,
+        ContextFactory contextFactory,
         ActionDefinitionService actionDefinitionService) {
 
         this.contextFactory = contextFactory;
         this.actionDefinitionService = actionDefinitionService;
         this.connectionService = connectionService;
+        this.connectionDefinitionService = connectionDefinitionService;
     }
 
     @Override
@@ -76,12 +87,22 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, null, null, null, componentConnection);
+
+        try {
+            return actionDefinitionService.executeOptions(
+                componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+                searchText,
+                componentConnection, actionContext);
+        } catch (Exception exception) {
+            componentConnection = getTokenRefreshedComponentConnection(
+                componentName, connectionId, exception, componentConnection, actionContext);
+        }
+
         return actionDefinitionService.executeOptions(
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-            searchText,
-            componentConnection,
-            contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, componentConnection));
+            searchText, componentConnection, actionContext);
     }
 
     @Override
@@ -112,13 +133,51 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
 
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, actionName, type, workflowId, jobId,
+            entries.size() == 1
+                ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
+                : null);
+
+        try {
+            return actionDefinitionService.executePerform(
+                componentName, componentVersion, actionName, inputParameters, componentConnections,
+                actionContext);
+        } catch (Exception exception) {
+            ComponentConnection refreshedComponentConnection = getTokenRefreshedComponentConnection(
+                componentName, connectionIds.get(componentName), exception, componentConnections.get(componentName),
+                actionContext);
+
+            componentConnections.replace(componentName, refreshedComponentConnection);
+        }
+
         return actionDefinitionService.executePerform(
-            componentName, componentVersion, actionName, inputParameters, componentConnections,
-            contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, workflowId, jobId,
-                entries.size() == 1
-                    ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
-                    : null));
+            componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
+    }
+
+    private ComponentConnection getTokenRefreshedComponentConnection(
+        String componentName, Long connectionId, Exception exception,
+        ComponentConnection componentConnection, ActionContext actionContext) {
+
+        if (!Objects.equals(PartyAccessException.AuthorizationFailedException.class, exception.getClass()) &&
+            !StringUtils.contains(exception.getMessage(), "401")) {
+
+            throw new UnsupportedOperationException(
+                "Unable to recover failed request with token refresh procedure", exception);
+        }
+
+        Authorization.RefreshTokenResponse refreshTokenResponse =
+            connectionDefinitionService.executeRefresh(componentName, componentConnection, actionContext);
+
+        Map<String, ?> refreshTokenResponseResult = refreshTokenResponse.result();
+
+        String accessToken = MapUtils.getRequiredString(refreshTokenResponseResult, "access_token");
+
+        Connection connection = connectionService.updateConnectionParameter(
+            connectionId, "access_token", accessToken);
+
+        return new ComponentConnection(
+            componentName, connection.getVersion(), connection.getParameters(), connection.getAuthorizationName());
     }
 
     @Override
