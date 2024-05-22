@@ -1418,6 +1418,10 @@ components:
       properties:
         authorizationUrl:
           type: "string"
+        extraQueryParameters:
+          type: "object"
+          additionalProperties:
+            type: "string"
         clientId:
           type: "string"
         scopes:
