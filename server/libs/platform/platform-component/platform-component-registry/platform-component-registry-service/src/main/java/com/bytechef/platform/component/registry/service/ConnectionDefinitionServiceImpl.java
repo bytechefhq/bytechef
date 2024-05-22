@@ -174,24 +174,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             getDefaultRefreshFunction(
                 OptionalUtils.orElse(
                     authorization.getClientId(),
-                    (connectionParameters, context1) -> getDefaultClientId(
-                        connectionParameters)),
+                    (connectionParameters, context1) -> getDefaultClientId(connectionParameters)),
                 OptionalUtils.orElse(
                     authorization.getClientSecret(),
-                    (connectionParameters, context1) -> getDefaultClientSecret(
-                        connectionParameters)),
+                    (connectionParameters, context1) -> getDefaultClientSecret(connectionParameters)),
                 OptionalUtils.orElse(
                     authorization.getRefreshToken(),
-                    (connectionParameters, context1) -> getDefaultRefreshToken(
-                        connectionParameters)),
+                    (connectionParameters, context1) -> getDefaultRefreshToken(connectionParameters)),
                 OptionalUtils.orElse(
                     authorization.getRefreshUrl(),
                     (connectionParameters, context1) -> getDefaultRefreshUrl(
                         connectionParameters,
                         OptionalUtils.orElse(
                             authorization.getTokenUrl(),
-                            (connectionParameters1, context2) -> getDefaultTokenUrl(
-                                connectionParameters1)),
+                            (connectionParameters1, context2) -> getDefaultTokenUrl(connectionParameters1)),
                         context1))));
 
         try {
@@ -469,8 +465,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static String getDefaultRefreshUrl(
-        Parameters connectionParameters, TokenUrlFunction tokenUrlFunction,
-        Context context) {
+        Parameters connectionParameters, TokenUrlFunction tokenUrlFunction, Context context) {
 
         String refreshUrl = MapUtils.getString(connectionParameters, Authorization.REFRESH_URL);
 
