@@ -433,7 +433,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                         ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
-                return new RefreshTokenResponse(JsonUtils.read(httpResponse.body(), new TypeReference<>() {}));
+                Map<String, Object> responseMap = JsonUtils.read(httpResponse.body(), new TypeReference<>() {});
+
+                return new RefreshTokenResponse(
+                    (String) responseMap.get("access_token"), (Long) responseMap.get("expires_in"));
             }
         };
     }

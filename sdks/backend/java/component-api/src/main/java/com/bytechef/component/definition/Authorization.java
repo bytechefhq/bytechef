@@ -429,26 +429,7 @@ public interface Authorization {
         }
     }
 
-    record RefreshTokenResponse(Map<String, ?> result) {
-        public RefreshTokenResponse(
-            String accessToken, Long expiresIn, Map<String, Object> additionalParameters) {
-
-            this(toMap(accessToken, expiresIn, additionalParameters));
-        }
-
-        private static Map<String, Object> toMap(
-            String accessToken, Long expiresIn, Map<String, Object> additionalParameters) {
-
-            Map<String, Object> map = new HashMap<>();
-
-            map.put(ACCESS_TOKEN, accessToken);
-            map.put(EXPIRES_IN, expiresIn);
-
-            map.putAll(additionalParameters);
-
-            return map;
-        }
-
+    record RefreshTokenResponse(String accessToken, Long expiresIn) {
     }
 
     record Pkce(String verifier, String challenge, String challengeMethod) {
