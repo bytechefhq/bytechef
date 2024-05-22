@@ -594,7 +594,21 @@ const Property = ({
             }
         }
 
-        if (isNumericalInput && !numericValue && propertyParameterValue && parameterValue) {
+        if (
+            isNumericalInput &&
+            (numericValue === null || numericValue === undefined) &&
+            (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
+            parameterValue
+        ) {
+            setNumericValue(propertyParameterValue);
+        }
+
+        if (
+            isNumericalInput &&
+            (numericValue !== null || numericValue !== undefined) &&
+            (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
+            propertyParameterValue !== numericValue
+        ) {
             setNumericValue(propertyParameterValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
