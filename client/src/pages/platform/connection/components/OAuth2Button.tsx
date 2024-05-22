@@ -6,6 +6,7 @@ import useOAuth2, {CodePayloadI, TokenPayloadI} from './oauth2/useOAuth2';
 interface OAuth2ButtonProps {
     authorizationUrl: string;
     clientId: string;
+    extraQueryParameters?: Record<string, any>;
     redirectUri: string;
     responseType: 'code' | 'token';
     scope?: string;
@@ -18,6 +19,7 @@ interface OAuth2ButtonProps {
 const OAuth2Button = ({
     authorizationUrl,
     clientId,
+                          extraQueryParameters,
     onClick,
     onCodeSuccess,
     onError,
@@ -29,6 +31,7 @@ const OAuth2Button = ({
     const {getAuth, loading} = useOAuth2({
         authorizationUrl,
         clientId,
+        extraQueryParameters,
         onCodeSuccess,
         onError,
         onTokenSuccess,
