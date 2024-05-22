@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public abstract class AbstractDispatcherPreSendProcessor {
 
-    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    protected final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
     protected AbstractDispatcherPreSendProcessor(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;

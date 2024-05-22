@@ -25,4 +25,6 @@ public class MetadataConstants {
     public static final String INSTANCE_ID = "instanceId";
     public static final String TYPE = "type";
     public static final String WORKFLOW_ID = "workflowId";
+    public static final String INSTANCE_WORKFLOW_ID = "instanceWorkflowId";
+
 }
