@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.encharge.constant.EnchargeConstants.EMAIL;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
@@ -36,11 +37,14 @@ public class EnchargeUtils {
     private EnchargeUtils() {
     }
 
+    protected static final ContextFunction<Http, Http.Executor> GET_PEOPLE_CONTEXT_FUNCTION =
+        http -> http.get("https://api.encharge.io/v1/people/all");
+
     public static List<Option<String>> getUserEmailOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get("https://api.encharge.io/v1/people/all"))
+        Map<String, ?> body = context.http(GET_PEOPLE_CONTEXT_FUNCTION)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
