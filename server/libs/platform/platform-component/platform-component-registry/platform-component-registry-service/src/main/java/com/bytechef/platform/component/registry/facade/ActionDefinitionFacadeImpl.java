@@ -117,9 +117,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentName, componentVersion, actionName, inputParameters, componentConnections,
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null,
-                entries.size() == 1
-                    ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
-                    : null));
+                entries.size() == 1 ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null));
     }
 
     @Override

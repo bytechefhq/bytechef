@@ -80,6 +80,7 @@ public final class Counter implements Persistable<Long> {
         return createdDate;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
