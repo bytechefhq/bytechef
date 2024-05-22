@@ -60,8 +60,6 @@
 
         <addPrimaryKey tableName="connection_tag" columnNames="connection_id,tag_id"/>
 
-        <addUniqueConstraint constraintName="uk_connection_name" tableName="connection" columnNames="name" />
-
         <addForeignKeyConstraint
             baseColumnNames="connection_id"
             baseTableName="connection_tag"
