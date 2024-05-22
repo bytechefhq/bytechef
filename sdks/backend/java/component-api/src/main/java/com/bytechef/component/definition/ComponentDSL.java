@@ -825,6 +825,12 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableAuthorization refreshToken(RefreshTokenFunction refreshTokenFunction) {
+            this.refreshTokenFunction = Objects.requireNonNull(refreshTokenFunction);
+
+            return this;
+        }
+
         public ModifiableAuthorization refreshUrl(RefreshUrlFunction refreshUrl) {
             this.refreshUrlFunction = Objects.requireNonNull(refreshUrl);
 
