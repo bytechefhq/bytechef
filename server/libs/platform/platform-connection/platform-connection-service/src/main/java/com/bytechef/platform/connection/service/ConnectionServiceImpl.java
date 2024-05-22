@@ -22,7 +22,9 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
@@ -49,7 +51,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         Validate.notBlank(connection.getComponentName(), "'componentName' must not be empty");
         Validate.notBlank(connection.getName(), "'name' must not be empty");
         Validate.isTrue(connection.getId() == null, "'id' must be null");
-
+// ovdje se ne sprema token_url - kako doći do tokenUrl
         return connectionRepository.save(connection);
     }
 
@@ -131,5 +133,20 @@ public class ConnectionServiceImpl implements ConnectionService {
         curConnection.setVersion(connection.getVersion());
 
         return connectionRepository.save(curConnection);
+    }
+
+    @Override
+    public Connection updateConnectionParameter(long connectionId, String key, Object value) {
+        Validate.notBlank(key, "'parameter name' must not be empty");
+
+        Connection connection = getConnection(connectionId);
+
+        Map<String, Object> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.put(key, value);
+
+        connection.setParameters(parameters);
+
+        return connectionRepository.save(connection);
     }
 }
