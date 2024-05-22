@@ -8,7 +8,11 @@ import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {ProjectModel} from '@/middleware/automation/configuration';
-import {useGetProjectInstanceQuery, useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {
+    useGetProjectInstanceQuery,
+    useGetWorkspaceProjectInstancesQuery,
+} from '@/queries/automation/projectInstances.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowExecutionsQuery} from '@/queries/automation/workflowExecutions.queries';
 import {ActivityIcon} from 'lucide-react';
@@ -16,7 +20,7 @@ import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionModelFromJSON,
 } from 'middleware/automation/workflow/execution';
-import {useGetProjectsQuery} from 'queries/automation/projects.queries';
+import {useGetWorkspaceProjectsQuery} from 'queries/automation/projects.queries';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -77,15 +81,18 @@ export const WorkflowExecutions = () => {
     );
     const [filterWorkflowId, setFilterWorkflowId] = useState<string | undefined>();
 
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const navigate = useNavigate();
 
     const {data: projectInstance} = useGetProjectInstanceQuery(filterProjectInstanceId!, !!filterProjectInstanceId);
 
-    const {data: projectInstances} = useGetProjectInstancesQuery({
+    const {data: projectInstances} = useGetWorkspaceProjectInstancesQuery({
+        id: currentWorkspaceId!,
         projectId: filterProjectId,
     });
 
-    const {data: projects} = useGetProjectsQuery({});
+    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!});
 
     const {
         data: workflowExecutionPage,

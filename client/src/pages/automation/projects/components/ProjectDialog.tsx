@@ -14,6 +14,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {CategoryModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/mutations/automation/projects.mutations';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys, useGetProjectTagsQuery} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
@@ -32,6 +33,8 @@ interface ProjectDialogProps {
 const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const form = useForm<ProjectModel>({
         defaultValues: {
             category: project?.category
@@ -47,6 +50,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                     ...tag,
                     label: tag.name,
                 })) || [],
+            workspaceId: project?.workspaceId,
         } as ProjectModel,
     });
 
@@ -115,6 +119,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                 ...formData,
                 category,
                 tags: tagValues,
+                workspaceId: currentWorkspaceId,
             } as ProjectModel);
         }
     }

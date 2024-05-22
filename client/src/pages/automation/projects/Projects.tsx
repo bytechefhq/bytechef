@@ -2,9 +2,10 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useGetProjectCategoriesQuery} from '@/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/queries/automation/projectTags.queries';
-import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
+import {useGetWorkspaceProjectsQuery} from '@/queries/automation/projects.queries';
 import {FolderIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -33,6 +34,8 @@ const Projects = () => {
 
     const [filterData, setFilterData] = useState<{id?: number; type: Type}>(defaultCurrentState);
 
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const navigate = useNavigate();
 
     const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery();
@@ -41,8 +44,9 @@ const Projects = () => {
         data: projects,
         error: projectsError,
         isLoading: projectsIsLoading,
-    } = useGetProjectsQuery({
+    } = useGetWorkspaceProjectsQuery({
         categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+        id: currentWorkspaceId!,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 

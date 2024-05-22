@@ -3,11 +3,12 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
+    useGetWorkspaceConnectionsQuery,
 } from '@/queries/automation/connections.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
@@ -24,6 +25,8 @@ export enum Type {
 }
 
 export const Connections = () => {
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const [searchParams] = useSearchParams();
 
     const defaultCurrentState = {
@@ -44,7 +47,7 @@ export const Connections = () => {
         data: allConnections,
         error: allConnectionsError,
         isLoading: allConnectionsIsLoading,
-    } = useGetConnectionsQuery({});
+    } = useGetWorkspaceConnectionsQuery({id: currentWorkspaceId!});
 
     const allComponentNames = allConnections?.map((connection) => connection.componentName);
 
@@ -57,8 +60,9 @@ export const Connections = () => {
         data: connections,
         error: connectionsError,
         isLoading: connectionsIsLoading,
-    } = useGetConnectionsQuery({
+    } = useGetWorkspaceConnectionsQuery({
         componentName: searchParams.get('componentName') ? searchParams.get('componentName')! : undefined,
+        id: currentWorkspaceId!,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 

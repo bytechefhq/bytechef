@@ -3,11 +3,12 @@ import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessag
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
+    useGetWorkspaceConnectionsQuery,
 } from '@/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import * as Portal from '@radix-ui/react-portal';
@@ -31,15 +32,18 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
 }: ProjectInstanceDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
         componentVersion: workflowConnection.componentVersion,
     });
 
-    const {data: connections} = useGetConnectionsQuery(
+    const {data: connections} = useGetWorkspaceConnectionsQuery(
         {
             componentName: workflowConnection.componentName,
             connectionVersion: componentDefinition?.connection?.version,
+            id: currentWorkspaceId!,
         },
         !!componentDefinition
     );

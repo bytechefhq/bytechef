@@ -4,9 +4,10 @@ import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {ProjectInstanceModel} from '@/middleware/automation/configuration';
 import ProjectInstanceWorkflowSheet from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowSheet';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
-import {useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
-import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
+import {useGetWorkspaceProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
+import {useGetWorkspaceProjectsQuery} from '@/queries/automation/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -22,6 +23,8 @@ export enum Type {
 }
 
 const ProjectInstances = () => {
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const [searchParams] = useSearchParams();
 
     const defaultCurrentState = {
@@ -39,7 +42,8 @@ const ProjectInstances = () => {
         data: projects,
         error: projectsError,
         isLoading: projectsIsLoading,
-    } = useGetProjectsQuery({
+    } = useGetWorkspaceProjectsQuery({
+        id: currentWorkspaceId!,
         projectInstances: true,
     });
 
@@ -47,7 +51,8 @@ const ProjectInstances = () => {
         data: projectInstances,
         error: projectInstancesError,
         isLoading: projectInstancesIsLoading,
-    } = useGetProjectInstancesQuery({
+    } = useGetWorkspaceProjectInstancesQuery({
+        id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });

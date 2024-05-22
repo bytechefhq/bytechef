@@ -9,7 +9,11 @@ import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutati
 import useUpdatePlatformWorkflowMutation from '@/mutations/platform/workflows.mutations';
 import ProjectHeader from '@/pages/automation/project/components/ProjectHeader';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
-import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {
+    ConnectionReactQueryProvider,
+    RequestI,
+} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/components/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
@@ -25,7 +29,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
+    useGetWorkspaceConnectionsQuery,
 } from '@/queries/automation/connections.queries';
 import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
@@ -52,6 +56,7 @@ const Project = () => {
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {currentWorkspaceId} = useWorkspaceStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {projectId, projectWorkflowId} = useParams();
@@ -282,7 +287,15 @@ const Project = () => {
                                         ConnectionKeys: ConnectionKeys,
                                         useCreateConnectionMutation: useCreateConnectionMutation,
                                         useGetConnectionTagsQuery: useGetConnectionTagsQuery,
-                                        useGetConnectionsQuery: useGetConnectionsQuery,
+                                        useGetConnectionsQuery: (request: RequestI, enabled?: boolean) => {
+                                            return useGetWorkspaceConnectionsQuery(
+                                                {
+                                                    id: currentWorkspaceId!,
+                                                    ...request,
+                                                },
+                                                enabled
+                                            );
+                                        },
                                     }}
                                 >
                                     <WorkflowMutationProvider
@@ -343,7 +356,15 @@ const Project = () => {
                                 ConnectionKeys: ConnectionKeys,
                                 useCreateConnectionMutation: useCreateConnectionMutation,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
-                                useGetConnectionsQuery: useGetConnectionsQuery,
+                                useGetConnectionsQuery: (request: RequestI, enabled?: boolean) => {
+                                    return useGetWorkspaceConnectionsQuery(
+                                        {
+                                            id: currentWorkspaceId!,
+                                            ...request,
+                                        },
+                                        enabled
+                                    );
+                                },
                             }}
                         >
                             <WorkflowMutationProvider

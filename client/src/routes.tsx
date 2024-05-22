@@ -10,6 +10,7 @@ import OAuthPopup from '@/pages/platform/connection/components/oauth2/OAuthPopup
 import Account from '@/pages/platform/settings/Account';
 import Appearance from '@/pages/platform/settings/Appearance';
 import Settings from '@/pages/platform/settings/Settings';
+import Workspaces from '@/pages/platform/settings/automation/workspaces/Workspaces';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter} from 'react-router-dom';
 
@@ -74,6 +75,15 @@ export const router = createBrowserRouter([
                     {
                         element: <Appearance />,
                         path: 'appearance',
+                    },
+                    {
+                        children: [
+                            {
+                                element: <Workspaces />,
+                                path: 'workspaces',
+                            },
+                        ],
+                        path: 'a',
                     },
                 ],
                 element: <Settings />,

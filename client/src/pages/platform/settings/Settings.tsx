@@ -13,6 +13,13 @@ const sidebarNavItems = [
         title: 'Appearance',
     },
     {
+        title: 'Automation',
+    },
+    {
+        href: '/settings/a/workspaces',
+        title: 'Workspaces',
+    },
+    {
         title: 'Embedded',
     },
     {

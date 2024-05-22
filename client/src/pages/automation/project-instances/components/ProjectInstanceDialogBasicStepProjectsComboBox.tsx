@@ -1,7 +1,8 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {ProjectStatusModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogBasicStepProjectLabel from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectLabel';
-import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useGetWorkspaceProjectsQuery} from '@/queries/automation/projects.queries';
 import {FocusEventHandler} from 'react';
 
 const ProjectInstanceDialogBasicStepProjectsComboBox = ({
@@ -13,7 +14,12 @@ const ProjectInstanceDialogBasicStepProjectsComboBox = ({
     onChange: (item?: ComboBoxItemType) => void;
     value?: number;
 }) => {
-    const {data: projects} = useGetProjectsQuery({status: ProjectStatusModel.Published});
+    const {currentWorkspaceId} = useWorkspaceStore();
+
+    const {data: projects} = useGetWorkspaceProjectsQuery({
+        id: currentWorkspaceId!,
+        status: ProjectStatusModel.Published,
+    });
 
     return projects ? (
         <ComboBox
