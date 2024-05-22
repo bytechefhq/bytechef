@@ -1093,9 +1093,11 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
-        category:
-          description: "The category."
-          type: "string"
+        categories:
+          description: "The list of categories the component belongs to."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ComponentCategory"
         connection:
           $ref: "#/components/schemas/ConnectionDefinitionBasic"
         connectionRequired:
@@ -1204,6 +1206,30 @@ components:
         version:
           description: "The version of a connection."
           type: "integer"
+    ComponentCategory:
+      description: "A category of component."
+      type: "string"
+      enum:
+        - "accounting"
+        - "advertising"
+        - "analytics"
+        - "artificial-intelligence"
+        - "ats"
+        - "calendars-and-scheduling"
+        - "communication"
+        - "crm"
+        - "customer-support"
+        - "developer-tools"
+        - "e-commerce"
+        - "file-storage"
+        - "helpers"
+        - "hris"
+        - "marketing-automation"
+        - "payment-processing"
+        - "productivity-and-collaboration"
+        - "project-management"
+        - "social-media"
+        - "surveys-and-feedback"
     ConnectionDefinitionBasic:
       description: "Definition of a connection to an outside service."
       type: "object"
