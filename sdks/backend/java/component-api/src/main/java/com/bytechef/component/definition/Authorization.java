@@ -150,12 +150,15 @@ public interface Authorization {
     Optional<List<Object>> getRefreshOn();
 
     /**
-     * TODO
      *
      * @return
      */
     Optional<RefreshUrlFunction> getRefreshUrl();
 
+    /**
+     *
+     * @return
+     */
     Optional<RefreshTokenFunction> getRefreshToken();
 
     /**
