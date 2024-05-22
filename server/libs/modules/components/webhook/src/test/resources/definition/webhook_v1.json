@@ -12,6 +12,8 @@
   "resources": null,
   "version": 1,
   "title": "Webhook",
+  "connection": null,
+  "actions": null,
   "triggers": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -21,7 +23,6 @@
     "name": "autoRespondWithHTTP200",
     "outputFunction": { },
     "properties": null,
-    "staticWebhookRequest": { },
     "title": "Auto Respond with HTTP 200 status",
     "type": "STATIC_WEBHOOK",
     "webhookRawBody": null,
@@ -29,15 +30,16 @@
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
     "deduplicate": null,
+    "poll": null,
+    "output": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "poll": null,
-    "webhookValidate": null,
-    "output": null
+    "staticWebhookRequest": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -67,7 +69,6 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": { },
     "title": "Validate and respond",
     "type": "STATIC_WEBHOOK",
     "webhookRawBody": null,
@@ -75,15 +76,16 @@
     "workflowSyncExecution": null,
     "workflowSyncValidation": true,
     "deduplicate": null,
+    "poll": null,
+    "output": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": { },
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "poll": null,
-    "webhookValidate": { },
-    "output": null
+    "staticWebhookRequest": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -132,7 +134,6 @@
       "controlType": "INTEGER",
       "optionsDataSource": null
     } ],
-    "staticWebhookRequest": { },
     "title": "Await workflow and respond",
     "type": "STATIC_WEBHOOK",
     "webhookRawBody": null,
@@ -140,16 +141,15 @@
     "workflowSyncExecution": true,
     "workflowSyncValidation": null,
     "deduplicate": null,
+    "poll": null,
+    "output": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": { },
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "poll": null,
-    "webhookValidate": { },
-    "output": null
-  } ],
-  "connection": null,
-  "actions": null
+    "staticWebhookRequest": { }
+  } ]
 }

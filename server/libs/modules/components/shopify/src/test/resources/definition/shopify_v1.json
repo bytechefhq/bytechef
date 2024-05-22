@@ -12,6 +12,94 @@
   "resources": null,
   "version": 1,
   "title": "Shopify",
+  "connection": {
+    "authorizations": [ {
+      "detectOn": null,
+      "description": null,
+      "name": "api_key",
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "shopName",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Shop name",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": true,
+        "metadata": { },
+        "required": true,
+        "name": "key",
+        "type": "STRING",
+        "defaultValue": "X-Shopify-Access-Token",
+        "exampleValue": null,
+        "label": "Access token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "value",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Access Token",
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "refreshOn": null,
+      "title": "API Key",
+      "type": "API_KEY",
+      "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
+      "pkce": null,
+      "refresh": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationCallback": null
+    } ],
+    "properties": null,
+    "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
+    "test": null
+  },
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -169,8 +257,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "controlType": "NUMBER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "NUMBER"
             }, {
               "advancedOption": null,
               "description": "The ID of the product that the line item belongs to.",
@@ -188,11 +276,11 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "SELECT",
               "optionsDataSource": {
                 "optionsLookupDependsOn": null,
                 "options": { }
-              }
+              },
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "The ID of the product variant.",
@@ -210,11 +298,11 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "SELECT",
               "optionsDataSource": {
                 "optionsLookupDependsOn": [ "__item.order.line_items[index].product_id" ],
                 "options": { }
-              }
+              },
+              "controlType": "SELECT"
             }, {
               "advancedOption": null,
               "description": "The number of items that were purchased.",
@@ -232,8 +320,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": "The title of the product.",
@@ -255,15 +343,15 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "The sum of all the taxes applied to the order in the shop currency. Must be positive.",
@@ -305,14 +393,15 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create an order",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -350,8 +439,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -563,8 +652,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "controlType": "NUMBER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "NUMBER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -582,8 +671,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -601,8 +690,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -620,8 +709,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -643,22 +732,21 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -690,16 +778,16 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "SELECT",
       "optionsDataSource": {
         "optionsLookupDependsOn": null,
         "options": { }
-      }
+      },
+      "controlType": "SELECT"
     } ],
     "title": "Delete an order",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": null
+    "perform": null,
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -731,14 +819,15 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "SELECT",
       "optionsDataSource": {
         "optionsLookupDependsOn": null,
         "options": { }
-      }
+      },
+      "controlType": "SELECT"
     } ],
     "title": "Cancel an order",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -776,8 +865,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -989,8 +1078,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "controlType": "NUMBER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "NUMBER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1008,8 +1097,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1027,8 +1116,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1046,8 +1135,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1069,22 +1158,21 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1118,11 +1206,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "SELECT",
       "optionsDataSource": {
         "optionsLookupDependsOn": null,
         "options": { }
-      }
+      },
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": null,
@@ -1240,14 +1328,15 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update an order",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1285,8 +1374,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1498,8 +1587,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "controlType": "NUMBER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "NUMBER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1517,8 +1606,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1536,8 +1625,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1555,8 +1644,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1578,22 +1667,21 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1625,14 +1713,15 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "SELECT",
       "optionsDataSource": {
         "optionsLookupDependsOn": null,
         "options": { }
-      }
+      },
+      "controlType": "SELECT"
     } ],
     "title": "Close an order",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -1670,8 +1759,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1883,8 +1972,8 @@
               "minValue": null,
               "numberPrecision": null,
               "options": null,
-              "controlType": "NUMBER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "NUMBER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1902,8 +1991,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1921,8 +2010,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1940,8 +2029,8 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "controlType": "INTEGER",
-              "optionsDataSource": null
+              "optionsDataSource": null,
+              "controlType": "INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -1963,109 +2052,21 @@
               "options": null,
               "optionsDataSource": null
             } ],
-            "controlType": "OBJECT_BUILDER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "OBJECT_BUILDER"
           } ],
           "maxItems": null,
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   } ],
-  "connection": {
-    "authorizations": [ {
-      "detectOn": null,
-      "description": null,
-      "name": "api_key",
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "shopName",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Shop name",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": true,
-        "metadata": { },
-        "required": true,
-        "name": "key",
-        "type": "STRING",
-        "defaultValue": "X-Shopify-Access-Token",
-        "exampleValue": null,
-        "label": "Access token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": true,
-        "name": "value",
-        "type": "STRING",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": "Access Token",
-        "placeholder": null,
-        "controlType": "TEXT",
-        "languageId": null,
-        "maxLength": null,
-        "minLength": null,
-        "options": null,
-        "optionsDataSource": null
-      } ],
-      "refreshOn": null,
-      "title": "API Key",
-      "type": "API_KEY",
-      "acquire": null,
-      "apply": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "pkce": null,
-      "refresh": null,
-      "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null
-    } ],
-    "properties": null,
-    "version": 1,
-    "authorizationRequired": null,
-    "baseUri": { },
-    "test": null
-  },
   "triggers": [ ]
 }

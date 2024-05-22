@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Google Docs",
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,23 +61,24 @@
       "refreshOn": null,
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
-      "apply": null,
+      "acquire": null,
       "authorizationCallback": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { },
-      "acquire": null
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "test": null,
-    "baseUri": null
+    "baseUri": null,
+    "test": null
   },
   "actions": [ {
     "batch": null,
@@ -201,8 +201,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Key: Image ID (get it manually from the Read File Action), Value: Image URL",
@@ -241,8 +241,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Edit template file",
     "workflowNodeDescriptionFunction": null,
@@ -282,5 +282,6 @@
     "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
-  } ]
+  } ],
+  "triggers": null
 }

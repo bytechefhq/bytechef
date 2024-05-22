@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Example",
-  "triggers": null,
   "connection": null,
   "actions": [ {
     "batch": null,
@@ -26,6 +25,7 @@
     "properties": [ ],
     "title": "Title",
     "workflowNodeDescriptionFunction": null,
+    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -49,7 +49,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
-  } ]
+    }
+  } ],
+  "triggers": null
 }

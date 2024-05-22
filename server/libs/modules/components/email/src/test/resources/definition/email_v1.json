@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Email",
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,17 +61,18 @@
       "refreshOn": null,
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
-      "apply": null,
+      "acquire": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
-      "clientId": null,
       "clientSecret": null,
+      "refreshToken": null,
+      "tokenUrl": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
-      "scopes": null,
-      "tokenUrl": null,
-      "acquire": null
+      "scopes": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -111,8 +111,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "If selected the connection will use TLS when connecting to server.",
@@ -169,8 +169,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Who to send the email to.",
@@ -210,8 +210,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Who to CC on the email.",
@@ -251,8 +251,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Who to BCC on the email.",
@@ -292,8 +292,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "When someone replies to this email, where should it go to?",
@@ -333,8 +333,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Your email subject.",
@@ -490,12 +490,13 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send",
     "workflowNodeDescriptionFunction": null,
     "output": null,
     "perform": { }
-  } ]
+  } ],
+  "triggers": null
 }

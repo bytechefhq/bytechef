@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Encharge",
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,17 +61,18 @@
       "refreshOn": null,
       "title": "API Key",
       "type": "API_KEY",
-      "apply": null,
+      "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "acquire": null
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
@@ -199,6 +199,7 @@
     } ],
     "title": "Create email template",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -363,8 +364,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -545,6 +545,7 @@
     } ],
     "title": "Create people",
     "workflowNodeDescriptionFunction": null,
+    "perform": null,
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -771,8 +772,7 @@
         "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": null
+    }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -855,7 +855,8 @@
     } ],
     "title": "Add tag",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": null
-  } ]
+    "perform": null,
+    "output": null
+  } ],
+  "triggers": [ ]
 }

@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Keap",
-  "triggers": [ ],
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,23 +61,24 @@
       "refreshOn": null,
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
-      "apply": null,
+      "acquire": null,
       "authorizationCallback": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
+      "refreshToken": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": { },
-      "acquire": null
+      "tokenUrl": { }
     } ],
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "test": null,
-    "baseUri": null
+    "baseUri": null,
+    "test": null
   },
   "actions": [ {
     "batch": null,
@@ -4964,5 +4964,6 @@
       "sampleOutput": null
     },
     "perform": null
-  } ]
+  } ],
+  "triggers": [ ]
 }

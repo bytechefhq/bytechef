@@ -51,7 +51,8 @@
       "scopes": null,
       "tokenUrl": null,
       "authorizationUrl": null,
-      "clientSecret": null
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,

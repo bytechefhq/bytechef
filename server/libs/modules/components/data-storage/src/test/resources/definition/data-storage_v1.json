@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Data Storage",
-  "triggers": null,
   "connection": null,
   "actions": [ {
     "batch": null,
@@ -380,8 +379,8 @@
     } ],
     "title": "Append Value to List",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -468,8 +467,8 @@
     } ],
     "title": "Atomic Increment",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -556,8 +555,8 @@
     } ],
     "title": "Await Get Value",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -625,8 +624,8 @@
     } ],
     "title": "Delete Value",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -713,8 +712,8 @@
     } ],
     "title": "Delete Value from List",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -762,8 +761,8 @@
     } ],
     "title": "Get All Entries(Keys and Values)",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -1082,8 +1081,8 @@
     } ],
     "title": "Get Value",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1402,8 +1401,8 @@
     } ],
     "title": "Set Value",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -1741,7 +1740,8 @@
     } ],
     "title": "Set Value in List",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
-  } ]
+    "output": null,
+    "perform": { }
+  } ],
+  "triggers": null
 }

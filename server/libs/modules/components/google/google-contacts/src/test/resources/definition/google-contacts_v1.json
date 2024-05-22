@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Google Contacts",
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -62,23 +61,24 @@
       "refreshOn": null,
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
-      "apply": null,
+      "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": { },
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
       "tokenUrl": { },
-      "acquire": null
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "refreshToken": null
     } ],
     "properties": null,
     "version": 1,
     "authorizationRequired": null,
-    "test": null,
-    "baseUri": null
+    "baseUri": null,
+    "test": null
   },
   "actions": [ {
     "batch": null,
@@ -638,5 +638,6 @@
       },
       "sampleOutput": null
     }
-  } ]
+  } ],
+  "triggers": null
 }
