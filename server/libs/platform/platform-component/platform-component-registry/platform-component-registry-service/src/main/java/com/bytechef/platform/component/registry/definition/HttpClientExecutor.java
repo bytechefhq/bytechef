@@ -30,6 +30,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.platform.exception.PartyAccessException;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +40,7 @@ import com.github.mizosoft.methanol.Methanol;
 import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
@@ -53,10 +55,8 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -181,6 +181,10 @@ public class HttpClientExecutor {
 
         if (!configuration.isDisableAuthorization()) {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
+
+            if (Objects.equals("oauth2_authorization_code", componentConnection.getAuthorizationName())) {
+                builder.interceptor(getInterceptor(headers, componentName, componentConnection, context));
+            }
         }
 
         if (configuration.isFollowRedirect()) {
@@ -206,6 +210,35 @@ public class HttpClientExecutor {
         }
 
         return builder.build();
+    }
+
+    private Methanol.Interceptor getInterceptor(
+        Map<String, List<String>> headers, String componentName, ComponentConnection componentConnection,
+        Context context) {
+        return new Methanol.Interceptor() {
+            @Override
+            public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
+                throws IOException, InterruptedException {
+                logger.trace("Intercepting OAuth Authorized request to analyze response");
+
+                HttpResponse<T> httpResponse = chain.forward(httpRequest);
+
+                if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 300)) {
+                    return httpResponse;
+                }
+
+                logger.debug("Rise exception");
+
+                throw PartyAccessException.getByHttpResponseCode(httpResponse.statusCode(), "Token expired");
+            }
+
+            @Override
+            public <T> CompletableFuture<HttpResponse<T>> interceptAsync(HttpRequest httpRequest, Chain<T> chain) {
+                logger.trace("Intercepting ASYNC OAuth Authorized request to analyze response");
+
+                return chain.forwardAsync(httpRequest);
+            }
+        };
     }
 
     HttpRequest createHTTPRequest(
