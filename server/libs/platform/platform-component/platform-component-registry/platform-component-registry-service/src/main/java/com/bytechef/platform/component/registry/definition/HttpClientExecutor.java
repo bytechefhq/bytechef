@@ -55,7 +55,10 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
@@ -183,7 +186,7 @@ public class HttpClientExecutor {
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
             if (Objects.equals("oauth2_authorization_code", componentConnection.getAuthorizationName())) {
-                builder.interceptor(getInterceptor(headers, componentName, componentConnection, context));
+                builder.interceptor(getInterceptor());
             }
         }
 
@@ -212,9 +215,7 @@ public class HttpClientExecutor {
         return builder.build();
     }
 
-    private Methanol.Interceptor getInterceptor(
-        Map<String, List<String>> headers, String componentName, ComponentConnection componentConnection,
-        Context context) {
+    private Methanol.Interceptor getInterceptor() {
         return new Methanol.Interceptor() {
             @Override
             public <T> HttpResponse<T> intercept(HttpRequest httpRequest, Chain<T> chain)
