@@ -36,7 +36,8 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
     }
 
     @Override
-    public List<Project> findAllProjects(Long categoryId, List<Long> ids, Long tagId, Integer status) {
+    public List<Project>
+        findAllProjects(Long workspaceId, Long categoryId, List<Long> ids, Long tagId, Integer status) {
         List<Object> arguments = new ArrayList<>();
         String query = "SELECT DISTINCT project.*, LOWER(name) AS lower_name FROM project ";
 
@@ -46,12 +47,22 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "JOIN project_tag ON project.id = project_tag.project_id ";
         }
 
-        if (categoryId != null || !ids.isEmpty() || tagId != null || status != null) {
+        if (workspaceId != null || categoryId != null || !ids.isEmpty() || tagId != null || status != null) {
             query += "WHERE ";
+        }
+
+        if (workspaceId != null) {
+            arguments.add(workspaceId);
+
+            query += "workspace_id = ? ";
         }
 
         if (categoryId != null) {
             arguments.add(categoryId);
+
+            if (workspaceId != null) {
+                query += "AND ";
+            }
 
             query += "category_id = ? ";
         }
@@ -59,7 +70,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         if (!ids.isEmpty()) {
             arguments.addAll(ids);
 
-            if (categoryId != null) {
+            if (workspaceId != null || categoryId != null) {
                 query += "AND ";
             }
 
@@ -79,7 +90,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         if (tagId != null) {
             arguments.add(tagId);
 
-            if (categoryId != null || !ids.isEmpty()) {
+            if (workspaceId != null || categoryId != null || !ids.isEmpty()) {
                 query += "AND ";
             }
 
@@ -89,7 +100,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         if (status != null) {
             arguments.add(status);
 
-            if (categoryId != null || !ids.isEmpty() || tagId != null) {
+            if (workspaceId != null || categoryId != null || !ids.isEmpty() || tagId != null) {
                 query += "AND ";
             }
 

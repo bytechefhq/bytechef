@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface CustomProjectRepository {
 
-    List<Project> findAllProjects(Long categoryId, List<Long> ids, Long tagId, Integer status);
+    List<Project> findAllProjects(Long workspaceId, Long categoryId, List<Long> ids, Long tagId, Integer status);
 }

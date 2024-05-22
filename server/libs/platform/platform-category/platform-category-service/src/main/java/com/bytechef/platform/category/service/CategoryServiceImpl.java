@@ -93,8 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
                 Category finalCategory = category;
 
                 category = OptionalUtils.orElseGet(
-                    categoryRepository.findByName(category.getName()),
-                    () -> categoryRepository.save(finalCategory));
+                    categoryRepository.findByName(category.getName()), () -> categoryRepository.save(finalCategory));
             }
         } else {
             Category curCategory = OptionalUtils.get(

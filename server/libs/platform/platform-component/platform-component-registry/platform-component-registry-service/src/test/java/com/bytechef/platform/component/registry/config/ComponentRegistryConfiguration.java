@@ -82,9 +82,6 @@ public class ComponentRegistryConfiguration {
     DataStorageService dataStorageService;
 
     @MockBean
-    InstanceAccessorRegistry instanceAccessorRegistry;
-
-    @MockBean
     MessageBroker messageBroker;
 
     @MockBean
@@ -116,6 +113,11 @@ public class ComponentRegistryConfiguration {
 
     @MockBean
     WorkflowTestConfigurationService workflowTestConfigurationService;
+
+    @Bean
+    InstanceAccessorRegistry instanceAccessorRegistry() {
+        return new InstanceAccessorRegistry(List.of());
+    }
 
     @Bean
     TaskFileStorage workflowFileStorage() {

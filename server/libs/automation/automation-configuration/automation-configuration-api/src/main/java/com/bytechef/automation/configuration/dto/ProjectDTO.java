@@ -31,13 +31,14 @@ import java.util.List;
 public record ProjectDTO(
     Category category, String createdBy, LocalDateTime createdDate, String description, Long id, String name,
     String lastModifiedBy, LocalDateTime lastModifiedDate, int projectVersion, LocalDateTime publishedDate,
-    Status status, List<Tag> tags, int version, List<Long> projectWorkflowIds) {
+    Status status, List<Tag> tags, int version, List<Long> projectWorkflowIds, Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Tag> tags, List<Long> projectWorkflowIds) {
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastVersion(),
-            project.getLastPublishedDate(), project.getLastStatus(), tags, project.getVersion(), projectWorkflowIds);
+            project.getLastPublishedDate(), project.getLastStatus(), tags, project.getVersion(), projectWorkflowIds,
+            project.getWorkspaceId());
     }
 
     public static Builder builder() {
@@ -52,6 +53,7 @@ public record ProjectDTO(
         project.setId(id);
         project.setName(name);
         project.setVersion(version);
+        project.setWorkspaceId(workspaceId);
 
         return project;
     }
@@ -72,6 +74,7 @@ public record ProjectDTO(
         private List<Tag> tags;
         private int version;
         private List<Long> projectWorkflowIds;
+        private Long workspaceId;
 
         private Builder() {
         }
@@ -160,10 +163,16 @@ public record ProjectDTO(
             return this;
         }
 
+        public Builder workspaceId(long workspaceId) {
+            this.workspaceId = workspaceId;
+
+            return this;
+        }
+
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                projectVersion, publishedDate, status, tags, version, projectWorkflowIds);
+                projectVersion, publishedDate, status, tags, version, projectWorkflowIds, workspaceId);
         }
     }
 }

@@ -71,20 +71,22 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances() {
-        return getProjectInstances(null, null, null);
+        return getProjectInstances(null, null, null, null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances(long projectId) {
-        return getProjectInstances(null, projectId, null);
+        return getProjectInstances(null, null, projectId, null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectInstance> getProjectInstances(Environment environment, Long projectId, Long tagId) {
+    public List<ProjectInstance> getProjectInstances(
+        Long workspaceId, Environment environment, Long projectId, Long tagId) {
+
         return projectInstanceRepository.findAllProjectInstances(
-            environment == null ? null : environment.ordinal(), projectId, tagId);
+            workspaceId, environment == null ? null : environment.ordinal(), projectId, tagId);
     }
 
     @Override

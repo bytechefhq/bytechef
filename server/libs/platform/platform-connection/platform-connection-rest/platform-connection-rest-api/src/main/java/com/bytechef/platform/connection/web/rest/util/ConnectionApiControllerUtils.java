@@ -28,13 +28,6 @@ import org.springframework.http.ResponseEntity;
  */
 public class ConnectionApiControllerUtils {
 
-    public static ResponseEntity<Void> deleteConnection(Long id, ConnectionFacade connectionFacade) {
-        connectionFacade.delete(id);
-
-        return ResponseEntity.noContent()
-            .build();
-    }
-
     public static ResponseEntity<ConnectionModel> getConnection(
         Long id, ConnectionFacade connectionFacade, ConversionService conversionService) {
 

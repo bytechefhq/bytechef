@@ -120,8 +120,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId, Status status) {
-        return projectRepository.findAllProjects(categoryId, ids, tagId, status == null ? null : status.ordinal());
+    public List<Project> getProjects(Long workspaceId, Long categoryId, List<Long> ids, Long tagId, Status status) {
+        return projectRepository.findAllProjects(
+            workspaceId, categoryId, ids, tagId, status == null ? null : status.ordinal());
     }
 
     @Override
@@ -158,6 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
         curProject.setDescription(project.getDescription());
         curProject.setName(Validate.notNull(project.getName(), "name"));
         curProject.setTagIds(project.getTagIds());
+        curProject.setVersion(project.getVersion());
 
         return projectRepository.save(curProject);
     }

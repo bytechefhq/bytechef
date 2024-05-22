@@ -8,6 +8,10 @@ openapi:
       embedded: /api/embedded
       platform: /api/platform
 
+spring:
+  liquibase:
+    contexts: connection
+
 bytechef:
   encryption:
     provider: filesystem

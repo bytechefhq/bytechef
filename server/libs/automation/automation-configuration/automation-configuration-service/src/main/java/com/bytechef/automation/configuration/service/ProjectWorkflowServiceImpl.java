@@ -134,6 +134,13 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         Validate.notNull(projectWorkflow, "'projectWorkflow' must not be null");
         Validate.notNull(projectWorkflow.getId(), "'id' must not be null");
 
+        ProjectWorkflow curProjectWorkflow = OptionalUtils.get(
+            projectWorkflowRepository.findById(projectWorkflow.getId()));
+
+        curProjectWorkflow.setProjectVersion(projectWorkflow.getProjectVersion());
+        curProjectWorkflow.setWorkflowId(projectWorkflow.getWorkflowId());
+        curProjectWorkflow.setWorkflowReferenceCode(projectWorkflow.getWorkflowReferenceCode());
+
         return projectWorkflowRepository.save(projectWorkflow);
     }
 }

@@ -64,6 +64,9 @@ public interface ProjectFacade {
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
 
+    List<ProjectDTO> getWorkspaceProjects(
+        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status);
+
     ProjectDTO updateProject(@NonNull ProjectDTO projectDTO);
 
     void updateProjectTags(long id, @NonNull List<Tag> tags);

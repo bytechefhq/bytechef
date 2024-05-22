@@ -20,11 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,10 +49,21 @@ public class ProjectWorkflowServiceIntTest {
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
 
+    @Autowired
+    private WorkspaceRepository workspaceRepository;
+
+    private Workspace workspace;
+
     @AfterEach
     public void afterEach() {
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
+        workspaceRepository.deleteAll();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @Test
@@ -67,6 +81,7 @@ public class ProjectWorkflowServiceIntTest {
         return Project.builder()
             .description("description")
             .name("name")
+            .workspaceId(workspace.getId())
             .build();
     }
 }

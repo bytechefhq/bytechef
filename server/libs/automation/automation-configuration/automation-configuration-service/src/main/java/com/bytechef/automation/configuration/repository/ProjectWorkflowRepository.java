@@ -28,8 +28,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface ProjectWorkflowRepository
-    extends ListCrudRepository<ProjectWorkflow, Long> {
+public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWorkflow, Long> {
 
     int countByProjectIdAndProjectVersion(long projectId, int projectVersion);
 

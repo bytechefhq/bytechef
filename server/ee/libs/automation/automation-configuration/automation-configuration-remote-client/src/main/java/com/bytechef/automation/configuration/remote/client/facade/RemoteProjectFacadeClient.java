@@ -110,6 +110,13 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
+    public List<ProjectDTO> getWorkspaceProjects(
+        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status) {
+
+        return List.of();
+    }
+
+    @Override
     public ProjectDTO updateProject(@NonNull ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }

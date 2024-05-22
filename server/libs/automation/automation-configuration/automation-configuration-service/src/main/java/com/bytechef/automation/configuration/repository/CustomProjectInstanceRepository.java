@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface CustomProjectInstanceRepository {
 
-    List<ProjectInstance> findAllProjectInstances(Integer environment, Long projectId, Long tagId);
+    List<ProjectInstance> findAllProjectInstances(Long workspaceId, Integer environment, Long projectId, Long tagId);
 }

@@ -12,6 +12,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
             <column name="category_id" type="BIGINT"/>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
@@ -167,6 +170,33 @@
             </column>
         </createTable>
 
+        <createTable tableName="workspace">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <addPrimaryKey tableName="project_instance_tag" columnNames="project_instance_id,tag_id"/>
         <addPrimaryKey tableName="project_instance_workflow_connection" columnNames="project_instance_workflow_id,workflow_node_name,key"/>
         <addPrimaryKey tableName="project_tag" columnNames="project_id,tag_id"/>
@@ -177,11 +207,23 @@
             columnNames="workflow_id"
             constraintName="uk_project_workflow_workflow_id" />
 
+        <addUniqueConstraint
+            tableName="workspace"
+            columnNames="name"
+            constraintName="uk_workspace_name" />
+
         <addForeignKeyConstraint
             baseTableName="project"
             baseColumnNames="category_id"
             constraintName="fk_project_category"
             referencedTableName="category"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project"
+            baseColumnNames="workspace_id"
+            constraintName="fk_project_workspace"
+            referencedTableName="workspace"
             referencedColumnNames="id"/>
 
         <addForeignKeyConstraint
@@ -246,5 +288,34 @@
             constraintName="fk_project_workflow_project"
             referencedTableName="project"
             referencedColumnNames="id"/>
+
+        <insert tableName="workspace">
+            <column name="id" value="1049" />
+            <column name="name" value="Default" />
+            <column name="description" value="The default workspace" />
+            <column name="created_date" value="now" />
+            <column name="created_by" value="system" />
+            <column name="last_modified_by" value="system" />
+            <column name="last_modified_date" value="now" />
+            <column name="version" value="1049" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="202308070818" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseTableName="project_instance_workflow_connection"
+            baseColumnNames="connection_id"
+            constraintName="project_instance_workflow_connection_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"
+        />
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_connection"
+            baseColumnNames="workspace_id"
+            constraintName="workspace_connection_workspace"
+            referencedTableName="workspace"
+            referencedColumnNames="id"
+        />
     </changeSet>
 </databaseChangeLog>

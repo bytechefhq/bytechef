@@ -44,6 +44,7 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
+import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -133,6 +134,11 @@ public class ComponentTestIntConfiguration {
     @Bean
     FileStorageService fileStorageService() {
         return new Base64FileStorageService();
+    }
+
+    @Bean
+    InstanceAccessorRegistry instanceAccessorRegistry() {
+        return new InstanceAccessorRegistry(List.of());
     }
 
     @Bean

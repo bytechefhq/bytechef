@@ -26,10 +26,12 @@ import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,18 +86,32 @@ public class ProjectFacadeIntTest {
     @Autowired
     private WorkflowCrudRepository workflowRepository;
 
+    private Workspace workspace;
+
+    @Autowired
+    private WorkspaceRepository workspaceRepository;
+
     @AfterEach
     public void afterEach() {
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
+        workspaceRepository.deleteAll();
 
         categoryRepository.deleteAll();
         tagRepository.deleteAll();
+
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @Test
     public void testAddWorkflow() {
         Project project = new Project();
+
+        project.setWorkspaceId(workspace.getId());
 
         project.setName("name");
 
@@ -126,6 +143,7 @@ public class ProjectFacadeIntTest {
             .description("description")
             .name("name1")
             .tags(List.of(new Tag("tag1")))
+            .workspaceId(workspace.getId())
             .build();
 
         projectDTO = projectFacade.createProject(projectDTO);
@@ -145,6 +163,7 @@ public class ProjectFacadeIntTest {
         ProjectDTO projectDTO1 = ProjectDTO.builder()
             .name("name1")
             .tags(List.of(new Tag("tag1")))
+            .workspaceId(workspace.getId())
             .build();
 
         projectDTO1 = projectFacade.createProject(projectDTO1);
@@ -152,6 +171,7 @@ public class ProjectFacadeIntTest {
         ProjectDTO projectDTO2 = ProjectDTO.builder()
             .name("name2")
             .tags(List.of(new Tag("tag1")))
+            .workspaceId(workspace.getId())
             .build();
 
         projectDTO2 = projectFacade.createProject(projectDTO2);
@@ -172,6 +192,8 @@ public class ProjectFacadeIntTest {
     @Test
     public void testGetProject() {
         Project project = new Project();
+
+        project.setWorkspaceId(workspace.getId());
 
         Category category = categoryRepository.save(new Category("category1"));
 
@@ -195,6 +217,8 @@ public class ProjectFacadeIntTest {
     @Test
     public void testGetProjects() {
         Project project = new Project();
+
+        project.setWorkspaceId(workspace.getId());
 
         Category category = categoryRepository.save(new Category("category1"));
 
@@ -225,6 +249,8 @@ public class ProjectFacadeIntTest {
     public void testGetProjectTags() {
         Project project = new Project();
 
+        project.setWorkspaceId(workspace.getId());
+
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
 
@@ -241,6 +267,7 @@ public class ProjectFacadeIntTest {
         project = new Project();
 
         project.setName("name2");
+        project.setWorkspaceId(workspace.getId());
 
         tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
@@ -272,6 +299,7 @@ public class ProjectFacadeIntTest {
         Project project = new Project();
 
         project.setName("name");
+        project.setWorkspaceId(workspace.getId());
 
         project = projectRepository.save(project);
 
@@ -298,6 +326,7 @@ public class ProjectFacadeIntTest {
         ProjectDTO projectDTO = ProjectDTO.builder()
             .name("name")
             .tags(List.of(new Tag("tag1"), tagRepository.save(new Tag("tag2"))))
+            .workspaceId(workspace.getId())
             .build();
 
         projectDTO = projectFacade.createProject(projectDTO);
@@ -310,6 +339,8 @@ public class ProjectFacadeIntTest {
             .name("name")
             .tags(List.of(new Tag("tag1")))
             .projectWorkflowIds(projectDTO.projectWorkflowIds())
+            .version(projectDTO.version())
+            .workspaceId(workspace.getId())
             .build();
 
         projectDTO = projectFacade.updateProject(projectDTO);

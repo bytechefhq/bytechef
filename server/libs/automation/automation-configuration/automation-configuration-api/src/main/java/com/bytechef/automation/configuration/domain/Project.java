@@ -84,6 +84,9 @@ public final class Project {
     @Version
     private int version;
 
+    @Column("workspace_id")
+    private AggregateReference<Category, Long> workspaceId;
+
     public Project() {
         projectVersions.add(new ProjectVersion(1));
     }
@@ -135,18 +138,6 @@ public final class Project {
     public int hashCode() {
         return getClass().hashCode();
     }
-
-//    public List<String> getAllWorkflowIds() {
-//        return CollectionUtils.map(projectWorkflows, ProjectWorkflow::getWorkflowId);
-//    }
-//
-//    public Map<Integer, List<String>> getAllWorkflowIdMap() {
-//        return projectWorkflows.stream()
-//            .collect(Collectors.groupingBy(
-//                ProjectWorkflow::getProjectVersion,
-//                Collectors.collectingAndThen(
-//                    Collectors.toList(), list -> CollectionUtils.map(list, ProjectWorkflow::getWorkflowId))));
-//    }
 
     public Long getCategoryId() {
         return categoryId == null ? null : categoryId.getId();
@@ -213,6 +204,10 @@ public final class Project {
         return version;
     }
 
+    public Long getWorkspaceId() {
+        return workspaceId == null ? null : workspaceId.getId();
+    }
+
     public boolean isPublished() {
         return projectVersions.stream()
             .anyMatch(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED);
@@ -252,10 +247,6 @@ public final class Project {
         this.projectVersions = new HashSet<>(projectVersions);
     }
 
-//    public void setProjectWorkflows(Set<ProjectWorkflow> projectWorkflows) {
-//        this.projectWorkflows = new HashSet<>(projectWorkflows);
-//    }
-
     public void setTagIds(List<Long> tagIds) {
         this.projectTags = new HashSet<>();
 
@@ -276,11 +267,16 @@ public final class Project {
         this.version = version;
     }
 
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId == null ? null : AggregateReference.to(workspaceId);
+    }
+
     @Override
     public String toString() {
         return "Project{" +
             "id=" + id +
             ", name='" + name + '\'' +
+            ", workspaceId=" + getWorkspaceId() +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", projectTags=" + projectTags +
@@ -300,37 +296,50 @@ public final class Project {
         private String name;
         private List<Long> tagIds;
         private int version;
+        private long workspaceId;
 
         private Builder() {
         }
 
         public Builder categoryId(Long categoryId) {
             this.categoryId = categoryId;
+
             return this;
         }
 
         public Builder description(String description) {
             this.description = description;
+
             return this;
         }
 
         public Builder id(Long id) {
             this.id = id;
+
             return this;
         }
 
         public Builder name(String name) {
             this.name = name;
+
             return this;
         }
 
         public Builder tagIds(List<Long> tagIds) {
             this.tagIds = tagIds;
+
             return this;
         }
 
         public Builder version(int version) {
             this.version = version;
+
+            return this;
+        }
+
+        public Builder workspaceId(long workspaceId) {
+            this.workspaceId = workspaceId;
+
             return this;
         }
 
@@ -346,6 +355,7 @@ public final class Project {
             project.setName(name);
             project.setTagIds(tagIds);
             project.setVersion(version);
+            project.setWorkspaceId(workspaceId);
 
             return project;
         }

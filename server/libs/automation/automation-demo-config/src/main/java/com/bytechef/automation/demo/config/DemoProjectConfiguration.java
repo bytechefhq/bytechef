@@ -76,6 +76,7 @@ public class DemoProjectConfiguration {
                                 .stream()
                                 .map(Tag::getId)
                                 .toList())
+                        .workspaceId(1049)
                         .build());
 
                 for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.json")) {

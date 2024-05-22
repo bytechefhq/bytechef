@@ -292,46 +292,14 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstanceDTO> getProjectInstances(Environment environment, Long projectId, Long tagId) {
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(
-            environment, projectId, tagId);
+        return getProjectInstances(null, environment, projectId, tagId);
+    }
 
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-            .getProjectInstanceWorkflows(CollectionUtils.map(projectInstances, ProjectInstance::getId));
-        List<Project> projects = getProjects(projectInstances);
-        List<Tag> tags = getTags(projectInstances);
+    @Override
+    public List<ProjectInstanceDTO> getWorkspaceProjectInstances(
+        long id, Environment environment, Long projectId, Long tagId) {
 
-        return CollectionUtils.map(
-            projectInstances,
-            projectInstance -> {
-                Project project = CollectionUtils.getFirst(
-                    projects, curProject -> Objects.equals(curProject.getId(), projectInstance.getProjectId()));
-
-                List<String> workflowIds = projectWorkflowService.getWorkflowIds(
-                    projectInstance.getProjectId(), projectInstance.getProjectVersion());
-
-                List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-                    projectInstance.getProjectId());
-
-                return new ProjectInstanceDTO(
-                    projectInstance,
-                    CollectionUtils.map(
-                        CollectionUtils.filter(
-                            projectInstanceWorkflows,
-                            projectInstanceWorkflow -> Objects.equals(
-                                projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId()) &&
-                                workflowIds.contains(projectInstanceWorkflow.getWorkflowId())),
-                        projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
-                            projectInstanceWorkflow,
-                            getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
-                            getStaticWebhookUrl(
-                                projectInstanceWorkflow.getProjectInstanceId(),
-                                projectInstanceWorkflow.getWorkflowId()),
-                            getWorkflowReferenceCode(
-                                projectInstanceWorkflow.getWorkflowId(), projectInstance.getProjectVersion(),
-                                projectWorkflows))),
-                    project, getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
-                    filterTags(tags, projectInstance));
-            });
+        return getProjectInstances(id, environment, projectId, tagId);
     }
 
     @Override
@@ -483,6 +451,51 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private LocalDateTime getProjectInstanceLastExecutionDate(long projectInstanceId) {
         return OptionalUtils.mapOrElse(
             instanceJobService.fetchLastJobId(projectInstanceId, Type.AUTOMATION), this::getJobEndDate, null);
+    }
+
+    private List<ProjectInstanceDTO> getProjectInstances(
+        Long workspaceId, Environment environment, Long projectId, Long tagId) {
+
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(
+            workspaceId, environment, projectId, tagId);
+
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+            .getProjectInstanceWorkflows(CollectionUtils.map(projectInstances, ProjectInstance::getId));
+        List<Project> projects = getProjects(projectInstances);
+        List<Tag> tags = getTags(projectInstances);
+
+        return CollectionUtils.map(
+            projectInstances,
+            projectInstance -> {
+                Project project = CollectionUtils.getFirst(
+                    projects, curProject -> Objects.equals(curProject.getId(), projectInstance.getProjectId()));
+
+                List<String> workflowIds = projectWorkflowService.getWorkflowIds(
+                    projectInstance.getProjectId(), projectInstance.getProjectVersion());
+
+                List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+                    projectInstance.getProjectId());
+
+                return new ProjectInstanceDTO(
+                    projectInstance,
+                    CollectionUtils.map(
+                        CollectionUtils.filter(
+                            projectInstanceWorkflows,
+                            projectInstanceWorkflow -> Objects.equals(
+                                projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId()) &&
+                                workflowIds.contains(projectInstanceWorkflow.getWorkflowId())),
+                        projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
+                            projectInstanceWorkflow,
+                            getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
+                            getStaticWebhookUrl(
+                                projectInstanceWorkflow.getProjectInstanceId(),
+                                projectInstanceWorkflow.getWorkflowId()),
+                            getWorkflowReferenceCode(
+                                projectInstanceWorkflow.getWorkflowId(), projectInstance.getProjectVersion(),
+                                projectWorkflows))),
+                    project, getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
+                    filterTags(tags, projectInstance));
+            });
     }
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {

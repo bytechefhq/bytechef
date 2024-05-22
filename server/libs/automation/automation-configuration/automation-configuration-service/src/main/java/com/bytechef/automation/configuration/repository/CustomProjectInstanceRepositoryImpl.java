@@ -35,20 +35,37 @@ public class CustomProjectInstanceRepositoryImpl implements CustomProjectInstanc
     }
 
     @Override
-    public List<ProjectInstance> findAllProjectInstances(Integer environment, Long projectId, Long tagId) {
+    public List<ProjectInstance> findAllProjectInstances(
+        Long workspaceId, Integer environment, Long projectId, Long tagId) {
+
         List<Object> arguments = new ArrayList<>();
+
         String query = "SELECT project_instance.* FROM project_instance ";
+
+        if (workspaceId != null) {
+            query += "JOIN project ON project_instance.project_id = project.id ";
+        }
 
         if (tagId != null) {
             query += "JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id ";
         }
 
-        if (environment != null || projectId != null || tagId != null) {
+        if (workspaceId != null || environment != null || projectId != null || tagId != null) {
             query += "WHERE ";
+        }
+
+        if (workspaceId != null) {
+            arguments.add(workspaceId);
+
+            query += "workspace_id = ? ";
         }
 
         if (environment != null) {
             arguments.add(environment);
+
+            if (workspaceId != null) {
+                query += "AND ";
+            }
 
             query += "environment = ? ";
         }
@@ -56,7 +73,7 @@ public class CustomProjectInstanceRepositoryImpl implements CustomProjectInstanc
         if (projectId != null) {
             arguments.add(projectId);
 
-            if (environment != null) {
+            if (workspaceId != null || environment != null) {
                 query += "AND ";
             }
 
@@ -66,7 +83,7 @@ public class CustomProjectInstanceRepositoryImpl implements CustomProjectInstanc
         if (tagId != null) {
             arguments.add(tagId);
 
-            if (environment != null || projectId != null) {
+            if (workspaceId != null || environment != null || projectId != null) {
                 query += "AND ";
             }
 

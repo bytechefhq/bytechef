@@ -36,6 +36,7 @@ public class ProjectInstanceWorkflowMapper {
         @Override
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "staticWebhookUrl", ignore = true)
+        @Mapping(target = "workflowReferenceCode", ignore = true)
         ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflow projectInstanceWorkflow);
     }
 

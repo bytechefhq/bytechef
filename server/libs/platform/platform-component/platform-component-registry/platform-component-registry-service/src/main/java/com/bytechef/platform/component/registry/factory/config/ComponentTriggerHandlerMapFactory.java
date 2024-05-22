@@ -28,6 +28,7 @@ import com.bytechef.platform.component.registry.util.BeanUtils;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.workflow.worker.trigger.factory.TriggerHandlerMapFactory;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record ComponentTriggerHandlerMapFactory(
     List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
     InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade)

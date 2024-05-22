@@ -349,35 +349,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status) {
-        List<Long> projectIds = List.of();
+        return getProjects(null, categoryId, projectInstances, tagId, status);
+    }
 
-        if (projectInstances) {
-            projectIds = projectInstanceService.getProjectIds();
-        }
+    @Override
+    public List<ProjectDTO> getWorkspaceProjects(
+        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status) {
 
-        List<Project> projects = projectService.getProjects(categoryId, projectIds, tagId, status);
-
-        return CollectionUtils.map(
-            projects,
-            project -> new ProjectDTO(
-                CollectionUtils.findFirstFilterOrElse(
-                    categoryService.getCategories(
-                        projects
-                            .stream()
-                            .map(Project::getCategoryId)
-                            .filter(Objects::nonNull)
-                            .toList()),
-                    category -> Objects.equals(project.getCategoryId(), category.getId()),
-                    null),
-                project,
-                CollectionUtils.filter(
-                    tagService.getTags(
-                        projects.stream()
-                            .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
-                            .filter(Objects::nonNull)
-                            .toList()),
-                    tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
-                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion())));
+        return getProjects(workspaceId, categoryId, projectInstances, tagId, status);
     }
 
     @Override
@@ -512,6 +491,40 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private Category getCategory(Project project) {
         return project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId());
+    }
+
+    private List<ProjectDTO> getProjects(
+        Long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status) {
+
+        List<Long> projectIds = List.of();
+
+        if (projectInstances) {
+            projectIds = projectInstanceService.getProjectIds();
+        }
+
+        List<Project> projects = projectService.getProjects(workspaceId, categoryId, projectIds, tagId, status);
+
+        return CollectionUtils.map(
+            projects,
+            project -> new ProjectDTO(
+                CollectionUtils.findFirstFilterOrElse(
+                    categoryService.getCategories(
+                        projects
+                            .stream()
+                            .map(Project::getCategoryId)
+                            .filter(Objects::nonNull)
+                            .toList()),
+                    category -> Objects.equals(project.getCategoryId(), category.getId()),
+                    null),
+                project,
+                CollectionUtils.filter(
+                    tagService.getTags(
+                        projects.stream()
+                            .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
+                            .filter(Objects::nonNull)
+                            .toList()),
+                    tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
+                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion())));
     }
 
     private ProjectDTO toProjectDTO(Project project) {

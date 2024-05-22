@@ -20,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.tag.domain.Tag;
@@ -56,14 +58,21 @@ public class ProjectServiceIntTest {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private WorkspaceRepository workspaceRepository;
+
+    private Workspace workspace;
+
     @BeforeEach
     public void beforeEach() {
         category = categoryRepository.save(new Category("name"));
+        workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @AfterEach
     public void afterEach() {
         projectRepository.deleteAll();
+        workspaceRepository.deleteAll();
 
         categoryRepository.deleteAll();
         tagRepository.deleteAll();
@@ -117,9 +126,9 @@ public class ProjectServiceIntTest {
 
         project = projectRepository.save(project);
 
-        assertThat(projectService.getProjects(category.getId(), List.of(), null, null)).hasSize(1);
+        assertThat(projectService.getProjects(null, category.getId(), List.of(), null, null)).hasSize(1);
 
-        assertThat(projectService.getProjects(Long.MAX_VALUE, List.of(), null, null)).hasSize(0);
+        assertThat(projectService.getProjects(null, Long.MAX_VALUE, List.of(), null, null)).hasSize(0);
 
         Tag tag = new Tag("tag1");
 
@@ -129,9 +138,9 @@ public class ProjectServiceIntTest {
 
         projectRepository.save(project);
 
-        assertThat(projectService.getProjects(null, List.of(), tag.getId(), null)).hasSize(1);
-        assertThat(projectService.getProjects(null, List.of(), Long.MAX_VALUE, null)).hasSize(0);
-        assertThat(projectService.getProjects(Long.MAX_VALUE, List.of(), Long.MAX_VALUE, null)).hasSize(0);
+        assertThat(projectService.getProjects(null, null, List.of(), tag.getId(), null)).hasSize(1);
+        assertThat(projectService.getProjects(null, null, List.of(), Long.MAX_VALUE, null)).hasSize(0);
+        assertThat(projectService.getProjects(null, Long.MAX_VALUE, List.of(), Long.MAX_VALUE, null)).hasSize(0);
     }
 
     @Test
@@ -167,6 +176,7 @@ public class ProjectServiceIntTest {
             .categoryId(category.getId())
             .description("description")
             .name("name")
+            .workspaceId(workspace.getId())
             .build();
     }
 }

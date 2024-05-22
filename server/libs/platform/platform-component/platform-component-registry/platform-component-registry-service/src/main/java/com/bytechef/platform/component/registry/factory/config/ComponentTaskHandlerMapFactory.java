@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.registry.util.BeanUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record ComponentTaskHandlerMapFactory(
     List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
     ActionDefinitionFacade actionDefinitionFacade)
