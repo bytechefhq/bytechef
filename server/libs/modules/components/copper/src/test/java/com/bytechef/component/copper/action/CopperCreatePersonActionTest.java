@@ -16,23 +16,32 @@
 
 package com.bytechef.component.copper.action;
 
+import static com.bytechef.component.copper.action.CopperCreatePersonAction.POST_PEOPLE_CONTEXT_FUNCTION;
 import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
+import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
+import static com.bytechef.component.copper.constant.CopperConstants.CITY;
 import static com.bytechef.component.copper.constant.CopperConstants.COMPANY_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.EMAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
+import static com.bytechef.component.copper.constant.CopperConstants.NUMBER;
 import static com.bytechef.component.copper.constant.CopperConstants.PHONE_NUMBERS;
 import static com.bytechef.component.copper.constant.CopperConstants.SOCIALS;
+import static com.bytechef.component.copper.constant.CopperConstants.STREET;
 import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
 import static com.bytechef.component.copper.constant.CopperConstants.TITLE;
+import static com.bytechef.component.copper.constant.CopperConstants.URL;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -40,6 +49,10 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  */
 class CopperCreatePersonActionTest extends AbstractCopperActionTest {
+
+    private static final List<Map<String, String>> phoneNumbers = List.of(Map.of(NUMBER, "1234", CATEGORY, "work"));
+    private static final List<Map<String, String>> socials = List.of(Map.of(URL, "url", CATEGORY, "youtube"));
+    private static final List<Map<String, String>> websites = List.of(Map.of(URL, "url", CATEGORY, "personal"));
 
     @Test
     void testPerform() {
@@ -59,22 +72,24 @@ class CopperCreatePersonActionTest extends AbstractCopperActionTest {
             .thenReturn((String) propertyStubsMap.get(CONTACT_TYPE_ID));
         when(mockedParameters.getString(DETAILS))
             .thenReturn((String) propertyStubsMap.get(DETAILS));
-        when(mockedParameters.getList(PHONE_NUMBERS))
-            .thenReturn(null);
-        when(mockedParameters.getList(SOCIALS))
-            .thenReturn(null);
-        when(mockedParameters.getList(WEBSITES))
-            .thenReturn(null);
+        when((List<Map<String, String>>) mockedParameters.getList(PHONE_NUMBERS))
+            .thenReturn(phoneNumbers);
+        when((List<Map<String, String>>) mockedParameters.getList(SOCIALS))
+            .thenReturn(socials);
+        when((List<Map<String, String>>) mockedParameters.getList(WEBSITES))
+            .thenReturn(websites);
         when(mockedParameters.get(ADDRESS))
-            .thenReturn(null);
-        when(mockedParameters.getList(TAGS))
-            .thenReturn(null);
+            .thenReturn(propertyStubsMap.get(ADDRESS));
+        when(mockedParameters.getList(TAGS, String.class))
+            .thenReturn((List<String>) propertyStubsMap.get(TAGS));
 
         Object result = CopperCreatePersonAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        verify(mockedContext, times(1)).http(POST_PEOPLE_CONTEXT_FUNCTION);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(propertyStubsMap, body.getContent());
     }
@@ -88,6 +103,11 @@ class CopperCreatePersonActionTest extends AbstractCopperActionTest {
         propertyStubsMap.put(COMPANY_ID, "companyId");
         propertyStubsMap.put(CONTACT_TYPE_ID, "contactType");
         propertyStubsMap.put(DETAILS, "details");
+        propertyStubsMap.put(PHONE_NUMBERS, phoneNumbers);
+        propertyStubsMap.put(SOCIALS, socials);
+        propertyStubsMap.put(WEBSITES, websites);
+        propertyStubsMap.put(ADDRESS, Map.of(STREET, "street", CITY, "city"));
+        propertyStubsMap.put(TAGS, List.of("tag1", "tag2"));
 
         return propertyStubsMap;
     }
