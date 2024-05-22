@@ -1,21 +1,18 @@
 package com.bytechef.platform.configuration.web.rest.model;
 
-import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -33,7 +30,28 @@ public class OAuth2AuthorizationParametersModel {
   @Valid
   private List<String> scopes = new ArrayList<>();
 
-  public OAuth2AuthorizationParametersModel authorizationUrl(String authorizationUrl) {
+  private Map<String, String> extraQueryParameters;
+
+    private void putExtraQueryParameter(String name, String value) {
+        if (extraQueryParameters == null) {
+            extraQueryParameters = new HashMap<>();
+        }
+
+        extraQueryParameters.put(name, value);
+    }
+
+    public OAuth2AuthorizationParametersModel accessType(String accessType) {
+        putExtraQueryParameter("access_type", accessType);
+        return this;
+    }
+
+    @Schema(name = "extraQueryParameters", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty("extraQueryParameters")
+    public Map<String, String> getExtraQueryParameters() {
+        return Collections.unmodifiableMap(extraQueryParameters);
+    }
+
+    public OAuth2AuthorizationParametersModel authorizationUrl(String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
     return this;
   }
@@ -42,7 +60,7 @@ public class OAuth2AuthorizationParametersModel {
    * Get authorizationUrl
    * @return authorizationUrl
   */
-  
+
   @Schema(name = "authorizationUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("authorizationUrl")
   public String getAuthorizationUrl() {
@@ -62,7 +80,7 @@ public class OAuth2AuthorizationParametersModel {
    * Get clientId
    * @return clientId
   */
-  
+
   @Schema(name = "clientId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("clientId")
   public String getClientId() {
@@ -90,7 +108,7 @@ public class OAuth2AuthorizationParametersModel {
    * Get scopes
    * @return scopes
   */
-  
+
   @Schema(name = "scopes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("scopes")
   public List<String> getScopes() {
