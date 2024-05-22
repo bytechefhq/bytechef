@@ -67,7 +67,7 @@ public class GoogleSheetsUtils {
 
     public static List<Property.ValueProperty<?>> createArrayPropertyForRow(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext context) throws IOException {
+        ActionContext context) throws Exception {
 
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
@@ -157,7 +157,7 @@ public class GoogleSheetsUtils {
 
     public static List<Option<String>> getSheetIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) throws IOException {
+        String searchText, ActionContext context) throws Exception {
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -177,7 +177,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetNameOptions(
-        Parameters inputParameters, Parameters connectionParameters) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters) throws Exception {
 
         List<Option<String>> options = new ArrayList<>();
 

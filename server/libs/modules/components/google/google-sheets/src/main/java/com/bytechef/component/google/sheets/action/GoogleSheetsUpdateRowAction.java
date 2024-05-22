@@ -41,7 +41,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -72,8 +71,7 @@ public class GoogleSheetsUpdateRowAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
-
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         String range = createRange(
             inputParameters.getRequiredString(SHEET_NAME), inputParameters.getRequiredInteger(ROW_NUMBER));
