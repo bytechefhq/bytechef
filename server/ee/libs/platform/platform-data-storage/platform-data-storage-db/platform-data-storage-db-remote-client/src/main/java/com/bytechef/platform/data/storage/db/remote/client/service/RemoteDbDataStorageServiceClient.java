@@ -25,47 +25,12 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String DATA_STORAGE_SERVICE = "/remote/db-ddata-storage-service";
+
     private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
     public RemoteDbDataStorageServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
-    }
-
-    @Override
-    public <T> Optional<T> fetch(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type) {
-
-        return Optional.ofNullable(
-            get(componentName, scope, scopeId, key, type));
-    }
-
-    @Override
-    public <T> T get(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type) {
-
-        return get(componentName, scope, scopeId, key, type);
-    }
-
-    @Override
-    public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type) {
-        return getAll(componentName, scope, scopeId, type);
-    }
-
-    @Override
-    public void put(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type, Object value) {
-
-        loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE
-                    + "/save/{componentName}/{scope}/{scopeId}/{key}/{type}")
-                .build(componentName, scope, scopeId, key, type),
-            value);
     }
 
     @Override
@@ -78,16 +43,40 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
                 .build(componentName, scope, scopeId, key, type));
     }
 
-    private <T> T get(
-        String componentName, Scope scope, String scopeId, String key, Type type,
-        ParameterizedTypeReference<T> responseTypeRef) {
+    @Override
+    public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, Type type) {
+        return fetchValue(componentName, scope, scopeId, key, type);
+    }
 
-        return loadBalancedRestClient.get(
+    @Override
+    public <T> T get(String componentName, Scope scope, String scopeId, String key, Type type) {
+        Optional<T> valueOptional = fetchValue(componentName, scope, scopeId, key, type);
+
+        return valueOptional.orElseThrow();
+    }
+
+    @Override
+    public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void put(String componentName, Scope scope, String scopeId, String key, Type type, Object value) {
+        loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE
-                    + "/fetch-value/{componentName}/{scope}/{scopeId}/{key}/{type}")
+                    + "/save/{componentName}/{scope}/{scopeId}/{key}/{type}")
                 .build(componentName, scope, scopeId, key, type),
-            responseTypeRef);
+            value);
+    }
+
+    private <T> Optional<T> fetchValue(String componentName, Scope scope, String scopeId, String key, Type type) {
+        return Optional.ofNullable(loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(DATA_STORAGE_SERVICE + "/fetch-value/{componentName}/{scope}/{scopeId}/{key}/{type}")
+                .build(componentName, scope, scopeId, key, type),
+            new ParameterizedTypeReference<>() {}));
     }
 }

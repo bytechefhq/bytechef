@@ -42,62 +42,48 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     }
 
     @Override
+    public void delete(String componentName, Scope scope, String scopeId, String key, Type type) {
+        dataStorageRepository
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
+            .ifPresentOrElse(dataStorageRepository::delete, null);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     @Transactional
-    public <T> Optional<T> fetch(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type) {
-
-        return dataStorageRepository.findByComponentNameAndScopeAndScopeIdAndKeyAndType(
-            componentName, scope, scopeId, key, type.ordinal())
+    public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, Type type) {
+        return dataStorageRepository
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
     @Override
-    public <T> T get(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type) {
-
+    public <T> T get(String componentName, Scope scope, String scopeId, String key, Type type) {
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
         String componentName, Scope scope, String scopeId, Type type) {
-        return OptionalUtils.get(dataStorageRepository
-            .findByComponentNameAndScopeAndScopeIdAndType(
-                componentName, scope, scopeId, type.ordinal()))
+        return OptionalUtils.get(
+            dataStorageRepository
+                .findByComponentNameAndScopeAndScopeIdAndType(componentName, scope, scopeId, type.ordinal()))
             .stream()
             .collect(Collectors.toMap(dataEntry -> String.valueOf(dataEntry.getKey()),
                 dataEntry -> (T) dataEntry.getValue()));
     }
 
     @Override
-    public void put(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type, Object value) {
-
+    public void put(String componentName, Scope scope, String scopeId, String key, Type type, Object value) {
         dataStorageRepository
-            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
-                componentName, scope, scopeId, key, type.ordinal())
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
             .ifPresentOrElse(
                 dataEntry -> {
                     dataEntry.setValue(value);
 
                     dataStorageRepository.save(dataEntry);
                 },
-                () -> dataStorageRepository.save(
-                    new DataEntry(componentName, scope, scopeId, key, value, type)));
-    }
-
-    @Override
-    public void delete(
-        String componentName, Scope scope, String scopeId, String key,
-        Type type) {
-
-        dataStorageRepository
-            .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
-                componentName, scope, scopeId, key, type.ordinal())
-            .ifPresentOrElse(dataStorageRepository::delete, null);
+                () -> dataStorageRepository.save(new DataEntry(componentName, scope, scopeId, key, value, type)));
     }
 }

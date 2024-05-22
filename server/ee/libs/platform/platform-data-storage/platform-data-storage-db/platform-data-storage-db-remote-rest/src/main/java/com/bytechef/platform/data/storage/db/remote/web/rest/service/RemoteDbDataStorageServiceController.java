@@ -48,8 +48,7 @@ public class RemoteDbDataStorageServiceController {
         @PathVariable String scopeId, @PathVariable String key, @PathVariable Type type) {
 
         return ResponseEntity.ok(
-            OptionalUtils.orElse(dataStorageService.fetch(
-                componentName, scope, scopeId, key, type), null));
+            OptionalUtils.orElse(dataStorageService.fetch(componentName, scope, scopeId, key, type), null));
     }
 
     @RequestMapping(

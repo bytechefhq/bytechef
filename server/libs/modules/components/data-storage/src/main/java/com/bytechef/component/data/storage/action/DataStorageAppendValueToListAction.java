@@ -35,7 +35,9 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.data.storage.constant.DataStorageConstants;
+import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -125,59 +127,29 @@ public class DataStorageAppendValueToListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Object value = null;
-        switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1:
-                value = inputParameters.getRequiredArray(VALUE);
-                break;
-            case 2:
-                value = inputParameters.getRequiredBoolean(VALUE);
-                break;
-            case 3:
-                value = inputParameters.getRequiredLocalDate(VALUE);
-                break;
-            case 4:
-                value = inputParameters.getRequiredLocalDateTime(VALUE);
-                break;
-            case 5:
-                value = inputParameters.getRequiredInteger(VALUE);
-                break;
-            case 6:
-                value = nullable();
-                break;
-            case 7:
-                value = inputParameters.getRequiredDouble(VALUE);
-                break;
-            case 8:
-                value = inputParameters.getRequiredMap(VALUE);
-                break;
-            case 9:
-                value = inputParameters.getRequiredString(VALUE);
-                break;
-            case 10:
-                value = inputParameters.getRequiredLocalTime(VALUE);
-                break;
-            default:
-                break;
+        return context.data(data -> data.setValue(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
+            getValues(inputParameters, context, DataStorageUtils.getValue(inputParameters))));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> getValues(Parameters inputParameters, ActionContext context, Object value) {
+        List<Object> list;
+        Optional<Object> optionalList = context.data(data -> data.fetchValue(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
+
+        if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
+            list = (List<Object>) curList;
+        } else {
+            list = new ArrayList<>();
         }
 
-        List<Object> list = null;
-        Optional<Object> optionalList = context
-            .data(data -> data.fetchValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY)));
-        if (optionalList.isPresent() && optionalList.get() instanceof List)
-            list = (List<Object>) optionalList.get();
-        else
-            list = new ArrayList<>();
-
-        if (value instanceof Object[] && !inputParameters.getRequiredBoolean(APPEND_LIST_AS_SINGLE_ITEM))
+        if (value instanceof Object[] && !inputParameters.getRequiredBoolean(APPEND_LIST_AS_SINGLE_ITEM)) {
             list.addAll(Arrays.asList((Object[]) value));
-        else
+        } else {
             list.add(value);
+        }
 
-        List<Object> finalList = list;
-        return context
-            .data(data -> data.setValue(ActionContext.Data.Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY), finalList));
+        return list;
     }
 }

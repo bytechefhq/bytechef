@@ -48,15 +48,19 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, Type type,
-        String projectWorkflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
+        Long instanceWorkflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
 
         super(componentName, actionName, connection, httpClientExecutor);
 
-        this.data = type == null ? new NoOpDataImpl() : new DataImpl(
-            componentName, componentVersion, actionName, type, projectWorkflowId, jobId,
-            dataStorageService);
+        if (type == null || instanceWorkflowId == null || jobId == null) {
+            this.data = new NoOpDataImpl();
+        } else {
+            this.data = new DataImpl(
+                componentName, componentVersion, actionName, type, instanceWorkflowId, jobId, dataStorageService);
+        }
+
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
     }
@@ -85,39 +89,34 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, Type type,
-        String projectWorkflowId, Long jobId, DataStorageService dataStorageService) implements Data {
+        String componentName, Integer componentVersion, String actionName, Type type, long instanceWorkflowId,
+        long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
-            return dataStorageService.fetch(
-                componentName, scope, getScopeId(scope), key, type);
+            return dataStorageService.fetch(componentName, scope, getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
-            return dataStorageService.get(
-                componentName, scope, getScopeId(scope), key, type);
+            return dataStorageService.get(componentName, scope, getScopeId(scope), key, type);
         }
 
         @Override
         public <T> Map<String, T> getAll(Scope scope) {
-            return dataStorageService.getAll(
-                componentName, scope, getScopeId(scope), type);
+            return dataStorageService.getAll(componentName, scope, getScopeId(scope), type);
         }
 
         @Override
         public Void setValue(Scope scope, String key, Object value) {
-            dataStorageService.put(
-                componentName, scope, getScopeId(scope), key, type, value);
+            dataStorageService.put(componentName, scope, getScopeId(scope), key, type, value);
 
             return null;
         }
 
         @Override
         public Void deleteValue(Scope scope, String key) {
-            dataStorageService.delete(
-                componentName, scope, getScopeId(scope), key, type);
+            dataStorageService.delete(componentName, scope, getScopeId(scope), key, type);
 
             return null;
         }
@@ -126,7 +125,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
             return Validate.notNull(
                 switch (scope) {
                     case CURRENT_EXECUTION -> String.valueOf(jobId);
-                    case WORKFLOW -> projectWorkflowId;
+                    case WORKFLOW -> String.valueOf(instanceWorkflowId);
                     case ACCOUNT -> "";
                 }, "scope");
         }
