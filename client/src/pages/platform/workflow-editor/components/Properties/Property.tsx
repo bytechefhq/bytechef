@@ -239,7 +239,9 @@ const Property = ({
         if (arrayName && arrayIndex !== undefined) {
             if (path?.includes('parameters')) {
                 if (objectName) {
-                    currentValue = parameters?.[arrayName]?.[arrayIndex]?.[name];
+                    const matchingObject = getParameterByPath(path, currentComponent);
+
+                    currentValue = matchingObject[name];
                 } else {
                     currentValue = parameters?.[arrayName]?.[arrayIndex];
                 }
