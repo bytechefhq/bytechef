@@ -40,4 +40,6 @@ public interface ConnectionService {
     Connection update(long id, List<Long> tagIds);
 
     Connection update(Connection connection);
+
+    Connection updateConnectionParameter(long connectionId, String key, Object value);
 }
