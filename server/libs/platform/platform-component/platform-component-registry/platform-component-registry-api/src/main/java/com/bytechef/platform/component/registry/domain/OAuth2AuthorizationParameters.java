@@ -18,11 +18,12 @@ package com.bytechef.platform.component.registry.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record OAuth2AuthorizationParameters(
-    String authorizationUrl, String clientId, List<String> scopes, String accessType) {
+    String authorizationUrl, String clientId, Map<String, String> extraQueryParameters, List<String> scopes) {
 }
