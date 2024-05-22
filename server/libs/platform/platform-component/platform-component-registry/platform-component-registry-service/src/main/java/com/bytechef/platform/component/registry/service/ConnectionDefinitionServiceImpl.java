@@ -34,6 +34,9 @@ import com.bytechef.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.component.definition.Authorization.ClientSecretFunction;
 import com.bytechef.component.definition.Authorization.PkceFunction;
+import com.bytechef.component.definition.Authorization.RefreshFunction;
+import com.bytechef.component.definition.Authorization.RefreshTokenFunction;
+import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Authorization.RefreshUrlFunction;
 import com.bytechef.component.definition.Authorization.ScopesFunction;
 import com.bytechef.component.definition.Authorization.TokenUrlFunction;
@@ -162,6 +165,45 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public RefreshTokenResponse executeRefresh(String componentName, ComponentConnection connection, Context context) {
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connection.authorizationName());
+
+        RefreshFunction refreshFunction = OptionalUtils.orElse(
+            authorization.getRefresh(),
+            getDefaultRefreshFunction(
+                OptionalUtils.orElse(
+                    authorization.getClientId(),
+                    (connectionParameters, context1) -> getDefaultClientId(
+                        connectionParameters)),
+                OptionalUtils.orElse(
+                    authorization.getClientSecret(),
+                    (connectionParameters, context1) -> getDefaultClientSecret(
+                        connectionParameters)),
+                OptionalUtils.orElse(
+                    authorization.getRefreshToken(),
+                    (connectionParameters, context1) -> getDefaultRefreshToken(
+                        connectionParameters)),
+                OptionalUtils.orElse(
+                    authorization.getRefreshUrl(),
+                    (connectionParameters, context1) -> getDefaultRefreshUrl(
+                        connectionParameters,
+                        OptionalUtils.orElse(
+                            authorization.getTokenUrl(),
+                            (connectionParameters1, context2) -> getDefaultTokenUrl(
+                                connectionParameters1)),
+                        context1))));
+
+        try {
+            return refreshFunction.apply(new ParametersImpl(connection.parameters()), context);
+
+        } catch (Exception exception) {
+            throw new ComponentExecutionException("Unable to perform oauth token refresh",
+                ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_REFRESH);
+        }
+    }
+
+    @Override
     public AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
@@ -210,7 +252,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return new OAuth2AuthorizationParameters(
                 authorizationUrlFunction.apply(connectionParameters, context),
                 clientIdFunction.apply(connectionParameters, context),
-                scopesFunction.apply(connectionParameters, context));
+                scopesFunction.apply(connectionParameters, context),
+                "offline");
         } catch (Exception e) {
             throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
         }
@@ -297,7 +340,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                                     connectionParameters, Authorization.HEADER_PREFIX,
                                     Authorization.BEARER) +
                                     " " +
-                                    MapUtils.getString(
+                                    MapUtils.getRequiredString(
                                         connectionParameters, Authorization.ACCESS_TOKEN))));
         };
     }
@@ -346,6 +389,55 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         };
     }
 
+    /**
+     *
+     * @param clientIdFunction
+     * @param clientSecretFunction
+     * @param refreshTokenFunction
+     * @param refreshUrlFunction
+     * @return
+     */
+    private static RefreshFunction getDefaultRefreshFunction(
+        ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
+        RefreshTokenFunction refreshTokenFunction, RefreshUrlFunction refreshUrlFunction) {
+
+        return (connectionParameters, context) -> {
+            FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
+
+            builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
+            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+            builder.query("refresh_token", refreshTokenFunction.apply(connectionParameters, context));
+            builder.query("grant_type", "refresh_token");
+
+            try (HttpClient httpClient = Methanol.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build()) {
+
+                HttpResponse<String> httpResponse = httpClient.send(
+                    HttpRequest.newBuilder()
+                        .POST(builder.build())
+                        .uri(URI.create(refreshUrlFunction.apply(connectionParameters, context)))
+                        .header("Accept", "application/json")
+                        .build(),
+                    HttpResponse.BodyHandlers.ofString());
+
+                if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
+                    throw new ComponentExecutionException(
+                        "OAuth provider rejected token refresh request",
+                        ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
+                }
+
+                if (httpResponse.body() == null) {
+                    throw new ComponentExecutionException(
+                        "Unable to locate access_token, body content misses",
+                        ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
+                }
+
+                return new RefreshTokenResponse(JsonUtils.read(httpResponse.body(), new TypeReference<>() {}));
+            }
+        };
+    }
+
     private static String getDefaultAuthorizationUrl(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters, Authorization.AUTHORIZATION_URL);
     }
@@ -363,6 +455,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
     }
 
+    private static String getDefaultRefreshToken(Parameters connectionParameters) {
+        return MapUtils.getString(connectionParameters, Authorization.REFRESH_TOKEN);
+    }
+
     private static PkceFunction getDefaultPkce() {
         return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
             challengeMethod);
@@ -370,29 +466,20 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static String getDefaultRefreshUrl(
-        Parameters connectionParameters, RefreshUrlFunction refreshUrlFunction, TokenUrlFunction tokenUrlFunction,
+        Parameters connectionParameters, TokenUrlFunction tokenUrlFunction,
         Context context) {
 
         String refreshUrl = MapUtils.getString(connectionParameters, Authorization.REFRESH_URL);
 
-        if (refreshUrl == null) {
-            if (refreshUrlFunction == null) {
-
-                try {
-                    refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
-                } catch (Exception e) {
-                    throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
-                }
-            } else {
-                try {
-                    refreshUrl = refreshUrlFunction.apply(connectionParameters, context);
-                } catch (Exception e) {
-                    throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
-                }
-            }
+        if (refreshUrl != null) {
+            return refreshUrl;
         }
 
-        return refreshUrl;
+        try {
+            return tokenUrlFunction.apply(connectionParameters, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
+        }
     }
 
     @SuppressWarnings("unchecked")

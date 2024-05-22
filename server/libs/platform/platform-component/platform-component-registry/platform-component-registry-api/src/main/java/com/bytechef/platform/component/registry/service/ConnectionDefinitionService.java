@@ -19,6 +19,7 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
@@ -40,6 +41,9 @@ public interface ConnectionDefinitionService {
         @NonNull String redirectUri);
 
     Optional<String> executeBaseUri(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
+
+    RefreshTokenResponse executeRefresh(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(

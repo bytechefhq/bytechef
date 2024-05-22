@@ -23,5 +23,6 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record OAuth2AuthorizationParameters(String authorizationUrl, String clientId, List<String> scopes) {
+public record OAuth2AuthorizationParameters(
+    String authorizationUrl, String clientId, List<String> scopes, String accessType) {
 }
