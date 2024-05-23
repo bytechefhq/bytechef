@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentCategoryModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
@@ -28,13 +29,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:28.229666+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T11:52:06.340457434+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ComponentDefinitionModel {
 
   @Valid
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
-  private String category;
+  @Valid
+  private List<ComponentCategoryModel> categories = new ArrayList<>();
 
   private ConnectionDefinitionBasicModel connection;
 
@@ -99,24 +101,32 @@ public class ComponentDefinitionModel {
     this.actions = actions;
   }
 
-  public ComponentDefinitionModel category(String category) {
-    this.category = category;
+  public ComponentDefinitionModel categories(List<ComponentCategoryModel> categories) {
+    this.categories = categories;
+    return this;
+  }
+
+  public ComponentDefinitionModel addCategoriesItem(ComponentCategoryModel categoriesItem) {
+    if (this.categories == null) {
+      this.categories = new ArrayList<>();
+    }
+    this.categories.add(categoriesItem);
     return this;
   }
 
   /**
-   * The category.
-   * @return category
+   * The list of categories the component belongs to.
+   * @return categories
   */
-  
-  @Schema(name = "category", description = "The category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("category")
-  public String getCategory() {
-    return category;
+  @Valid 
+  @Schema(name = "categories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("categories")
+  public List<ComponentCategoryModel> getCategories() {
+    return categories;
   }
 
-  public void setCategory(String category) {
-    this.category = category;
+  public void setCategories(List<ComponentCategoryModel> categories) {
+    this.categories = categories;
   }
 
   public ComponentDefinitionModel connection(ConnectionDefinitionBasicModel connection) {
@@ -345,7 +355,7 @@ public class ComponentDefinitionModel {
     }
     ComponentDefinitionModel componentDefinition = (ComponentDefinitionModel) o;
     return Objects.equals(this.actions, componentDefinition.actions) &&
-        Objects.equals(this.category, componentDefinition.category) &&
+        Objects.equals(this.categories, componentDefinition.categories) &&
         Objects.equals(this.connection, componentDefinition.connection) &&
         Objects.equals(this.connectionRequired, componentDefinition.connectionRequired) &&
         Objects.equals(this.description, componentDefinition.description) &&
@@ -360,7 +370,7 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, category, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, version);
+    return Objects.hash(actions, categories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, version);
   }
 
   @Override
@@ -368,7 +378,7 @@ public class ComponentDefinitionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionModel {\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
-    sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
     sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

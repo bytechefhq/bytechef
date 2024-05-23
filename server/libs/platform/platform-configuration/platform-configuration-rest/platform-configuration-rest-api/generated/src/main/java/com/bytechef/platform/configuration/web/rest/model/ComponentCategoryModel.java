@@ -17,35 +17,55 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Authorization type.
+ * A category of component.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T11:52:06.340457434+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public enum AuthorizationTypeModel {
+public enum ComponentCategoryModel {
   
-  API_KEY("API_KEY"),
+  ACCOUNTING("accounting"),
   
-  BASIC_AUTH("BASIC_AUTH"),
+  ADVERTISING("advertising"),
   
-  BEARER_TOKEN("BEARER_TOKEN"),
+  ANALYTICS("analytics"),
   
-  CUSTOM("CUSTOM"),
+  ARTIFICIAL_INTELLIGENCE("artificial-intelligence"),
   
-  DIGEST_AUTH("DIGEST_AUTH"),
+  ATS("ats"),
   
-  OAUTH2_AUTHORIZATION_CODE("OAUTH2_AUTHORIZATION_CODE"),
+  CALENDARS_AND_SCHEDULING("calendars-and-scheduling"),
   
-  OAUTH2_AUTHORIZATION_CODE_PKCE("OAUTH2_AUTHORIZATION_CODE_PKCE"),
+  COMMUNICATION("communication"),
   
-  OAUTH2_CLIENT_CREDENTIALS("OAUTH2_CLIENT_CREDENTIALS"),
+  CRM("crm"),
   
-  OAUTH2_IMPLICIT_CODE("OAUTH2_IMPLICIT_CODE"),
+  CUSTOMER_SUPPORT("customer-support"),
   
-  OAUTH2_RESOURCE_OWNER_PASSWORD("OAUTH2_RESOURCE_OWNER_PASSWORD");
+  DEVELOPER_TOOLS("developer-tools"),
+  
+  E_COMMERCE("e-commerce"),
+  
+  FILE_STORAGE("file-storage"),
+  
+  HELPERS("helpers"),
+  
+  HRIS("hris"),
+  
+  MARKETING_AUTOMATION("marketing-automation"),
+  
+  PAYMENT_PROCESSING("payment-processing"),
+  
+  PRODUCTIVITY_AND_COLLABORATION("productivity-and-collaboration"),
+  
+  PROJECT_MANAGEMENT("project-management"),
+  
+  SOCIAL_MEDIA("social-media"),
+  
+  SURVEYS_AND_FEEDBACK("surveys-and-feedback");
 
   private String value;
 
-  AuthorizationTypeModel(String value) {
+  ComponentCategoryModel(String value) {
     this.value = value;
   }
 
@@ -60,8 +80,8 @@ public enum AuthorizationTypeModel {
   }
 
   @JsonCreator
-  public static AuthorizationTypeModel fromValue(String value) {
-    for (AuthorizationTypeModel b : AuthorizationTypeModel.values()) {
+  public static ComponentCategoryModel fromValue(String value) {
+    for (ComponentCategoryModel b : ComponentCategoryModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

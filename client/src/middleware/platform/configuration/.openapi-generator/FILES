@@ -20,6 +20,7 @@ models/ArrayPropertyModel.ts
 models/AuthorizationModel.ts
 models/AuthorizationTypeModel.ts
 models/BooleanPropertyModel.ts
+models/ComponentCategoryModel.ts
 models/ComponentDefinitionBasicModel.ts
 models/ComponentDefinitionModel.ts
 models/ConnectionDefinitionBasicModel.ts

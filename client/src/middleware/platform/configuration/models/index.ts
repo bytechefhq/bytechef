@@ -6,6 +6,7 @@ export * from './ArrayPropertyModel';
 export * from './AuthorizationModel';
 export * from './AuthorizationTypeModel';
 export * from './BooleanPropertyModel';
+export * from './ComponentCategoryModel';
 export * from './ComponentDefinitionBasicModel';
 export * from './ComponentDefinitionModel';
 export * from './ConnectionDefinitionBasicModel';
