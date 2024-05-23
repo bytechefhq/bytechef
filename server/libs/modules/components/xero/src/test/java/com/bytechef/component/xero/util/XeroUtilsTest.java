@@ -37,6 +37,7 @@ import static com.bytechef.component.xero.util.XeroUtils.GET_CONTACTS_CONTEXT_FU
 import static com.bytechef.component.xero.util.XeroUtils.GET_CURRENCIES_CONTEXT_FUNCTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,9 +75,9 @@ class XeroUtilsTest {
 
         when(mockedParameters.getRequiredString(CONTACT_ID))
             .thenReturn("123");
-        when(mockedParameters.getLocalDate(DATE))
+        when(mockedParameters.getLocalDate(eq(DATE), any()))
             .thenReturn((LocalDate) propertyStubsMap.get(DATE));
-        when(mockedParameters.getLocalDate(DUE_DATE))
+        when(mockedParameters.getLocalDate(eq(DUE_DATE), any()))
             .thenReturn((LocalDate) propertyStubsMap.get(DUE_DATE));
         when(mockedParameters.getString(REFERENCE))
             .thenReturn((String) propertyStubsMap.get(REFERENCE));

@@ -45,7 +45,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xero.util.XeroUtils;
-import java.time.LocalDate;
 
 /**
  * @author Monika Domiter
@@ -64,12 +63,12 @@ public class XeroCreateBillAction {
             date(DATE)
                 .label("Date")
                 .description("Date of the bill. If no date is specified, the current date will be used.")
-                .defaultValue(LocalDate.now())
+//                .defaultValue(LocalDate.now())
                 .required(true),
             date(DUE_DATE)
                 .label("Due Date")
                 .description("Date bill is due.If no date is specified, the current date will be used. ")
-                .defaultValue(LocalDate.now())
+//                .defaultValue(LocalDate.now())
                 .required(false),
             LINE_AMOUNT_TYPE_PROPERTY,
             array(LINE_ITEMS)

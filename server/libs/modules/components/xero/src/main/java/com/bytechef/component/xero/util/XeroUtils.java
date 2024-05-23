@@ -38,6 +38,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,10 +69,11 @@ public class XeroUtils {
 
         Map<String, Object> body = actionContext.http(contextFunction)
             .body(
-                Http.Body.of(TYPE, accpay,
+                Http.Body.of(
+                    TYPE, accpay,
                     CONTACT, Map.of(CONTACT_ID, inputParameters.getRequiredString(CONTACT_ID)),
-                    DATE, inputParameters.getLocalDate(DATE),
-                    DUE_DATE, inputParameters.getLocalDate(DUE_DATE),
+                    DATE, inputParameters.getLocalDate(DATE, LocalDate.now()),
+                    DUE_DATE, inputParameters.getLocalDate(DUE_DATE, LocalDate.now()),
                     REFERENCE, inputParameters.getString(REFERENCE),
                     CURRENCY_CODE, inputParameters.getString(CURRENCY_CODE),
                     LINE_AMOUNT_TYPES, inputParameters.getString(LINE_AMOUNT_TYPES),

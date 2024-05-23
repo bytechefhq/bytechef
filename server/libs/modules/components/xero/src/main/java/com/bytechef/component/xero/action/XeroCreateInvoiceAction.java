@@ -39,7 +39,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xero.util.XeroUtils;
-import java.time.LocalDate;
 
 /**
  * @author Mario Cvjetojevic
@@ -59,12 +58,12 @@ public class XeroCreateInvoiceAction {
             date(DATE)
                 .label("Date")
                 .description("Date invoice was issued. If no date is specified, the current date will be used.")
-                .defaultValue(LocalDate.now())
+//                .defaultValue(LocalDate.now())
                 .required(false),
             date(DUE_DATE)
                 .label("Due Date")
                 .description("Date invoice is due. If no date is specified, the current date will be used.")
-                .defaultValue(LocalDate.now())
+//                .defaultValue(LocalDate.now())
                 .required(false),
             LINE_AMOUNT_TYPE_PROPERTY,
             LINE_ITEMS_ACCREC_PROPERTY,
