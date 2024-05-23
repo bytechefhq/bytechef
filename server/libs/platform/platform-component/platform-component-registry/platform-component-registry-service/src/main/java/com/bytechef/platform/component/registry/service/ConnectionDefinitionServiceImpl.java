@@ -194,7 +194,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return refreshFunction.apply(new ParametersImpl(connection.parameters()), context);
 
         } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to perform oauth token refresh",
+            throw new ComponentExecutionException("Unable to perform oauth token refresh", exception,
                 ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_REFRESH);
         }
     }
@@ -431,7 +431,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 Map<String, Object> responseMap = JsonUtils.read(httpResponse.body(), new TypeReference<>() {});
 
                 return new RefreshTokenResponse(
-                    (String) responseMap.get("access_token"), (Long) responseMap.get("expires_in"));
+                    (String) responseMap.get("access_token"), Long.valueOf((Integer) responseMap.get("expires_in")));
             }
         };
     }
