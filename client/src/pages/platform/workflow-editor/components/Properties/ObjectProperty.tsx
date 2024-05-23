@@ -160,18 +160,16 @@ const ObjectProperty = ({
                 key={`${name}_${newPropertyName}`}
             >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => {
-                    if (
-                        subProperty.controlType === 'OBJECT_BUILDER' &&
-                        !subProperty.additionalProperties?.length &&
-                        !subProperty.properties?.length
-                    ) {
-                        return <></>;
-                    }
-
                     const subPropertyDefaultValue = subProperty.name ? parameterValue?.[subProperty.name] : '';
 
                     return (
-                        <div className="relative flex w-full" key={`${property.name}_${subProperty.name}_${index}`}>
+                        <div
+                            className={twMerge(
+                                'relative flex w-full',
+                                subProperty.controlType === 'OBJECT_BUILDER' && 'pl-2'
+                            )}
+                            key={`${property.name}_${subProperty.name}_${index}`}
+                        >
                             <Property
                                 arrayIndex={arrayIndex}
                                 arrayName={arrayName}
