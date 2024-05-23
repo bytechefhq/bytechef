@@ -58,7 +58,8 @@ public class ProjectConnectionApiController implements ConnectionApi {
             conversionService.convert(
                 workspaceConnectionFacade.create(
                     id, conversionService.convert(connectionModel, ConnectionDTO.class)),
-                ConnectionModel.class));
+                ConnectionModel.class)
+                .parameters(null));
     }
 
     @Override
@@ -107,6 +108,7 @@ public class ProjectConnectionApiController implements ConnectionApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
-                ConnectionModel.class));
+                ConnectionModel.class)
+                .parameters(null));
     }
 }
