@@ -10,6 +10,7 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     description?: string;
     error?: boolean;
     errorMessage?: string;
+    fieldsetClassName?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     inputTypeSwitchButtonClassName?: string;
     label?: string;
@@ -29,6 +30,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             disabled,
             error,
             errorMessage,
+            fieldsetClassName,
             handleInputTypeSwitchButtonClick,
             id,
             inputTypeSwitchButtonClassName,
@@ -46,7 +48,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         },
         ref
     ) => (
-        <fieldset className="w-full gap-y-1">
+        <fieldset className={twMerge('w-full gap-y-1', fieldsetClassName)}>
             <div className="flex w-full items-center justify-between">
                 {label && type !== 'hidden' && (
                     <div className="flex items-center">
