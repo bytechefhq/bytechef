@@ -1094,7 +1094,7 @@ public final class ComponentDSL {
         }
 
         public ModifiableComponentDefinition categories(List<ComponentCategory> categories) {
-            this.categories = categories;
+            this.categories = new ArrayList<>(categories);
 
             return this;
         }
