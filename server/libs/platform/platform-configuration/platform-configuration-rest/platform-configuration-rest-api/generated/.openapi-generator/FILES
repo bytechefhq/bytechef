@@ -21,6 +21,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ArrayPropertyMo
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/BooleanPropertyModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentCategoryModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java

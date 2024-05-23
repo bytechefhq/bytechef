@@ -19,6 +19,12 @@ import {
     ActionDefinitionBasicModelFromJSONTyped,
     ActionDefinitionBasicModelToJSON,
 } from './ActionDefinitionBasicModel';
+import type { ComponentCategoryModel } from './ComponentCategoryModel';
+import {
+    ComponentCategoryModelFromJSON,
+    ComponentCategoryModelFromJSONTyped,
+    ComponentCategoryModelToJSON,
+} from './ComponentCategoryModel';
 import type { ConnectionDefinitionBasicModel } from './ConnectionDefinitionBasicModel';
 import {
     ConnectionDefinitionBasicModelFromJSON,
@@ -51,11 +57,11 @@ export interface ComponentDefinitionModel {
      */
     actions?: Array<ActionDefinitionBasicModel>;
     /**
-     * The category.
-     * @type {string}
+     * The list of categories the component belongs to.
+     * @type {Array<ComponentCategoryModel>}
      * @memberof ComponentDefinitionModel
      */
-    category?: string;
+    categories?: Array<ComponentCategoryModel>;
     /**
      * 
      * @type {ConnectionDefinitionBasicModel}
@@ -139,7 +145,7 @@ export function ComponentDefinitionModelFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
-        'category': json['category'] == null ? undefined : json['category'],
+        'categories': json['categories'] == null ? undefined : ((json['categories'] as Array<any>).map(ComponentCategoryModelFromJSON)),
         'connection': json['connection'] == null ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
         'connectionRequired': json['connectionRequired'],
         'description': json['description'] == null ? undefined : json['description'],
@@ -160,7 +166,7 @@ export function ComponentDefinitionModelToJSON(value?: ComponentDefinitionModel 
     return {
         
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicModelToJSON)),
-        'category': value['category'],
+        'categories': value['categories'] == null ? undefined : ((value['categories'] as Array<any>).map(ComponentCategoryModelToJSON)),
         'connection': ConnectionDefinitionBasicModelToJSON(value['connection']),
         'connectionRequired': value['connectionRequired'],
         'description': value['description'],
