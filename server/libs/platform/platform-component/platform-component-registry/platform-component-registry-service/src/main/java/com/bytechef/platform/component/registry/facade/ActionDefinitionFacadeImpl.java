@@ -131,14 +131,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, type, instanceWorkflowId, jobId,
+            componentName, componentVersion, actionName, type, workflowId, jobId,
             entries.size() == 1
                 ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
                 : null);
 
         try {
             return actionDefinitionService.executePerform(
-                componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
+                componentName, componentVersion, actionName, inputParameters, componentConnections,
+                actionContext);
         } catch (Exception exception) {
             ComponentConnection refreshedComponentConnection = getTokenRefreshedComponentConnection(
                 componentName, connectionIds.get(componentName), exception, componentConnections.get(componentName),
