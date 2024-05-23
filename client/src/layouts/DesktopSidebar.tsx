@@ -5,6 +5,8 @@ import {Link, useLocation, useNavigate} from 'react-router-dom';
 import './DesktopSidebar.css';
 
 import {
+    DropdownMenu,
+    DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuPortal,
     DropdownMenuRadioGroup,
@@ -85,7 +87,7 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 justify-center py-4">
-                        <Link className="flex" to="/settings">
+                        <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="cursor-pointer">
                                     <AvatarImage alt="@shadcn" src="https://github.com/shadcn.png" />
@@ -94,7 +96,7 @@ export function DesktopSidebar({
                                 </Avatar>
                             </DropdownMenuTrigger>
 
-                            <Avatar>
+                            <DropdownMenuContent align="start" className="w-64 space-y-2 p-2">
                                 <div className="min-h-52 space-y-1">
                                     {pathname.startsWith('/automation') && (
                                         <DropdownMenuSub>
@@ -134,9 +136,9 @@ export function DesktopSidebar({
 
                                 <DropdownMenuSeparator />
 
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
-                        </Link>
+                                <DropdownMenuItem className="cursor-pointer font-semibold">Log Out</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>
