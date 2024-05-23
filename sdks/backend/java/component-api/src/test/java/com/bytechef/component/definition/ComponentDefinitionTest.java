@@ -99,7 +99,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"category":null,"customAction":null,"customActionHelp":null,"dataStreamItemReader":null,"dataStreamItemWriter":null,"description":"description","icon":"icon","tags":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","actions":null,"triggers":null,"connection":null}
+                {"categories":null,"customAction":null,"customActionHelp":null,"dataStreamItemReader":null,"dataStreamItemWriter":null,"description":"description","icon":"icon","tags":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","actions":null,"triggers":null,"connection":null}
                   """,
             componentDefinition);
     }
