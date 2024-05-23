@@ -357,7 +357,7 @@ public class WebhookController {
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.isWorkflowEnabled(
-            workflowExecutionId.getInstanceId(), getWorkflowId(workflowExecutionId));
+            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
