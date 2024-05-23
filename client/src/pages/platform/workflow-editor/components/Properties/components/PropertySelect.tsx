@@ -45,7 +45,7 @@ const PropertySelect = ({
     showInputTypeSwitchButton,
     value,
 }: PropertySelectProps) => (
-    <fieldset className="w-full gap-y-1">
+    <fieldset className="w-full space-y-1">
         {label && (
             <div className="flex items-center">
                 <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>

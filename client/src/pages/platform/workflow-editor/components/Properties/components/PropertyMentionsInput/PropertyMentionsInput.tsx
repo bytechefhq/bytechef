@@ -227,7 +227,7 @@ const PropertyMentionsInput = forwardRef(
         }, [ref]);
 
         return (
-            <fieldset className={twMerge('w-full', label && 'gap-y-1')}>
+            <fieldset className={twMerge('w-full', label && 'space-y-1')}>
                 {(label || description || showInputTypeSwitchButton) && (
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
