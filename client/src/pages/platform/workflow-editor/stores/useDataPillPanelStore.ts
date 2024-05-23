@@ -7,7 +7,7 @@ interface DataPillPanelStateI {
     setDataPillPanelOpen: (dataPillPanelOpen: boolean) => void;
 }
 
-export const useDataPillPanelStore = create<DataPillPanelStateI>()(
+const useDataPillPanelStore = create<DataPillPanelStateI>()(
     devtools(
         (set) => ({
             dataPillPanelOpen: false,
@@ -18,3 +18,5 @@ export const useDataPillPanelStore = create<DataPillPanelStateI>()(
         }
     )
 );
+
+export default useDataPillPanelStore;

@@ -6,7 +6,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useEffect, useState} from 'react';
 
-import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
+import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 const DataPillPanel = ({
