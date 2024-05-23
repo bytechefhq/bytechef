@@ -120,12 +120,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             }
         } else if (name && Array.isArray(currentParams)) {
             const parameterArrayItems = currentParams.map((parameterItemValue: ArrayPropertyType, index: number) => {
-                const parameterItemType = getParameterType(parameterItemValue);
-
                 const customSubProperties = Object.keys(parameterItemValue).map((key) => {
                     const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
-                    const subPropertyType = typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING';
+                    const subPropertyParameterItemType = getParameterType(subPropertyParameterValue);
+
+                    const subPropertyType =
+                        subPropertyParameterItemType ||
+                        (typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING');
 
                     return {
                         controlType: VALUE_PROPERTY_CONTROL_TYPES[
@@ -139,6 +141,8 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         type: subPropertyType as PropertyTypeModel,
                     };
                 });
+
+                const parameterItemType = getParameterType(parameterItemValue);
 
                 return {
                     arrayName: name,
