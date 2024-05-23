@@ -739,7 +739,7 @@ const Property = ({
                     <>
                         {((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
                             controlType === 'ARRAY_BUILDER') && (
-                            <div className="flex items-center pb-2">
+                            <div className="flex items-center pb-1">
                                 {typeIcon && (
                                     <span className={twMerge(label ? 'pr-2' : 'pr-1')} title={type}>
                                         {typeIcon}
