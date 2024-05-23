@@ -48,7 +48,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         },
         ref
     ) => (
-        <fieldset className={twMerge('w-full gap-y-1', fieldsetClassName)}>
+        <fieldset className={twMerge('w-full space-y-1', fieldsetClassName)}>
             <div className="flex w-full items-center justify-between">
                 {label && type !== 'hidden' && (
                     <div className="flex items-center">
@@ -92,7 +92,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             error &&
                                 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500',
                             disabled && 'bg-gray-100 text-gray-500',
-                            leadingIcon && 'pl-[52px] leading-relaxed',
+                            leadingIcon && 'pl-12 leading-relaxed',
                             className
                         )}
                         disabled={disabled}
