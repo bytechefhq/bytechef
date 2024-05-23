@@ -39,8 +39,16 @@ export function DesktopSidebar({
     const {data: workspaces} = useGetWorkspacesQuery();
 
     useEffect(() => {
-        if (workspaces?.[0]?.id && !currentWorkspaceId) {
-            setCurrentWorkspaceId(workspaces?.[0]?.id);
+        if (workspaces && workspaces.length > 0) {
+            if (currentWorkspaceId) {
+                if (!workspaces.map((workspace) => workspace.id!).find((id) => id === currentWorkspaceId)) {
+                    if (workspaces[0]?.id) {
+                        setCurrentWorkspaceId(workspaces[0]?.id);
+                    }
+                }
+            } else if (workspaces[0]?.id && !currentWorkspaceId) {
+                setCurrentWorkspaceId(workspaces[0]?.id);
+            }
         }
     }, [currentWorkspaceId, workspaces, setCurrentWorkspaceId]);
 
