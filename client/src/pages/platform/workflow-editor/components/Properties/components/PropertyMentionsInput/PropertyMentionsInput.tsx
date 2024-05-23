@@ -262,8 +262,9 @@ const PropertyMentionsInput = forwardRef(
 
                 <div
                     className={twMerge(
-                        'mt-1 flex items-center shadow-sm',
+                        'flex items-center shadow-sm',
                         isFocused && 'ring-2 ring-blue-500',
+                        label && 'mt-1',
                         leadingIcon && 'relative rounded-md border'
                     )}
                     title={controlType}
