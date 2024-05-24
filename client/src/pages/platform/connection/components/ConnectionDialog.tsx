@@ -93,7 +93,7 @@ const ConnectionDialog = ({
             authorizationName: '',
             componentName: componentDefinition?.name,
             environment: connection?.environment || ConnectionEnvironmentModel.Development,
-            name: connection?.name || '',
+            name: connection?.name || componentDefinition?.title || '',
             tags:
                 connection?.tags?.map((tag) => ({
                     ...tag,
@@ -347,6 +347,10 @@ const ConnectionDialog = ({
 
             if (oAuth2Properties?.predefinedApps) {
                 setUsePredefinedOAuthApp(oAuth2Properties?.predefinedApps?.includes(componentDefinition?.name || ''));
+            }
+
+            if (!getValues('name') && componentDefinition.title) {
+                setValue('name', componentDefinition.title);
             }
 
             setWizardStep('configuration_step');
