@@ -10,8 +10,8 @@ interface WorkflowEditorI {
     showEditWorkflowDialog: boolean;
     setShowEditWorkflowDialog: (showEditWorkflowDialog: boolean) => void;
 
-    workflowTestConfigurationDialogOpen: boolean;
-    setWorkflowTestConfigurationDialogOpen: (workflowTestConfigurationDialogOpen: boolean) => void;
+    workflowCodeEditorSheetOpen: boolean;
+    setWorkflowCodeEditorSheetOpen: (workflowCodeEditorSheetOpen: boolean) => void;
 
     workflowTestExecution?: WorkflowTestExecutionModel;
     setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecutionModel) => void;
@@ -35,10 +35,10 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     showEditWorkflowDialog: showEditWorkflowDialog,
                 })),
 
-            workflowTestConfigurationDialogOpen: false,
-            setWorkflowTestConfigurationDialogOpen: (workflowTestConfigurationDialogOpen) =>
+            workflowCodeEditorSheetOpen: false,
+            setWorkflowCodeEditorSheetOpen: (workflowCodeEditorSheetOpen) =>
                 set(() => ({
-                    workflowTestConfigurationDialogOpen: workflowTestConfigurationDialogOpen,
+                    workflowCodeEditorSheetOpen: workflowCodeEditorSheetOpen,
                 })),
 
             workflowTestExecution: undefined,

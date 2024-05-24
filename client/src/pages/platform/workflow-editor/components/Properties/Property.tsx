@@ -104,7 +104,7 @@ const Property = ({
     } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
-    const {workflowTestConfigurationDialogOpen} = useWorkflowEditorStore();
+    const {workflowCodeEditorSheetOpen} = useWorkflowEditorStore();
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
@@ -281,7 +281,7 @@ const Property = ({
             path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
-            value: strippedValue,
+            value: strippedValue || null,
             workflowId: workflow.id,
         });
     }, 200);
@@ -461,7 +461,11 @@ const Property = ({
         if (propertyParameterValue) {
             setMentionInput(false);
 
-            if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
+            if (
+                typeof propertyParameterValue === 'string' &&
+                controlType !== 'SELECT' &&
+                (propertyParameterValue.includes('${') || type === 'STRING')
+            ) {
                 setMentionInput(true);
             }
         }
@@ -665,17 +669,17 @@ const Property = ({
 
     // update propertyParameterValue when workflow definition changes
     useEffect(() => {
-        if (!workflow.definition || !currentNode?.name || !name || !workflowTestConfigurationDialogOpen) {
+        if (!workflow.definition || !currentNode?.name || !name || !workflowCodeEditorSheetOpen) {
             return;
         }
 
         const workflowDefinition = JSON.parse(workflow.definition);
 
         const currentWorkflowNode = [...workflowDefinition.triggers, ...workflowDefinition.tasks].find(
-            (node: any) => node.name === currentNode?.name
+            (node) => node.name === currentNode?.name
         );
 
-        const value = getParameterByPath(path, currentWorkflowNode)[name];
+        const value = getParameterByPath(path, currentWorkflowNode)?.[name];
 
         if (value) {
             setPropertyParameterValue(value);

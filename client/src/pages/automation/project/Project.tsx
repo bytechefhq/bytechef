@@ -48,12 +48,16 @@ import LayoutContainer from '../../../layouts/LayoutContainer';
 
 const Project = () => {
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
-    const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
-    const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
+    const {
+        setShowBottomPanelOpen,
+        setShowEditWorkflowDialog,
+        setWorkflowCodeEditorSheetOpen,
+        workflowCodeEditorSheetOpen,
+    } = useWorkflowEditorStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {currentWorkspaceId} = useWorkspaceStore();
@@ -103,7 +107,7 @@ const Project = () => {
         {
             icon: Code2Icon,
             name: 'Workflow Code Editor',
-            onClick: () => setShowWorkflowCodeEditorSheet(true),
+            onClick: () => setWorkflowCodeEditorSheetOpen(true),
         },
     ];
 
@@ -350,7 +354,7 @@ const Project = () => {
                         />
                     )}
 
-                    {showWorkflowCodeEditorSheet && (
+                    {workflowCodeEditorSheetOpen && (
                         <ConnectionReactQueryProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
@@ -373,9 +377,7 @@ const Project = () => {
                                 }}
                             >
                                 <WorkflowCodeEditorSheet
-                                    onClose={() => {
-                                        setShowWorkflowCodeEditorSheet(false);
-                                    }}
+                                    onClose={() => setWorkflowCodeEditorSheetOpen(false)}
                                     runDisabled={runDisabled}
                                     testConfigurationDisabled={testConfigurationDisabled}
                                     workflow={workflow}
