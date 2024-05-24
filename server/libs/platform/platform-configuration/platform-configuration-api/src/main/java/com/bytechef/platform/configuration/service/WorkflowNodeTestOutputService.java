@@ -41,4 +41,6 @@ public interface WorkflowNodeTestOutputService {
     WorkflowNodeTestOutput save(
         @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
         @NonNull Output output);
+
+    void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }

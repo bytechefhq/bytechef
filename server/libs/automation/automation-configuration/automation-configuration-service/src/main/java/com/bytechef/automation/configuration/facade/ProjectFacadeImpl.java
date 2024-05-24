@@ -41,6 +41,7 @@ import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.exception.ConfigurationException;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
+import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -88,6 +89,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final WorkflowNodeParameterFacade workflowNodeParameterFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
@@ -95,7 +97,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ProjectInstanceService projectInstanceService, ProjectService projectService,
         ProjectInstanceFacade projectInstanceFacade, ProjectInstanceWorkflowService projectInstanceWorkflowService,
         TagService tagService, WorkflowFacade workflowFacade, WorkflowNodeParameterFacade workflowNodeParameterFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
         this.projectWorkflowService = projectWorkflowService;
@@ -108,6 +111,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.workflowNodeParameterFacade = workflowNodeParameterFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
     }
 
     @Override
@@ -446,9 +450,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 projectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
 
                 projectWorkflowService.update(projectWorkflow);
+
                 projectWorkflowService.addWorkflow(
                     project.getId(), lastVersion, oldWorkflowId, projectWorkflow.getWorkflowReferenceCode());
+
                 workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
+                workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             }
         }
 

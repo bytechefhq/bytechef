@@ -109,6 +109,11 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
             workflowId, workflowNodeName, workflowNodeType, output.getOutputSchema(), output.getSampleOutput());
     }
 
+    @Override
+    public void updateWorkflowId(String oldWorkflowId, String newWorkflowId) {
+        workflowNodeTestOutputRepository.updateWorkflowId(oldWorkflowId, newWorkflowId);
+    }
+
     private WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
         Property outputSchema, Object sampleOutput) {
