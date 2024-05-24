@@ -55,11 +55,8 @@ public class ProjectConnectionApiController implements ConnectionApi {
     @Override
     public ResponseEntity<ConnectionModel> createWorkspaceConnection(Long id, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                workspaceConnectionFacade.create(
-                    id, conversionService.convert(connectionModel, ConnectionDTO.class)),
-                ConnectionModel.class)
-                .parameters(null));
+            toConnectionModel(
+                workspaceConnectionFacade.create(id, conversionService.convert(connectionModel, ConnectionDTO.class))));
     }
 
     @Override
@@ -72,11 +69,7 @@ public class ProjectConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
-        ConnectionModel connectionModel = conversionService.convert(
-            connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class);
-
-        return ResponseEntity.ok(Validate.notNull(connectionModel, "connectionModel")
-            .parameters(null));
+        return ResponseEntity.ok(toConnectionModel(connectionFacade.getConnection(Validate.notNull(id, "id"))));
     }
 
     @Override
@@ -86,8 +79,7 @@ public class ProjectConnectionApiController implements ConnectionApi {
         return ResponseEntity.ok(
             connectionFacade.getConnections(componentName, connectionVersion, tagId, Type.AUTOMATION)
                 .stream()
-                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
-                    .parameters(null))
+                .map(this::toConnectionModel)
                 .toList());
     }
 
@@ -98,17 +90,20 @@ public class ProjectConnectionApiController implements ConnectionApi {
         return ResponseEntity.ok(
             workspaceConnectionFacade.getConnections(id, componentName, connectionVersion, tagId)
                 .stream()
-                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
-                    .parameters(null))
+                .map(this::toConnectionModel)
                 .toList());
     }
 
     @Override
     public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
-                ConnectionModel.class)
-                .parameters(null));
+        return ResponseEntity.ok(toConnectionModel(
+            connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));
+    }
+
+    private ConnectionModel toConnectionModel(ConnectionDTO connection) {
+        ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
+
+        return Validate.notNull(connectionModel, "connectionModel")
+            .parameters(null);
     }
 }
