@@ -34,7 +34,7 @@ export default function getParametersWithDefaultValues({
             if (Object.keys(nestedData).length) {
                 data[property.name!] = [nestedData];
             }
-        } else if (property.defaultValue) {
+        } else if (property.defaultValue !== undefined) {
             data[property.name] = property.defaultValue;
         }
     });
