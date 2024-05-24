@@ -1,13 +1,19 @@
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import {ProjectInstanceModel, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
+import {
+    ProjectInstanceModel,
+    ProjectInstanceWorkflowConnectionModel,
+    ProjectInstanceWorkflowModel,
+    WorkflowConnectionModel,
+    WorkflowModel,
+} from '@/middleware/automation/configuration';
 import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface ProjectInstanceEditWorkflowDialogProps {
@@ -27,7 +33,7 @@ const ProjectInstanceEditWorkflowDialog = ({
 
     const form = useForm<ProjectInstanceModel>({
         defaultValues: {
-            projectInstanceWorkflows: [projectInstanceWorkflow],
+            projectInstanceWorkflows: undefined,
         } as ProjectInstanceModel,
     });
 
@@ -63,6 +69,42 @@ const ProjectInstanceEditWorkflowDialog = ({
         updateProjectInstanceWorkflowMutation.mutate(formData.projectInstanceWorkflows![0]);
     }
 
+    useEffect(() => {
+        let newProjectInstanceWorkflowConnections: ProjectInstanceWorkflowConnectionModel[] = [];
+
+        const workflowConnections: WorkflowConnectionModel[] = (workflow?.tasks ?? [])
+            .flatMap((task) => task.connections ?? [])
+            .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
+
+        for (const workflowConnection of workflowConnections) {
+            const projectInstanceWorkflowConnection = projectInstanceWorkflow?.connections?.find(
+                (projectInstanceWorkflowConnection) =>
+                    projectInstanceWorkflowConnection.workflowNodeName === workflowConnection.workflowNodeName &&
+                    projectInstanceWorkflowConnection.key === workflowConnection.key
+            );
+
+            newProjectInstanceWorkflowConnections = [
+                ...newProjectInstanceWorkflowConnections,
+                projectInstanceWorkflowConnection!,
+            ];
+        }
+
+        setValue(
+            'projectInstanceWorkflows',
+            [
+                {
+                    ...projectInstanceWorkflow,
+                    connections: newProjectInstanceWorkflowConnections,
+                },
+            ],
+            {shouldValidate: true}
+        );
+        console.log(projectInstanceWorkflow);
+        console.log(getValues('projectInstanceWorkflows'));
+        console.log(getValues(`projectInstanceWorkflows.${0}.connections.${0}.connectionId`));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -90,7 +132,6 @@ const ProjectInstanceEditWorkflowDialog = ({
                         control={control}
                         formState={formState}
                         key={workflow.id!}
-                        label="Enable"
                         setValue={setValue}
                         switchHidden={true}
                         workflow={workflow}

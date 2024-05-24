@@ -12,7 +12,7 @@ import {useShallow} from 'zustand/react/shallow';
 export interface ProjectInstanceDialogWorkflowListItemProps {
     control: Control<ProjectInstanceModel>;
     formState: FormState<ProjectInstanceModel>;
-    label: string;
+    label?: string;
     setValue: UseFormSetValue<ProjectInstanceModel>;
     switchHidden?: boolean;
     workflow: WorkflowModel;
@@ -51,8 +51,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                         onClick={() => {
                             setValue(
                                 `projectInstanceWorkflows.${workflowIndex!}.enabled`,
-                                !workflowEnabledMap.get(workflow.id!),
-                                {shouldValidate: true}
+                                !workflowEnabledMap.get(workflow.id!)
                             );
                             setWorkflowEnabled(workflow.id!, !workflowEnabledMap.get(workflow.id!));
                         }}
@@ -69,7 +68,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
             )}
 
             {workflow && (workflowEnabledMap.get(workflow.id!) || switchHidden) && (
-                <div className="mt-2 space-y-4">
+                <div className="mt-2 space-y-6">
                     <div className="flex flex-col gap-3">
                         <Label className="font-semibold">Inputs</Label>
 

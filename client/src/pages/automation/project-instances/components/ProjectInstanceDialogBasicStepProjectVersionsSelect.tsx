@@ -15,10 +15,10 @@ const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
 
     return (
         <Select
-            defaultValue={projectVersion?.toString()}
             onValueChange={(value) => {
                 onChange(+value);
             }}
+            value={projectVersion?.toString() || ''}
         >
             <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select version" />

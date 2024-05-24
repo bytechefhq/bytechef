@@ -111,7 +111,6 @@ const ProjectInstanceDialog = ({
                 <ProjectInstanceDialogBasicStep
                     control={control}
                     getValues={getValues}
-                    projectId={getValues().projectId}
                     projectInstance={projectInstance}
                     setValue={setValue}
                     updateProjectVersion={updateProjectVersion}
@@ -239,7 +238,7 @@ const ProjectInstanceDialog = ({
                 ];
             }
 
-            setValue('projectInstanceWorkflows', projectInstanceWorkflows, {shouldValidate: true});
+            setValue('projectInstanceWorkflows', projectInstanceWorkflows);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

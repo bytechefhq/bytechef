@@ -50,7 +50,6 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
 
     return (
         <>
-            control: {workflowConnection.workflowNodeName}
             <FormField
                 control={control}
                 name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
@@ -68,10 +67,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                             </span>
                         </FormLabel>
 
-                        <Select
-                            defaultValue={field.value ? field.value.toString() : undefined}
-                            onValueChange={field.onChange}
-                        >
+                        <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : ''}>
                             <FormControl>
                                 <div className="flex space-x-2">
                                     <SelectTrigger>

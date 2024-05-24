@@ -27,6 +27,7 @@ const ProjectInstanceDialogBasicStepProjectsComboBox = ({
                 (project) =>
                     ({
                         label: <ProjectInstanceDialogBasicStepProjectLabel project={project} />,
+                        name: project.name,
                         value: project.id,
                     }) as ComboBoxItemType
             )}

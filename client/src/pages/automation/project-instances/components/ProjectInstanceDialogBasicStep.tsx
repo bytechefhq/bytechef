@@ -7,13 +7,13 @@ import ProjectInstanceDialogBasicStepProjectsComboBox from '@/pages/automation/p
 import ProjectInstanceDialogBasicStepTagsSelect from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {ProjectInstanceModel} from 'middleware/automation/configuration';
+import {useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
     control: Control<ProjectInstanceModel>;
     getValues: UseFormGetValues<ProjectInstanceModel>;
-    projectId: number | undefined;
     projectInstance: ProjectInstanceModel | undefined;
     setValue: UseFormSetValue<ProjectInstanceModel>;
     updateProjectVersion: boolean;
@@ -22,11 +22,13 @@ interface ProjectDialogBasicStepProps {
 const ProjectInstanceDialogBasicStep = ({
     control,
     getValues,
-    projectId,
     projectInstance,
     setValue,
     updateProjectVersion,
 }: ProjectDialogBasicStepProps) => {
+    const [curProjectId, setCurProjectId] = useState(getValues('projectId'));
+    const [curProjectVersion, setCurProjectVersion] = useState<number | undefined>(getValues('projectVersion'));
+
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     return (
@@ -45,8 +47,15 @@ const ProjectInstanceDialogBasicStep = ({
                                     onChange={(item) => {
                                         if (item) {
                                             resetWorkflowsEnabledStore();
-                                            setValue('projectId', item.value, {shouldValidate: true});
-                                            setValue('projectVersion', undefined, {shouldValidate: true});
+                                            setValue('projectId', item.value);
+                                            setValue('projectVersion', undefined);
+
+                                            if (!getValues('name')) {
+                                                setValue('name', item.name!.toString());
+                                            }
+
+                                            setCurProjectId(item.value);
+                                            setCurProjectVersion(undefined);
                                         }
                                     }}
                                     value={field.value}
@@ -98,10 +107,11 @@ const ProjectInstanceDialogBasicStep = ({
                                 <ProjectInstanceDialogBasicStepProjectVersionsSelect
                                     onChange={(value) => {
                                         field.onChange(value);
-                                        setValue('projectInstanceWorkflows', [], {shouldValidate: true});
+                                        setValue('projectInstanceWorkflows', []);
+                                        setCurProjectVersion(value);
                                     }}
-                                    projectId={projectId}
-                                    projectVersion={field.value}
+                                    projectId={curProjectId}
+                                    projectVersion={curProjectVersion}
                                 />
                             </FormControl>
 
