@@ -21,11 +21,11 @@ interface SidebarContentLayoutProps {
 }
 
 const leftSidebarWidths = {
-    56: ['md:w-56', 'md:pl-56'],
-    64: ['md:w-64', 'md:pl-64'],
-    72: ['md:w-72', 'md:pl-72'],
-    96: ['md:w-96', 'md:pl-96'],
-    112: ['md:w-[432px]', 'md:pl-[432px]'],
+    56: ['lg:w-56', 'lg:pl-56'],
+    64: ['lg:w-64', 'lg:pl-64'],
+    72: ['lg:w-72', 'lg:pl-72'],
+    96: ['lg:w-96', 'lg:pl-96'],
+    112: ['lg:w-[432px]', 'lg:pl-[432px]'],
 };
 
 const rightSidebarWidths = {
@@ -53,7 +53,7 @@ const LayoutContainer = ({
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className={twMerge('size-full', topHeader && 'flex flex-col', className)}>
+        <div className={twMerge('size-full overflow-auto', topHeader && 'flex flex-col', className)}>
             <Dialog open={sidebarOpen}>
                 <DialogContent className="h-full sm:max-w-[425px]">
                     <div className="relative">
@@ -81,9 +81,9 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden md:flex md:flex-col bg-white',
-                        !topHeader && 'md:fixed md:inset-y-0',
-                        topHeader && 'md:absolute md:bottom-0 md:top-14',
+                        'hidden lg:flex lg:flex-col bg-white',
+                        !topHeader && 'lg:fixed lg:inset-y-0',
+                        topHeader && 'lg:absolute lg:bottom-0 lg:top-14',
                         leftSidebarWidths[leftSidebarWidth][0]
                     )}
                 >

@@ -70,7 +70,7 @@ function App() {
 
                 <DesktopSidebar navigation={navigation} />
 
-                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                <div className="flex min-w-0 flex-1 flex-col">
                     <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
                     <Outlet />
