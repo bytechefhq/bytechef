@@ -4,6 +4,7 @@ import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/middle
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ArrayPropertyType, PropertyType} from '@/types/types';
+import getRandomId from '@/utils/getRandomId';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
@@ -36,13 +37,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             return;
         }
 
-        const newItem: ArrayPropertyType = {
+        const newItem = {
             ...matchingItem,
             controlType: matchingItem
                 ? matchingItem?.controlType
                 : (VALUE_PROPERTY_CONTROL_TYPES[newItemType!] as ControlTypeModel),
             custom: true,
             expressionEnabled: true,
+            key: getRandomId(),
             label: '',
             name: arrayItems.length.toString(),
             type: matchingItem?.type || newItemType || 'STRING',
@@ -52,10 +54,10 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     };
 
     const handleDeleteClick = (path: string, name: string, index: number) => {
-        const clickedItemParameter = getParameterByPath(path, currentComponent)[index];
+        const clickedItemParameter = getParameterByPath(path, currentComponent)?.[index];
 
         if (clickedItemParameter) {
-            onDeleteClick(path, undefined, index);
+            onDeleteClick(path, name, index);
         }
     };
 
@@ -175,13 +177,13 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             <ul className="ml-2 w-full space-y-4 border-l">
                 {arrayItems?.map((arrayItem, index) =>
                     Array.isArray(arrayItem) ? (
-                        arrayItem.map((subItem: ArrayPropertyType) => (
+                        arrayItem.map((subItem: ArrayPropertyType, subItemIndex: number) => (
                             <ArrayPropertyItem
                                 arrayItem={subItem}
                                 arrayName={name}
                                 currentComponent={currentComponent}
                                 index={index}
-                                key={subItem.name}
+                                key={subItemIndex}
                                 onDeleteClick={handleDeleteClick}
                                 path={path}
                                 setArrayItems={setArrayItems}
@@ -193,7 +195,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                             arrayName={name}
                             currentComponent={currentComponent}
                             index={index}
-                            key={arrayItem.name}
+                            key={arrayItem.key}
                             onDeleteClick={handleDeleteClick}
                             path={path}
                             setArrayItems={setArrayItems}

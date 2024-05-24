@@ -139,6 +139,7 @@ export type ArrayPropertyType = PropertyModel & {
     custom?: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     defaultValue?: any;
+    key?: string;
     label?: string;
     properties?: Array<PropertyType>;
 };
