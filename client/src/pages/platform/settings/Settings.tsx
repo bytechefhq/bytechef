@@ -42,7 +42,7 @@ export default function Settings() {
                                 toLink={navItem.href}
                             />
                         ) : (
-                            <h3 className="px-2 py-3 text-sm text-muted-foreground" key={navItem.title}>
+                            <h3 className="px-2 py-1 text-sm font-semibold text-muted-foreground" key={navItem.title}>
                                 {navItem.title}
                             </h3>
                         )

@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const SidebarSubtitle = ({title}: {title: string}) => (
-    <h4 className="px-2 py-1 pr-4 text-sm font-medium tracking-tight">{title}</h4>
+    <h4 className="px-2 py-1 pr-4 text-sm font-medium tracking-tight text-muted-foreground">{title}</h4>
 );
 
 export interface LeftSidebarNavProps {
