@@ -52,6 +52,10 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillP
                           })
                         : [];
 
+                    if (!componentOperation.componentDefinition) {
+                        return <></>;
+                    }
+
                     return (
                         <AccordionItem
                             className="group"

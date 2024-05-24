@@ -121,7 +121,7 @@ const DataPill = ({
                                 />
 
                                 {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                                    <div className="flex-1 text-xs text-muted-foreground">
+                                    <div className="text-muted-foreground flex-1 text-xs">
                                         {value === true ? 'true' : value === false ? false : value}
                                     </div>
                                 )}

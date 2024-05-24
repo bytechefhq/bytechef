@@ -22,18 +22,17 @@ const DataPillPanelBodyPropertiesItem = ({
     outputSchemaExists: boolean;
     sampleOutput: object;
 }) => {
-    const {icon, title} = componentAction.componentDefinition;
+    const {componentDefinition, outputSchema, workflowNodeName} = componentAction;
+    const {icon, title} = componentDefinition;
 
     const {componentActions} = useWorkflowDataStore();
     const {getNodes} = useReactFlow();
 
-    const currentComponentAction = componentActions.find(
-        (action) => action.workflowNodeName === componentAction.workflowNodeName
-    );
+    const currentComponentAction = componentActions.find((action) => action.workflowNodeName === workflowNodeName);
 
     const nodes = getNodes();
 
-    const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === componentAction.workflowNodeName);
+    const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === workflowNodeName);
 
     const handleOutputTabRedirectClick = useNodeClickHandler(redirectTargetNode?.data, redirectTargetNode?.data.name);
 
@@ -41,7 +40,7 @@ const DataPillPanelBodyPropertiesItem = ({
         <>
             <AccordionTrigger
                 className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b"
-                key={`accordion-trigger-${componentAction.workflowNodeName}`}
+                key={`accordion-trigger-${workflowNodeName}`}
             >
                 <div className="flex items-center space-x-4">
                     {icon && (
@@ -53,11 +52,11 @@ const DataPillPanelBodyPropertiesItem = ({
                     <span className="text-sm">
                         {title}
 
-                        <span className="pl-1 text-xs text-gray-400">({componentAction.workflowNodeName})</span>
+                        <span className="pl-1 text-xs text-gray-400">({workflowNodeName})</span>
                     </span>
                 </div>
 
-                <span className="ml-auto mr-4 rounded bg-muted px-2 py-1 text-xs">
+                <span className="bg-muted ml-auto mr-4 rounded px-2 py-1 text-xs">
                     {currentComponentAction?.operationName}
                 </span>
 
@@ -66,16 +65,16 @@ const DataPillPanelBodyPropertiesItem = ({
 
             <AccordionContent
                 className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
-                key={`accordion-content-${componentAction.workflowNodeName}`}
+                key={`accordion-content-${workflowNodeName}`}
             >
                 {outputSchemaExists ? (
                     <>
                         <DataPill
-                            componentIcon={componentAction.componentDefinition.icon}
-                            property={componentAction?.outputSchema}
+                            componentIcon={componentDefinition.icon}
+                            property={outputSchema}
                             root={true}
                             sampleOutput={sampleOutput}
-                            workflowNodeName={componentAction.workflowNodeName}
+                            workflowNodeName={workflowNodeName}
                         />
 
                         <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
@@ -85,10 +84,10 @@ const DataPillPanelBodyPropertiesItem = ({
                                 return (
                                     <div className="flex items-center space-x-3" key={property.name}>
                                         <DataPill
-                                            componentIcon={componentAction.componentDefinition.icon}
+                                            componentIcon={componentDefinition.icon}
                                             property={property}
                                             sampleOutput={sampleOutput}
-                                            workflowNodeName={componentAction.workflowNodeName}
+                                            workflowNodeName={workflowNodeName}
                                         />
 
                                         {(value || value === 0 || value === false) && typeof value !== 'object' && (
