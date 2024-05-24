@@ -169,7 +169,7 @@ const ProjectInstanceWorkflowListItem = ({
                             }}
                         />
 
-                        {workflow.triggers?.[0]?.name === 'manual' && (
+                        {(workflow.triggers?.length == 0 || workflow.triggers?.[0]?.name === 'manual') && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
                                 onClick={() => handleWorkflowRun()}
@@ -203,9 +203,8 @@ const ProjectInstanceWorkflowListItem = ({
                             </Button>
                         )}
 
-                        {workflow.triggers?.[0]?.name !== 'manual' && !projectInstanceWorkflow.staticWebhookUrl && (
-                            <div className="w-9"></div>
-                        )}
+                        {!(workflow.triggers?.length == 0 || workflow.triggers?.[0]?.name === 'manual') &&
+                            !projectInstanceWorkflow.staticWebhookUrl && <div className="w-9"></div>}
 
                         <ProjectInstanceWorkflowListItemDropdownMenu
                             onEditClick={() => setShowEditWorkflowDialog(true)}
