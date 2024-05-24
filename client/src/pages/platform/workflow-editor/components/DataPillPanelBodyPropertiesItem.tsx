@@ -56,7 +56,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     </span>
                 </div>
 
-                <span className="bg-muted ml-auto mr-4 rounded px-2 py-1 text-xs">
+                <span className="ml-auto mr-4 rounded bg-muted px-2 py-1 text-xs">
                     {currentComponentAction?.operationName}
                 </span>
 
