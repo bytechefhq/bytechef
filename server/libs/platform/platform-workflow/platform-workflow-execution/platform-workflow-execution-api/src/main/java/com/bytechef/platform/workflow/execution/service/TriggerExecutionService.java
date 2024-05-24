@@ -28,7 +28,7 @@ public interface TriggerExecutionService {
 
     void delete(long id);
 
-    void deleteJobTriggerExecution(long id);
+    void deleteJobTriggerExecution(long jobId);
 
     Optional<TriggerExecution> fetchJobTriggerExecution(long jobId);
 

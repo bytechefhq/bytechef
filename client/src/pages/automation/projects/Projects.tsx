@@ -63,12 +63,12 @@ const Projects = () => {
     return (
         <LayoutContainer
             header={
-                <PageHeader
-                    centerTitle={true}
-                    position="main"
-                    right={
-                        projects &&
-                        projects.length > 0 && (
+                projects &&
+                projects.length > 0 && (
+                    <PageHeader
+                        centerTitle={true}
+                        position="main"
+                        right={
                             <ProjectDialog
                                 onClose={(project) => {
                                     if (project) {
@@ -80,11 +80,14 @@ const Projects = () => {
                                 project={undefined}
                                 triggerNode={<Button>New Project</Button>}
                             />
-                        )
-                    }
-                    title={`Filter by: ${searchParams.get('tagId') ? 'tag' : 'category'} ${pageTitle || 'All'}`}
-                    titleClassName="text-base"
-                />
+                        }
+                        title={
+                            !pageTitle
+                                ? 'All Projects'
+                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}: ${pageTitle}`
+                        }
+                    />
+                )
             }
             leftSidebarBody={
                 <>

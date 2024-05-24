@@ -1,4 +1,5 @@
 import {Button} from '@/components/ui/button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import CreatableSelect, {SelectOptionType} from 'components/CreatableSelect/CreatableSelect';
@@ -117,7 +118,13 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                         setIsNewTagWindowVisible(true);
                     }}
                 >
-                    <PlusIcon className="size-3" />
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <PlusIcon className="size-3" />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Add new tag</TooltipContent>
+                    </Tooltip>
                 </div>
             )}
         </div>

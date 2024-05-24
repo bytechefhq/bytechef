@@ -30,8 +30,9 @@ import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.querie
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
-import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
@@ -214,7 +215,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button size="icon" variant="ghost">
-                                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                                 </Button>
                             </DropdownMenuTrigger>
 

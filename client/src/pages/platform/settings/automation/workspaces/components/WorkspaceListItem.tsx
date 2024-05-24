@@ -21,8 +21,8 @@ import {WorkspaceModel} from '@/middleware/automation/configuration';
 import {useDeleteWorkspaceMutation} from '@/mutations/automation/workspaces.mutations';
 import WorkspaceDialog from '@/pages/platform/settings/automation/workspaces/components/WorkspaceDialog';
 import {WorkspaceKeys} from '@/queries/automation/workspaces.queries';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface WorkspaceListItemProps {
@@ -73,7 +73,7 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 

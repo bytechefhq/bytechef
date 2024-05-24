@@ -169,7 +169,7 @@ const ProjectHeader = ({
 
     return (
         <header className="flex items-center border-b py-2 pl-3 pr-2.5">
-            <div className="flex flex-1 items-center space-x-2">
+            <div className="flex flex-1 items-center">
                 <h1>{project?.name}</h1>
 
                 {project && <ProjectHeaderProjectVersionBadge project={project} />}

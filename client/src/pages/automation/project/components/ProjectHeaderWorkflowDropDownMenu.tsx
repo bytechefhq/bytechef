@@ -10,8 +10,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDuplicateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 
 const ProjectHeaderWorkflowDropDownMenu = ({
     onShowDeleteWorkflowAlertDialog,
@@ -42,7 +42,7 @@ const ProjectHeaderWorkflowDropDownMenu = ({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button className="hover:bg-gray-200" size="icon" variant="ghost">
-                                <DotsVerticalIcon />
+                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                             </Button>
                         </TooltipTrigger>
 

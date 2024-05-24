@@ -24,8 +24,9 @@ import {useDeleteConnectionMutation, useUpdateConnectionMutation} from '@/mutati
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/queries/automation/connections.queries';
 import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
+import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -141,7 +142,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button size="icon" variant="ghost">
-                                        <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                        <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                                     </Button>
                                 </DropdownMenuTrigger>
 

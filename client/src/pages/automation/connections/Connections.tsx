@@ -81,12 +81,12 @@ export const Connections = () => {
     return (
         <LayoutContainer
             header={
-                <PageHeader
-                    centerTitle={true}
-                    position="main"
-                    right={
-                        connections &&
-                        connections.length > 0 && (
+                connections &&
+                connections.length > 0 && (
+                    <PageHeader
+                        centerTitle={true}
+                        position="main"
+                        right={
                             <ConnectionDialog
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
@@ -94,11 +94,14 @@ export const Connections = () => {
                                 useCreateConnectionMutation={useCreateConnectionMutation}
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
-                        )
-                    }
-                    title={`Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}: ${pageTitle || 'All'}`}
-                    titleClassName="text-base"
-                />
+                        }
+                        title={
+                            !pageTitle
+                                ? 'All Connections'
+                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}: ${pageTitle}`
+                        }
+                    />
+                )
             }
             leftSidebarBody={
                 <>

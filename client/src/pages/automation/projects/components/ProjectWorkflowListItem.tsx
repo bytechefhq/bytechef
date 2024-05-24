@@ -29,8 +29,8 @@ import {ProjectWorkflowKeys} from '@/queries/automation/projectWorkflows.queries
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -142,7 +142,7 @@ const ProjectWorkflowListItem = ({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 

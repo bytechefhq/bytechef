@@ -48,7 +48,7 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
     }
 
     @Override
-    public void deleteJobTriggerExecution(long id) {
+    public void deleteJobTriggerExecution(long jobId) {
         throw new UnsupportedOperationException();
     }
 

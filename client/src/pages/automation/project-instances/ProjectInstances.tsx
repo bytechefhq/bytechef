@@ -90,18 +90,19 @@ const ProjectInstances = () => {
     return (
         <LayoutContainer
             header={
-                <PageHeader
-                    centerTitle={true}
-                    position="main"
-                    right={
-                        projectInstances &&
-                        projectInstances?.length > 0 && (
-                            <ProjectInstanceDialog triggerNode={<Button>New Instance</Button>} />
-                        )
-                    }
-                    title={`Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle || 'All'}`}
-                    titleClassName="text-base"
-                />
+                projectInstances &&
+                projectInstances?.length > 0 && (
+                    <PageHeader
+                        centerTitle={true}
+                        position="main"
+                        right={<ProjectInstanceDialog triggerNode={<Button>New Instance</Button>} />}
+                        title={
+                            !pageTitle
+                                ? 'All Instances'
+                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle}`
+                        }
+                    />
+                )
             }
             leftSidebarBody={
                 <>

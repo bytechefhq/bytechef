@@ -51,8 +51,9 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
     }
 
     @Override
-    public void deleteJobTriggerExecution(long id) {
-
+    public void deleteJobTriggerExecution(long jobId) {
+        triggerExecutionRepository.findByJobId(jobId)
+            .ifPresent(triggerExecutionRepository::delete);
     }
 
     @Override

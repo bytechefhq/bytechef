@@ -283,7 +283,10 @@ export const WorkflowExecutions = () => {
                 )
             }
             header={
-                <PageHeader centerTitle={true} position="main" title="Workflow Executions" titleClassName="text-base" />
+                workflowExecutionPage?.content &&
+                workflowExecutionPage.content.length > 0 && (
+                    <PageHeader centerTitle={true} position="main" title="All Workflow Executions" />
+                )
             }
             leftSidebarBody={
                 <div className="space-y-4 px-4">

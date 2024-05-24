@@ -5,7 +5,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
+import {EllipsisVerticalIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -32,7 +32,7 @@ const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenu
                 trigger
             ) : (
                 <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-gray-100">
-                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                 </div>
             )}
         </DropdownMenuTrigger>

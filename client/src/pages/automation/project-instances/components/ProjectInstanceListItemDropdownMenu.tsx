@@ -6,7 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {DotsVerticalIcon} from '@radix-ui/react-icons';
+import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface ProjectInstanceListItemDropdownMenuProps {
     onDeleteClick: () => void;
@@ -27,7 +27,7 @@ const ProjectInstanceListItemDropdownMenu = ({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="ghost">
-                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                 </Button>
             </DropdownMenuTrigger>
 
