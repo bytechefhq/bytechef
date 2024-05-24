@@ -98,7 +98,7 @@ export function DesktopSidebar({
 
                             <DropdownMenuContent align="start" className="w-64 space-y-2 p-2">
                                 <div className="min-h-52 space-y-1">
-                                    {pathname.startsWith('/automation') && (
+                                    {pathname.startsWith('/automation') && workspaces && workspaces.length > 1 && (
                                         <DropdownMenuSub>
                                             <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
                                                 Workspaces
@@ -106,21 +106,19 @@ export function DesktopSidebar({
 
                                             <DropdownMenuPortal>
                                                 <DropdownMenuSubContent>
-                                                    {workspaces && (
-                                                        <DropdownMenuRadioGroup
-                                                            onValueChange={(value) => setCurrentWorkspaceId(+value)}
-                                                            value={currentWorkspaceId?.toString()}
-                                                        >
-                                                            {workspaces.map((workspace) => (
-                                                                <DropdownMenuRadioItem
-                                                                    key={workspace.id}
-                                                                    value={workspace.id!.toString()}
-                                                                >
-                                                                    {workspace.name}
-                                                                </DropdownMenuRadioItem>
-                                                            ))}
-                                                        </DropdownMenuRadioGroup>
-                                                    )}
+                                                    <DropdownMenuRadioGroup
+                                                        onValueChange={(value) => setCurrentWorkspaceId(+value)}
+                                                        value={currentWorkspaceId?.toString()}
+                                                    >
+                                                        {workspaces.map((workspace) => (
+                                                            <DropdownMenuRadioItem
+                                                                key={workspace.id}
+                                                                value={workspace.id!.toString()}
+                                                            >
+                                                                {workspace.name}
+                                                            </DropdownMenuRadioItem>
+                                                        ))}
+                                                    </DropdownMenuRadioGroup>
                                                 </DropdownMenuSubContent>
                                             </DropdownMenuPortal>
                                         </DropdownMenuSub>

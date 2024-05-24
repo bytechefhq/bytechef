@@ -5,6 +5,9 @@ import {Outlet, useLocation} from 'react-router-dom';
 
 const sidebarNavItems = [
     {
+        title: 'General',
+    },
+    {
         href: '/settings/account',
         title: 'Account',
     },
@@ -18,13 +21,6 @@ const sidebarNavItems = [
     {
         href: '/settings/a/workspaces',
         title: 'Workspaces',
-    },
-    {
-        title: 'Embedded',
-    },
-    {
-        href: '/settings/signing-keys',
-        title: 'Signing Keys',
     },
 ];
 
@@ -46,7 +42,7 @@ export default function Settings() {
                                 toLink={navItem.href}
                             />
                         ) : (
-                            <h3 className="px-2 py-3 font-semibold" key={navItem.title}>
+                            <h3 className="px-2 py-3 text-sm text-muted-foreground" key={navItem.title}>
                                 {navItem.title}
                             </h3>
                         )
