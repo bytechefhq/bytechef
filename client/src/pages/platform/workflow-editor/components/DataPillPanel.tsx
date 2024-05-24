@@ -104,7 +104,7 @@ const DataPillPanel = ({
                             dataPillFilterQuery={dataPillFilterQuery}
                         />
                     ) : (
-                        <span className="text-muted-foreground p-4 text-sm">No available data pills.</span>
+                        <span className="p-4 text-sm text-muted-foreground">No available data pills.</span>
                     )}
                 </main>
             </div>
