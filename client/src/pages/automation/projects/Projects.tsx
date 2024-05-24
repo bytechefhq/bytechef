@@ -82,7 +82,8 @@ const Projects = () => {
                             />
                         )
                     }
-                    title={`${searchParams.get('tagId') ? 'Tags' : 'Categories'}: ${pageTitle || 'All'}`}
+                    title={`Filter by: ${searchParams.get('tagId') ? 'tag' : 'category'} ${pageTitle || 'All'}`}
+                    titleClassName="text-base"
                 />
             }
             leftSidebarBody={

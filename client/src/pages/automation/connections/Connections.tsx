@@ -96,7 +96,8 @@ export const Connections = () => {
                             />
                         )
                     }
-                    title={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${pageTitle || 'All'}`}
+                    title={`Filter by ${searchParams.get('tagId') ? 'tag' : 'component'}: ${pageTitle || 'All'}`}
+                    titleClassName="text-base"
                 />
             }
             leftSidebarBody={

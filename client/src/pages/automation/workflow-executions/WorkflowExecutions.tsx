@@ -282,7 +282,9 @@ export const WorkflowExecutions = () => {
                     </PageFooter>
                 )
             }
-            header={<PageHeader centerTitle={true} position="main" title="All Workflow Executions" />}
+            header={
+                <PageHeader centerTitle={true} position="main" title="Workflow Executions" titleClassName="text-base" />
+            }
             leftSidebarBody={
                 <div className="space-y-4 px-4">
                     <div className="flex flex-col space-y-2">

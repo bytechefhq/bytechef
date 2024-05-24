@@ -99,7 +99,8 @@ const ProjectInstances = () => {
                             <ProjectInstanceDialog triggerNode={<Button>New Instance</Button>} />
                         )
                     }
-                    title={`${searchParams.get('tagId') ? 'Tags' : 'Projects'}: ${pageTitle || 'All'}`}
+                    title={`Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle || 'All'}`}
+                    titleClassName="text-base"
                 />
             }
             leftSidebarBody={
