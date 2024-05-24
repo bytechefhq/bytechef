@@ -16,10 +16,13 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.constant.WorkspaceErrorType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
+
+import com.bytechef.platform.configuration.exception.ConfigurationException;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +50,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public void delete(long id) {
+        if (workspaceRepository.count() == 1) {
+            throw new ConfigurationException(
+                "The last workspace cannot be deleted", WorkspaceErrorType.DELETE_WORKSPACE);
+        }
+
         workspaceRepository.deleteById(id);
     }
 
