@@ -1,11 +1,11 @@
 {
-  "category": null,
+  "categories": null,
   "customAction": null,
   "customActionHelp": null,
   "dataStreamItemReader": null,
   "dataStreamItemWriter": null,
   "description": "Helper component for converting technical date values to human friendly formatted expressions.",
-  "icon": "path:assets/text-helper.svg",
+  "icon": "path:assets/date-helper.svg",
   "tags": null,
   "metadata": null,
   "name": "dateHelper",
