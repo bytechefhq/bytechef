@@ -16,11 +16,11 @@
 
 package com.bytechef.component.date.helper;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_HELPER;
 import static com.bytechef.component.definition.ComponentDSL.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.date.helper.action.DateHelperConvertAction;
-import com.bytechef.component.date.helper.constants.DateHelperConstants;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
@@ -30,7 +30,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class DateHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(DateHelperConstants.DATE_HELPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(DATE_HELPER)
         .title("Date Helper")
         .description("Helper component for converting technical date values to human friendly formatted expressions.")
         .icon("path:assets/date-helper.svg")
