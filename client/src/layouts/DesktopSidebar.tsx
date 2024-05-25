@@ -126,7 +126,7 @@ export function DesktopSidebar({
 
                                     <DropdownMenuItem
                                         className="cursor-pointer font-semibold"
-                                        onClick={() => navigate('/settings')}
+                                        onClick={() => navigate('/automation/settings')}
                                     >
                                         Settings
                                     </DropdownMenuItem>

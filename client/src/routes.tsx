@@ -12,7 +12,7 @@ import Appearance from '@/pages/platform/settings/Appearance';
 import Settings from '@/pages/platform/settings/Settings';
 import Workspaces from '@/pages/platform/settings/automation/workspaces/Workspaces';
 import {QueryClient} from '@tanstack/react-query';
-import {createBrowserRouter} from 'react-router-dom';
+import {createBrowserRouter, redirect} from 'react-router-dom';
 
 import {ProjectKeys} from './queries/automation/projects.queries';
 
@@ -26,7 +26,9 @@ export const router = createBrowserRouter([
     {
         children: [
             {
-                element: <Projects />,
+                loader: async () => {
+                    return redirect('projects');
+                },
                 path: '',
             },
             {
@@ -59,35 +61,49 @@ export const router = createBrowserRouter([
                         element: <AutomationWorkflowExecutions />,
                         path: 'executions',
                     },
-                ],
-                path: 'automation',
-            },
-            {
-                children: [
-                    {
-                        element: <Account />,
-                        path: '',
-                    },
-                    {
-                        element: <Account />,
-                        path: 'account',
-                    },
-                    {
-                        element: <Appearance />,
-                        path: 'appearance',
-                    },
                     {
                         children: [
+                            {
+                                loader: async () => {
+                                    return redirect('account');
+                                },
+                                path: '',
+                            },
+                            {
+                                element: <Account />,
+                                path: 'account',
+                            },
+                            {
+                                element: <Appearance />,
+                                path: 'appearance',
+                            },
                             {
                                 element: <Workspaces />,
                                 path: 'workspaces',
                             },
                         ],
-                        path: 'a',
+                        element: (
+                            <Settings
+                                sidebarNavItems={[
+                                    {
+                                        href: '/automation/settings/account',
+                                        title: 'Account',
+                                    },
+                                    {
+                                        href: '/automation/settings/appearance',
+                                        title: 'Appearance',
+                                    },
+                                    {
+                                        href: '/automation/settings/workspaces',
+                                        title: 'Workspaces',
+                                    },
+                                ]}
+                            />
+                        ),
+                        path: 'settings',
                     },
                 ],
-                element: <Settings />,
-                path: 'settings',
+                path: 'automation',
             },
         ],
         element: <App />,

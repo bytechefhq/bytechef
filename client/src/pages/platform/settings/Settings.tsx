@@ -3,28 +3,14 @@ import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import PageHeader from '@/layouts/PageHeader';
 import {Outlet, useLocation} from 'react-router-dom';
 
-const sidebarNavItems = [
-    {
-        title: 'General',
-    },
-    {
-        href: '/settings/account',
-        title: 'Account',
-    },
-    {
-        href: '/settings/appearance',
-        title: 'Appearance',
-    },
-    {
-        title: 'Automation',
-    },
-    {
-        href: '/settings/a/workspaces',
-        title: 'Workspaces',
-    },
-];
+interface SettingsProps {
+    sidebarNavItems: {
+        href: string;
+        title: string;
+    }[];
+}
 
-export default function Settings() {
+export default function Settings({sidebarNavItems}: SettingsProps) {
     const location = useLocation();
 
     return (
