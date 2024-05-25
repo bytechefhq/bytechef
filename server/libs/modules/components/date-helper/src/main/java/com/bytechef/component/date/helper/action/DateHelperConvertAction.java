@@ -16,6 +16,12 @@
 
 package com.bytechef.component.date.helper.action;
 
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.CONVERT_UNIX_TIMESTAMP_TO_ISO8601;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_TIMESTAMP;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -24,7 +30,7 @@ import com.bytechef.component.date.helper.constants.DateHelperConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,34 +41,36 @@ import java.util.Date;
 public class DateHelperConvertAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION =
-        action(DateHelperConstants.CONVERT_UNIX_TIMESTAMP_TO_ISO8601)
+        action(CONVERT_UNIX_TIMESTAMP_TO_ISO8601)
             .title("Convert Date Timestamp")
             .description("Converts UNIX timestamp to ISO8601 format.")
             .properties(
-                string(DateHelperConstants.DATE_TIMESTAMP)
+                string(DATE_TIMESTAMP)
                     .label("UNIX Timestamp.")
                     .description("UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)")
-                    .controlType(Property.ControlType.NUMBER)
+                    .controlType(ControlType.NUMBER)
                     .required(true),
                 string(DateHelperConstants.DATE_FORMAT)
                     .label("Date Format")
                     .description("Formatting that should be applied the text representation of date.")
-                    .controlType(Property.ControlType.SELECT)
+                    .controlType(ControlType.SELECT)
                     .options(
-                        option(DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME,
-                            DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE,
+                        option(
+                            DATE_FORMAT_OPTION_ISO8601_DATE_TIME,
+                            DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE,
                             "Get date in yyyy-MM-ddTHH:mm:ssZ"),
-                        option(DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE,
-                            DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE, "Get date in yyyy-MM-dd"))
+                        option(
+                            DATE_FORMAT_OPTION_ISO8601_DATE,
+                            DATE_FORMAT_OPTION_ISO8601_DATE_VALUE, "Get date in yyyy-MM-dd"))
                     .required(true)
-                    .defaultValue(DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE))
+                    .defaultValue(DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE))
             .output()
             .perform(DateHelperConvertAction::perform);
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        long unixTimestamp = inputParameters.getRequiredLong(DateHelperConstants.DATE_TIMESTAMP);
+        long unixTimestamp = inputParameters.getRequiredLong(DATE_TIMESTAMP);
 
         if (getDigitCount(unixTimestamp) == 10) {
             unixTimestamp = unixTimestamp * 1000;
@@ -77,12 +85,11 @@ public class DateHelperConvertAction {
 
     private static DateFormat getDateFormat(String format) {
         return switch (format) {
-            case DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE -> new SimpleDateFormat("yyyy-MM-dd");
-            case DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE ->
+            case DATE_FORMAT_OPTION_ISO8601_DATE_VALUE -> new SimpleDateFormat("yyyy-MM-dd");
+            case DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE ->
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             default -> throw new IllegalArgumentException("Unsupported format " + format);
         };
-
     }
 
     private static int getDigitCount(long value) {

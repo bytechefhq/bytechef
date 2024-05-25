@@ -30,8 +30,6 @@ public class DateHelperConvertActionTest {
 
     @Test
     public void testActionPerform() {
-        DateHelperConvertAction dateHelperConvertAction = new DateHelperConvertAction();
-
         Parameters parameters = getParameters(1716572102L, DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
 
         Assertions.assertEquals("2024-05-24",
@@ -63,5 +61,4 @@ public class DateHelperConvertActionTest {
 
         return parameters;
     }
-
 }
