@@ -47,7 +47,7 @@ const LeftSidebarNavItem = ({
         className={cn(
             buttonVariants({variant: 'ghost'}),
             filterData ? 'bg-muted hover:bg-muted' : 'hover:bg-muted',
-            'justify-start'
+            'justify-start px-2'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
         to={toLink}
