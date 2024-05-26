@@ -44,7 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 /**
@@ -73,29 +74,24 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, ?> deleteParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
+    public Map<String, ?> deleteParameter(String workflowId, String workflowNodeName, String path) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
         ParameterMapPropertiesResult result =
-            getParameterMapProperties(workflowNodeName, (Map<String, Object>) definitionMap);
+            getParameterMapProperties(workflowNodeName, definitionMap);
 
-        Map<String, ?> parameterMap = result.parameterMap;
-
-        deleteParameter(path, name, arrayIndex, (Map<String, Object>) parameterMap);
+        setParameter(path, null, result.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
-        return parameterMap;
+        return result.parameterMap;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName) {
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
@@ -104,7 +100,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
         ParameterMapPropertiesResult parameterMapProperties = getParameterMapProperties(
-            workflowNodeName, (Map<String, Object>) definitionMap);
+            workflowNodeName, definitionMap);
 
         Set<String> keySet = parameterMapProperties.parameterMap.keySet();
 
@@ -121,37 +117,32 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public UpdateParameterResultDTO updateParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
+        String workflowId, String workflowNodeName, String path, Object value) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        ParameterMapPropertiesResult result = getParameterMapProperties(
-            workflowNodeName, (Map<String, Object>) definitionMap);
+        ParameterMapPropertiesResult result = getParameterMapProperties(workflowNodeName, definitionMap);
+
+        setParameter(path, value, result.parameterMap);
 
         Map<String, Boolean> displayConditionMap = Map.of();
-        Map<String, ?> parameterMap = result.parameterMap;
 
-        updateParameter(path, name, arrayIndex, value, (Map<String, Object>) parameterMap);
+        String[] pathItems = path.split("\\.");
 
-        // dependOn list should not contain paths inside arrays
+        // For now only check the first, root level of properties on which other properties could depend on
+        if (pathItems.length == 1) {
+            checkDependOn(pathItems[0], result.properties(), result.parameterMap);
 
-        if (arrayIndex == null) {
-            checkDependOn(name, result.properties(), result.parameterMap);
-        } else {
-            // For now only check the first, root level of properties on which other properties could depend on
+            Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+                workflow.getId());
 
-            name = path;
+            displayConditionMap = checkDisplayConditionsParameters(
+                workflowNodeName, pathItems[0], result.properties, workflow, result.parameterMap, inputMap,
+                result.taskParameters);
         }
-
-        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflow.getId());
-
-        displayConditionMap = checkDisplayConditionsParameters(
-            workflowNodeName, name, result.properties, workflow, result.parameterMap, inputMap, result.taskParameters);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -159,7 +150,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return new UpdateParameterResultDTO(displayConditionMap, result.parameterMap);
     }
 
-    // For now only check the first, root level of properties on which other properties could depend on
     private void checkDependOn(String name, List<? extends Property> properties, Map<String, ?> parameterMap) {
         for (Property property : properties) {
             List<String> dependOnPropertyNames = List.of();
@@ -245,7 +235,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private ParameterMapPropertiesResult getParameterMapProperties(
-        String workflowNodeName, Map<String, Object> definitionMap) {
+        String workflowNodeName, Map<String, ?> definitionMap) {
 
         Map<String, ?> parameterMap;
         List<? extends Property> properties;
@@ -373,112 +363,72 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private void deleteParameter(String path, String name, Integer arrayIndex, Map<String, Object> parameterMap) {
-        if (StringUtils.isEmpty(path)) {
-            if (arrayIndex == null) {
-                parameterMap.remove(name);
-            } else {
-                throw new IllegalStateException("Either path or name must be defined");
-            }
-        } else {
-            String[] pathItems = path.split("\\.");
+    private void setParameter(String path, Object value, Map<String, ?> parameterMap) {
+        Map<String, Object> map = (Map<String, Object>) parameterMap;
 
-            Object subParameter = parameterMap;
-            Object parentSubParameter;
+        String[] pathItems = path.split("\\.");
 
-            for (int i = 0; i < pathItems.length; i++) {
-                String pathItem = pathItems[i];
+        for (int i = 0; i < pathItems.length; i++) {
+            String pathItem = pathItems[i];
 
-                parentSubParameter = subParameter;
-                subParameter = ((Map<String, Object>) subParameter).get(pathItem);
+            if (pathItem.endsWith("]")) {
+                String name = pathItem.substring(0, pathItem.indexOf("["));
+                String arrays = pathItem.substring(pathItem.indexOf("["));
 
-                if (subParameter == null) {
-                    if (arrayIndex == null || i < pathItems.length - 1) {
-                        subParameter = new HashMap<>();
-
-                        ((Map<String, Object>) parentSubParameter).put(pathItem, subParameter);
-                    } else {
-                        subParameter = new ArrayList<>();
-
-                        ((Map<String, Object>) parentSubParameter).put(pathItem, subParameter);
-                    }
-                }
-            }
-
-            if (arrayIndex == null) {
-                ((Map<String, Object>) subParameter).remove(name);
-            } else {
-                List<Object> subParameters = (List<Object>) subParameter;
-
-                if (name == null) {
-                    subParameters.remove((int) arrayIndex);
+                List<Object> list;
+                if (map.containsKey(name)) {
+                    list = (List<Object>) map.get(name);
                 } else {
-                    Map<String, Object> subParameterMap = (Map<String, Object>) subParameters.get(arrayIndex);
+                    list = new ArrayList<>();
 
-                    subParameterMap.remove(name);
+                    map.put(name, list);
                 }
-            }
-        }
-    }
 
-    @SuppressWarnings("unchecked")
-    private void updateParameter(
-        String path, String name, Integer arrayIndex, Object value, Map<String, Object> parameterMap) {
+                Pattern pattern = Pattern.compile("\\[(\\d+)]");
+                Matcher matcher = pattern.matcher(arrays);
 
-        if (StringUtils.isEmpty(path)) {
-            if (arrayIndex == null) {
-                parameterMap.put(name, value);
-            } else {
-                throw new IllegalStateException("Either path or name must be defined");
-            }
-        } else {
-            String[] pathItems = path.split("\\.");
+                while (matcher.find()) {
+                    int arrayIndex = Integer.parseInt(matcher.group(1));
 
-            Object subParameter = parameterMap;
-            Object parentSubParameter;
-
-            for (int i = 0; i < pathItems.length; i++) {
-                String pathItem = pathItems[i];
-
-                parentSubParameter = subParameter;
-                subParameter = ((Map<String, Object>) subParameter).get(pathItem);
-
-                if (subParameter == null) {
-                    if (arrayIndex == null || i < pathItems.length - 1) {
-                        subParameter = new HashMap<>();
-
-                        ((Map<String, Object>) parentSubParameter).put(pathItem, subParameter);
-                    } else {
-                        subParameter = new ArrayList<>();
-
-                        ((Map<String, Object>) parentSubParameter).put(pathItem, subParameter);
-                    }
-                }
-            }
-
-            if (arrayIndex == null) {
-                ((Map<String, Object>) subParameter).put(name, value);
-            } else {
-                List<Object> subParameters = (List<Object>) subParameter;
-
-                if (name == null) {
-                    if (arrayIndex >= subParameters.size()) {
-                        for (int i = subParameters.size() - 1; i < arrayIndex; i++) {
-                            subParameters.add(null);
+                    if (arrayIndex > (list.size() - 1)) {
+                        for (int j = -1; j < arrayIndex; j++) {
+                            list.add(null);
                         }
                     }
 
-                    subParameters.set(arrayIndex, value);
-                } else {
-                    if (arrayIndex >= subParameters.size()) {
-                        for (int i = subParameters.size() - 1; i < arrayIndex; i++) {
-                            subParameters.add(new HashMap<>());
+                    if (matcher.hitEnd()) {
+                        if (i == pathItems.length - 1) {
+                            list.set(arrayIndex, value);
+                        } else {
+                            map = new HashMap<>();
+
+                            list.set(arrayIndex, map);
                         }
+                    } else {
+                        if (list.get(arrayIndex) == null) {
+                            list.set(arrayIndex, new ArrayList<>());
+                        }
+
+                        list = (List<Object>) list.get(arrayIndex);
                     }
+                }
+            } else {
+                if (i < pathItems.length - 1) {
+                    if (map.containsKey(pathItem)) {
+                        map = (Map<String, Object>) map.get(pathItem);
+                    } else {
+                        Map<String, Object> subParameterMap = new HashMap<>();
 
-                    Map<String, Object> subParameterMap = (Map<String, Object>) subParameters.get(arrayIndex);
+                        map.put(pathItem, subParameterMap);
 
-                    subParameterMap.put(name, value);
+                        map = subParameterMap;
+                    }
+                } else {
+                    if (value == null) {
+                        map.remove(pathItem);
+                    } else {
+                        map.put(pathItem, value);
+                    }
                 }
             }
         }

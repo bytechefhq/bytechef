@@ -48,9 +48,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public Map<String, ?> deleteWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
-
+    public Map<String, ?> deleteWorkflowParameter(String workflowId, String workflowNodeName, String path) {
         throw new UnsupportedOperationException();
     }
 
@@ -133,7 +131,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public UpdateParameterResultDTO updateWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
+        String workflowId, String workflowNodeName, String path, Object value) {
 
         throw new UnsupportedOperationException();
     }

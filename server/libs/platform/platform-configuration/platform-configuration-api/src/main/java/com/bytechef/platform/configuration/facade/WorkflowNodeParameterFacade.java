@@ -24,12 +24,10 @@ import java.util.Map;
  */
 public interface WorkflowNodeParameterFacade {
 
-    Map<String, ?> deleteParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex);
+    Map<String, ?> deleteParameter(String workflowId, String workflowNodeName, String path);
 
     Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName);
 
     UpdateParameterResultDTO updateParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
-
+        String workflowId, String workflowNodeName, String path, Object value);
 }

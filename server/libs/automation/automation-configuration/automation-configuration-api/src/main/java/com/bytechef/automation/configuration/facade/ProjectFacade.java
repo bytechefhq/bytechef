@@ -39,8 +39,7 @@ public interface ProjectFacade {
 
     void deleteWorkflow(@NonNull String workflowId);
 
-    Map<String, ?> deleteWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex);
+    Map<String, ?> deleteWorkflowParameter(String workflowId, String workflowNodeName, String path);
 
     ProjectDTO duplicateProject(long id);
 
@@ -74,5 +73,5 @@ public interface ProjectFacade {
     WorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 
     UpdateParameterResultDTO updateWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value);
+        String workflowId, String workflowNodeName, String path, Object value);
 }

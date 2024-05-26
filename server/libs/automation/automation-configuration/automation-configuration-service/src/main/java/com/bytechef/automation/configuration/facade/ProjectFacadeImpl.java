@@ -227,9 +227,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public Map<String, ?> deleteWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
-
+    public Map<String, ?> deleteWorkflowParameter(String workflowId, String workflowNodeName, String path) {
         Project project = projectService.getWorkflowProject(workflowId);
 
         ProjectWorkflowStatusResult projectWorkflowStatusResult = checkProjectWorkflowStatus(
@@ -239,7 +237,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             workflowId = projectWorkflowStatusResult.workflowId;
         }
 
-        return workflowNodeParameterFacade.deleteParameter(workflowId, workflowNodeName, path, name, arrayIndex);
+        return workflowNodeParameterFacade.deleteParameter(workflowId, workflowNodeName, path);
     }
 
     @Override
@@ -401,7 +399,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public UpdateParameterResultDTO updateWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
+        String workflowId, String workflowNodeName, String path, Object value) {
 
         Project project = projectService.getWorkflowProject(workflowId);
 
@@ -412,7 +410,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             workflowId = projectWorkflowStatusResult.workflowId;
         }
 
-        return workflowNodeParameterFacade.updateParameter(workflowId, workflowNodeName, path, name, arrayIndex, value);
+        return workflowNodeParameterFacade.updateParameter(workflowId, workflowNodeName, path, value);
     }
 
     private ProjectWorkflowStatusResult checkProjectWorkflowStatus(long id, @Nullable String workflowId) {

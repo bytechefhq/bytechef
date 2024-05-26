@@ -53,9 +53,7 @@ public class ProjectWorkflowNodeParameterApiController implements WorkflowNodePa
             new DeleteWorkflowNodeParameter200ResponseModel().parameters(
                 (Map<String, Object>) projectFacade.deleteWorkflowParameter(
                     id, deleteWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-                    deleteWorkflowNodeParameterRequestModel.getPath(),
-                    deleteWorkflowNodeParameterRequestModel.getName(),
-                    deleteWorkflowNodeParameterRequestModel.getArrayIndex())));
+                    deleteWorkflowNodeParameterRequestModel.getPath())));
     }
 
     @Override
@@ -65,9 +63,7 @@ public class ProjectWorkflowNodeParameterApiController implements WorkflowNodePa
 
         UpdateParameterResultDTO updateParameterResultDTO = projectFacade.updateWorkflowParameter(
             id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-            updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getName(),
-            updateWorkflowNodeParameterRequestModel.getArrayIndex(),
-            updateWorkflowNodeParameterRequestModel.getValue());
+            updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue());
 
         return ResponseEntity.ok(
             new UpdateWorkflowNodeParameter200ResponseModel()
