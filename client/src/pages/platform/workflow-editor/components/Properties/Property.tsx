@@ -160,7 +160,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: isNumericalInput ? numericValueToSave : inputValue,
@@ -275,7 +275,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: strippedValue || null,
@@ -290,7 +290,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value,
@@ -298,10 +298,10 @@ const Property = ({
         });
     }, 200);
 
-    const handleDeleteCustomPropertyClick = (path: string, name?: string, arrayIndex?: number) => {
+    const handleDeleteCustomPropertyClick = (path: string, name?: string, arrayIndex?: number) => {console.log(name)
         deleteProperty(
             workflow.id!,
-            `${path}${arrayIndex ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
             currentComponent!,
             setCurrentComponent,
             deleteWorkflowNodeParameterMutation!
@@ -405,7 +405,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
             setCurrentComponent,
             successCallback: () => {
                 setNumericValue('');
@@ -429,7 +429,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: type === 'BOOLEAN' ? value === 'true' : value,

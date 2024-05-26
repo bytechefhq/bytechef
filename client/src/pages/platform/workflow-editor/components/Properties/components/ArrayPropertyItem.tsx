@@ -9,7 +9,7 @@ interface ArrayPropertyItemProps {
     arrayName?: string;
     currentComponent?: ComponentType;
     index: number;
-    onDeleteClick: (path: string, name: string, index: number) => void;
+    onDeleteClick: (path: string, index: number) => void;
     path?: string;
     setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
 }
@@ -24,7 +24,7 @@ const ArrayPropertyItem = ({
     setArrayItems,
 }: ArrayPropertyItemProps) => {
     const handleOnDeleteClick = () => {
-        onDeleteClick(`${path}.${arrayName}`, arrayItem.name!, index);
+        onDeleteClick(`${path}.${arrayName}`, index);
 
         setArrayItems((subProperties) =>
             subProperties.filter((_subProperty, subPropertyIndex) => subPropertyIndex !== index)

@@ -53,11 +53,11 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         setArrayItems([...arrayItems, newItem]);
     };
 
-    const handleDeleteClick = (path: string, name: string, index: number) => {
+    const handleDeleteClick = (path: string, index: number) => {
         const clickedItemParameter = getParameterByPath(path, currentComponent)?.[index];
 
         if (clickedItemParameter) {
-            onDeleteClick(path, name, index);
+            onDeleteClick(path, undefined, index);
         }
     };
 
