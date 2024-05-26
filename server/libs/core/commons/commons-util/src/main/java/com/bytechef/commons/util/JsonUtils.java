@@ -50,6 +50,8 @@ public class JsonUtils {
     @SuppressFBWarnings("MS_PKGPROTECT")
     protected static ObjectMapper objectMapper;
 
+    private static Configuration configuration;
+
     public static Object read(InputStream inputStream) {
         try {
             return objectMapper.readValue(inputStream, Object.class);
@@ -85,25 +87,25 @@ public class JsonUtils {
     }
 
     public static Object read(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, Object.class);
     }
 
     public static <T> T read(InputStream inputStream, String path, Class<T> valueType) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, valueType);
     }
 
     public static <T> T read(InputStream inputStream, String path, Type type) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, new TypeTypeRef<>(type));
     }
 
     public static <T> T read(InputStream inputStream, String path, TypeRef<T> typeRef) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, typeRef);
     }
@@ -143,25 +145,25 @@ public class JsonUtils {
     }
 
     public static Object read(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, Object.class);
     }
 
     public static <T> T read(String json, String path, Class<T> valueType) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, valueType);
     }
 
     public static <T> T read(String json, String path, Type type) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, new TypeTypeRef<>(type));
     }
 
     public static <T> T read(String json, String path, TypeRef<T> typeRef) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, typeRef);
     }
@@ -181,7 +183,7 @@ public class JsonUtils {
     }
 
     public static List<?> readList(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, new TypeRef<>() {});
     }
@@ -189,7 +191,7 @@ public class JsonUtils {
     public static <T> List<T> readList(
         InputStream inputStream, String path, Class<T> elementType) {
 
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(List.class, elementType)));
@@ -210,13 +212,13 @@ public class JsonUtils {
     }
 
     public static List<?> readList(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, new TypeRef<>() {});
     }
 
     public static <T> List<T> readList(String json, String path, Class<T> elementType) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(List.class, elementType)));
@@ -234,7 +236,7 @@ public class JsonUtils {
     }
 
     public static Map<String, ?> readMap(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(
@@ -244,7 +246,7 @@ public class JsonUtils {
     public static <V> Map<String, V> readMap(
         InputStream inputStream, String path, Class<V> valueType) {
 
-        DocumentContext documentContext = JsonPath.parse(inputStream, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(Map.class, String.class, valueType)));
@@ -276,7 +278,7 @@ public class JsonUtils {
     }
 
     public static Map<String, ?> readMap(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(
@@ -284,7 +286,7 @@ public class JsonUtils {
     }
 
     public static <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
-        DocumentContext documentContext = JsonPath.parse(json, createConfiguration(objectMapper));
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(
             path, new ResolvableTypeTypeRef<>(ResolvableType.forClassWithGenerics(Map.class, String.class, valueType)));
@@ -322,6 +324,8 @@ public class JsonUtils {
     @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     void setObjectMapper(ObjectMapper objectMapper) {
         JsonUtils.objectMapper = objectMapper;
+
+        JsonUtils.configuration = createConfiguration(objectMapper);
     }
 
     private static Configuration createConfiguration(ObjectMapper objectMapper) {
