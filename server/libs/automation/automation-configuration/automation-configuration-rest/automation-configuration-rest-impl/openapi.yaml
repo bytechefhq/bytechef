@@ -760,12 +760,6 @@ paths:
                 - "path"
                 - "workflowNodeName"
               properties:
-                arrayIndex:
-                  description: "The array index."
-                  type: "integer"
-                name:
-                  description: "The parameter name."
-                  type: "string"
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
@@ -805,12 +799,6 @@ paths:
                 - "path"
                 - "workflowNodeName"
               properties:
-                arrayIndex:
-                  description: "The array index."
-                  type: "integer"
-                name:
-                  description: "The parameter name."
-                  type: "string"
                 path:
                   description: "The workflow node parameter path."
                   type: "string"
