@@ -20,12 +20,8 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("deleteWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:27.360237+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-26T21:42:16.021130+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class DeleteWorkflowNodeParameterRequestModel {
-
-  private Integer arrayIndex;
-
-  private String name;
 
   private String path;
 
@@ -41,46 +37,6 @@ public class DeleteWorkflowNodeParameterRequestModel {
   public DeleteWorkflowNodeParameterRequestModel(String path, String workflowNodeName) {
     this.path = path;
     this.workflowNodeName = workflowNodeName;
-  }
-
-  public DeleteWorkflowNodeParameterRequestModel arrayIndex(Integer arrayIndex) {
-    this.arrayIndex = arrayIndex;
-    return this;
-  }
-
-  /**
-   * The array index.
-   * @return arrayIndex
-  */
-  
-  @Schema(name = "arrayIndex", description = "The array index.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("arrayIndex")
-  public Integer getArrayIndex() {
-    return arrayIndex;
-  }
-
-  public void setArrayIndex(Integer arrayIndex) {
-    this.arrayIndex = arrayIndex;
-  }
-
-  public DeleteWorkflowNodeParameterRequestModel name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * The parameter name.
-   * @return name
-  */
-  
-  @Schema(name = "name", description = "The parameter name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("name")
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public DeleteWorkflowNodeParameterRequestModel path(String path) {
@@ -132,23 +88,19 @@ public class DeleteWorkflowNodeParameterRequestModel {
       return false;
     }
     DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequest = (DeleteWorkflowNodeParameterRequestModel) o;
-    return Objects.equals(this.arrayIndex, deleteWorkflowNodeParameterRequest.arrayIndex) &&
-        Objects.equals(this.name, deleteWorkflowNodeParameterRequest.name) &&
-        Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path) &&
+    return Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path) &&
         Objects.equals(this.workflowNodeName, deleteWorkflowNodeParameterRequest.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(arrayIndex, name, path, workflowNodeName);
+    return Objects.hash(path, workflowNodeName);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DeleteWorkflowNodeParameterRequestModel {\n");
-    sb.append("    arrayIndex: ").append(toIndentedString(arrayIndex)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
