@@ -13,25 +13,17 @@ export default function deleteProperty(
         Error,
         DeleteWorkflowNodeParameterRequestI,
         unknown
-    >,
-    name?: string,
-    arrayIndex?: number
+    >
 ) {
     // TODO fix in Property.tsx path value, it should be without 'parameters.' prefix and should not contain '${arrayName}_${arrayIndex}' as suffix if array is updated
 
     path = path.replace('parameters.', '').replace('parameters', '');
-
-    if (arrayIndex !== undefined && path.endsWith(arrayIndex.toString())) {
-        path = path.substring(0, path.lastIndexOf('.'));
-    }
 
     const {workflowNodeName} = currentComponent;
 
     deleteWorkflowNodeParameterMutation.mutate(
         {
             deleteWorkflowNodeParameterRequestModel: {
-                arrayIndex,
-                name: name === arrayIndex?.toString() ? undefined : name,
                 path,
                 workflowNodeName,
             },

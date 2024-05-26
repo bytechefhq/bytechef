@@ -6,9 +6,7 @@ import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 interface SavePropertyProps {
-    arrayIndex?: number;
     currentComponent: ComponentType;
-    name: string;
     path: string;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
     successCallback?: () => void;
@@ -24,9 +22,7 @@ interface SavePropertyProps {
 }
 
 export default function saveProperty({
-    arrayIndex,
     currentComponent,
-    name,
     path,
     setCurrentComponent,
     successCallback,
@@ -38,18 +34,12 @@ export default function saveProperty({
 
     path = path.replace('parameters.', '').replace('parameters', '');
 
-    if (arrayIndex !== undefined && path.endsWith(arrayIndex.toString())) {
-        path = path.substring(0, path.lastIndexOf('.'));
-    }
-
     const {workflowNodeName} = currentComponent;
 
     updateWorkflowNodeParameterMutation.mutate(
         {
             id: workflowId,
             updateWorkflowNodeParameterRequestModel: {
-                arrayIndex,
-                name: name === arrayIndex?.toString() ? undefined : name,
                 path,
                 value,
                 workflowNodeName,

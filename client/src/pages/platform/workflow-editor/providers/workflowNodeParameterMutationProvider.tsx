@@ -7,8 +7,6 @@ export interface DeleteWorkflowNodeParameter200ResponseModelI {
 }
 
 export interface DeleteWorkflowNodeParameterRequestModelI {
-    arrayIndex?: number;
-    name?: string;
     path: string;
     workflowNodeName: string;
 }
@@ -25,8 +23,6 @@ export interface UpdateWorkflowNodeParameter200ResponseModelI {
 }
 
 export interface UpdateWorkflowNodeParameterRequestModelI {
-    arrayIndex?: number;
-    name?: string;
     path: string;
     value?: object;
     workflowNodeName: string;
