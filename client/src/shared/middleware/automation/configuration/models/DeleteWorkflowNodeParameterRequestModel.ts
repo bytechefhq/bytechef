@@ -20,18 +20,6 @@ import { mapValues } from '../runtime';
  */
 export interface DeleteWorkflowNodeParameterRequestModel {
     /**
-     * The array index.
-     * @type {number}
-     * @memberof DeleteWorkflowNodeParameterRequestModel
-     */
-    arrayIndex?: number;
-    /**
-     * The parameter name.
-     * @type {string}
-     * @memberof DeleteWorkflowNodeParameterRequestModel
-     */
-    name?: string;
-    /**
      * The workflow node parameter path.
      * @type {string}
      * @memberof DeleteWorkflowNodeParameterRequestModel
@@ -64,8 +52,6 @@ export function DeleteWorkflowNodeParameterRequestModelFromJSONTyped(json: any, 
     }
     return {
         
-        'arrayIndex': json['arrayIndex'] == null ? undefined : json['arrayIndex'],
-        'name': json['name'] == null ? undefined : json['name'],
         'path': json['path'],
         'workflowNodeName': json['workflowNodeName'],
     };
@@ -77,8 +63,6 @@ export function DeleteWorkflowNodeParameterRequestModelToJSON(value?: DeleteWork
     }
     return {
         
-        'arrayIndex': value['arrayIndex'],
-        'name': value['name'],
         'path': value['path'],
         'workflowNodeName': value['workflowNodeName'],
     };

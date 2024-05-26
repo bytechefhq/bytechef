@@ -20,18 +20,6 @@ import { mapValues } from '../runtime';
  */
 export interface UpdateWorkflowNodeParameterRequestModel {
     /**
-     * The array index.
-     * @type {number}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
-     */
-    arrayIndex?: number;
-    /**
-     * The parameter name.
-     * @type {string}
-     * @memberof UpdateWorkflowNodeParameterRequestModel
-     */
-    name?: string;
-    /**
      * The workflow node parameter path.
      * @type {string}
      * @memberof UpdateWorkflowNodeParameterRequestModel
@@ -70,8 +58,6 @@ export function UpdateWorkflowNodeParameterRequestModelFromJSONTyped(json: any, 
     }
     return {
         
-        'arrayIndex': json['arrayIndex'] == null ? undefined : json['arrayIndex'],
-        'name': json['name'] == null ? undefined : json['name'],
         'path': json['path'],
         'value': json['value'] == null ? undefined : json['value'],
         'workflowNodeName': json['workflowNodeName'],
@@ -84,8 +70,6 @@ export function UpdateWorkflowNodeParameterRequestModelToJSON(value?: UpdateWork
     }
     return {
         
-        'arrayIndex': value['arrayIndex'],
-        'name': value['name'],
         'path': value['path'],
         'value': value['value'],
         'workflowNodeName': value['workflowNodeName'],
