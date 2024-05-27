@@ -23,6 +23,7 @@ import static com.bytechef.component.date.helper.constants.DateHelperConstants.D
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_TIMESTAMP;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
@@ -45,10 +46,10 @@ public class DateHelperConvertAction {
             .title("Convert Date Timestamp")
             .description("Converts UNIX timestamp to ISO8601 format.")
             .properties(
-                string(DATE_TIMESTAMP)
+                number(DATE_TIMESTAMP)
                     .label("UNIX Timestamp.")
                     .description("UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)")
-                    .controlType(ControlType.NUMBER)
+                    .maxNumberPrecision(0)
                     .required(true),
                 string(DateHelperConstants.DATE_FORMAT)
                     .label("Date Format")
