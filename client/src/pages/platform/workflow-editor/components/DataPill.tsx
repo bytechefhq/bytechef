@@ -40,16 +40,18 @@ const DataPill = ({
         path?: string
     ) => {
         const dataPillName = parentPropertyName
-            ? `${parentPropertyName}/${propertyName || '[index]'}`
+            ? `${parentPropertyName}.${propertyName || '[index]'}`
             : `${propertyName || workflowNodeName}`;
+
+        const value = propertyName
+            ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.')}`
+            : workflowNodeName
 
         mentionInput.insertItem(
             {
                 componentIcon,
                 id: propertyName || workflowNodeName,
-                value: propertyName
-                    ? `${workflowNodeName}.${(path || dataPillName).replace('/', '.')}`
-                    : workflowNodeName,
+                value,
             },
             true,
             {blotName: 'property-mention'}
