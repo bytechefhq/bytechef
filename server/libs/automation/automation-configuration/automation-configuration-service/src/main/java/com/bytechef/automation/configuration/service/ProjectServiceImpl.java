@@ -132,12 +132,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void publishProject(long id, String description) {
+    public Project publishProject(long id, String description) {
         Project project = getProject(id);
 
         project.publish(description);
 
-        projectRepository.save(project);
+        return projectRepository.save(project);
     }
 
     @Override

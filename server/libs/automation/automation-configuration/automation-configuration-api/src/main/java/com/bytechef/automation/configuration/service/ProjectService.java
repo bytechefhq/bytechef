@@ -53,7 +53,7 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
-    void publishProject(long id, String description);
+    Project publishProject(long id, String description);
 
     Project update(long id, List<Long> tagIds);
 
