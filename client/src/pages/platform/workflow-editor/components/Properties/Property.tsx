@@ -83,7 +83,9 @@ const Property = ({
     const [inputValue, setInputValue] = useState(property.defaultValue || '');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
-    const [mentionInput, setMentionInput] = useState(!control && property.controlType === 'TEXT' ? true : false);
+    const [mentionInput, setMentionInput] = useState(
+        !control && (property.controlType === 'TEXT' || property.controlType === 'TEXT_AREA') ? true : false
+    );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(property.defaultValue || '');
