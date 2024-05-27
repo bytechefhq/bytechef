@@ -122,7 +122,8 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     public void removeWorkflow(long projectId, int projectVersion, String workflowId) {
         if (projectWorkflowRepository.countByProjectIdAndProjectVersion(projectId, projectVersion) == 1) {
             throw new ConfigurationException(
-                "The last workflow cannot be deleted", ProjectErrorType.REMOVE_WORKFLOW);
+                "The last workflow id=%s cannot be deleted".formatted(workflowId),
+                ProjectErrorType.REMOVE_LAST_WORKFLOW);
         }
 
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
