@@ -11,6 +11,10 @@
     @apply h-0;
 }
 
+.ql-container {
+    @apply h-auto;
+}
+
 .ql-editor {
     @apply break-all;
     @apply rounded-md;
@@ -19,6 +23,7 @@
     @apply focus:outline-none;
     @apply min-w-[34px];
     @apply min-h-[34px];
+    @apply h-auto;
     padding: 0.25rem;
     @apply pl-3;
 }
@@ -82,4 +87,8 @@
 .property-mention svg {
     @apply mr-1;
     @apply h-4 w-4;
+}
+
+.quill.min-h-32 .ql-editor {
+    min-height: 8rem;
 }

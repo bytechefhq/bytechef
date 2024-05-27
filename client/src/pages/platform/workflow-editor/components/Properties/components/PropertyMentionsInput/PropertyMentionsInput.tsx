@@ -276,7 +276,11 @@ const PropertyMentionsInput = forwardRef(
                     )}
 
                     <ReactQuill
-                        className={twMerge('h-full w-full bg-white rounded-md', leadingIcon && 'border-0 pl-10')}
+                        className={twMerge(
+                            'h-full w-full bg-white rounded-md',
+                            leadingIcon && 'border-0 pl-10',
+                            controlType === 'TEXT_AREA' && 'min-h-32'
+                        )}
                         defaultValue={defaultValue}
                         formats={['property-mention', 'mention']}
                         id={elementId}
