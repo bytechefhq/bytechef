@@ -4,7 +4,7 @@ import {ProjectModel, ProjectStatusModel} from '@/middleware/automation/configur
 const ProjectHeaderProjectVersionBadge = ({project}: {project: ProjectModel}) => (
     <Badge
         className="flex space-x-1"
-        variant={project.status === ProjectStatusModel.Published ? 'success_outline' : 'secondary'}
+        variant={project.status === ProjectStatusModel.Published ? 'success_outline' : 'outline'}
     >
         <span>V{project.projectVersion}</span>
 
