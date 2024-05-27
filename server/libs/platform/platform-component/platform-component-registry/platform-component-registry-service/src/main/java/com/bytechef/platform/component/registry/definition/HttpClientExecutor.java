@@ -202,9 +202,10 @@ public class HttpClientExecutor {
         String proxy = configuration.getProxy();
 
         if (StringUtils.isNoneEmpty(proxy)) {
-            String[] proxyAddress = proxy.split(":");
+            String[] hostPortArray = proxy.split(":");
 
-            builder.proxy(ProxySelector.of(new InetSocketAddress(proxyAddress[0], Integer.parseInt(proxyAddress[1]))));
+            builder.proxy(
+                ProxySelector.of(new InetSocketAddress(hostPortArray[0], Integer.parseInt(hostPortArray[1]))));
         }
 
         if (configuration.getTimeout() == null) {
@@ -388,7 +389,7 @@ public class HttpClientExecutor {
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            Object value = Validate.notNull(parameter.getValue(), "value");
+            Object value = Validate.notNull(parameter.getValue(), "expected value for " + parameter.getKey());
 
             builder.query((String) parameter.getKey(), value.toString());
         }
