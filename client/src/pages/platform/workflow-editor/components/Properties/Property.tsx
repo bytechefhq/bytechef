@@ -207,7 +207,7 @@ const Property = ({
                     {
                         componentIcon: currentComponentDefinition?.icon,
                         id: currentNode?.name,
-                        value: strippedValue.replace('${', '').replace('}', '').replace('.', '/'),
+                        value: strippedValue.replace('${', '').replace('}', ''),
                     },
                     true,
                     {blotName: 'property-mention'}
@@ -559,7 +559,6 @@ const Property = ({
             if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
                 const mentionInputNodes = mentionValues.map((value) => {
                     if (value.startsWith('${')) {
-                        value = value.replace('.', '/');
                         const componentName = value.split('_')[0].replace('${', '');
 
                         const componentIcon =

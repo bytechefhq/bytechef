@@ -47,7 +47,9 @@ const DataPill = ({
             {
                 componentIcon,
                 id: propertyName || workflowNodeName,
-                value: propertyName ? `${workflowNodeName}/${path || dataPillName}` : workflowNodeName,
+                value: propertyName
+                    ? `${workflowNodeName}.${(path || dataPillName).replace('/', '.')}`
+                    : workflowNodeName,
             },
             true,
             {blotName: 'property-mention'}
