@@ -122,7 +122,7 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public void publishProject(long id, String description) {
+    public Project publishProject(long id, String description) {
         throw new UnsupportedOperationException();
     }
 

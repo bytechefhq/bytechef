@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.configuration.constant.ProjectErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
@@ -38,7 +37,6 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
-import com.bytechef.platform.configuration.exception.ConfigurationException;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
@@ -54,7 +52,6 @@ import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,8 +113,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public WorkflowDTO addWorkflow(long id, @NonNull String definition) {
-        checkProjectWorkflowStatus(id, null);
-
         Project project = projectService.getProject(id);
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
@@ -199,8 +194,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public void deleteWorkflow(@NonNull String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
-        checkProjectWorkflowStatus(project.getId(), workflowId);
-
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
 
         for (ProjectInstance projectInstance : projectInstances) {
@@ -230,15 +223,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public Map<String, ?> deleteWorkflowParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
 
-        Project project = projectService.getWorkflowProject(workflowId);
-
-        ProjectWorkflowStatusResult projectWorkflowStatusResult = checkProjectWorkflowStatus(
-            project.getId(), workflowId);
-
-        if (projectWorkflowStatusResult != null) {
-            workflowId = projectWorkflowStatusResult.workflowId;
-        }
-
         return workflowNodeParameterFacade.deleteParameter(workflowId, workflowNodeName, path, name, arrayIndex);
     }
 
@@ -261,8 +245,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     public String duplicateWorkflow(long id, @NonNull String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
-
-        checkProjectWorkflowStatus(project.getId(), workflowId);
 
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
 
@@ -364,6 +346,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public void publishProject(long id, String description) {
+        Project project = projectService.publishProject(id, description);
+
+        checkProjectWorkflowsStatus(project);
+    }
+
+    @Override
     public ProjectDTO updateProject(@NonNull ProjectDTO projectDTO) {
         Category category = projectDTO.category() == null ? null : categoryService.save(projectDTO.category());
         List<Tag> tags = checkTags(projectDTO.tags());
@@ -388,14 +377,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public WorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        ProjectWorkflowStatusResult projectWorkflowStatusResult = checkProjectWorkflowStatus(
-            projectWorkflow.getProjectId(), workflowId);
-
-        if (projectWorkflowStatusResult != null) {
-            workflowId = projectWorkflowStatusResult.workflowId;
-            version = projectWorkflowStatusResult.version;
-        }
-
         return new WorkflowDTO(workflowFacade.update(workflowId, definition, version), projectWorkflow);
     }
 
@@ -403,49 +384,21 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public UpdateParameterResultDTO updateWorkflowParameter(
         String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
 
-        Project project = projectService.getWorkflowProject(workflowId);
-
-        ProjectWorkflowStatusResult projectWorkflowStatusResult = checkProjectWorkflowStatus(
-            project.getId(), workflowId);
-
-        if (projectWorkflowStatusResult != null) {
-            workflowId = projectWorkflowStatusResult.workflowId;
-        }
-
         return workflowNodeParameterFacade.updateParameter(workflowId, workflowNodeName, path, name, arrayIndex, value);
     }
 
-    private ProjectWorkflowStatusResult checkProjectWorkflowStatus(long id, @Nullable String workflowId) {
-        ProjectWorkflowStatusResult projectWorkflowStatusResult = null;
-
-        Project project = projectService.getProject(id);
-
+    private void checkProjectWorkflowsStatus(Project project) {
         List<ProjectWorkflow> latestProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), project.getLastVersion());
 
-        List<String> latestWorkflowIds = latestProjectWorkflows.stream()
-            .map(ProjectWorkflow::getWorkflowId)
-            .toList();
-
-        if (workflowId != null && !latestWorkflowIds.contains(workflowId)) {
-            throw new ConfigurationException(
-                "Older version of the workflow id=%s cannot be updated.".formatted(workflowId),
-                ProjectErrorType.UPDATE_OLD_WORKFLOW);
-        }
-
         if (project.getLastStatus() == Status.PUBLISHED) {
             int lastVersion = project.getLastVersion();
-            int newVersion = projectService.addVersion(id);
+            int newVersion = projectService.addVersion(project.getId());
 
             for (ProjectWorkflow projectWorkflow : latestProjectWorkflows) {
                 String oldWorkflowId = projectWorkflow.getWorkflowId();
 
                 Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
-
-                if (Objects.equals(workflowId, oldWorkflowId)) {
-                    projectWorkflowStatusResult = new ProjectWorkflowStatusResult(
-                        duplicatedWorkflow.getId(), duplicatedWorkflow.getVersion());
-                }
 
                 projectWorkflow.setProjectVersion(newVersion);
                 projectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
@@ -458,9 +411,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
                 workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             }
+        } else {
+            throw new IllegalStateException("Project id=%s must be published".formatted(project.getId()));
         }
-
-        return projectWorkflowStatusResult;
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -539,8 +492,5 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return new ProjectDTO(
             getCategory(project), project, tagService.getTags(project.getTagIds()),
             projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()));
-    }
-
-    private record ProjectWorkflowStatusResult(String workflowId, int version) {
     }
 }

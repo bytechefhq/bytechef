@@ -120,7 +120,7 @@ public class ProjectApiController implements ProjectApi {
 
     @Override
     public ResponseEntity<Void> publishProject(Long id, PublishProjectRequestModel publishProjectRequestModel) {
-        projectService.publishProject(
+        projectFacade.publishProject(
             id, publishProjectRequestModel == null ? null : publishProjectRequestModel.getDescription());
 
         return ResponseEntity.noContent()
