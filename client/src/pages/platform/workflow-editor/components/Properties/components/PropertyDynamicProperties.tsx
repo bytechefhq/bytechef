@@ -67,7 +67,7 @@ const PropertyDynamicProperties = ({
                         objectName={name}
                         operationName={currentOperationName}
                         parameterValue={propertyDefaultValue}
-                        path={name}
+                        path={`parameters.${name}`}
                         property={property}
                     />
                 );
