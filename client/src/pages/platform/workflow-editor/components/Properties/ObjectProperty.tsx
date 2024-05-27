@@ -179,7 +179,7 @@ const ObjectProperty = ({
                                     name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
                                 )}
                                 inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
-                                objectName={name}
+                                objectName={arrayName ? '' : name}
                                 operationName={operationName}
                                 parameterValue={subPropertyDefaultValue}
                                 path={`${path}.${name}`}
