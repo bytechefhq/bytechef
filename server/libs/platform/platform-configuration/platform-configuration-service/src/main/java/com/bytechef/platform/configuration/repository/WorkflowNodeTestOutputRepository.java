@@ -37,6 +37,6 @@ public interface WorkflowNodeTestOutputRepository
     Optional<WorkflowNodeTestOutput> findByWorkflowIdAndWorkflowNodeName(String workflowId, String workflowNodeName);
 
     @Modifying
-    @Query("UPDATE workflow_test_configuration SET workflow_id = :newWorkflowId WHERE workflow_id = :oldWorkflowId")
+    @Query("UPDATE workflow_node_test_output SET workflow_id = :newWorkflowId WHERE workflow_id = :oldWorkflowId")
     void updateWorkflowId(@Param("oldWorkflowId") String oldWorkflowId, @Param("newWorkflowId") String newWorkflowId);
 }
