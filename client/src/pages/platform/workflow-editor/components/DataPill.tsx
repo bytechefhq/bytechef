@@ -45,7 +45,7 @@ const DataPill = ({
 
         const value = propertyName
             ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.')}`
-            : workflowNodeName
+            : workflowNodeName;
 
         mentionInput.insertItem(
             {
