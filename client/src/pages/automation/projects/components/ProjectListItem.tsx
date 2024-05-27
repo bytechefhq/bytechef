@@ -184,31 +184,22 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            <Badge
-                                className="flex space-x-1"
-                                variant={
-                                    project.status === ProjectStatusModel.Published ? 'success_outline' : 'secondary'
-                                }
-                            >
+                            <Badge className="flex space-x-1" variant="secondary">
                                 <span>V{project.projectVersion}</span>
 
-                                <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
+                                <span>Draft</span>
                             </Badge>
 
                             <Tooltip>
                                 <TooltipTrigger>
                                     <div className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                        {project.status === ProjectStatusModel.Published ? (
-                                            <span>
-                                                {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
-                                            </span>
-                                        ) : (
-                                            '-'
-                                        )}
+                                        <span>
+                                            {`Modified at ${project.lastModifiedDate?.toLocaleDateString()} ${project.lastModifiedDate?.toLocaleTimeString()}`}
+                                        </span>
                                     </div>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Last Published Date</TooltipContent>
+                                <TooltipContent>Last Modified Date</TooltipContent>
                             </Tooltip>
                         </div>
 
