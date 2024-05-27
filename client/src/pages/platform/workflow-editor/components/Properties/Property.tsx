@@ -260,7 +260,7 @@ const Property = ({
                     path,
                     setCurrentComponent,
                     updateWorkflowNodeParameterMutation,
-                    value: strippedValue || null,
+                    value: null,
                     workflowId: workflow.id!,
                 });
 
