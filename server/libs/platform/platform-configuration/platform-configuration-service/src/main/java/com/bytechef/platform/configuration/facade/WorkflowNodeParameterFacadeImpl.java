@@ -355,6 +355,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private Map<String, ?> getTrigger(String workflowNodeName, List<Map<String, ?>> triggerMaps) {
+        if (triggerMaps == null) {
+            return null;
+        }
+
         for (Map<String, ?> triggerMap : triggerMaps) {
             if (Objects.equals(triggerMap.get(WorkflowConstants.NAME), workflowNodeName)) {
                 if (!triggerMap.containsKey(WorkflowConstants.PARAMETERS)) {
