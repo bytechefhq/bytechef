@@ -65,6 +65,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +201,7 @@ public class HttpClientExecutor {
 
         String proxy = configuration.getProxy();
 
-        if (proxy != null) {
+        if (StringUtils.isNoneEmpty(proxy)) {
             String[] proxyAddress = proxy.split(":");
 
             builder.proxy(ProxySelector.of(new InetSocketAddress(proxyAddress[0], Integer.parseInt(proxyAddress[1]))));
