@@ -182,11 +182,11 @@ const Project = () => {
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.project(parseInt(projectId!)),
+                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
             });
 
             queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
+                queryKey: ProjectWorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
             setShowEditWorkflowDialog(false);
@@ -199,11 +199,7 @@ const Project = () => {
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.project(parseInt(projectId!)),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: WorkflowKeys.workflow(workflow.id!),
+                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
             });
         },
     });
