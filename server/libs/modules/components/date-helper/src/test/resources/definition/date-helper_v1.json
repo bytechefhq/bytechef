@@ -29,17 +29,19 @@
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
-      "languageId": null,
-      "maxLength": null,
-      "minLength": null,
       "required": true,
       "name": "dateTimestamp",
-      "options": null,
-      "type": "STRING",
+      "type": "NUMBER",
       "defaultValue": null,
       "exampleValue": null,
       "label": "UNIX Timestamp.",
       "placeholder": null,
+      "maxNumberPrecision": 0,
+      "maxValue": null,
+      "minNumberPrecision": null,
+      "minValue": null,
+      "numberPrecision": null,
+      "options": null,
       "controlType": "NUMBER",
       "optionsDataSource": null
     }, {
@@ -55,11 +57,11 @@
       "defaultValue": "ISO8601DATETIME",
       "exampleValue": null,
       "label": "Date Format",
+      "placeholder": null,
+      "controlType": "SELECT",
       "languageId": null,
       "maxLength": null,
       "minLength": null,
-      "placeholder": null,
-      "controlType": "SELECT",
       "options": [ {
         "description": "Get date in yyyy-MM-ddTHH:mm:ssZ",
         "label": "ISO8601 Date Time",
@@ -73,8 +75,8 @@
     } ],
     "title": "Convert Date Timestamp",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
   "triggers": null
 }
