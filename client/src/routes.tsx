@@ -27,7 +27,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 loader: async () => {
-                    return redirect('projects');
+                    return redirect('automation/projects');
                 },
                 path: '',
             },
