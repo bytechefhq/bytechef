@@ -35,6 +35,7 @@ import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -82,7 +83,9 @@ class GoogleCalendarUtilsTest {
 
         EventDateTime eventDateTime = GoogleCalendarUtils.createEventDateTime(mockedParameters, START);
 
-        assertEquals(new DateTime(date), eventDateTime.getDate());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        assertEquals(new DateTime(simpleDateFormat.format(date)), eventDateTime.getDate());
         assertNull(eventDateTime.getDateTime());
         assertNull(eventDateTime.getTimeZone());
     }
