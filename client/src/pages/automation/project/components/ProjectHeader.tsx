@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectModel} from '@/middleware/automation/configuration';
+import {ProjectModel, WorkflowModel} from '@/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/middleware/platform/workflow/test';
 import {useDeleteProjectMutation} from '@/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation, useDeleteWorkflowMutation} from '@/mutations/automation/workflows.mutations';
@@ -23,7 +23,7 @@ import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.querie
 import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
 import {ProjectWorkflowKeys} from '@/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetProjectQuery} from '@/queries/automation/projects.queries';
-import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -110,7 +110,15 @@ const ProjectHeader = ({
         onSuccess: () => {
             setShowDeleteWorkflowAlertDialog(false);
 
-            navigate('/automation/projects');
+            navigate(`/automation/projects/${projectId}/project-workflows/${project?.projectWorkflowIds?.[0]}`);
+
+            queryClient.removeQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(
+                    projectId,
+                    (workflow as WorkflowModel).projectWorkflowId!
+                ),
+            });
+            queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
