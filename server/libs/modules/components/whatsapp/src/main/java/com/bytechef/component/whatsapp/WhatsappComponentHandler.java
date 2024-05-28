@@ -17,26 +17,27 @@
 package com.bytechef.component.whatsapp;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.component.whatsapp.connection.WhatsappConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.WHATSAPP;
+import static com.bytechef.component.whatsapp.connection.WhatsAppConnection.CONNECTION_DEFINITION;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.WHATS_APP;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.whatsapp.action.WhatsappSendMessageAction;
+import com.bytechef.component.whatsapp.action.WhatsAppSendMessageAction;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Luka Ljubić
  */
 @AutoService(ComponentHandler.class)
-public class WhatsappComponentHandler implements ComponentHandler {
+public class WhatsAppComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(WHATSAPP)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(WHATS_APP)
         .title("WhatsApp")
-        .description("WhatsApp is a free-to-use messaging app offering end-to-end encrypted chat, voice, and" +
-            " video communication, along with document and media sharing, available on multiple platforms.")
+        .description(
+            "WhatsApp is a free-to-use messaging app offering end-to-end encrypted chat, voice, and " +
+                "video communication, along with document and media sharing, available on multiple platforms.")
         .connection(CONNECTION_DEFINITION)
-        .actions(WhatsappSendMessageAction.ACTION_DEFINITION)
+        .actions(WhatsAppSendMessageAction.ACTION_DEFINITION)
         .icon("path:assets/whatsapp.svg");
 
     @Override

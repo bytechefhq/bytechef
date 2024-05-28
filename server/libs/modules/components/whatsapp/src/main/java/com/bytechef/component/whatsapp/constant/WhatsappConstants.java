@@ -19,7 +19,7 @@ package com.bytechef.component.whatsapp.constant;
 /**
  * @author Luka Ljubić
  */
-public class WhatsappConstants {
+public class WhatsAppConstants {
 
     public static final String BASE_URL = "https://graph.facebook.com/v17.0";
     public static final String BODY = "body";
@@ -31,8 +31,8 @@ public class WhatsappConstants {
     public static final String SYSTEM_USER_ACCESS_TOKEN = "systemUserAccessToken";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
-    public static final String WHATSAPP = "whatsapp";
+    public static final String WHATS_APP = "whatsApp";
 
-    private WhatsappConstants() {
+    private WhatsAppConstants() {
     }
 }

@@ -19,17 +19,21 @@ package com.bytechef.component.whatsapp.connection;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.PHONE_NUMBER_ID;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.SYSTEM_USER_ACCESS_TOKEN;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SYSTEM_USER_ACCESS_TOKEN;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL;
 
-public class WhatsappConnection {
+/**
+ * @author Luka Ljubic
+ */
+public class WhatsAppConnection {
+
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
             Authorization.AuthorizationType.CUSTOM.toLowerCase(), Authorization.AuthorizationType.CUSTOM)
-                .title("Whatsapp Custom Authorization")
+                .title("WhatsApp Custom Authorization")
                 .properties(
                     string(SYSTEM_USER_ACCESS_TOKEN)
                         .label("System user access token")
@@ -38,6 +42,6 @@ public class WhatsappConnection {
                         .label("Phone number ID")
                         .required(true)));
 
-    private WhatsappConnection() {
+    private WhatsAppConnection() {
     }
 }

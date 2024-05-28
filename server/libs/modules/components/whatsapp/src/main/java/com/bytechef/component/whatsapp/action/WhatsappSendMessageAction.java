@@ -21,16 +21,16 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.BASE_URL;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.BODY;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.MESSAGING_PRODUCT;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.PHONE_NUMBER_ID;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.RECEIVE_USER;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.RECIPIENT_TYPE;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.SEND_MESSAGE;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.SYSTEM_USER_ACCESS_TOKEN;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.TEXT;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.TYPE;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BASE_URL;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BODY;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGING_PRODUCT;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECIPIENT_TYPE;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SEND_MESSAGE;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SYSTEM_USER_ACCESS_TOKEN;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TEXT;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -39,14 +39,15 @@ import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
-public class WhatsappSendMessageAction {
+public class WhatsAppSendMessageAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
         .title("Send Message")
-        .description("Send a message via Whatsapp")
+        .description("Send a message via WhatsApp")
         .properties(
             string(BODY)
                 .label("Message")
-                .description("Message to send via whatsapp")
+                .description("Message to send via WhatsApp")
                 .maxLength(4096)
                 .required(true),
             string(RECEIVE_USER)
@@ -56,13 +57,14 @@ public class WhatsappSendMessageAction {
         .outputSchema(
             object()
                 .properties())
-        .perform(WhatsappSendMessageAction::perform);
+        .perform(WhatsAppSendMessageAction::perform);
 
-    private WhatsappSendMessageAction() {
+    private WhatsAppSendMessageAction() {
     }
 
     public static Object
         perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         return actionContext
             .http(http -> http.post(BASE_URL + "/" + connectionParameters.getString(PHONE_NUMBER_ID) + "/messages"))
             .header("Authorization", "Bearer " + connectionParameters.getString(SYSTEM_USER_ACCESS_TOKEN))

@@ -22,10 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Luka Ljubić
  */
-class WhatsappComponentHandlerTest {
+class WhatsAppComponentHandlerTest {
+
     @Test
     public void testGetComponentDefinition() {
 
-        JsonFileAssert.assertEquals("definition/whatsapp_v1.json", new WhatsappComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/whatsapp_v1.json", new WhatsAppComponentHandler().getDefinition());
     }
 }

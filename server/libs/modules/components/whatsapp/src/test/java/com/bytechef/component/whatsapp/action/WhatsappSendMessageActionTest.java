@@ -16,12 +16,12 @@
 
 package com.bytechef.component.whatsapp.action;
 
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.BODY;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.MESSAGING_PRODUCT;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.RECEIVE_USER;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.RECIPIENT_TYPE;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.TEXT;
-import static com.bytechef.component.whatsapp.constant.WhatsappConstants.TYPE;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BODY;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGING_PRODUCT;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECIPIENT_TYPE;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TEXT;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,7 +43,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Luka Ljubić
  */
-class WhatsappSendMessageActionTest {
+class WhatsAppSendMessageActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Context.Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
@@ -54,7 +54,6 @@ class WhatsappSendMessageActionTest {
 
     @Test
     void testPerform() {
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(anyString(), anyString())).thenReturn(mockedExecutor);
@@ -81,7 +80,7 @@ class WhatsappSendMessageActionTest {
             .thenReturn(propertyStubsMap.get(TEXT));
         when(mockedParameters.getRequiredString(BODY)).thenReturn("Some Message");
 
-        Object result = WhatsappSendMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = WhatsAppSendMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responeseMap, result);
 
