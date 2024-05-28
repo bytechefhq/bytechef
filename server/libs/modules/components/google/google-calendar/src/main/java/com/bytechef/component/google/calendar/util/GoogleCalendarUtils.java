@@ -27,6 +27,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +50,11 @@ public class GoogleCalendarUtils {
         EventDateTime eventDateTime = new EventDateTime();
 
         if (inputParameters.getRequiredBoolean(ALL_DAY)) {
-            eventDateTime.setDate(new DateTime(inputParameters.getRequiredDate(time)));
+            Date date = inputParameters.getRequiredDate(time);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            eventDateTime.setDate(new DateTime(simpleDateFormat.format(date)));
         } else {
             eventDateTime.setDateTime(
                 new DateTime(convertToDateViaSqlTimestamp(inputParameters.getRequiredLocalDateTime(time))));
