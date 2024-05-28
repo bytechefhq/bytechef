@@ -10,10 +10,11 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
 import {ActionDefinitionKeys} from '@/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
+import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
 import {ClickedItemType, PropertyType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
-import {QueryClient} from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {memo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
@@ -45,13 +46,13 @@ const WorkflowNodesPopoverMenuList = memo(
         triggerComponentDefinitions,
     }: WorkflowNodesListProps) => {
         const {setLatestComponentDefinition, setWorkflow, workflow} = useWorkflowDataStore();
-        const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+        const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
         const {updateWorkflowMutation} = useWorkflowMutation();
 
-        const queryClient = new QueryClient();
+        const queryClient = useQueryClient();
 
         const {componentNames} = workflow;
 
@@ -113,7 +114,20 @@ const WorkflowNodesPopoverMenuList = memo(
 
                             setCurrentNode(newTriggerNode.data);
 
-                            saveWorkflowDefinition(newTriggerNode.data, workflow, updateWorkflowMutation);
+                            saveWorkflowDefinition(
+                                newTriggerNode.data,
+                                workflow,
+                                updateWorkflowMutation,
+                                undefined,
+                                () => {
+                                    queryClient.invalidateQueries({
+                                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                                            id: workflow.id!,
+                                            lastWorkflowNodeName: currentNode?.name,
+                                        }),
+                                    });
+                                }
+                            );
 
                             return newTriggerNode;
                         }
@@ -216,7 +230,16 @@ const WorkflowNodesPopoverMenuList = memo(
                         },
                         workflow!,
                         updateWorkflowMutation,
-                        previousWorkflowNodeIndex
+                        previousWorkflowNodeIndex,
+                        () => {
+                            // console.log(currentNode?.name)
+                            queryClient.invalidateQueries({
+                                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                                    id: workflow.id!,
+                                    lastWorkflowNodeName: currentNode?.name,
+                                }),
+                            });
+                        }
                     );
 
                     return tempNodes;
@@ -291,7 +314,16 @@ const WorkflowNodesPopoverMenuList = memo(
                                         type: `${clickedComponentDefinition.name}/${clickedComponentDefinition.version}/${clickedComponentDefinition.actions?.[0].name}`,
                                     },
                                     workflow!,
-                                    updateWorkflowMutation
+                                    updateWorkflowMutation,
+                                    undefined,
+                                    () => {
+                                        queryClient.invalidateQueries({
+                                            queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                                                id: workflow.id!,
+                                                lastWorkflowNodeName: currentNode?.name,
+                                            }),
+                                        });
+                                    }
                                 );
 
                                 return {
