@@ -429,7 +429,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (workflowId != null && !latestWorkflowIds.contains(workflowId)) {
             throw new ConfigurationException(
-                "Older version of the workflow cannot be updated.", ProjectErrorType.UPDATE_OLD_WORKFLOW);
+                "Older version of the workflow id=%s cannot be updated.".formatted(workflowId),
+                ProjectErrorType.UPDATE_OLD_WORKFLOW);
         }
 
         if (project.getLastStatus() == Status.PUBLISHED) {

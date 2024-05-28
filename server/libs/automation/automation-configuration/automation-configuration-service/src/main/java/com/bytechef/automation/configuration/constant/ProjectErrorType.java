@@ -24,7 +24,7 @@ import com.bytechef.platform.exception.ErrorType;
  */
 public enum ProjectErrorType implements ErrorType {
 
-    REMOVE_LAST_WORKFLOW(100);
+    REMOVE_LAST_WORKFLOW(100), UPDATE_OLD_WORKFLOW(101);
 
     private final int errorKey;
 
