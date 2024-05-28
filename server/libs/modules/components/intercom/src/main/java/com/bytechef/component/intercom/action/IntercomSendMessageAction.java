@@ -33,7 +33,9 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.TO;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.intercom.constant.IntercomConstants;
@@ -77,11 +79,16 @@ public class IntercomSendMessageAction {
             object())
         .perform(IntercomSendMessageAction::perform);
 
-    static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    protected static final ContextFunction<Http, Http.Executor> POST_MESSAGES_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/messages");
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         Map<String, String> fromData = IntercomUtils.getContactRole(inputParameters.getString(TO), actionContext);
         Map<String, String> toData = IntercomUtils.getAdminId(actionContext);
 
-        return actionContext.http(http -> http.post(BASE_URL + "/messages"))
+        return actionContext.http(POST_MESSAGES_CONTEXT_FUNCTION)
             .body(
                 Body.of(
                     MESSAGE_TYPE, inputParameters.getRequiredString(MESSAGE_TYPE),
@@ -92,7 +99,7 @@ public class IntercomSendMessageAction {
                     TO, toData))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
     }
 
     private IntercomSendMessageAction() {

@@ -29,6 +29,7 @@ public class IntercomConstants {
     public static final String EMAIL = "email";
     public static final String FROM = "from";
     public static final String GET_CONTACT = "getContact";
+    public static final String ID = "id";
     public static final String INTERCOM = "intercom";
     public static final String LEAD = "lead";
     public static final String MESSAGE_TYPE = "message_type";
@@ -39,6 +40,7 @@ public class IntercomConstants {
     public static final String SUBJECT = "subject";
     public static final String TEMPLATE = "template";
     public static final String TO = "to";
+    public static final String TYPE = "type";
     public static final String USER = "user";
 
     private IntercomConstants() {

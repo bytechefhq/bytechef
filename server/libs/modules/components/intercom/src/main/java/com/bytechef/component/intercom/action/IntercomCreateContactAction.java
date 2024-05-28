@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.Context.TypeReference;
 import static com.bytechef.component.intercom.constant.IntercomConstants.AVATAR;
 import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.LEAD;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
@@ -35,6 +36,8 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.USER;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.intercom.constant.IntercomConstants;
 
@@ -74,17 +77,20 @@ public class IntercomCreateContactAction {
             object()
                 .properties(
                     string("type"),
-                    string("id"),
+                    string(ID),
                     string(ROLE),
                     string(EMAIL),
                     string(PHONE),
                     string(NAME)))
         .perform(IntercomCreateContactAction::perform);
 
+    protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =
+        http -> http.post(BASE_URL + "/contacts");
+
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(http -> http.post(BASE_URL + "/contacts"))
+        return actionContext.http(POST_CONTACTS_CONTEXT_FUNCTION)
             .body(
                 Body.of(
                     ROLE, inputParameters.getRequiredString(ROLE),
@@ -95,7 +101,6 @@ public class IntercomCreateContactAction {
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
     }
 
     private IntercomCreateContactAction() {

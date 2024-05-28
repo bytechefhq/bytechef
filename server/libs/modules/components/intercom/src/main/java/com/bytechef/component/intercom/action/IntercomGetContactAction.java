@@ -26,6 +26,7 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
+import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
@@ -49,7 +50,7 @@ public class IntercomGetContactAction {
             .outputSchema(
                 object()
                     .properties(
-                        string("type"),
+                        string(TYPE),
                         string(CONTACT_NAME),
                         string(ROLE),
                         string(EMAIL),
