@@ -20,8 +20,11 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -31,11 +34,14 @@ import java.util.Map;
 
 public class IntercomOptionUtils {
 
+    protected static final ContextFunction<Http, Http.Executor> GET_CONTACTS_CONTEXT_FUNCTION =
+        http -> http.get(BASE_URL + "/contacts");
+
     public static List<Option<String>> getContactIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/contacts"))
+        Map<String, Object> body = context.http(GET_CONTACTS_CONTEXT_FUNCTION)
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -45,7 +51,7 @@ public class IntercomOptionUtils {
         if (body != null && body.get("data") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get("name"), (String) map.get(ID)));
                 }
             }
         }

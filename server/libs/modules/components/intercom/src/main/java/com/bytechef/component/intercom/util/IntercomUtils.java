@@ -19,15 +19,20 @@ package com.bytechef.component.intercom.util;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.intercom.constant.IntercomConstants.BASE_URL;
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
+import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.TypeReference;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class IntercomUtils {
+
+    private IntercomUtils() {
+
+    }
 
     public static Map<String, String> getContactRole(String id, ActionContext context) {
         Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/contacts/" + id))
@@ -39,8 +44,8 @@ public class IntercomUtils {
 
         Object type = body.get("role");
 
-        contactMap.put("type", (String) type);
-        contactMap.put("id", id);
+        contactMap.put(TYPE, (String) type);
+        contactMap.put(ID, id);
 
         return contactMap;
     }
@@ -50,15 +55,15 @@ public class IntercomUtils {
         Map<String, Object> body = context.http(http -> http.get(BASE_URL + "/admins"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new Context.TypeReference<>() {});
+            .getBody(new TypeReference<>() {});
 
         Map<String, String> adminMap = new LinkedHashMap<>();
 
         if (body != null && body.get("admins") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    adminMap.put("type", "admin");
-                    adminMap.put("id", (String) map.get("id"));
+                    adminMap.put(TYPE, "admin");
+                    adminMap.put(ID, (String) map.get(ID));
                 }
             }
         }
