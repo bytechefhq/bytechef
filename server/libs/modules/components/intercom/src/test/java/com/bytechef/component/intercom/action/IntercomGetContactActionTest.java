@@ -17,40 +17,27 @@
 package com.bytechef.component.intercom.action;
 
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class IntercomGetContactActionTest {
 
-    ActionContext mockedContext = mock(ActionContext.class);
-    Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    Parameters mockedParameters = mock(Parameters.class);
-    Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
-    Map<String, Object> responeseMap = Map.of("key", "value");
-
-    @BeforeEach
-    public void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
-            .thenReturn(responeseMap);
-    }
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
@@ -59,16 +46,24 @@ class IntercomGetContactActionTest {
         when(mockedParameters.getRequiredString(CONTACT_NAME))
             .thenReturn((String) propertyStubsMap.get(CONTACT_NAME));
 
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
+
         Object result = IntercomGetContactAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
-
+        assertEquals(responseMap, result);
     }
 
     private static Map<String, Object> createPropertyStubsMap() {
         Map<String, Object> propertyStubsMap = new HashMap<>();
 
-        propertyStubsMap.put(CONTACT_NAME, "id");
+        propertyStubsMap.put(CONTACT_NAME, ID);
 
         return propertyStubsMap;
     }
