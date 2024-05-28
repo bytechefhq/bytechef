@@ -19,9 +19,12 @@ package com.bytechef.component.intercom.util;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
@@ -29,29 +32,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class IntercomOptionUtilsTest {
 
-    private final ActionContext mockedContext = Mockito.mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = Mockito.mock(Context.Http.Executor.class);
-    private final Parameters mockedParameters = Mockito.mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = Mockito.mock(Context.Http.Response.class);
-
-    @BeforeEach
-    public void beforeEach() {
-
-        Mockito.when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.headers(any()))
-            .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testGetContactIdOptions() {
@@ -62,7 +50,15 @@ class IntercomOptionUtilsTest {
         task.put("id", "123");
         body.put("data", List.of(task));
 
-        Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedContext.http(IntercomOptionUtils.GET_CONTACTS_CONTEXT_FUNCTION))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.headers(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<Option<String>> expectedOptions = new ArrayList<>();

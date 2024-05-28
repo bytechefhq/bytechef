@@ -16,32 +16,36 @@
 
 package com.bytechef.component.intercom.util;
 
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
+import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.TypeReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class IntercomUtilsTest {
 
-    private final ActionContext mockedContext = Mockito.mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = Mockito.mock(Context.Http.Executor.class);
-    private final Context.Http.Response mockedResponse = Mockito.mock(Context.Http.Response.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
-        Mockito.when(mockedContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.execute())
+        when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
     }
 
@@ -53,14 +57,14 @@ class IntercomUtilsTest {
 
         body.put("role", role);
 
-        Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         Map<String, String> result = IntercomUtils.getContactRole(id, mockedContext);
 
         assertEquals(2, result.size());
-        assertEquals(role, result.get("type"));
-        assertEquals(id, result.get("id"));
+        assertEquals(role, result.get(TYPE));
+        assertEquals(id, result.get(ID));
     }
 
     @Test
@@ -73,14 +77,14 @@ class IntercomUtilsTest {
         adminData.put("id", id);
         body.put("admins", List.of(adminData));
 
-        Mockito.when(mockedResponse.getBody(any(Context.TypeReference.class)))
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         Map<String, String> result = IntercomUtils.getAdminId(mockedContext);
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("admin", result.get("type"));
-        assertEquals(id, result.get("id"));
+        assertEquals("admin", result.get(TYPE));
+        assertEquals(id, result.get(ID));
     }
 }
