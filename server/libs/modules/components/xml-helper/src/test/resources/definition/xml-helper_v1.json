@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "XML Helper",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -63,8 +64,8 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       },
       "sampleOutput": null
     },
@@ -103,8 +104,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to convert to XML string.",
@@ -123,8 +124,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array to convert to XML string.",
@@ -144,8 +145,8 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Convert to XML string",
     "workflowNodeDescriptionFunction": null,
@@ -175,6 +176,5 @@
     },
     "perform": { }
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }

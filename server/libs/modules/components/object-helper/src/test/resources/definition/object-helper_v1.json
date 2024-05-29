@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Object Helper",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -44,8 +45,8 @@
     } ],
     "title": "Convert from JSON string",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -80,8 +81,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The data to convert to JSON string.",
@@ -100,8 +101,8 @@
       "multipleValues": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The data to convert to JSON string.",
@@ -121,14 +122,13 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Convert to JSON string",
     "workflowNodeDescriptionFunction": null,
-    "output": null,
-    "perform": { }
+    "perform": { },
+    "output": null
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }

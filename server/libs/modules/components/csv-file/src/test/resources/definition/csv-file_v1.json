@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "CSV File",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -202,8 +203,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -221,8 +222,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -328,8 +329,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -350,8 +351,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -376,15 +377,15 @@
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.csv\" will be used.",
@@ -408,108 +409,8 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
-    "output": {
-      "outputSchema": {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "metadata": { },
-        "required": null,
-        "name": null,
-        "type": "FILE_ENTRY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "label": null,
-        "placeholder": null,
-        "properties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "extension",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "languageId": null,
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "mimeType",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "languageId": null,
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "name",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "languageId": null,
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": true,
-          "name": "url",
-          "type": "STRING",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "controlType": "TEXT",
-          "languageId": null,
-          "maxLength": null,
-          "minLength": null,
-          "options": null,
-          "optionsDataSource": null
-        } ],
-        "controlType": "FILE_ENTRY"
-      },
-      "sampleOutput": null
-    },
+    "output": null,
     "perform": { }
   } ],
-  "connection": null,
   "triggers": null
 }

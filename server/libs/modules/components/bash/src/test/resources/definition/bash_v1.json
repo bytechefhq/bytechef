@@ -12,6 +12,7 @@
   "resources": null,
   "version": 1,
   "title": "Bash",
+  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -70,6 +71,5 @@
     },
     "perform": { }
   } ],
-  "triggers": null,
-  "connection": null
+  "triggers": null
 }
