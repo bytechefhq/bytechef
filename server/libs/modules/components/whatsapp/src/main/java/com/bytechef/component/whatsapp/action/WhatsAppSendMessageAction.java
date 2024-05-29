@@ -28,7 +28,6 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_N
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECIPIENT_TYPE;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SEND_MESSAGE;
-import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SYSTEM_USER_ACCESS_TOKEN;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TEXT;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TYPE;
 
@@ -67,7 +66,6 @@ public class WhatsAppSendMessageAction {
 
         return actionContext
             .http(http -> http.post(BASE_URL + "/" + connectionParameters.getString(PHONE_NUMBER_ID) + "/messages"))
-            .header("Authorization", "Bearer " + connectionParameters.getString(SYSTEM_USER_ACCESS_TOKEN))
             .body(
                 Body.of(
                     MESSAGING_PRODUCT, "whatsapp",

@@ -16,23 +16,28 @@
 
 package com.bytechef.component.whatsapp.connection;
 
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
+import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
+import static com.bytechef.component.definition.Authorization.BEARER;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SYSTEM_USER_ACCESS_TOKEN;
 
-import com.bytechef.component.definition.Authorization;
-import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luka Ljubic
  */
 public class WhatsAppConnection {
 
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            Authorization.AuthorizationType.CUSTOM.toLowerCase(), Authorization.AuthorizationType.CUSTOM)
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .authorizations(
+            authorization(AuthorizationType.CUSTOM.toLowerCase(), AuthorizationType.CUSTOM)
                 .title("WhatsApp Custom Authorization")
                 .properties(
                     string(SYSTEM_USER_ACCESS_TOKEN)
@@ -40,7 +45,10 @@ public class WhatsAppConnection {
                         .required(true),
                     string(PHONE_NUMBER_ID)
                         .label("Phone number ID")
-                        .required(true)));
+                        .required(true))
+                .apply((connectionParameters, context) -> ofHeaders(
+                    Map.of(AUTHORIZATION,
+                        List.of(BEARER + " " + connectionParameters.getString(SYSTEM_USER_ACCESS_TOKEN))))));
 
     private WhatsAppConnection() {
     }
