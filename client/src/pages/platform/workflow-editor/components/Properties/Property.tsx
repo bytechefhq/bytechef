@@ -97,7 +97,7 @@ const Property = ({
     const inputRef = useRef<HTMLInputElement>(null);
 
     const {
-            currentComponent,
+        currentComponent,
         currentComponentDefinition,
         currentNode,
         focusedInput,
