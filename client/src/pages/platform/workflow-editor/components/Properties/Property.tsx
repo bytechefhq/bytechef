@@ -84,7 +84,7 @@ const Property = ({
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
-        !control && (property.controlType === 'TEXT' || property.controlType === 'TEXT_AREA') ? true : false
+        !control && ['EMAIL', 'PHONE', 'TEXT', 'TEXT_AREA', 'URL'].includes(property.controlType!)
     );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
