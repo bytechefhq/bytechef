@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
@@ -62,7 +61,7 @@ public class CsvFileWriteAction {
                     "Filename to set for binary data. By default, \"file.csv\" will be used.")
                 .defaultValue("file.csv")
                 .advancedOption(true))
-        .outputSchema(fileEntry())
+        .output()
         .perform(CsvFileWriteAction::perform);
 
     protected static FileEntry perform(

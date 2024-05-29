@@ -17,7 +17,6 @@
 package com.bytechef.component.file.storage.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.CONTENT;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
@@ -46,7 +45,7 @@ public class FileStorageWriteAction {
                 .description(
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
-        .outputSchema(fileEntry())
+        .output()
         .perform(FileStorageWriteAction::perform);
 
     protected static FileEntry perform(

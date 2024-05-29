@@ -18,7 +18,6 @@ package com.bytechef.component.openai.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
@@ -87,7 +86,7 @@ public class OpenAICreateSpeechAction {
                 .minValue(0.25)
                 .maxValue(4.0)
                 .required(false))
-        .outputSchema(fileEntry())
+        .output()
         .perform(OpenAICreateSpeechAction::perform);
 
     private OpenAICreateSpeechAction() {
