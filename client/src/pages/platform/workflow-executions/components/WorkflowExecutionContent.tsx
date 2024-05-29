@@ -174,7 +174,7 @@ const WorkflowExecutionContent = ({
                                         <div className="flex flex-col space-y-1 text-sm">
                                             <div className="text-sm font-semibold">Message</div>
 
-                                            <div className="text-sm">{error.message}</div>
+                                            <div className="text-sm">{error.message || 'No message.'}</div>
                                         </div>
 
                                         <div className="flex flex-col space-y-1">
@@ -192,7 +192,7 @@ const WorkflowExecutionContent = ({
 
                     <div className="overflow-x-auto">
                         <div className="flex flex-col space-y-1">
-                            <div className="text-sm">{error.message}</div>
+                            <div className="text-sm">{error.message || 'No message.'}</div>
                         </div>
                     </div>
                 </div>
