@@ -21,6 +21,7 @@ import static com.bytechef.component.whatsapp.connection.WhatsAppConnection.CONN
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.WHATS_APP;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.whatsapp.action.WhatsAppSendMessageAction;
 import com.google.auto.service.AutoService;
@@ -37,6 +38,7 @@ public class WhatsAppComponentHandler implements ComponentHandler {
             "WhatsApp is a free-to-use messaging app offering end-to-end encrypted chat, voice, and " +
                 "video communication, along with document and media sharing, available on multiple platforms.")
         .connection(CONNECTION_DEFINITION)
+        .categories(ComponentCategory.COMMUNICATION)
         .actions(WhatsAppSendMessageAction.ACTION_DEFINITION)
         .icon("path:assets/whatsapp.svg");
 
