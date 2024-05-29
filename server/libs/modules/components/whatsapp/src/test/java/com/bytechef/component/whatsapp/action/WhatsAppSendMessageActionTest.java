@@ -24,16 +24,15 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TEXT;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.Parameters;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,26 +44,25 @@ import org.mockito.ArgumentCaptor;
  */
 class WhatsAppSendMessageActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Context.Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Response mockedResponse = mock(Context.Http.Response.class);
-    private final Map<String, Object> responeseMap = Map.of("key", "value");
+    private final Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(anyString(), anyString())).thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(Context.TypeReference.class)))
-            .thenReturn(responeseMap);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
 
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
@@ -78,11 +76,12 @@ class WhatsAppSendMessageActionTest {
             .thenReturn((String) propertyStubsMap.get(TYPE));
         when(mockedParameters.getRequired(TEXT))
             .thenReturn(propertyStubsMap.get(TEXT));
-        when(mockedParameters.getRequiredString(BODY)).thenReturn("Some Message");
+        when(mockedParameters.getRequiredString(BODY))
+            .thenReturn("Some Message");
 
         Object result = WhatsAppSendMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(responseMap, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
