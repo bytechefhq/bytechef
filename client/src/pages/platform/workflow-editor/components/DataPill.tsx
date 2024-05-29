@@ -21,7 +21,8 @@ const DataPill = ({
     property?: PropertyType;
     path?: string;
     root?: boolean;
-    sampleOutput?: object;
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    sampleOutput?: any;
 }) => {
     const {focusedInput} = useWorkflowNodeDetailsPanelStore();
 
@@ -40,7 +41,7 @@ const DataPill = ({
         path?: string
     ) => {
         const dataPillName = parentPropertyName
-            ? `${parentPropertyName}.${propertyName || '[index]'}`
+            ? `${parentPropertyName}.${propertyName}`
             : `${propertyName || workflowNodeName}`;
 
         const value = propertyName
@@ -88,26 +89,44 @@ const DataPill = ({
                 className="mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
                 data-name={property?.name || workflowNodeName}
                 draggable
-                onClick={() => addDataPillToInput(workflowNodeName, property?.name, parentProperty?.name, path)}
+                onClick={() =>
+                    addDataPillToInput(workflowNodeName, property?.name || '[index]', parentProperty?.name, path)
+                }
                 onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
             >
-                <span className="mr-2" title={property?.type}>
-                    {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
-                </span>
+                {property?.name && (
+                    <span className="mr-2" title={property?.type}>
+                        {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
+                    </span>
+                )}
 
-                {property?.name ? property?.name : '[index]' || workflowNodeName}
+                {!property?.name && (
+                    <span className="mr-2" title={property?.type}>
+                        {TYPE_ICONS.INTEGER}
+                    </span>
+                )}
+
+                {property?.name || '[index]'}
             </div>
 
             {!!subProperties?.length && (
                 <ul className="mt-2 flex flex-col space-y-2 border-l border-gray-200 pl-4">
                     {subProperties?.map((subProperty, index) => {
-                        let value = getNestedObject(
-                            sampleOutput,
-                            `${getSubPropertyPath(subProperty.name).replaceAll('/', '.')}`
-                        );
+                        let sampleValue;
 
-                        if (typeof value === 'string') {
-                            value = (value as string).substring(0, 27) + ((value as string).length > 27 ? '...' : '');
+                        if (typeof sampleOutput === 'object') {
+                            sampleValue = getNestedObject(
+                                sampleOutput,
+                                `${getSubPropertyPath(subProperty.name).replaceAll('/', '.')}`
+                            );
+                        } else {
+                            sampleValue = sampleOutput;
+                        }
+
+                        if (typeof sampleValue === 'string') {
+                            sampleValue =
+                                (sampleValue as string).substring(0, 27) +
+                                ((sampleValue as string).length > 27 ? '...' : '');
                         }
 
                         return (
@@ -124,11 +143,16 @@ const DataPill = ({
                                     workflowNodeName={workflowNodeName}
                                 />
 
-                                {(value || value === 0 || value === false) && typeof value !== 'object' && (
-                                    <div className="flex-1 text-xs text-muted-foreground">
-                                        {value === true ? 'true' : value === false ? false : value}
-                                    </div>
-                                )}
+                                {(sampleValue || sampleValue === 0 || sampleValue === false) &&
+                                    typeof sampleValue !== 'object' && (
+                                        <div className="flex-1 text-xs text-muted-foreground">
+                                            {sampleValue === true
+                                                ? 'true'
+                                                : sampleValue === false
+                                                  ? false
+                                                  : sampleValue}
+                                        </div>
+                                    )}
                             </div>
                         );
                     })}

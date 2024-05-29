@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
+import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {PropertyType} from '@/types/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
@@ -9,24 +10,35 @@ import {useReactFlow} from 'reactflow';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import {ComponentActionI} from './DataPillPanelBody';
+import {ComponentOperationType} from './DataPillPanelBody';
 
 const DataPillPanelBodyPropertiesItem = ({
-    componentAction,
-    filteredProperties,
-    outputSchemaExists,
+    componentOperation,
+    dataPillFilterQuery,
     sampleOutput,
 }: {
-    componentAction: ComponentActionI;
-    filteredProperties: Array<PropertyType>;
-    outputSchemaExists: boolean;
-    sampleOutput: object;
+    componentOperation: ComponentOperationType;
+    dataPillFilterQuery: string;
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    sampleOutput: any;
 }) => {
-    const {componentDefinition, outputSchema, workflowNodeName} = componentAction;
-    const {icon, title} = componentDefinition;
-
     const {componentActions} = useWorkflowDataStore();
     const {getNodes} = useReactFlow();
+
+    const {componentDefinition, workflowNodeName} = componentOperation;
+
+    const outputSchema: PropertyType | undefined = componentOperation?.outputSchema;
+
+    const properties: Array<PropertyType> | undefined = outputSchema?.properties || outputSchema?.items;
+
+    const filteredProperties = properties?.length
+        ? getFilteredProperties({
+              filterQuery: dataPillFilterQuery,
+              properties,
+          })
+        : [];
+
+    const {icon, title} = componentDefinition;
 
     const currentComponentAction = componentActions.find((action) => action.workflowNodeName === workflowNodeName);
 
@@ -67,7 +79,7 @@ const DataPillPanelBodyPropertiesItem = ({
                 className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${workflowNodeName}`}
             >
-                {outputSchemaExists ? (
+                {outputSchema ? (
                     <>
                         <DataPill
                             componentIcon={componentDefinition.icon}
@@ -79,7 +91,13 @@ const DataPillPanelBodyPropertiesItem = ({
 
                         <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
                             {filteredProperties?.map((property) => {
-                                const value = getNestedObject(sampleOutput, property.name!.replaceAll('/', '.'));
+                                let value;
+
+                                if (typeof sampleOutput === 'object' && property.name) {
+                                    value = getNestedObject(sampleOutput, property.name.replaceAll('/', '.'));
+                                } else {
+                                    value = sampleOutput;
+                                }
 
                                 return (
                                     <div className="flex items-center space-x-3" key={property.name}>

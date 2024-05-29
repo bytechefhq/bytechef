@@ -5,8 +5,6 @@ import {
     TriggerDefinitionModel,
 } from '@/middleware/platform/configuration';
 import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/DataPillPanelBodyInputsItem';
-import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
-import {PropertyType} from '@/types/types';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
 import DataPillPanelBodyPropertiesItem from './DataPillPanelBodyPropertiesItem';
@@ -41,17 +39,6 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillP
                 </AccordionItem>
 
                 {componentOperations.map((componentOperation: ComponentOperationType, index: number) => {
-                    const outputSchema: PropertyType | undefined = componentOperations[index]?.outputSchema;
-
-                    const properties: Array<PropertyType> | undefined = outputSchema?.properties;
-
-                    const filteredProperties = properties?.length
-                        ? getFilteredProperties({
-                              filterQuery: dataPillFilterQuery,
-                              properties,
-                          })
-                        : [];
-
                     if (!componentOperation.componentDefinition) {
                         return <></>;
                     }
@@ -63,9 +50,8 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillP
                             value={componentOperation.workflowNodeName}
                         >
                             <DataPillPanelBodyPropertiesItem
-                                componentAction={componentOperation}
-                                filteredProperties={filteredProperties}
-                                outputSchemaExists={!!outputSchema}
+                                componentOperation={componentOperation}
+                                dataPillFilterQuery={dataPillFilterQuery}
                                 sampleOutput={componentOperations[index].sampleOutput}
                             />
                         </AccordionItem>
