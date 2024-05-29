@@ -16,49 +16,53 @@
 
 package com.bytechef.component.date.helper.action;
 
-import com.bytechef.component.date.helper.constants.DateHelperConstants;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_TIMESTAMP;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Igor Beslic
  */
-public class DateHelperConvertActionTest {
+class DateHelperConvertActionTest {
+
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
 
     @Test
-    public void testActionPerform() {
-        Parameters parameters = getParameters(1716572102L, DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
+    void testActionPerform() {
+        mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
 
-        Assertions.assertEquals("2024-05-24",
-            DateHelperConvertAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+        assertEquals("2024-05-24",
+            DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-        parameters = getParameters(1716572102000L, DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
+        mockParameters(1716572102000L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
 
-        Assertions.assertEquals("2024-05-24",
-            DateHelperConvertAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+        assertEquals("2024-05-24",
+            DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-        parameters = getParameters(1716572102L, DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
+        mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
 
-        Assertions.assertEquals("2024-05-24T19:35:02.000+0200",
-            DateHelperConvertAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+        assertEquals("2024-05-24T19:35:02.000+0200",
+            DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-        parameters = getParameters(1716572102977L, DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
+        mockParameters(1716572102977L, DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
 
-        Assertions.assertEquals("2024-05-24T19:35:02.977+0200",
-            DateHelperConvertAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+        assertEquals("2024-05-24T19:35:02.977+0200",
+            DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
     }
 
-    private Parameters getParameters(Long unixTimestamp, String dateFormat) {
-        Parameters parameters = Mockito.mock(Parameters.class);
-
-        Mockito.when(parameters.getRequiredString(DateHelperConstants.DATE_FORMAT))
+    private void mockParameters(Long unixTimestamp, String dateFormat) {
+        when(mockedParameters.getRequiredString(DATE_FORMAT))
             .thenReturn(dateFormat);
-        Mockito.when(parameters.getRequiredLong(DateHelperConstants.DATE_TIMESTAMP))
+        when(mockedParameters.getRequiredLong(DATE_TIMESTAMP))
             .thenReturn(unixTimestamp);
-
-        return parameters;
     }
 }

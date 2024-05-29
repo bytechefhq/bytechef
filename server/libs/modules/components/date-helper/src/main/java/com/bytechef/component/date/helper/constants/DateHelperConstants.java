@@ -21,12 +21,15 @@ package com.bytechef.component.date.helper.constants;
  */
 public class DateHelperConstants {
 
-    public static final String DATE_TIMESTAMP = "dateTimestamp";
-    public static final String DATE_HELPER = "dateHelper";
     public static final String CONVERT_UNIX_TIMESTAMP_TO_ISO8601 = "convertUnixTimestampToIso8601";
     public static final String DATE_FORMAT = "dateFormat";
     public static final String DATE_FORMAT_OPTION_ISO8601_DATE = "ISO8601 Date";
     public static final String DATE_FORMAT_OPTION_ISO8601_DATE_VALUE = "ISO8601DATE";
     public static final String DATE_FORMAT_OPTION_ISO8601_DATE_TIME = "ISO8601 Date Time";
     public static final String DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE = "ISO8601DATETIME";
+    public static final String DATE_HELPER = "dateHelper";
+    public static final String DATE_TIMESTAMP = "dateTimestamp";
+
+    private DateHelperConstants() {
+    }
 }

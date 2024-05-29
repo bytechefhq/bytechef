@@ -16,35 +16,17 @@
 
 package com.bytechef.component.date.helper;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Igor Beslic
  */
-public class DateHelperComponentHandlerTest {
+class DateHelperComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/date-helper_v1.json", new DateHelperComponentHandler().getDefinition());
-    }
-
-    @Test
-    public void testComponentActionSize() throws Exception {
-        ComponentDefinition componentDefinition = new DateHelperComponentHandler().getDefinition();
-
-        Optional<List<? extends ActionDefinition>> actionsOptional = componentDefinition.getActions();
-
-        Assertions.assertTrue(actionsOptional.isPresent());
-
-        List<? extends ActionDefinition> actionDefinitions = actionsOptional.get();
-
-        Assertions.assertEquals(1, actionDefinitions.size());
     }
 
 }
