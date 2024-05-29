@@ -16,17 +16,15 @@
 
 package com.bytechef.component.copper.connection;
 
+import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
 import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
 
@@ -47,17 +45,12 @@ public class CopperConnection {
                         string(KEY)
                             .label("Key")
                             .required(true))
-                    .apply(CopperConnection::getApplyResponse));
+                    .apply((connectionParameters, context) -> ofHeaders(
+                        Map.of(
+                            "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
+                            "X-PW-Application", List.of("developer_api"),
+                            "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))))));
 
     private CopperConnection() {
-    }
-
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
-        return ApplyResponse.ofHeaders(
-            Map.of(
-                "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
-                "X-PW-Application", List.of("developer_api"),
-                "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))));
     }
 }
