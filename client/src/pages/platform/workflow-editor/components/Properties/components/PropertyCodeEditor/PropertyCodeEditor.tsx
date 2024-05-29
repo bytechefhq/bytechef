@@ -3,8 +3,9 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowModel} from '@/middleware/platform/configuration';
 import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheet';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {ReactNode, forwardRef, useState} from 'react';
+import {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyCodeEditorProps {
@@ -40,7 +41,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
         },
         ref
     ) => {
-        const [showPropertyCodeEditorSheet, setShowPropertyCodeEditorSheet] = useState(false);
+        const {setShowPropertyCodeEditorSheet, showPropertyCodeEditorSheet} = useWorkflowEditorStore();
 
         return (
             <>

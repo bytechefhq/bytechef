@@ -7,6 +7,8 @@ interface WorkflowEditorI {
     showBottomPanel: boolean;
     setShowBottomPanelOpen: (showBottomPanel: boolean) => void;
 
+    showPropertyCodeEditorSheet: boolean;
+    setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet: boolean) => void;
 
     showEditWorkflowDialog: boolean;
     setShowEditWorkflowDialog: (showEditWorkflowDialog: boolean) => void;
@@ -30,6 +32,10 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     showBottomPanel,
                 })),
 
+            showPropertyCodeEditorSheet: false,
+            setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet) =>
+                set(() => ({
+                    showPropertyCodeEditorSheet,
                 })),
 
             showEditWorkflowDialog: false,

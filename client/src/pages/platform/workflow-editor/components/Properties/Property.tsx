@@ -106,7 +106,7 @@ const Property = ({
     } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
-    const {showPropertyCodeEditorSheetOpen, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
+    const {showPropertyCodeEditorSheet, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
@@ -670,7 +670,12 @@ const Property = ({
 
     // update propertyParameterValue when workflow definition changes
     useEffect(() => {
-        if (!workflow.definition || !currentNode?.name || !name || !workflowCodeEditorSheetOpen) {
+        if (
+            !workflow.definition ||
+            !currentNode?.name ||
+            !name ||
+            !(showPropertyCodeEditorSheet || showWorkflowCodeEditorSheet)
+        ) {
             return;
         }
 
