@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 class WhatsAppComponentHandlerTest {
 
     @Test
-    public void testGetComponentDefinition() {
+    void testGetComponentDefinition() {
 
         JsonFileAssert.assertEquals("definition/whatsapp_v1.json", new WhatsAppComponentHandler().getDefinition());
     }

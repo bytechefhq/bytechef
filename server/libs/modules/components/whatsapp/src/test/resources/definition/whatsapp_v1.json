@@ -1,5 +1,5 @@
 {
-  "categories": null,
+  "categories": [ "COMMUNICATION" ],
   "customAction": null,
   "customActionHelp": null,
   "dataStreamItemReader": null,
@@ -90,7 +90,6 @@
     },
     "perform": { }
   } ],
-  "triggers": null,
   "connection": {
     "authorizations": [ {
       "detectOn": null,
@@ -141,7 +140,7 @@
       "title": "WhatsApp Custom Authorization",
       "type": "CUSTOM",
       "acquire": null,
-      "apply": null,
+      "apply": { },
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
@@ -158,5 +157,6 @@
     "authorizationRequired": null,
     "baseUri": null,
     "test": null
-  }
+  },
+  "triggers": null
 }
