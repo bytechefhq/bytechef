@@ -17,6 +17,7 @@
 package com.bytechef.component.date.helper.action;
 
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.CONVERT_UNIX_TIMESTAMP_TO_ISO8601;
+import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME;
 import static com.bytechef.component.date.helper.constants.DateHelperConstants.DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE;
@@ -27,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.date.helper.constants.DateHelperConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -51,7 +51,7 @@ public class DateHelperConvertAction {
                     .description("UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)")
                     .maxNumberPrecision(0)
                     .required(true),
-                string(DateHelperConstants.DATE_FORMAT)
+                string(DATE_FORMAT)
                     .label("Date Format")
                     .description("Formatting that should be applied the text representation of date.")
                     .controlType(ControlType.SELECT)
@@ -65,8 +65,11 @@ public class DateHelperConvertAction {
                             DATE_FORMAT_OPTION_ISO8601_DATE_VALUE, "Get date in yyyy-MM-dd"))
                     .required(true)
                     .defaultValue(DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE))
-            .output()
+            .outputSchema(string())
             .perform(DateHelperConvertAction::perform);
+
+    private DateHelperConvertAction() {
+    }
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
@@ -74,12 +77,12 @@ public class DateHelperConvertAction {
         long unixTimestamp = inputParameters.getRequiredLong(DATE_TIMESTAMP);
 
         if (getDigitCount(unixTimestamp) == 10) {
-            unixTimestamp = unixTimestamp * 1000;
+            unixTimestamp *= 1000;
         }
 
         Date date = new Date(unixTimestamp);
 
-        DateFormat dateFormat = getDateFormat(inputParameters.getRequiredString(DateHelperConstants.DATE_FORMAT));
+        DateFormat dateFormat = getDateFormat(inputParameters.getRequiredString(DATE_FORMAT));
 
         return dateFormat.format(date);
     }
@@ -94,14 +97,7 @@ public class DateHelperConvertAction {
     }
 
     private static int getDigitCount(long value) {
-        int cnt = 0;
-
-        while (value > 0) {
-            value = value / 10;
-
-            cnt++;
-        }
-
-        return cnt;
+        return String.valueOf(Math.abs(value))
+            .length();
     }
 }
