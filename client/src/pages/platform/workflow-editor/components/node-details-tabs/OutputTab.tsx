@@ -149,6 +149,18 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                             workflowNodeName={currentNode.name}
                         />
                     )}
+
+                    {(outputSchema as PropertyType)?.items && (
+                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1">
+                            <SchemaProperties
+                                copiedValue={copiedValue}
+                                copyToClipboard={copyToClipboard}
+                                properties={(outputSchema as PropertyType).items!}
+                                sampleOutput={sampleOutput}
+                                workflowNodeName={currentNode.name}
+                            />
+                        </div>
+                    )}
                 </>
             ) : (
                 <div className="flex size-full items-center justify-center">
