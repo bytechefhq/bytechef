@@ -106,7 +106,7 @@ const Property = ({
     } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
-    const {workflowCodeEditorSheetOpen} = useWorkflowEditorStore();
+    const {showPropertyCodeEditorSheetOpen, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 

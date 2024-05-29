@@ -55,8 +55,8 @@ const Project = () => {
     const {
         setShowBottomPanelOpen,
         setShowEditWorkflowDialog,
-        setWorkflowCodeEditorSheetOpen,
-        workflowCodeEditorSheetOpen,
+        setShowWorkflowCodeEditorSheet,
+        showWorkflowCodeEditorSheet,
     } = useWorkflowEditorStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
@@ -107,7 +107,7 @@ const Project = () => {
         {
             icon: Code2Icon,
             name: 'Workflow Code Editor',
-            onClick: () => setWorkflowCodeEditorSheetOpen(true),
+            onClick: () => setShowWorkflowCodeEditorSheet(true),
         },
     ];
 
@@ -354,7 +354,7 @@ const Project = () => {
                         />
                     )}
 
-                    {workflowCodeEditorSheetOpen && (
+                    {showWorkflowCodeEditorSheet && (
                         <ConnectionReactQueryProvider
                             value={{
                                 ConnectionKeys: ConnectionKeys,
@@ -377,7 +377,7 @@ const Project = () => {
                                 }}
                             >
                                 <WorkflowCodeEditorSheet
-                                    onClose={() => setWorkflowCodeEditorSheetOpen(false)}
+                                    onClose={() => setShowWorkflowCodeEditorSheet(false)}
                                     runDisabled={runDisabled}
                                     testConfigurationDisabled={testConfigurationDisabled}
                                     workflow={workflow}

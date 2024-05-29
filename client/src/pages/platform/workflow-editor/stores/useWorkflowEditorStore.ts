@@ -4,14 +4,15 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowEditorI {
-    showBottomPanelOpen: boolean;
-    setShowBottomPanelOpen: (showBottomPanelOpen: boolean) => void;
+    showBottomPanel: boolean;
+    setShowBottomPanelOpen: (showBottomPanel: boolean) => void;
+
 
     showEditWorkflowDialog: boolean;
     setShowEditWorkflowDialog: (showEditWorkflowDialog: boolean) => void;
 
-    workflowCodeEditorSheetOpen: boolean;
-    setWorkflowCodeEditorSheetOpen: (workflowCodeEditorSheetOpen: boolean) => void;
+    showWorkflowCodeEditorSheet: boolean;
+    setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet: boolean) => void;
 
     workflowTestExecution?: WorkflowTestExecutionModel;
     setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecutionModel) => void;
@@ -23,10 +24,12 @@ interface WorkflowEditorI {
 const useWorkflowEditorStore = create<WorkflowEditorI>()(
     devtools(
         (set) => ({
-            showBottomPanelOpen: false,
-            setShowBottomPanelOpen: (showBottomPanelOpen) =>
+            showBottomPanel: false,
+            setShowBottomPanelOpen: (showBottomPanel) =>
                 set(() => ({
-                    showBottomPanelOpen: showBottomPanelOpen,
+                    showBottomPanel,
+                })),
+
                 })),
 
             showEditWorkflowDialog: false,
@@ -35,10 +38,10 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     showEditWorkflowDialog: showEditWorkflowDialog,
                 })),
 
-            workflowCodeEditorSheetOpen: false,
-            setWorkflowCodeEditorSheetOpen: (workflowCodeEditorSheetOpen) =>
+            showWorkflowCodeEditorSheet: false,
+            setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet) =>
                 set(() => ({
-                    workflowCodeEditorSheetOpen: workflowCodeEditorSheetOpen,
+                    showWorkflowCodeEditorSheet,
                 })),
 
             workflowTestExecution: undefined,

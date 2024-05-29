@@ -10,7 +10,7 @@ const ProjectHeaderOutputButton = ({
 }: {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
 }) => {
-    const {setShowBottomPanelOpen, showBottomPanelOpen} = useWorkflowEditorStore();
+    const {setShowBottomPanelOpen, showBottomPanel} = useWorkflowEditorStore();
 
     return (
         <Tooltip>
@@ -18,10 +18,10 @@ const ProjectHeaderOutputButton = ({
                 <Button
                     className="hover:bg-gray-200"
                     onClick={() => {
-                        setShowBottomPanelOpen(!showBottomPanelOpen);
+                        setShowBottomPanelOpen(!showBottomPanel);
 
                         if (bottomResizablePanelRef.current) {
-                            bottomResizablePanelRef.current.resize(!showBottomPanelOpen ? 35 : 0);
+                            bottomResizablePanelRef.current.resize(!showBottomPanel ? 35 : 0);
                         }
                     }}
                     size="icon"
