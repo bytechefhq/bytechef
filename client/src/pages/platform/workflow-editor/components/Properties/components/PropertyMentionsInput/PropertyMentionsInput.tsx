@@ -164,7 +164,6 @@ const PropertyMentionsInput = forwardRef(
                         renderList(matches, searchTerm);
                     }
                 },
-                spaceAfterInsert: false,
             },
             toolbar: false,
         };
@@ -180,10 +179,14 @@ const PropertyMentionsInput = forwardRef(
         };
 
         const handleOnKeyDown = (event: KeyboardEvent) => {
-            if (mentionOccurences && isAlphaNumericalKeyCode(event) && singleMention) {
-                // @ts-expect-error Quill false positive
-                const editor = ref.current.getEditor();
+            // @ts-expect-error Quill false positive
+            const editor = ref.current.getEditor();
 
+            if (!editor) {
+                return;
+            }
+
+            if (mentionOccurences && isAlphaNumericalKeyCode(event) && singleMention) {
                 const selection = editor.getSelection();
 
                 const [leaf] = editor.getLeaf(selection?.index || 0);
@@ -201,6 +204,12 @@ const PropertyMentionsInput = forwardRef(
 
             if (singleMention && mentionOccurences) {
                 event.preventDefault();
+            }
+
+            if (event.key === ' ') {
+                setTimeout(() => {
+                    editor.setSelection(editor.getLength(), 0);
+                }, 10);
             }
         };
 
