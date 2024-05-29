@@ -16,17 +16,16 @@
 
 package com.bytechef.component.freshsales.connection;
 
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
+import static com.bytechef.component.definition.Authorization.ApplyResponse.ofHeaders;
 import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
 
@@ -49,14 +48,9 @@ public class FreshsalesConnection {
                             .label("API Key")
                             .description("The API Key supplied by Freshsales")
                             .required(true))
-                    .apply(FreshsalesConnection::getApplyResponse));
+                    .apply((connectionParameters, context) -> ofHeaders(
+                        Map.of(AUTHORIZATION, List.of("Token token=" + connectionParameters.getRequiredString(KEY))))));
 
     private FreshsalesConnection() {
-    }
-
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Authorization.ApplyResponse getApplyResponse(Parameters connectionParameters, Context context) {
-        return Authorization.ApplyResponse.ofHeaders(
-            Map.of("Authorization", List.of("Token token=" + connectionParameters.getRequiredString(KEY))));
     }
 }
