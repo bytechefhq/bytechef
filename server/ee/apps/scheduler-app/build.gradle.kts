@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))
+    implementation(project(":server:libs:config:messages-config"))
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))

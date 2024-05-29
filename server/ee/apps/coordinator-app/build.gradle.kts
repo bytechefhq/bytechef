@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))
+    implementation(project(":server:libs:config:messages-config"))
     implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))

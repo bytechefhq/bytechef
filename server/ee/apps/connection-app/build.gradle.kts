@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":server:libs:config:jackson-config"))
     implementation(project(":server:libs:config:jdbc-config"))
     implementation(project(":server:libs:config:liquibase-config"))
+    implementation(project(":server:libs:config:messages-config"))
     implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))

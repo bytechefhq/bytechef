@@ -23,9 +23,11 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.platform.configuration.exception.ConfigurationException;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.constant.ConnectionErrorType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -121,7 +123,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.getConnection(id);
 
         if (isConnectionUsed(id, connection.getType())) {
-            throw new IllegalArgumentException("Connection id=%s is used".formatted(id));
+            throw new ConfigurationException(
+                "Connection id=%s is used".formatted(id), ConnectionErrorType.CONNECTION_IS_USED);
         }
 
         connectionService.delete(id);
