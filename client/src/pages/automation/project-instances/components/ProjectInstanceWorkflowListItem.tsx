@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
-import useCopyToClipboard from '@/hooks/useCopyToClipboard';
 import {ProjectInstanceApi, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
@@ -11,6 +10,7 @@ import ProjectInstanceWorkflowListItemDropdownMenu from '@/pages/automation/proj
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
 import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';

@@ -3,7 +3,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import useCopyToClipboard from '@/hooks/useCopyToClipboard';
 import {PropertyModel} from '@/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
@@ -14,6 +13,7 @@ import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.que
 import {NodeType, PropertyType} from '@/types/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useState} from 'react';
 
 import PropertyField from '../PropertyField';

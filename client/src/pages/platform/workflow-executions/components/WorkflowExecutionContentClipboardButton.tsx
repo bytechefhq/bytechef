@@ -1,4 +1,4 @@
-import useCopyToClipboard from '@/hooks/useCopyToClipboard';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardCopyIcon} from 'lucide-react';
 
 const SPACE = 4;

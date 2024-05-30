@@ -4,7 +4,7 @@ import PropertyField from './PropertyField';
 
 interface SchemaPropertiesProps {
     copiedValue: string | null;
-    copyToClipboard: (text: string) => Promise<boolean>;
+    copyToClipboard: (text: string) => Promise<void>;
     parentPath?: string;
     properties: Array<PropertyType>;
     sampleOutput: object;

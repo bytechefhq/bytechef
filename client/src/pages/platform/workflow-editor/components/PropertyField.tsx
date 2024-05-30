@@ -6,7 +6,7 @@ import getNestedObject from '../utils/getNestedObject';
 
 interface PropertyFieldProps {
     copiedValue: string | null;
-    copyToClipboard: (text: string) => Promise<boolean>;
+    copyToClipboard: (text: string) => Promise<void>;
     label: string;
     property: PropertyType;
     parentPath?: string;
