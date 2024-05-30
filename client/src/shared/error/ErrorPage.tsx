@@ -5,8 +5,8 @@ export default function ErrorPage() {
     const error: any = useRouteError();
 
     return (
-        <div id="error-page">
-            <h1>Oops!</h1>
+        <div className="space-y-2 p-4" id="error-page">
+            <h1 className="text-lg">Oops!</h1>
 
             <p>Sorry, an unexpected error has occurred.</p>
 

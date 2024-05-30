@@ -1,5 +1,4 @@
 import App from '@/App';
-import ErrorPage from '@/ErrorPage';
 import {ProjectApi} from '@/middleware/automation/configuration';
 import {Connections as AutomationConnections} from '@/pages/automation/connections/Connections';
 import ProjectInstances from '@/pages/automation/project-instances/ProjectInstances';
@@ -11,6 +10,8 @@ import Account from '@/pages/platform/settings/Account';
 import Appearance from '@/pages/platform/settings/Appearance';
 import Settings from '@/pages/platform/settings/Settings';
 import Workspaces from '@/pages/platform/settings/automation/workspaces/Workspaces';
+import ErrorPage from '@/shared/error/ErrorPage';
+import PageNotFound from '@/shared/error/PageNotFound';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
@@ -103,8 +104,14 @@ export const router = createBrowserRouter([
                         path: 'settings',
                     },
                 ],
+                errorElement: <ErrorPage />,
                 path: 'automation',
             },
+            {
+                element: <PageNotFound />,
+                path: '*',
+            },
+
         ],
         element: <App />,
         errorElement: <ErrorPage />,
