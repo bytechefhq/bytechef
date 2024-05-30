@@ -1,16 +1,16 @@
 import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
-import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {ProjectInstanceModel, WorkflowConnectionModel} from '@/shared/middleware/automation/configuration';
+import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetWorkspaceConnectionsQuery,
-} from '@/queries/automation/connections.queries';
-import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
+} from '@/shared/queries/automation/connections.queries';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import * as Portal from '@radix-ui/react-portal';
 import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';

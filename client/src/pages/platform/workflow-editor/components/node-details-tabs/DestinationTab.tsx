@@ -1,7 +1,7 @@
 import ComboBox from '@/components/ComboBox';
 import {Label} from '@/components/ui/label';
-import {GetDataStreamComponentDefinitionsComponentTypeEnum} from '@/middleware/platform/configuration';
-import {useGetDataStreamComponentDefinitions} from '@/queries/platform/componentDefinitions.queries';
+import {GetDataStreamComponentDefinitionsComponentTypeEnum} from '@/shared/middleware/platform/configuration';
+import {useGetDataStreamComponentDefinitions} from '@/shared/queries/platform/componentDefinitions.queries';
 
 const DestinationTab = () => {
     const {data: componentDefinitions} = useGetDataStreamComponentDefinitions({

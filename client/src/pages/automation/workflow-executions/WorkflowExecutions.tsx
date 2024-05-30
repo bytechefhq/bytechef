@@ -4,23 +4,23 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
-import LayoutContainer from '@/layouts/LayoutContainer';
-import PageFooter from '@/layouts/PageFooter';
-import PageHeader from '@/layouts/PageHeader';
-import {ProjectModel} from '@/middleware/automation/configuration';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {
-    useGetProjectInstanceQuery,
-    useGetWorkspaceProjectInstancesQuery,
-} from '@/queries/automation/projectInstances.queries';
-import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
-import {useGetWorkflowExecutionsQuery} from '@/queries/automation/workflowExecutions.queries';
-import {ActivityIcon} from 'lucide-react';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import PageFooter from '@/shared/layout/PageFooter';
+import PageHeader from '@/shared/layout/PageHeader';
+import {ProjectModel} from '@/shared/middleware/automation/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionModelFromJSON,
-} from 'middleware/automation/workflow/execution';
-import {useGetWorkspaceProjectsQuery} from 'queries/automation/projects.queries';
+} from '@/shared/middleware/automation/workflow/execution';
+import {
+    useGetProjectInstanceQuery,
+    useGetWorkspaceProjectInstancesQuery,
+} from '@/shared/queries/automation/projectInstances.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useGetWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 

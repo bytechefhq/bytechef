@@ -1,6 +1,6 @@
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/shared/middleware/platform/configuration';
 import {PropsWithChildren, useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';

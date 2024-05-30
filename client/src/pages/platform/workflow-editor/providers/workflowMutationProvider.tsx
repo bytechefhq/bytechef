@@ -1,4 +1,4 @@
-import {UpdateWorkflowMutationType} from '@/types/types';
+import {UpdateWorkflowMutationType} from '@/shared/types';
 import {createContext, useContext} from 'react';
 
 export interface WorkflowMutationStateI {

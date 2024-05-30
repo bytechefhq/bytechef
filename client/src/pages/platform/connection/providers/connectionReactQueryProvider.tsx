@@ -1,4 +1,4 @@
-import {ConnectionModel, TagModel} from '@/middleware/platform/connection';
+import {ConnectionModel, TagModel} from '@/shared/middleware/platform/connection';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {createContext, useContext} from 'react';
 

@@ -7,26 +7,26 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ComponentDefinitionBasicModel,
-    WorkflowConnectionModel,
-    WorkflowModel,
-    WorkflowTestConfigurationConnectionModel,
-} from '@/middleware/platform/configuration';
-import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import {
+    ComponentDefinitionBasicModel,
+    WorkflowConnectionModel,
+    WorkflowModel,
+    WorkflowTestConfigurationConnectionModel,
+} from '@/shared/middleware/platform/configuration';
+import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
+import {
     useGetComponentDefinitionQuery,
     useGetComponentDefinitionsQuery,
-} from '@/queries/platform/componentDefinitions.queries';
+} from '@/shared/queries/platform/componentDefinitions.queries';
 import {
     WorkflowTestConfigurationKeys,
     useGetWorkflowTestConfigurationConnectionsQuery,
-} from '@/queries/platform/workflowTestConfigurations.queries';
-import {WorkflowDefinitionType, WorkflowTaskType} from '@/types/types';
+} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';

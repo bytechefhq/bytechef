@@ -1,5 +1,5 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {ProjectModel, TagModel} from '@/middleware/automation/configuration';
+import {ProjectModel, TagModel} from '@/shared/middleware/automation/configuration';
 import ProjectListItem from 'pages/automation/projects/components/ProjectListItem';
 
 import ProjectWorkflowList from './ProjectWorkflowList';

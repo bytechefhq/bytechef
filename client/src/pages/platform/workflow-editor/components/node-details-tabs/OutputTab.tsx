@@ -3,14 +3,14 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {PropertyModel} from '@/middleware/platform/configuration';
+import {PropertyModel} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
     useUploadSampleOutputRequestMutation,
-} from '@/mutations/platform/workflowNodeTestOutputs.mutations';
-import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
-import {NodeType, PropertyType} from '@/types/types';
+} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {NodeType, PropertyType} from '@/shared/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';

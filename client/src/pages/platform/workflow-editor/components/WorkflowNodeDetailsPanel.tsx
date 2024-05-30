@@ -1,25 +1,25 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
+import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
+import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
 import {
     ComponentDefinitionBasicModel,
     WorkflowConnectionModel,
     WorkflowNodeOutputModel,
-} from '@/middleware/platform/configuration';
-import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import DestinationTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DestinationTab';
-import SourceTab from '@/pages/platform/workflow-editor/components/node-details-tabs/SourceTab';
-import {useGetTriggerDefinitionQuery} from '@/queries/platform/triggerDefinitions.queries';
-import {WorkflowNodeDynamicPropertyKeys} from '@/queries/platform/workflowNodeDynamicProperties.queries';
-import {WorkflowNodeOptionKeys} from '@/queries/platform/workflowNodeOptions.queries';
-import {useGetWorkflowNodeOutputQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/queries/platform/workflowTestConfigurations.queries';
-import {DataPillType, PropertyType, UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/types/types';
+} from '@/shared/middleware/platform/configuration';
+import {useGetComponentActionDefinitionQuery} from '@/shared/queries/platform/actionDefinitions.queries';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
+import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {useGetWorkflowNodeOutputQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {DataPillType, PropertyType, UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
-import {useGetComponentActionDefinitionQuery} from 'queries/platform/actionDefinitions.queries';
-import {useGetComponentDefinitionQuery} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';

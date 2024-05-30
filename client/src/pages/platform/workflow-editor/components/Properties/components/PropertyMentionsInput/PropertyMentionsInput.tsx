@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import getRandomId from '@/utils/getRandomId';
+import getRandomId from '@/shared/util/random-utils';
 
 import 'quill-mention';
 import {KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
@@ -12,7 +12,7 @@ import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/P
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {DataPillType} from '@/types/types';
+import {DataPillType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 

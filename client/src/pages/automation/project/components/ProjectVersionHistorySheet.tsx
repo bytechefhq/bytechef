@@ -1,8 +1,8 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import {ProjectStatusModel} from '@/middleware/automation/configuration';
-import {useGetProjectVersionsQuery} from '@/queries/automation/projectVersions.queries';
+import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 

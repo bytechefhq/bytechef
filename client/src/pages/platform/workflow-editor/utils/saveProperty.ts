@@ -2,7 +2,7 @@ import {
     UpdateWorkflowNodeParameter200ResponseModelI,
     UpdateWorkflowNodeParameterRequestI,
 } from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
-import {ComponentType} from '@/types/types';
+import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 interface SavePropertyProps {

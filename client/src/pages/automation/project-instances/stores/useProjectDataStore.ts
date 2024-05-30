@@ -1,4 +1,4 @@
-import {WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
+import {WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/test';
 
 /* eslint-disable sort-keys */
 

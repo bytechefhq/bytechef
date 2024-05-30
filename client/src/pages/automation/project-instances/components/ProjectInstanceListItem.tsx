@@ -2,17 +2,17 @@ import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectInstanceModel, TagModel} from '@/middleware/automation/configuration';
-import {useUpdateProjectInstanceTagsMutation} from '@/mutations/automation/projectInstanceTags.mutations';
-import {
-    useDeleteProjectInstanceMutation,
-    useEnableProjectInstanceMutation,
-} from '@/mutations/automation/projectInstances.mutations';
 import ProjectInstanceListItemAlertDialog from '@/pages/automation/project-instances/components/ProjectInstanceListItemAlertDialog';
 import ProjectInstanceListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceListItemDropdownMenu';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.queries';
-import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
+import {ProjectInstanceModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {useUpdateProjectInstanceTagsMutation} from '@/shared/mutations/automation/projectInstanceTags.mutations';
+import {
+    useDeleteProjectInstanceMutation,
+    useEnableProjectInstanceMutation,
+} from '@/shared/mutations/automation/projectInstances.mutations';
+import {ProjectInstanceTagKeys} from '@/shared/queries/automation/projectInstanceTags.queries';
+import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';

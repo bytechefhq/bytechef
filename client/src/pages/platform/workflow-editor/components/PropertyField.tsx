@@ -1,5 +1,5 @@
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {PropertyType} from '@/types/types';
+import {PropertyType} from '@/shared/types';
 import {ClipboardCheck, ClipboardIcon} from 'lucide-react';
 
 import getNestedObject from '../utils/getNestedObject';

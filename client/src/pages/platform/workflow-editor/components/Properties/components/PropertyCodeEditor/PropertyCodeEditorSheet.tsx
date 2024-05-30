@@ -2,9 +2,13 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {RightSidebar} from '@/layouts/RightSidebar';
-import {ScriptTestExecutionModel, WorkflowModel, WorkflowNodeScriptApi} from '@/middleware/platform/configuration';
 import PropertyCodeEditorSheetConnectionsSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSheet';
+import {RightSidebar} from '@/shared/layout/RightSidebar';
+import {
+    ScriptTestExecutionModel,
+    WorkflowModel,
+    WorkflowNodeScriptApi,
+} from '@/shared/middleware/platform/configuration';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';

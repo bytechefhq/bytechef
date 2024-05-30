@@ -19,23 +19,29 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/platform/oauth2.queries';
+import {
+    AuthorizationModel,
+    ComponentDefinitionBasicModel,
+    ComponentDefinitionModel,
+} from '@/shared/middleware/platform/configuration';
+import {ConnectionEnvironmentModel, ConnectionModel, TagModel} from '@/shared/middleware/platform/connection';
+import {
+    ComponentDefinitionKeys,
+    useGetComponentDefinitionsQuery,
+} from '@/shared/queries/platform/componentDefinitions.queries';
+import {
+    useGetConnectionDefinitionQuery,
+    useGetConnectionDefinitionsQuery,
+} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {
+    useGetOAuth2AuthorizationParametersQuery,
+    useGetOAuth2PropertiesQuery,
+} from '@/shared/queries/platform/oauth2.queries';
 import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ClipboardIcon} from 'lucide-react';
-import {
-    AuthorizationModel,
-    ComponentDefinitionBasicModel,
-    ComponentDefinitionModel,
-} from 'middleware/platform/configuration';
-import {ConnectionEnvironmentModel, ConnectionModel, TagModel} from 'middleware/platform/connection';
-import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
-import {
-    useGetConnectionDefinitionQuery,
-    useGetConnectionDefinitionsQuery,
-} from 'queries/platform/connectionDefinitions.queries';
 import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 

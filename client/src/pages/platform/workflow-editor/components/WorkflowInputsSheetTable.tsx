@@ -10,10 +10,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import WorkflowInputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetDialog';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowDefinitionType} from '@/types/types';
+import {
+    WorkflowInputModel,
+    WorkflowModel,
+    WorkflowTestConfigurationModel,
+} from '@/shared/middleware/platform/configuration';
+import {WorkflowDefinitionType} from '@/shared/types';
 import {EditIcon, PlusIcon, SlidersIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 

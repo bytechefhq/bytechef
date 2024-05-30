@@ -1,11 +1,11 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ControlTypeModel} from '@/middleware/platform/configuration';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
 import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {PropertyType, SubPropertyType} from '@/types/types';
+import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
+import {PropertyType, SubPropertyType} from '@/shared/types';
 import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';

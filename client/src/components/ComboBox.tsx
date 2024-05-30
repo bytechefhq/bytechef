@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverTrigger} from '@/components/ui/popover';
-import {cn} from '@/lib/utils';
+import {cn} from '@/shared/util/cn-utils';
 import {CaretSortIcon, CheckIcon} from '@radix-ui/react-icons';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import {FocusEventHandler, ReactNode, useState} from 'react';

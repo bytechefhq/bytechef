@@ -4,7 +4,7 @@ import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandL
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useGetWorkflowNodeOptionsQuery} from '@/queries/platform/workflowNodeOptions.queries';
+import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {FocusEventHandler, ReactNode, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -13,7 +13,7 @@ import {twMerge} from 'tailwind-merge';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
-import type {OptionModel} from '@/middleware/platform/configuration';
+import type {OptionModel} from '@/shared/middleware/platform/configuration';
 
 type ComboBoxItemType = {
     description?: string;

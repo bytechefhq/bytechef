@@ -1,6 +1,6 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {ClickedItemType} from '@/types/types';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/platform/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/shared/middleware/platform/configuration';
+import {ClickedItemType} from '@/shared/types';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';

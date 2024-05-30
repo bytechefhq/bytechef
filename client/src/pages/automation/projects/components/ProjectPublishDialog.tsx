@@ -3,9 +3,9 @@ import {DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/components/ui/use-toast';
-import {ProjectModel} from '@/middleware/automation/configuration';
-import {usePublishProjectMutation} from '@/mutations/automation/projects.mutations';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {Dialog} from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

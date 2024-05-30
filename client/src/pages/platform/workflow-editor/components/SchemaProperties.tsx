@@ -1,4 +1,4 @@
-import {PropertyType} from '@/types/types';
+import {PropertyType} from '@/shared/types';
 
 import PropertyField from './PropertyField';
 

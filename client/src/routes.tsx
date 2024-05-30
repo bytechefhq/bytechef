@@ -1,21 +1,20 @@
 import App from '@/App';
-import {ProjectApi} from '@/middleware/automation/configuration';
 import {Connections as AutomationConnections} from '@/pages/automation/connections/Connections';
 import ProjectInstances from '@/pages/automation/project-instances/ProjectInstances';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
 import {WorkflowExecutions as AutomationWorkflowExecutions} from '@/pages/automation/workflow-executions/WorkflowExecutions';
 import OAuthPopup from '@/pages/platform/connection/components/oauth2/OAuthPopup';
-import Account from '@/pages/platform/settings/Account';
-import Appearance from '@/pages/platform/settings/Appearance';
-import Settings from '@/pages/platform/settings/Settings';
-import Workspaces from '@/pages/platform/settings/automation/workspaces/Workspaces';
+import Account from '@/pages/settings/Account';
+import Appearance from '@/pages/settings/Appearance';
+import Settings from '@/pages/settings/Settings';
+import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import ErrorPage from '@/shared/error/ErrorPage';
 import PageNotFound from '@/shared/error/PageNotFound';
+import {ProjectApi} from '@/shared/middleware/automation/configuration';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter, redirect} from 'react-router-dom';
-
-import {ProjectKeys} from './queries/automation/projects.queries';
 
 const queryClient = new QueryClient();
 
@@ -111,7 +110,6 @@ export const router = createBrowserRouter([
                 element: <PageNotFound />,
                 path: '*',
             },
-
         ],
         element: <App />,
         errorElement: <ErrorPage />,

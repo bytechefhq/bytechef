@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {WorkflowModel} from '@/middleware/automation/configuration';
+import {WorkflowModel} from '@/shared/middleware/automation/configuration';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface ProjectInstanceWorkflowListItemDropDownProps {

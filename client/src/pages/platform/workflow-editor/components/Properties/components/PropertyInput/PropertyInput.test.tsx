@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import {render, screen, userEvent} from '@/utils/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it} from 'vitest';
 
 import PropertyInput from './PropertyInput';

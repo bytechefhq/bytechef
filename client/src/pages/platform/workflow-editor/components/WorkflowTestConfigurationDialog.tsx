@@ -11,21 +11,21 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {
     WorkflowConnectionModel,
     WorkflowInputModel,
     WorkflowModel,
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
-} from '@/middleware/platform/configuration';
-import {ConnectionModel} from '@/middleware/platform/connection';
-import {useSaveWorkflowTestConfigurationMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
-import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
-import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
-import {PropertyType} from '@/types/types';
+} from '@/shared/middleware/platform/configuration';
+import {ConnectionModel} from '@/shared/middleware/platform/connection';
+import {useSaveWorkflowTestConfigurationMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {PropertyType} from '@/shared/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';

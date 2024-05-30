@@ -1,16 +1,16 @@
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
+import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {
     ProjectInstanceModel,
     ProjectInstanceWorkflowConnectionModel,
     ProjectInstanceWorkflowModel,
     WorkflowConnectionModel,
     WorkflowModel,
-} from '@/middleware/automation/configuration';
-import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
-import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
-import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
+} from '@/shared/middleware/automation/configuration';
+import {useUpdateProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
+import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';

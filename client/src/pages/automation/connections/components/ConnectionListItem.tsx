@@ -18,12 +18,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
-import {useUpdateConnectionTagsMutation} from '@/mutations/automation/connectionTags.mutations';
-import {useDeleteConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {ConnectionKeys, useGetConnectionTagsQuery} from '@/queries/automation/connections.queries';
-import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
+import {ConnectionModel, TagModel} from '@/shared/middleware/automation/connection';
+import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
+import {
+    useDeleteConnectionMutation,
+    useUpdateConnectionMutation,
+} from '@/shared/mutations/automation/connections.mutations';
+import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
+import {
+    ComponentDefinitionKeys,
+    useGetComponentDefinitionQuery,
+} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';

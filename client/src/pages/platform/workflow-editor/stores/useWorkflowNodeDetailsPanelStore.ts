@@ -1,7 +1,7 @@
-import {ComponentDefinitionModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionModel} from '@/shared/middleware/platform/configuration';
 
 /* eslint-disable sort-keys */
-import {ComponentType, NodeType} from '@/types/types';
+import {ComponentType, NodeType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 

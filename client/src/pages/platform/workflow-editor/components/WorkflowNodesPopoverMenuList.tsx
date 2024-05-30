@@ -1,18 +1,18 @@
+import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/WorkflowNodesTabs';
+import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '@/middleware/platform/configuration';
-import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/WorkflowNodesTabs';
-import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import getFormattedName from '@/pages/platform/workflow-editor/utils/getFormattedName';
-import {ActionDefinitionKeys} from '@/queries/platform/actionDefinitions.queries';
-import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
-import {WorkflowNodeOutputKeys} from '@/queries/platform/workflowNodeOutputs.queries';
-import {ClickedItemType, PropertyType} from '@/types/types';
-import getRandomId from '@/utils/getRandomId';
+} from '@/shared/middleware/platform/configuration';
+import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {ClickedItemType, PropertyType} from '@/shared/types';
+import getRandomId from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {memo} from 'react';

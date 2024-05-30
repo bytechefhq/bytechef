@@ -47,5 +47,5 @@ export default function deleteProperty(
     );
 }
 
-import {ComponentType} from '@/types/types';
+import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';

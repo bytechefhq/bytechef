@@ -1,6 +1,6 @@
+import {WorkflowExecutionModel} from '@/shared/middleware/automation/workflow/execution';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 
 const WorkflowExecutionSheetPanel = ({workflowExecution}: {workflowExecution: WorkflowExecutionModel}) => {
     const {project, projectInstance, workflow} = workflowExecution;

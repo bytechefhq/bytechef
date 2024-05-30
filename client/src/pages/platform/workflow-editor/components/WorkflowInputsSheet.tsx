@@ -1,9 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import {WorkflowModel} from '@/middleware/automation/configuration';
-import {WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import WorkflowInputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetDialog';
 import WorkflowInputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetTable';
+import {WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {WorkflowTestConfigurationModel} from '@/shared/middleware/platform/configuration';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 

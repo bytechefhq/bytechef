@@ -10,23 +10,23 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.queries';
-import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
-import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {Cross2Icon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
 import {
     EnvironmentModel,
     ProjectInstanceModel,
     ProjectInstanceWorkflowConnectionModel,
     ProjectInstanceWorkflowModel,
     WorkflowConnectionModel,
-} from 'middleware/automation/configuration';
+} from '@/shared/middleware/automation/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
-} from 'mutations/automation/projectInstances.mutations';
+} from '@/shared/mutations/automation/projectInstances.mutations';
+import {ProjectInstanceTagKeys} from '@/shared/queries/automation/projectInstanceTags.queries';
+import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
+import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {Cross2Icon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';

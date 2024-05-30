@@ -8,10 +8,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
-import {ProjectModel} from '@/middleware/automation/configuration';
-import {useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
-import {useCreateProjectWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
+import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon} from 'lucide-react';
 import {ChangeEvent, useRef} from 'react';

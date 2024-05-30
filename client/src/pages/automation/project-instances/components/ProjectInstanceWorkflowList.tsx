@@ -1,10 +1,10 @@
 import {Skeleton} from '@/components/ui/skeleton';
-import {ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItem';
-import {useGetProjectVersionWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
-import {useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
+import {ProjectInstanceWorkflowModel} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
 const ProjectInstanceWorkflowList = ({
     projectId,

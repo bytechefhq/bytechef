@@ -1,10 +1,10 @@
+import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/DataPillPanelBodyInputsItem';
 import {
     ActionDefinitionModel,
     ComponentDefinitionBasicModel,
     type PropertyModel,
     TriggerDefinitionModel,
-} from '@/middleware/platform/configuration';
-import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/DataPillPanelBodyInputsItem';
+} from '@/shared/middleware/platform/configuration';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
 import DataPillPanelBodyPropertiesItem from './DataPillPanelBodyPropertiesItem';

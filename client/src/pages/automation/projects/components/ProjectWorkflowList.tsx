@@ -1,10 +1,10 @@
 import {Skeleton} from '@/components/ui/skeleton';
-import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/ProjectWorkflowListItem';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
-import {ProjectModel} from 'middleware/automation/configuration';
-import {useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
+import {ProjectModel} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
 const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: componentDefinitions, isLoading: isComponentDefinitionsLoading} = useGetComponentDefinitionsQuery({

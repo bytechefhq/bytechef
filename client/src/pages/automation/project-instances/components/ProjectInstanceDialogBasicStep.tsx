@@ -6,7 +6,7 @@ import ProjectInstanceDialogBasicStepProjectVersionsSelect from '@/pages/automat
 import ProjectInstanceDialogBasicStepProjectsComboBox from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectsComboBox';
 import ProjectInstanceDialogBasicStepTagsSelect from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepTagsSelect';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {ProjectInstanceModel} from 'middleware/automation/configuration';
+import {ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
 import {useState} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';

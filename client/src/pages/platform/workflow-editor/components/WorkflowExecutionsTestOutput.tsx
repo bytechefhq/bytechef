@@ -1,10 +1,10 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {JobModel, TaskExecutionModel, TriggerExecutionModel} from '@/middleware/platform/workflow/execution';
-import {WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
 import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
 import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
+import {JobModel, TaskExecutionModel, TriggerExecutionModel} from '@/shared/middleware/platform/workflow/execution';
+import {WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/test';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {RefreshCwIcon, RefreshCwOffIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';

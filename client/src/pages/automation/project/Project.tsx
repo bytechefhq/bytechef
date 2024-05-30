@@ -1,12 +1,5 @@
+import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {RightSidebar} from '@/layouts/RightSidebar';
-import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
-import {
-    useDeleteWorkflowNodeParameterMutation,
-    useUpdateWorkflowNodeParameterMutation,
-} from '@/mutations/automation/workflowNodeParameters.mutations';
-import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
-import useUpdatePlatformWorkflowMutation from '@/mutations/platform/workflows.mutations';
 import ProjectHeader from '@/pages/automation/project/components/ProjectHeader';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -26,25 +19,31 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {RightSidebar} from '@/shared/layout/RightSidebar';
+import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
+import {
+    useDeleteWorkflowNodeParameterMutation,
+    useUpdateWorkflowNodeParameterMutation,
+} from '@/shared/mutations/automation/workflowNodeParameters.mutations';
+import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetWorkspaceConnectionsQuery,
-} from '@/queries/automation/connections.queries';
-import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/queries/automation/projectWorkflows.queries';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {WorkflowKeys} from '@/queries/automation/workflows.queries';
-import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
-import {useGetWorkflowTestConfigurationQuery} from '@/queries/platform/workflowTestConfigurations.queries';
+} from '@/shared/queries/automation/connections.queries';
+import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
+import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
-
-import PageLoader from '../../../components/PageLoader';
-import LayoutContainer from '../../../layouts/LayoutContainer';
 
 const Project = () => {
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);

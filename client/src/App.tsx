@@ -1,8 +1,8 @@
 import {Toaster} from '@/components/ui/toaster';
 import useGlobalErrorInterceptor from '@/config/useGlobalErrorInterceptor';
-import {DesktopSidebar} from '@/layouts/DesktopSidebar';
-import {MobileSidebar} from '@/layouts/MobileSidebar';
-import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
+import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
+import {MobileSidebar} from '@/shared/layout/MobileSidebar';
+import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {ActivityIcon, FolderIcon, Layers3Icon, Link2Icon, LucideIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';

@@ -4,9 +4,9 @@ import {
     WorkflowModel,
     WorkflowTaskModel,
     WorkflowTriggerModel,
-} from '@/middleware/platform/configuration';
-import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
-import {WorkflowDefinitionType} from '@/types/types';
+} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 const SPACE = 4;

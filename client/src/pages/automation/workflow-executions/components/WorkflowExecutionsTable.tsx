@@ -1,7 +1,7 @@
 import {Badge} from '@/components/ui/badge';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {JobBasicModel, WorkflowExecutionModel} from '@/shared/middleware/automation/workflow/execution';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
-import {JobBasicModel, WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 

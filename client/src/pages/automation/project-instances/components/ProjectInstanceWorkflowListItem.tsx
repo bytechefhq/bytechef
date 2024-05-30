@@ -2,13 +2,17 @@ import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
-import {ProjectInstanceApi, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
-import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/automation/projectInstanceWorkflows.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import ProjectInstanceWorkflowListItemDropdownMenu from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItemDropdownMenu';
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
-import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
+import {
+    ProjectInstanceApi,
+    ProjectInstanceWorkflowModel,
+    WorkflowModel,
+} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
+import {useEnableProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
+import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, PlayIcon} from 'lucide-react';

@@ -1,9 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectModel, WorkflowModel} from '@/middleware/automation/configuration';
-import {WorkflowTestApi} from '@/middleware/platform/workflow/test';
-import {useDeleteProjectMutation} from '@/mutations/automation/projects.mutations';
-import {useCreateProjectWorkflowMutation, useDeleteWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteWorkflowAlertDialog';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/ProjectHeaderOutputButton';
@@ -19,12 +15,19 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
-import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
-import {ProjectWorkflowKeys} from '@/queries/automation/projectWorkflows.queries';
-import {ProjectKeys, useGetProjectQuery} from '@/queries/automation/projects.queries';
-import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
-import {UpdateWorkflowMutationType} from '@/types/types';
+import {ProjectModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
+import {useDeleteProjectMutation} from '@/shared/mutations/automation/projects.mutations';
+import {
+    useCreateProjectWorkflowMutation,
+    useDeleteWorkflowMutation,
+} from '@/shared/mutations/automation/workflows.mutations';
+import {ProjectCategoryKeys} from '@/shared/queries/automation/projectCategories.queries';
+import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {UpdateWorkflowMutationType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useState} from 'react';

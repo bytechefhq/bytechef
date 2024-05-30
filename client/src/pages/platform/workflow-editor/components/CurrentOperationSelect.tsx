@@ -1,10 +1,10 @@
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {ActionDefinitionBasicModel, TriggerDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
-import {ActionDefinitionBasicModel, TriggerDefinitionBasicModel} from 'middleware/platform/configuration';
 import {twMerge} from 'tailwind-merge';
 
 interface CurrentOperationSelectProps {

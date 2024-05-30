@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
 import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
-import {PropertyType} from '@/types/types';
+import {PropertyType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';

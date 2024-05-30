@@ -1,4 +1,4 @@
-import {ProjectModel} from '@/middleware/automation/configuration';
+import {ProjectModel} from '@/shared/middleware/automation/configuration';
 
 const ProjectInstanceDialogBasicStepProjectLabel = ({project}: {project: ProjectModel}) => (
     <div className="flex items-center">

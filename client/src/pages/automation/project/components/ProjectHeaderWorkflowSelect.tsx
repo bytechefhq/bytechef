@@ -7,7 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {useGetProjectWorkflowsQuery} from '@/queries/automation/projectWorkflows.queries';
+import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 
 const ProjectHeaderWorkflowSelect = ({
     onValueChange,

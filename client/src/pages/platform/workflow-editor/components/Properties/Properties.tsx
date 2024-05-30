@@ -1,4 +1,4 @@
-import {PropertyType} from '@/types/types';
+import {PropertyType} from '@/shared/types';
 import {Fragment} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {Control, FormState} from 'react-hook-form/dist/types/form';

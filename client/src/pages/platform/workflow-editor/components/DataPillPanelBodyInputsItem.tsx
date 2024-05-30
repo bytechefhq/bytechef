@@ -1,5 +1,5 @@
-import {PropertyTypeModel} from '@/middleware/platform/configuration';
 import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
+import {PropertyTypeModel} from '@/shared/middleware/platform/configuration';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon, FormInputIcon} from 'lucide-react';
 

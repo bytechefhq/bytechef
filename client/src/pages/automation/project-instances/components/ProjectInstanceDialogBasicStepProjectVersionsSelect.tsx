@@ -1,6 +1,6 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {ProjectStatusModel} from '@/middleware/automation/configuration';
-import {useGetProjectVersionsQuery} from '@/queries/automation/projectVersions.queries';
+import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 
 const ProjectInstanceDialogBasicStepProjectVersionsSelect = ({
     onChange,

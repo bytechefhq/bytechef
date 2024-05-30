@@ -1,4 +1,4 @@
-import {PropertyTypeModel} from '@/middleware/platform/configuration';
+import {PropertyTypeModel} from '@/shared/middleware/platform/configuration';
 
 export default function getParameterType(parameterValue: unknown): PropertyTypeModel {
     let parameterType = 'STRING';

@@ -6,10 +6,13 @@ import 'reactflow/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from '@/middleware/platform/configuration';
-import {useGetPreviousWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
-import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/queries/platform/workflowNodeParameters.queries';
-import {ComponentType, UpdateWorkflowMutationType} from '@/types/types';
+import {
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
+} from '@/shared/middleware/platform/configuration';
+import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
+import {ComponentType, UpdateWorkflowMutationType} from '@/shared/types';
 import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';

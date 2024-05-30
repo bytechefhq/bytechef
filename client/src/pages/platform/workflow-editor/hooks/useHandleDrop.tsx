@@ -1,15 +1,15 @@
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {ActionDefinitionKeys} from '@/queries/platform/actionDefinitions.queries';
-import {ComponentDefinitionKeys} from '@/queries/platform/componentDefinitions.queries';
-import getRandomId from '@/utils/getRandomId';
-import {QueryClient} from '@tanstack/react-query';
-import {PlayIcon} from 'lucide-react';
 import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
-} from 'middleware/platform/configuration';
+} from '@/shared/middleware/platform/configuration';
+import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import getRandomId from '@/shared/util/random-utils';
+import {QueryClient} from '@tanstack/react-query';
+import {PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 

@@ -1,19 +1,19 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {ProjectInstanceModel} from '@/middleware/automation/configuration';
 import ProjectInstanceWorkflowSheet from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
-import {useGetWorkspaceProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
-import {useGetWorkspaceProjectsQuery} from '@/queries/automation/projects.queries';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import PageHeader from '@/shared/layout/PageHeader';
+import {ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
+import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
+import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import LayoutContainer from '../../../layouts/LayoutContainer';
-import PageHeader from '../../../layouts/PageHeader';
 import ProjectInstanceDialog from './components/ProjectInstanceDialog';
 import ProjectInstanceList from './components/ProjectInstanceList';
 

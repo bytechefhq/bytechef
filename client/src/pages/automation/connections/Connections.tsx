@@ -1,22 +1,22 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {useCreateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import PageHeader from '@/shared/layout/PageHeader';
+import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetWorkspaceConnectionsQuery,
-} from '@/queries/automation/connections.queries';
-import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
+} from '@/shared/queries/automation/connections.queries';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import LayoutContainer from '../../../layouts/LayoutContainer';
-import PageHeader from '../../../layouts/PageHeader';
 import ConnectionList from './components/ConnectionList';
 
 export enum Type {

@@ -1,17 +1,17 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useGetProjectCategoriesQuery} from '@/queries/automation/projectCategories.queries';
-import {useGetProjectTagsQuery} from '@/queries/automation/projectTags.queries';
-import {useGetWorkspaceProjectsQuery} from '@/queries/automation/projects.queries';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import PageHeader from '@/shared/layout/PageHeader';
+import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
+import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FolderIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
-import LayoutContainer from '../../../layouts/LayoutContainer';
-import PageHeader from '../../../layouts/PageHeader';
 import ProjectDialog from './components/ProjectDialog';
 import ProjectList from './components/ProjectList';
 

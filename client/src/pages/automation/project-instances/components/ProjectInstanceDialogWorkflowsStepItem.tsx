@@ -1,9 +1,13 @@
 import {Label} from '@/components/ui/label';
 import {Switch} from '@/components/ui/switch';
-import {ProjectInstanceModel, WorkflowConnectionModel, WorkflowModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogWorkflowsStepItemConnections from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnections';
 import ProjectInstanceDialogWorkflowsStepItemInputs from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
+import {
+    ProjectInstanceModel,
+    WorkflowConnectionModel,
+    WorkflowModel,
+} from '@/shared/middleware/automation/configuration';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';

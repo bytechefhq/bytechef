@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ComponentType} from '@/types/types';
+import {ComponentType} from '@/shared/types';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';

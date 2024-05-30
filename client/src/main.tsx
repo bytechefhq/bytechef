@@ -5,7 +5,7 @@ import {worker} from './mocks/server';
 
 import './styles/index.css';
 
-import {ThemeProvider} from '@/providers/theme-provider';
+import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';

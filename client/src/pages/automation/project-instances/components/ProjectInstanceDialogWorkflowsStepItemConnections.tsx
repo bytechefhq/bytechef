@@ -1,5 +1,5 @@
-import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnection';
+import {ProjectInstanceModel, WorkflowConnectionModel} from '@/shared/middleware/automation/configuration';
 import {Control} from 'react-hook-form';
 
 const ProjectInstanceDialogWorkflowsStepItemConnections = ({

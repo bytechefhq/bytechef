@@ -1,5 +1,5 @@
 import {Input} from '@/components/ui/input';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/shared/middleware/platform/configuration';
 import {useEffect, useState} from 'react';
 
 import WorkflowNodesTabs from './WorkflowNodesTabs';

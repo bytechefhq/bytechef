@@ -1,7 +1,7 @@
-import {ProjectInstanceModel, WorkflowModel} from '@/middleware/automation/configuration';
-import {ControlTypeModel, PropertyTypeModel} from '@/middleware/platform/configuration';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
-import {PropertyType} from '@/types/types';
+import {ProjectInstanceModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {ControlTypeModel, PropertyTypeModel} from '@/shared/middleware/platform/configuration';
+import {PropertyType} from '@/shared/types';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {Control, FormState} from 'react-hook-form/dist/types/form';
 

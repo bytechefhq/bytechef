@@ -7,9 +7,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useDuplicateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {useDuplicateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 

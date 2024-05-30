@@ -1,5 +1,5 @@
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
-import {NodeType} from '@/types/types';
+import {NodeType} from '@/shared/types';
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 

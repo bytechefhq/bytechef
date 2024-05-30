@@ -17,18 +17,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectModel, WorkflowModel} from '@/middleware/automation/configuration';
-import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
+import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import {ProjectModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
     useUpdateWorkflowMutation,
-} from '@/mutations/automation/workflows.mutations';
-import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectWorkflowKeys} from '@/queries/automation/projectWorkflows.queries';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
-import {WorkflowKeys, useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
-import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
+} from '@/shared/mutations/automation/workflows.mutations';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';

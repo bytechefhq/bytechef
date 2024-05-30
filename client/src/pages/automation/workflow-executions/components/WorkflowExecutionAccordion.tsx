@@ -1,9 +1,9 @@
 import {Accordion} from '@/components/ui/accordion';
-import {JobModel, TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
 import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
 import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
 import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
+import {JobModel, TriggerExecutionModel} from '@/shared/middleware/automation/workflow/execution';
 import {AccordionContent, AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {twMerge} from 'tailwind-merge';
 

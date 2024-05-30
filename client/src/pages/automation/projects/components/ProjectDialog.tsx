@@ -12,12 +12,12 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {CategoryModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
-import {useCreateProjectMutation, useUpdateProjectMutation} from '@/mutations/automation/projects.mutations';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/queries/automation/projectCategories.queries';
-import {ProjectTagKeys, useGetProjectTagsQuery} from '@/queries/automation/projectTags.queries';
-import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {CategoryModel, ProjectModel, TagModel} from '@/shared/middleware/automation/configuration';
+import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
+import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
+import {ProjectTagKeys, useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';

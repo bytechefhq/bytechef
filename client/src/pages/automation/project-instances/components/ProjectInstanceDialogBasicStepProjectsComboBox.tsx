@@ -1,8 +1,8 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
-import {ProjectStatusModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogBasicStepProjectLabel from '@/pages/automation/project-instances/components/ProjectInstanceDialogBasicStepProjectLabel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useGetWorkspaceProjectsQuery} from '@/queries/automation/projects.queries';
+import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
+import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FocusEventHandler} from 'react';
 
 const ProjectInstanceDialogBasicStepProjectsComboBox = ({

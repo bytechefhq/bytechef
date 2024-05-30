@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
+import {WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/test';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 

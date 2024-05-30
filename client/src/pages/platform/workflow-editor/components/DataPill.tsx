@@ -1,7 +1,7 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {PropertyType} from '@/types/types';
+import {PropertyType} from '@/shared/types';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 

@@ -13,11 +13,15 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
-import {useSaveWorkflowTestConfigurationInputsMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
-import {WorkflowDefinitionType} from '@/types/types';
+import {
+    WorkflowInputModel,
+    WorkflowModel,
+    WorkflowTestConfigurationModel,
+} from '@/shared/middleware/platform/configuration';
+import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {WorkflowDefinitionType} from '@/shared/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';

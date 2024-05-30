@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
-import {WorkflowDefinitionType} from '@/types/types';
+import {WorkflowInputModel, WorkflowModel} from '@/shared/middleware/platform/configuration';
+import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 

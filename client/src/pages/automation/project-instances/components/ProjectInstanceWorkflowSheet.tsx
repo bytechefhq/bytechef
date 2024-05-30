@@ -1,6 +1,6 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
-import {useGetWorkflowQuery} from '@/queries/automation/workflows.queries';
+import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 
 const ProjectInstanceWorkflowSheet = () => {
     const {projectInstanceWorkflowSheetOpen, setProjectInstanceWorkflowSheetOpen, workflowId} =

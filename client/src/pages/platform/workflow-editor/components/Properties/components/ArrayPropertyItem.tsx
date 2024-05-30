@@ -1,5 +1,5 @@
-import {ControlTypeModel} from '@/middleware/platform/configuration';
-import {ArrayPropertyType, ComponentType, PropertyType} from '@/types/types';
+import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
+import {ArrayPropertyType, ComponentType, PropertyType} from '@/shared/types';
 
 import Property from '../Property';
 import DeletePropertyButton from './DeletePropertyButton';

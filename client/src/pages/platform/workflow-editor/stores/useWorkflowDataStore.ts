@@ -3,8 +3,8 @@ import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
     WorkflowModel,
-} from '@/middleware/platform/configuration';
-import {ComponentOperationType, DataPillType} from '@/types/types';
+} from '@/shared/middleware/platform/configuration';
+import {ComponentOperationType, DataPillType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 

@@ -1,5 +1,5 @@
 import {Badge} from '@/components/ui/badge';
-import {ProjectModel, ProjectStatusModel} from '@/middleware/automation/configuration';
+import {ProjectModel, ProjectStatusModel} from '@/shared/middleware/automation/configuration';
 
 const ProjectHeaderProjectVersionBadge = ({project}: {project: ProjectModel}) => (
     <Badge

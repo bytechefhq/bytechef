@@ -1,9 +1,12 @@
-import {ActionDefinitionBasicModel} from '@/middleware/platform/configuration';
-import {ComponentOperationType} from '@/types/types';
-import getRandomId from '@/utils/getRandomId';
+import {
+    ActionDefinitionBasicModel,
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
+} from '@/shared/middleware/platform/configuration';
+import {ComponentOperationType} from '@/shared/types';
+import getRandomId from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {usePrevious} from '@uidotdev/usehooks';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/platform/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
