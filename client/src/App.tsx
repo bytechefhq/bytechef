@@ -1,5 +1,5 @@
 import {Toaster} from '@/components/ui/toaster';
-import useGlobalErrorInterceptor from '@/interceptors/useGlobalErrorInterceptor';
+import useGlobalErrorInterceptor from '@/config/useGlobalErrorInterceptor';
 import {DesktopSidebar} from '@/layouts/DesktopSidebar';
 import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';

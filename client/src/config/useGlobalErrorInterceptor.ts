@@ -18,7 +18,7 @@ export default function useGlobalErrorInterceptor() {
                             variant: 'destructive',
                         });
                     })
-                    .catch((e) => console.error(e.message));
+                    .catch(() => {});
             }
 
             return response;
