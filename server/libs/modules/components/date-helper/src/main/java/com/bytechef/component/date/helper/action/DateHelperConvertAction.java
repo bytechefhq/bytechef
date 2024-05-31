@@ -97,7 +97,8 @@ public class DateHelperConvertAction {
     }
 
     private static int getDigitCount(long value) {
-        return String.valueOf(Math.abs(value))
-            .length();
+        String string = String.valueOf(Math.abs(value));
+
+        return string.length();
     }
 }

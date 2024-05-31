@@ -40,22 +40,26 @@ class DateHelperConvertActionTest {
     void testActionPerform() {
         mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
 
-        assertEquals("2024-05-24",
+        assertEquals(
+            "2024-05-24",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
         mockParameters(1716572102000L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
 
-        assertEquals("2024-05-24",
+        assertEquals(
+            "2024-05-24",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
         mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
 
-        assertEquals("2024-05-24T19:35:02.000+0200",
+        assertEquals(
+            "2024-05-24T19:35:02.000+0200",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
 
         mockParameters(1716572102977L, DATE_FORMAT_OPTION_ISO8601_DATE_TIME_VALUE);
 
-        assertEquals("2024-05-24T19:35:02.977+0200",
+        assertEquals(
+            "2024-05-24T19:35:02.977+0200",
             DateHelperConvertAction.perform(mockedParameters, mockedParameters, mockedContext));
     }
 
