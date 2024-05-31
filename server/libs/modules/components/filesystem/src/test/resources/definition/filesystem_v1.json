@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Filesystem",
-  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -45,8 +44,107 @@
     } ],
     "title": "Read from file",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": {
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "FILE_ENTRY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": true,
+          "name": "extension",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "controlType": "TEXT",
+          "languageId": null,
+          "maxLength": null,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": true,
+          "name": "mimeType",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "controlType": "TEXT",
+          "languageId": null,
+          "maxLength": null,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": true,
+          "name": "name",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "controlType": "TEXT",
+          "languageId": null,
+          "maxLength": null,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": true,
+          "name": "url",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": null,
+          "placeholder": null,
+          "controlType": "TEXT",
+          "languageId": null,
+          "maxLength": null,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        } ],
+        "controlType": "FILE_ENTRY"
+      },
+      "sampleOutput": null
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -175,7 +273,6 @@
     } ],
     "title": "Write to file",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -211,16 +308,17 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": {
         "bytes": 1024
       }
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -233,7 +331,6 @@
     "properties": null,
     "title": "Create Temp Directory",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -257,7 +354,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_tmp_dir"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -290,7 +388,6 @@
     } ],
     "title": "File Path",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -314,7 +411,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -371,7 +469,6 @@
     } ],
     "title": "List",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -461,21 +558,22 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "maxItems": null,
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -508,7 +606,6 @@
     } ],
     "title": "Create",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -532,7 +629,8 @@
         "optionsDataSource": null
       },
       "sampleOutput": "/sample_data"
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "defaultOutputFunction": true,
@@ -565,7 +663,6 @@
     } ],
     "title": "Remove",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
     "output": {
       "outputSchema": {
         "advancedOption": null,
@@ -593,7 +690,9 @@
         "controlType": "SELECT"
       },
       "sampleOutput": true
-    }
+    },
+    "perform": { }
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": null
 }

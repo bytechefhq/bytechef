@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Webhook",
-  "connection": null,
   "actions": null,
   "triggers": [ {
     "batch": null,
@@ -29,17 +28,17 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": null,
     "output": null,
     "deduplicate": null,
-    "poll": null,
-    "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": { }
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "poll": null,
+    "dynamicWebhookDisable": null,
+    "staticWebhookRequest": { },
+    "webhookValidate": null
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -75,17 +74,17 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": true,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": { },
     "output": null,
     "deduplicate": null,
-    "poll": null,
-    "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": { }
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "poll": null,
+    "dynamicWebhookDisable": null,
+    "staticWebhookRequest": { },
+    "webhookValidate": { }
   }, {
     "batch": null,
     "defaultOutputFunction": false,
@@ -131,8 +130,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Await workflow and respond",
     "type": "STATIC_WEBHOOK",
@@ -140,16 +139,17 @@
     "workflowNodeDescriptionFunction": null,
     "workflowSyncExecution": true,
     "workflowSyncValidation": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": { },
     "output": null,
     "deduplicate": null,
-    "poll": null,
-    "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "staticWebhookRequest": { }
-  } ]
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "poll": null,
+    "dynamicWebhookDisable": null,
+    "staticWebhookRequest": { },
+    "webhookValidate": { }
+  } ],
+  "connection": null
 }

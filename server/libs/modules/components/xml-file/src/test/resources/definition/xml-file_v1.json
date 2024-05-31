@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "XML File",
-  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -407,5 +406,6 @@
     },
     "perform": { }
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": null
 }

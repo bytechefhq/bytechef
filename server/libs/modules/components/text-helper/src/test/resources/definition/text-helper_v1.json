@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Text Helper",
-  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": true,
@@ -141,8 +140,9 @@
     } ],
     "title": "Extract Content from HTML",
     "workflowNodeDescriptionFunction": null,
-    "perform": { },
-    "output": null
+    "output": null,
+    "perform": { }
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": null
 }

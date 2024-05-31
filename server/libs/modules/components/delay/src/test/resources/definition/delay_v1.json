@@ -12,7 +12,6 @@
   "resources": null,
   "version": 1,
   "title": "Delay",
-  "connection": null,
   "actions": [ {
     "batch": null,
     "defaultOutputFunction": false,
@@ -47,5 +46,6 @@
     "output": null,
     "perform": { }
   } ],
-  "triggers": null
+  "triggers": null,
+  "connection": null
 }
