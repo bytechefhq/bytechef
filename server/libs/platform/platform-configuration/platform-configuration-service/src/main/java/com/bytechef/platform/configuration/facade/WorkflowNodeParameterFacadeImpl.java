@@ -83,7 +83,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         ParameterMapPropertiesResult result =
             getParameterMapProperties(workflowNodeName, definitionMap);
 
-        setParameter(path, null, result.parameterMap);
+        String[] pathItems = path.split("\\.");
+
+        setParameter(pathItems, null, result.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -126,23 +128,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         ParameterMapPropertiesResult result = getParameterMapProperties(workflowNodeName, definitionMap);
 
-        setParameter(path, value, result.parameterMap);
-
-        Map<String, Boolean> displayConditionMap = Map.of();
-
         String[] pathItems = path.split("\\.");
 
+        setParameter(pathItems, value, result.parameterMap);
+
+        Map<String, Boolean> displayConditionMap;
+
         // For now only check the first, root level of properties on which other properties could depend on
-        if (pathItems.length == 1) {
-            checkDependOn(pathItems[0], result.properties(), result.parameterMap);
 
-            Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-                workflow.getId());
+        checkDependOn(pathItems[0], result.properties(), result.parameterMap);
 
-            displayConditionMap = checkDisplayConditionsParameters(
-                workflowNodeName, pathItems[0], result.properties, workflow, result.parameterMap, inputMap,
-                result.taskParameters);
-        }
+        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+            workflow.getId());
+
+        displayConditionMap = checkDisplayConditionsParameters(
+            workflowNodeName, pathItems[0], result.properties, workflow, result.parameterMap, inputMap,
+            result.taskParameters);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -363,10 +364,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private void setParameter(String path, Object value, Map<String, ?> parameterMap) {
+    private void setParameter(String[] pathItems, Object value, Map<String, ?> parameterMap) {
         Map<String, Object> map = (Map<String, Object>) parameterMap;
-
-        String[] pathItems = path.split("\\.");
 
         for (int i = 0; i < pathItems.length; i++) {
             String pathItem = pathItems[i];
