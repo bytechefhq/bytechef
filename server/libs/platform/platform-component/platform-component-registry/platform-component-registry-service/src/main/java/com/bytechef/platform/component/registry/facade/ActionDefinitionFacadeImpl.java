@@ -29,7 +29,7 @@ import com.bytechef.platform.component.registry.service.ConnectionDefinitionServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Type;
-import com.bytechef.platform.exception.PartyAccessException;
+import com.bytechef.platform.exception.ProviderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +155,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, Long connectionId, Exception exception,
         ComponentConnection componentConnection, ActionContext actionContext) {
 
-        if (!Objects.equals(PartyAccessException.AuthorizationFailedException.class, exception.getClass()) &&
+        if (!Objects.equals(ProviderException.AuthorizationFailedException.class, exception.getClass()) &&
             !StringUtils.contains(exception.getMessage(), "401")) {
 
             throw new UnsupportedOperationException(

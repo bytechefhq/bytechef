@@ -19,59 +19,59 @@ package com.bytechef.platform.exception;
 /**
  * @author Igor Beslic
  */
-public abstract class PartyAccessException extends AbstractException {
+public abstract class ProviderException extends AbstractException {
 
-    public static PartyAccessException getByHttpResponseCode(int code, String message) {
+    public static ProviderException getByHttpResponseCode(int code, String message) {
         return switch (code) {
-            case 400 -> new BadRequestException(message, new PartyAccessErrorType());
-            case 401 -> new AuthorizationFailedException(message, new PartyAccessErrorType());
-            case 403 -> new UnauthorizedRequestException(message, new PartyAccessErrorType());
-            case 404 -> new NotFoundException(message, new PartyAccessErrorType());
-            default -> new GeneralException(message, new PartyAccessErrorType());
+            case 400 -> new BadRequestException(message, new ProviderErrorType());
+            case 401 -> new AuthorizationFailedException(message, new ProviderErrorType());
+            case 403 -> new UnauthorizedRequestException(message, new ProviderErrorType());
+            case 404 -> new NotFoundException(message, new ProviderErrorType());
+            default -> new GeneralException(message, new ProviderErrorType());
         };
     }
 
-    public PartyAccessException(String message, ErrorType errorType) {
+    public ProviderException(String message, ErrorType errorType) {
         super(message, errorType);
     }
 
-    public static class UnauthorizedRequestException extends PartyAccessException {
+    public static class UnauthorizedRequestException extends ProviderException {
         public UnauthorizedRequestException(String message, ErrorType errorType) {
             super(message, errorType);
         }
     }
 
-    public static class AuthorizationFailedException extends PartyAccessException {
+    public static class AuthorizationFailedException extends ProviderException {
         public AuthorizationFailedException(String message, ErrorType errorType) {
             super(message, errorType);
         }
     }
 
-    public static class AuthenticationFailedException extends PartyAccessException {
+    public static class AuthenticationFailedException extends ProviderException {
         public AuthenticationFailedException(String message, ErrorType errorType) {
             super(message, errorType);
         }
     }
 
-    public static class BadRequestException extends PartyAccessException {
+    public static class BadRequestException extends ProviderException {
         public BadRequestException(String message, ErrorType errorType) {
             super(message, errorType);
         }
     }
 
-    public static class NotFoundException extends PartyAccessException {
+    public static class NotFoundException extends ProviderException {
         public NotFoundException(String message, ErrorType errorType) {
             super(message, errorType);
         }
     }
 
-    public static class GeneralException extends PartyAccessException {
+    public static class GeneralException extends ProviderException {
         public GeneralException(String message, ErrorType errorType) {
             super(message, errorType);
         }
     }
 
-    public static class PartyAccessErrorType implements ErrorType {
+    public static class ProviderErrorType implements ErrorType {
         @Override
         public Class<?> getErrorClass() {
             return getClass();
