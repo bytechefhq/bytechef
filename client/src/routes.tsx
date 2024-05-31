@@ -26,10 +26,10 @@ export const router = createBrowserRouter([
     {
         children: [
             {
+                index: true,
                 loader: async () => {
                     return redirect('automation/projects');
                 },
-                path: '',
             },
             {
                 children: [
@@ -67,7 +67,7 @@ export const router = createBrowserRouter([
                                 loader: async () => {
                                     return redirect('account');
                                 },
-                                path: '',
+                                index: true,
                             },
                             {
                                 element: <Account />,
