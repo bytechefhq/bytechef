@@ -16,103 +16,102 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
-const queryClient = new QueryClient();
-
-export const router = createBrowserRouter([
-    {
-        element: <OAuthPopup />,
-        path: '/callback',
-    },
-    {
-        children: [
-            {
-                index: true,
-                loader: async () => {
-                    return redirect('automation/projects');
+export const getRouter = (queryClient: QueryClient) =>
+    createBrowserRouter([
+        {
+            element: <OAuthPopup />,
+            path: '/callback',
+        },
+        {
+            children: [
+                {
+                    index: true,
+                    loader: async () => {
+                        return redirect('automation/projects');
+                    },
                 },
-            },
-            {
-                children: [
-                    {
-                        element: <Project />,
-                        loader: async ({params}) =>
-                            queryClient.ensureQueryData({
-                                queryFn: () =>
-                                    new ProjectApi().getProject({
-                                        id: parseInt(params.projectId!),
-                                    }),
-                                queryKey: ProjectKeys.project(parseInt(params.projectId!)),
-                            }),
-                        path: 'projects/:projectId/project-workflows/:projectWorkflowId',
-                    },
-                    {
-                        element: <Projects />,
-                        path: 'projects',
-                    },
-                    {
-                        element: <ProjectInstances />,
-                        path: 'instances',
-                    },
-                    {
-                        element: <AutomationConnections />,
-                        path: 'connections',
-                    },
-                    {
-                        element: <AutomationWorkflowExecutions />,
-                        path: 'executions',
-                    },
-                    {
-                        children: [
-                            {
-                                index: true,
-                                loader: async () => {
-                                    return redirect('account');
+                {
+                    children: [
+                        {
+                            element: <Project />,
+                            loader: async ({params}) =>
+                                queryClient.ensureQueryData({
+                                    queryFn: () =>
+                                        new ProjectApi().getProject({
+                                            id: parseInt(params.projectId!),
+                                        }),
+                                    queryKey: ProjectKeys.project(parseInt(params.projectId!)),
+                                }),
+                            path: 'projects/:projectId/project-workflows/:projectWorkflowId',
+                        },
+                        {
+                            element: <Projects />,
+                            path: 'projects',
+                        },
+                        {
+                            element: <ProjectInstances />,
+                            path: 'instances',
+                        },
+                        {
+                            element: <AutomationConnections />,
+                            path: 'connections',
+                        },
+                        {
+                            element: <AutomationWorkflowExecutions />,
+                            path: 'executions',
+                        },
+                        {
+                            children: [
+                                {
+                                    index: true,
+                                    loader: async () => {
+                                        return redirect('account');
+                                    },
                                 },
-                            },
-                            {
-                                element: <Account />,
-                                path: 'account',
-                            },
-                            {
-                                element: <Appearance />,
-                                path: 'appearance',
-                            },
-                            {
-                                element: <Workspaces />,
-                                path: 'workspaces',
-                            },
-                        ],
-                        element: (
-                            <Settings
-                                sidebarNavItems={[
-                                    {
-                                        href: '/automation/settings/account',
-                                        title: 'Account',
-                                    },
-                                    {
-                                        href: '/automation/settings/appearance',
-                                        title: 'Appearance',
-                                    },
-                                    {
-                                        href: '/automation/settings/workspaces',
-                                        title: 'Workspaces',
-                                    },
-                                ]}
-                            />
-                        ),
-                        path: 'settings',
-                    },
-                ],
-                errorElement: <ErrorPage />,
-                path: 'automation',
-            },
-            {
-                element: <PageNotFound />,
-                path: '*',
-            },
-        ],
-        element: <App />,
-        errorElement: <ErrorPage />,
-        path: '/',
-    },
-]);
+                                {
+                                    element: <Account />,
+                                    path: 'account',
+                                },
+                                {
+                                    element: <Appearance />,
+                                    path: 'appearance',
+                                },
+                                {
+                                    element: <Workspaces />,
+                                    path: 'workspaces',
+                                },
+                            ],
+                            element: (
+                                <Settings
+                                    sidebarNavItems={[
+                                        {
+                                            href: '/automation/settings/account',
+                                            title: 'Account',
+                                        },
+                                        {
+                                            href: '/automation/settings/appearance',
+                                            title: 'Appearance',
+                                        },
+                                        {
+                                            href: '/automation/settings/workspaces',
+                                            title: 'Workspaces',
+                                        },
+                                    ]}
+                                />
+                            ),
+                            path: 'settings',
+                        },
+                    ],
+                    errorElement: <ErrorPage />,
+                    path: 'automation',
+                },
+                {
+                    element: <PageNotFound />,
+                    path: '*',
+                },
+            ],
+            element: <App />,
+            errorElement: <ErrorPage />,
+            path: '/',
+        },
+    ]);

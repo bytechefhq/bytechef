@@ -16,7 +16,7 @@ import {RouterProvider} from 'react-router-dom';
 
 import useWorkflowDataStore from './pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {router} from './routes';
+import {getRouter} from './routes';
 
 window.MonacoEnvironment = {
     getWorker(moduleId: string, label: string) {
@@ -45,6 +45,8 @@ function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
     const root = createRoot(container);
     const queryClient = new QueryClient();
+
+    const router = getRouter(queryClient);
 
     router.subscribe(() => {
         useWorkflowDataStore.getState().reset();
