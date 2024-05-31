@@ -3,9 +3,9 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ProjectInstanceWorkflowSheet from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import PageHeader from '@/shared/layout/PageHeader';
 import {ProjectInstanceModel} from '@/shared/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projectInstanceTags.queries';
 import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
@@ -92,7 +92,7 @@ const ProjectInstances = () => {
             header={
                 projectInstances &&
                 projectInstances?.length > 0 && (
-                    <PageHeader
+                    <Header
                         centerTitle={true}
                         position="main"
                         right={<ProjectInstanceDialog triggerNode={<Button>New Instance</Button>} />}
@@ -179,7 +179,7 @@ const ProjectInstances = () => {
                     />
                 </>
             }
-            leftSidebarHeader={<PageHeader position="sidebar" title="Instances" />}
+            leftSidebarHeader={<Header position="sidebar" title="Instances" />}
         >
             <PageLoader
                 errors={[projectsError, projectInstancesError, tagsError]}

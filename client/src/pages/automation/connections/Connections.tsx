@@ -3,9 +3,9 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import PageHeader from '@/shared/layout/PageHeader';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,
@@ -83,7 +83,7 @@ export const Connections = () => {
             header={
                 connections &&
                 connections.length > 0 && (
-                    <PageHeader
+                    <Header
                         centerTitle={true}
                         position="main"
                         right={
@@ -177,7 +177,7 @@ export const Connections = () => {
                     />
                 </>
             }
-            leftSidebarHeader={<PageHeader position="sidebar" title="Connections" />}
+            leftSidebarHeader={<Header position="sidebar" title="Connections" />}
         >
             <PageLoader
                 errors={[allConnectionsError, connectionsError, tagsError]}

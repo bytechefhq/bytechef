@@ -2,9 +2,9 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import PageHeader from '@/shared/layout/PageHeader';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -65,7 +65,7 @@ const Projects = () => {
             header={
                 projects &&
                 projects.length > 0 && (
-                    <PageHeader
+                    <Header
                         centerTitle={true}
                         position="main"
                         right={
@@ -164,7 +164,7 @@ const Projects = () => {
                     />
                 </>
             }
-            leftSidebarHeader={<PageHeader position="sidebar" title="Projects" />}
+            leftSidebarHeader={<Header position="sidebar" title="Projects" />}
         >
             <PageLoader
                 errors={[categoriesError, projectsError, tagsError]}

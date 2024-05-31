@@ -1,7 +1,7 @@
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-interface PageHeaderProps {
+interface HeaderProps {
     centerTitle?: boolean;
     className?: string;
     position?: 'main' | 'sidebar';
@@ -10,14 +10,7 @@ interface PageHeaderProps {
     titleClassName?: string;
 }
 
-const PageHeader = ({
-    centerTitle = false,
-    className,
-    position = 'sidebar',
-    right,
-    title,
-    titleClassName,
-}: PageHeaderProps) => (
+const Header = ({centerTitle = false, className, position = 'sidebar', right, title, titleClassName}: HeaderProps) => (
     <header className={twMerge('p-4', centerTitle && '2xl:mx-auto 2xl:w-4/5', className)}>
         <div className="flex w-full items-center justify-between">
             <div
@@ -35,4 +28,4 @@ const PageHeader = ({
     </header>
 );
 
-export default PageHeader;
+export default Header;

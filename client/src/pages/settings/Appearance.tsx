@@ -1,7 +1,7 @@
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import PageHeader from '@/shared/layout/PageHeader';
 import {useTheme} from '@/shared/providers/theme-provider';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
@@ -27,7 +27,7 @@ export default function Appearance() {
 
     return (
         <LayoutContainer
-            header={<PageHeader centerTitle={true} position="main" title="Appeearance" />}
+            header={<Header centerTitle={true} position="main" title="Appeearance" />}
             leftSidebarOpen={false}
         >
             <Form {...form}>

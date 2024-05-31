@@ -1,6 +1,6 @@
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import PageHeader from '@/shared/layout/PageHeader';
 import {Outlet, useLocation} from 'react-router-dom';
 
 interface SettingsProps {
@@ -35,7 +35,7 @@ export default function Settings({sidebarNavItems}: SettingsProps) {
                     )}
                 />
             }
-            leftSidebarHeader={<PageHeader position="sidebar" title="Settings" />}
+            leftSidebarHeader={<Header position="sidebar" title="Settings" />}
         >
             <div className="size-full">
                 <Outlet />

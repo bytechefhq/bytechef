@@ -5,9 +5,9 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import Footer from '@/shared/layout/Footer';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import PageFooter from '@/shared/layout/PageFooter';
-import PageHeader from '@/shared/layout/PageHeader';
 import {ProjectModel} from '@/shared/middleware/automation/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
@@ -271,7 +271,7 @@ export const WorkflowExecutions = () => {
             footer={
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
-                    <PageFooter position="main">
+                    <Footer position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber ? filterPageNumber : 0}
@@ -279,13 +279,13 @@ export const WorkflowExecutions = () => {
                             totalElements={workflowExecutionPage.totalElements!}
                             totalPages={workflowExecutionPage.totalPages!}
                         />
-                    </PageFooter>
+                    </Footer>
                 )
             }
             header={
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
-                    <PageHeader centerTitle={true} position="main" title="All Workflow Executions" />
+                    <Header centerTitle={true} position="main" title="All Workflow Executions" />
                 )
             }
             leftSidebarBody={
@@ -370,7 +370,7 @@ export const WorkflowExecutions = () => {
                     </div>
                 </div>
             }
-            leftSidebarHeader={<PageHeader position="sidebar" title="Execution History" />}
+            leftSidebarHeader={<Header position="sidebar" title="Execution History" />}
             leftSidebarWidth="72"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>

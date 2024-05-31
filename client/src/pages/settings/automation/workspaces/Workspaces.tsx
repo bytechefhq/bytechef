@@ -3,8 +3,8 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import WorkspaceDialog from '@/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import WorkspaceList from '@/pages/settings/automation/workspaces/components/WorkspaceList';
+import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import PageHeader from '@/shared/layout/PageHeader';
 import {useGetWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {ZapIcon} from 'lucide-react';
 
@@ -15,7 +15,7 @@ const Workspaces = () => {
         <PageLoader errors={[workspacesError]} loading={workspacesIsLoading}>
             <LayoutContainer
                 header={
-                    <PageHeader
+                    <Header
                         className="w-full px-4 2xl:mx-auto 2xl:w-4/5"
                         position="main"
                         right={
