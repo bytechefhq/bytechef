@@ -64,10 +64,10 @@ export const router = createBrowserRouter([
                     {
                         children: [
                             {
+                                index: true,
                                 loader: async () => {
                                     return redirect('account');
                                 },
-                                index: true,
                             },
                             {
                                 element: <Account />,
