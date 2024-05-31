@@ -1,5 +1,5 @@
 {
-  "categories": null,
+  "categories": [ "HELPERS" ],
   "customAction": null,
   "customActionHelp": null,
   "dataStreamItemReader": null,
@@ -76,7 +76,30 @@
     "title": "Convert Date Timestamp",
     "workflowNodeDescriptionFunction": null,
     "perform": { },
-    "output": null
+    "output": {
+      "outputSchema": {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "controlType": "TEXT",
+        "languageId": null,
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      },
+      "sampleOutput": null
+    }
   } ],
   "triggers": null
 }
