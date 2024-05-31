@@ -17,6 +17,7 @@
 package com.bytechef.component.file.storage.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.DOWNLOAD;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
@@ -56,7 +57,7 @@ public class FileStorageDownloadAction {
                 .description(
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
-        .output()
+        .outputSchema(fileEntry())
         .perform(FileStorageDownloadAction::perform);
 
     /**

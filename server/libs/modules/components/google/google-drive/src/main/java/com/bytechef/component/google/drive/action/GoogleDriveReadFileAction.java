@@ -17,6 +17,7 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.READ_FILE;
@@ -48,7 +49,7 @@ public final class GoogleDriveReadFileAction {
                 .description("The id of a file to read.")
                 .options((ActionOptionsFunction<String>) GoogleDriveOptionUtils::getFileOptions)
                 .required(true))
-        .output()
+        .outputSchema(fileEntry())
         .perform(GoogleDriveReadFileAction::perform);
 
     private GoogleDriveReadFileAction() {

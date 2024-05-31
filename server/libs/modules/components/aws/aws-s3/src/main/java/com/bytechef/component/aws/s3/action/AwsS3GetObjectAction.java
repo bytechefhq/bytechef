@@ -21,6 +21,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.FILENAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.GET_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
@@ -51,7 +52,7 @@ public class AwsS3GetObjectAction {
                 .description("Key is most likely the name of the file.")
                 .placeholder("file.txt")
                 .required(true))
-        .output()
+        .outputSchema(fileEntry())
         .perform(AwsS3GetObjectAction::perform);
 
     protected static FileEntry perform(

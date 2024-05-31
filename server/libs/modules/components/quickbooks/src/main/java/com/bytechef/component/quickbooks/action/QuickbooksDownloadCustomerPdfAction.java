@@ -17,6 +17,7 @@
 package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER_ID;
@@ -52,7 +53,7 @@ public final class QuickbooksDownloadCustomerPdfAction {
                 .label("Customer")
                 .description("The id of a customer to download the pdf for.")
                 .options((ActionOptionsFunction<String>) QuickbooksDownloadCustomerPdfAction::getAllCustomerOptions))
-        .output()
+        .outputSchema(fileEntry())
         .perform(QuickbooksDownloadCustomerPdfAction::perform);
 
     private QuickbooksDownloadCustomerPdfAction() {
