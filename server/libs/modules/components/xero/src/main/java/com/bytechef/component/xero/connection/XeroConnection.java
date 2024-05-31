@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
@@ -71,14 +72,13 @@ public class XeroConnection {
         Http.Response response = context
             .http(http -> http.get("https://api.xero.com/connections"))
             .body(
-                Http.Body.of(
+                Body.of(
                     Map.of(
                         "Authorization", BEARER + " " + accessToken,
                         "Content-Type", "application/json")))
             .header(AUTHORIZATION, BEARER + " " + accessToken)
             .configuration(
-                Http
-                    .responseType(Http.ResponseType.JSON)
+                Http.responseType(Http.ResponseType.JSON)
                     .disableAuthorization(true))
             .execute();
 
