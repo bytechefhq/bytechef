@@ -9,8 +9,8 @@ import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 
-import getParameterByPath from '../../utils/getParameterByPath';
 import getParameterType from '../../utils/getParameterType';
+import getParameterValueByPath from '../../utils/getParameterValueByPath';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
 
@@ -54,7 +54,11 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     };
 
     const handleDeleteClick = (path: string, index: number) => {
-        const clickedItemParameter = getParameterByPath(path, currentComponent)?.[index];
+        if (!currentComponent || !path) {
+            return;
+        }
+
+        const clickedItemParameter = getParameterValueByPath(path, currentComponent.parameters)?.[index];
 
         if (clickedItemParameter) {
             onDeleteClick(path, undefined, index);
@@ -90,8 +94,8 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         let params = currentComponent.parameters;
 
-        if (path && path !== 'parameters') {
-            params = getParameterByPath(path, currentComponent);
+        if (path) {
+            params = getParameterValueByPath(path, currentComponent.parameters);
         }
 
         const currentParams: Array<ArrayPropertyType> = params?.[name]?.filter(

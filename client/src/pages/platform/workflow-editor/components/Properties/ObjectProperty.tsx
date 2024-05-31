@@ -11,8 +11,8 @@ import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import getParameterByPath from '../../utils/getParameterByPath';
 import getParameterType from '../../utils/getParameterType';
+import getParameterValueByPath from '../../utils/getParameterValueByPath';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
 
@@ -72,6 +72,14 @@ const ObjectProperty = ({
         }
     }
 
+    if (!path) {
+        path = name;
+    }
+
+    if (name === '__item' && path) {
+        path = path.replace('.__item', '');
+    }
+
     const handleAddItemClick = () => {
         const newItem: SubPropertyType = {
             additionalProperties,
@@ -104,12 +112,10 @@ const ObjectProperty = ({
             return;
         }
 
-        let parameterObject = getParameterByPath(path, currentComponent);
+        let parameterObject = getParameterValueByPath(path, currentComponent.parameters);
 
         if (parameterObject && arrayName && arrayIndex) {
             parameterObject = parameterObject[arrayIndex];
-        } else if (parameterObject && name !== '__item') {
-            parameterObject = parameterObject[name];
         }
 
         if (!parameterObject) {
@@ -182,7 +188,7 @@ const ObjectProperty = ({
                                 objectName={arrayName ? '' : name}
                                 operationName={operationName}
                                 parameterValue={subPropertyDefaultValue}
-                                path={`${path}.${name}`}
+                                path={`${path}.${subProperty.name}`}
                                 property={{
                                     ...subProperty,
                                     name: subProperty.name,

@@ -30,7 +30,7 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
-import getParameterByPath from '../../utils/getParameterByPath';
+import getParameterValueByPath from '../../utils/getParameterValueByPath';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -74,7 +74,7 @@ const Property = ({
     objectName,
     operationName,
     parameterValue,
-    path = 'parameters',
+    path,
     property,
     showDeletePropertyButton = false,
 }: PropertyProps) => {
@@ -151,8 +151,16 @@ const Property = ({
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
 
+    if (arrayIndex !== undefined && arrayName) {
+        path = `${path}.${arrayName}`;
+    }
+
+    if (!path && name) {
+        path = name;
+    }
+
     const saveInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow || !name || !updateWorkflowNodeParameterMutation) {
+        if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
             return;
         }
 
@@ -160,7 +168,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: isNumericalInput ? numericValueToSave : inputValue,
@@ -169,7 +177,7 @@ const Property = ({
     }, 200);
 
     const saveMentionInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow.id || !updateWorkflowNodeParameterMutation || !name) {
+        if (!currentComponent || !workflow.id || !updateWorkflowNodeParameterMutation || !name || !path) {
             return;
         }
 
@@ -237,9 +245,9 @@ const Property = ({
         let currentValue;
 
         if (arrayName && arrayIndex !== undefined) {
-            if (path?.includes('parameters')) {
+            if (path?.includes('.')) {
                 if (objectName) {
-                    const matchingObject = getParameterByPath(path, currentComponent);
+                    const matchingObject = getParameterValueByPath(path, parameters);
 
                     currentValue = matchingObject[name];
                 } else {
@@ -249,21 +257,10 @@ const Property = ({
                 currentValue = parameters[arrayName];
             }
         } else if (objectName && parameters && path) {
-            const matchingObject = getParameterByPath(path, currentComponent);
+            const paramValue = getParameterValueByPath(path, parameters);
 
-            if (matchingObject) {
-                currentValue = matchingObject[name];
-            } else {
-                saveProperty({
-                    currentComponent,
-                    path: `${path}${name ? '.' || name : ''}`,
-                    setCurrentComponent,
-                    updateWorkflowNodeParameterMutation,
-                    value: strippedValue || null,
-                    workflowId: workflow.id!,
-                });
-
-                return;
+            if (paramValue) {
+                currentValue = paramValue;
             }
         } else {
             currentValue = parameters[name as string];
@@ -275,7 +272,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: strippedValue || null,
@@ -284,13 +281,13 @@ const Property = ({
     }, 200);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
-        if (!currentComponent || !name || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
             return;
         }
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value,
@@ -298,7 +295,7 @@ const Property = ({
         });
     }, 200);
 
-    const handleDeleteCustomPropertyClick = (path: string, name?: string, arrayIndex?: number) => {console.log(name)
+    const handleDeleteCustomPropertyClick = (path: string, name?: string, arrayIndex?: number) => {
         deleteProperty(
             workflow.id!,
             `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
@@ -347,7 +344,7 @@ const Property = ({
     };
 
     const handleMentionsInputChange = (value: string) => {
-        const parentParameterValue = getParameterByPath(path, currentComponent);
+        const parentParameterValue = path && getParameterValueByPath(path, currentComponent?.parameters);
 
         if (!parentParameterValue && !parameterValue && propertyParameterValue) {
             setMentionInputValue('');
@@ -381,11 +378,11 @@ const Property = ({
             }, 50);
         }
 
-        if (!currentComponent || !name || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
             return;
         }
 
-        const parentParameterValue = getParameterByPath(path, currentComponent);
+        const parentParameterValue = getParameterValueByPath(path, currentComponent.parameters);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -405,7 +402,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path,
             setCurrentComponent,
             successCallback: () => {
                 setNumericValue('');
@@ -421,7 +418,7 @@ const Property = ({
     };
 
     const handleSelectChange = (value: string, name: string) => {
-        if (!currentComponent || !workflow.id || !name || !updateWorkflowNodeParameterMutation) {
+        if (!currentComponent || !workflow.id || !name || !path || !updateWorkflowNodeParameterMutation) {
             return;
         }
 
@@ -429,7 +426,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            path: `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path,
             setCurrentComponent,
             updateWorkflowNodeParameterMutation,
             value: type === 'BOOLEAN' ? value === 'true' : value,
@@ -482,7 +479,7 @@ const Property = ({
     }, [controlType, properties?.length, propertyParameterValue]);
 
     useEffect(() => {
-        if (formState && name) {
+        if (formState && name && path) {
             setHasError(
                 formState.touchedFields[path] &&
                     formState.touchedFields[path]![name] &&
@@ -505,13 +502,13 @@ const Property = ({
                 (component) => component.name === currentNode?.name
             );
 
-            let params = currentWorkflowComponent?.parameters;
+            if (path?.includes('.')) {
+                setPropertyParameterValue(getParameterValueByPath(path, currentWorkflowComponent?.parameters));
 
-            if (path && path !== 'parameters') {
-                params = getParameterByPath(path, currentWorkflowComponent);
+                return;
             }
 
-            setPropertyParameterValue(name ? (params?.[name] as unknown as string) : '');
+            setPropertyParameterValue(currentWorkflowComponent?.parameters?.[name]);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -661,6 +658,7 @@ const Property = ({
             !workflow.definition ||
             !currentNode?.name ||
             !name ||
+            !path ||
             !(showPropertyCodeEditorSheet || showWorkflowCodeEditorSheet)
         ) {
             return;
@@ -672,10 +670,10 @@ const Property = ({
             (node) => node.name === currentNode?.name
         );
 
-        const value = getParameterByPath(path, currentWorkflowNode)?.[name];
+        const paramValue = getParameterValueByPath(path, currentWorkflowNode.parameters);
 
-        if (value) {
-            setPropertyParameterValue(value);
+        if (paramValue) {
+            setPropertyParameterValue(paramValue);
         } else {
             setPropertyParameterValue('');
         }
