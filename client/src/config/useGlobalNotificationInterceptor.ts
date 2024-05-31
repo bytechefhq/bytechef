@@ -1,7 +1,7 @@
 import {useToast} from '@/components/ui/use-toast';
 import fetchIntercept from 'fetch-intercept';
 
-export default function useGlobalErrorInterceptor() {
+export default function useGlobalNotificationInterceptor() {
     const {toast} = useToast();
 
     const unregister = fetchIntercept.register({

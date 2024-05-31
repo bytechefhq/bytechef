@@ -1,5 +1,5 @@
 import {Toaster} from '@/components/ui/toaster';
-import useGlobalErrorInterceptor from '@/config/useGlobalErrorInterceptor';
+import useGlobalNotificationInterceptor from '@/config/useGlobalNotificationInterceptor';
 import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
@@ -52,7 +52,7 @@ function App() {
 
     const location = useLocation();
 
-    useGlobalErrorInterceptor();
+    useGlobalNotificationInterceptor();
 
     useEffect(() => {
         document.title = titles[location.pathname] ?? 'ByteChef';
