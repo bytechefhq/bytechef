@@ -232,7 +232,6 @@ const WorkflowNodesPopoverMenuList = memo(
                         updateWorkflowMutation,
                         previousWorkflowNodeIndex,
                         () => {
-                            // console.log(currentNode?.name)
                             queryClient.invalidateQueries({
                                 queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                                     id: workflow.id!,
