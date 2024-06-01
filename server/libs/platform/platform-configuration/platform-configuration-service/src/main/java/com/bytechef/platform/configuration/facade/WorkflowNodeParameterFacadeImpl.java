@@ -386,16 +386,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 Pattern pattern = Pattern.compile("\\[(\\d+)]");
                 Matcher matcher = pattern.matcher(arrays);
 
-                while (matcher.find()) {
-                    int arrayIndex = Integer.parseInt(matcher.group(1));
+                List<Integer> arrayIndexes = new ArrayList<>();
 
-                    if (arrayIndex > (list.size() - 1)) {
-                        for (int j = -1; j < arrayIndex; j++) {
+                while (matcher.find()) {
+                    arrayIndexes.add(Integer.parseInt(matcher.group(1)));
+                }
+
+                for (int j = 0; j < arrayIndexes.size(); j++) {
+                    int arrayIndex = arrayIndexes.get(j);
+
+                    if (list.size() < (arrayIndex + 1)) {
+                        for (int k = list.size(); k < (arrayIndex + 1); k++) {
                             list.add(null);
                         }
                     }
 
-                    if (matcher.hitEnd()) {
+                    if (j == arrayIndexes.size() - 1) {
                         if (i == pathItems.length - 1) {
                             list.set(arrayIndex, value);
                         } else {
