@@ -11,8 +11,8 @@ import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
-import getParameterValueByPath from '../../utils/getParameterValueByPath';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
 
@@ -112,7 +112,7 @@ const ObjectProperty = ({
             return;
         }
 
-        let parameterObject = getParameterValueByPath(path, currentComponent.parameters);
+        let parameterObject = getObjectParameterValueByPath(path, currentComponent.parameters);
 
         if (parameterObject && arrayName && arrayIndex) {
             parameterObject = parameterObject[arrayIndex];
@@ -162,7 +162,7 @@ const ObjectProperty = ({
     return (
         <>
             <ul
-                className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l')}
+                className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}
                 key={`${name}_${newPropertyName}`}
             >
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => {

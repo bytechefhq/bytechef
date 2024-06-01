@@ -1,5 +1,4 @@
-import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
-import {ArrayPropertyType, ComponentType, PropertyType} from '@/shared/types';
+import {ArrayPropertyType, ComponentType} from '@/shared/types';
 
 import Property from '../Property';
 import DeletePropertyButton from './DeletePropertyButton';
@@ -39,8 +38,8 @@ const ArrayPropertyItem = ({
                 customClassName="pl-2 w-full"
                 inputTypeSwitchButtonClassName="ml-auto"
                 parameterValue={arrayItem.defaultValue}
-                path={`${path}.${arrayName}`}
-                property={arrayItem as PropertyType & {controlType?: ControlTypeModel; defaultValue?: string}}
+                path={path}
+                property={arrayItem as ArrayPropertyType}
             />
 
             {arrayItem.custom && arrayName && arrayItem.name && currentComponent && (

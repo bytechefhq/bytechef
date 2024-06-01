@@ -30,7 +30,8 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
-import getParameterValueByPath from '../../utils/getParameterValueByPath';
+import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
+import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -151,10 +152,6 @@ const Property = ({
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
 
-    if (arrayIndex !== undefined && arrayName) {
-        path = `${path}.${arrayName}`;
-    }
-
     if (!path && name) {
         path = name;
     }
@@ -186,8 +183,6 @@ const Property = ({
         if (!parameters) {
             return;
         }
-
-        // TODO handle mix of text and multiple data pills when pasting
 
         let strippedValue: string | number = mentionInputValue.replace(/<[^>]*>?/gm, '').trim();
 
@@ -245,19 +240,17 @@ const Property = ({
         let currentValue;
 
         if (arrayName && arrayIndex !== undefined) {
-            if (path?.includes('.')) {
-                if (objectName) {
-                    const matchingObject = getParameterValueByPath(path, parameters);
+            if (path?.includes('.') && objectName) {
+                const matchingObject = getObjectParameterValueByPath(path, parameters);
 
-                    currentValue = matchingObject[name];
-                } else {
-                    currentValue = parameters?.[arrayName]?.[arrayIndex];
-                }
-            } else {
-                currentValue = parameters[arrayName];
+                currentValue = matchingObject[name];
+            }
+
+            if (path?.includes('[')) {
+                currentValue = parameters?.[arrayName]?.[arrayIndex];
             }
         } else if (objectName && parameters && path) {
-            const paramValue = getParameterValueByPath(path, parameters);
+            const paramValue = getObjectParameterValueByPath(path, parameters);
 
             if (paramValue) {
                 currentValue = paramValue;
@@ -344,7 +337,7 @@ const Property = ({
     };
 
     const handleMentionsInputChange = (value: string) => {
-        const parentParameterValue = path && getParameterValueByPath(path, currentComponent?.parameters);
+        const parentParameterValue = path && getObjectParameterValueByPath(path, currentComponent?.parameters);
 
         if (!parentParameterValue && !parameterValue && propertyParameterValue) {
             setMentionInputValue('');
@@ -382,7 +375,7 @@ const Property = ({
             return;
         }
 
-        const parentParameterValue = getParameterValueByPath(path, currentComponent.parameters);
+        const parentParameterValue = getObjectParameterValueByPath(path, currentComponent.parameters);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -503,7 +496,13 @@ const Property = ({
             );
 
             if (path?.includes('.')) {
-                setPropertyParameterValue(getParameterValueByPath(path, currentWorkflowComponent?.parameters));
+                setPropertyParameterValue(getObjectParameterValueByPath(path, currentWorkflowComponent?.parameters));
+
+                return;
+            }
+
+            if (path?.includes('[')) {
+                setPropertyParameterValue(getArrayParameterValueByPath(path, currentWorkflowComponent?.parameters));
 
                 return;
             }
@@ -670,7 +669,7 @@ const Property = ({
             (node) => node.name === currentNode?.name
         );
 
-        const paramValue = getParameterValueByPath(path, currentWorkflowNode.parameters);
+        const paramValue = getObjectParameterValueByPath(path, currentWorkflowNode.parameters);
 
         if (paramValue) {
             setPropertyParameterValue(paramValue);
@@ -713,7 +712,7 @@ const Property = ({
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                             inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                             key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                            label={label || (arrayName ? undefined : name)}
+                            label={label || name}
                             leadingIcon={typeIcon}
                             onChange={handleMentionsInputChange}
                             onKeyPress={(event: KeyboardEvent) => {
@@ -813,7 +812,7 @@ const Property = ({
                                     <PropertyInput
                                         description={description}
                                         error={hasError}
-                                        label={label}
+                                        label={label || name}
                                         leadingIcon={typeIcon}
                                         placeholder={placeholder}
                                         required={required}
@@ -833,7 +832,7 @@ const Property = ({
                                 render={({field: {name, onChange}}) => (
                                     <PropertySelect
                                         description={description}
-                                        label={label}
+                                        label={label || name}
                                         leadingIcon={typeIcon}
                                         name={name}
                                         onValueChange={(value) => onChange(value)}
@@ -853,7 +852,7 @@ const Property = ({
                                 render={({field: {name, onChange}}) => (
                                     <PropertySelect
                                         description={description}
-                                        label={label}
+                                        label={label || name}
                                         leadingIcon={typeIcon}
                                         name={name}
                                         onValueChange={(value) => onChange(value)}
@@ -876,7 +875,7 @@ const Property = ({
                                     <PropertyTextArea
                                         description={description}
                                         error={hasError}
-                                        label={label}
+                                        label={label || name}
                                         leadingIcon={typeIcon}
                                         required={required}
                                         {...field}
@@ -894,7 +893,7 @@ const Property = ({
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={arrayName && !objectName ? undefined : label || name}
+                                label={label || name}
                                 leadingIcon={typeIcon}
                                 max={maxValue}
                                 maxLength={maxLength}
@@ -920,7 +919,7 @@ const Property = ({
                             <PropertySelect
                                 description={description}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label}
+                                label={label || name}
                                 leadingIcon={typeIcon}
                                 name={name}
                                 onValueChange={(value) => handleSelectChange(value, name!)}
@@ -935,7 +934,7 @@ const Property = ({
                                 description={description}
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label}
+                                label={label || name}
                                 leadingIcon={typeIcon}
                                 lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map((path) =>
                                     path.replace('[index]', `[${arrayIndex}]`)
@@ -960,7 +959,7 @@ const Property = ({
                                 handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                                 inputTypeSwitchButtonClassName={inputTypeSwitchButtonClassName}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label}
+                                label={label || name}
                                 leadingIcon={typeIcon}
                                 name={name}
                                 onValueChange={(value: string) => handleSelectChange(value, name!)}
@@ -978,7 +977,7 @@ const Property = ({
                                 description={description}
                                 error={hasError}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                label={label}
+                                label={label || name}
                                 leadingIcon={typeIcon}
                                 name={name!}
                                 onChange={handleInputChange}
@@ -1006,7 +1005,7 @@ const Property = ({
                         defaultValue={defaultValue}
                         description={description}
                         key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                        label={label}
+                        label={label || name}
                         language={languageId!}
                         leadingIcon={typeIcon}
                         name={name!}

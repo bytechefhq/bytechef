@@ -9,8 +9,8 @@ import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 
+import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
-import getParameterValueByPath from '../../utils/getParameterValueByPath';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
 
@@ -45,8 +45,8 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             custom: true,
             expressionEnabled: true,
             key: getRandomId(),
-            label: '',
-            name: arrayItems.length.toString(),
+            label: arrayItems.length.toString(),
+            name: `${name}__${arrayItems.length.toString()}`,
             type: matchingItem?.type || newItemType || 'STRING',
         };
 
@@ -58,7 +58,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             return;
         }
 
-        const clickedItemParameter = getParameterValueByPath(path, currentComponent.parameters)?.[index];
+        const clickedItemParameter = getObjectParameterValueByPath(path, currentComponent.parameters)?.[index];
 
         if (clickedItemParameter) {
             onDeleteClick(path, undefined, index);
@@ -95,12 +95,10 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         let params = currentComponent.parameters;
 
         if (path) {
-            params = getParameterValueByPath(path, currentComponent.parameters);
+            params = getObjectParameterValueByPath(path, currentComponent.parameters);
         }
 
-        const currentParams: Array<ArrayPropertyType> = params?.[name]?.filter(
-            (param: ArrayPropertyType) => param !== null
-        );
+        const currentParams: Array<ArrayPropertyType> = params.filter((param: ArrayPropertyType) => param !== null);
 
         if (!currentParams) {
             return;
@@ -201,7 +199,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                             index={index}
                             key={arrayItem.key}
                             onDeleteClick={handleDeleteClick}
-                            path={path}
+                            path={`${path}[${index}]`}
                             setArrayItems={setArrayItems}
                         />
                     )
@@ -216,7 +214,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                             size="sm"
                             variant="ghost"
                         >
-                            <PlusIcon className="size-4" /> Add item
+                            <PlusIcon className="size-4" /> Add array item
                         </Button>
                     </PopoverTrigger>
 
@@ -256,7 +254,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     size="sm"
                     variant="ghost"
                 >
-                    <PlusIcon className="size-4" /> Add item
+                    <PlusIcon className="size-4" /> Add Array item
                 </Button>
             )}
         </>

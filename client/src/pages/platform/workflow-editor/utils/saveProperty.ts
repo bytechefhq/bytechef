@@ -30,10 +30,6 @@ export default function saveProperty({
     value,
     workflowId,
 }: SavePropertyProps) {
-    // TODO fix in Property.tsx path value, it should be without 'parameters.' prefix and should not contain '${arrayName}_${arrayIndex}' as suffix if array is updated
-
-    path = path.replace('parameters.', '').replace('parameters', '');
-
     const {workflowNodeName} = currentComponent;
 
     updateWorkflowNodeParameterMutation.mutate(
