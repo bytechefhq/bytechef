@@ -208,10 +208,6 @@ export const getRouter = (queryClient: QueryClient) =>
                     errorElement: <ErrorPage />,
                     path: 'embedded',
                 },
-                {
-                    element: <PageNotFound />,
-                    path: '*',
-                },
             ],
             element: <App />,
             errorElement: <ErrorPage />,
@@ -220,5 +216,9 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <Home />,
             index: true,
+        },
+        {
+            element: <PageNotFound />,
+            path: '*',
         },
     ]);
