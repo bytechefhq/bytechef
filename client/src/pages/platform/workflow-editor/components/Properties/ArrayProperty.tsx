@@ -3,7 +3,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyType} from '@/shared/types';
-import getRandomId from '@/shared/util/random-utils';
+import {getRandomId} from '@/shared/util/random-utils';
 import {PlusIcon} from '@radix-ui/react-icons';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';

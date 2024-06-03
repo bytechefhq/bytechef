@@ -3,8 +3,6 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/shee
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import WorkflowOutputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetTable';
 import {WorkflowModel} from '@/shared/middleware/platform/configuration';
-import * as SheetPrimitive from '@radix-ui/react-dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
 
 interface WorkflowOutputsSheetProps {
     onClose: () => void;
@@ -29,10 +27,6 @@ const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) =>
                                 workflow={workflow}
                             />
                         )}
-
-                        <SheetPrimitive.Close asChild>
-                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                        </SheetPrimitive.Close>
                     </div>
                 </div>
             </SheetHeader>

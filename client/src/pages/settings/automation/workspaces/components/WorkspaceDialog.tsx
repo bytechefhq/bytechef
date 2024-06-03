@@ -19,7 +19,6 @@ import {
 } from '@/shared/mutations/automation/workspaces.mutations';
 import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -103,13 +102,7 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkspace)}>
                         <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
-
-                                <DialogClose asChild>
-                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                </DialogClose>
-                            </div>
+                            <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
 
                             <DialogDescription>
                                 Send app events from your application to trigger workflows using App Event trigger.

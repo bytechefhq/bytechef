@@ -82,7 +82,7 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                        <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -102,7 +102,7 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                        <AlertDialogAction className="bg-red-600" onClick={handleAlertDeleteDialogClick}>
+                        <AlertDialogAction className="bg-destructive" onClick={handleAlertDeleteDialogClick}>
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>

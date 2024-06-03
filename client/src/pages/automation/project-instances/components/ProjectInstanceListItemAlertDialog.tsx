@@ -33,7 +33,7 @@ const ProjectInstanceListItemAlertDialog = ({
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onCancelClick}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-red-600" onClick={onDeleteClick}>
+                    <AlertDialogAction className="bg-destructive" onClick={onDeleteClick}>
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>

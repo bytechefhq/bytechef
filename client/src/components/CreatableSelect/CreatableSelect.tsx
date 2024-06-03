@@ -66,7 +66,7 @@ const CreatableSelect = <
         </div>
 
         {error && (
-            <p className="mt-2 text-sm text-red-600" id={`${name}-error`} role="alert">
+            <p className="mt-2 text-sm text-destructive" id={`${name}-error`} role="alert">
                 This field is required
             </p>
         )}

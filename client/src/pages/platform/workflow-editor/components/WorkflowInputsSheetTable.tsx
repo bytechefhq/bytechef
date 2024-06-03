@@ -89,15 +89,17 @@ const WorkflowInputsSheetTable = ({
                         {workflow.inputs &&
                             workflow.inputs.map((input, index) => (
                                 <TableRow key={input.name}>
-                                    <TableCell className="p-3">{input.name}</TableCell>
+                                    <TableCell className="px-3 py-4">{input.name}</TableCell>
 
-                                    <TableCell className="p-3">{input.label}</TableCell>
+                                    <TableCell className="px-3 py-4">{input.label}</TableCell>
 
-                                    <TableCell className="p-3">{input.type}</TableCell>
+                                    <TableCell className="px-3 py-4">{input.type}</TableCell>
 
-                                    <TableCell className="p-3">{input.required === true ? 'true' : 'false'}</TableCell>
+                                    <TableCell className="px-3 py-4">
+                                        {input.required === true ? 'true' : 'false'}
+                                    </TableCell>
 
-                                    <TableCell className="p-3">
+                                    <TableCell className="px-3 py-4">
                                         {workflowTestConfiguration?.inputs
                                             ? workflowTestConfiguration?.inputs[
                                                   workflow.inputs![index]?.name
@@ -105,7 +107,7 @@ const WorkflowInputsSheetTable = ({
                                             : undefined}
                                     </TableCell>
 
-                                    <TableCell className="flex justify-end p-3">
+                                    <TableCell className="flex justify-end px-3 py-4">
                                         <Button
                                             onClick={() => {
                                                 setCurrentInputIndex(index);
@@ -125,7 +127,7 @@ const WorkflowInputsSheetTable = ({
                                             size="icon"
                                             variant="ghost"
                                         >
-                                            <Trash2Icon className="h-4 text-red-600" />
+                                            <Trash2Icon className="h-4 text-destructive" />
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -180,7 +182,7 @@ const WorkflowInputsSheetTable = ({
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-red-600"
+                            className="bg-destructive"
                             onClick={() => handleDelete(workflow.inputs![currentInputIndex]!)}
                         >
                             Delete
