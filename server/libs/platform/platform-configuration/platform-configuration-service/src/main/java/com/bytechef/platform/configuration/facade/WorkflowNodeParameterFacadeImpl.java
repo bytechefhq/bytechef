@@ -375,6 +375,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 String arrays = pathItem.substring(pathItem.indexOf("["));
 
                 List<Object> list;
+
                 if (map.containsKey(name)) {
                     list = (List<Object>) map.get(name);
                 } else {
@@ -403,7 +404,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                     if (j == arrayIndexes.size() - 1) {
                         if (i == pathItems.length - 1) {
-                            list.set(arrayIndex, value);
+                            if (value == null) {
+                                list.remove(arrayIndex);
+                            } else {
+                                list.set(arrayIndex, value);
+                            }
                         } else {
                             map = new HashMap<>();
 
