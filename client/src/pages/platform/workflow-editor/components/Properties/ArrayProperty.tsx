@@ -9,14 +9,14 @@ import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 
-import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
+import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
 
 interface ArrayPropertyProps {
-    onDeleteClick: (path: string, name?: string, index?: number) => void;
-    path?: string;
+    onDeleteClick: (path: string) => void;
+    path: string;
     property: PropertyType;
 }
 
@@ -53,15 +53,15 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         setArrayItems([...arrayItems, newItem]);
     };
 
-    const handleDeleteClick = (path: string, index: number) => {
+    const handleDeleteClick = (path: string) => {
         if (!currentComponent || !path) {
             return;
         }
 
-        const clickedItemParameter = getObjectParameterValueByPath(path, currentComponent.parameters)?.[index];
+        const clickedItemParameterValue = getArrayParameterValueByPath(path, currentComponent.parameters);
 
-        if (clickedItemParameter) {
-            onDeleteClick(path, undefined, index);
+        if (clickedItemParameterValue !== undefined || clickedItemParameterValue !== null) {
+            onDeleteClick(path);
         }
     };
 
@@ -95,7 +95,11 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         let params = currentComponent.parameters;
 
         if (path) {
-            params = getObjectParameterValueByPath(path, currentComponent.parameters);
+            params = getArrayParameterValueByPath(path, currentComponent.parameters);
+        }
+
+        if (!params) {
+            return;
         }
 
         const currentParams: Array<ArrayPropertyType> = params.filter((param: ArrayPropertyType) => param !== null);

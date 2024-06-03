@@ -247,7 +247,7 @@ const Property = ({
             }
 
             if (path?.includes('[')) {
-                currentValue = parameters?.[arrayName]?.[arrayIndex];
+                currentValue = getArrayParameterValueByPath(path, parameters);
             }
         } else if (objectName && parameters && path) {
             const paramValue = getObjectParameterValueByPath(path, parameters);
@@ -288,10 +288,10 @@ const Property = ({
         });
     }, 200);
 
-    const handleDeleteCustomPropertyClick = (path: string, name?: string, arrayIndex?: number) => {
+    const handleDeleteCustomPropertyClick = (path: string) => {
         deleteProperty(
             workflow.id!,
-            `${path}${arrayIndex !== undefined ? '[' + arrayIndex + ']' : ''}${name ? '.' + name : ''}`,
+            path,
             currentComponent!,
             setCurrentComponent,
             deleteWorkflowNodeParameterMutation!
@@ -780,7 +780,7 @@ const Property = ({
                             </div>
                         )}
 
-                        {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && (
+                        {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && path && (
                             <ArrayProperty
                                 onDeleteClick={handleDeleteCustomPropertyClick}
                                 path={path}
