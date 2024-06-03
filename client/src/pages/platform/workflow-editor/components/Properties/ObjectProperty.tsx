@@ -20,7 +20,7 @@ interface ObjectPropertyProps {
     operationName?: string;
     arrayIndex?: number;
     arrayName?: string;
-    onDeleteClick?: (path: string, name: string) => void;
+    onDeleteClick?: (path: string) => void;
     path?: string;
     property: PropertyType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -99,10 +99,14 @@ const ObjectProperty = ({
     };
 
     const handleDeleteClick = (subProperty: SubPropertyType) => {
+        if (!path) {
+            return;
+        }
+
         setSubProperties((subProperties) => subProperties.filter((property) => property.name !== subProperty.name));
 
         if (onDeleteClick) {
-            onDeleteClick(`${path}.${name}`, subProperty.name!);
+            onDeleteClick(`${path}.${subProperty.name}`);
         }
     };
 
