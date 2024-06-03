@@ -28,7 +28,6 @@ import {
 } from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
-import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {useQueryClient} from '@tanstack/react-query';
@@ -411,15 +410,7 @@ const PropertyCodeEditorSheetConnectionsSheet = ({
         <Sheet onOpenChange={onCLose} open>
             <SheetContent className="flex h-full flex-col gap-4 overflow-auto p-4 pt-3.5">
                 <SheetHeader>
-                    <SheetTitle>
-                        <div className="flex items-center justify-between">
-                            <span>Connections</span>
-
-                            <SheetPrimitive.Close asChild>
-                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                            </SheetPrimitive.Close>
-                        </div>
-                    </SheetTitle>
+                    <SheetTitle>Connections</SheetTitle>
                 </SheetHeader>
 
                 {workflowConnections?.length ? (

@@ -4,7 +4,6 @@ import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -37,7 +36,7 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
-import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
+import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
@@ -386,13 +385,7 @@ const ConnectionDialog = ({
                 <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                     <Form {...form}>
                         <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
-
-                                <DialogClose asChild>
-                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                </DialogClose>
-                            </div>
+                            <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
                             {!connection?.id && (
                                 <DialogDescription>

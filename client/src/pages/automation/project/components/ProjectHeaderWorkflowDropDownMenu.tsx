@@ -79,7 +79,7 @@ const ProjectHeaderWorkflowDropDownMenu = ({
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="text-red-600" onClick={() => onShowDeleteWorkflowAlertDialog()}>
+                <DropdownMenuItem className="text-destructive" onClick={() => onShowDeleteWorkflowAlertDialog()}>
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>

@@ -25,7 +25,7 @@ const WorkflowTriggerExecutionItem = ({
             onClick={() => onClick && onClick()}
         >
             <div className="flex items-center space-x-2 text-sm">
-                <WorkflowExecutionBadge success={triggerExecution.status === 'COMPLETED'} />
+                <WorkflowExecutionBadge status={triggerExecution.status} />
 
                 <div className="flex items-center gap-x-1">
                     {triggerExecution?.component?.icon && (

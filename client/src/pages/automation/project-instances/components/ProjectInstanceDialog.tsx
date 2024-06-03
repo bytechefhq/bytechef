@@ -25,7 +25,6 @@ import {ProjectInstanceTagKeys} from '@/shared/queries/automation/projectInstanc
 import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -260,19 +259,13 @@ const ProjectInstanceDialog = ({
             <DialogContent className={twMerge('flex flex-col')} onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <DialogHeader>
-                        <div className="flex items-center justify-between">
-                            <DialogTitle>
-                                {updateProjectVersion
-                                    ? 'Upgrade Project Version'
-                                    : `${projectInstance?.id ? 'Edit' : 'New'} Instance ${!projectInstance?.id ? '-' : ''} ${
-                                          !projectInstance?.id ? projectInstanceDialogSteps[activeStepIndex].name : ''
-                                      }`}
-                            </DialogTitle>
-
-                            <DialogClose asChild>
-                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                            </DialogClose>
-                        </div>
+                        <DialogTitle>
+                            {updateProjectVersion
+                                ? 'Upgrade Project Version'
+                                : `${projectInstance?.id ? 'Edit' : 'New'} Instance ${!projectInstance?.id ? '-' : ''} ${
+                                      !projectInstance?.id ? projectInstanceDialogSteps[activeStepIndex].name : ''
+                                  }`}
+                        </DialogTitle>
 
                         {!projectInstance?.id && (
                             <nav aria-label="Progress">

@@ -26,7 +26,6 @@ import {useSaveWorkflowTestConfigurationMutation} from '@/shared/mutations/platf
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {PropertyType} from '@/shared/types';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
@@ -220,13 +219,7 @@ const WorkflowTestConfigurationDialog = ({
                 <Form {...form}>
                     <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
                         <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>Workflow Test Configuration</DialogTitle>
-
-                                <DialogClose asChild>
-                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                </DialogClose>
-                            </div>
+                            <DialogTitle>Workflow Test Configuration</DialogTitle>
 
                             <DialogDescription>
                                 Set workflow input, trigger output values and test connections. Click save when you are

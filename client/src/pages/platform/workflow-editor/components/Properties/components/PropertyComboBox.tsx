@@ -202,7 +202,7 @@ const PropertyComboBox = ({
                                                 leadingIcon && 'ml-9',
                                                 ((lookupDependsOnValues?.length && !options.length) ||
                                                     missingConnection) &&
-                                                    'text-red-600'
+                                                    'text-destructive'
                                             )}
                                         >
                                             {placeholder}

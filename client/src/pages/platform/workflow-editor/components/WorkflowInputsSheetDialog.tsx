@@ -22,7 +22,6 @@ import {
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType} from '@/shared/types';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -144,13 +143,7 @@ const WorkflowInputsSheetDialog = ({
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkflowInputs)}>
                         <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>{`${inputIndex === -1 ? 'Create' : 'Edit'} Input`}</DialogTitle>
-
-                                <DialogClose asChild>
-                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                </DialogClose>
-                            </div>
+                            <DialogTitle>{`${inputIndex === -1 ? 'Create' : 'Edit'} Input`}</DialogTitle>
 
                             <DialogDescription>Add new workflow input definition.</DialogDescription>
                         </DialogHeader>

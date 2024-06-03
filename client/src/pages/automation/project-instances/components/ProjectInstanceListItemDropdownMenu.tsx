@@ -46,7 +46,11 @@ const ProjectInstanceListItemDropdownMenu = ({
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="text-red-600" disabled={projectInstanceEnabled} onClick={onDeleteClick}>
+                <DropdownMenuItem
+                    className="text-destructive"
+                    disabled={projectInstanceEnabled}
+                    onClick={onDeleteClick}
+                >
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
