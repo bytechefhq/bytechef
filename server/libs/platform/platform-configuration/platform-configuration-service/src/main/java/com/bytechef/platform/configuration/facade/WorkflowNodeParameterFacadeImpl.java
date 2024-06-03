@@ -410,9 +410,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                 list.set(arrayIndex, value);
                             }
                         } else {
-                            map = new HashMap<>();
+                            if (list.get(arrayIndex) == null) {
+                                map = new HashMap<>();
 
-                            list.set(arrayIndex, map);
+                                list.set(arrayIndex, map);
+                            } else {
+                                map = (Map<String, Object>) list.get(arrayIndex);
+                            }
                         }
                     } else {
                         if (list.get(arrayIndex) == null) {
