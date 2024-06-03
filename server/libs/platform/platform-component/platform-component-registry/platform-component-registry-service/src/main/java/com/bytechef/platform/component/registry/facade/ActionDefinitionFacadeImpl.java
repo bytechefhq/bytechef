@@ -29,7 +29,7 @@ import com.bytechef.platform.component.registry.service.ConnectionDefinitionServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Type;
-import com.bytechef.platform.exception.ProviderException;
+import com.bytechef.component.exception.ProviderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

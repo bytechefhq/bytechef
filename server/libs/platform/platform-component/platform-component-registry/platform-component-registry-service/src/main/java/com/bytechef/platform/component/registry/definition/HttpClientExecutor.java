@@ -30,7 +30,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.platform.exception.ProviderException;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
