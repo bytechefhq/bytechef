@@ -5,12 +5,6 @@ import {WorkflowTestExecutionModel} from '@/shared/middleware/platform/workflow/
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export type WorkflowTaskDataType = {
-    actionNames?: Array<string>;
-    componentNames: Array<string>;
-    nodeNames: Array<string>;
-};
-
 interface WorkflowDataStateI {
     projectId: number;
     setProjectId: (projectId: number) => void;

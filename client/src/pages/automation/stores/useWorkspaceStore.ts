@@ -17,7 +17,7 @@ export const useWorkspaceStore = create<WorkspaceStateI>()(
                     })),
             }),
             {
-                name: 'current-workspace',
+                name: 'workspace',
             }
         )
     )
