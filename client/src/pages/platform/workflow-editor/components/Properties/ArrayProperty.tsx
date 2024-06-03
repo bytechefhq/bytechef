@@ -13,6 +13,7 @@ import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPa
 import getParameterType from '../../utils/getParameterType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import PropertySelect from './components/PropertySelect';
+import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
@@ -96,79 +97,104 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         if (path) {
             params = getArrayParameterValueByPath(path, currentComponent.parameters);
+
+            if (path.includes('.')) {
+                params = getObjectParameterValueByPath(path, currentComponent.parameters);
+            }
         }
 
         if (!params) {
             return;
         }
 
-        const currentParams: Array<ArrayPropertyType> = params.filter((param: ArrayPropertyType) => param !== null);
+        const currentParameterValues: Array<ArrayPropertyType> = params.filter(
+            (param: ArrayPropertyType) => param !== null
+        );
 
-        if (!currentParams) {
+        if (!currentParameterValues) {
             return;
         }
 
-        if (items?.length && name && items[0].type === 'OBJECT' && Array.isArray(currentParams)) {
-            const parameterArrayItems = currentParams.map((parameterItem: ArrayPropertyType, index: number) => {
-                const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
-                    Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
-                        ? {
-                              ...property,
-                              defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
-                          }
-                        : property
-                );
+        if (items?.length && name && items[0].type === 'OBJECT' && Array.isArray(currentParameterValues)) {
+            const parameterArrayItems = currentParameterValues.map(
+                (parameterItem: ArrayPropertyType, index: number) => {
+                    const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
+                        Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
+                            ? {
+                                  ...property,
+                                  defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              }
+                            : property
+                    );
 
-                return {
-                    ...items[0],
-                    custom: true,
-                    name: index.toString(),
-                    properties: subProperties,
-                };
-            });
+                    return {
+                        ...items[0],
+                        custom: true,
+                        name: index.toString(),
+                        properties: subProperties,
+                    };
+                }
+            );
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
-        } else if (name && Array.isArray(currentParams)) {
-            const parameterArrayItems = currentParams.map((parameterItemValue: ArrayPropertyType, index: number) => {
-                const customSubProperties = Object.keys(parameterItemValue).map((key) => {
-                    const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
+        } else if (name && Array.isArray(currentParameterValues)) {
+            const parameterArrayItems = currentParameterValues.map(
+                (parameterItemValue: ArrayPropertyType, index: number) => {
+                    const parameterItemType = getParameterType(parameterItemValue);
 
-                    const subPropertyParameterItemType = getParameterType(subPropertyParameterValue);
-
-                    const subPropertyType =
-                        subPropertyParameterItemType ||
-                        (typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING');
-
-                    return {
+                    const newSubProperty = {
+                        arrayName: name,
                         controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                            subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                            parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                         ] as ControlTypeModel,
                         custom: true,
-                        defaultValue: subPropertyParameterValue,
+                        defaultValue: parameterItemValue,
                         expressionEnabled: true,
-                        label: key,
-                        name: key,
-                        type: subPropertyType as PropertyTypeModel,
+                        name: index.toString(),
+                        type: parameterItemType,
                     };
-                });
 
-                const parameterItemType = getParameterType(parameterItemValue);
+                    if (parameterItemType === 'OBJECT') {
+                        const customSubProperties = Object.keys(parameterItemValue).map((key) => {
+                            const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
-                return {
-                    arrayName: name,
-                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                        parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                    ] as ControlTypeModel,
-                    custom: true,
-                    defaultValue: parameterItemValue,
-                    expressionEnabled: true,
-                    name: index.toString(),
-                    properties: parameterItemType === 'OBJECT' ? customSubProperties : undefined,
-                    type: parameterItemType,
-                };
-            });
+                            const subPropertyParameterItemType = getParameterType(subPropertyParameterValue);
+
+                            const subPropertyType =
+                                subPropertyParameterItemType ||
+                                (typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING');
+
+                            return {
+                                controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                                    subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                                ] as ControlTypeModel,
+                                custom: true,
+                                defaultValue: subPropertyParameterValue,
+                                expressionEnabled: true,
+                                label: key,
+                                name: key,
+                                type: subPropertyType as PropertyTypeModel,
+                            };
+                        });
+
+                        return {
+                            ...newSubProperty,
+                            properties: customSubProperties,
+                        };
+                    }
+
+                    if (parameterItemType === 'BOOLEAN') {
+                        return {
+                            ...newSubProperty,
+                            defaultValue: parameterItemValue.toString(),
+                        };
+                    }
+
+                    return newSubProperty;
+                }
+            );
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);

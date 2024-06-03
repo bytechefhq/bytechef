@@ -150,6 +150,7 @@ const ObjectProperty = ({
                     custom: true,
                     defaultValue: parameterObject[parameter!],
                     expressionEnabled: true,
+                    label: parameter,
                     name: parameter,
                     type: parameterItemType,
                 };
