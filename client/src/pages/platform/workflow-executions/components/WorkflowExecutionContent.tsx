@@ -1,7 +1,6 @@
-import {Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
+import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import WorkflowExecutionContentClipboardButton from '@/pages/platform/workflow-executions/components/WorkflowExecutionContentClipboardButton';
 import {ExecutionErrorModel} from '@/shared/middleware/automation/workflow/execution';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {ExpandIcon} from 'lucide-react';
 import ReactJson from 'react-json-view';
 
@@ -34,16 +33,10 @@ const WorkflowExecutionContent = ({
 
                             <DialogContent className="max-w-[1000px]">
                                 <DialogHeader>
-                                    <div className="flex items-center justify-between uppercase">
+                                    <div className="mr-3 flex items-center justify-between uppercase">
                                         <DialogTitle>Input</DialogTitle>
 
-                                        <div className="flex space-x-1">
-                                            <WorkflowExecutionContentClipboardButton value={input} />
-
-                                            <DialogClose asChild>
-                                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                            </DialogClose>
-                                        </div>
+                                        <WorkflowExecutionContentClipboardButton value={input} />
                                     </div>
                                 </DialogHeader>
 
@@ -97,16 +90,10 @@ const WorkflowExecutionContent = ({
 
                                 <DialogContent className="max-w-[1000px]">
                                     <DialogHeader>
-                                        <div className="flex items-center justify-between uppercase">
+                                        <div className="mr-3 flex items-center justify-between uppercase">
                                             <DialogTitle>Output</DialogTitle>
 
-                                            <div className="flex space-x-1">
-                                                <WorkflowExecutionContentClipboardButton value={output} />
-
-                                                <DialogClose asChild>
-                                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                                </DialogClose>
-                                            </div>
+                                            <WorkflowExecutionContentClipboardButton value={output} />
                                         </div>
                                     </DialogHeader>
 
@@ -161,13 +148,7 @@ const WorkflowExecutionContent = ({
 
                                 <DialogContent className="max-w-[1000px]">
                                     <DialogHeader>
-                                        <div className="flex items-center justify-between uppercase">
-                                            <DialogTitle className="text-destructive">Error</DialogTitle>
-
-                                            <DialogClose asChild>
-                                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                            </DialogClose>
-                                        </div>
+                                        <DialogTitle className="uppercase text-destructive">Error</DialogTitle>
                                     </DialogHeader>
 
                                     <div className="max-h-[80vh] space-y-3 overflow-y-auto">

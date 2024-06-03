@@ -18,7 +18,6 @@ import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutat
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {ProjectTagKeys, useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ReactNode, useState} from 'react';
@@ -141,13 +140,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveProject)}>
                         <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
-
-                                <DialogClose asChild>
-                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                </DialogClose>
-                            </div>
+                            <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
 
                             <DialogDescription>
                                 {`Use this to ${

@@ -1,5 +1,5 @@
-import {Badge} from '@/components/ui/badge';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
 import {JobBasicModel, WorkflowExecutionModel} from '@/shared/middleware/automation/workflow/execution';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
@@ -20,19 +20,7 @@ const columnHelper = createColumnHelper<WorkflowExecutionModel>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
-        cell: (info) => (
-            <Badge
-                variant={
-                    info.getValue()?.status === 'COMPLETED'
-                        ? 'success_outline'
-                        : info.getValue()?.status === 'FAILED'
-                          ? 'destructive_outline'
-                          : 'secondary'
-                }
-            >
-                {info.getValue()?.status ?? ''}
-            </Badge>
-        ),
+        cell: (info) => <WorkflowExecutionBadge status={info?.getValue()?.status || ''} />,
         header: 'Status',
     }),
     columnHelper.accessor('workflow', {
@@ -108,7 +96,10 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
                             {row.getVisibleCells().map((cell, index) => (
-                                <TableCell className="whitespace-nowrap p-3" key={`${row.id}_${cell.id}_${index}`}>
+                                <TableCell
+                                    className="whitespace-nowrap px-3 py-4"
+                                    key={`${row.id}_${cell.id}_${index}`}
+                                >
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}

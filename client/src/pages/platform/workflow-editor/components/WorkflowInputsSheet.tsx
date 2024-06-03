@@ -4,8 +4,6 @@ import WorkflowInputsSheetDialog from '@/pages/platform/workflow-editor/componen
 import WorkflowInputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetTable';
 import {WorkflowModel} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestConfigurationModel} from '@/shared/middleware/platform/configuration';
-import * as SheetPrimitive from '@radix-ui/react-dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
 
 interface WorkflowInputsSheetProps {
     onClose: () => void;
@@ -32,10 +30,6 @@ const WorkflowInputsSheet = ({onClose, workflow, workflowTestConfiguration}: Wor
                                 workflowTestConfiguration={workflowTestConfiguration}
                             />
                         )}
-
-                        <SheetPrimitive.Close asChild>
-                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                        </SheetPrimitive.Close>
                     </div>
                 </div>
             </SheetHeader>

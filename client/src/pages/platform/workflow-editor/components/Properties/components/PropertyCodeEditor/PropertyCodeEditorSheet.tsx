@@ -10,8 +10,6 @@ import {
     WorkflowNodeScriptApi,
 } from '@/shared/middleware/platform/configuration';
 import Editor from '@monaco-editor/react';
-import * as SheetPrimitive from '@radix-ui/react-dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {Link2Icon, PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import ReactJson from 'react-json-view';
@@ -77,50 +75,44 @@ const PropertyCodeEditorSheet = ({
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
                     <SheetHeader>
-                        <SheetTitle>
-                            <div className="flex flex-1 items-center justify-between px-4 py-2">
-                                <div>Edit Script</div>
+                        <div className="flex flex-1 items-center justify-between px-4 py-2">
+                            <SheetTitle>Edit Script</SheetTitle>
 
-                                <div className="flex items-center">
-                                    <div className="mr-4 flex items-center">
-                                        {!scriptIsRunning && (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span tabIndex={0}>
-                                                        <Button
-                                                            disabled={dirty}
-                                                            onClick={handleRunClick}
-                                                            size="icon"
-                                                            variant="ghost"
-                                                        >
-                                                            <PlayIcon className="h-5 text-success" />
-                                                        </Button>
-                                                    </span>
-                                                </TooltipTrigger>
+                            <div className="flex items-center">
+                                <div className="mr-4 flex items-center">
+                                    {!scriptIsRunning && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span tabIndex={0}>
+                                                    <Button
+                                                        disabled={dirty}
+                                                        onClick={handleRunClick}
+                                                        size="icon"
+                                                        variant="ghost"
+                                                    >
+                                                        <PlayIcon className="h-5 text-success" />
+                                                    </Button>
+                                                </span>
+                                            </TooltipTrigger>
 
-                                                <TooltipContent>Run the current workflow</TooltipContent>
-                                            </Tooltip>
-                                        )}
+                                            <TooltipContent>Run the current workflow</TooltipContent>
+                                        </Tooltip>
+                                    )}
 
-                                        {scriptIsRunning && (
-                                            <Button
-                                                onClick={() => {
-                                                    // TODO
-                                                }}
-                                                size="icon"
-                                                variant="destructive"
-                                            >
-                                                <SquareIcon className="h-5" />
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    <SheetPrimitive.Close asChild>
-                                        <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                                    </SheetPrimitive.Close>
+                                    {scriptIsRunning && (
+                                        <Button
+                                            onClick={() => {
+                                                // TODO
+                                            }}
+                                            size="icon"
+                                            variant="destructive"
+                                        >
+                                            <SquareIcon className="h-5" />
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
-                        </SheetTitle>
+                        </div>
                     </SheetHeader>
 
                     <div className="flex h-full border">

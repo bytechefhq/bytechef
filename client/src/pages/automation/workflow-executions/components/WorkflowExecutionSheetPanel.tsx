@@ -1,6 +1,4 @@
 import {WorkflowExecutionModel} from '@/shared/middleware/automation/workflow/execution';
-import * as SheetPrimitive from '@radix-ui/react-dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
 
 const WorkflowExecutionSheetPanel = ({workflowExecution}: {workflowExecution: WorkflowExecutionModel}) => {
     const {project, projectInstance, workflow} = workflowExecution;
@@ -38,10 +36,6 @@ const WorkflowExecutionSheetPanel = ({workflowExecution}: {workflowExecution: Wo
                     {/*    <PencilIcon className="mr-1 size-4 cursor-pointer" /> Edit*/}
 
                     {/*</Button>*/}
-
-                    <SheetPrimitive.Close asChild>
-                        <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                    </SheetPrimitive.Close>
                 </div>
             </div>
 

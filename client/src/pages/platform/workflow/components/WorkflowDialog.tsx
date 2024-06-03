@@ -13,7 +13,6 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/shared/middleware/platform/configuration';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -130,13 +129,7 @@ const WorkflowDialog = ({
             <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <DialogHeader>
-                        <div className="flex items-center justify-between">
-                            <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
-
-                            <DialogClose asChild>
-                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                            </DialogClose>
-                        </div>
+                        <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
 
                         <DialogDescription>
                             Use this to create a workflow. Creating a workflow will redirect you to the page where you

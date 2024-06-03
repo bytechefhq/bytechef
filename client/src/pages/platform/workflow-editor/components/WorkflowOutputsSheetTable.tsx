@@ -73,11 +73,11 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
                         {workflow.outputs &&
                             workflow.outputs.map((output, index) => (
                                 <TableRow key={output.name}>
-                                    <TableCell className="p-3">{output.name}</TableCell>
+                                    <TableCell className="px-3 py-4">{output.name}</TableCell>
 
-                                    <TableCell className="p-3">{output.value.toString()}</TableCell>
+                                    <TableCell className="px-3 py-4">{output.value.toString()}</TableCell>
 
-                                    <TableCell className="flex justify-end p-3">
+                                    <TableCell className="flex justify-end px-3 py-4">
                                         <Button
                                             onClick={() => {
                                                 setCurrentInputIndex(index);
@@ -97,7 +97,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
                                             size="icon"
                                             variant="ghost"
                                         >
-                                            <Trash2Icon className="h-4 text-red-600" />
+                                            <Trash2Icon className="h-4 text-destructive" />
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -145,7 +145,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-red-600"
+                            className="bg-destructive"
                             onClick={() => handleDelete(workflow.outputs![currentInputIndex]!)}
                         >
                             Delete

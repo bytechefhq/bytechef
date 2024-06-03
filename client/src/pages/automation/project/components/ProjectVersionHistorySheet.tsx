@@ -3,8 +3,6 @@ import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatusModel} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
-import * as SheetPrimitive from '@radix-ui/react-dialog';
-import {Cross2Icon} from '@radix-ui/react-icons';
 
 interface ProjectVersionHistorySheetProps {
     onClose: () => void;
@@ -22,15 +20,7 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <SheetHeader>
-                    <SheetTitle>
-                        <div className="flex items-center justify-between">
-                            <span>Project Version History</span>
-
-                            <SheetPrimitive.Close asChild>
-                                <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                            </SheetPrimitive.Close>
-                        </div>
-                    </SheetTitle>
+                    <SheetTitle>Project Version History</SheetTitle>
                 </SheetHeader>
 
                 <div className="overflow-y-auto">
@@ -55,7 +45,7 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                                                 <Badge
                                                     variant={
                                                         projectVersion.status === ProjectStatusModel.Published
-                                                            ? 'success_outline'
+                                                            ? 'success'
                                                             : 'secondary'
                                                     }
                                                 >

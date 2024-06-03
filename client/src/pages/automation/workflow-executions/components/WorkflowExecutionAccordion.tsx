@@ -32,7 +32,9 @@ const WorkflowExecutionAccordion = ({
         <>
             <div className="px-3 py-4">
                 <div className="mb-3 flex items-center gap-x-2">
-                    <WorkflowExecutionBadge success={!!(taskExecutionsCompleted && triggerExecutionCompleted)} />
+                    <WorkflowExecutionBadge
+                        status={taskExecutionsCompleted && triggerExecutionCompleted ? 'COMPLETED' : 'FAILED'}
+                    />
 
                     <span
                         className={twMerge(
@@ -40,9 +42,7 @@ const WorkflowExecutionAccordion = ({
                             'font-semibold uppercase text-sm'
                         )}
                     >
-                        {taskExecutionsCompleted && triggerExecutionCompleted
-                            ? 'Workflow executed successfully'
-                            : 'Workflow failed'}
+                        {taskExecutionsCompleted && triggerExecutionCompleted ? 'Workflow executed' : 'Workflow failed'}
                     </span>
                 </div>
 

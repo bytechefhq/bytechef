@@ -177,7 +177,7 @@ const ProjectWorkflowListItem = ({
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="text-red-600"
+                            className="text-destructive"
                             onClick={() => {
                                 setShowDeleteDialog(true);
                             }}
@@ -202,7 +202,7 @@ const ProjectWorkflowListItem = ({
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-red-600"
+                            className="bg-destructive"
                             onClick={() => {
                                 if (workflow?.id) {
                                     deleteWorkflowMutation.mutate({

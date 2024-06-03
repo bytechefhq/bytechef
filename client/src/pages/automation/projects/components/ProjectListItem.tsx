@@ -250,7 +250,10 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                                <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                >
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -274,7 +277,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-red-600"
+                            className="bg-destructive"
                             onClick={() => {
                                 if (project.id) {
                                     deleteProjectMutation.mutate(project.id);

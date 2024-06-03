@@ -105,7 +105,7 @@ const ProjectHeaderProjectDropDownMenu = ({
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem className="text-red-600" onClick={() => onDelete()}>
+                    <DropdownMenuItem className="text-destructive" onClick={() => onDelete()}>
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>

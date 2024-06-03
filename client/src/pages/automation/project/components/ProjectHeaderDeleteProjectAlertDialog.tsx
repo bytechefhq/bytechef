@@ -25,7 +25,7 @@ const ProjectHeaderDeleteProjectAlertDialog = ({onClose, onDelete}: {onClose: ()
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-red-600" onClick={() => onDelete()}>
+                    <AlertDialogAction className="bg-destructive" onClick={() => onDelete()}>
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>

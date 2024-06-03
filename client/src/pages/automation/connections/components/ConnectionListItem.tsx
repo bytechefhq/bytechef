@@ -128,7 +128,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
 
                         <div className="flex items-center justify-end gap-x-6">
                             <div className="flex flex-col items-end gap-y-4">
-                                <Badge variant={connection.active ? 'success_outline' : 'secondary'}>
+                                <Badge variant={connection.active ? 'success' : 'secondary'}>
                                     {connection.active ? 'Active' : 'Not Active'}
                                 </Badge>
 
@@ -158,7 +158,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                                     <DropdownMenuSeparator />
 
                                     <DropdownMenuItem
-                                        className="text-red-600"
+                                        className="text-destructive"
                                         onClick={() => setShowDeleteDialog(true)}
                                     >
                                         Delete
@@ -182,7 +182,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         <AlertDialogFooter>
                             <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                            <AlertDialogAction className="bg-red-600" onClick={handleAlertDeleteDialogClick}>
+                            <AlertDialogAction className="bg-destructive" onClick={handleAlertDeleteDialogClick}>
                                 Delete
                             </AlertDialogAction>
                         </AlertDialogFooter>
