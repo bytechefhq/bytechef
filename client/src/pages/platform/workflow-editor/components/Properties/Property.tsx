@@ -156,6 +156,10 @@ const Property = ({
         path = name;
     }
 
+    if (control) {
+        path = `parameters.${name}`;
+    }
+
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
             return;
@@ -802,33 +806,35 @@ const Property = ({
 
                         {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
 
-                        {control && (isValidControlType || isNumericalInput) && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={`${path}.${name}`}
-                                render={({field}) => (
-                                    <PropertyInput
-                                        description={description}
-                                        error={hasError}
-                                        label={label || name}
-                                        leadingIcon={typeIcon}
-                                        placeholder={placeholder}
-                                        required={required}
-                                        type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                        {...field}
-                                    />
-                                )}
-                            />
+                        {control && (isValidControlType || isNumericalInput) && path && (
+                            <>
+                                <Controller
+                                    control={control}
+                                    defaultValue={defaultValue}
+                                    key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                                    name={path}
+                                    render={({field}) => (
+                                        <PropertyInput
+                                            description={description}
+                                            error={hasError}
+                                            label={label || name}
+                                            leadingIcon={typeIcon}
+                                            placeholder={placeholder}
+                                            required={required}
+                                            type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                            {...field}
+                                        />
+                                    )}
+                                />
+                            </>
                         )}
 
-                        {control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
+                        {control && controlType === 'SELECT' && type !== 'BOOLEAN' && path && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={`${path}.${name}`}
+                                name={path}
                                 render={({field: {name, onChange}}) => (
                                     <PropertySelect
                                         description={description}
@@ -843,12 +849,12 @@ const Property = ({
                             />
                         )}
 
-                        {control && controlType === 'SELECT' && type === 'BOOLEAN' && (
+                        {control && controlType === 'SELECT' && type === 'BOOLEAN' && path && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={`${path}.${name}`}
+                                name={path}
                                 render={({field: {name, onChange}}) => (
                                     <PropertySelect
                                         description={description}
@@ -865,12 +871,12 @@ const Property = ({
                             />
                         )}
 
-                        {control && controlType === 'TEXT_AREA' && (
+                        {control && controlType === 'TEXT_AREA' && path && (
                             <Controller
                                 control={control}
                                 defaultValue={defaultValue}
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={`${path}.${name}`}
+                                name={path}
                                 render={({field}) => (
                                     <PropertyTextArea
                                         description={description}
@@ -884,7 +890,7 @@ const Property = ({
                             />
                         )}
 
-                        {!control && (isValidControlType || isNumericalInput) && (
+                        {!control && (isValidControlType || isNumericalInput) && path && (
                             <PropertyInput
                                 description={description}
                                 error={hasError}
@@ -899,7 +905,7 @@ const Property = ({
                                 maxLength={maxLength}
                                 min={minValue}
                                 minLength={minLength}
-                                name={arrayName ? `${arrayName}_${arrayIndex}` : `${path}.${name}`}
+                                name={path}
                                 onChange={handleInputChange}
                                 placeholder={
                                     isNumericalInput && minValue && maxValue
