@@ -1,13 +1,7 @@
-import {Button} from '@/components/ui/button';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
-import PropertySelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
 import {PropertyType, SubPropertyType} from '@/shared/types';
-import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
-import {PopoverClose} from '@radix-ui/react-popover';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -15,6 +9,7 @@ import getObjectParameterValueByPath from '../../utils/getObjectParameterValueBy
 import getParameterType from '../../utils/getParameterType';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
+import SubPropertyPopover from './components/SubPropertyPopover';
 
 interface ObjectPropertyProps {
     operationName?: string;
@@ -166,10 +161,7 @@ const ObjectProperty = ({
 
     return (
         <>
-            <ul
-                className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}
-                key={`${name}_${newPropertyName}`}
-            >
+            <ul className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}>
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => {
                     const subPropertyDefaultValue = subProperty.name ? parameterValue?.[subProperty.name] : '';
 
@@ -216,75 +208,14 @@ const ObjectProperty = ({
             </ul>
 
             {!!availablePropertyTypes?.length && (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                            size="sm"
-                            variant="ghost"
-                        >
-                            <PlusIcon className="size-4" /> Add property
-                        </Button>
-                    </PopoverTrigger>
-
-                    <PopoverContent className="min-w-[400px]">
-                        <header className="flex items-center justify-between">
-                            <span className="font-medium">Add property</span>
-
-                            <PopoverClose asChild>
-                                <Cross2Icon
-                                    aria-hidden="true"
-                                    className="size-4 cursor-pointer"
-                                    onClick={() => setNewPropertyName('')}
-                                />
-                            </PopoverClose>
-                        </header>
-
-                        <main className="my-2 space-y-2">
-                            <PropertyInput
-                                className="mb-2"
-                                label="Name"
-                                name="additionalPropertyName"
-                                onChange={(event) => setNewPropertyName(event.target.value)}
-                                placeholder="Name for the additional property"
-                                required
-                                value={newPropertyName}
-                            />
-
-                            {availablePropertyTypes?.length > 1 ? (
-                                <PropertySelect
-                                    label="Type"
-                                    onValueChange={(value) =>
-                                        setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
-                                    }
-                                    options={availablePropertyTypes.map((property) => ({
-                                        label: property.value!,
-                                        value: property.value!,
-                                    }))}
-                                    value={newPropertyType}
-                                />
-                            ) : (
-                                <div className="flex w-full flex-col">
-                                    <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
-
-                                    {availablePropertyTypes[0] && (
-                                        <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
-                                            {availablePropertyTypes[0].value}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-                        </main>
-
-                        <footer className="flex items-center justify-end space-x-2">
-                            <PopoverClose asChild>
-                                <Button disabled={!newPropertyName} onClick={handleAddItemClick} size="sm">
-                                    Add
-                                </Button>
-                            </PopoverClose>
-                        </footer>
-                    </PopoverContent>
-                </Popover>
+                <SubPropertyPopover
+                    availablePropertyTypes={availablePropertyTypes}
+                    handleClick={handleAddItemClick}
+                    newPropertyName={newPropertyName}
+                    newPropertyType={newPropertyType}
+                    setNewPropertyName={setNewPropertyName}
+                    setNewPropertyType={setNewPropertyType}
+                />
             )}
         </>
     );

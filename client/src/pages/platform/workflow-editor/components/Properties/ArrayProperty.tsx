@@ -1,19 +1,17 @@
 import {Button} from '@/components/ui/button';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyType} from '@/shared/types';
 import getRandomId from '@/shared/util/random-utils';
-import {Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
-import {PopoverClose} from '@radix-ui/react-popover';
+import {PlusIcon} from '@radix-ui/react-icons';
 import {useEffect, useState} from 'react';
 
 import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
+import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
-import PropertySelect from './components/PropertySelect';
-import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
+import SubPropertyPopover from './components/SubPropertyPopover';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
@@ -23,8 +21,8 @@ interface ArrayPropertyProps {
 
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
-    const [newItemType, setNewItemType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES | undefined>(
-        property.items?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+    const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
+        (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
@@ -32,7 +30,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const {items, name} = property;
 
     const handleAddItemClick = () => {
-        const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newItemType);
+        const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
 
         if (!currentComponent || !name) {
             return;
@@ -42,13 +40,13 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             ...matchingItem,
             controlType: matchingItem
                 ? matchingItem?.controlType
-                : (VALUE_PROPERTY_CONTROL_TYPES[newItemType!] as ControlTypeModel),
+                : (VALUE_PROPERTY_CONTROL_TYPES[newPropertyType!] as ControlTypeModel),
             custom: true,
             expressionEnabled: true,
             key: getRandomId(),
-            label: arrayItems.length.toString(),
+            label: `Item ${arrayItems.length.toString()}`,
             name: `${name}__${arrayItems.length.toString()}`,
-            type: matchingItem?.type || newItemType || 'STRING',
+            type: matchingItem?.type || newPropertyType || 'STRING',
         };
 
         setArrayItems([...arrayItems, newItem]);
@@ -66,7 +64,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         }
     };
 
-    const availableItemTypes = items?.length
+    const availablePropertyTypes = items?.length
         ? items?.reduce((types: Array<{label: string; value: string}>, item) => {
               if (item.type) {
                   types.push({
@@ -236,47 +234,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 )}
             </ul>
 
-            {availableItemTypes.length > 1 ? (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                            size="sm"
-                            variant="ghost"
-                        >
-                            <PlusIcon className="size-4" /> Add array item
-                        </Button>
-                    </PopoverTrigger>
-
-                    <PopoverContent className="min-w-[400px]">
-                        <header className="flex items-center justify-between">
-                            <span className="font-medium">Add item</span>
-
-                            <PopoverClose asChild>
-                                <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
-                            </PopoverClose>
-                        </header>
-
-                        <main className="my-2 space-y-2">
-                            <PropertySelect
-                                label="Type"
-                                onValueChange={(value) =>
-                                    setNewItemType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
-                                }
-                                options={availableItemTypes}
-                                value={newItemType}
-                            />
-                        </main>
-
-                        <footer className="flex items-center justify-end space-x-2">
-                            <PopoverClose asChild>
-                                <Button onClick={handleAddItemClick} size="sm">
-                                    Add
-                                </Button>
-                            </PopoverClose>
-                        </footer>
-                    </PopoverContent>
-                </Popover>
+            {availablePropertyTypes.length > 1 ? (
+                <SubPropertyPopover
+                    array
+                    availablePropertyTypes={availablePropertyTypes}
+                    handleClick={handleAddItemClick}
+                    newPropertyType={newPropertyType}
+                    setNewPropertyType={setNewPropertyType}
+                />
             ) : (
                 <Button
                     className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
