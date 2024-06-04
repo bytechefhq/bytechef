@@ -247,7 +247,9 @@ const Property = ({
             if (path?.includes('.')) {
                 const matchingArrayObject = getArrayParameterValueByPath(path, parameters);
 
-                currentValue = matchingArrayObject[name];
+                if (matchingArrayObject) {
+                    currentValue = matchingArrayObject[name];
+                }
             } else if (path?.includes('[')) {
                 currentValue = getArrayParameterValueByPath(path, parameters);
             }
