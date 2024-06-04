@@ -798,7 +798,6 @@ const Property = ({
                                 arrayName={arrayName}
                                 onDeleteClick={handleDeleteCustomPropertyClick}
                                 operationName={operationName}
-                                parameterValue={propertyParameterValue}
                                 path={path}
                                 property={property}
                             />

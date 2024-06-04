@@ -5,6 +5,7 @@ import {PropertyType, SubPropertyType} from '@/shared/types';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
 import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
 import Property from './Property';
@@ -18,19 +19,9 @@ interface ObjectPropertyProps {
     onDeleteClick?: (path: string) => void;
     path?: string;
     property: PropertyType;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parameterValue?: any;
 }
 
-const ObjectProperty = ({
-    arrayIndex,
-    arrayName,
-    onDeleteClick,
-    operationName,
-    parameterValue,
-    path,
-    property,
-}: ObjectPropertyProps) => {
+const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, path, property}: ObjectPropertyProps) => {
     const [subProperties, setSubProperties] = useState<Array<PropertyType>>(
         (property.properties as Array<PropertyType>) || []
     );
@@ -113,40 +104,42 @@ const ObjectProperty = ({
 
         let parameterObject = getObjectParameterValueByPath(path, currentComponent.parameters);
 
-        if (parameterObject && arrayName && arrayIndex) {
-            parameterObject = parameterObject[arrayIndex];
+        if (path.includes('.')) {
+            const parameterArrayValue = getArrayParameterValueByPath(path, currentComponent.parameters);
+
+            parameterObject = parameterArrayValue[name];
         }
 
         if (!parameterObject) {
             return;
         }
 
-        const objectParameters = properties?.length
+        const objectParameterKeys = properties?.length
             ? properties?.map((property) => property.name)
             : Object.keys(parameterObject);
 
-        const preexistingProperties = objectParameters.map((parameter) => {
+        const preexistingProperties = objectParameterKeys.map((parameterKey) => {
             const matchingProperty = (properties as Array<PropertyType>)?.find(
-                (property) => property.name === parameter
+                (property) => property.name === parameterKey
             );
 
             if (matchingProperty) {
                 return {
                     ...matchingProperty,
-                    defaultValue: parameterObject[parameter!],
+                    defaultValue: parameterObject[parameterKey!],
                 };
             } else {
-                const parameterItemType = getParameterType(parameterObject[parameter!]);
+                const parameterItemType = getParameterType(parameterObject[parameterKey!]);
 
                 return {
                     controlType: VALUE_PROPERTY_CONTROL_TYPES[
                         parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
                     ] as ControlTypeModel,
                     custom: true,
-                    defaultValue: parameterObject[parameter!],
+                    defaultValue: parameterObject[parameterKey!],
                     expressionEnabled: true,
-                    label: parameter,
-                    name: parameter,
+                    label: parameterKey,
+                    name: parameterKey,
                     type: parameterItemType,
                 };
             }
@@ -162,47 +155,43 @@ const ObjectProperty = ({
     return (
         <>
             <ul className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}>
-                {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => {
-                    const subPropertyDefaultValue = subProperty.name ? parameterValue?.[subProperty.name] : '';
-
-                    return (
-                        <div
-                            className={twMerge(
-                                'relative flex w-full',
-                                subProperty.controlType === 'OBJECT_BUILDER' && 'pl-2'
+                {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
+                    <div
+                        className={twMerge(
+                            'relative flex w-full',
+                            subProperty.controlType === 'OBJECT_BUILDER' && 'pl-2'
+                        )}
+                        key={`${property.name}_${subProperty.name}_${index}`}
+                    >
+                        <Property
+                            arrayIndex={arrayIndex}
+                            arrayName={arrayName}
+                            customClassName={twMerge(
+                                'w-full last-of-type:pb-0',
+                                label && 'mb-0',
+                                name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
                             )}
-                            key={`${property.name}_${subProperty.name}_${index}`}
-                        >
-                            <Property
-                                arrayIndex={arrayIndex}
-                                arrayName={arrayName}
-                                customClassName={twMerge(
-                                    'w-full last-of-type:pb-0',
-                                    label && 'mb-0',
-                                    name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
-                                )}
-                                inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
-                                objectName={arrayName ? '' : name}
-                                operationName={operationName}
-                                parameterValue={subPropertyDefaultValue}
-                                path={`${path}.${subProperty.name}`}
-                                property={{
-                                    ...subProperty,
-                                    name: subProperty.name,
-                                }}
-                                showDeletePropertyButton
+                            inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
+                            objectName={arrayName ? '' : name}
+                            operationName={operationName}
+                            parameterValue={subProperty.defaultValue}
+                            path={`${path}.${subProperty.name}`}
+                            property={{
+                                ...subProperty,
+                                name: subProperty.name,
+                            }}
+                            showDeletePropertyButton
+                        />
+
+                        {subProperty.custom && name && subProperty.name && currentComponent && (
+                            <DeletePropertyButton
+                                className="absolute right-0"
+                                onClick={() => handleDeleteClick(subProperty)}
+                                propertyName={subProperty.name}
                             />
-
-                            {subProperty.custom && name && subProperty.name && currentComponent && (
-                                <DeletePropertyButton
-                                    className="absolute right-0"
-                                    onClick={() => handleDeleteClick(subProperty)}
-                                    propertyName={subProperty.name}
-                                />
-                            )}
-                        </div>
-                    );
-                })}
+                        )}
+                    </div>
+                ))}
             </ul>
 
             {!!availablePropertyTypes?.length && (
