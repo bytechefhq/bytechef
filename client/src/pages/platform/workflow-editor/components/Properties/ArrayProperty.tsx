@@ -150,6 +150,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                         custom: true,
                         defaultValue: parameterItemValue,
                         expressionEnabled: true,
+                        label: `Item ${index}`,
                         name: index.toString(),
                         type: parameterItemType,
                     };
