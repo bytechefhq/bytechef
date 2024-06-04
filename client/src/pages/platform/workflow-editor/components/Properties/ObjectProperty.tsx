@@ -196,10 +196,8 @@ const ObjectProperty = ({
                             {subProperty.custom && name && subProperty.name && currentComponent && (
                                 <DeletePropertyButton
                                     className="absolute right-0"
-                                    currentComponent={currentComponent}
                                     onClick={() => handleDeleteClick(subProperty)}
-                                    propertyName={name}
-                                    subPropertyName={subProperty.name}
+                                    propertyName={subProperty.name}
                                 />
                             )}
                         </div>
