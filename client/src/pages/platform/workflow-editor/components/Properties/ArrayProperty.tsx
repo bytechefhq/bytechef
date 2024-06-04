@@ -92,28 +92,25 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         }
 
         let params = currentComponent.parameters;
+        let currentParameterValues;
 
         if (path) {
             params = getArrayParameterValueByPath(path, currentComponent.parameters);
 
+            currentParameterValues = params.filter((param: ArrayPropertyType) => param !== null);
+
             if (path.includes('.')) {
                 params = getObjectParameterValueByPath(path, currentComponent.parameters);
+
+                currentParameterValues = params;
             }
         }
 
-        if (!params) {
+        if (!params || !currentParameterValues) {
             return;
         }
 
-        const currentParameterValues: Array<ArrayPropertyType> = params.filter(
-            (param: ArrayPropertyType) => param !== null
-        );
-
-        if (!currentParameterValues) {
-            return;
-        }
-
-        if (items?.length && name && items[0].type === 'OBJECT' && Array.isArray(currentParameterValues)) {
+        if (items?.length && items[0].type === 'OBJECT' && Array.isArray(currentParameterValues)) {
             const parameterArrayItems = currentParameterValues.map(
                 (parameterItem: ArrayPropertyType, index: number) => {
                     const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
@@ -137,7 +134,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
-        } else if (name && Array.isArray(currentParameterValues)) {
+        } else if (Array.isArray(currentParameterValues)) {
             const parameterArrayItems = currentParameterValues.map(
                 (parameterItemValue: ArrayPropertyType, index: number) => {
                     const parameterItemType = getParameterType(parameterItemValue);
