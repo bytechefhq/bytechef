@@ -7,6 +7,7 @@
 
 package com.bytechef.api.gateway;
 
+import com.bytechef.logback.config.CRLFLogConverter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
@@ -69,6 +70,7 @@ public class ApiGatewayApplication {
         }
 
         log.info(
+            CRLFLogConverter.CRLF_SAFE_MARKER,
             """
                 ----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:

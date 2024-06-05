@@ -7,6 +7,7 @@
 
 package com.bytechef.scheduler;
 
+import com.bytechef.logback.config.CRLFLogConverter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
@@ -63,6 +64,7 @@ public class SchedulerApplication {
         }
 
         logger.info(
+            CRLFLogConverter.CRLF_SAFE_MARKER,
             """
                 \n----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:
