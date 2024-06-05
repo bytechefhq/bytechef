@@ -107,7 +107,9 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         if (path.includes('[')) {
             const parameterArrayValue = getArrayParameterValueByPath(path, currentComponent.parameters);
 
-            parameterObject = parameterArrayValue[name];
+            if (parameterArrayValue && parameterArrayValue[name]) {
+                parameterObject = parameterArrayValue[name];
+            }
         }
 
         if (!parameterObject) {

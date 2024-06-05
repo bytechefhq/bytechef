@@ -22,7 +22,7 @@ interface ArrayPropertyProps {
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
-        (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
+        property.items?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
     );
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
@@ -213,7 +213,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                                 arrayName={name}
                                 currentComponent={currentComponent}
                                 index={index}
-                                key={`${(arrayItem as unknown as ArrayPropertyType).name}_${subItem.name}_${subItemIndex}`}
+                                key={`${(arrayItem as unknown as ArrayPropertyType).key}_${subItem.name}_${subItemIndex}`}
                                 onDeleteClick={handleDeleteClick}
                                 path={path}
                                 setArrayItems={setArrayItems}
@@ -225,7 +225,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                             arrayName={name}
                             currentComponent={currentComponent}
                             index={index}
-                            key={arrayItem.key}
+                            key={arrayItem.key || `${path}_${name}_${arrayItem.name}_${index}`}
                             onDeleteClick={handleDeleteClick}
                             path={`${path}[${index}]`}
                             setArrayItems={setArrayItems}
@@ -239,12 +239,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     array
                     availablePropertyTypes={availablePropertyTypes}
                     handleClick={handleAddItemClick}
+                    key={`${path}_${name}_subPropertyPopoverButton`}
                     newPropertyType={newPropertyType}
                     setNewPropertyType={setNewPropertyType}
                 />
             ) : (
                 <Button
                     className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                    key={`${path}_${name}_addPropertyPopoverButton`}
                     onClick={handleAddItemClick}
                     size="sm"
                     variant="ghost"

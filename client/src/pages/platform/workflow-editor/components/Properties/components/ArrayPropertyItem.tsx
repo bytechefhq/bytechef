@@ -37,14 +37,19 @@ const ArrayPropertyItem = ({
                 arrayName={arrayName}
                 customClassName="pl-2 w-full"
                 inputTypeSwitchButtonClassName="ml-auto"
-                key={`${arrayName}_${arrayItem.name}_property`}
+                key={`${arrayName}_${arrayItem.name}_${arrayItem.key}_property`}
                 parameterValue={arrayItem.defaultValue}
                 path={path}
                 property={arrayItem as ArrayPropertyType}
             />
 
             {arrayItem.custom && arrayName && arrayItem.name && currentComponent && (
-                <DeletePropertyButton className="ml-2 mr-4" onClick={handleOnDeleteClick} propertyName={path} />
+                <DeletePropertyButton
+                    className="ml-2 mr-4"
+                    key={`${arrayItem.key}_deleteSubPropertyButton`}
+                    onClick={handleOnDeleteClick}
+                    propertyName={path}
+                />
             )}
         </div>
     );

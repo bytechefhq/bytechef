@@ -247,7 +247,7 @@ const Property = ({
             if (path?.includes('.')) {
                 const matchingArrayObject = getArrayParameterValueByPath(path, parameters);
 
-                if (matchingArrayObject[name]) {
+                if (matchingArrayObject && matchingArrayObject[name]) {
                     currentValue = matchingArrayObject[name];
                 }
             } else if (path?.includes('[')) {
@@ -496,13 +496,15 @@ const Property = ({
 
         const currentWorkflowComponent = workflowComponents?.find((component) => component.name === currentNode?.name);
 
-        if (!currentWorkflowComponent) {
+        if (!currentWorkflowComponent || !currentWorkflowComponent.parameters) {
             return;
         }
 
+        const {parameters} = currentWorkflowComponent;
+
         if (!propertyParameterValue || propertyParameterValue === defaultValue) {
             if (!path) {
-                setPropertyParameterValue(currentWorkflowComponent.parameters?.[name]);
+                setPropertyParameterValue(parameters[name]);
 
                 return;
             }
@@ -510,25 +512,33 @@ const Property = ({
             let paramValue;
 
             if (path.includes('.')) {
-                setPropertyParameterValue(getObjectParameterValueByPath(path, currentWorkflowComponent.parameters));
+                paramValue = getObjectParameterValueByPath(path, parameters);
 
-                return;
+                if (paramValue) {
+                    setPropertyParameterValue(paramValue);
+
+                    return;
+                }
             }
 
             if (path.includes('[')) {
-                paramValue = getArrayParameterValueByPath(path, currentWorkflowComponent.parameters);
+                paramValue = getArrayParameterValueByPath(path, parameters);
 
                 const pathToObjectInsideArray = path.slice(path.lastIndexOf(']') + 2);
 
                 if (paramValue && typeof paramValue === 'object' && pathToObjectInsideArray) {
                     paramValue = getObjectParameterValueByPath(pathToObjectInsideArray, paramValue);
+                } else if (paramValue) {
+                    setPropertyParameterValue(paramValue);
+
+                    return;
                 }
             }
 
             if (paramValue) {
                 setPropertyParameterValue(paramValue);
             } else {
-                setPropertyParameterValue(currentWorkflowComponent.parameters?.[name]);
+                setPropertyParameterValue(parameters[name]);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
