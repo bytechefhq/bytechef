@@ -6,9 +6,17 @@ replicaCount: 1
 
 image:
   repository: bitnaprednost/bytechef-monolith
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
+
+env:
+  normal:
+    SERVER_PORT: 9555
+    SPRING_PROFILES_ACTIVE: "dev,docker"
+    BYTECHEF_RESOURCES_WEB: "file:///opt/bytechef/client/"
+  secret: {}
+
 
 imagePullSecrets: []
 nameOverride: ""
@@ -75,10 +83,12 @@ livenessProbe:
   httpGet:
     path: /actuator/health/liveness
     port: 9555
+  initialDelaySeconds: 80
 readinessProbe:
   httpGet:
     path: /actuator/health/readiness/
     port: 9555
+  initialDelaySeconds: 80
 
 autoscaling:
   enabled: false
@@ -105,11 +115,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-# Helm Variables
-# Used to set ENVIRONMENT VARIABLES for ByteChef Qube
-datasourceJdbcUrl: overrideWithQubinetsValues
-datasourcePassword: overrideWithQubinetsValues
-datasourceUsername: overrideWithQubinetsValues
-springProfilesActive: overrideWithQubinetsValues
-webResourceUrl: overrideWithQubinetsValues

@@ -36,17 +36,15 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: "BYTECHEF_DATASOURCE_URL"
-              value: {{ .Values.datasourceJdbcUrl }}
-            - name: "BYTECHEF_DATASOURCE_PASSWORD"
-              value: {{ .Values.datasourcePassword }}
-            - name: "BYTECHEF_DATASOURCE_USERNAME"
-              value: {{ .Values.datasourceUsername }}
-            - name: "BYTECHEF_RESOURCES_WEB"
-              value: {{ .Values.webResourceUrl }}
-            - name: "SPRING_PROFILES_ACTIVE"
-              value: {{ .Values.springProfilesActive }}
+          envFrom:
+          {{- if .Values.env.secret }}
+          - secretRef:
+              name: {{ include "bytechef-monolith.fullname" . }}-envs
+          {{- end }}
+          {{- if .Values.env.normal }}
+          - configMapRef:
+              name: {{ include "bytechef-monolith.fullname" . }}-envs
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
