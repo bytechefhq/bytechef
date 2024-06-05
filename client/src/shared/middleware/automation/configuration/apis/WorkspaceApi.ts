@@ -30,6 +30,10 @@ export interface DeleteWorkspaceRequest {
     id: number;
 }
 
+export interface GetUserWorkspacesRequest {
+    id: number;
+}
+
 export interface GetWorkspaceRequest {
     id: number;
 }
@@ -114,6 +118,41 @@ export class WorkspaceApi extends runtime.BaseAPI {
      */
     async deleteWorkspace(requestParameters: DeleteWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteWorkspaceRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get all user workspaces.
+     * Get all user workspaces
+     */
+    async getUserWorkspacesRaw(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkspaceModel>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getUserWorkspaces().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/users/{id}/workspaces`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkspaceModelFromJSON));
+    }
+
+    /**
+     * Get all user workspaces.
+     * Get all user workspaces
+     */
+    async getUserWorkspaces(requestParameters: GetUserWorkspacesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkspaceModel>> {
+        const response = await this.getUserWorkspacesRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
