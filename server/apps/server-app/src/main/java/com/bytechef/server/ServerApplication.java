@@ -16,6 +16,7 @@
 
 package com.bytechef.server;
 
+import com.bytechef.logback.config.CRLFLogConverter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -68,6 +69,7 @@ public class ServerApplication {
         }
 
         logger.info(
+            CRLFLogConverter.CRLF_SAFE_MARKER,
             """
                 ----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:

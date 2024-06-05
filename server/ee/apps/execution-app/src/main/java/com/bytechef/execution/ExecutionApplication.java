@@ -7,6 +7,7 @@
 
 package com.bytechef.execution;
 
+import com.bytechef.logback.config.CRLFLogConverter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -64,6 +65,7 @@ public class ExecutionApplication {
         }
 
         logger.info(
+            CRLFLogConverter.CRLF_SAFE_MARKER,
             """
                 \n----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:
