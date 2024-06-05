@@ -130,7 +130,7 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
                             name="description"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>Description</FormLabel>
 
                                     <FormControl>
                                         <Textarea rows={6} {...field} />
