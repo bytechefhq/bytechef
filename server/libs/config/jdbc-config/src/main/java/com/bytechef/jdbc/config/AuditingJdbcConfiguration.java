@@ -16,10 +16,13 @@
 
 package com.bytechef.jdbc.config;
 
+import com.bytechef.platform.security.util.SecurityUtils;
+import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
@@ -31,8 +34,16 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableJdbcRepositories(basePackages = "com.bytechef")
 public class AuditingJdbcConfiguration {
 
+    private static final String SYSTEM = "system";
+
     @Bean
     public DateTimeProvider auditingDateTimeProvider() {
         return CurrentDateTimeProvider.INSTANCE;
+    }
+
+    @Bean
+    AuditorAware<String> springSecurityAuditorAware() {
+        return () -> Optional.of(SecurityUtils.getCurrentUserLogin()
+            .orElse(SYSTEM));
     }
 }

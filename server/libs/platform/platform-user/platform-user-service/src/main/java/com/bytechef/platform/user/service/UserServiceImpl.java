@@ -16,30 +16,31 @@
 
 package com.bytechef.platform.user.service;
 
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
-import com.bytechef.platform.user.dto.UserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
-import com.bytechef.platform.user.exception.UsernameAlreadyUsedException;
+import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
 import com.bytechef.platform.user.util.RandomUtils;
-import com.bytechef.platform.user.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -59,6 +60,8 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    private static final EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
+
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
     private final PasswordEncoder passwordEncoder;
@@ -76,6 +79,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    @Override
     public Optional<User> activateRegistration(String key) {
         logger.debug("Activating user for activation key {}", key);
 
@@ -84,12 +88,18 @@ public class UserServiceImpl implements UserService {
                 // activate given user for the registration key.
                 user.setActivated(true);
                 user.setActivationKey(null);
+
+                user = userRepository.save(user);
+
                 this.clearUserCaches(user);
+
                 logger.debug("Activated user: {}", user);
+
                 return user;
             });
     }
 
+    @Override
     public Optional<User> completePasswordReset(String newPassword, String key) {
         logger.debug("Reset user password for reset key {}", key);
 
@@ -102,33 +112,49 @@ public class UserServiceImpl implements UserService {
                 user.setResetKey(null);
                 user.setResetDate(null);
 
+                user = userRepository.save(user);
+
                 this.clearUserCaches(user);
 
                 return user;
             });
     }
 
-    public Optional<User> requestPasswordReset(String mail) {
-        return userRepository.findByEmailIgnoreCase(mail)
+    @Override
+    public long countActiveUsers() {
+        return userRepository.countAllByActivatedIsTrue();
+    }
+
+    @Override
+    public Optional<User> requestPasswordReset(String email) {
+        return userRepository.findByEmailIgnoreCase(email)
             .filter(User::isActivated)
             .map(user -> {
                 user.setResetKey(RandomUtils.generateResetKey());
                 user.setResetDate(Instant.now());
 
+                user = userRepository.save(user);
+
                 this.clearUserCaches(user);
 
                 return user;
             });
     }
 
+    @Override
     public User registerUser(AdminUserDTO userDTO, String password) {
+        if (!EMAIL_VALIDATOR.isValid(userDTO.getEmail())) {
+            throw new InvalidEmailException(userDTO.getEmail());
+        }
+
         String login = userDTO.getLogin();
 
         userRepository.findByLogin(login.toLowerCase())
             .ifPresent(existingUser -> {
                 boolean removed = removeNonActivatedUser(existingUser);
+
                 if (!removed) {
-                    throw new UsernameAlreadyUsedException();
+                    throw new LoginAlreadyUsedException();
                 }
             });
 
@@ -165,7 +191,7 @@ public class UserServiceImpl implements UserService {
 
         Set<Authority> authorities = new HashSet<>();
 
-        authorityRepository.findByName(AuthoritiesConstants.USER)
+        authorityRepository.findByName(AuthorityConstants.ADMIN)
             .ifPresent(authorities::add);
 
         newUser.setAuthorities(authorities);
@@ -174,23 +200,12 @@ public class UserServiceImpl implements UserService {
 
         this.clearUserCaches(newUser);
 
-        logger.debug("Created Information for User: {}", newUser);
+        logger.debug("Created User: {}", newUser);
 
         return newUser;
     }
 
-    private boolean removeNonActivatedUser(User existingUser) {
-        if (existingUser.isActivated()) {
-            return false;
-        }
-
-        userRepository.delete(existingUser);
-
-        this.clearUserCaches(existingUser);
-
-        return true;
-    }
-
+    @Override
     public User createUser(AdminUserDTO userDTO) {
         User user = new User();
 
@@ -203,6 +218,10 @@ public class UserServiceImpl implements UserService {
         String email = userDTO.getEmail();
 
         if (email != null) {
+            if (!EMAIL_VALIDATOR.isValid(userDTO.getEmail())) {
+                throw new InvalidEmailException(email.toLowerCase());
+            }
+
             user.setEmail(email.toLowerCase());
         }
 
@@ -236,7 +255,7 @@ public class UserServiceImpl implements UserService {
 
         this.clearUserCaches(user);
 
-        logger.debug("Created Information for User: {}", user);
+        logger.debug("Created User: {}", user);
 
         return user;
     }
@@ -247,7 +266,8 @@ public class UserServiceImpl implements UserService {
      * @param userDTO user to update.
      * @return updated user.
      */
-    public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
+    @Override
+    public Optional<User> updateUser(AdminUserDTO userDTO) {
         return Optional.of(userRepository.findById(userDTO.getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -277,17 +297,17 @@ public class UserServiceImpl implements UserService {
                         .map(Optional::get)
                         .collect(Collectors.toSet()));
 
-                userRepository.save(user);
+                user = userRepository.save(user);
 
                 this.clearUserCaches(user);
 
                 logger.debug("Changed Information for User: {}", user);
 
                 return user;
-            })
-            .map(AdminUserDTO::new);
+            });
     }
 
+    @Override
     public void deleteUser(String login) {
         userRepository.findByLogin(login)
             .ifPresent(user -> {
@@ -299,6 +319,11 @@ public class UserServiceImpl implements UserService {
             });
     }
 
+    @Override
+    public Optional<User> fetchUserByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email);
+    }
+
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -308,7 +333,12 @@ public class UserServiceImpl implements UserService {
      * @param langKey   language key.
      * @param imageUrl  image URL of user.
      */
+    @Override
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+        if (!EMAIL_VALIDATOR.isValid(email)) {
+            throw new InvalidEmailException(email);
+        }
+
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findByLogin)
             .ifPresent(user -> {
@@ -330,6 +360,7 @@ public class UserServiceImpl implements UserService {
             });
     }
 
+    @Override
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
         SecurityUtils.getCurrentUserLogin()
@@ -345,31 +376,29 @@ public class UserServiceImpl implements UserService {
 
                 user.setPassword(encryptedPassword);
 
+                user = userRepository.save(user);
+
                 this.clearUserCaches(user);
 
                 logger.debug("Changed password for User: {}", user);
             });
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Page<AdminUserDTO> getAllManagedUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
-            .map(AdminUserDTO::new);
+    public Page<User> getAllManagedUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Page<UserDTO> getAllPublicUsers(Pageable pageable) {
-        return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable)
-            .map(UserDTO::new);
+    public Page<User> getAllActiveUsers(Pageable pageable) {
+        return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable);
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findByLogin(login);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities() {
+    public Optional<User> fetchCurrentUser() {
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findByLogin);
     }
@@ -380,16 +409,13 @@ public class UserServiceImpl implements UserService {
      * <p>
      * This is scheduled to get fired everyday, at midnight.
      */
+    @Override
     @Scheduled(cron = "0 0 0 * * ?")
     public void removeOldPersistentTokens() {
         LocalDate now = LocalDate.now();
         persistentTokenRepository.findAllByTokenDateBefore(now.minusMonths(1))
             .forEach(token -> {
                 logger.debug("Deleting token {}", token.getSeries());
-
-//                User user = token.getUser();
-//
-//                user.getPersistentTokens().remove(token);
 
                 persistentTokenRepository.delete(token);
             });
@@ -400,12 +426,15 @@ public class UserServiceImpl implements UserService {
      * <p>
      * This is scheduled to get fired everyday, at 01:00 (am).
      */
+    @Override
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
                 Instant.now()
-                    .minus(3, ChronoUnit.DAYS))
+                    .minus(3, ChronoUnit.DAYS)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime())
             .forEach(user -> {
                 logger.debug("Deleting not activated user {}", user.getLogin());
 
@@ -415,17 +444,15 @@ public class UserServiceImpl implements UserService {
             });
     }
 
-    /**
-     * Gets a list of all the authorities.
-     *
-     * @return a list of all the authorities.
-     */
-    @Transactional(readOnly = true)
-    public List<String> getAuthorities() {
-        return authorityRepository.findAll()
-            .stream()
-            .map(Authority::getName)
-            .toList();
+    @Override
+    public Optional<User> fetchUserByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
+    @Override
+    public User getUser(long id) {
+        return userRepository.findById(id)
+            .orElseThrow();
     }
 
     @SuppressFBWarnings("NP")
@@ -439,14 +466,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public Optional<User> fetchUserByLogin(String login) {
-        return userRepository.findByLogin(login);
-    }
+    private boolean removeNonActivatedUser(User existingUser) {
+        if (existingUser.isActivated()) {
+            return false;
+        }
 
-    @Override
-    public User getUser(long id) {
-        return userRepository.findById(id)
-            .orElseThrow();
+        userRepository.delete(existingUser);
+
+        this.clearUserCaches(existingUser);
+
+        return true;
     }
 }

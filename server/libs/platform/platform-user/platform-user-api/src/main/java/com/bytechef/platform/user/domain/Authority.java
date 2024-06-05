@@ -33,21 +33,32 @@ public class Authority {
     @Column
     private String name;
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getName() {
         return this.name;
     }
 
+    public Authority id(long id) {
+        this.setId(id);
+
+        return this;
+    }
+
     public Authority name(String name) {
         this.setName(name);
+
         return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return this.id;
     }
 
     @Override

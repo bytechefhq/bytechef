@@ -22,7 +22,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.automation.configuration.exception.ProjectInstanceErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
@@ -30,6 +29,7 @@ import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConne
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.automation.configuration.dto.ProjectInstanceWorkflowDTO;
+import com.bytechef.automation.configuration.exception.ProjectInstanceErrorType;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -41,13 +41,13 @@ import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.exception.ConfigurationException;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -129,7 +129,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         Project project = projectService.getProject(Validate.notNull(projectInstance.getProjectId(), "projectId"));
 
         if (!project.isPublished()) {
-            throw new ConfigurationException(
+            throw new PlatformException(
                 "Project id=%s is not published".formatted(projectId),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
@@ -180,7 +180,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
         if (projectInstance.isEnabled()) {
-            throw new ConfigurationException(
+            throw new PlatformException(
                 "Project instance id=%s is enabled".formatted(id), ProjectInstanceErrorType.DELETE_PROJECT_INSTANCE);
         }
 
@@ -573,7 +573,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 projectInstanceWorkflowConnection.getConnectionId());
 
             WorkflowConnection workflowConnection = workflowConnectionFacade.getWorkflowConnection(
-                workflow, projectInstanceWorkflowConnection.getWorkflowNodeName(),
+                workflow.getId(), projectInstanceWorkflowConnection.getWorkflowNodeName(),
                 projectInstanceWorkflowConnection.getKey());
 
             if (!Objects.equals(connection.getComponentName(), workflowConnection.componentName())) {

@@ -17,16 +17,22 @@
 package com.bytechef.server;
 
 import com.bytechef.logback.config.CRLFLogConverter;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
 
 /**
  * @author Ivica Cardic
@@ -36,6 +42,8 @@ public class ServerApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerApplication.class);
 
+    private static UserService userService;
+
     /**
      * Main method, used to run the application.
      *
@@ -44,8 +52,11 @@ public class ServerApplication {
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(ServerApplication.class);
 
-        Environment environment = springApplication.run(args)
-            .getEnvironment();
+        ApplicationContext applicationContext = springApplication.run(args);
+
+        userService = applicationContext.getBean(UserService.class);
+
+        Environment environment = applicationContext.getEnvironment();
 
         logApplicationStartup(environment);
     }
@@ -68,6 +79,8 @@ public class ServerApplication {
             logger.warn("The host name could not be determined, using `localhost` as fallback");
         }
 
+        String[] environments = environment.getActiveProfiles();
+
         logger.info(
             CRLFLogConverter.CRLF_SAFE_MARKER,
             """
@@ -76,7 +89,8 @@ public class ServerApplication {
                 \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
                 \tSwaggerUI: \t{}
-                \tProfile(s): \t{}
+                \tProfile(s): {}
+                \tUsers: \t\t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -86,10 +100,25 @@ public class ServerApplication {
             hostAddress,
             serverPort,
             contextPath,
-            Arrays.asList(environment.getActiveProfiles())
-                .contains("api-docs")
-                    ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
-                    : "",
-            environment.getActiveProfiles());
+            getSwaggerUiUrl(Arrays.asList(environments), protocol, serverPort, contextPath),
+            environments,
+            getUsers(Arrays.asList(environments)));
+    }
+
+    private static String getSwaggerUiUrl(
+        List<String> environments, String protocol, String serverPort, String contextPath) {
+
+        return environments.contains("api-docs")
+            ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
+            : "";
+    }
+
+    private static String getUsers(List<String> environments) {
+        return environments.contains("dev")
+            ? userService.getAllActiveUsers(Pageable.ofSize(10))
+                .stream()
+                .map(User::getEmail)
+                .collect(Collectors.joining(", "))
+            : "";
     }
 }

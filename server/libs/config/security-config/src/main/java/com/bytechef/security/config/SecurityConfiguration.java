@@ -19,33 +19,41 @@ package com.bytechef.security.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import com.bytechef.embedded.configuration.service.ConnectedUserService;
-import com.bytechef.embedded.user.service.SigningKeyService;
-import com.bytechef.platform.user.security.constant.AuthoritiesConstants;
-import com.bytechef.platform.user.service.ApiKeyService;
-import com.bytechef.security.web.rest.filter.ApiKeyAuthenticationFilter;
-import com.bytechef.security.web.rest.filter.ConnectedUserAuthenticationFilter;
+import com.bytechef.platform.security.config.SecurityProperties;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
+import com.bytechef.platform.security.web.matcher.RequestMatcherContributor;
+import com.bytechef.security.web.rest.filter.CookieCsrfFilter;
 import com.bytechef.security.web.rest.filter.SpaWebFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.function.Supplier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
@@ -56,25 +64,21 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
-    private final ApiKeyService apiKeyService;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final ConnectedUserService connectedUserService;
     private final RememberMeServices rememberMeServices;
     private final SecurityProperties securityProperties;
-    private final SigningKeyService signingKeyService;
+    private final List<FilterBeforeContributor> filterBeforeContributors;
+    private final List<RequestMatcherContributor> requestMatcherContributors;
 
     @SuppressFBWarnings("EI")
     public SecurityConfiguration(
-        ApiKeyService apiKeyService, AuthenticationManagerBuilder authenticationManagerBuilder,
-        ConnectedUserService connectedUserService, RememberMeServices rememberMeServices,
-        SecurityProperties securityProperties, SigningKeyService signingKeyService) {
+        RememberMeServices rememberMeServices, SecurityProperties securityProperties,
+        List<FilterBeforeContributor> filterBeforeContributors,
+        List<RequestMatcherContributor> requestMatcherContributors) {
 
-        this.apiKeyService = apiKeyService;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.connectedUserService = connectedUserService;
         this.rememberMeServices = rememberMeServices;
         this.securityProperties = securityProperties;
-        this.signingKeyService = signingKeyService;
+        this.filterBeforeContributors = filterBeforeContributors;
+        this.requestMatcherContributors = requestMatcherContributors;
     }
 
     @Bean
@@ -86,20 +90,17 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
             .cors(withDefaults())
-            // TODO
-//            .csrf(csrf -> csrf
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                // See https://stackoverflow.com/q/74447118/65681
-//                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
-            .addFilterBefore(
-                new ConnectedUserAuthenticationFilter(connectedUserService, signingKeyService),
-                UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(
-                new ApiKeyAuthenticationFilter(apiKeyService),
-                UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
-//            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // See https://stackoverflow.com/q/74447118/65681
+                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()));
+
+        for (FilterBeforeContributor filterBeforeContributor : filterBeforeContributors) {
+            http.addFilterAfter(filterBeforeContributor.getFilter(), filterBeforeContributor.getBeforeFilter());
+        }
+
+        http.addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class)
             .headers(
                 headers -> headers
                     .contentSecurityPolicy(csp -> csp.policyDirectives(securityProperties.getContentSecurityPolicy()))
@@ -111,10 +112,8 @@ public class SecurityConfiguration {
                         permissions -> permissions.policy(
                             "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()")))
             .authorizeHttpRequests(
-                authz -> authz
+                authz -> requestMatchers(authz, mvc)
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"))
-                    .permitAll()
-                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/assets/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/actuator/health"))
                     .permitAll()
@@ -125,7 +124,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/actuator/prometheus"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/actuator/**"))
-                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .hasAuthority(AuthorityConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/authenticate"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/api/register"))
@@ -137,14 +136,19 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**"))
-                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .hasAuthority(AuthorityConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/embedded/public/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern("/api/embedded/by-user-token/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern("/api/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern("/assets/**"))
                     .permitAll()
-//                        .requestMatchers(mvc.pattern("/api/**")).authenticated()
+                    .requestMatchers(mvc.pattern("/i18n/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.pattern("/index.html"))
+                    .permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui.html"))
@@ -178,6 +182,18 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    private AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requestMatchers(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz,
+        MvcRequestMatcher.Builder mvc) {
+
+        for (RequestMatcherContributor requestMatcherContributor : requestMatcherContributors) {
+            authz.requestMatchers(requestMatcherContributor.getRequestMatcher(mvc))
+                .authenticated();
+        }
+
+        return authz;
+    }
+
     @Bean
     MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
         return new MvcRequestMatcher.Builder(introspector);
@@ -187,5 +203,47 @@ public class SecurityConfiguration {
         SecurityProperties.RememberMe rememberMe = securityProperties.getRememberMe();
 
         return rememberMe.getKey();
+    }
+
+    /**
+     * Custom CSRF handler to provide BREACH protection.
+     *
+     * @see <a href=
+     *      "https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html#csrf-integration-javascript-spa">Spring
+     *      Security Documentation - Integrating with CSRF Protection</a>
+     * @see <a href="https://github.com/jhipster/generator-jhipster/pull/25907">JHipster - use customized
+     *      SpaCsrfTokenRequestHandler to handle CSRF token</a>
+     * @see <a href="https://stackoverflow.com/q/74447118/65681">CSRF protection not working with Spring Security 6</a>
+     */
+    static final class SpaCsrfTokenRequestHandler extends CsrfTokenRequestAttributeHandler {
+
+        private final CsrfTokenRequestHandler delegate = new XorCsrfTokenRequestAttributeHandler();
+
+        @Override
+        public void handle(HttpServletRequest request, HttpServletResponse response, Supplier<CsrfToken> csrfToken) {
+            /*
+             * Always use XorCsrfTokenRequestAttributeHandler to provide BREACH protection of the CsrfToken when it is
+             * rendered in the response body.
+             */
+            this.delegate.handle(request, response, csrfToken);
+        }
+
+        @Override
+        public String resolveCsrfTokenValue(HttpServletRequest request, CsrfToken csrfToken) {
+            /*
+             * If the request contains a request header, use CsrfTokenRequestAttributeHandler to resolve the CsrfToken.
+             * This applies when a single-page application includes the header value automatically, which was obtained
+             * via a cookie containing the raw CsrfToken.
+             */
+            if (StringUtils.hasText(request.getHeader(csrfToken.getHeaderName()))) {
+                return super.resolveCsrfTokenValue(request, csrfToken);
+            }
+            /*
+             * In all other cases (e.g. if the request contains a request parameter), use
+             * XorCsrfTokenRequestAttributeHandler to resolve the CsrfToken. This applies when a server-side rendered
+             * form includes the _csrf request parameter as a hidden input.
+             */
+            return this.delegate.resolveCsrfTokenValue(request, csrfToken);
+        }
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.repository;
 
 import com.bytechef.platform.user.domain.User;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,10 +34,11 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends ListCrudRepository<User, Long>, ListPagingAndSortingRepository<User, Long> {
 
     String USERS_BY_LOGIN_CACHE = "usersByLogin";
-
     String USERS_BY_EMAIL_CACHE = "usersByEmail";
 
-    List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime);
+    long countAllByActivatedIsTrue();
+
+    List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(LocalDateTime dateTime);
 
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 

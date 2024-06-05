@@ -37,6 +37,14 @@ public final class OptionalUtils {
         return optional.orElseThrow();
     }
 
+    public static <T, U> U get(Optional<T> optional, Function<? super T, ? extends U> mapper) {
+        Validate.notNull(optional, "'optional' must not be null");
+
+        return optional
+            .map(mapper)
+            .orElseThrow();
+    }
+
     public static <T> T get(Optional<T> optional, String exceptionMessage) {
         Validate.notNull(optional, "'optional' must not be null");
 

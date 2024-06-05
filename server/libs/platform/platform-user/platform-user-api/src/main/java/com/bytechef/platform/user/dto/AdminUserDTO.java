@@ -16,10 +16,20 @@
 
 package com.bytechef.platform.user.dto;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.user.constant.UserConstants;
+import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -29,18 +39,27 @@ public class AdminUserDTO {
 
     private Long id;
 
+    @NotBlank
+    @Pattern(regexp = UserConstants.LOGIN_REGEX)
+    @Size(min = 1, max = 50)
     private String login;
 
+    @Size(max = 50)
     private String firstName;
 
+    @Size(max = 50)
     private String lastName;
 
+    @Email
+    @Size(min = 5, max = 254)
     private String email;
 
+    @Size(max = 256)
     private String imageUrl;
 
     private boolean activated = false;
 
+    @Size(min = 2, max = 10)
     private String langKey;
 
     private String createdBy;
@@ -57,7 +76,7 @@ public class AdminUserDTO {
         // Empty constructor needed for Jackson.
     }
 
-    public AdminUserDTO(User user) {
+    public AdminUserDTO(User user, List<Authority> authorities) {
         this.id = user.getId();
         this.login = user.getLogin();
         this.firstName = user.getFirstName();
@@ -70,7 +89,12 @@ public class AdminUserDTO {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
-//        this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        this.authorities = user.getAuthorityIds()
+            .stream()
+            .map(authorityId -> CollectionUtils.getFirst(
+                authorities, authority -> Objects.equals(authority.getId(), authorityId)))
+            .map(Authority::getName)
+            .collect(Collectors.toSet());
     }
 
     public Long getId() {

@@ -19,6 +19,8 @@ package com.bytechef.platform.user.domain;
 import java.time.LocalDate;
 import java.util.Objects;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -27,9 +29,12 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("persistent_token")
-public class PersistentToken {
+public class PersistentToken implements Persistable<String> {
 
     private static final int MAX_USER_AGENT_LEN = 255;
+
+    @Transient
+    private boolean isNew;
 
     @Id
     private String series;
@@ -48,20 +53,17 @@ public class PersistentToken {
 
     private AggregateReference<User, Long> userId;
 
+    @Override
+    public String getId() {
+        return series;
+    }
+
     public String getSeries() {
         return series;
     }
 
-    public void setSeries(String series) {
-        this.series = series;
-    }
-
     public String getTokenValue() {
         return tokenValue;
-    }
-
-    public void setTokenValue(String tokenValue) {
-        this.tokenValue = tokenValue;
     }
 
     public LocalDate getTokenDate() {
@@ -76,12 +78,29 @@ public class PersistentToken {
         return ipAddress;
     }
 
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public Long getUserId() {
+        return userId.getId();
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
-    public String getUserAgent() {
-        return userAgent;
+    public void setSeries(String series) {
+        this.series = series;
     }
 
     public void setUserAgent(String userAgent) {
@@ -92,8 +111,8 @@ public class PersistentToken {
         }
     }
 
-    public Long getUserId() {
-        return userId.getId();
+    public void setTokenValue(String tokenValue) {
+        this.tokenValue = tokenValue;
     }
 
     public void setUser(User user) {

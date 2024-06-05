@@ -7,6 +7,3 @@ spring:
   devtools:
     restart:
       enabled: true
-  h2:
-    console:
-      enabled: false

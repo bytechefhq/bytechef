@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.web.rest.error;
 
 import com.bytechef.platform.component.exception.ComponentExecutionException;
-import com.bytechef.platform.web.rest.error.constant.AbstractResponseEntityExceptionHandler;
+import com.bytechef.platform.web.rest.error.AbstractResponseEntityExceptionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.core.Ordered;
@@ -47,9 +47,7 @@ public class ComponentResponseEntityExceptionHandler extends AbstractResponseEnt
         return ResponseEntity
             .of(
                 createProblemDetail(
-                    exception.getCause() == null ? exception : (Exception) exception.getCause(),
-                    HttpStatus.BAD_REQUEST, exception.getEntityClass(), exception.getErrorKey(),
-                    exception.getErrorMessageCode(), null, Map.of("inputParameters", exception.getInputParameters()),
+                    exception, HttpStatus.BAD_REQUEST, Map.of("inputParameters", exception.getInputParameters()),
                     request))
             .build();
     }

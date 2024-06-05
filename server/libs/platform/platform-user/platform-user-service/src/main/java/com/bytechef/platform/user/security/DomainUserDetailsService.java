@@ -20,6 +20,7 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.platform.user.security.exception.UserNotActivatedException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;

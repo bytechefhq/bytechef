@@ -59,9 +59,11 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:embedded:embedded-user:embedded-user-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("org.springframework:spring-webflux")

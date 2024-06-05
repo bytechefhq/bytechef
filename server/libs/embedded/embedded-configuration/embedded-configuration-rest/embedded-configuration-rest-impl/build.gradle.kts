@@ -44,14 +44,23 @@ tasks.register("generateOpenAPI") {
 }
 
 dependencies {
+    compileOnly("jakarta.servlet:jakarta.servlet-api")
+
+    implementation("io.jsonwebtoken:jjwt-api:0.12.5")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-api"))
+    implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-api"))
+    implementation(project(":server:libs:embedded:embedded-user:embedded-user-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-web-api"))
+
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

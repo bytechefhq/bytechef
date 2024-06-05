@@ -26,6 +26,8 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
@@ -60,6 +62,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class ProjectIntTestConfiguration {
 
     @MockBean
+    private AuthorityService authorityService;
+
+    @MockBean
     private ConnectionService connectionService;
 
     @MockBean
@@ -82,6 +87,9 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    @MockBean
+    private UserService userService;
 
     @MockBean
     private WorkflowConnectionFacade workflowConnectionFacade;

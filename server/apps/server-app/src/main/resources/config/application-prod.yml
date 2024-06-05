@@ -23,6 +23,13 @@ spring:
       enabled: false
     livereload:
       enabled: false
+  mail:
+    host: localhost
+    port: 25
+    username:
+    password:
+  thymeleaf:
+    cache: true
 
 #####
 
