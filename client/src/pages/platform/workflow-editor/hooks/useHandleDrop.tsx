@@ -7,7 +7,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import getRandomId from '@/shared/util/random-utils';
+import {getRandomId} from '@/shared/util/random-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';

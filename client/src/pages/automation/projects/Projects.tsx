@@ -96,7 +96,7 @@ const Projects = () => {
                             <>
                                 <LeftSidebarNavItem
                                     item={{
-                                        filterData: !filterData?.id && filterData.type === Type.Category,
+                                        current: !filterData?.id && filterData.type === Type.Category,
                                         name: 'All Categories',
                                         onItemClick: (id?: number | string) => {
                                             setFilterData({
@@ -111,7 +111,7 @@ const Projects = () => {
                                     categories?.map((item) => (
                                         <LeftSidebarNavItem
                                             item={{
-                                                filterData:
+                                                current:
                                                     filterData?.id === item.id && filterData.type === Type.Category,
                                                 id: item.id,
                                                 name: item.name,
@@ -140,8 +140,7 @@ const Projects = () => {
                                             <LeftSidebarNavItem
                                                 icon={<TagIcon className="mr-1 size-4" />}
                                                 item={{
-                                                    filterData:
-                                                        filterData?.id === item.id && filterData.type === Type.Tag,
+                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
                                                     onItemClick: (id?: number | string) => {
@@ -156,7 +155,7 @@ const Projects = () => {
                                             />
                                         ))
                                     ) : (
-                                        <span className="px-3 text-xs">You have not created any tags yet.</span>
+                                        <span className="px-3 text-xs">No defined tags.</span>
                                     ))}
                             </>
                         }

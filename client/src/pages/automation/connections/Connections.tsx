@@ -110,7 +110,7 @@ export const Connections = () => {
                             <>
                                 <LeftSidebarNavItem
                                     item={{
-                                        filterData: !filterData?.id && filterData.type === Type.Component,
+                                        current: !filterData?.id && filterData.type === Type.Component,
                                         name: 'All Components',
                                         onItemClick: (id?: number | string) => {
                                             setFilterData({
@@ -125,7 +125,7 @@ export const Connections = () => {
                                     componentDefinitions?.map((item) => (
                                         <LeftSidebarNavItem
                                             item={{
-                                                filterData:
+                                                current:
                                                     filterData?.id === item.name && filterData.type === Type.Component,
                                                 id: item.name!,
                                                 name: item.title!,
@@ -155,8 +155,7 @@ export const Connections = () => {
                                             <LeftSidebarNavItem
                                                 icon={<TagIcon className="mr-1 size-4" />}
                                                 item={{
-                                                    filterData:
-                                                        filterData?.id === item.id && filterData.type === Type.Tag,
+                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
                                                     onItemClick: (id?: number | string) => {

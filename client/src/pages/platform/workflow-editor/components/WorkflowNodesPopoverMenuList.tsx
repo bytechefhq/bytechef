@@ -12,7 +12,7 @@ import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ClickedItemType, PropertyType} from '@/shared/types';
-import getRandomId from '@/shared/util/random-utils';
+import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {memo} from 'react';

@@ -1,10 +1,36 @@
+import {Section, useSectionStore} from '@/pages/home/stores/useSectionStore';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import * as Dialog from '@radix-ui/react-dialog';
 import {FolderIcon, SquareIcon} from 'lucide-react';
-import {Link} from 'react-router-dom';
+import {useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 const Home = () => {
+    const {authenticated} = useAuthenticationStore();
+    const {currentSection, setCurrentSection} = useSectionStore();
+
+    const navigate = useNavigate();
+
+    if (!authenticated) {
+        navigate('/login');
+    }
+
+    const handleClick = (section: Section) => {
+        setCurrentSection(section);
+    };
+
+    useEffect(() => {
+        if (currentSection !== undefined) {
+            if (currentSection === Section.AUTOMATION) {
+                navigate('/automation');
+            } else {
+                navigate('/embedded');
+            }
+        }
+    }, [currentSection, navigate]);
+
     return (
-        <Dialog.Root defaultOpen={true} open={true}>
+        <Dialog.Root open={currentSection === undefined}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
 
@@ -12,7 +38,7 @@ const Home = () => {
                     <div className="mx-auto flex h-full items-center">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <Link to="/embedded">
+                                <button onClick={() => handleClick(Section.EMBEDDED)}>
                                     <div className="flex size-80 flex-col items-center justify-between rounded-md p-4 hover:bg-green-100 hover:text-accent-foreground">
                                         <div className="text-2xl font-semibold">Embedded</div>
 
@@ -24,11 +50,11 @@ const Home = () => {
                                             Allow your users to integrate your product with applications they use.
                                         </div>
                                     </div>
-                                </Link>
+                                </button>
                             </div>
 
                             <div>
-                                <Link to="/automation">
+                                <button onClick={() => handleClick(Section.AUTOMATION)}>
                                     <div className="flex size-80 flex-col items-center justify-between rounded-md p-4 hover:bg-blue-100 hover:text-accent-foreground">
                                         <div className="text-2xl font-semibold">Automation</div>
 
@@ -40,7 +66,7 @@ const Home = () => {
                                             Integrate applications and automate processes inside your organization.
                                         </div>
                                     </div>
-                                </Link>
+                                </button>
                             </div>
                         </div>
                     </div>

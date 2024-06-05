@@ -1,5 +1,3 @@
-'use client';
-
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -9,6 +7,7 @@ import {
     NavigationMenuTrigger,
     NavigationMenuViewport,
 } from '@/components/ui/navigation-menu';
+import {Section, useSectionStore} from '@/pages/home/stores/useSectionStore';
 import {cn} from '@/shared/util/cn-utils';
 import {ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef} from 'react';
 import {Link} from 'react-router-dom';
@@ -16,6 +15,12 @@ import {Link} from 'react-router-dom';
 import reactLogo from '../../assets/logo.svg';
 
 const DesktopSidebarNavigationMenu = ({children}: {children: ReactNode}) => {
+    const {setCurrentSection} = useSectionStore();
+
+    const handleClick = (section: Section) => {
+        setCurrentSection(section);
+    };
+
     return (
         <NavigationMenu>
             <NavigationMenuList>
@@ -38,11 +43,11 @@ const DesktopSidebarNavigationMenu = ({children}: {children: ReactNode}) => {
                                 </div>
                             </li>
 
-                            <ListItem href="/embedded" title="Embedded">
+                            <ListItem onClick={() => handleClick(Section.EMBEDDED)} title="Embedded">
                                 Build integrations for your product.
                             </ListItem>
 
-                            <ListItem href="/automation" title="Automation">
+                            <ListItem onClick={() => handleClick(Section.AUTOMATION)} title="Automation">
                                 Automate your daily work.
                             </ListItem>
                         </ul>

@@ -1,3 +1,8 @@
+export const AUTHORITIES = {
+    ADMIN: 'ROLE_ADMIN',
+    USER: 'ROLE_USER',
+};
+
 export const VALUE_PROPERTY_CONTROL_TYPES = {
     ARRAY: 'ARRAY_BUILDER',
     BOOLEAN: 'SELECT',

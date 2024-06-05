@@ -4,7 +4,7 @@ import {
     TaskDispatcherDefinitionBasicModel,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentOperationType} from '@/shared/types';
-import getRandomId from '@/shared/util/random-utils';
+import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {usePrevious} from '@uidotdev/usehooks';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';

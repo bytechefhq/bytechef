@@ -3,7 +3,11 @@ import {PropsWithChildren} from 'react';
 
 type TErrorType = Error | null;
 
-const PageLoader = ({children, errors, loading}: PropsWithChildren<{errors: Array<TErrorType>; loading: boolean}>) => {
+const PageLoader = ({
+    children,
+    errors = [],
+    loading,
+}: PropsWithChildren<{errors?: Array<TErrorType>; loading: boolean}>) => {
     let errorExists = false;
 
     errors.forEach((error) => {
