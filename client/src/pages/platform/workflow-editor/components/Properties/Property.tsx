@@ -241,13 +241,13 @@ const Property = ({
             }
         }
 
-        let currentValue;
+        let currentValue = defaultValue;
 
         if (arrayName && arrayIndex !== undefined) {
             if (path?.includes('.')) {
                 const matchingArrayObject = getArrayParameterValueByPath(path, parameters);
 
-                if (matchingArrayObject) {
+                if (matchingArrayObject[name]) {
                     currentValue = matchingArrayObject[name];
                 }
             } else if (path?.includes('[')) {
