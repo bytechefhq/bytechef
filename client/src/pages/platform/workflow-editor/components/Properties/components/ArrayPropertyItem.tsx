@@ -31,12 +31,13 @@ const ArrayPropertyItem = ({
     };
 
     return (
-        <div className="ml-2 flex w-full items-center" key={arrayItem.name}>
+        <div className="ml-2 flex w-full items-center" key={`${arrayName}_${arrayItem.name}`}>
             <Property
                 arrayIndex={index}
                 arrayName={arrayName}
                 customClassName="pl-2 w-full"
                 inputTypeSwitchButtonClassName="ml-auto"
+                key={`${arrayName}_${arrayItem.name}_property`}
                 parameterValue={arrayItem.defaultValue}
                 path={path}
                 property={arrayItem as ArrayPropertyType}

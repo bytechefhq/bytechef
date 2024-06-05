@@ -2,7 +2,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
 import {PropertyType, SubPropertyType} from '@/shared/types';
-import {useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
@@ -104,7 +104,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
         let parameterObject = getObjectParameterValueByPath(path, currentComponent.parameters);
 
-        if (path.includes('.')) {
+        if (path.includes('[')) {
             const parameterArrayValue = getArrayParameterValueByPath(path, currentComponent.parameters);
 
             parameterObject = parameterArrayValue[name];
@@ -153,7 +153,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     }, []);
 
     return (
-        <>
+        <Fragment key={name}>
             <ul className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}>
                 {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
                     <div
@@ -172,6 +172,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                                 name === '__item' ? 'pb-0' : !arrayName && 'pl-2'
                             )}
                             inputTypeSwitchButtonClassName={subProperty.custom ? 'mr-6' : ''}
+                            key={`${property.name}_${subProperty.name}_${index}`}
                             objectName={arrayName ? '' : name}
                             operationName={operationName}
                             parameterValue={subProperty.defaultValue}
@@ -204,7 +205,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                     setNewPropertyType={setNewPropertyType}
                 />
             )}
-        </>
+        </Fragment>
     );
 };
 

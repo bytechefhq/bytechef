@@ -5,7 +5,7 @@ import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/shared
 import {ArrayPropertyType, PropertyType} from '@/shared/types';
 import getRandomId from '@/shared/util/random-utils';
 import {PlusIcon} from '@radix-ui/react-icons';
-import {useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 
 import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
 import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
@@ -97,7 +97,9 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         if (path) {
             params = getArrayParameterValueByPath(path, currentComponent.parameters);
 
-            currentParameterValues = params.filter((param: ArrayPropertyType) => param !== null);
+            if (Array.isArray(params)) {
+                currentParameterValues = params.filter((param: ArrayPropertyType) => param !== null);
+            }
 
             if (path.includes('.')) {
                 params = getObjectParameterValueByPath(path, currentComponent.parameters);
@@ -201,7 +203,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     }, []);
 
     return (
-        <>
+        <Fragment key={`${path}_${name}_arrayProperty`}>
             <ul className="ml-2 w-full space-y-4 border-l">
                 {arrayItems?.map((arrayItem, index) =>
                     Array.isArray(arrayItem) ? (
@@ -211,7 +213,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                                 arrayName={name}
                                 currentComponent={currentComponent}
                                 index={index}
-                                key={subItemIndex}
+                                key={`${(arrayItem as unknown as ArrayPropertyType).name}_${subItem.name}_${subItemIndex}`}
                                 onDeleteClick={handleDeleteClick}
                                 path={path}
                                 setArrayItems={setArrayItems}
@@ -250,7 +252,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     <PlusIcon className="size-4" /> Add Array item
                 </Button>
             )}
-        </>
+        </Fragment>
     );
 };
 

@@ -492,26 +492,44 @@ const Property = ({
             return;
         }
 
+        const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
+
+        const currentWorkflowComponent = workflowComponents?.find((component) => component.name === currentNode?.name);
+
+        if (!currentWorkflowComponent) {
+            return;
+        }
+
         if (!propertyParameterValue || propertyParameterValue === defaultValue) {
-            const workflowComponents = [...(workflow.triggers || []), ...(workflow.tasks || [])];
-
-            const currentWorkflowComponent = workflowComponents?.find(
-                (component) => component.name === currentNode?.name
-            );
-
-            if (path?.includes('.')) {
-                setPropertyParameterValue(getObjectParameterValueByPath(path, currentWorkflowComponent?.parameters));
+            if (!path) {
+                setPropertyParameterValue(currentWorkflowComponent.parameters?.[name]);
 
                 return;
             }
 
-            if (path?.includes('[')) {
-                setPropertyParameterValue(getArrayParameterValueByPath(path, currentWorkflowComponent?.parameters));
+            let paramValue;
+
+            if (path.includes('.')) {
+                setPropertyParameterValue(getObjectParameterValueByPath(path, currentWorkflowComponent.parameters));
 
                 return;
             }
 
-            setPropertyParameterValue(currentWorkflowComponent?.parameters?.[name]);
+            if (path.includes('[')) {
+                paramValue = getArrayParameterValueByPath(path, currentWorkflowComponent.parameters);
+
+                const pathToObjectInsideArray = path.slice(path.lastIndexOf(']') + 2);
+
+                if (paramValue && typeof paramValue === 'object' && pathToObjectInsideArray) {
+                    paramValue = getObjectParameterValueByPath(pathToObjectInsideArray, paramValue);
+                }
+            }
+
+            if (paramValue) {
+                setPropertyParameterValue(paramValue);
+            } else {
+                setPropertyParameterValue(currentWorkflowComponent.parameters?.[name]);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -673,13 +691,28 @@ const Property = ({
             (node) => node.name === currentNode?.name
         );
 
-        const paramValue = getObjectParameterValueByPath(path, currentWorkflowNode.parameters);
+        if (path.includes('[')) {
+            let paramValue = getArrayParameterValueByPath(path, currentWorkflowNode.parameters);
 
-        if (paramValue) {
+            const pathToObjectInsideArray = path.slice(path.lastIndexOf(']') + 2);
+
+            if (paramValue && typeof paramValue === 'object' && pathToObjectInsideArray) {
+                if (pathToObjectInsideArray.includes('.')) {
+                    paramValue = getObjectParameterValueByPath(pathToObjectInsideArray, paramValue);
+                } else {
+                    paramValue = paramValue[pathToObjectInsideArray];
+                }
+            }
+
             setPropertyParameterValue(paramValue);
+        } else if (path.includes('.')) {
+            setPropertyParameterValue(getObjectParameterValueByPath(path, currentWorkflowNode.parameters));
         } else {
-            setPropertyParameterValue('');
+            setPropertyParameterValue(currentWorkflowNode.parameters?.[name]);
+
+            return;
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);
 
