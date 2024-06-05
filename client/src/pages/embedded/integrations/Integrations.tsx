@@ -43,7 +43,7 @@ const Integrations = () => {
                                 <>
                                     <LeftSidebarNavItem
                                         item={{
-                                            filterData: !filterData?.id && filterData.type === Type.Category,
+                                            current: !filterData?.id && filterData.type === Type.Category,
                                             name: 'All Categories',
                                             onItemClick: (id?: number | string) => {
                                                 setFilterData({
@@ -58,7 +58,7 @@ const Integrations = () => {
                                         categories?.map((item) => (
                                             <LeftSidebarNavItem
                                                 item={{
-                                                    filterData:
+                                                    current:
                                                         filterData?.id === item.id && filterData.type === Type.Category,
                                                     id: item.id,
                                                     name: item.name,
@@ -87,7 +87,7 @@ const Integrations = () => {
                                                 <LeftSidebarNavItem
                                                     icon={<TagIcon className="mr-1 size-4" />}
                                                     item={{
-                                                        filterData:
+                                                        current:
                                                             filterData?.id === item.id && filterData.type === Type.Tag,
                                                         id: item.id!,
                                                         name: item.name,

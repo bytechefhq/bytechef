@@ -111,7 +111,7 @@ const ProjectInstances = () => {
                             <>
                                 <LeftSidebarNavItem
                                     item={{
-                                        filterData: !filterData?.id && filterData.type === Type.Project,
+                                        current: !filterData?.id && filterData.type === Type.Project,
                                         name: 'All Projects',
                                         onItemClick: (id?: number | string) => {
                                             setFilterData({
@@ -126,8 +126,7 @@ const ProjectInstances = () => {
                                     projects?.map((item) => (
                                         <LeftSidebarNavItem
                                             item={{
-                                                filterData:
-                                                    filterData?.id === item.id && filterData.type === Type.Project,
+                                                current: filterData?.id === item.id && filterData.type === Type.Project,
                                                 id: item.id,
                                                 name: item.name,
                                                 onItemClick: (id?: number | string) => {
@@ -155,8 +154,7 @@ const ProjectInstances = () => {
                                             <LeftSidebarNavItem
                                                 icon={<TagIcon className="mr-1 size-4" />}
                                                 item={{
-                                                    filterData:
-                                                        filterData?.id === item.id && filterData.type === Type.Tag,
+                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
                                                     onItemClick: (id?: number | string) => {
@@ -171,7 +169,7 @@ const ProjectInstances = () => {
                                             />
                                         ))
                                     ) : (
-                                        <span className="px-3 text-xs">You have not created any tags yet.</span>
+                                        <span className="px-3 text-xs">No defined tags.</span>
                                     ))}
                             </>
                         }

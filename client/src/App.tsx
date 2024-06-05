@@ -1,8 +1,9 @@
 import {Toaster} from '@/components/ui/toaster';
-import useGlobalNotificationInterceptor from '@/config/useGlobalNotificationInterceptor';
+import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {
     ActivityIcon,
     FolderIcon,
@@ -15,7 +16,7 @@ import {
     ZapIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
-import {Outlet, useLocation} from 'react-router-dom';
+import {Outlet, useLocation, useNavigate} from 'react-router-dom';
 
 import {TooltipProvider} from './components/ui/tooltip';
 
@@ -78,24 +79,32 @@ const embeddedNavigation: {
     },
 ];
 
-const titles: {[key: string]: string} = {
-    '/': 'Projects',
-    '/automation/connections': 'Connections',
-    '/automation/executions': 'Executions',
-    '/automation/instances': 'Instances',
-    '/automation/projects': 'Projects',
-};
-
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    const {getAccount, showLogin} = useAuthenticationStore();
+
     const location = useLocation();
 
-    useGlobalNotificationInterceptor();
+    const navigate = useNavigate();
+
+    useFetchInterceptor();
 
     useEffect(() => {
-        document.title = titles[location.pathname] ?? 'ByteChef';
+        document.title =
+            [...automationNavigation, ...embeddedNavigation].find((navItem) => navItem.href === location.pathname)
+                ?.name ?? 'ByteChef';
     }, [location]);
+
+    useEffect(() => {
+        getAccount();
+    }, [getAccount]);
+
+    useEffect(() => {
+        if (showLogin) {
+            navigate('/login');
+        }
+    }, [showLogin, navigate]);
 
     return (
         <div className="flex h-full">
