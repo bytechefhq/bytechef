@@ -1,4 +1,4 @@
-import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
+import {Avatar, AvatarFallback} from '@/components/ui/avatar';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 
@@ -19,7 +19,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import DesktopSidebarNavigationMenu from '@/shared/layout/DesktopSidebarNavigationMenu';
-import {useGetWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
+import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {SettingsIcon, UserCircle2Icon, UserRoundCog} from 'lucide-react';
 import React, {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -36,13 +38,19 @@ export function DesktopSidebar({
         icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
 }) {
+    const {account, logout} = useAuthenticationStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
 
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
 
-    const {data: workspaces} = useGetWorkspacesQuery();
+    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
+
+    const handleLogOutClick = () => {
+        logout();
+    };
 
     useEffect(() => {
         if (workspaces && workspaces.length > 0) {
@@ -94,38 +102,56 @@ export function DesktopSidebar({
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="cursor-pointer">
-                                    <AvatarImage alt="@shadcn" src="https://github.com/shadcn.png" />
-
-                                    <AvatarFallback>CN</AvatarFallback>
+                                    <AvatarFallback>
+                                        <UserCircle2Icon className="size-8" />
+                                    </AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="start" className="w-64 space-y-2 p-2">
+                                <div className="flex items-center space-x-2">
+                                    <div>
+                                        <UserCircle2Icon className="size-8" />
+                                    </div>
+
+                                    <div>
+                                        <div className="text-sm text-muted-foreground">Signed in as</div>
+
+                                        <div>{account?.email}</div>
+                                    </div>
+                                </div>
+
+                                <DropdownMenuSeparator />
+
                                 <div className="min-h-52 space-y-1">
                                     {pathname.startsWith('/automation') && workspaces && workspaces.length > 1 && (
-                                        <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                                Workspaces
-                                            </DropdownMenuSubTrigger>
+                                        <>
+                                            <DropdownMenuSub>
+                                                <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
+                                                    Workspaces
+                                                </DropdownMenuSubTrigger>
 
-                                            <DropdownMenuPortal>
-                                                <DropdownMenuSubContent>
-                                                    <DropdownMenuRadioGroup
-                                                        onValueChange={(value) => setCurrentWorkspaceId(+value)}
-                                                        value={currentWorkspaceId?.toString()}
-                                                    >
-                                                        {workspaces.map((workspace) => (
-                                                            <DropdownMenuRadioItem
-                                                                key={workspace.id}
-                                                                value={workspace.id!.toString()}
-                                                            >
-                                                                {workspace.name}
-                                                            </DropdownMenuRadioItem>
-                                                        ))}
-                                                    </DropdownMenuRadioGroup>
-                                                </DropdownMenuSubContent>
-                                            </DropdownMenuPortal>
-                                        </DropdownMenuSub>
+                                                <DropdownMenuPortal>
+                                                    <DropdownMenuSubContent>
+                                                        <DropdownMenuRadioGroup
+                                                            onValueChange={(value) => setCurrentWorkspaceId(+value)}
+                                                            value={currentWorkspaceId?.toString()}
+                                                        >
+                                                            {workspaces.map((workspace) => (
+                                                                <DropdownMenuRadioItem
+                                                                    key={workspace.id}
+                                                                    value={workspace.id!.toString()}
+                                                                >
+                                                                    {workspace.name}
+                                                                </DropdownMenuRadioItem>
+                                                            ))}
+                                                        </DropdownMenuRadioGroup>
+                                                    </DropdownMenuSubContent>
+                                                </DropdownMenuPortal>
+                                            </DropdownMenuSub>
+
+                                            <DropdownMenuSeparator />
+                                        </>
                                     )}
 
                                     <DropdownMenuItem
@@ -136,13 +162,34 @@ export function DesktopSidebar({
                                             )
                                         }
                                     >
-                                        Settings
+                                        <div className="flex items-center space-x-1">
+                                            <SettingsIcon className="size-5" />
+
+                                            <span>Settings</span>
+                                        </div>
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem
+                                        className="cursor-pointer font-semibold"
+                                        onClick={() =>
+                                            navigate(
+                                                `${pathname.startsWith('/automation') ? '/automation' : '/embedded'}/account`
+                                            )
+                                        }
+                                    >
+                                        <div className="flex items-center space-x-1">
+                                            <UserRoundCog className="size-5" />
+
+                                            <span>Your account</span>
+                                        </div>
                                     </DropdownMenuItem>
                                 </div>
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem className="cursor-pointer font-semibold">Log Out</DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={handleLogOutClick}>
+                                    Log Out
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

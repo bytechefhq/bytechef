@@ -8,9 +8,10 @@ interface SettingsProps {
         href: string;
         title: string;
     }[];
+    title?: string;
 }
 
-export default function Settings({sidebarNavItems}: SettingsProps) {
+const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const location = useLocation();
 
     return (
@@ -21,7 +22,7 @@ export default function Settings({sidebarNavItems}: SettingsProps) {
                         navItem.href ? (
                             <LeftSidebarNavItem
                                 item={{
-                                    filterData: location.pathname === navItem.href,
+                                    current: location.pathname === navItem.href,
                                     name: navItem.title,
                                 }}
                                 key={navItem.href}
@@ -35,11 +36,13 @@ export default function Settings({sidebarNavItems}: SettingsProps) {
                     )}
                 />
             }
-            leftSidebarHeader={<Header position="sidebar" title="Settings" />}
+            leftSidebarHeader={<Header position="sidebar" title={title} />}
         >
             <div className="size-full">
                 <Outlet />
             </div>
         </LayoutContainer>
     );
-}
+};
+
+export default Settings;

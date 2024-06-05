@@ -35,7 +35,7 @@ const AppEvents = () => {
                             <>
                                 <LeftSidebarNavItem
                                     item={{
-                                        filterData: true,
+                                        current: true,
                                         name: 'All Workflows',
                                     }}
                                 />

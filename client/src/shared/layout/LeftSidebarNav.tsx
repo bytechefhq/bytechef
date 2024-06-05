@@ -28,7 +28,7 @@ const LeftSidebarNav = ({body, className, title}: LeftSidebarNavProps) => (
 
 interface LeftSidebarNavItemProps {
     item: {
-        filterData: boolean;
+        current: boolean;
         name: string;
         onItemClick?: (id?: number | string) => void;
         id?: number | string;
@@ -37,16 +37,12 @@ interface LeftSidebarNavItemProps {
     icon?: ReactNode;
 }
 
-const LeftSidebarNavItem = ({
-    icon,
-    item: {filterData, id, name, onItemClick},
-    toLink = '',
-}: LeftSidebarNavItemProps) => (
+const LeftSidebarNavItem = ({icon, item: {current, id, name, onItemClick}, toLink = ''}: LeftSidebarNavItemProps) => (
     <Link
-        aria-current={filterData ? 'page' : undefined}
+        aria-current={current ? 'page' : undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            filterData ? 'bg-muted hover:bg-muted' : 'hover:bg-muted',
+            current ? 'bg-muted hover:bg-muted' : 'hover:bg-muted',
             'justify-start px-2'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}

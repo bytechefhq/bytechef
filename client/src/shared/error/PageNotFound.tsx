@@ -3,7 +3,7 @@ import React from 'react';
 
 const PageNotFound = () => {
     return (
-        <PublicLayoutContainer className="my-32">
+        <PublicLayoutContainer>
             <div className="mx-auto max-w-screen-md">
                 <h1 className="text-lg">Oops!</h1>
 
