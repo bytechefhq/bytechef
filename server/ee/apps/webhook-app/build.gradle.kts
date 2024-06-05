@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:jackson-config"))
+    implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:messages-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
