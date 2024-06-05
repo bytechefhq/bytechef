@@ -4,6 +4,11 @@
 application-local.yml
 
 ######################
+# Kubernetes
+######################
+kubernetes/**/bytechef-monolith/*.tgz
+
+######################
 # Node
 ######################
 /node/
