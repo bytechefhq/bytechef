@@ -90,8 +90,10 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                                 {connections &&
                                     connections.map((connection) => (
                                         <SelectItem key={connection.id} value={connection.id!.toString()}>
-                                            <div className="flex items-center">
-                                                <span className="mr-1 ">{connection.name}</span>
+                                            <div className="flex items-center space-x-1">
+                                                <span>{connection.name}</span>
+
+                                                <span className="text-xs text-gray-500">{connection.environment}</span>
 
                                                 <span className="text-xs text-gray-500">
                                                     {connection?.tags?.map((tag) => tag.name).join(', ')}
