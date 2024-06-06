@@ -137,7 +137,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public RefreshTokenResponse
-        executeRefresh(String componentName, ComponentConnection connection, Context context) {
+        executeRefresh(
+            @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
         throw new UnsupportedOperationException("This method is still under development");
     }
 }

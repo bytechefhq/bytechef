@@ -165,7 +165,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public RefreshTokenResponse executeRefresh(String componentName, ComponentConnection connection, Context context) {
+    public RefreshTokenResponse executeRefresh(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connection.authorizationName());
 
