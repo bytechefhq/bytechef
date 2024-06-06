@@ -217,7 +217,7 @@ const WorkflowNodeDetailsPanel = ({
                 componentIcon: componentDefinition.icon,
                 id: property.name,
                 nodeName,
-                value: `${nodeName}/${property.name}`,
+                value: `${nodeName}.${property.name}`,
             };
         });
 
