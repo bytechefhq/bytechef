@@ -289,20 +289,23 @@ public final class Connection {
 
     @Override
     public String toString() {
-        return "Connection{id="
-            + id + ", name='"
-            + name + '\'' + "authorizationName='"
-            + authorizationName + '\'' + ", componentName='"
-            + componentName + ", type='"
-            + type + ", connectionVersion='"
-            + connectionVersion + ", connectionTags="
-            + connectionTags + ", queryParameters="
-            + parameters + ", version="
-            + version + ", createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + '}';
+        return "Connection{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", authorizationName='" + authorizationName + '\'' +
+            ", connectionVersion=" + connectionVersion +
+            ", environment=" + environment +
+            ", credentialStatus=" + credentialStatus +
+            ", connectionTags=" + connectionTags +
+            ", type=" + type +
+            ", parameters=" + parameters +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", version=" + version +
+            '}';
     }
 
     @SuppressFBWarnings("EI")
