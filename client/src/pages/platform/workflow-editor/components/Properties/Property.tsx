@@ -222,15 +222,11 @@ const Property = ({
                 return;
             }
 
-            // console.log(name, strippedValue.length, 'strippedValue #1: ', strippedValue);
-
             if (dataPillValues?.length) {
                 strippedValue = basicValues.reduce(
                     (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
                     ''
                 );
-
-                // console.log(name, strippedValue.length, 'strippedValue #2: ', strippedValue);
             } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
                 strippedValue = parseInt(strippedValue);
             } else {
@@ -249,8 +245,6 @@ const Property = ({
         if (currentValue === strippedValue) {
             return;
         }
-
-        // console.log(name, strippedValue.length, 'strippedValue #3: ', strippedValue);
 
         saveProperty({
             currentComponent,
