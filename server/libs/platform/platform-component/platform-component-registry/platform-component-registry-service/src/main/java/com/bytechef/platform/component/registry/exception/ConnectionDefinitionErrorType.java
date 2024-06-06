@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.constant;
+package com.bytechef.platform.component.registry.exception;
 
-import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ProjectErrorType implements ErrorType {
+public enum ConnectionDefinitionErrorType implements ErrorType {
 
-    REMOVE_LAST_WORKFLOW(100);
+    GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION(100), GET_DEFAULT_REFRESH_URL(101), EXECUTE_AUTHORIZATION_APPLY(102),
+    EXECUTE_AUTHORIZATION_CALLBACK(103), GET_OAUTH2_AUTHORIZATION_PARAMETERS(104), EXECUTE_AUTHORIZATION_REFRESH(105);
 
     private final int errorKey;
 
-    ProjectErrorType(int errorKey) {
+    ConnectionDefinitionErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return Project.class;
+        return ConnectionDefinition.class;
     }
 
     @Override

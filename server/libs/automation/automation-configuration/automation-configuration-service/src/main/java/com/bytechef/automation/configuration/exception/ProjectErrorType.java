@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.constant;
+package com.bytechef.automation.configuration.exception;
 
-import com.bytechef.automation.configuration.domain.ProjectInstance;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ProjectInstanceErrorType implements ErrorType {
+public enum ProjectErrorType implements ErrorType {
 
-    CREATE_PROJECT_INSTANCE(100), DELETE_PROJECT_INSTANCE(101);
+    REMOVE_LAST_WORKFLOW(100);
 
     private final int errorKey;
 
-    ProjectInstanceErrorType(int errorKey) {
+    ProjectErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return ProjectInstance.class;
+        return Project.class;
     }
 
     @Override

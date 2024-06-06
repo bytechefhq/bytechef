@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.constant;
+package com.bytechef.automation.configuration.exception;
 
-import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ConnectionErrorType implements ErrorType {
+public enum WorkspaceErrorType implements ErrorType {
 
-    CONNECTION_IS_USED(100);
+    DELETE_WORKSPACE(100);
 
     private final int errorKey;
 
-    ConnectionErrorType(int errorKey) {
+    WorkspaceErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return Connection.class;
+        return Workspace.class;
     }
 
     @Override

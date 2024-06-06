@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
-import com.bytechef.automation.configuration.constant.WorkspaceErrorType;
+import com.bytechef.automation.configuration.exception.WorkspaceErrorType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.OptionalUtils;

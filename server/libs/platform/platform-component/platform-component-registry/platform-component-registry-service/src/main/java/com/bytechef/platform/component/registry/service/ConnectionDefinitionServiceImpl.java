@@ -46,7 +46,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.constant.ConnectionDefinitionErrorType;
+import com.bytechef.platform.component.registry.exception.ConnectionDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;

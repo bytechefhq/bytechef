@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.constant;
+package com.bytechef.platform.component.registry.exception;
 
-import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ConnectionDefinitionErrorType implements ErrorType {
+public enum ActionDefinitionErrorType implements ErrorType {
 
-    GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION(100), GET_DEFAULT_REFRESH_URL(101), EXECUTE_AUTHORIZATION_APPLY(102),
-    EXECUTE_AUTHORIZATION_CALLBACK(103), GET_OAUTH2_AUTHORIZATION_PARAMETERS(104), EXECUTE_AUTHORIZATION_REFRESH(105);
+    EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102), EXECUTE_OUTPUT(103),
+    EXECUTE_PERFORM(104);
 
     private final int errorKey;
 
-    ConnectionDefinitionErrorType(int errorKey) {
+    ActionDefinitionErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return ConnectionDefinition.class;
+        return ActionDefinition.class;
     }
 
     @Override
