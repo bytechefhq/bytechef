@@ -40,7 +40,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.constant.TriggerDefinitionErrorType;
+import com.bytechef.platform.component.registry.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.registry.definition.HttpParametersImpl;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;

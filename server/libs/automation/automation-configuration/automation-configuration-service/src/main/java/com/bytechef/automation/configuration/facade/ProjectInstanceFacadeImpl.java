@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.automation.configuration.constant.ProjectInstanceErrorType;
+import com.bytechef.automation.configuration.exception.ProjectInstanceErrorType;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;

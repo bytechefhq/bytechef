@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.constant;
+package com.bytechef.platform.connection.exception;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ActionDefinitionErrorType implements ErrorType {
+public enum ConnectionErrorType implements ErrorType {
 
-    EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102), EXECUTE_OUTPUT(103),
-    EXECUTE_PERFORM(104);
+    CONNECTION_IS_USED(100);
 
     private final int errorKey;
 
-    ActionDefinitionErrorType(int errorKey) {
+    ConnectionErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return ActionDefinition.class;
+        return Connection.class;
     }
 
     @Override
