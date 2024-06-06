@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.constant;
+package com.bytechef.automation.configuration.exception;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum TriggerDefinitionErrorType implements ErrorType {
+public enum ProjectInstanceErrorType implements ErrorType {
 
-    EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102),
-    EXECUTE_LISTENER_DISABLE(103), EXECUTE_LISTENER_ENABLE(104), EXECUTE_DYNAMIC_WEBHOOK_TRIGGER(105),
-    EXECUTE_POLLING_TRIGGER(106), EXECUTE_STATIC_WEBHOOK_ERROR_TYPE(107), EXECUTE_DYNAMIC_WEBHOOK_DISABLE(108),
-    EXECUTE_DYNAMIC_WEBHOOK_ENABLE(109);
+    CREATE_PROJECT_INSTANCE(100), DELETE_PROJECT_INSTANCE(101);
 
     private final int errorKey;
 
-    TriggerDefinitionErrorType(int errorKey) {
+    ProjectInstanceErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return ActionDefinition.class;
+        return ProjectInstance.class;
     }
 
     @Override

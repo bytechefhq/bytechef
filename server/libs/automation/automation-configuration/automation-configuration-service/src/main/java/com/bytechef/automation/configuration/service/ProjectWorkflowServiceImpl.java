@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
-import com.bytechef.automation.configuration.constant.ProjectErrorType;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;

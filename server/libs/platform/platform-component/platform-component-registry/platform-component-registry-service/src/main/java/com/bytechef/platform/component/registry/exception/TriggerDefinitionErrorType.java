@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.constant;
+package com.bytechef.platform.component.registry.exception;
 
-import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum WorkspaceErrorType implements ErrorType {
+public enum TriggerDefinitionErrorType implements ErrorType {
 
-    DELETE_WORKSPACE(100);
+    EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102),
+    EXECUTE_LISTENER_DISABLE(103), EXECUTE_LISTENER_ENABLE(104), EXECUTE_DYNAMIC_WEBHOOK_TRIGGER(105),
+    EXECUTE_POLLING_TRIGGER(106), EXECUTE_STATIC_WEBHOOK_ERROR_TYPE(107), EXECUTE_DYNAMIC_WEBHOOK_DISABLE(108),
+    EXECUTE_DYNAMIC_WEBHOOK_ENABLE(109);
 
     private final int errorKey;
 
-    WorkspaceErrorType(int errorKey) {
+    TriggerDefinitionErrorType(int errorKey) {
         this.errorKey = errorKey;
     }
 
     @Override
     public Class<?> getErrorClass() {
-        return Workspace.class;
+        return ActionDefinition.class;
     }
 
     @Override
