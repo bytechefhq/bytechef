@@ -2,11 +2,10 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlTypeModel} from '@/shared/middleware/platform/configuration';
 import {PropertyType, SubPropertyType} from '@/shared/types';
+import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
-import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
@@ -102,15 +101,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             return;
         }
 
-        let parameterObject = getObjectParameterValueByPath(path, currentComponent.parameters);
-
-        if (path.includes('[')) {
-            const parameterArrayValue = getArrayParameterValueByPath(path, currentComponent.parameters);
-
-            if (parameterArrayValue && parameterArrayValue[name]) {
-                parameterObject = parameterArrayValue[name];
-            }
-        }
+        const parameterObject = resolvePath(currentComponent.parameters, path);
 
         if (!parameterObject) {
             return;

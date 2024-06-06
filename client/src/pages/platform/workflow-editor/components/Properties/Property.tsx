@@ -22,6 +22,7 @@ import {PropertyType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {usePrevious} from '@uidotdev/usehooks';
+import resolvePath from 'object-resolve-path';
 import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -30,8 +31,6 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
-import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
-import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -223,11 +222,15 @@ const Property = ({
                 return;
             }
 
+            // console.log(name, strippedValue.length, 'strippedValue #1: ', strippedValue);
+
             if (dataPillValues?.length) {
                 strippedValue = basicValues.reduce(
                     (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
                     ''
                 );
+
+                // console.log(name, strippedValue.length, 'strippedValue #2: ', strippedValue);
             } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
                 strippedValue = parseInt(strippedValue);
             } else {
@@ -241,31 +244,13 @@ const Property = ({
             }
         }
 
-        let currentValue = defaultValue;
-
-        if (arrayName && arrayIndex !== undefined) {
-            if (path?.includes('.')) {
-                const matchingArrayObject = getArrayParameterValueByPath(path, parameters);
-
-                if (matchingArrayObject && matchingArrayObject[name]) {
-                    currentValue = matchingArrayObject[name];
-                }
-            } else if (path?.includes('[')) {
-                currentValue = getArrayParameterValueByPath(path, parameters);
-            }
-        } else if (objectName && parameters && path) {
-            const paramValue = getObjectParameterValueByPath(path, parameters);
-
-            if (paramValue) {
-                currentValue = paramValue;
-            }
-        } else {
-            currentValue = parameters[name as string];
-        }
+        const currentValue = resolvePath(parameters, path) || '';
 
         if (currentValue === strippedValue) {
             return;
         }
+
+        // console.log(name, strippedValue.length, 'strippedValue #3: ', strippedValue);
 
         saveProperty({
             currentComponent,
@@ -341,7 +326,7 @@ const Property = ({
     };
 
     const handleMentionsInputChange = (value: string) => {
-        const parentParameterValue = path && getObjectParameterValueByPath(path, currentComponent?.parameters);
+        const parentParameterValue = path && resolvePath(currentComponent?.parameters, path);
 
         if (!parentParameterValue && !parameterValue && propertyParameterValue) {
             setMentionInputValue('');
@@ -379,7 +364,7 @@ const Property = ({
             return;
         }
 
-        const parentParameterValue = getObjectParameterValueByPath(path, currentComponent.parameters);
+        const parentParameterValue = resolvePath(currentComponent.parameters, path);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -509,31 +494,7 @@ const Property = ({
                 return;
             }
 
-            let paramValue;
-
-            if (path.includes('.')) {
-                paramValue = getObjectParameterValueByPath(path, parameters);
-
-                if (paramValue) {
-                    setPropertyParameterValue(paramValue);
-
-                    return;
-                }
-            }
-
-            if (path.includes('[')) {
-                paramValue = getArrayParameterValueByPath(path, parameters);
-
-                const pathToObjectInsideArray = path.slice(path.lastIndexOf(']') + 2);
-
-                if (paramValue && typeof paramValue === 'object' && pathToObjectInsideArray) {
-                    paramValue = getObjectParameterValueByPath(pathToObjectInsideArray, paramValue);
-                } else if (paramValue) {
-                    setPropertyParameterValue(paramValue);
-
-                    return;
-                }
-            }
+            const paramValue = resolvePath(parameters, path);
 
             if (paramValue) {
                 setPropertyParameterValue(paramValue);
@@ -701,27 +662,7 @@ const Property = ({
             (node) => node.name === currentNode?.name
         );
 
-        if (path.includes('[')) {
-            let paramValue = getArrayParameterValueByPath(path, currentWorkflowNode.parameters);
-
-            const pathToObjectInsideArray = path.slice(path.lastIndexOf(']') + 2);
-
-            if (paramValue && typeof paramValue === 'object' && pathToObjectInsideArray) {
-                if (pathToObjectInsideArray.includes('.')) {
-                    paramValue = getObjectParameterValueByPath(pathToObjectInsideArray, paramValue);
-                } else {
-                    paramValue = paramValue[pathToObjectInsideArray];
-                }
-            }
-
-            setPropertyParameterValue(paramValue);
-        } else if (path.includes('.')) {
-            setPropertyParameterValue(getObjectParameterValueByPath(path, currentWorkflowNode.parameters));
-        } else {
-            setPropertyParameterValue(currentWorkflowNode.parameters?.[name]);
-
-            return;
-        }
+        setPropertyParameterValue(resolvePath(currentWorkflowNode.parameters, path));
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);

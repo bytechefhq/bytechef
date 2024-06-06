@@ -25,83 +25,97 @@ const SubPropertyPopover = ({
     newPropertyType,
     setNewPropertyName,
     setNewPropertyType,
-}: SubPropertyPopoverProps) => (
-    <Popover>
-        <PopoverTrigger asChild>
-            <Button
-                className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                size="sm"
-                variant="ghost"
-            >
-                <PlusIcon className="mr-2 size-4" /> Add {array ? 'array' : 'object'} property
-            </Button>
-        </PopoverTrigger>
+}: SubPropertyPopoverProps) => {
+    const handleNewPropertyNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        let {value} = event.target;
 
-        <PopoverContent className="min-w-[400px] space-y-4 p-4">
-            <header className="flex items-center justify-between">
-                <span className="font-semibold">Add {array ? 'array' : 'object'} property</span>
+        if (value.match(/^\d/)) {
+            value = `_${value}`;
+        }
 
-                <PopoverClose asChild>
-                    <XIcon
-                        aria-hidden="true"
-                        className="size-4 cursor-pointer"
-                        onClick={() => setNewPropertyName && setNewPropertyName('')}
-                    />
-                </PopoverClose>
-            </header>
+        if (setNewPropertyName) {
+            setNewPropertyName(value);
+        }
+    };
 
-            <main className="space-y-2">
-                {!array && (
-                    <PropertyInput
-                        className="mb-2"
-                        label="Name"
-                        name="additionalPropertyName"
-                        onChange={(event) => setNewPropertyName && setNewPropertyName(event.target.value)}
-                        placeholder="Name for the additional property"
-                        required
-                        value={newPropertyName}
-                    />
-                )}
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button
+                    className="mt-3 rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                    size="sm"
+                    variant="ghost"
+                >
+                    <PlusIcon className="mr-2 size-4" /> Add {array ? 'array item' : 'object property'}
+                </Button>
+            </PopoverTrigger>
 
-                {availablePropertyTypes?.length > 1 ? (
-                    <PropertySelect
-                        label="Type"
-                        onValueChange={(value) =>
-                            setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
-                        }
-                        options={availablePropertyTypes.map((property) => ({
-                            label: property.value!,
-                            value: property.value!,
-                        }))}
-                        value={newPropertyType}
-                    />
-                ) : (
-                    <div className="flex w-full flex-col">
-                        <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
+            <PopoverContent className="min-w-[400px] space-y-4 p-4">
+                <header className="flex items-center justify-between">
+                    <span className="font-semibold">Add {array ? 'array item' : 'object property'}</span>
 
-                        {availablePropertyTypes[0] && (
-                            <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
-                                {availablePropertyTypes[0].value}
-                            </span>
-                        )}
-                    </div>
-                )}
-            </main>
+                    <PopoverClose asChild>
+                        <XIcon
+                            aria-hidden="true"
+                            className="size-4 cursor-pointer"
+                            onClick={() => setNewPropertyName && setNewPropertyName('')}
+                        />
+                    </PopoverClose>
+                </header>
 
-            <footer className="flex items-center justify-end space-x-2">
-                <PopoverClose asChild>
-                    <Button
-                        className="cursor-pointer"
-                        disabled={!array && !newPropertyName}
-                        onClick={handleClick}
-                        size="sm"
-                    >
-                        Add
-                    </Button>
-                </PopoverClose>
-            </footer>
-        </PopoverContent>
-    </Popover>
-);
+                <main className="space-y-2">
+                    {!array && (
+                        <PropertyInput
+                            className="mb-2"
+                            label="Name"
+                            name="additionalPropertyName"
+                            onChange={handleNewPropertyNameChange}
+                            placeholder="Name for the additional property"
+                            required
+                            value={newPropertyName}
+                        />
+                    )}
+
+                    {availablePropertyTypes?.length > 1 ? (
+                        <PropertySelect
+                            label="Type"
+                            onValueChange={(value) =>
+                                setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
+                            }
+                            options={availablePropertyTypes.map((property) => ({
+                                label: property.value!,
+                                value: property.value!,
+                            }))}
+                            value={newPropertyType}
+                        />
+                    ) : (
+                        <div className="flex w-full flex-col">
+                            <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
+
+                            {availablePropertyTypes[0] && (
+                                <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
+                                    {availablePropertyTypes[0].value}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                </main>
+
+                <footer className="flex items-center justify-end space-x-2">
+                    <PopoverClose asChild>
+                        <Button
+                            className="cursor-pointer"
+                            disabled={!array && !newPropertyName}
+                            onClick={handleClick}
+                            size="sm"
+                        >
+                            Add
+                        </Button>
+                    </PopoverClose>
+                </footer>
+            </PopoverContent>
+        </Popover>
+    );
+};
 
 export default SubPropertyPopover;

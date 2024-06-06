@@ -5,10 +5,9 @@ import {ControlTypeModel, ObjectPropertyModel, PropertyTypeModel} from '@/shared
 import {ArrayPropertyType, PropertyType} from '@/shared/types';
 import getRandomId from '@/shared/util/random-utils';
 import {PlusIcon} from '@radix-ui/react-icons';
+import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
 
-import getArrayParameterValueByPath from '../../utils/getArrayParameterValueByPath';
-import getObjectParameterValueByPath from '../../utils/getObjectParameterValueByPath';
 import getParameterType from '../../utils/getParameterType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import SubPropertyPopover from './components/SubPropertyPopover';
@@ -57,7 +56,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             return;
         }
 
-        const clickedItemParameterValue = getArrayParameterValueByPath(path, currentComponent.parameters);
+        const clickedItemParameterValue = resolvePath(currentComponent.parameters, path);
 
         if (clickedItemParameterValue !== undefined || clickedItemParameterValue !== null) {
             onDeleteClick(path);
@@ -91,108 +90,95 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             return;
         }
 
-        let params = currentComponent.parameters;
-        let currentParameterValues;
+        let parameterValue = resolvePath(currentComponent.parameters, path);
 
         if (path) {
-            params = getArrayParameterValueByPath(path, currentComponent.parameters);
-
-            if (Array.isArray(params)) {
-                currentParameterValues = params.filter((param: ArrayPropertyType) => param !== null);
-            }
-
-            if (path.includes('.')) {
-                params = getObjectParameterValueByPath(path, currentComponent.parameters);
-
-                currentParameterValues = params;
+            if (Array.isArray(parameterValue)) {
+                parameterValue = parameterValue.filter((param: ArrayPropertyType) => param !== null);
             }
         }
 
-        if (!params || !currentParameterValues) {
+        if (!parameterValue) {
             return;
         }
 
-        if (items?.length && items[0].type === 'OBJECT' && Array.isArray(currentParameterValues)) {
-            const parameterArrayItems = currentParameterValues.map(
-                (parameterItem: ArrayPropertyType, index: number) => {
-                    const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
-                        Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
-                            ? {
-                                  ...property,
-                                  defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
-                              }
-                            : property
-                    );
+        if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
+            const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
+                const subProperties = (items[0] as ObjectPropertyModel).properties?.map((property) =>
+                    Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
+                        ? {
+                              ...property,
+                              defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                          }
+                        : property
+                );
 
-                    return {
-                        ...items[0],
-                        custom: true,
-                        name: index.toString(),
-                        properties: subProperties,
-                    };
-                }
-            );
+                return {
+                    ...items[0],
+                    custom: true,
+                    name: index.toString(),
+                    properties: subProperties,
+                };
+            });
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
             }
-        } else if (Array.isArray(currentParameterValues)) {
-            const parameterArrayItems = currentParameterValues.map(
-                (parameterItemValue: ArrayPropertyType, index: number) => {
-                    const parameterItemType = getParameterType(parameterItemValue);
+        } else if (Array.isArray(parameterValue)) {
+            const parameterArrayItems = parameterValue.map((parameterItemValue: ArrayPropertyType, index: number) => {
+                const parameterItemType = getParameterType(parameterItemValue);
 
-                    const newSubProperty = {
-                        arrayName: name,
-                        controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                            parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                        ] as ControlTypeModel,
-                        custom: true,
-                        defaultValue: parameterItemValue,
-                        expressionEnabled: true,
-                        label: `Item ${index}`,
-                        name: index.toString(),
-                        type: parameterItemType,
+                const newSubProperty = {
+                    arrayName: name,
+                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                        parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                    ] as ControlTypeModel,
+                    custom: true,
+                    defaultValue: parameterItemValue,
+                    expressionEnabled: true,
+                    label: `Item ${index}`,
+                    name: index.toString(),
+                    type: parameterItemType,
+                };
+
+                if (parameterItemType === 'OBJECT') {
+                    const customSubProperties = Object.keys(parameterItemValue).map((key) => {
+                        const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
+
+                        const subPropertyParameterItemType = getParameterType(subPropertyParameterValue);
+
+                        const subPropertyType =
+                            subPropertyParameterItemType ||
+                            (typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING');
+
+                        return {
+                            controlType: VALUE_PROPERTY_CONTROL_TYPES[
+                                subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                            ] as ControlTypeModel,
+                            custom: true,
+                            defaultValue: subPropertyParameterValue,
+                            expressionEnabled: true,
+                            label: key,
+                            name: key,
+                            type: subPropertyType as PropertyTypeModel,
+                        };
+                    });
+
+                    return {
+                        ...newSubProperty,
+                        properties: customSubProperties,
                     };
-
-                    if (parameterItemType === 'OBJECT') {
-                        const customSubProperties = Object.keys(parameterItemValue).map((key) => {
-                            const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
-
-                            const subPropertyParameterItemType = getParameterType(subPropertyParameterValue);
-
-                            const subPropertyType =
-                                subPropertyParameterItemType ||
-                                (typeof subPropertyParameterValue === 'boolean' ? 'BOOLEAN' : 'STRING');
-
-                            return {
-                                controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                                    subPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                                ] as ControlTypeModel,
-                                custom: true,
-                                defaultValue: subPropertyParameterValue,
-                                expressionEnabled: true,
-                                label: key,
-                                name: key,
-                                type: subPropertyType as PropertyTypeModel,
-                            };
-                        });
-
-                        return {
-                            ...newSubProperty,
-                            properties: customSubProperties,
-                        };
-                    }
-
-                    if (parameterItemType === 'BOOLEAN') {
-                        return {
-                            ...newSubProperty,
-                            defaultValue: parameterItemValue.toString(),
-                        };
-                    }
-
-                    return newSubProperty;
                 }
-            );
+
+                if (parameterItemType === 'BOOLEAN') {
+                    return {
+                        ...newSubProperty,
+                        defaultValue: parameterItemValue.toString(),
+                    };
+                }
+
+                return newSubProperty;
+            });
 
             if (parameterArrayItems?.length) {
                 setArrayItems(parameterArrayItems);
@@ -251,7 +237,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     size="sm"
                     variant="ghost"
                 >
-                    <PlusIcon className="size-4" /> Add Array item
+                    <PlusIcon className="size-4" /> Add array item
                 </Button>
             )}
         </Fragment>
