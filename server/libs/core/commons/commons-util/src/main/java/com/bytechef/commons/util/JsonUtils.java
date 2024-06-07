@@ -325,7 +325,7 @@ public class JsonUtils {
     void setObjectMapper(ObjectMapper objectMapper) {
         JsonUtils.objectMapper = objectMapper;
 
-        JsonUtils.configuration = createConfiguration(objectMapper);
+        configuration = createConfiguration(objectMapper);
     }
 
     private static Configuration createConfiguration(ObjectMapper objectMapper) {

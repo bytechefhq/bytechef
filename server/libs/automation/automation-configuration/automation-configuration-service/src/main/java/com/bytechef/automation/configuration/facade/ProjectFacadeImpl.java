@@ -221,8 +221,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public Map<String, ?> deleteWorkflowParameter(String workflowId, String workflowNodeName, String path) {
-        Project project = projectService.getWorkflowProject(workflowId);
-
         return workflowNodeParameterFacade.deleteParameter(workflowId, workflowNodeName, path);
     }
 
