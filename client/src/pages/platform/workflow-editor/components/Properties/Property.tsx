@@ -320,14 +320,6 @@ const Property = ({
     };
 
     const handleMentionsInputChange = (value: string) => {
-        const parentParameterValue = path && resolvePath(currentComponent?.parameters, path);
-
-        if (!parentParameterValue && !parameterValue && propertyParameterValue) {
-            setMentionInputValue('');
-
-            return;
-        }
-
         setMentionInputValue(value);
 
         saveMentionInputValue();
@@ -335,6 +327,8 @@ const Property = ({
 
     const handleInputTypeSwitchButtonClick = () => {
         setMentionInput(!mentionInput);
+
+        setMentionInputValue('');
 
         if (mentionInput) {
             setTimeout(() => {
@@ -364,15 +358,9 @@ const Property = ({
             return;
         } else if (!mentionInput && isNumericalInput && !numericValue) {
             return;
-        } else if (
-            !mentionInput &&
-            !isNumericalInput &&
-            !selectValue &&
-            !inputValue &&
-            (!Object.keys(parentParameterValue[name] ?? {}).length || (arrayIndex && !parentParameterValue[arrayIndex]))
-        ) {
-            return;
         } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
+            return;
+        } else if (!parentParameterValue) {
             return;
         }
 
