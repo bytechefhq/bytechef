@@ -122,7 +122,7 @@ const Property = ({
         maxValue,
         minLength,
         minValue,
-        name,
+        name = property.name?.replace(/\s/g, '_'),
         options,
         optionsDataSource,
         placeholder = '',
@@ -153,6 +153,10 @@ const Property = ({
 
     if (!path && name) {
         path = name;
+    }
+
+    if (path) {
+        path = path.replace(/\s/g, '_');
     }
 
     if (control) {
@@ -579,18 +583,20 @@ const Property = ({
 
     useEffect(() => {
         if (optionsDataSource?.optionsLookupDependsOn) {
-            const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map((key) => {
-                return key
-                    .split('.')
-                    .reduce((acc, key) => {
-                        if (key.endsWith('[index]') && arrayIndex !== undefined) {
-                            return acc && acc[key.replace('[index]', '')][arrayIndex];
-                        } else {
-                            return acc && acc[key];
-                        }
-                    }, currentComponent?.parameters ?? {})
-                    ?.toString();
-            });
+            const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map(
+                (optionLookupDependency) => {
+                    return optionLookupDependency
+                        .split('.')
+                        .reduce((acc, optionLookupDependency) => {
+                            if (optionLookupDependency.endsWith('[index]') && arrayIndex !== undefined) {
+                                return acc && acc[optionLookupDependency.replace('[index]', '')][arrayIndex];
+                            } else {
+                                return acc && acc[optionLookupDependency];
+                            }
+                        }, currentComponent?.parameters ?? {})
+                        ?.toString();
+                }
+            );
 
             setLookupDependsOnValues(optionsLookupDependsOnValues);
         }
@@ -598,18 +604,20 @@ const Property = ({
 
     useEffect(() => {
         if (propertiesDataSource?.propertiesLookupDependsOn) {
-            const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map((key) => {
-                return key
-                    .split('.')
-                    .reduce((acc, key) => {
-                        if (key.endsWith('[index]') && arrayIndex !== undefined) {
-                            return acc && acc[key.replace('[index]', '')][arrayIndex];
-                        } else {
-                            return acc && acc[key];
-                        }
-                    }, currentComponent?.parameters ?? {})
-                    ?.toString();
-            });
+            const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map(
+                (propertyLookupDependency) => {
+                    return propertyLookupDependency
+                        .split('.')
+                        .reduce((acc, propertyLookupDependency) => {
+                            if (propertyLookupDependency.endsWith('[index]') && arrayIndex !== undefined) {
+                                return acc && acc[propertyLookupDependency.replace('[index]', '')][arrayIndex];
+                            } else {
+                                return acc && acc[propertyLookupDependency];
+                            }
+                        }, currentComponent?.parameters ?? {})
+                        ?.toString();
+                }
+            );
 
             setLookupDependsOnValues(propertiesLookupDependsOnValues);
         }
@@ -907,8 +915,9 @@ const Property = ({
                                 key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                                 label={label || name}
                                 leadingIcon={typeIcon}
-                                lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map((path) =>
-                                    path.replace('[index]', `[${arrayIndex}]`)
+                                lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
+                                    (optionLookupDependency) =>
+                                        optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
                                 )}
                                 lookupDependsOnValues={lookupDependsOnValues}
                                 name={name}
@@ -968,6 +977,7 @@ const Property = ({
                         lookupDependsOnValues={lookupDependsOnValues}
                         name={name}
                         parameterValue={propertyParameterValue}
+                        path={path}
                     />
                 )}
 

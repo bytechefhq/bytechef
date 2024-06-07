@@ -12,6 +12,7 @@ interface PropertyDynamicPropertiesProps {
     currentNodeConnectionId?: number;
     lookupDependsOnValues?: Array<string>;
     name?: string;
+    path?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameterValue?: any;
 }
@@ -22,6 +23,7 @@ const PropertyDynamicProperties = ({
     lookupDependsOnValues,
     name,
     parameterValue,
+    path,
 }: PropertyDynamicPropertiesProps) => {
     const [subProperties, setSubProperties] = useState<PropertyModel[]>();
 
@@ -67,7 +69,7 @@ const PropertyDynamicProperties = ({
                         objectName={name}
                         operationName={currentOperationName}
                         parameterValue={propertyDefaultValue}
-                        path={`parameters.${name}`}
+                        path={path}
                         property={property}
                     />
                 );

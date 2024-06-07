@@ -88,7 +88,7 @@ const PropertyComboBox = ({
             request: {
                 id: workflowId,
                 lookupDependsOnPaths,
-                propertyName: (path ? path.replace('parameters.', '').replace('parameters', '') + '.' : '') + name!,
+                propertyName: path!,
                 workflowNodeName,
             },
         },
