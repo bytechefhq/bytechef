@@ -24,7 +24,9 @@
     @apply min-w-[34px];
     @apply min-h-[34px];
     @apply h-auto;
+    @apply w-full;
     padding: 0.25rem;
+    white-space: preserve;
     @apply pl-3;
 }
 
@@ -75,13 +77,16 @@
 }
 
 .property-mention > span {
-    @apply inline-flex;
-    @apply items-center;
     @apply border;
     @apply bg-gray-100;
     @apply hover:bg-gray-100;
     @apply px-2;
     @apply rounded-full;
+}
+
+.property-mention span {
+    @apply inline-flex;
+    @apply items-center;
 }
 
 .property-mention svg {

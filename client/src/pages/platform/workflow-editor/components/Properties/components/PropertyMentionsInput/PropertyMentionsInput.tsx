@@ -206,12 +206,6 @@ const PropertyMentionsInput = forwardRef(
             if (singleMention && mentionOccurences) {
                 event.preventDefault();
             }
-
-            if (event.key === ' ') {
-                setTimeout(() => {
-                    editor.setSelection(editor.getLength(), 0);
-                }, 10);
-            }
         };
 
         const handleOnFocus = () => {
