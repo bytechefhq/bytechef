@@ -17,7 +17,6 @@
 package com.bytechef.commons.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -30,15 +29,8 @@ import org.junit.jupiter.api.Test;
 public class JsonUtilsTest {
 
     @BeforeAll
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     public static void beforeAll() {
-        class JsonUtilsMock extends JsonUtils {
-            static {
-                objectMapper = new ObjectMapper();
-            }
-        }
-
-        new JsonUtilsMock();
+        new JsonUtils().setObjectMapper(new ObjectMapper());
     }
 
     @Test
