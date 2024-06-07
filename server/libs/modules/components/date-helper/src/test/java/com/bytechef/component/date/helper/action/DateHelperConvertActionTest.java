@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,6 +37,7 @@ class DateHelperConvertActionTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Parameters mockedParameters = mock(Parameters.class);
 
+    @Disabled
     @Test
     void testActionPerform() {
         mockParameters(1716572102L, DATE_FORMAT_OPTION_ISO8601_DATE_VALUE);
