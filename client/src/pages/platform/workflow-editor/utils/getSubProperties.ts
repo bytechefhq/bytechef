@@ -18,7 +18,7 @@ export default function getSubProperties(
             componentIcon,
             id: subProperty.name,
             path,
-            value: propertyName ? `${path}/${propertyName}/${subProperty.name}` : `${path}/${subProperty.name}`,
+            value: propertyName ? `${path}.${propertyName}.${subProperty.name}` : `${path}.${subProperty.name}`,
         };
     });
 }
