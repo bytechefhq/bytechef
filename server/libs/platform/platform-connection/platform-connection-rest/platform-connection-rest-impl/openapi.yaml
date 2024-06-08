@@ -32,9 +32,19 @@ components:
           description: "The name of an authorization used by this connection. Used\
             \ for HTTP based services."
           type: "string"
+        authorizationParameters:
+          description: "The authorization parameters of a connection."
+          type: "object"
+          additionalProperties: true
+          readOnly: true
         componentName:
           description: "The name of a component that uses this connection."
           type: "string"
+        connectionParameters:
+          description: "The authorization parameters of a connection."
+          type: "object"
+          additionalProperties: true
+          readOnly: true
         connectionVersion:
           description: "The version of a component that uses this connection."
           type: "integer"
