@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerOutput", description = "The trigger output.")
 @JsonTypeName("TriggerOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-23T10:43:29.106220+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-08T11:00:32.662245+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class TriggerOutputModel {
 
   private Object value;
