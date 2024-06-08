@@ -19,6 +19,7 @@ package com.bytechef.automation.user.web.rest;
 import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
 import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.SecurityUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.user.domain.ApiKey;
@@ -33,16 +34,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.automation.user.web.rest.ApiKeyApiController")
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
-public class ApiKeyApiController implements ApiKeyApi {
+public class ProjectApiKeyApiController implements ApiKeyApi {
 
     private final ApiKeyService apiKeyService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyApiController(ApiKeyService apiKeyService, ConversionService conversionService) {
+    public ProjectApiKeyApiController(ApiKeyService apiKeyService, ConversionService conversionService) {
         this.apiKeyService = apiKeyService;
         this.conversionService = conversionService;
     }
@@ -70,7 +71,7 @@ public class ApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
         ApiKeyModel apiKeyModel = conversionService.convert(apiKeyService.getApiKey(id), ApiKeyModel.class);
 
-        return ResponseEntity.ok(apiKeyModel.secretKey(abbreviateSecretKey(apiKeyModel.getSecretKey())));
+        return ResponseEntity.ok(apiKeyModel.secretKey(obfuscate(apiKeyModel.getSecretKey())));
     }
 
     @Override
@@ -81,7 +82,7 @@ public class ApiKeyApiController implements ApiKeyApi {
                 apiKey -> {
                     ApiKeyModel apiKeyModel = conversionService.convert(apiKey, ApiKeyModel.class);
 
-                    return apiKeyModel.secretKey(abbreviateSecretKey(apiKeyModel.getSecretKey()));
+                    return apiKeyModel.secretKey(obfuscate(apiKeyModel.getSecretKey()));
                 }));
     }
 
@@ -94,7 +95,7 @@ public class ApiKeyApiController implements ApiKeyApi {
                 ApiKeyModel.class));
     }
 
-    private String abbreviateSecretKey(String secretKey) {
-        return ".".repeat(28) + secretKey.substring(secretKey.length() - 4);
+    private static String obfuscate(String secretKey) {
+        return SecurityUtils.obfuscate(secretKey, 28, 4);
     }
 }
