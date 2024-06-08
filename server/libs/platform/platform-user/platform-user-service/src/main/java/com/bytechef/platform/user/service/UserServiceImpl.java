@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.user.service;
 
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.UserConstants;
@@ -33,7 +34,6 @@ import com.bytechef.platform.user.util.RandomUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Objects;
@@ -431,10 +431,9 @@ public class UserServiceImpl implements UserService {
     public void removeNotActivatedUsers() {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
-                Instant.now()
-                    .minus(3, ChronoUnit.DAYS)
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime())
+                LocalDateTimeUtils.toLocalDateTime(
+                    Instant.now()
+                        .minus(3, ChronoUnit.DAYS)))
             .forEach(user -> {
                 logger.debug("Deleting not activated user {}", user.getLogin());
 
