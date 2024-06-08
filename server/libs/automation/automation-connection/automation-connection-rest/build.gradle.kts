@@ -65,6 +65,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api"))
     implementation(project(":server:libs:automation:automation-connection:automation-connection-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

@@ -30,18 +30,21 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
-    boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
-    LocalDateTime createdDate, CredentialStatus credentialStatus, ConnectionEnvironment environment, Long id,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags,
-    int version) {
+    boolean active, String authorizationName, Map<String, ?> authorizationParameters, String componentName,
+    Map<String, ?> connectionParameters, int connectionVersion, String createdBy, LocalDateTime createdDate,
+    CredentialStatus credentialStatus, ConnectionEnvironment environment, Long id, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
 
-    public ConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
+    public ConnectionDTO(
+        boolean active, Map<String, ?> authorizationParameters, Connection connection,
+        Map<String, ?> connectionParameters, List<Tag> tags) {
+
         this(
-            active, connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion(),
-            connection.getCreatedBy(), connection.getCreatedDate(), connection.getCredentialStatus(),
-            connection.getEnvironment(), connection.getId(), connection.getLastModifiedBy(),
-            connection.getLastModifiedDate(), connection.getName(), connection.getParameters(), tags,
-            connection.getVersion());
+            active, connection.getAuthorizationName(), authorizationParameters, connection.getComponentName(),
+            connectionParameters, connection.getConnectionVersion(), connection.getCreatedBy(),
+            connection.getCreatedDate(), connection.getCredentialStatus(), connection.getEnvironment(),
+            connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
+            connection.getParameters(), tags, connection.getVersion());
     }
 
     public Connection toConnection() {
@@ -174,8 +177,8 @@ public record ConnectionDTO(
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus,
-                environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+                active, authorizationName, Map.of(), componentName, Map.of(), connectionVersion, createdBy, createdDate,
+                credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
         }
     }
 }

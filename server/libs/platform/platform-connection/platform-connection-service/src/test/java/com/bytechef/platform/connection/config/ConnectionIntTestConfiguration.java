@@ -18,6 +18,16 @@ package com.bytechef.platform.connection.config;
 
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.Resources;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -25,6 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -42,13 +54,98 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class ConnectionIntTestConfiguration {
 
     @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    ComponentHandler componentHandler() {
+        return () -> new ComponentDefinition() {
+            @Override
+            public Optional<List<? extends ActionDefinition>> getActions() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<List<ComponentCategory>> getCategories() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<ConnectionDefinition> getConnection() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<Boolean> getCustomAction() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<Help> getCustomActionHelp() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<DataStreamItemReader> getDataStreamItemReader() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<DataStreamItemWriter> getDataStreamItemWriter() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<String> getDescription() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<String> getIcon() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<Map<String, Object>> getMetadata() {
+                return Optional.empty();
+            }
+
+            @Override
+            public String getName() {
+                return "componentName";
+            }
+
+            @Override
+            public Optional<Resources> getResources() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<List<String>> getTags() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<String> getTitle() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<List<? extends TriggerDefinition>> getTriggers() {
+                return Optional.empty();
+            }
+
+            @Override
+            public int getVersion() {
+                return 1;
+            }
+        };
     }
 
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @EnableJdbcRepositories(basePackages = {

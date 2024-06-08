@@ -17,6 +17,8 @@
 package com.bytechef.automation.connection.web.rest;
 
 import com.bytechef.automation.connection.facade.WorkspaceConnectionFacade;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.SecurityUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -24,6 +26,7 @@ import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -100,10 +103,21 @@ public class ProjectConnectionApiController implements ConnectionApi {
             connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));
     }
 
+    @SuppressFBWarnings("NP")
     private ConnectionModel toConnectionModel(ConnectionDTO connection) {
         ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
 
+        connectionModel.authorizationParameters(
+            MapUtils.toMap(
+                connectionModel.getAuthorizationParameters(),
+                Map.Entry::getKey,
+                entry -> SecurityUtils.obfuscate(toString(entry.getValue()), 28, 8)));
+
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);
+    }
+
+    private static String toString(Object object) {
+        return object.toString();
     }
 }
