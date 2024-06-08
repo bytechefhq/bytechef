@@ -45,7 +45,7 @@ public class ScheduleTriggerJob implements Job {
             new TriggerListenerEvent(
                 new TriggerListenerEvent.ListenerParameters(
                     WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
-                    LocalDateTimeUtils.getLocalDateTime(fireTime),
+                    LocalDateTimeUtils.toLocalDateTime(fireTime),
                     MapUtils.concat(
                         Map.of("datetime", fireTime.toString()),
                         JsonUtils.readMap(jobDataMap.getString("output"), String.class)))));
