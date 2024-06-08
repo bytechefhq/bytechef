@@ -51,11 +51,23 @@ export interface ConnectionModel {
      */
     authorizationName?: string;
     /**
+     * The authorization parameters of a connection.
+     * @type {{ [key: string]: any; }}
+     * @memberof ConnectionModel
+     */
+    readonly authorizationParameters?: { [key: string]: any; };
+    /**
      * The name of a component that uses this connection.
      * @type {string}
      * @memberof ConnectionModel
      */
     componentName: string;
+    /**
+     * The authorization parameters of a connection.
+     * @type {{ [key: string]: any; }}
+     * @memberof ConnectionModel
+     */
+    readonly connectionParameters?: { [key: string]: any; };
     /**
      * The version of a component that uses this connection.
      * @type {number}
@@ -152,7 +164,9 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'active': json['active'] == null ? undefined : json['active'],
         'authorizationName': json['authorizationName'] == null ? undefined : json['authorizationName'],
+        'authorizationParameters': json['authorizationParameters'] == null ? undefined : json['authorizationParameters'],
         'componentName': json['componentName'],
+        'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
         'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
@@ -168,7 +182,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function ConnectionModelToJSON(value?: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
+export function ConnectionModelToJSON(value?: Omit<ConnectionModel, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null): any {
     if (value == null) {
         return value;
     }
