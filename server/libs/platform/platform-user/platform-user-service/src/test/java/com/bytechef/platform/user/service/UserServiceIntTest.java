@@ -19,6 +19,7 @@ package com.bytechef.platform.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
@@ -239,13 +240,14 @@ class UserServiceIntTest {
         Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
 
         List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
-            threeDaysAgo);
+            LocalDateTimeUtils.toLocalDateTime(threeDaysAgo));
 
         assertThat(users).isNotEmpty();
 
         userService.removeNotActivatedUsers();
 
-        users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
+        users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
+            LocalDateTimeUtils.toLocalDateTime(threeDaysAgo));
 
         assertThat(users).isEmpty();
     }
@@ -268,7 +270,7 @@ class UserServiceIntTest {
         Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
 
         List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
-            threeDaysAgo);
+            LocalDateTimeUtils.toLocalDateTime(threeDaysAgo));
 
         assertThat(users).isEmpty();
 

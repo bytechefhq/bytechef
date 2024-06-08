@@ -80,7 +80,7 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
-            .startAt(DateUtils.getDate(webhookExpirationDate))
+            .startAt(DateUtils.toDate(webhookExpirationDate))
             .build();
 
         schedule(jobDetail, trigger);

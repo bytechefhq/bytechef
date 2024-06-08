@@ -92,7 +92,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     protected Workflow doReadWorkflow(WorkflowResource workflowResource) throws IOException {
         return new Workflow(
             workflowResource.getId(), readDefinition(workflowResource), workflowResource.getWorkflowFormat(),
-            LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())),
+            LocalDateTimeUtils.toLocalDateTime(new Date(workflowResource.lastModified())),
             workflowResource.getMetadata());
     }
 

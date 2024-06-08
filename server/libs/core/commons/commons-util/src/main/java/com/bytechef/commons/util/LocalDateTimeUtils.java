@@ -30,15 +30,19 @@ public final class LocalDateTimeUtils {
     private LocalDateTimeUtils() {
     }
 
-    public static LocalDateTime getLocalDateTime(Date date) {
-        Instant instant = Instant.ofEpochMilli(date.getTime());
-
-        return LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
-    }
-
     public static long getTime(LocalDateTime localDateTime) {
         return localDateTime.atZone(ZoneId.systemDefault())
             .toInstant()
             .toEpochMilli();
+    }
+
+    public static LocalDateTime toLocalDateTime(Date date) {
+        Instant instant = Instant.ofEpochMilli(date.getTime());
+
+        return toLocalDateTime(instant);
+    }
+
+    public static LocalDateTime toLocalDateTime(Instant instant) {
+        return LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
     }
 }

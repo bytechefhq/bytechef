@@ -68,7 +68,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
                     triggerKey,
                     TriggerBuilder.newTrigger()
                         .withIdentity(triggerKey)
-                        .startAt(DateUtils.getDate(webhookExpirationDate))
+                        .startAt(DateUtils.toDate(webhookExpirationDate))
                         .build());
             } catch (SchedulerException e) {
                 throw new JobExecutionException(e);
