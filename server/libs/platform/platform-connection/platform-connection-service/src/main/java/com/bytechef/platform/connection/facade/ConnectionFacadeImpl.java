@@ -21,6 +21,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
@@ -33,13 +34,17 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import com.bytechef.platform.registry.domain.BaseProperty;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -105,6 +110,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             }
         }
 
+        Map<String, ?> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.remove("state");
+
+        connection.setParameters(parameters);
+
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         if (!tags.isEmpty()) {
@@ -115,7 +126,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         connection = connectionService.create(connection);
 
-        return new ConnectionDTO(false, connection, tags);
+        return toConnectionDTO(false, connection, tags);
     }
 
     @Override
@@ -139,7 +150,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
 
-        return new ConnectionDTO(
+        return toConnectionDTO(
             isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()),
             connection, tagService.getTags(connection.getTagIds()));
     }
@@ -173,7 +184,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         Connection connection = connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
 
-        return new ConnectionDTO(
+        return toConnectionDTO(
             isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection, tags);
     }
 
@@ -185,7 +196,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         connection = connectionService.update(connection);
 
-        return new ConnectionDTO(isConnectionUsed(connectionDTO.id(), connection.getType()), connection, tags);
+        return toConnectionDTO(isConnectionUsed(connectionDTO.id(), connection.getType()), connection, tags);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -229,8 +240,51 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         return CollectionUtils.map(
             connections,
-            connection -> new ConnectionDTO(
+            connection -> toConnectionDTO(
                 isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
                 filterTags(tags, connection)));
+    }
+
+    private ConnectionDTO toConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
+        Map<String, ?> parameters = connection.getParameters();
+
+        ConnectionDefinition connectionDefinition =
+            connectionDefinitionService.getConnectionDefinition(connection.getComponentName(), 1);
+
+        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
+            .stream()
+            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
+            .map(BaseProperty::getName)
+            .toList();
+
+        List<String> connectionPropertyNames = connectionDefinition.getProperties()
+            .stream()
+            .map(BaseProperty::getName)
+            .toList();
+
+        return new ConnectionDTO(
+            active,
+            getAuthorizationParameters(parameters, authorizationPropertyNames),
+            connection,
+            getConnectionParameters(parameters, connectionPropertyNames),
+            tags);
+    }
+
+    private static Map<String, ?> getAuthorizationParameters(
+        Map<String, ?> parameters, List<String> authorizationPropertyNames) {
+
+        return parameters.entrySet()
+            .stream()
+            .filter(entry -> authorizationPropertyNames.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static Map<String, ?> getConnectionParameters(
+        Map<String, ?> parameters, List<String> connectionPropertyNames) {
+
+        return parameters.entrySet()
+            .stream()
+            .filter(entry -> connectionPropertyNames.contains(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

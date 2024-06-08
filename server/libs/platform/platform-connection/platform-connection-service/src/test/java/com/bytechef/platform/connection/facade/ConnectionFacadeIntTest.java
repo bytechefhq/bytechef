@@ -16,9 +16,16 @@
 
 package com.bytechef.platform.connection.facade;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Property;
+import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
@@ -35,10 +42,12 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,6 +69,9 @@ import org.springframework.context.annotation.Import;
 public class ConnectionFacadeIntTest {
 
     @Autowired
+    private ConnectionDefinitionService connectionDefinitionService;
+
+    @Autowired
     private ConnectionFacade connectionFacade;
 
     @Autowired
@@ -72,6 +84,12 @@ public class ConnectionFacadeIntTest {
     public void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        when(connectionDefinitionService.getConnectionDefinition(anyString(), anyInt()))
+            .thenReturn(new ConnectionDefinition(new MockConnectionDefinition(), "componentName", null, null));
     }
 
     @Test
@@ -306,6 +324,48 @@ public class ConnectionFacadeIntTest {
                     return "";
                 }
             };
+        }
+    }
+
+    private static class MockConnectionDefinition implements com.bytechef.component.definition.ConnectionDefinition {
+        @Override
+        public boolean containsAuthorizations() {
+            return false;
+        }
+
+        @Override
+        public Authorization getAuthorization(String authorizationName) {
+            return null;
+        }
+
+        @Override
+        public Optional<Boolean> getAuthorizationRequired() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<List<? extends Authorization>> getAuthorizations() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<BaseUriFunction> getBaseUri() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<List<? extends Property>> getProperties() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<TestConsumer> getTest() {
+            return Optional.empty();
+        }
+
+        @Override
+        public int getVersion() {
+            return 0;
         }
     }
 }
