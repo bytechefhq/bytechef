@@ -17,7 +17,7 @@
 package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
-import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
+import com.bytechef.automation.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
@@ -34,7 +34,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public abstract class ProjectWorkflowMapper {
 
-    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
     public abstract static class ProjectWorkflowDTOToWorkflowModelMapper
         implements Converter<WorkflowDTO, WorkflowModel> {
 
@@ -54,7 +54,7 @@ public abstract class ProjectWorkflowMapper {
         }
     }
 
-    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
     public abstract static class ProjectWorkflowModelToWorkflowBasicModel
         implements Converter<WorkflowDTO, WorkflowBasicModel> {
 

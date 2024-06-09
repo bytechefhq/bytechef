@@ -16,16 +16,16 @@
 
 package com.bytechef.automation.user.web.rest.mapper.config;
 
-import com.bytechef.platform.user.web.rest.adapter.PlatformUserConversionServiceAdapter;
+import com.bytechef.platform.user.web.rest.adapter.ProjectUserConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = PlatformUserConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = ProjectUserConversionServiceAdapter.class)
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.platform.user.web.rest.adapter",
-    conversionServiceAdapterClassName = "PlatformUserConversionServiceAdapter")
-public interface AutomationUserMapperSpringConfig {
+    conversionServiceAdapterClassName = "ProjectUserConversionServiceAdapter")
+public interface ProjectUserMapperSpringConfig {
 }

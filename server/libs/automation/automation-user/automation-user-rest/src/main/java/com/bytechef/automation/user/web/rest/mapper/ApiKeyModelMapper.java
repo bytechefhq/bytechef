@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.user.web.rest.mapper;
 
-import com.bytechef.automation.user.web.rest.mapper.config.AutomationUserMapperSpringConfig;
+import com.bytechef.automation.user.web.rest.mapper.config.ProjectUserMapperSpringConfig;
 import com.bytechef.automation.user.web.rest.model.ApiKeyModel;
 import com.bytechef.platform.user.domain.ApiKey;
 import org.mapstruct.Mapper;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationUserMapperSpringConfig.class, implementationName = "Automation<CLASS_NAME>Impl")
+@Mapper(config = ProjectUserMapperSpringConfig.class, implementationName = "Project<CLASS_NAME>Impl")
 public interface ApiKeyModelMapper extends Converter<ApiKeyModel, ApiKey> {
 
     @Override
