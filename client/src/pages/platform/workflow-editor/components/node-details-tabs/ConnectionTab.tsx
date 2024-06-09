@@ -1,6 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import {
     ComponentDefinitionModel,
@@ -9,6 +10,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -78,6 +80,11 @@ const ConnectionSelect = ({
         componentVersion: workflowConnection.componentVersion,
     });
 
+    const {data: connectionDefinition} = useGetConnectionDefinitionQuery({
+        componentName: workflowConnection.componentName,
+        componentVersion: workflowConnection.componentVersion,
+    });
+
     const {data: connections} = useGetConnectionsQuery!(
         {
             componentName: componentDefinition?.name,
@@ -117,8 +124,10 @@ const ConnectionSelect = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connectionId]);
 
+    const connection = connections?.find((connection) => connection.id === connectionId);
+
     return (
-        <>
+        <div className="flex flex-col gap-6">
             <Select
                 onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
                 required={workflowConnection.required}
@@ -160,7 +169,11 @@ const ConnectionSelect = ({
                         ))}
                 </SelectContent>
             </Select>
-        </>
+
+            {connection && connectionDefinition && (
+                <ConnectionParameters connection={connection} connectionDefinition={connectionDefinition} />
+            )}
+        </div>
     );
 };
 
@@ -184,29 +197,32 @@ const ConnectionTab = ({
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
             {workflowConnections?.length ? (
-                workflowConnections.map((workflowConnection) => (
-                    <fieldset className="space-y-2" key={workflowConnection.key}>
-                        <ConnectionLabel
-                            workflowConnection={workflowConnection}
-                            workflowConnectionsCount={workflowConnections.length}
-                        />
+                workflowConnections.map((workflowConnection) => {
+                    const workflowTestConfigurationConnection =
+                        workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0
+                            ? workflowTestConfigurationConnections.filter(
+                                  (workflowTestConfigurationConnection) =>
+                                      workflowTestConfigurationConnection.workflowConnectionKey ===
+                                      workflowConnection.key
+                              )[0]
+                            : undefined;
 
-                        <ConnectionSelect
-                            workflowConnection={workflowConnection}
-                            workflowId={workflowId}
-                            workflowNodeName={workflowNodeName}
-                            workflowTestConfigurationConnection={
-                                workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0
-                                    ? workflowTestConfigurationConnections.filter(
-                                          (workflowTestConfigurationConnection) =>
-                                              workflowTestConfigurationConnection.workflowConnectionKey ===
-                                              workflowConnection.key
-                                      )[0]
-                                    : undefined
-                            }
-                        />
-                    </fieldset>
-                ))
+                    return (
+                        <fieldset className="space-y-2" key={workflowConnection.key}>
+                            <ConnectionLabel
+                                workflowConnection={workflowConnection}
+                                workflowConnectionsCount={workflowConnections.length}
+                            />
+
+                            <ConnectionSelect
+                                workflowConnection={workflowConnection}
+                                workflowId={workflowId}
+                                workflowNodeName={workflowNodeName}
+                                workflowTestConfigurationConnection={workflowTestConfigurationConnection}
+                            />
+                        </fieldset>
+                    );
+                })
             ) : (
                 <EmptyList
                     button={
