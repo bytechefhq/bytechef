@@ -851,7 +851,10 @@ const Property = ({
                                         label={label}
                                         leadingIcon={typeIcon}
                                         name={name}
-                                        onValueChange={(value) => onChange(value)}
+                                        onValueChange={(value) => {
+                                            onChange(value);
+                                            setSelectValue(value);
+                                        }}
                                         options={options as Array<SelectOptionType>}
                                         value={selectValue}
                                     />
@@ -871,7 +874,10 @@ const Property = ({
                                         label={label}
                                         leadingIcon={typeIcon}
                                         name={name}
-                                        onValueChange={(value) => onChange(value)}
+                                        onValueChange={(value) => {
+                                            onChange(value);
+                                            setSelectValue(value);
+                                        }}
                                         options={[
                                             {label: 'True', value: 'true'},
                                             {label: 'False', value: 'false'},
