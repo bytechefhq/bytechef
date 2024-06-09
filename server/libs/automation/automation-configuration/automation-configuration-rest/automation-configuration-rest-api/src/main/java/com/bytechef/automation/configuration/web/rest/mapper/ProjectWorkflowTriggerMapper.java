@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.configuration.web.rest.mapper;
 
-import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
+import com.bytechef.automation.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowTriggerModel;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import org.mapstruct.Mapper;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConfigurationMapperSpringConfig.class)
+@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
 public interface ProjectWorkflowTriggerMapper extends Converter<WorkflowTrigger, WorkflowTriggerModel> {
 
     @Mapping(target = "connections", ignore = true)
