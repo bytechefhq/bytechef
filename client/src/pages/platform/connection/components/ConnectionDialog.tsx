@@ -16,6 +16,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {
@@ -120,7 +121,7 @@ const ConnectionDialog = ({
         error: connectionDefinitionError,
         isLoading: connectionDefinitionLoading,
     } = useGetConnectionDefinitionQuery({
-        componentName: selectedComponentDefinition?.name as string,
+        componentName: (selectedComponentDefinition?.name as string) || (connection?.componentName as string),
         componentVersion: 1,
     });
 
@@ -536,7 +537,7 @@ const ConnectionDialog = ({
                                     />
                                 )}
 
-                                {showConnectionProperties && !!connectionDefinition.properties && (
+                                {!connection?.id && showConnectionProperties && !!connectionDefinition.properties && (
                                     <Properties
                                         control={control}
                                         formState={formState}
@@ -592,7 +593,8 @@ const ConnectionDialog = ({
                                     </div>
                                 )}
 
-                                {showAuthorizationProperties &&
+                                {!connection?.id &&
+                                    showAuthorizationProperties &&
                                     !!authorizations?.length &&
                                     authorizations[0]?.properties && (
                                         <Properties
@@ -677,6 +679,15 @@ const ConnectionDialog = ({
                                 </Alert>
 
                                 {scopes && scopes.length > 0 && <Scopes scopes={scopes} />}
+                            </div>
+                        )}
+
+                        {connection?.id && connectionDefinition && (
+                            <div className="py-4">
+                                <ConnectionParameters
+                                    connection={connection}
+                                    connectionDefinition={connectionDefinition}
+                                />
                             </div>
                         )}
 
