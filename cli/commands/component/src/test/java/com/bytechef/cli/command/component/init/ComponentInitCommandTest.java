@@ -32,7 +32,7 @@ public class ComponentInitCommandTest {
 
         CliApplication.main(
             "component", "init", "--open-api-path", url.getFile(), "--output-path",
-            new File("build/test/generated").getAbsolutePath(), "petstore");
+            new File("build/test/generated").getAbsolutePath(), "-n", "petstore");
 
         // TODO Add asserts
     }
@@ -43,7 +43,7 @@ public class ComponentInitCommandTest {
 
         CliApplication.main(
             "component", "init", "--open-api-path", url.getFile(), "--output-path",
-            new File("build/test/generated").getAbsolutePath(), "petstore");
+            new File("build/test/generated").getAbsolutePath(), "-n", "petstore");
 
         // TODO Add asserts
     }
