@@ -390,7 +390,13 @@ const Property = ({
             return;
         }
 
+        if (value === propertyParameterValue) {
+            return;
+        }
+
         setSelectValue(value);
+
+        setPropertyParameterValue(value);
 
         saveProperty({
             currentComponent,
