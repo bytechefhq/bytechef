@@ -29,6 +29,7 @@ export type DataPillType = {
     componentDefinition?: ComponentDefinitionModel | string;
     componentIcon?: string;
     id: string;
+    nodeName?: string;
     value: string;
 };
 
