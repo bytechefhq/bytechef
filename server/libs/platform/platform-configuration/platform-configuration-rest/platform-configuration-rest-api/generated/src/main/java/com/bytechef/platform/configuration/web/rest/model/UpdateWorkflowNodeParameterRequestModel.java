@@ -1,4 +1,4 @@
-package com.bytechef.automation.configuration.web.rest.model;
+package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -16,30 +16,32 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * DeleteWorkflowNodeParameterRequestModel
+ * UpdateWorkflowNodeParameterRequestModel
  */
 
-@JsonTypeName("deleteWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-26T21:42:16.021130+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
-public class DeleteWorkflowNodeParameterRequestModel {
+@JsonTypeName("updateWorkflowNodeParameter_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-10T12:18:15.141178+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+public class UpdateWorkflowNodeParameterRequestModel {
 
   private String path;
 
+  private Object value;
+
   private String workflowNodeName;
 
-  public DeleteWorkflowNodeParameterRequestModel() {
+  public UpdateWorkflowNodeParameterRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public DeleteWorkflowNodeParameterRequestModel(String path, String workflowNodeName) {
+  public UpdateWorkflowNodeParameterRequestModel(String path, String workflowNodeName) {
     this.path = path;
     this.workflowNodeName = workflowNodeName;
   }
 
-  public DeleteWorkflowNodeParameterRequestModel path(String path) {
+  public UpdateWorkflowNodeParameterRequestModel path(String path) {
     this.path = path;
     return this;
   }
@@ -59,7 +61,27 @@ public class DeleteWorkflowNodeParameterRequestModel {
     this.path = path;
   }
 
-  public DeleteWorkflowNodeParameterRequestModel workflowNodeName(String workflowNodeName) {
+  public UpdateWorkflowNodeParameterRequestModel value(Object value) {
+    this.value = value;
+    return this;
+  }
+
+  /**
+   * The value.
+   * @return value
+  */
+  
+  @Schema(name = "value", description = "The value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("value")
+  public Object getValue() {
+    return value;
+  }
+
+  public void setValue(Object value) {
+    this.value = value;
+  }
+
+  public UpdateWorkflowNodeParameterRequestModel workflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
   }
@@ -87,21 +109,23 @@ public class DeleteWorkflowNodeParameterRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DeleteWorkflowNodeParameterRequestModel deleteWorkflowNodeParameterRequest = (DeleteWorkflowNodeParameterRequestModel) o;
-    return Objects.equals(this.path, deleteWorkflowNodeParameterRequest.path) &&
-        Objects.equals(this.workflowNodeName, deleteWorkflowNodeParameterRequest.workflowNodeName);
+    UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequest = (UpdateWorkflowNodeParameterRequestModel) o;
+    return Objects.equals(this.path, updateWorkflowNodeParameterRequest.path) &&
+        Objects.equals(this.value, updateWorkflowNodeParameterRequest.value) &&
+        Objects.equals(this.workflowNodeName, updateWorkflowNodeParameterRequest.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(path, workflowNodeName);
+    return Objects.hash(path, value, workflowNodeName);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class DeleteWorkflowNodeParameterRequestModel {\n");
+    sb.append("class UpdateWorkflowNodeParameterRequestModel {\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();

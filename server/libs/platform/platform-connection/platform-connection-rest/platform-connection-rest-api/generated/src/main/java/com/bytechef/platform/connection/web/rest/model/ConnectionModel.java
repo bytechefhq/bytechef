@@ -32,14 +32,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-26T21:42:17.519258+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-10T12:12:59.777912+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class ConnectionModel {
 
   private Boolean active;
 
   private String authorizationName;
 
+  @Valid
+  private Map<String, Object> authorizationParameters = new HashMap<>();
+
   private String componentName;
+
+  @Valid
+  private Map<String, Object> connectionParameters = new HashMap<>();
 
   private Integer connectionVersion;
 
@@ -122,6 +128,34 @@ public class ConnectionModel {
     this.authorizationName = authorizationName;
   }
 
+  public ConnectionModel authorizationParameters(Map<String, Object> authorizationParameters) {
+    this.authorizationParameters = authorizationParameters;
+    return this;
+  }
+
+  public ConnectionModel putAuthorizationParametersItem(String key, Object authorizationParametersItem) {
+    if (this.authorizationParameters == null) {
+      this.authorizationParameters = new HashMap<>();
+    }
+    this.authorizationParameters.put(key, authorizationParametersItem);
+    return this;
+  }
+
+  /**
+   * The authorization parameters of a connection.
+   * @return authorizationParameters
+  */
+  
+  @Schema(name = "authorizationParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationParameters")
+  public Map<String, Object> getAuthorizationParameters() {
+    return authorizationParameters;
+  }
+
+  public void setAuthorizationParameters(Map<String, Object> authorizationParameters) {
+    this.authorizationParameters = authorizationParameters;
+  }
+
   public ConnectionModel componentName(String componentName) {
     this.componentName = componentName;
     return this;
@@ -140,6 +174,34 @@ public class ConnectionModel {
 
   public void setComponentName(String componentName) {
     this.componentName = componentName;
+  }
+
+  public ConnectionModel connectionParameters(Map<String, Object> connectionParameters) {
+    this.connectionParameters = connectionParameters;
+    return this;
+  }
+
+  public ConnectionModel putConnectionParametersItem(String key, Object connectionParametersItem) {
+    if (this.connectionParameters == null) {
+      this.connectionParameters = new HashMap<>();
+    }
+    this.connectionParameters.put(key, connectionParametersItem);
+    return this;
+  }
+
+  /**
+   * The authorization parameters of a connection.
+   * @return connectionParameters
+  */
+  
+  @Schema(name = "connectionParameters", accessMode = Schema.AccessMode.READ_ONLY, description = "The authorization parameters of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionParameters")
+  public Map<String, Object> getConnectionParameters() {
+    return connectionParameters;
+  }
+
+  public void setConnectionParameters(Map<String, Object> connectionParameters) {
+    this.connectionParameters = connectionParameters;
   }
 
   public ConnectionModel connectionVersion(Integer connectionVersion) {
@@ -409,7 +471,9 @@ public class ConnectionModel {
     ConnectionModel connection = (ConnectionModel) o;
     return Objects.equals(this.active, connection.active) &&
         Objects.equals(this.authorizationName, connection.authorizationName) &&
+        Objects.equals(this.authorizationParameters, connection.authorizationParameters) &&
         Objects.equals(this.componentName, connection.componentName) &&
+        Objects.equals(this.connectionParameters, connection.connectionParameters) &&
         Objects.equals(this.connectionVersion, connection.connectionVersion) &&
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
@@ -426,7 +490,7 @@ public class ConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
+    return Objects.hash(active, authorizationName, authorizationParameters, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environment, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
   }
 
   @Override
@@ -435,7 +499,9 @@ public class ConnectionModel {
     sb.append("class ConnectionModel {\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
+    sb.append("    authorizationParameters: ").append(toIndentedString(authorizationParameters)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionParameters: ").append(toIndentedString(connectionParameters)).append("\n");
     sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");

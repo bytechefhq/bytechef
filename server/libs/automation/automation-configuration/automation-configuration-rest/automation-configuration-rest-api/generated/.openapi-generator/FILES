@@ -7,12 +7,9 @@ src/main/java/com/bytechef/automation/configuration/web/rest/ProjectInstanceApi.
 src/main/java/com/bytechef/automation/configuration/web/rest/ProjectInstanceTagApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/ProjectTagApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowApi.java
-src/main/java/com/bytechef/automation/configuration/web/rest/WorkflowNodeParameterApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/WorkspaceApi.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
-src/main/java/com/bytechef/automation/configuration/web/rest/model/DeleteWorkflowNodeParameter200ResponseModel.java
-src/main/java/com/bytechef/automation/configuration/web/rest/model/DeleteWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectBasicModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectInstanceBasicModel.java
@@ -26,8 +23,6 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/ProjectVersio
 src/main/java/com/bytechef/automation/configuration/web/rest/model/PublishProjectRequestModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateTagsRequestModel.java
-src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateWorkflowNodeParameter200ResponseModel.java
-src/main/java/com/bytechef/automation/configuration/web/rest/model/UpdateWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/Workflow1Model.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowBasic1Model.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/WorkflowBasicModel.java

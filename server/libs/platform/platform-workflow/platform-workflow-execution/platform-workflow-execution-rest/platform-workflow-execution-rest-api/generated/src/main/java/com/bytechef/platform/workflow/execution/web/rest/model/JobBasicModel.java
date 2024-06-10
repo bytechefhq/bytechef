@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-05-26T21:42:17.653577+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-10T12:12:59.939542+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class JobBasicModel {
 
   private String createdBy;
