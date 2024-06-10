@@ -22,12 +22,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
 @EnableAsync
+@EnableScheduling
 public class AsyncConfiguration implements AsyncUncaughtExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncConfiguration.class);

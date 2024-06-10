@@ -1,8 +1,9 @@
 dependencies {
     api(project(":server:libs:platform:platform-api"))
 
-    implementation("org.apache.commons:commons-lang3")
+    implementation("jakarta.validation:jakarta.validation-api")
     implementation("com.fasterxml.jackson.core:jackson-annotations")
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:commons:commons-data"))

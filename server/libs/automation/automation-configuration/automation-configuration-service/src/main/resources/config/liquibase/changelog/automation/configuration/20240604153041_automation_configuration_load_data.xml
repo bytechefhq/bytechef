@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20240604153041" author="Ivica Cardic" contextFilter="mono">
+        <loadData file="config/liquibase/data/workspace_user.csv" separator=";" tableName="workspace_user" usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="workspace_id" type="numeric"/>
+            <column name="user_id" type="numeric"/>
+            <column name="created_date" type="date"/>
+            <column name="last_modified_date" type="date"/>
+            <column name="version" type="numeric"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

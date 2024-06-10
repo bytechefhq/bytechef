@@ -1,0 +1,8 @@
+spring:
+  liquibase:
+    contexts: configuration
+
+bytechef:
+  mail:
+    base-url: http://127.0.0.1:8080
+    from: noreply@bytechef.io

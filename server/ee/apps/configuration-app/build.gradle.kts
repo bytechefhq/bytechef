@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
@@ -63,6 +64,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-user:platform-user-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
 

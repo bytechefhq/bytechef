@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-rest"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-db:platform-data-storage-db-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
 

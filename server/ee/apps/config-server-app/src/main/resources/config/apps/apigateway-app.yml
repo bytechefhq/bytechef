@@ -21,6 +21,9 @@ spring:
           uri: lb://webhook-app
           predicates:
             - Path=/webhooks/**
+  mail:
+    base-url: https://www.bytechef.io
+    from: noreply@bytechef.io
 
 server:
   servlet:

@@ -42,15 +42,15 @@ public class UserMapper {
         return new UserDTO(user);
     }
 
-    public List<AdminUserDTO> usersToAdminUserDTOs(List<User> users) {
+    public List<AdminUserDTO> usersToAdminUserDTOs(List<User> users, List<Authority> authorities) {
         return users.stream()
             .filter(Objects::nonNull)
-            .map(this::userToAdminUserDTO)
+            .map(user -> userToAdminUserDTO(user, authorities))
             .toList();
     }
 
-    public AdminUserDTO userToAdminUserDTO(User user) {
-        return new AdminUserDTO(user);
+    public AdminUserDTO userToAdminUserDTO(User user, List<Authority> authorities) {
+        return new AdminUserDTO(user, authorities);
     }
 
     public List<User> userDTOsToUsers(List<AdminUserDTO> userDTOs) {
@@ -65,6 +65,7 @@ public class UserMapper {
             return null;
         } else {
             User user = new User();
+
             user.setId(userDTO.getId());
             user.setLogin(userDTO.getLogin());
             user.setFirstName(userDTO.getFirstName());
@@ -73,7 +74,9 @@ public class UserMapper {
             user.setImageUrl(userDTO.getImageUrl());
             user.setActivated(userDTO.isActivated());
             user.setLangKey(userDTO.getLangKey());
+
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
+
             user.setAuthorities(authorities);
 
             return user;
@@ -101,8 +104,11 @@ public class UserMapper {
         if (id == null) {
             return null;
         }
+
         User user = new User();
+
         user.setId(id);
+
         return user;
     }
 
@@ -111,7 +117,9 @@ public class UserMapper {
             return null;
         }
         UserDTO userDto = new UserDTO();
+
         userDto.setId(user.getId());
+
         return userDto;
     }
 
@@ -121,6 +129,7 @@ public class UserMapper {
         }
 
         Set<UserDTO> userSet = new HashSet<>();
+
         for (User userEntity : users) {
             userSet.add(this.toDtoId(userEntity));
         }

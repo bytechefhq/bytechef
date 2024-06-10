@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
@@ -87,6 +88,9 @@ public class ProjectWorkflowApiControllerIntTest {
 
     @MockBean
     private WorkflowConnectionFacade workflowConnectionFacade;
+
+    @MockBean
+    private WorkspaceFacade workspaceFacade;
 
     @MockBean
     private WorkspaceService workspaceService;

@@ -163,7 +163,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         Connection connection = connectionService.getConnection(connectionId);
 
         WorkflowConnection workflowConnection = workflowConnectionFacade.getWorkflowConnection(
-            workflow, workflowNodeName, workflowConnectionKey);
+            workflow.getId(), workflowNodeName, workflowConnectionKey);
 
         if (!Objects.equals(connection.getComponentName(), workflowConnection.componentName())) {
             throw new IllegalArgumentException(

@@ -1,0 +1,12 @@
+spring:
+  liquibase:
+    contexts: configuration
+
+bytechef:
+  mail:
+    base-url: http://127.0.0.1:8080
+    from: noreply@bytechef.io
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+    remember-me:
+      key: rememberMe

@@ -94,6 +94,24 @@ public class User {
     @Column("reset_key")
     private String resetKey;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof User)) {
+            return false;
+        }
+
+        return id != null && id.equals(((User) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
     public String getActivationKey() {
         return activationKey;
     }
@@ -189,6 +207,10 @@ public class User {
         }
     }
 
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -227,24 +249,6 @@ public class User {
 
     public void setResetDate(Instant resetDate) {
         this.resetDate = resetDate;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof User)) {
-            return false;
-        }
-
-        return id != null && id.equals(((User) o).id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 
     @Override

@@ -33,6 +33,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("workspace")
 public final class Workspace {
 
+    public static final long DEFAULT_WORKSPACE_ID = 1049;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;

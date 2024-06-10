@@ -24,7 +24,7 @@ import com.bytechef.platform.exception.ErrorType;
  */
 public enum WorkspaceErrorType implements ErrorType {
 
-    DELETE_WORKSPACE(100);
+    DELETE_DEFAULT_WORKSPACE(100), UPDATE_DEFAULT_WORKSPACE(101);
 
     private final int errorKey;
 
