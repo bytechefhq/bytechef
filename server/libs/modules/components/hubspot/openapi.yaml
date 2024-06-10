@@ -44,11 +44,8 @@ paths:
       security:
       - hapikey: []
       - oauth2:
+        - "crm.objects.contacts.read"
         - "crm.objects.contacts.write"
-      - private_apps:
-        - "crm.objects.contacts.write"
-      - private_apps_legacy:
-        - "contacts"
   /crm/v3/objects/contacts/{contactId}:
     patch:
       tags:
@@ -85,11 +82,8 @@ paths:
       security:
       - hapikey: []
       - oauth2:
+        - "crm.objects.contacts.read"
         - "crm.objects.contacts.write"
-      - private_apps:
-        - "crm.objects.contacts.write"
-      - private_apps_legacy:
-        - "contacts"
 components:
   schemas:
     StandardError:
