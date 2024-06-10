@@ -1,10 +1,10 @@
+import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/ProjectHeaderDeleteWorkflowAlertDialog';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/ProjectHeaderOutputButton';
 import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/ProjectHeaderProjectDropDownMenu';
-import ProjectHeaderProjectVersionBadge from '@/pages/automation/project/components/ProjectHeaderProjectVersionBadge';
 import ProjectHeaderRunButton from '@/pages/automation/project/components/ProjectHeaderRunButton';
 import ProjectHeaderStopButton from '@/pages/automation/project/components/ProjectHeaderStopButton';
 import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/ProjectHeaderWorkflowDropDownMenu';
@@ -15,7 +15,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
-import {ProjectModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
+import {ProjectModel, ProjectStatusModel, WorkflowModel} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useDeleteProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {
@@ -183,7 +183,16 @@ const ProjectHeader = ({
             <div className="flex flex-1 items-center space-x-2">
                 <h1>{project?.name}</h1>
 
-                {project && <ProjectHeaderProjectVersionBadge project={project} />}
+                {project && (
+                    <Badge
+                        className="flex space-x-1"
+                        variant={project.status === ProjectStatusModel.Published ? 'success' : 'outline'}
+                    >
+                        <span>V{project.projectVersion}</span>
+
+                        <span>{project.status === ProjectStatusModel.Published ? `Published` : 'Draft'}</span>
+                    </Badge>
+                )}
             </div>
 
             <div className="flex items-center space-x-6">
