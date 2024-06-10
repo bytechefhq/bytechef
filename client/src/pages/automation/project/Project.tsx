@@ -22,11 +22,11 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
+import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
     useDeleteWorkflowNodeParameterMutation,
     useUpdateWorkflowNodeParameterMutation,
-} from '@/shared/mutations/automation/workflowNodeParameters.mutations';
-import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+} from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {
     ConnectionKeys,
