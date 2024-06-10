@@ -145,6 +145,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        setSubProperties(properties as Array<PropertyType>);
+    }, [properties]);
+
     return (
         <Fragment key={name}>
             <ul className={twMerge('space-y-4', label && name !== '__item' && 'ml-2 border-l', arrayName && 'pl-2')}>
