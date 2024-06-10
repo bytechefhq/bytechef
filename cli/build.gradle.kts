@@ -18,19 +18,16 @@ sonarProperties.forEach { key, value ->
 }
 
 subprojects {
+    apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.sonarqube")
 
     dependencies {
-        annotationProcessor(rootProject.libs.info.picocli.picocli.codegen)
+        implementation("org.springframework.shell:spring-shell-starter")
+    }
 
-        implementation(rootProject.libs.ch.qos.logback.logback.core)
-        implementation(rootProject.libs.ch.qos.logback.logback.classic)
-        implementation(rootProject.libs.info.picocli)
-        implementation(rootProject.libs.io.swagger.parser.v3.swagger.parser)
-
-        constraints {
-            implementation(rootProject.libs.ch.qos.logback.logback.core)
-            implementation(rootProject.libs.ch.qos.logback.logback.classic)
+    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+        imports {
+            mavenBom("org.springframework.shell:spring-shell-dependencies:${rootProject.libs.versions.spring.shell.get()}")
         }
     }
 }
