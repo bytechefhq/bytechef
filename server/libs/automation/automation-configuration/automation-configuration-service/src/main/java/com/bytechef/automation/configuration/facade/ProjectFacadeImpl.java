@@ -36,9 +36,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -83,7 +81,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
     private final WorkflowFacade workflowFacade;
-    private final WorkflowNodeParameterFacade workflowNodeParameterFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -93,8 +90,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         CategoryService categoryService, ProjectWorkflowService projectWorkflowService,
         ProjectInstanceService projectInstanceService, ProjectService projectService,
         ProjectInstanceFacade projectInstanceFacade, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        TagService tagService, WorkflowFacade workflowFacade, WorkflowNodeParameterFacade workflowNodeParameterFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
@@ -105,7 +102,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
         this.workflowFacade = workflowFacade;
-        this.workflowNodeParameterFacade = workflowNodeParameterFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
@@ -217,13 +213,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         projectWorkflowService.removeWorkflow(project.getId(), project.getLastVersion(), workflowId);
 
         workflowService.delete(workflowId);
-    }
-
-    @Override
-    public Map<String, ?> deleteWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
-
-        return workflowNodeParameterFacade.deleteParameter(workflowId, workflowNodeName, path, name, arrayIndex);
     }
 
     @Override
@@ -378,13 +367,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         return new WorkflowDTO(workflowFacade.update(workflowId, definition, version), projectWorkflow);
-    }
-
-    @Override
-    public UpdateParameterResultDTO updateWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
-
-        return workflowNodeParameterFacade.updateParameter(workflowId, workflowNodeName, path, name, arrayIndex, value);
     }
 
     private void checkProjectWorkflowsStatus(Project project) {

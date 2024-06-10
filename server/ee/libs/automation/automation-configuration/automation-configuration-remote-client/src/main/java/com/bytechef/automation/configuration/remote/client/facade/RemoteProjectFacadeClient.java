@@ -12,10 +12,8 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import java.util.Map;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -44,13 +42,6 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public void deleteWorkflow(@NonNull String workflowId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Map<String, ?> deleteWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex) {
-
         throw new UnsupportedOperationException();
     }
 
@@ -133,13 +124,6 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public WorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public UpdateParameterResultDTO updateWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, String name, Integer arrayIndex, Object value) {
-
         throw new UnsupportedOperationException();
     }
 }
