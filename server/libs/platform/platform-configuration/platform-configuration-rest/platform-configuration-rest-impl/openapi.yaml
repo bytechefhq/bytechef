@@ -791,10 +791,19 @@ paths:
               type: "object"
               required:
                 - "path"
+                - "type"
+                - "value"
                 - "workflowNodeName"
               properties:
+                includeInMetadata:
+                  description: "If path and value type should be included in metadata "
+                  type: "boolean"
+                  default: false
                 path:
                   description: "The workflow node parameter path."
+                  type: "string"
+                type:
+                  description: "The type of a property."
                   type: "string"
                 value:
                   description: "The value."
