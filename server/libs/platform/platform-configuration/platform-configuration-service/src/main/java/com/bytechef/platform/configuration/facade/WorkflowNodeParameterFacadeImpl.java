@@ -75,7 +75,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     public Map<String, ?> deleteParameter(String workflowId, String workflowNodeName, String path) {
-
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
@@ -85,6 +84,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] pathItems = path.split("\\.");
 
+        setMetadata(workflowNodeName, path, null, definitionMap);
         setParameter(pathItems, null, result.parameterMap);
 
         workflowService.update(
@@ -120,7 +120,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @Override
     public UpdateParameterResultDTO updateParameter(
-        String workflowId, String workflowNodeName, String path, Object value) {
+        String workflowId, String workflowNodeName, String path, Object value, String type, boolean includeInMetadata) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -144,6 +144,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         displayConditionMap = checkDisplayConditionsParameters(
             workflowNodeName, pathItems[0], result.properties, workflow, result.parameterMap, inputMap,
             result.taskParameters);
+
+        if (includeInMetadata) {
+            setMetadata(workflowNodeName, path, type, definitionMap);
+        }
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
@@ -361,6 +365,61 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setMetadata(String workflowNodeName, String path, String type, Map<String, ?> definitionMap) {
+        Map<String, Object> metadataMap;
+
+        Map<String, ?> triggerMap = getTrigger(
+            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
+
+        if (triggerMap == null) {
+            Map<String, ?> taskMap = getTask(
+                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
+
+            if (taskMap == null) {
+                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
+            }
+
+            metadataMap = (Map<String, Object>) taskMap.get("metadata");
+
+            if (metadataMap == null) {
+                metadataMap = new HashMap<>();
+
+                ((Map<String, Object>) taskMap).put("metadata", metadataMap);
+            }
+        } else {
+            metadataMap = (Map<String, Object>) triggerMap.get("metadata");
+
+            if (metadataMap == null) {
+                metadataMap = new HashMap<>();
+
+                ((Map<String, Object>) triggerMap).put("metadata", metadataMap);
+            }
+        }
+
+        Map<String, Object> uiMap = (Map<String, Object>) metadataMap.get("ui");
+
+        if (uiMap == null) {
+            uiMap = new HashMap<>();
+
+            metadataMap.put("ui", uiMap);
+        }
+
+        Map<String, Object> dynamicPropertyTypesMap = (Map<String, Object>) uiMap.get("dynamicPropertyTypes");
+
+        if (dynamicPropertyTypesMap == null) {
+            dynamicPropertyTypesMap = new HashMap<>();
+
+            uiMap.put("dynamicPropertyTypes", dynamicPropertyTypesMap);
+        }
+
+        if (type == null) {
+            dynamicPropertyTypesMap.remove(path);
+        } else {
+            dynamicPropertyTypesMap.put(path, type);
+        }
     }
 
     @SuppressWarnings("unchecked")

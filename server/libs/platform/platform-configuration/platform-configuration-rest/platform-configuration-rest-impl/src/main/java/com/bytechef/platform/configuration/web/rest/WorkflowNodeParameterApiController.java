@@ -74,7 +74,9 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
         UpdateParameterResultDTO updateParameterResultDTO = workflowNodeParameterFacade.updateParameter(
             id, updateWorkflowNodeParameterRequestModel.getWorkflowNodeName(),
-            updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue());
+            updateWorkflowNodeParameterRequestModel.getPath(), updateWorkflowNodeParameterRequestModel.getValue(),
+            updateWorkflowNodeParameterRequestModel.getType(),
+            updateWorkflowNodeParameterRequestModel.getIncludeInMetadata());
 
         return ResponseEntity.ok(
             new UpdateWorkflowNodeParameter200ResponseModel()
