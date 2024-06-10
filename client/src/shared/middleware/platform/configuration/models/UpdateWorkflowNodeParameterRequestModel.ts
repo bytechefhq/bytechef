@@ -20,17 +20,29 @@ import { mapValues } from '../runtime';
  */
 export interface UpdateWorkflowNodeParameterRequestModel {
     /**
+     * If path and value type should be included in metadata 
+     * @type {boolean}
+     * @memberof UpdateWorkflowNodeParameterRequestModel
+     */
+    includeInMetadata?: boolean;
+    /**
      * The workflow node parameter path.
      * @type {string}
      * @memberof UpdateWorkflowNodeParameterRequestModel
      */
     path: string;
     /**
+     * The type of a property.
+     * @type {string}
+     * @memberof UpdateWorkflowNodeParameterRequestModel
+     */
+    type: string;
+    /**
      * The value.
      * @type {object}
      * @memberof UpdateWorkflowNodeParameterRequestModel
      */
-    value?: object;
+    value: object;
     /**
      * The workflow node name.
      * @type {string}
@@ -44,6 +56,8 @@ export interface UpdateWorkflowNodeParameterRequestModel {
  */
 export function instanceOfUpdateWorkflowNodeParameterRequestModel(value: object): boolean {
     if (!('path' in value)) return false;
+    if (!('type' in value)) return false;
+    if (!('value' in value)) return false;
     if (!('workflowNodeName' in value)) return false;
     return true;
 }
@@ -58,8 +72,10 @@ export function UpdateWorkflowNodeParameterRequestModelFromJSONTyped(json: any, 
     }
     return {
         
+        'includeInMetadata': json['includeInMetadata'] == null ? undefined : json['includeInMetadata'],
         'path': json['path'],
-        'value': json['value'] == null ? undefined : json['value'],
+        'type': json['type'],
+        'value': json['value'],
         'workflowNodeName': json['workflowNodeName'],
     };
 }
@@ -70,7 +86,9 @@ export function UpdateWorkflowNodeParameterRequestModelToJSON(value?: UpdateWork
     }
     return {
         
+        'includeInMetadata': value['includeInMetadata'],
         'path': value['path'],
+        'type': value['type'],
         'value': value['value'],
         'workflowNodeName': value['workflowNodeName'],
     };
