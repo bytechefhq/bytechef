@@ -24,7 +24,7 @@ import {
 
 export interface CreateWorkspaceConnectionRequest {
     id: number;
-    connectionModel: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    connectionModel: Omit<ConnectionModel, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface DeleteConnectionRequest {
@@ -50,7 +50,7 @@ export interface GetWorkspaceConnectionsRequest {
 
 export interface UpdateConnectionRequest {
     id: number;
-    connectionModel: Omit<ConnectionModel, 'active'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    connectionModel: Omit<ConnectionModel, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 /**
