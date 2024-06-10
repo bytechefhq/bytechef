@@ -20,7 +20,10 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * @author Ivica Cardic
@@ -33,5 +36,12 @@ class ServerApplicationIntTest {
 
     @Test
     void testContextLoads() {
+    }
+
+    @TestConfiguration
+    static class ServerApplicationIntTestConfiguration {
+
+        @MockBean
+        private JavaMailSender javaMailSender;
     }
 }

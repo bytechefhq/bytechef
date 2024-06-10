@@ -37,13 +37,13 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.component.registry.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

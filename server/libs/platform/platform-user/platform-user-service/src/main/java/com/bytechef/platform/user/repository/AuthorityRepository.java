@@ -28,4 +28,6 @@ import org.springframework.stereotype.Repository;
 public interface AuthorityRepository extends ListCrudRepository<Authority, Long> {
 
     Optional<Authority> findByName(String name);
+
+    boolean existsByName(String name);
 }

@@ -7,7 +7,6 @@
 
 package com.bytechef.platform.configuration.remote.client.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
@@ -37,7 +36,7 @@ public class RemoteWorkflowConnectionFacadeClient implements WorkflowConnectionF
     }
 
     @Override
-    public WorkflowConnection getWorkflowConnection(Workflow workflow, String workflowNodeName, String key) {
+    public WorkflowConnection getWorkflowConnection(String workflowId, String workflowNodeName, String key) {
         throw new UnsupportedOperationException();
     }
 

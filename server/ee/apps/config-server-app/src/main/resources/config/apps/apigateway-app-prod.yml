@@ -1,0 +1,8 @@
+spring:
+  mail:
+    host: localhost
+    port: 25
+    username:
+    password:
+  thymeleaf:
+    cache: true
