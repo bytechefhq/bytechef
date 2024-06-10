@@ -20,10 +20,8 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import java.util.Map;
 import org.springframework.lang.NonNull;
 
 /**
@@ -38,8 +36,6 @@ public interface ProjectFacade {
     void deleteProject(long id);
 
     void deleteWorkflow(@NonNull String workflowId);
-
-    Map<String, ?> deleteWorkflowParameter(String workflowId, String workflowNodeName, String path);
 
     ProjectDTO duplicateProject(long id);
 
@@ -73,7 +69,4 @@ public interface ProjectFacade {
     void updateProjectTags(long id, @NonNull List<Tag> tags);
 
     WorkflowDTO updateWorkflow(String workflowId, String definition, int version);
-
-    UpdateParameterResultDTO updateWorkflowParameter(
-        String workflowId, String workflowNodeName, String path, Object value);
 }
