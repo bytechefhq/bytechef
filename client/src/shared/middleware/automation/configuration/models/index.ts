@@ -3,8 +3,6 @@
 export * from './CategoryModel';
 export * from './CreateProjectInstanceWorkflowJob200ResponseModel';
 export * from './DataStreamComponentModel';
-export * from './DeleteWorkflowNodeParameter200ResponseModel';
-export * from './DeleteWorkflowNodeParameterRequestModel';
 export * from './EnvironmentModel';
 export * from './ProjectBasicModel';
 export * from './ProjectInstanceBasicModel';
@@ -18,8 +16,6 @@ export * from './ProjectVersionModel';
 export * from './PublishProjectRequestModel';
 export * from './TagModel';
 export * from './UpdateTagsRequestModel';
-export * from './UpdateWorkflowNodeParameter200ResponseModel';
-export * from './UpdateWorkflowNodeParameterRequestModel';
 export * from './Workflow1Model';
 export * from './WorkflowBasic1Model';
 export * from './WorkflowBasicModel';
