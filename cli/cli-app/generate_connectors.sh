@@ -10,6 +10,6 @@ do
         COMPONENTNAME=$(basename $COMPONENTPATH)
 
         echo "Generate $COMPONENTNAME OpenAPI Connector"
-        $SCRIPTPATH/bytechef.sh component init --open-api-path=$COMPONENTSFOLDER/$COMPONENTNAME/openapi.yaml -o $COMPONENTSFOLDER $COMPONENTNAME
+        $SCRIPTPATH/bytechef.sh component init --open-api-path $COMPONENTSFOLDER/$COMPONENTNAME/openapi.yaml -o $COMPONENTSFOLDER -n $COMPONENTNAME
     fi
 done

@@ -12,4 +12,9 @@ tasks.compileJava {
 
 dependencies {
     implementation(project(":cli:commands:component"))
+
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.shell:spring-shell-starter")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

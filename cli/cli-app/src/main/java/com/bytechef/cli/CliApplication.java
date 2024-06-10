@@ -16,34 +16,19 @@
 
 package com.bytechef.cli;
 
-import static picocli.CommandLine.Command;
-
 import com.bytechef.cli.command.component.ComponentCommand;
-import picocli.CommandLine;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.shell.command.annotation.EnableCommand;
 
 /**
  * @author Ivica Cardic
  */
-@Command(
-    name = "bytechef",
-    description = "Executes various ByteChef related commands.",
-    mixinStandardHelpOptions = true,
-    version = "1.0",
-    subcommands = {
-        CommandLine.HelpCommand.class, ComponentCommand.class
-    })
-public class CliApplication implements Runnable {
-
-    public CliApplication() {
-    }
-
-    @Override
-    public void run() {
-    }
+@SpringBootApplication
+@EnableCommand(ComponentCommand.class)
+public class CliApplication {
 
     public static void main(String... args) {
-        int exitCode = new CommandLine(new CliApplication()).execute(args);
-
-        System.exit(exitCode);
+        SpringApplication.run(CliApplication.class, args);
     }
 }

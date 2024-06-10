@@ -4,7 +4,6 @@ checkstyle = "10.12.5"
 com-google-auto-service = "1.1.1"
 graalvm = "23.1.2"
 gradle-git-properties = "2.4.1"
-info-picocli = "4.7.6"
 jacoco = "0.8.11"
 java = "21"
 jib-gradle-plugin = "3.4.2"
@@ -17,10 +16,9 @@ spotbugs = "4.8.5"
 spotbugs-gradle-plugin = "6.0.14"
 spotless-plugin-gradle = "6.25.0"
 spring-boot = "3.3.0"
+spring-shell = "3.3.0"
 
 [libraries]
-ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
-ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.7"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.8.5"
@@ -28,8 +26,6 @@ com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 commons-validator = "commons-validator:commons-validator:1.8.0"
-info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
-info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.21"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.22"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.1.0-M2"
