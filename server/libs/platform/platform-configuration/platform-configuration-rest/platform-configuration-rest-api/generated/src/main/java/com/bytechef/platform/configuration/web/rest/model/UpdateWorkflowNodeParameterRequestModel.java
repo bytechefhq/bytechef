@@ -20,10 +20,14 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-10T12:18:15.141178+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-11T06:18:17.677938+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class UpdateWorkflowNodeParameterRequestModel {
 
+  private Boolean includeInMetadata = false;
+
   private String path;
+
+  private String type;
 
   private Object value;
 
@@ -36,9 +40,31 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * Constructor with only required parameters
    */
-  public UpdateWorkflowNodeParameterRequestModel(String path, String workflowNodeName) {
+  public UpdateWorkflowNodeParameterRequestModel(String path, String type, Object value, String workflowNodeName) {
     this.path = path;
+    this.type = type;
+    this.value = value;
     this.workflowNodeName = workflowNodeName;
+  }
+
+  public UpdateWorkflowNodeParameterRequestModel includeInMetadata(Boolean includeInMetadata) {
+    this.includeInMetadata = includeInMetadata;
+    return this;
+  }
+
+  /**
+   * If path and value type should be included in metadata 
+   * @return includeInMetadata
+  */
+  
+  @Schema(name = "includeInMetadata", description = "If path and value type should be included in metadata ", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("includeInMetadata")
+  public Boolean getIncludeInMetadata() {
+    return includeInMetadata;
+  }
+
+  public void setIncludeInMetadata(Boolean includeInMetadata) {
+    this.includeInMetadata = includeInMetadata;
   }
 
   public UpdateWorkflowNodeParameterRequestModel path(String path) {
@@ -61,6 +87,26 @@ public class UpdateWorkflowNodeParameterRequestModel {
     this.path = path;
   }
 
+  public UpdateWorkflowNodeParameterRequestModel type(String type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * The type of a property.
+   * @return type
+  */
+  @NotNull 
+  @Schema(name = "type", description = "The type of a property.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
   public UpdateWorkflowNodeParameterRequestModel value(Object value) {
     this.value = value;
     return this;
@@ -70,8 +116,8 @@ public class UpdateWorkflowNodeParameterRequestModel {
    * The value.
    * @return value
   */
-  
-  @Schema(name = "value", description = "The value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "value", description = "The value.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("value")
   public Object getValue() {
     return value;
@@ -110,21 +156,25 @@ public class UpdateWorkflowNodeParameterRequestModel {
       return false;
     }
     UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequest = (UpdateWorkflowNodeParameterRequestModel) o;
-    return Objects.equals(this.path, updateWorkflowNodeParameterRequest.path) &&
+    return Objects.equals(this.includeInMetadata, updateWorkflowNodeParameterRequest.includeInMetadata) &&
+        Objects.equals(this.path, updateWorkflowNodeParameterRequest.path) &&
+        Objects.equals(this.type, updateWorkflowNodeParameterRequest.type) &&
         Objects.equals(this.value, updateWorkflowNodeParameterRequest.value) &&
         Objects.equals(this.workflowNodeName, updateWorkflowNodeParameterRequest.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(path, value, workflowNodeName);
+    return Objects.hash(includeInMetadata, path, type, value, workflowNodeName);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateWorkflowNodeParameterRequestModel {\n");
+    sb.append("    includeInMetadata: ").append(toIndentedString(includeInMetadata)).append("\n");
     sb.append("    path: ").append(toIndentedString(path)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
