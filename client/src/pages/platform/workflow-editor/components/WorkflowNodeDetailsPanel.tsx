@@ -200,6 +200,10 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
+        if (!workflow.triggers?.length) {
+            index += 1;
+        }
+
         const {componentDefinition} = componentProperty;
 
         const existingProperties = getExistingProperties(componentProperty.properties);
