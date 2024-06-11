@@ -494,7 +494,7 @@ const Property = ({
 
             const paramValue = resolvePath(parameters, path);
 
-            if (paramValue) {
+            if (paramValue !== undefined || paramValue !== null) {
                 setPropertyParameterValue(paramValue);
             } else {
                 setPropertyParameterValue(parameters[name]);
@@ -682,49 +682,51 @@ const Property = ({
 
     // handle pasting mentions
     useEffect(() => {
-        if (mentionInputValue.includes('${')) {
-            const mentionValues: Array<string> = mentionInputValue
-                .split(/(\$\{.*?\})/g)
-                .filter((value: string) => value !== '');
+        if (typeof mentionInputValue !== 'string' || !mentionInputValue.includes('${')) {
+            return;
+        }
 
-            const mentionInputNodes = mentionValues.map((value) => {
-                if (value.startsWith('${')) {
-                    const componentName = value.split('_')[0].replace('${', '');
+        const mentionValues: Array<string> = mentionInputValue
+            .split(/(\$\{.*?\})/g)
+            .filter((value: string) => value !== '');
 
-                    const componentIcon =
-                        componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
+        const mentionInputNodes = mentionValues.map((value) => {
+            if (value.startsWith('${')) {
+                const componentName = value.split('_')[0].replace('${', '');
 
-                    const node = document.createElement('div');
+                const componentIcon =
+                    componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
 
-                    node.className = 'property-mention';
+                const node = document.createElement('div');
 
-                    node.dataset.value = value.replace(/\$\{|\}/g, '');
-                    node.dataset.componentIcon = componentIcon;
+                node.className = 'property-mention';
 
-                    return node.outerHTML;
-                } else {
-                    return value;
-                }
-            });
+                node.dataset.value = value.replace(/\$\{|\}/g, '');
+                node.dataset.componentIcon = componentIcon;
 
-            const pastingChange =
-                previousMentionInputValue &&
-                mentionValues.length > 1 &&
-                previousMentionInputValue.length !== mentionInputValue.length;
-
-            if (pastingChange) {
-                setTimeout(() => {
-                    const selection = editorRef.current?.getEditor().getSelection();
-
-                    if (selection) {
-                        editorRef.current?.getEditor().setSelection(selection.index + 1, 0);
-                    }
-                }, 50);
-
-                setMentionInputValue(mentionInputNodes.join(''));
-
-                saveMentionInputValue();
+                return node.outerHTML;
+            } else {
+                return value;
             }
+        });
+
+        const pastingChange =
+            previousMentionInputValue &&
+            mentionValues.length > 1 &&
+            previousMentionInputValue.length !== mentionInputValue.length;
+
+        if (pastingChange) {
+            setTimeout(() => {
+                const selection = editorRef.current?.getEditor().getSelection();
+
+                if (selection) {
+                    editorRef.current?.getEditor().setSelection(selection.index + 1, 0);
+                }
+            }, 50);
+
+            setMentionInputValue(mentionInputNodes.join(''));
+
+            saveMentionInputValue();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mentionInputValue]);
