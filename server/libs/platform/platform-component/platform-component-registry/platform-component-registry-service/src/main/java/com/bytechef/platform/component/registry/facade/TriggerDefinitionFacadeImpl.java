@@ -208,8 +208,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             Connection connection = connectionService.getConnection(connectionId);
 
             componentConnection = new ComponentConnection(
-                connection.getComponentName(), connection.getConnectionVersion(), connection.getParameters(),
-                connection.getAuthorizationName());
+                connection.getComponentName(), connection.getConnectionVersion(), connectionId,
+                connection.getParameters(), connection.getAuthorizationName());
         }
 
         return componentConnection;
