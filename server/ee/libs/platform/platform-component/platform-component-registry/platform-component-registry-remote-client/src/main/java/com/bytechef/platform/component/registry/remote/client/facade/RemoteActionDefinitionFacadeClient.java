@@ -8,6 +8,8 @@
 package com.bytechef.platform.component.registry.remote.client.facade;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
@@ -105,6 +107,13 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
             new NodeDescriptionRequest(
                 componentVersion, componentName, actionName, inputParameters),
             String.class);
+    }
+
+    @Override
+    public Object executePerformForPolyglot(
+        String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections, ActionContext actionContext) {
+        throw new UnsupportedOperationException();
     }
 
     private record NodeDescriptionRequest(

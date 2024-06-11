@@ -27,12 +27,17 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record ComponentConnection(
-    String componentName, int version, Map<String, ?> parameters, String authorizationName)
+    String componentName, int version, long connectionId, Map<String, ?> parameters, String authorizationName)
     implements ParameterConnection {
 
     @Override
     public String getComponentName() {
         return componentName;
+    }
+
+    @Override
+    public long getConnectionId() {
+        return connectionId;
     }
 
     @Override

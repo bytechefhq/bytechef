@@ -33,6 +33,8 @@ public interface ParameterConnection {
 
     <T> T getParameter(String key);
 
+    long getConnectionId();
+
     String getAuthorizationName();
 
     default boolean isAuthorizationNameOauth2AuthorizationCode() {
