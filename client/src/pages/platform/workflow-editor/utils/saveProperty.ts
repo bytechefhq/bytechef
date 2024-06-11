@@ -1,19 +1,21 @@
 import {
-    UpdateWorkflowNodeParameter200ResponseModelI,
-    UpdateWorkflowNodeParameterRequestI,
-} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+    UpdateWorkflowNodeParameter200ResponseModel,
+    UpdateWorkflowNodeParameterRequest,
+} from '@/shared/middleware/platform/configuration';
 import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
 interface SavePropertyProps {
     currentComponent: ComponentType;
+    includeInMetadata?: boolean;
     path: string;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
     successCallback?: () => void;
+    type: string;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateWorkflowNodeParameter200ResponseModelI,
+        UpdateWorkflowNodeParameter200ResponseModel,
         Error,
-        UpdateWorkflowNodeParameterRequestI,
+        UpdateWorkflowNodeParameterRequest,
         unknown
     >;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,9 +25,11 @@ interface SavePropertyProps {
 
 export default function saveProperty({
     currentComponent,
+    includeInMetadata = false,
     path,
     setCurrentComponent,
     successCallback,
+    type,
     updateWorkflowNodeParameterMutation,
     value,
     workflowId,
@@ -36,7 +40,9 @@ export default function saveProperty({
         {
             id: workflowId,
             updateWorkflowNodeParameterRequestModel: {
+                includeInMetadata,
                 path,
+                type,
                 value,
                 workflowNodeName,
             },
