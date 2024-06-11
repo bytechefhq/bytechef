@@ -73,11 +73,11 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: WorkflowModel}) => {
                         {workflow.outputs &&
                             workflow.outputs.map((output, index) => (
                                 <TableRow key={output.name}>
-                                    <TableCell className="px-3 py-4">{output.name}</TableCell>
+                                    <TableCell>{output.name}</TableCell>
 
-                                    <TableCell className="px-3 py-4">{output.value.toString()}</TableCell>
+                                    <TableCell>{output.value.toString()}</TableCell>
 
-                                    <TableCell className="flex justify-end px-3 py-4">
+                                    <TableCell className="flex justify-end">
                                         <Button
                                             onClick={() => {
                                                 setCurrentInputIndex(index);
