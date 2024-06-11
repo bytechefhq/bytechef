@@ -173,7 +173,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                             {row.getVisibleCells().map((cell) => (
                                 <TableCell
                                     className={twMerge(
-                                        'whitespace-nowrap px-3 py-4',
+                                        'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
                                         cell.id.endsWith('enabled') && 'flex ml-6'
                                     )}

@@ -196,7 +196,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                             {row.getVisibleCells().map((cell) => (
                                 <TableCell
                                     className={twMerge(
-                                        'whitespace-nowrap px-3 py-4',
+                                        'whitespace-nowrap',
                                         !connectedUsers[row.index].enabled && 'text-muted-foreground',
                                         cell.id.endsWith('actions') && 'flex justify-end',
                                         cell.id.endsWith('enabled') && 'flex justify-center w-20',

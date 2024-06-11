@@ -22,7 +22,7 @@ const WorkflowInputsSheet = ({onClose, workflow, workflowTestConfiguration}: Wor
                 <div className="flex items-center justify-between">
                     <SheetTitle className="flex">Workflow Inputs</SheetTitle>
 
-                    <div className="flex items-center gap-2">
+                    <div className="mx-8 flex items-center">
                         {workflow.inputs && workflow.inputs.length > 0 && (
                             <WorkflowInputsSheetDialog
                                 triggerNode={<Button size="sm">New Input</Button>}
