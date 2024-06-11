@@ -24,3 +24,9 @@ For details on setting up your development machine, please refer to the [Setup G
 ## HTTPS in Development mode
 
 To enable HTTPS in development mode, create `.env.local` file inside the `client` directory and add `VITE_HTTPS=true`
+
+## Feature Flags
+
+To enable feature flags, create `.env.local` file inside the `client` directory and set to `true` the following feature flags:
+
+-   `VITE_FF_EMBEDDED_TYPE_ENABLED` - enables Embedded mode in UI

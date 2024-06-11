@@ -1,4 +1,5 @@
 import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import * as Dialog from '@radix-ui/react-dialog';
 import {FolderIcon, SquareIcon} from 'lucide-react';
 import {useEffect} from 'react';
@@ -7,14 +8,19 @@ import {useNavigate} from 'react-router-dom';
 const Home = () => {
     const {currentType, setCurrentType} = useAppTypeStore();
 
-    const navigate = useNavigate();
+    const embeddedTypeEnabled: boolean = useFeatureFlagsStore('VITE_FF_EMBEDDED_TYPE_ENABLED') === 'true';
 
+    const navigate = useNavigate();
 
     const handleClick = (appType: AppType) => {
         setCurrentType(appType);
     };
 
     useEffect(() => {
+        if (!embeddedTypeEnabled) {
+            navigate('/automation');
+        }
+
         if (currentType !== undefined) {
             if (currentType === AppType.AUTOMATION) {
                 navigate('/automation');
@@ -22,9 +28,9 @@ const Home = () => {
                 navigate('/embedded');
             }
         }
-    }, [currentSection, navigate]);
+    }, [currentType, embeddedTypeEnabled, navigate]);
 
-    return (
+    return embeddedTypeEnabled ? (
         <Dialog.Root open={currentType === undefined}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
@@ -68,6 +74,8 @@ const Home = () => {
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
+    ) : (
+        <></>
     );
 };
 
