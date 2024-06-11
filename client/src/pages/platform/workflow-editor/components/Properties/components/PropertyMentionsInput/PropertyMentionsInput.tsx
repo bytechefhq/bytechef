@@ -5,6 +5,8 @@ import 'quill-mention';
 import {KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
+import 'quill-paste-smart';
+
 import './propertyMentionsInput.css';
 
 import {Label} from '@/components/ui/label';
@@ -85,6 +87,10 @@ const PropertyMentionsInput = forwardRef(
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
 
         const modules = {
+            clipboard: {
+                keepSelection: true,
+                matchVisual: false,
+            },
             mention: {
                 blotName: 'property-mention',
                 dataAttributes: ['componentIcon'],
@@ -317,7 +323,7 @@ const PropertyMentionsInput = forwardRef(
                         // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                         modules={useMemo(() => modules, [])}
                         onBlur={handleOnBlur}
-                        onChange={(newValue) => handleOnChange(newValue)}
+                        onChange={handleOnChange}
                         onFocus={handleOnFocus}
                         onKeyDown={handleOnKeyDown}
                         onKeyPress={onKeyPress}

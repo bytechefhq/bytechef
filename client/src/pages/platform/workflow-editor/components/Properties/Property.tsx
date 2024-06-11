@@ -109,6 +109,7 @@ const Property = ({
     const {showPropertyCodeEditorSheet, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
 
     const previousOperationName = usePrevious(currentNode?.operationName);
+    const previousMentionInputValue = usePrevious(mentionInputValue);
 
     const defaultValue = property.defaultValue || '';
 
@@ -678,6 +679,55 @@ const Property = ({
             setNumericValue('');
         }
     }, [currentNode?.operationName, previousOperationName]);
+
+    // handle pasting mentions
+    useEffect(() => {
+        if (mentionInputValue.includes('${')) {
+            const mentionValues: Array<string> = mentionInputValue
+                .split(/(\$\{.*?\})/g)
+                .filter((value: string) => value !== '');
+
+            const mentionInputNodes = mentionValues.map((value) => {
+                if (value.startsWith('${')) {
+                    const componentName = value.split('_')[0].replace('${', '');
+
+                    const componentIcon =
+                        componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
+
+                    const node = document.createElement('div');
+
+                    node.className = 'property-mention';
+
+                    node.dataset.value = value.replace(/\$\{|\}/g, '');
+                    node.dataset.componentIcon = componentIcon;
+
+                    return node.outerHTML;
+                } else {
+                    return value;
+                }
+            });
+
+            const pastingChange =
+                previousMentionInputValue &&
+                mentionValues.length > 1 &&
+                previousMentionInputValue.length !== mentionInputValue.length;
+
+            if (pastingChange) {
+                setTimeout(() => {
+                    const selection = editorRef.current?.getEditor().getSelection();
+
+                    if (selection) {
+                        editorRef.current?.getEditor().setSelection(selection.index + 1, 0);
+                    }
+                }, 50);
+
+                setMentionInputValue(mentionInputNodes.join(''));
+
+                saveMentionInputValue();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mentionInputValue]);
 
     return (
         <li
