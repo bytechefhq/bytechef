@@ -21,7 +21,7 @@ export interface ComboBoxProps {
     maxHeight?: boolean;
     name?: string;
     onBlur?: FocusEventHandler;
-    onChange: (item?: ComboBoxItemType) => void;
+    onChange?: (item?: ComboBoxItemType) => void;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
 }
@@ -34,7 +34,10 @@ const ComboBox = ({disabled, items, name, onBlur, onChange, value}: ComboBoxProp
             key={comboBoxItem.value}
             onSelect={() => {
                 setOpen(false);
-                onChange(comboBoxItem);
+
+                if (onChange) {
+                    onChange(comboBoxItem);
+                }
             }}
             value={comboBoxItem.value}
         >
