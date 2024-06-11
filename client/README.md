@@ -20,3 +20,7 @@ This project uses many tools and libs like:
 -   [zustand](https://github.com/pmndrs/zustand)
 
 For details on setting up your development machine, please refer to the [Setup Guide](../CONTRIBUTING.md#client-side)
+
+## HTTPS in Development mode
+
+To enable HTTPS in development mode, create `.env.local` file inside the `client` directory and add `VITE_HTTPS=true`
