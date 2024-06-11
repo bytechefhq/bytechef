@@ -75,6 +75,7 @@ const PropertyMentionsInput = forwardRef(
         }: PropertyMentionsInputProps,
         ref: Ref<ReactQuill>
     ) => {
+        const [isFocused, setIsFocused] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {dataPills} = useWorkflowDataStore();
@@ -169,8 +170,6 @@ const PropertyMentionsInput = forwardRef(
             toolbar: false,
         };
 
-        const isFocused = focusedInput?.props.id === elementId;
-
         const handleOnChange = (value: string) => {
             if (onChange) {
                 onChange(value);
@@ -210,12 +209,24 @@ const PropertyMentionsInput = forwardRef(
 
         const handleOnFocus = () => {
             // @ts-expect-error Quill false positive
-            if (ref?.current) {
-                // @ts-expect-error Quill false positive
-                setFocusedInput(ref.current!);
+            if (ref?.current && !isFocused) {
+                setTimeout(() => {
+                    // @ts-expect-error Quill false positive
+                    setFocusedInput(ref.current!);
 
-                setDataPillPanelOpen(true);
+                    setIsFocused(true);
+
+                    setDataPillPanelOpen(true);
+                }, 50);
             }
+        };
+
+        const handleOnBlur = () => {
+            setFocusedInput(null);
+
+            setIsFocused(false);
+
+            // setDataPillPanelOpen(false);
         };
 
         useEffect(() => {
@@ -225,10 +236,24 @@ const PropertyMentionsInput = forwardRef(
             }
 
             // @ts-expect-error Quill false positive
-            const keyboard = ref?.current.getEditor().getModule('keyboard');
+            const editor = ref.current.getEditor();
+
+            if (!editor) {
+                return;
+            }
+
+            const keyboard = editor.getModule('keyboard');
 
             delete keyboard.bindings[9];
         }, [ref]);
+
+        useEffect(() => {
+            if (!focusedInput) {
+                return;
+            }
+
+            setIsFocused(focusedInput.props.id === elementId);
+        }, [focusedInput, elementId]);
 
         return (
             <fieldset className={twMerge('w-full', label && 'space-y-1')}>
@@ -291,6 +316,7 @@ const PropertyMentionsInput = forwardRef(
                         key={elementId}
                         // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                         modules={useMemo(() => modules, [])}
+                        onBlur={handleOnBlur}
                         onChange={(newValue) => handleOnChange(newValue)}
                         onFocus={handleOnFocus}
                         onKeyDown={handleOnKeyDown}
