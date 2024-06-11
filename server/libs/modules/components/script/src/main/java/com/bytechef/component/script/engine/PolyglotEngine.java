@@ -25,7 +25,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ParameterConnection;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
-import com.bytechef.platform.component.registry.service.ActionDefinitionService;
+import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -244,10 +244,10 @@ public class PolyglotEngine {
                     }
                 }
 
-                ActionDefinitionService actionDefinitionService = applicationContext.getBean(
-                    ActionDefinitionService.class);
+                ActionDefinitionFacade actionDefinitionFacade = applicationContext.getBean(
+                    ActionDefinitionFacade.class);
 
-                Object result = actionDefinitionService.executePerform(
+                Object result = actionDefinitionFacade.executePerformForPolyglot(
                     componentDefinition.getName(), componentDefinition.getVersion(), actionName,
                     (Map) copyFromPolyglotContext(inputParameters), connections, actionContext);
 
@@ -303,7 +303,8 @@ public class PolyglotEngine {
         private ComponentConnection toComponentConnection(ParameterConnection parameterConnection) {
             return new ComponentConnection(
                 parameterConnection.getComponentName(), parameterConnection.getVersion(),
-                parameterConnection.getParameters(), parameterConnection.getAuthorizationName());
+                parameterConnection.getConnectionId(), parameterConnection.getParameters(),
+                parameterConnection.getAuthorizationName());
         }
     }
 
