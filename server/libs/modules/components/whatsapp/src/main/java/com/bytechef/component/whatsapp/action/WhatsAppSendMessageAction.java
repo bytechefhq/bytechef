@@ -23,6 +23,10 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BASE_URL;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.BODY;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.CONTACTS;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.ID;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.INPUT;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGES;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGING_PRODUCT;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
@@ -55,7 +59,16 @@ public class WhatsAppSendMessageAction {
                 .required(true))
         .outputSchema(
             object()
-                .properties())
+                .properties(
+                    string(MESSAGING_PRODUCT),
+                    object(CONTACTS)
+                        .properties(
+                            string(INPUT),
+                            string("wa_id")
+                        ),
+                    object(MESSAGES)
+                        .properties(
+                            string(ID))))
         .perform(WhatsAppSendMessageAction::perform);
 
     private WhatsAppSendMessageAction() {
