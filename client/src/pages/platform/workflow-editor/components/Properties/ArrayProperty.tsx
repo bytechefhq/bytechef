@@ -92,14 +92,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
         let parameterValue = resolvePath(currentComponent.parameters, path);
 
+        if (parameterValue === null || parameterValue === undefined) {
+            return;
+        }
+
         if (path) {
             if (Array.isArray(parameterValue)) {
                 parameterValue = parameterValue.filter((param: ArrayPropertyType) => param !== null);
             }
-        }
-
-        if (!parameterValue) {
-            return;
         }
 
         if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {

@@ -78,7 +78,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
         };
 
-        setSubProperties([...subProperties, newItem]);
+        setSubProperties([...(subProperties || []), newItem]);
 
         setNewPropertyName('');
     };
@@ -145,8 +145,11 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // set subProperties in cases where the ObjectProperty has predefined properties
     useEffect(() => {
-        setSubProperties(properties as Array<PropertyType>);
+        if (properties?.length) {
+            setSubProperties(properties as Array<PropertyType>);
+        }
     }, [properties]);
 
     return (
