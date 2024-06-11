@@ -130,6 +130,39 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
+    public Object executePerformForPolyglot(
+        String componentName, int componentVersion, String actionName, @NonNull Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections,
+        ActionContext actionContext) {
+
+        Exception executionException;
+
+        try {
+            return actionDefinitionService.executePerform(
+                componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
+        } catch (Exception exception) {
+            executionException = exception;
+
+            ComponentConnection componentConnection = componentConnections.values()
+                .stream()
+                .findFirst()
+                .get();
+
+            componentConnections = getTokenRefreshedComponentConnection(
+                componentName, Map.of(componentConnection.componentName(), componentConnection.getConnectionId()),
+                exception, Map.of(componentConnection.componentName(), componentConnection),
+                actionContext);
+
+            if (!componentConnections.isEmpty()) {
+                return actionDefinitionService.executePerform(
+                    componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
+            }
+        }
+
+        throw new UnsupportedOperationException("Unable to recover from execution error", executionException);
+    }
+
+    @Override
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull AppType type,
         Long instanceId, Long instanceWorkflowId, Long jobId, @NonNull Map<String, ?> inputParameters,
@@ -185,22 +218,21 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             }
 
             String realComponentName = componentName;
-            String realConnectionName = null;
 
             if (!Objects.equals(ProviderException.getComponentName(exception), componentName)) {
                 realComponentName = ProviderException.getComponentName(exception);
-                realConnectionName = ProviderException.getConnectionName(exception);
             }
 
             Authorization.RefreshTokenResponse refreshTokenResponse =
                 connectionDefinitionService.executeRefresh(realComponentName, componentConnection, actionContext);
 
+            Long connectionId = connectionIds.get(realComponentName);
             Connection connection = connectionService.updateConnectionParameter(
-                connectionIds.get(realConnectionName), "access_token",
+                connectionId, "access_token",
                 Objects.requireNonNull(refreshTokenResponse.accessToken()));
 
             refreshedConnections.put(connectionName, new ComponentConnection(
-                realComponentName, connection.getVersion(), connection.getParameters(),
+                realComponentName, connection.getVersion(), connectionId, connection.getParameters(),
                 connection.getAuthorizationName()));
 
         });
@@ -225,8 +257,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             Connection connection = connectionService.getConnection(connectionId);
 
             componentConnection = new ComponentConnection(
-                connection.getComponentName(), connection.getConnectionVersion(), connection.getParameters(),
-                connection.getAuthorizationName());
+                connection.getComponentName(), connection.getConnectionVersion(), connectionId,
+                connection.getParameters(), connection.getAuthorizationName());
         }
 
         return componentConnection;
@@ -243,7 +275,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                         Connection connection = connectionService.getConnection(entry.getValue());
 
                         return new ComponentConnection(
-                            connection.getComponentName(), connection.getConnectionVersion(),
+                            connection.getComponentName(), connection.getConnectionVersion(), entry.getValue(),
                             connection.getParameters(), connection.getAuthorizationName());
                     }));
     }
