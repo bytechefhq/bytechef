@@ -40,6 +40,10 @@ const DataPill = ({
         parentPropertyName?: string,
         path?: string
     ) => {
+        if (!mentionInput) {
+            return;
+        }
+
         const dataPillName = parentPropertyName
             ? `${parentPropertyName}.${propertyName}`
             : `${propertyName || workflowNodeName}`;
@@ -52,6 +56,7 @@ const DataPill = ({
             {
                 componentIcon,
                 id: propertyName || workflowNodeName,
+                nodeName: workflowNodeName,
                 value,
             },
             true,
@@ -65,7 +70,10 @@ const DataPill = ({
     if (root) {
         return (
             <div
-                className="inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
+                className={twMerge(
+                    'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50',
+                    !mentionInput && 'cursor-not-allowed'
+                )}
                 onClick={() => addDataPillToInput(workflowNodeName)}
             >
                 <span className="mr-2" title={property?.type}>
@@ -86,7 +94,10 @@ const DataPill = ({
             )}
         >
             <div
-                className="mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
+                className={twMerge(
+                    'mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50',
+                    !mentionInput && 'cursor-not-allowed'
+                )}
                 data-name={property?.name || workflowNodeName}
                 draggable
                 onClick={() =>
