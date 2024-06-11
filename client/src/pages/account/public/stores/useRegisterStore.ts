@@ -43,8 +43,6 @@ export const useRegisterStore = create<RegisterI>()(
                         registerErrorMessage: detail,
                     }));
                 }
-
-                console.log();
             },
         }),
         {

@@ -98,9 +98,7 @@ const ProjectInstanceEditWorkflowDialog = ({
             ],
             {shouldValidate: true}
         );
-        console.log(projectInstanceWorkflow);
-        console.log(getValues('projectInstanceWorkflows'));
-        console.log(getValues(`projectInstanceWorkflows.${0}.connections.${0}.connectionId`));
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

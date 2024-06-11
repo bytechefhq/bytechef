@@ -24,9 +24,6 @@ const DestinationTab = () => {
                             label: componentDefinition.title!,
                             value: componentDefinition.name,
                         }))}
-                        onChange={(item) => {
-                            console.log(item);
-                        }}
                     />
                 </fieldset>
             )}
