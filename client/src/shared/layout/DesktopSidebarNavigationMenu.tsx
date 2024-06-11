@@ -7,7 +7,7 @@ import {
     NavigationMenuTrigger,
     NavigationMenuViewport,
 } from '@/components/ui/navigation-menu';
-import {Section, useSectionStore} from '@/pages/home/stores/useSectionStore';
+import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
 import {cn} from '@/shared/util/cn-utils';
 import {ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef} from 'react';
 import {Link} from 'react-router-dom';
@@ -15,10 +15,10 @@ import {Link} from 'react-router-dom';
 import reactLogo from '../../assets/logo.svg';
 
 const DesktopSidebarNavigationMenu = ({children}: {children: ReactNode}) => {
-    const {setCurrentSection} = useSectionStore();
+    const {setCurrentType} = useAppTypeStore();
 
-    const handleClick = (section: Section) => {
-        setCurrentSection(section);
+    const handleClick = (appType: AppType) => {
+        setCurrentType(appType);
     };
 
     return (
@@ -43,11 +43,11 @@ const DesktopSidebarNavigationMenu = ({children}: {children: ReactNode}) => {
                                 </div>
                             </li>
 
-                            <ListItem onClick={() => handleClick(Section.EMBEDDED)} title="Embedded">
+                            <ListItem onClick={() => handleClick(AppType.EMBEDDED)} title="Embedded">
                                 Build integrations for your product.
                             </ListItem>
 
-                            <ListItem onClick={() => handleClick(Section.AUTOMATION)} title="Automation">
+                            <ListItem onClick={() => handleClick(AppType.AUTOMATION)} title="Automation">
                                 Automate your daily work.
                             </ListItem>
                         </ul>
