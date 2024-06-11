@@ -53,8 +53,8 @@ public class RemoteConnectionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             connectionDefinitionFacade.executeAuthorizationCallback(
-                authorizationCallbackRequest.componentName, authorizationCallbackRequest.connection,
-                authorizationCallbackRequest.redirectUri()));
+                authorizationCallbackRequest.componentName, authorizationCallbackRequest.connection.authorizationName(),
+                authorizationCallbackRequest.connection.getParameters(), authorizationCallbackRequest.redirectUri()));
     }
 
     @RequestMapping(
@@ -71,7 +71,8 @@ public class RemoteConnectionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             connectionDefinitionFacade.getOAuth2AuthorizationParameters(
-                connectionRequest.componentName, connectionRequest.connection));
+                connectionRequest.componentName, connectionRequest.connection.authorizationName(),
+                connectionRequest.connection.getParameters()));
     }
 
     @SuppressFBWarnings("EI")

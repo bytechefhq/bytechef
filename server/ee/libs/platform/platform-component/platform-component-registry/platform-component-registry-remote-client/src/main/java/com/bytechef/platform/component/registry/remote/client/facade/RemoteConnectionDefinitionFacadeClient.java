@@ -9,11 +9,11 @@ package com.bytechef.platform.component.registry.remote.client.facade;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.component.definition.Authorization;
-import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -37,31 +37,32 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName,
-        @NonNull ComponentConnection connection, @NonNull String redirectUri) {
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String redirectUri) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
-            new AuthorizationCallbackRequest(componentName, connection, redirectUri),
+            new AuthorizationCallbackRequest(componentName, authorizationName, authorizationParms, redirectUri),
             Authorization.AuthorizationCallbackResponse.class);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, ComponentConnection connection) {
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/get-oauth2-authorization-parameters"),
-            new ConnectionRequest(componentName, connection),
+            new ConnectionRequest(componentName, authorizationName, authorizationParms),
             OAuth2AuthorizationParameters.class);
     }
 
     private record AuthorizationCallbackRequest(
-        String componentName, ComponentConnection connection, String redirectUri) {
+        String componentName, String authorizationName, Map<String, ?> authorizationParams, String redirectUri) {
     }
 
-    private record ConnectionRequest(String componentName, ComponentConnection connection) {
+    private record ConnectionRequest(String componentName, String authorizationName,
+        Map<String, ?> authorizationParams) {
     }
 }
