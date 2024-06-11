@@ -11,7 +11,7 @@ import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -141,7 +141,7 @@ public class RemoteActionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName, Type type,
+        @NotNull String componentName, int componentVersion, @NotNull String actionName, AppType type,
         Long instanceId, @NonNull String workflowId, long jobId, @NotNull Map<String, ?> inputParameters,
         @NotNull Map<String, Long> connectionIds) {
     }

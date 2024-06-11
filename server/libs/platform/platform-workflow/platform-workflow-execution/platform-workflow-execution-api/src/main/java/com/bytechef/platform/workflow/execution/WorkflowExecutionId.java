@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import java.io.Serializable;
 import org.apache.commons.lang3.Validate;
 
@@ -27,21 +27,23 @@ import org.apache.commons.lang3.Validate;
 public class WorkflowExecutionId implements Serializable {
 
     private long instanceId;
-    private Type type;
+    private AppType type;
     private String workflowReferenceCode;
     private String triggerName;
 
     private WorkflowExecutionId() {
     }
 
-    private WorkflowExecutionId(Type type, long instanceId, String workflowReferenceCode, String triggerName) {
+    private WorkflowExecutionId(AppType type, long instanceId, String workflowReferenceCode, String triggerName) {
         this.instanceId = instanceId;
         this.triggerName = triggerName;
         this.type = type;
         this.workflowReferenceCode = workflowReferenceCode;
     }
 
-    public static WorkflowExecutionId of(Type type, long instanceId, String workflowReferenceCode, String triggerName) {
+    public static WorkflowExecutionId of(
+        AppType type, long instanceId, String workflowReferenceCode, String triggerName) {
+
         Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
@@ -53,14 +55,14 @@ public class WorkflowExecutionId implements Serializable {
 
         String[] items = id.split(":");
 
-        return of(Type.values()[Integer.parseInt(items[0])], Long.parseLong(items[1]), items[2], items[3]);
+        return of(AppType.values()[Integer.parseInt(items[0])], Long.parseLong(items[1]), items[2], items[3]);
     }
 
     public long getInstanceId() {
         return instanceId;
     }
 
-    public Type getType() {
+    public AppType getType() {
         return type;
     }
 

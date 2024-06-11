@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -93,14 +93,14 @@ public class ConnectionServiceIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionService.getConnection(Validate.notNull(connection.getId(), "id"))).isEqualTo(connection);
-        assertThat(connectionService.getConnections(null, null, tag.getId(), Type.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, tag.getId(), AppType.AUTOMATION)).hasSize(1);
     }
 
     @Test
     public void getGetConnections() {
         connectionRepository.save(getConnection());
 
-        assertThat(connectionService.getConnections(null, null, null, Type.AUTOMATION)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, null, AppType.AUTOMATION)).hasSize(1);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class ConnectionServiceIntTest {
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
-            .type(Type.AUTOMATION)
+            .type(AppType.AUTOMATION)
             .build();
     }
 }

@@ -21,7 +21,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.web.rest.util.ConnectionTagApiControllerUtils;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -50,7 +50,7 @@ public class IntegrationConnectionTagApiController implements ConnectionTagApi {
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(Type.EMBEDDED)
+            connectionFacade.getConnectionTags(AppType.EMBEDDED)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());

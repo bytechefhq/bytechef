@@ -21,7 +21,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
@@ -52,7 +52,7 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     // TODO @Transactional
-    public long createJob(JobParameters jobParameters, long instanceId, Type type) {
+    public long createJob(JobParameters jobParameters, long instanceId, AppType type) {
         long jobId = jobFacade.createJob(jobParameters);
 
         instanceJobService.create(jobId, instanceId, type);
@@ -62,7 +62,7 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     @Transactional
-    public Job createSyncJob(JobParameters jobParameters, long instanceId, Type type) {
+    public Job createSyncJob(JobParameters jobParameters, long instanceId, AppType type) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
         instanceJobService.create(Validate.notNull(job.getId(), "id"), instanceId, type);

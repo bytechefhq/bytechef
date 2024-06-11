@@ -21,7 +21,7 @@ import com.bytechef.automation.connection.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @Override
     public ConnectionDTO create(long workspaceId, ConnectionDTO connectionDTO) {
-        connectionDTO = connectionFacade.create(connectionDTO, Type.AUTOMATION);
+        connectionDTO = connectionFacade.create(connectionDTO, AppType.AUTOMATION);
 
         workspaceConnectionService.create(connectionDTO.id(), workspaceId);
 
@@ -69,7 +69,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
         return CollectionUtils.filter(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId, Type.AUTOMATION),
+            connectionFacade.getConnections(componentName, connectionVersion, tagId, AppType.AUTOMATION),
             connectionDTO -> connectionIds.contains(connectionDTO.id()));
     }
 }

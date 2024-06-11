@@ -20,7 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.user.web.rest.model.ApiKeyModel;
 import com.bytechef.embedded.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,7 +52,7 @@ public class IntegrationApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel appEventModel) {
         ApiKey apiKey = conversionService.convert(appEventModel, ApiKey.class);
 
-        apiKey.setType(Type.EMBEDDED);
+        apiKey.setType(AppType.EMBEDDED);
 
         return ResponseEntity.ok(new CreateApiKey200ResponseModel().secretKey(apiKeyService.create(apiKey)));
     }
@@ -77,7 +77,7 @@ public class IntegrationApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiKeyService.getApiKeys(Type.EMBEDDED),
+                apiKeyService.getApiKeys(AppType.EMBEDDED),
                 apiKey -> {
                     ApiKeyModel apiKeyModel = conversionService.convert(apiKey, ApiKeyModel.class);
 

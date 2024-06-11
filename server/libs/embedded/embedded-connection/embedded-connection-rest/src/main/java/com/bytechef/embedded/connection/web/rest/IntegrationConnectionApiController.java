@@ -22,7 +22,7 @@ import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class IntegrationConnectionApiController implements ConnectionApi {
         return ResponseEntity.ok(
             toConnectionModel(
                 connectionFacade.create(
-                    conversionService.convert(connectionModel, ConnectionDTO.class), Type.EMBEDDED)));
+                    conversionService.convert(connectionModel, ConnectionDTO.class), AppType.EMBEDDED)));
     }
 
     @Override
@@ -76,7 +76,7 @@ public class IntegrationConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectionFacade
-                .getConnections(componentName, connectionVersion, tagId, Type.EMBEDDED)
+                .getConnections(componentName, connectionVersion, tagId, AppType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

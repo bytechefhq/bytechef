@@ -20,7 +20,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -124,7 +124,7 @@ public class TriggerCompletionHandler {
         }
     }
 
-    private long createJob(String workflowId, Map<String, ?> inpputMap, long instanceId, Type type) {
+    private long createJob(String workflowId, Map<String, ?> inpputMap, long instanceId, AppType type) {
         return instanceJobFacade.createJob(new JobParameters(workflowId, inpputMap), instanceId, type);
     }
 

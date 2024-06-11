@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import com.bytechef.platform.workflow.execution.repository.InstanceJobRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,44 +45,44 @@ public class InstanceJobServiceImpl implements InstanceJobService {
     }
 
     @Override
-    public InstanceJob create(long jobId, long instanceId, Type type) {
+    public InstanceJob create(long jobId, long instanceId, AppType type) {
         return instanceJobRepository.save(new InstanceJob(instanceId, jobId, type));
     }
 
     @Override
-    public void deleteInstanceJobs(long jobId, Type type) {
+    public void deleteInstanceJobs(long jobId, AppType type) {
         instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .ifPresent(instanceJob -> instanceJobRepository.deleteById(Validate.notNull(instanceJob.getId(), "id")));
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long instanceId, Type type) {
+    public Optional<Long> fetchLastJobId(long instanceId, AppType type) {
         return instanceJobRepository
             .findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type.ordinal())
             .map(InstanceJob::getJobId);
     }
 
     @Override
-    public Optional<Long> fetchJobInstanceId(long jobId, Type type) {
+    public Optional<Long> fetchJobInstanceId(long jobId, AppType type) {
         return instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(InstanceJob::getInstanceId);
     }
 
     @Override
-    public long getJobInstanceId(long jobId, Type type) {
+    public long getJobInstanceId(long jobId, AppType type) {
         return instanceJobRepository.findByJobIdAndType(jobId, type.ordinal())
             .map(InstanceJob::getInstanceId)
             .orElseThrow();
     }
 
     @Override
-    public List<Long> getJobIds(long instanceId, Type type) {
+    public List<Long> getJobIds(long instanceId, AppType type) {
         return instanceJobRepository.findallJobIds(instanceId, type.ordinal());
     }
 
     @Override
     public Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, AppType type,
         List<String> workflowIds, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, InstanceJobRepository.DEFAULT_PAGE_SIZE);

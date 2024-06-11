@@ -17,8 +17,8 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
 import java.security.SecureRandom;
@@ -89,7 +89,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ApiKey> getApiKeys(Type type) {
+    public List<ApiKey> getApiKeys(AppType type) {
         return apiKeyRepository.findAllByType(type.ordinal());
     }
 

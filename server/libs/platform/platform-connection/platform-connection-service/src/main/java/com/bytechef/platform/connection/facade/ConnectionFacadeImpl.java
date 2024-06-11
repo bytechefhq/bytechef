@@ -31,7 +31,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.registry.domain.BaseProperty;
@@ -82,7 +82,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public ConnectionDTO create(ConnectionDTO connectionDTO, Type type) {
+    public ConnectionDTO create(ConnectionDTO connectionDTO, AppType type) {
         Connection connection = connectionDTO.toConnection();
 
         if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
@@ -158,7 +158,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Type type) {
+        String componentName, Integer connectionVersion, Long tagId, AppType type) {
 
         List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId, type);
 
@@ -167,7 +167,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getConnectionTags(Type type) {
+    public List<Tag> getConnectionTags(AppType type) {
         List<Connection> connections = connectionService.getConnections(type);
 
         return tagService.getTags(
@@ -209,7 +209,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return curTagIds.contains(tag.getId());
     }
 
-    private boolean isConnectionUsed(long connectionId, Type type) {
+    private boolean isConnectionUsed(long connectionId, AppType type) {
         boolean connectionUsed;
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);

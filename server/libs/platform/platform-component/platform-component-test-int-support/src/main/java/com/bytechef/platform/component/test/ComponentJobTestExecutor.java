@@ -28,7 +28,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -68,7 +68,7 @@ public class ComponentJobTestExecutor {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, objectMapper,
             List.of(taskExecution -> {
-                taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
+                taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
 
                 return taskExecution;
             }),

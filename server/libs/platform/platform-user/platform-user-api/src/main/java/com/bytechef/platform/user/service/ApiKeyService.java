@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.user.service;
 
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.user.domain.ApiKey;
 import java.util.List;
 import org.springframework.lang.NonNull;
@@ -35,7 +35,7 @@ public interface ApiKeyService {
 
     ApiKey getApiKey(long id);
 
-    List<ApiKey> getApiKeys(Type type);
+    List<ApiKey> getApiKeys(AppType type);
 
     ApiKey update(@NonNull ApiKey apiKey);
 }

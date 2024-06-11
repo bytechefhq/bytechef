@@ -24,7 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long integrationInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), Type.EMBEDDED), null);
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), AppType.EMBEDDED), null);
 
         if (integrationInstanceId != null) {
             taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, integrationInstanceId);
@@ -70,7 +70,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, Type.EMBEDDED);
+        taskExecution.putMetadata(MetadataConstants.TYPE, AppType.EMBEDDED);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;

@@ -18,7 +18,7 @@ package com.bytechef.platform.data.storage.db.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.db.domain.DataEntry;
 import com.bytechef.platform.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.service.DataStorageService;
@@ -42,7 +42,7 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     }
 
     @Override
-    public void delete(String componentName, Scope scope, String scopeId, String key, Type type) {
+    public void delete(String componentName, Scope scope, String scopeId, String key, AppType type) {
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
             .ifPresentOrElse(dataStorageRepository::delete, null);
@@ -51,21 +51,21 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     @Override
     @SuppressWarnings("unchecked")
     @Transactional
-    public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, Type type) {
+    public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, AppType type) {
         return dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
     @Override
-    public <T> T get(String componentName, Scope scope, String scopeId, String key, Type type) {
+    public <T> T get(String componentName, Scope scope, String scopeId, String key, AppType type) {
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
-        String componentName, Scope scope, String scopeId, Type type) {
+        String componentName, Scope scope, String scopeId, AppType type) {
         return OptionalUtils.get(
             dataStorageRepository
                 .findByComponentNameAndScopeAndScopeIdAndType(componentName, scope, scopeId, type.ordinal()))
@@ -75,7 +75,7 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     }
 
     @Override
-    public void put(String componentName, Scope scope, String scopeId, String key, Type type, Object value) {
+    public void put(String componentName, Scope scope, String scopeId, String key, AppType type, Object value) {
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope, scopeId, key, type.ordinal())
             .ifPresentOrElse(
