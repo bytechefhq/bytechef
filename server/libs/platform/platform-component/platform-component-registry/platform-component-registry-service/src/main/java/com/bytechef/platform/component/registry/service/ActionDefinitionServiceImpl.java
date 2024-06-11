@@ -51,7 +51,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -197,19 +196,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         throw (ProviderException) e;
                     }
 
-                    if (Objects.equals(ScriptComponentDefinition.SCRIPT, componentName) && ProviderException.hasAuthorizationFailedExceptionContent(e)) {
+                    if (Objects.equals(ScriptComponentDefinition.SCRIPT, componentName)
+                        && ProviderException.hasAuthorizationFailedExceptionContent(e)) {
                         throw ProviderException.fromException(e);
                     }
 
                     ProviderException providerException = ProviderException.fromExceptionMessage(e.getMessage());
 
                     if (providerException != null) {
-                        for (Map.Entry<String, ComponentConnection> componentConnectionEntry : connections.entrySet()) {
-                            if (Objects.equals(componentConnectionEntry.getValue().getComponentName(), componentName)) {
-                                providerException.withConnectionName(componentConnectionEntry.getKey());
-                            }
-                        }
-
                         throw providerException.withComponentName(componentName);
                     }
 
