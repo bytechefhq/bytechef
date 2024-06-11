@@ -1,19 +1,14 @@
 import {Section, useSectionStore} from '@/pages/home/stores/useSectionStore';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import * as Dialog from '@radix-ui/react-dialog';
 import {FolderIcon, SquareIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const Home = () => {
-    const {authenticated} = useAuthenticationStore();
     const {currentSection, setCurrentSection} = useSectionStore();
 
     const navigate = useNavigate();
 
-    if (!authenticated) {
-        navigate('/login');
-    }
 
     const handleClick = (section: Section) => {
         setCurrentSection(section);

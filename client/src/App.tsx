@@ -108,7 +108,11 @@ function App() {
         }
     }, [showLogin, navigate]);
 
-    return authenticated ? (
+    if (!authenticated) {
+        navigate('/login');
+    }
+
+    return (
         <div className="flex h-full">
             <TooltipProvider>
                 <MobileSidebar
@@ -137,8 +141,6 @@ function App() {
 
             <Toaster />
         </div>
-    ) : (
-        <div>Not authenticated</div>
     );
 }
 
