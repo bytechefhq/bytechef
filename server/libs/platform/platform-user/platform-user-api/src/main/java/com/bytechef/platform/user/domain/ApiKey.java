@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.user.domain;
 
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.constant.Type;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -129,8 +129,8 @@ public class ApiKey {
         return secretKey;
     }
 
-    public Type getType() {
-        return Type.values()[type];
+    public AppType getType() {
+        return AppType.values()[type];
     }
 
     public Long getUserId() {
@@ -165,7 +165,7 @@ public class ApiKey {
         this.secretKey = secretKey;
     }
 
-    public void setType(Type type) {
+    public void setType(AppType type) {
         this.type = type.ordinal();
     }
 

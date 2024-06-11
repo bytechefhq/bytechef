@@ -20,7 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -68,14 +68,14 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(Type type) {
+    public List<Connection> getConnections(AppType type) {
         return CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name")), connection -> connection.getType() == type);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, int version, Type type) {
+    public List<Connection> getConnections(String componentName, int version, AppType type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
             componentName, version, type.ordinal());
     }
@@ -83,7 +83,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Type type) {
+        String componentName, Integer connectionVersion, Long tagId, AppType type) {
 
         List<Connection> connectionIterable;
 

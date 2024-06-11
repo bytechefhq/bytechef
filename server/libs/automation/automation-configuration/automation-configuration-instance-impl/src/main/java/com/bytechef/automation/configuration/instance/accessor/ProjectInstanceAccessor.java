@@ -21,7 +21,7 @@ import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -74,8 +74,8 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public Type getType() {
-        return Type.AUTOMATION;
+    public AppType getType() {
+        return AppType.AUTOMATION;
     }
 
     @Override

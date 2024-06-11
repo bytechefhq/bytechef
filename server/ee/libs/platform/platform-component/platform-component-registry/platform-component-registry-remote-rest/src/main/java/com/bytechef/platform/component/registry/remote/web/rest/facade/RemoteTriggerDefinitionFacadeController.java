@@ -14,7 +14,7 @@ import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -290,7 +290,7 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
         String componentName, int componentVersion, String triggerName,
-        @NonNull Type type, Long instanceId, @NonNull String workflowId, Long jobId,
+        @NonNull AppType type, Long instanceId, @NonNull String workflowId, Long jobId,
         @NotNull Map<String, ?> inputParameters, Object state, @NotNull WebhookRequest webhookRequest,
         Long connectionId) {
     }

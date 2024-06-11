@@ -10,7 +10,7 @@ package com.bytechef.platform.connection.remote.client.service;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -52,7 +52,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(Type type) {
+    public List<Connection> getConnections(AppType type) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
@@ -62,13 +62,13 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, int version, Type type) {
+    public List<Connection> getConnections(String componentName, int version, AppType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Connection> getConnections(
-        String componentName, Integer connectionVersion, Long tagId, Type type) {
+        String componentName, Integer connectionVersion, Long tagId, AppType type) {
 
         throw new UnsupportedOperationException();
     }

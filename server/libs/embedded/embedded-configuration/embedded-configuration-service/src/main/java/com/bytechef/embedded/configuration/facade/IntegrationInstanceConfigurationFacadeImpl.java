@@ -44,8 +44,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.constant.Type;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.tag.domain.Tag;
@@ -171,7 +171,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
 
         return instanceJobFacade.createJob(
-            new JobParameters(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, Type.EMBEDDED);
+            new JobParameters(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, AppType.EMBEDDED);
     }
 
     @Override
@@ -188,12 +188,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(id);
 
-        List<Long> jobIds = instanceJobService.getJobIds(id, Type.EMBEDDED);
+        List<Long> jobIds = instanceJobService.getJobIds(id, AppType.EMBEDDED);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            instanceJobService.deleteInstanceJobs(jobId, Type.EMBEDDED);
+            instanceJobService.deleteInstanceJobs(jobId, AppType.EMBEDDED);
 
             jobFacade.deleteJob(jobId);
         }
@@ -451,7 +451,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 workflow.getId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                Type.EMBEDDED, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                AppType.EMBEDDED, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
                 integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -477,7 +477,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 workflow.getId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                Type.EMBEDDED, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                AppType.EMBEDDED, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
                 integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -528,7 +528,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         long integrationInstanceConfigurationId) {
 
         return OptionalUtils.mapOrElse(
-            instanceJobService.fetchLastJobId(integrationInstanceConfigurationId, Type.EMBEDDED),
+            instanceJobService.fetchLastJobId(integrationInstanceConfigurationId, AppType.EMBEDDED),
             this::getJobEndDate, null);
     }
 
@@ -582,7 +582,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        Type.EMBEDDED, integrationInstanceConfigurationId,
+                        AppType.EMBEDDED, integrationInstanceConfigurationId,
                         integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName()));
             }
         }

@@ -9,7 +9,7 @@ package com.bytechef.platform.workflow.execution.remote.web.rest.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -57,6 +57,6 @@ public class RemoteInstanceJobFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParameters jobParameters, long instanceId, Type type) {
+    public record CreateJobRequest(JobParameters jobParameters, long instanceId, AppType type) {
     }
 }

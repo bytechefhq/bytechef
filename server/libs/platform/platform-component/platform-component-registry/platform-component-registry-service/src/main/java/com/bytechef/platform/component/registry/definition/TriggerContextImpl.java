@@ -22,7 +22,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,7 +47,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, Type type,
+        String componentName, int componentVersion, String triggerName, AppType type,
         String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
@@ -85,7 +85,7 @@ public class TriggerContextImpl extends ContextImpl implements TriggerContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String triggerName, Type type,
+        String componentName, Integer componentVersion, String triggerName, AppType type,
         String workflowId, Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override

@@ -43,7 +43,7 @@ import com.bytechef.platform.component.registry.definition.FileEntryImpl;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.nio.charset.StandardCharsets;
@@ -771,7 +771,7 @@ public class OpenApiComponentTaskHandlerIntTest {
             .metadata(
                 Map.of(
                     MetadataConstants.CONNECTION_IDS, Map.of("petstore", Validate.notNull(connection.getId(), "id")),
-                    MetadataConstants.TYPE, Type.AUTOMATION))
+                    MetadataConstants.TYPE, AppType.AUTOMATION))
             .workflowTask(
                 new WorkflowTask(
                     Map.of(

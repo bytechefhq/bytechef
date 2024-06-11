@@ -26,7 +26,7 @@ import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendPro
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,7 +60,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), Type.AUTOMATION),
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), AppType.AUTOMATION),
             null);
 
         if (projectInstanceId != null) {
@@ -86,7 +86,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, Type.AUTOMATION);
+        taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         if (projectInstanceId != null) {

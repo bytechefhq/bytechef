@@ -25,7 +25,7 @@ import com.bytechef.platform.component.registry.definition.ContextImpl;
 import com.bytechef.platform.component.registry.definition.HttpClientExecutor;
 import com.bytechef.platform.component.registry.definition.TriggerContextImpl;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,7 +56,7 @@ public class ContextFactory {
     }
 
     public ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable Type type,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable AppType type,
         @Nullable Long instanceWorkflowId, @Nullable Long jobId, @Nullable ComponentConnection connection) {
 
         return new ActionContextImpl(
@@ -69,7 +69,7 @@ public class ContextFactory {
     }
 
     public TriggerContext createTriggerContext(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @Nullable Type type,
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @Nullable AppType type,
         @Nullable String workflowId, @Nullable Long jobId, @Nullable ComponentConnection connection) {
 
         return new TriggerContextImpl(

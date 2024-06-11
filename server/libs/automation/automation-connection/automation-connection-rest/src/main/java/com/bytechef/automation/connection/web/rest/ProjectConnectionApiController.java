@@ -23,7 +23,7 @@ import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +80,7 @@ public class ProjectConnectionApiController implements ConnectionApi {
         String componentName, Integer connectionVersion, Long tagId) {
 
         return ResponseEntity.ok(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId, Type.AUTOMATION)
+            connectionFacade.getConnections(componentName, connectionVersion, tagId, AppType.AUTOMATION)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

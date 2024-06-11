@@ -41,7 +41,7 @@ import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -120,7 +120,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         JobDTO jobDTO = new JobDTO(
             job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
         long integrationInstanceId = instanceJobService.getJobInstanceId(
-            Validate.notNull(job.getId(), ""), Type.EMBEDDED);
+            Validate.notNull(job.getId(), ""), AppType.EMBEDDED);
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -163,7 +163,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         } else {
             Page<Job> jobIdsPage = instanceJobService
                 .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationId, Type.EMBEDDED,
+                    jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationId, AppType.EMBEDDED,
                     workflowIds, pageNumber)
                 .map(jobService::getJob);
 
@@ -180,7 +180,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
             return jobIdsPage.map(job -> {
                 IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
-                    instanceJobService.getJobInstanceId(Validate.notNull(job.getId(), ""), Type.EMBEDDED));
+                    instanceJobService.getJobInstanceId(Validate.notNull(job.getId(), ""), AppType.EMBEDDED));
 
                 return new WorkflowExecution(
                     Validate.notNull(job.getId(), "id"),

@@ -22,7 +22,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -52,7 +52,7 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
         try {
             return actionDefinitionFacade.executePerform(
                 componentName, componentVersion, actionName,
-                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, Type.class),
+                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, AppType.class),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_WORKFLOW_ID),
                 Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(), connectIdMap);

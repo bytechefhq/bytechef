@@ -39,7 +39,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -119,7 +119,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 : taskFileStorage.readJobOutputs(job.getOutputs()),
             getJobTaskExecutions(id));
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
-            Validate.notNull(job.getId(), ""), Type.AUTOMATION);
+            Validate.notNull(job.getId(), ""), AppType.AUTOMATION);
 
         return new WorkflowExecution(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
@@ -156,7 +156,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         } else {
             Page<Job> jobsPage = instanceJobService
                 .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, projectInstanceId, Type.AUTOMATION, workflowIds,
+                    jobStatus, jobStartDate, jobEndDate, projectInstanceId, AppType.AUTOMATION, workflowIds,
                     pageNumber)
                 .map(jobService::getJob);
 
@@ -178,7 +178,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                     project -> CollectionUtils.contains(
                         projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
                 OptionalUtils.map(
-                    instanceJobService.fetchJobInstanceId(job.getId(), Type.AUTOMATION),
+                    instanceJobService.fetchJobInstanceId(job.getId(), AppType.AUTOMATION),
                     projectInstanceService::getProjectInstance),
                 new JobDTO(job),
                 CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),

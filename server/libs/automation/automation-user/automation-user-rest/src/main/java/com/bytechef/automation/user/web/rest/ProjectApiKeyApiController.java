@@ -21,7 +21,7 @@ import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.SecurityUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,7 +53,7 @@ public class ProjectApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel appEventModel) {
         ApiKey apiKey = conversionService.convert(appEventModel, ApiKey.class);
 
-        apiKey.setType(Type.AUTOMATION);
+        apiKey.setType(AppType.AUTOMATION);
 
         return ResponseEntity.ok(new CreateApiKey200ResponseModel().secretKey(apiKeyService.create(apiKey)));
     }
@@ -78,7 +78,7 @@ public class ProjectApiKeyApiController implements ApiKeyApi {
     public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiKeyService.getApiKeys(Type.AUTOMATION),
+                apiKeyService.getApiKeys(AppType.AUTOMATION),
                 apiKey -> {
                     ApiKeyModel apiKeyModel = conversionService.convert(apiKey, ApiKeyModel.class);
 

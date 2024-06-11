@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.storage.db.domain;
 
 import com.bytechef.component.definition.ActionContext.Data.Scope;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -80,7 +80,7 @@ public class DataEntry {
     }
 
     public DataEntry(
-        String componentName, Scope scope, String scopeId, String key, Object value, Type type) {
+        String componentName, Scope scope, String scopeId, String key, Object value, AppType type) {
 
         this.componentName = componentName;
         this.key = key;
@@ -126,8 +126,8 @@ public class DataEntry {
         return scopeId;
     }
 
-    public Type getType() {
-        return Type.values()[type];
+    public AppType getType() {
+        return AppType.values()[type];
     }
 
     public Object getValue() {

@@ -9,7 +9,7 @@ package com.bytechef.platform.connection.remote.web.rest.service;
 
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;
@@ -52,7 +52,7 @@ public class RemoteConnectionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<Connection>> getConnections(@PathVariable Type type) {
+    public ResponseEntity<List<Connection>> getConnections(@PathVariable AppType type) {
         return ResponseEntity.ok(connectionService.getConnections(type));
     }
 }

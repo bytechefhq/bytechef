@@ -21,7 +21,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.service.DataStorageService;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,7 +47,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, Type type,
+        String componentName, int componentVersion, String actionName, AppType type,
         Long instanceWorkflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor) {
@@ -89,7 +89,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, Type type, long instanceWorkflowId,
+        String componentName, Integer componentVersion, String actionName, AppType type, long instanceWorkflowId,
         long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override

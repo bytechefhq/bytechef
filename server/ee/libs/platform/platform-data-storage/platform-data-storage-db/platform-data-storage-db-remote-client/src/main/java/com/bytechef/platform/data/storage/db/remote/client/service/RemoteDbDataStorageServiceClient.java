@@ -9,7 +9,7 @@ package com.bytechef.platform.data.storage.db.remote.client.service;
 
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
     }
 
     @Override
-    public void delete(String componentName, Scope scope, String scopeId, String key, Type type) {
+    public void delete(String componentName, Scope scope, String scopeId, String key, AppType type) {
         loadBalancedRestClient.delete(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -44,24 +44,24 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
     }
 
     @Override
-    public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, Type type) {
+    public <T> Optional<T> fetch(String componentName, Scope scope, String scopeId, String key, AppType type) {
         return fetchValue(componentName, scope, scopeId, key, type);
     }
 
     @Override
-    public <T> T get(String componentName, Scope scope, String scopeId, String key, Type type) {
+    public <T> T get(String componentName, Scope scope, String scopeId, String key, AppType type) {
         Optional<T> valueOptional = fetchValue(componentName, scope, scopeId, key, type);
 
         return valueOptional.orElseThrow();
     }
 
     @Override
-    public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, Type type) {
+    public <T> Map<String, T> getAll(String componentName, Scope scope, String scopeId, AppType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void put(String componentName, Scope scope, String scopeId, String key, Type type, Object value) {
+    public void put(String componentName, Scope scope, String scopeId, String key, AppType type, Object value) {
         loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -71,7 +71,7 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
             value);
     }
 
-    private <T> Optional<T> fetchValue(String componentName, Scope scope, String scopeId, String key, Type type) {
+    private <T> Optional<T> fetchValue(String componentName, Scope scope, String scopeId, String key, AppType type) {
         return Optional.ofNullable(loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)

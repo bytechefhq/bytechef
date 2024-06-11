@@ -22,7 +22,7 @@ import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -69,7 +69,7 @@ public interface TriggerDefinitionFacade {
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Type type, Long instanceId, String workflowId, Long jobId,
+        @NonNull AppType type, Long instanceId, String workflowId, Long jobId,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId);
 

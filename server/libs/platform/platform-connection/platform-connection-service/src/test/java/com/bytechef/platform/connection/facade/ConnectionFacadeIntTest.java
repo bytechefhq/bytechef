@@ -35,7 +35,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -100,7 +100,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO, Type.AUTOMATION);
+        connectionDTO = connectionFacade.create(connectionDTO, AppType.AUTOMATION);
 
         Assertions.assertThat(connectionDTO.name())
             .isEqualTo("name1");
@@ -118,7 +118,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO1 = connectionFacade.create(connectionDTO1, Type.AUTOMATION);
+        connectionDTO1 = connectionFacade.create(connectionDTO1, AppType.AUTOMATION);
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
@@ -126,7 +126,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO2 = connectionFacade.create(connectionDTO2, Type.AUTOMATION);
+        connectionDTO2 = connectionFacade.create(connectionDTO2, AppType.AUTOMATION);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(2);
@@ -152,7 +152,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
-        connection.setType(Type.AUTOMATION);
+        connection.setType(AppType.AUTOMATION);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -173,7 +173,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
-        connection.setType(Type.AUTOMATION);
+        connection.setType(AppType.AUTOMATION);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -182,7 +182,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, Type.AUTOMATION);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, AppType.AUTOMATION);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
@@ -205,11 +205,11 @@ public class ConnectionFacadeIntTest {
         connection.setComponentName("componentName");
         connection.setName("name");
         connection.setTags(List.of(tag1, tag2));
-        connection.setType(Type.AUTOMATION);
+        connection.setType(AppType.AUTOMATION);
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(Type.AUTOMATION)
+        Assertions.assertThat(connectionFacade.getConnectionTags(AppType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -219,7 +219,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name2");
-        connection.setType(Type.AUTOMATION);
+        connection.setType(AppType.AUTOMATION);
 
         tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
@@ -227,7 +227,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(Type.AUTOMATION)
+        Assertions.assertThat(connectionFacade.getConnectionTags(AppType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -235,7 +235,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(Type.AUTOMATION)
+        Assertions.assertThat(connectionFacade.getConnectionTags(AppType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -252,7 +252,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO, Type.AUTOMATION);
+        connectionDTO = connectionFacade.create(connectionDTO, AppType.AUTOMATION);
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(2);
@@ -315,8 +315,8 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public Type getType() {
-                    return Type.AUTOMATION;
+                public AppType getType() {
+                    return AppType.AUTOMATION;
                 }
 
                 @Override

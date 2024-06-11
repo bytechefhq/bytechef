@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.platform.constant.Type;
+import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,19 +29,19 @@ import org.springframework.data.domain.Page;
  */
 public interface InstanceJobService {
 
-    InstanceJob create(long jobId, long instanceId, Type type);
+    InstanceJob create(long jobId, long instanceId, AppType type);
 
-    void deleteInstanceJobs(long jobId, Type type);
+    void deleteInstanceJobs(long jobId, AppType type);
 
-    Optional<Long> fetchLastJobId(long instanceId, Type type);
+    Optional<Long> fetchLastJobId(long instanceId, AppType type);
 
-    Optional<Long> fetchJobInstanceId(long jobId, Type type);
+    Optional<Long> fetchJobInstanceId(long jobId, AppType type);
 
-    long getJobInstanceId(long jobId, Type type);
+    long getJobInstanceId(long jobId, AppType type);
 
-    List<Long> getJobIds(long instanceId, Type type);
+    List<Long> getJobIds(long instanceId, AppType type);
 
     Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, Type type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, AppType type,
         List<String> workflowIds, int pageNumber);
 }
