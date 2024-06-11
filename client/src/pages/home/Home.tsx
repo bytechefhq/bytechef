@@ -1,22 +1,22 @@
-import {Section, useSectionStore} from '@/pages/home/stores/useSectionStore';
+import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
 import * as Dialog from '@radix-ui/react-dialog';
 import {FolderIcon, SquareIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const Home = () => {
-    const {currentSection, setCurrentSection} = useSectionStore();
+    const {currentType, setCurrentType} = useAppTypeStore();
 
     const navigate = useNavigate();
 
 
-    const handleClick = (section: Section) => {
-        setCurrentSection(section);
+    const handleClick = (appType: AppType) => {
+        setCurrentType(appType);
     };
 
     useEffect(() => {
-        if (currentSection !== undefined) {
-            if (currentSection === Section.AUTOMATION) {
+        if (currentType !== undefined) {
+            if (currentType === AppType.AUTOMATION) {
                 navigate('/automation');
             } else {
                 navigate('/embedded');
@@ -25,7 +25,7 @@ const Home = () => {
     }, [currentSection, navigate]);
 
     return (
-        <Dialog.Root open={currentSection === undefined}>
+        <Dialog.Root open={currentType === undefined}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80" />
 
@@ -33,7 +33,7 @@ const Home = () => {
                     <div className="mx-auto flex h-full items-center">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <button onClick={() => handleClick(Section.EMBEDDED)}>
+                                <button onClick={() => handleClick(AppType.EMBEDDED)}>
                                     <div className="flex size-80 flex-col items-center justify-between rounded-md p-4 hover:bg-green-100 hover:text-accent-foreground">
                                         <div className="text-2xl font-semibold">Embedded</div>
 
@@ -49,7 +49,7 @@ const Home = () => {
                             </div>
 
                             <div>
-                                <button onClick={() => handleClick(Section.AUTOMATION)}>
+                                <button onClick={() => handleClick(AppType.AUTOMATION)}>
                                     <div className="flex size-80 flex-col items-center justify-between rounded-md p-4 hover:bg-blue-100 hover:text-accent-foreground">
                                         <div className="text-2xl font-semibold">Automation</div>
 
