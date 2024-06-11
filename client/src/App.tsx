@@ -80,6 +80,8 @@ const embeddedNavigation: {
 ];
 
 function App() {
+    const {authenticated} = useAuthenticationStore();
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const {getAccount, showLogin} = useAuthenticationStore();
@@ -106,7 +108,7 @@ function App() {
         }
     }, [showLogin, navigate]);
 
-    return (
+    return authenticated ? (
         <div className="flex h-full">
             <TooltipProvider>
                 <MobileSidebar
@@ -135,6 +137,8 @@ function App() {
 
             <Toaster />
         </div>
+    ) : (
+        <div>Not authenticated</div>
     );
 }
 
