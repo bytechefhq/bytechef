@@ -36,25 +36,21 @@ const PropertyField = ({
         sampleValue = sampleOutput;
     }
 
-    if (typeof sampleValue === 'string') {
-        sampleValue = (sampleValue as string).substring(0, 35) + ((sampleValue as string).length > 35 ? '...' : '');
-    }
-
     valueToCopy = valueToCopy || `$\{${workflowNodeName}.${selector}}`;
 
     return (
-        <div>
-            <div className="group inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
-                {label !== '[index]' && (
-                    <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
-                )}
+        <div className="group inline-flex w-full items-center rounded-md p-1 text-sm hover:bg-gray-100">
+            {label !== '[index]' && (
+                <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
+            )}
 
-                {label === '[index]' && <span title={property.type}>{TYPE_ICONS.INTEGER}</span>}
+            {label === '[index]' && <span title={property.type}>{TYPE_ICONS.INTEGER}</span>}
 
-                <span className="px-2">{label}</span>
+            <span className="px-2">{label}</span>
 
+            <div className="flex truncate">
                 {(sampleValue || sampleValue === 0 || sampleValue === false) && typeof sampleValue !== 'object' && (
-                    <span className="flex-1 text-xs text-muted-foreground">
+                    <span className="flex-1 truncate text-xs text-muted-foreground">
                         {sampleValue === true ? 'true' : sampleValue === false ? false : sampleValue}
                     </span>
                 )}

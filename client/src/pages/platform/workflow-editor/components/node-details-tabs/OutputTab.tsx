@@ -87,7 +87,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
         <div className="h-full p-4">
             {outputSchema ? (
                 <>
-                    <div className="flex items-center justify-between">
+                    <div className="mb-2 flex items-center justify-between">
                         <div className="text-sm font-semibold">Output Schema</div>
 
                         <DropdownMenu>
