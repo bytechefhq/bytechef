@@ -164,8 +164,8 @@ const Property = ({
         path = `parameters.${name}`;
     }
 
-    if (objectName && path && !path.includes(objectName)) {
-        path = `${objectName}.${path}`;
+    if (path === objectName) {
+        path = `${path}.${name}`;
     }
 
     const saveInputValue = useDebouncedCallback(() => {
