@@ -1288,7 +1288,7 @@ components:
           description: "The description used from the connection's component."
           type: "string"
         componentName:
-          description: "The connection name used from the connection's component."
+          description: "The component name used from the connection's component."
           type: "string"
         properties:
           description: "The properties of the connection."
@@ -1336,7 +1336,7 @@ components:
           description: "The description used from the connection's component."
           type: "string"
         componentName:
-          description: "The connection name used from the connection's component."
+          description: "The component name used from the connection's component."
           type: "string"
         componentTitle:
           description: "The title used from the connection's component"
