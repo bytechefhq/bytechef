@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.registry.definition;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Ivica Cardic
@@ -48,6 +49,7 @@ public class FileEntryImpl implements com.bytechef.component.definition.FileEntr
         return extension;
     }
 
+    @JsonIgnore
     public FileEntry getFileEntry() {
         return new FileEntry(name, url);
     }
@@ -69,7 +71,7 @@ public class FileEntryImpl implements com.bytechef.component.definition.FileEntr
 
     @Override
     public String toString() {
-        return "ContextFileEntryImpl{" +
+        return "FileEntryImpl{" +
             "extension='" + extension + '\'' +
             ", mimeType='" + mimeType + '\'' +
             ", name='" + name + '\'' +
