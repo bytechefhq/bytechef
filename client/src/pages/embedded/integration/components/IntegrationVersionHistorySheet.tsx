@@ -58,7 +58,11 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                         </div>
                                     </AccordionTrigger>
 
-                                    <AccordionContent>{integrationVersion.description}</AccordionContent>
+                                    <AccordionContent>
+                                        {integrationVersion.description
+                                            ? integrationVersion.description
+                                            : 'No description.'}
+                                    </AccordionContent>
                                 </AccordionItem>
                             ))}
                     </Accordion>

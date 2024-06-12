@@ -57,7 +57,9 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                                         </div>
                                     </AccordionTrigger>
 
-                                    <AccordionContent>{projectVersion.description}</AccordionContent>
+                                    <AccordionContent>
+                                        {projectVersion.description ? projectVersion.description : 'No description.'}
+                                    </AccordionContent>
                                 </AccordionItem>
                             ))}
                     </Accordion>
