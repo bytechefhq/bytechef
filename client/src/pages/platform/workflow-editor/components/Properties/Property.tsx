@@ -594,45 +594,28 @@ const Property = ({
     }, [propertyParameterValue, mentionInput]);
 
     useEffect(() => {
-        if (optionsDataSource?.optionsLookupDependsOn) {
-            const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map(
-                (optionLookupDependency) => {
-                    return optionLookupDependency
-                        .split('.')
-                        .reduce((acc, optionLookupDependency) => {
-                            if (optionLookupDependency.endsWith('[index]') && arrayIndex !== undefined) {
-                                return acc && acc[optionLookupDependency.replace('[index]', '')][arrayIndex];
-                            } else {
-                                return acc && acc[optionLookupDependency];
-                            }
-                        }, currentComponent?.parameters ?? {})
-                        ?.toString();
-                }
-            );
-
-            setLookupDependsOnValues(optionsLookupDependsOnValues);
+        if (!currentComponent?.parameters || !optionsDataSource?.optionsLookupDependsOn) {
+            return;
         }
+
+        const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map((optionLookupDependency) =>
+            resolvePath(currentComponent?.parameters, optionLookupDependency)?.toString()
+        );
+
+        setLookupDependsOnValues(optionsLookupDependsOnValues);
     }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
     useEffect(() => {
-        if (propertiesDataSource?.propertiesLookupDependsOn) {
-            const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map(
-                (propertyLookupDependency) => {
-                    return propertyLookupDependency
-                        .split('.')
-                        .reduce((acc, propertyLookupDependency) => {
-                            if (propertyLookupDependency.endsWith('[index]') && arrayIndex !== undefined) {
-                                return acc && acc[propertyLookupDependency.replace('[index]', '')][arrayIndex];
-                            } else {
-                                return acc && acc[propertyLookupDependency];
-                            }
-                        }, currentComponent?.parameters ?? {})
-                        ?.toString();
-                }
-            );
-
-            setLookupDependsOnValues(propertiesLookupDependsOnValues);
+        if (!currentComponent?.parameters || !propertiesDataSource?.propertiesLookupDependsOn) {
+            return;
         }
+
+        const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map(
+            (propertyLookupDependency) =>
+                resolvePath(currentComponent?.parameters, propertyLookupDependency)?.toString()
+        );
+
+        setLookupDependsOnValues(propertiesLookupDependsOnValues);
     }, [arrayIndex, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
 
     // set showInputTypeSwitchButton state depending on the controlType
