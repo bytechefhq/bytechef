@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import javax.lang.model.type.ErrorType;
 
 /**
  * @author Igor Beslic
@@ -71,11 +70,9 @@ public abstract class ProviderException extends RuntimeException {
         Map<String, ?> map = JsonUtils.readMap(exception.getMessage());
 
         AuthorizationFailedException exceptionMessage1 = new AuthorizationFailedException(
-            MapUtils.getString(map,"exceptionMessage"));
+            MapUtils.getString(map,"exceptionMessage"), new ProviderErrorType());
 
-        exceptionMessage1.withComponentName(MapUtils.getString(map,"componentName"));
-        exceptionMessage1.withConnectionName(MapUtils.getString(map,"connectionName"));
-
+        exceptionMessage1.withComponentName(MapUtils.getString(map, "componentName"));
 
         return exceptionMessage1;
     }
@@ -108,30 +105,8 @@ public abstract class ProviderException extends RuntimeException {
         return null;
     }
 
-    public static String getConnectionName(@Nonnull Exception exception) {
-        if (exception instanceof AuthorizationFailedException) {
-            ProviderException providerException = (ProviderException) exception;
-
-            return providerException.connectionName;
-        }
-
-        if (!hasAuthorizationFailedExceptionContent(exception)) {
-            Map<String, ?> map = JsonUtils.readMap(exception.getMessage());
-
-            return (String) map.get("connectionName");
-        }
-
-        return null;
-    }
-
     public ProviderException withComponentName(@Nonnull String componentName) {
         this.componentName = componentName;
-
-        return this;
-    }
-
-    public ProviderException withConnectionName(@Nonnull String connectionName) {
-        this.connectionName = connectionName;
 
         return this;
     }
@@ -143,18 +118,12 @@ public abstract class ProviderException extends RuntimeException {
     @Nonnull
     @Override
     public String getMessage() {
-        String tmpConnection="";
-
-        if (connectionName != null) {
-            tmpConnection = connectionName;
-        }
-
-        return JsonUtils.write(Map.of("componentName", getComponentName(), "connectionName", tmpConnection, "exceptionMessage", super.getMessage(),
+        return JsonUtils.write(Map.of("componentName", getComponentName(),
+            "exceptionMessage", super.getMessage(),
             "exceptionClass", getClass().getName()));
     }
 
     private String componentName;
-    private String connectionName;
 
     public ProviderException(String message) {
         super(message);
