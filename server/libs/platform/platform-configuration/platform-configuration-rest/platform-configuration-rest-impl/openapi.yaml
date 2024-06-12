@@ -792,7 +792,6 @@ paths:
               required:
                 - "path"
                 - "type"
-                - "value"
                 - "workflowNodeName"
               properties:
                 includeInMetadata:
