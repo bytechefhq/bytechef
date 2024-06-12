@@ -1,6 +1,5 @@
 apis/AppEventApi.ts
 apis/CategoryApi.ts
-apis/ConnectedUserApi.ts
 apis/IntegrationApi.ts
 apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceConfigurationApi.ts
@@ -11,10 +10,7 @@ apis/index.ts
 index.ts
 models/AppEventModel.ts
 models/CategoryModel.ts
-models/ConnectedUserIntegrationInstanceModel.ts
-models/ConnectedUserModel.ts
 models/CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel.ts
-models/CredentialStatusModel.ts
 models/DataStreamComponentModel.ts
 models/EnvironmentModel.ts
 models/IntegrationBasicModel.ts

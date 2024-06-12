@@ -1,0 +1,10 @@
+.openapi-generator-ignore
+apis/ConnectedUserApi.ts
+apis/index.ts
+index.ts
+models/ConnectedUserIntegrationInstanceModel.ts
+models/ConnectedUserModel.ts
+models/CredentialStatusModel.ts
+models/PageModel.ts
+models/index.ts
+runtime.ts

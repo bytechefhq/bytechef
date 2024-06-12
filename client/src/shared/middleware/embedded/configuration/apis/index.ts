@@ -2,7 +2,6 @@
 /* eslint-disable */
 export * from './AppEventApi';
 export * from './CategoryApi';
-export * from './ConnectedUserApi';
 export * from './IntegrationApi';
 export * from './IntegrationInstanceApi';
 export * from './IntegrationInstanceConfigurationApi';

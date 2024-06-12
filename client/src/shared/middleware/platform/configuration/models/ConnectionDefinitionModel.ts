@@ -57,7 +57,7 @@ export interface ConnectionDefinitionModel {
      */
     componentDescription?: string;
     /**
-     * The connection name used from the connection's component.
+     * The component name used from the connection's component.
      * @type {string}
      * @memberof ConnectionDefinitionModel
      */

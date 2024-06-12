@@ -2,10 +2,7 @@
 /* eslint-disable */
 export * from './AppEventModel';
 export * from './CategoryModel';
-export * from './ConnectedUserIntegrationInstanceModel';
-export * from './ConnectedUserModel';
 export * from './CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel';
-export * from './CredentialStatusModel';
 export * from './DataStreamComponentModel';
 export * from './EnvironmentModel';
 export * from './IntegrationBasicModel';

@@ -26,7 +26,7 @@ export interface ConnectionDefinitionBasicModel {
      */
     componentDescription?: string;
     /**
-     * The connection name used from the connection's component.
+     * The component name used from the connection's component.
      * @type {string}
      * @memberof ConnectionDefinitionBasicModel
      */
