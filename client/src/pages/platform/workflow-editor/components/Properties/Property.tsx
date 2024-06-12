@@ -164,6 +164,10 @@ const Property = ({
         path = `parameters.${name}`;
     }
 
+    if (objectName && path && !path.includes(objectName)) {
+        path = `${objectName}.${path}`;
+    }
+
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
             return;
