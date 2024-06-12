@@ -1149,6 +1149,7 @@ components:
       - "BEARER_TOKEN"
       - "CUSTOM"
       - "DIGEST_AUTH"
+      - "NONE"
       - "OAUTH2_AUTHORIZATION_CODE"
       - "OAUTH2_AUTHORIZATION_CODE_PKCE"
       - "OAUTH2_CLIENT_CREDENTIALS"
