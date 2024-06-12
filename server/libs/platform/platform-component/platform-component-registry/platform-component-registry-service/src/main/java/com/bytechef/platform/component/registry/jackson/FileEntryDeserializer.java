@@ -46,6 +46,10 @@ public class FileEntryDeserializer extends JsonDeserializer<FileEntry> {
     private String asText(String fieldName, JsonNode jsonNode) {
         JsonNode fieldJsonNode = jsonNode.get(fieldName);
 
+        if (fieldJsonNode == null) {
+            return null;
+        }
+
         return fieldJsonNode.asText();
     }
 }
