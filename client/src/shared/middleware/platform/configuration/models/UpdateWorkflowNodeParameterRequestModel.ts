@@ -42,7 +42,7 @@ export interface UpdateWorkflowNodeParameterRequestModel {
      * @type {object}
      * @memberof UpdateWorkflowNodeParameterRequestModel
      */
-    value: object;
+    value?: object;
     /**
      * The workflow node name.
      * @type {string}
@@ -57,7 +57,6 @@ export interface UpdateWorkflowNodeParameterRequestModel {
 export function instanceOfUpdateWorkflowNodeParameterRequestModel(value: object): boolean {
     if (!('path' in value)) return false;
     if (!('type' in value)) return false;
-    if (!('value' in value)) return false;
     if (!('workflowNodeName' in value)) return false;
     return true;
 }
@@ -75,7 +74,7 @@ export function UpdateWorkflowNodeParameterRequestModelFromJSONTyped(json: any, 
         'includeInMetadata': json['includeInMetadata'] == null ? undefined : json['includeInMetadata'],
         'path': json['path'],
         'type': json['type'],
-        'value': json['value'],
+        'value': json['value'] == null ? undefined : json['value'],
         'workflowNodeName': json['workflowNodeName'],
     };
 }
