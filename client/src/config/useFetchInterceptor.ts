@@ -3,11 +3,13 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import fetchIntercept from 'fetch-intercept';
+import {useNavigate} from 'react-router-dom';
 
 export default function useFetchInterceptor() {
     const {clearAuthentication} = useAuthenticationStore();
     const {clearCurrentWorkspaceId} = useWorkspaceStore();
 
+    const navigate = useNavigate();
     const {toast} = useToast();
 
     const unregister = fetchIntercept.register({
@@ -29,6 +31,12 @@ export default function useFetchInterceptor() {
             if (response.status === 403 || response.status === 401) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();
+                console.log(response.url);
+                if (!response.url.endsWith('/api/account')) {
+                    navigate('/login');
+                }
+
+                return response;
             }
 
             if (response.status < 200 || response.status > 299) {

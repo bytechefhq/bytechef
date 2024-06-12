@@ -70,8 +70,8 @@ export const useAuthenticationStore = create<AuthenticationI>()(
 
             clearAuthentication: () => {
                 set(() => ({
-                    loading: false,
-                    showModalLogin: true,
+                    ...initialState,
+                    showLogin: true,
                 }));
             },
 
