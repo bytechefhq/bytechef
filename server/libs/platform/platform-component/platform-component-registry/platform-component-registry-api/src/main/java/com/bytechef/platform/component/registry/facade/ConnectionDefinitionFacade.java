@@ -17,8 +17,8 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
+import java.util.Map;
 import org.springframework.lang.NonNull;
 
 /**
@@ -27,8 +27,9 @@ import org.springframework.lang.NonNull;
 public interface ConnectionDefinitionFacade {
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull String redirectUri);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String redirectUri);
 
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, ComponentConnection connection);
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms);
 }

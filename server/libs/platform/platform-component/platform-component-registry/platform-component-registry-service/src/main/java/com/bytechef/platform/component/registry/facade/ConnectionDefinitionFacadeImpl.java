@@ -18,9 +18,9 @@ package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.platform.component.registry.definition.factory.ContextFactory;
-import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
+import java.util.Map;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -42,17 +42,19 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull String redirectUri) {
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms,
+        @NonNull String redirectUri) {
 
         return connectionDefinitionService.executeAuthorizationCallback(
-            componentName, connection, contextFactory.createContext(componentName, null), redirectUri);
+            componentName, authorizationName, authorizationParms, contextFactory.createContext(componentName, null),
+            redirectUri);
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, ComponentConnection connection) {
+        @NonNull String componentName, @NonNull String authorizationName, @NonNull Map<String, ?> authorizationParms) {
 
         return connectionDefinitionService.getOAuth2AuthorizationParameters(
-            componentName, connection, contextFactory.createContext(componentName, null));
+            componentName, authorizationName, authorizationParms, contextFactory.createContext(componentName, null));
     }
 }

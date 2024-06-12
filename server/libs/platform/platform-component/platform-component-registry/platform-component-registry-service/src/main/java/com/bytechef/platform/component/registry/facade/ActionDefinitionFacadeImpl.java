@@ -224,7 +224,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             }
 
             Authorization.RefreshTokenResponse refreshTokenResponse =
-                connectionDefinitionService.executeRefresh(realComponentName, componentConnection, actionContext);
+                connectionDefinitionService.executeRefresh(realComponentName, componentConnection.authorizationName(),
+                    componentConnection.getParameters(), actionContext);
 
             Long connectionId = connectionIds.get(realComponentName);
             Connection connection = connectionService.updateConnectionParameter(
