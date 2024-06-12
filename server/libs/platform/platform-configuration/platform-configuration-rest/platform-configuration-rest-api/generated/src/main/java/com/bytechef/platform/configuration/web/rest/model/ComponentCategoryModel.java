@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * A category of component.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-11T06:18:17.677938+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T07:17:53.466209+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public enum ComponentCategoryModel {
   
   ACCOUNTING("accounting"),

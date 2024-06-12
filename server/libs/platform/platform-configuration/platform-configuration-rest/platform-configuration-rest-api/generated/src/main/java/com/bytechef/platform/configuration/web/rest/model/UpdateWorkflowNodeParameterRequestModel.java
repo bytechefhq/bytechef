@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("updateWorkflowNodeParameter_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-11T06:18:17.677938+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T07:17:53.466209+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class UpdateWorkflowNodeParameterRequestModel {
 
   private Boolean includeInMetadata = false;
@@ -40,10 +40,9 @@ public class UpdateWorkflowNodeParameterRequestModel {
   /**
    * Constructor with only required parameters
    */
-  public UpdateWorkflowNodeParameterRequestModel(String path, String type, Object value, String workflowNodeName) {
+  public UpdateWorkflowNodeParameterRequestModel(String path, String type, String workflowNodeName) {
     this.path = path;
     this.type = type;
-    this.value = value;
     this.workflowNodeName = workflowNodeName;
   }
 
@@ -116,8 +115,8 @@ public class UpdateWorkflowNodeParameterRequestModel {
    * The value.
    * @return value
   */
-  @NotNull 
-  @Schema(name = "value", description = "The value.", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "value", description = "The value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("value")
   public Object getValue() {
     return value;
