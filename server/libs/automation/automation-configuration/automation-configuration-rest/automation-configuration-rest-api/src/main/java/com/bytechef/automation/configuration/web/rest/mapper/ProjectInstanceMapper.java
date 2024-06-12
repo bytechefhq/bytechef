@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.dto.ProjectInstanceDTO;
-import com.bytechef.automation.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceModel;
 import org.mapstruct.Mapper;
@@ -30,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ProjectInstanceMapper {
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectInstanceBasicToProjectInstanceModelMapper
         extends Converter<ProjectInstance, ProjectInstanceBasicModel> {
 
@@ -39,7 +39,7 @@ public class ProjectInstanceMapper {
         ProjectInstanceBasicModel convert(ProjectInstance projectInstanc);
     }
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectInstanceToProjectInstanceModelMapper
         extends Converter<ProjectInstance, ProjectInstanceModel> {
 
@@ -51,7 +51,7 @@ public class ProjectInstanceMapper {
         ProjectInstanceModel convert(ProjectInstance projectInstance);
     }
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectInstanceDTOToProjectInstanceModelMapper
         extends Converter<ProjectInstanceDTO, ProjectInstanceModel> {
 

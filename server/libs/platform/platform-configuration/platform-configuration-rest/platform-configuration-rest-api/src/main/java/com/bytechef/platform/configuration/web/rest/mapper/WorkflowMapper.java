@@ -35,7 +35,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public abstract class WorkflowMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowToWorkflowModelMapper implements Converter<Workflow, WorkflowModel> {
 
         @Override
@@ -47,7 +47,7 @@ public abstract class WorkflowMapper {
         public abstract WorkflowModel convert(Workflow workflow);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowDTOToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
 
         @Autowired
@@ -66,7 +66,7 @@ public abstract class WorkflowMapper {
         }
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowModelToWorkflowBasicModel implements Converter<Workflow, WorkflowBasicModel> {
 
         @Override

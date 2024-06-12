@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.connection.web.rest.mapper;
 
-import com.bytechef.platform.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
+import com.bytechef.platform.connection.web.rest.mapper.config.PlatformConnectionMapperSpringConfig;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.tag.domain.Tag;
 import org.mapstruct.Mapper;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConnectionMapperSpringConfig.class)
+@Mapper(config = PlatformConnectionMapperSpringConfig.class)
 public interface ConnectionTagModelMapper extends Converter<TagModel, Tag> {
 
     Tag convert(TagModel tagModel);

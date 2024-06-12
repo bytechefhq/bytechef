@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
 public interface WorkflowTriggerMapper extends Converter<WorkflowTrigger, WorkflowTriggerModel> {
 
     @Mapping(target = "connections", ignore = true)

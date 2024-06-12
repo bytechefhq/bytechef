@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.web.rest.mapper;
 
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
-import com.bytechef.embedded.configuration.web.rest.mapper.config.IntegratioConfigurationMapperSpringConfig;
+import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = IntegratioConfigurationMapperSpringConfig.class)
+@Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
 public interface IntegrationInstanceConfigurationModelMapper
     extends Converter<IntegrationInstanceConfigurationModel, IntegrationInstanceConfigurationDTO> {
 

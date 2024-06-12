@@ -18,7 +18,7 @@ package com.bytechef.embedded.configuration.web.rest.mapper;
 
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
-import com.bytechef.embedded.configuration.web.rest.mapper.config.IntegratioConfigurationMapperSpringConfig;
+import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
 import org.mapstruct.Mapper;
@@ -30,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class IntegrationMapper {
 
-    @Mapper(config = IntegratioConfigurationMapperSpringConfig.class)
+    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
     public interface IntegrationToIntegrationBasicModelMapper extends Converter<Integration, IntegrationBasicModel> {
 
         @Override
@@ -40,7 +40,7 @@ public class IntegrationMapper {
         IntegrationBasicModel convert(Integration integration);
     }
 
-    @Mapper(config = IntegratioConfigurationMapperSpringConfig.class)
+    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
     public interface IntegrationDTOToIntegrationModelMapper extends Converter<IntegrationDTO, IntegrationModel> {
 
         @Override

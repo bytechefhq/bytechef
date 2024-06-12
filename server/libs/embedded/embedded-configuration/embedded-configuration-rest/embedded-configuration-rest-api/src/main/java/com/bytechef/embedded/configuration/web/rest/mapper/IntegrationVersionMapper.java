@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.web.rest.mapper;
 
 import com.bytechef.embedded.configuration.domain.IntegrationVersion;
-import com.bytechef.embedded.configuration.web.rest.mapper.config.IntegratioConfigurationMapperSpringConfig;
+import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationVersionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = IntegratioConfigurationMapperSpringConfig.class)
+@Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
 public interface IntegrationVersionMapper extends Converter<IntegrationVersion, IntegrationVersionModel> {
 
     @Override
