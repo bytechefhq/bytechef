@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -33,4 +34,8 @@ public interface ParameterConnection {
     <T> T getParameter(String key);
 
     String getAuthorizationName();
+
+    default boolean isAuthorizationNameOauth2AuthorizationCode() {
+        return Objects.equals("oauth2_authorization_code", getAuthorizationName());
+    }
 }

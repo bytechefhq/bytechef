@@ -113,6 +113,17 @@ public class JsonUtilsTest {
     }
 
     @Test
+    public void testReadMap() {
+        Map<String, ?> map = JsonUtils.readMap(
+            "{\"componentName\":\"byteChefChef\",\"exceptionMessage\":\"Unauthorized request\",\"exceptionClass\":\""
+                + getClass().getName() + "\"}");
+
+        Assertions.assertThat(map)
+            .isEqualTo(Map.of("componentName", "byteChefChef", "exceptionMessage", "Unauthorized request",
+                "exceptionClass", getClass().getName()));
+    }
+
+    @Test
     public void testReadListFromPath() {
         List<Map<String, ?>> list = (List) JsonUtils.readList(
             """
@@ -227,6 +238,12 @@ public class JsonUtilsTest {
 
         Assertions.assertThat(JsonUtils.write(Map.of("key", "value")))
             .isEqualTo("{\"key\":\"value\"}");
+
+        Assertions.assertThat(
+            JsonUtils.write(Map.of("array", new String[] {
+                "element1", "element2", "element3"
+            })))
+            .isEqualTo("{\"array\":[\"element1\",\"element2\",\"element3\"]}");
     }
 
     @Test

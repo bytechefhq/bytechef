@@ -232,7 +232,7 @@ public class HttpClientExecutor {
 
                 logger.debug("Rise exception");
 
-                throw ProviderException.getByHttpResponseCode(httpResponse.statusCode(), "Token expired");
+                throw ProviderException.fromHttpResponseCode(httpResponse.statusCode(), "Token expired");
             }
 
             @Override

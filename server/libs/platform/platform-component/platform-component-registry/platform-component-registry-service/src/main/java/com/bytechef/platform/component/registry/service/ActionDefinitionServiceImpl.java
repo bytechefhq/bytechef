@@ -33,8 +33,10 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.definition.ParametersImpl;
@@ -48,6 +50,8 @@ import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -187,6 +191,28 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         default -> throw new IllegalStateException();
                     };
                 } catch (Exception e) {
+                    if (e instanceof ProviderException) {
+
+                        // this exception kind is not handled in serviceImpl
+                        throw (ProviderException) e;
+                    }
+
+                    if (Objects.equals(ScriptComponentDefinition.SCRIPT, componentName) && ProviderException.hasAuthorizationFailedExceptionContent(e)) {
+                        throw ProviderException.fromException(e);
+                    }
+
+                    ProviderException providerException = ProviderException.fromExceptionMessage(e.getMessage());
+
+                    if (providerException != null) {
+                        for (Map.Entry<String, ComponentConnection> componentConnectionEntry : connections.entrySet()) {
+                            if (Objects.equals(componentConnectionEntry.getValue().getComponentName(), componentName)) {
+                                providerException.withConnectionName(componentConnectionEntry.getKey());
+                            }
+                        }
+
+                        throw providerException.withComponentName(componentName);
+                    }
+
                     throw new ComponentExecutionException(
                         e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
                 }

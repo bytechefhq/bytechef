@@ -31,12 +31,12 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -89,19 +89,28 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, componentConnection);
 
+        Exception executionException;
+
         try {
             return actionDefinitionService.executeOptions(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
                 searchText,
                 componentConnection, actionContext);
         } catch (Exception exception) {
-            componentConnection = getTokenRefreshedComponentConnection(
-                componentName, connectionId, exception, componentConnection, actionContext);
+            executionException = exception;
+
+            Map<String, ComponentConnection> tokenRefreshedComponentConnections = getTokenRefreshedComponentConnection(
+                componentName, Map.of("tmpName", connectionId), exception, Map.of("tmpName", componentConnection),
+                actionContext);
+
+            if (!tokenRefreshedComponentConnections.isEmpty()) {
+                return actionDefinitionService.executeOptions(
+                    componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+                    searchText, componentConnection, actionContext);
+            }
         }
 
-        return actionDefinitionService.executeOptions(
-            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-            searchText, componentConnection, actionContext);
+        throw new UnsupportedOperationException("Unable to recover from execution error", executionException);
     }
 
     @Override
@@ -136,40 +145,67 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue)
                 : null);
 
+        Exception executionException;
+
         try {
             return actionDefinitionService.executePerform(
                 componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
         } catch (Exception exception) {
-            ComponentConnection refreshedComponentConnection = getTokenRefreshedComponentConnection(
-                componentName, connectionIds.get(componentName), exception, componentConnections.get(componentName),
+            executionException = exception;
+
+            componentConnections = getTokenRefreshedComponentConnection(
+                componentName, connectionIds, exception, componentConnections,
                 actionContext);
 
-            componentConnections.replace(componentName, refreshedComponentConnection);
+            if (!componentConnections.isEmpty()) {
+                return actionDefinitionService.executePerform(
+                    componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
+            }
         }
 
-        return actionDefinitionService.executePerform(
-            componentName, componentVersion, actionName, inputParameters, componentConnections, actionContext);
+        throw new UnsupportedOperationException("Unable to recover from execution error", executionException);
+
     }
 
-    private ComponentConnection getTokenRefreshedComponentConnection(
-        String componentName, Long connectionId, Exception exception,
-        ComponentConnection componentConnection, ActionContext actionContext) {
+    private Map<String, ComponentConnection> getTokenRefreshedComponentConnection(
+        String componentName, Map<String, Long> connectionIds, Exception exception,
+        Map<String, ComponentConnection> componentConnections, ActionContext actionContext) {
 
-        if (!Objects.equals(ProviderException.AuthorizationFailedException.class, exception.getClass()) &&
-            !StringUtils.contains(exception.getMessage(), "401")) {
-
+        if (!ProviderException.hasAuthorizationFailedExceptionContent(exception)) {
             throw new UnsupportedOperationException(
                 "Unable to recover failed request with token refresh procedure", exception);
         }
 
-        Authorization.RefreshTokenResponse refreshTokenResponse =
-            connectionDefinitionService.executeRefresh(componentName, componentConnection, actionContext);
+        HashMap<String, ComponentConnection> refreshedConnections = new HashMap<>();
 
-        Connection connection = connectionService.updateConnectionParameter(
-            connectionId, "access_token", Objects.requireNonNull(refreshTokenResponse.accessToken()));
+        componentConnections.forEach((connectionName, componentConnection) -> {
 
-        return new ComponentConnection(
-            componentName, connection.getVersion(), connection.getParameters(), connection.getAuthorizationName());
+            if (!componentConnection.isAuthorizationNameOauth2AuthorizationCode()) {
+                return;
+            }
+
+            String realComponentName = componentName;
+            String realConnectionName = null;
+
+            if (!Objects.equals(ProviderException.getComponentName(exception), componentName)) {
+                realComponentName = ProviderException.getComponentName(exception);
+                realConnectionName = ProviderException.getConnectionName(exception);
+            }
+
+            Authorization.RefreshTokenResponse refreshTokenResponse =
+                connectionDefinitionService.executeRefresh(realComponentName, componentConnection, actionContext);
+
+            Connection connection = connectionService.updateConnectionParameter(
+                connectionIds.get(realConnectionName), "access_token",
+                Objects.requireNonNull(refreshTokenResponse.accessToken()));
+
+            refreshedConnections.put(connectionName, new ComponentConnection(
+                realComponentName, connection.getVersion(), connection.getParameters(),
+                connection.getAuthorizationName()));
+
+        });
+
+        return refreshedConnections;
     }
 
     @Override
