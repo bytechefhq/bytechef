@@ -21,7 +21,7 @@ const Properties = ({control, customClassName, formState, operationName, path, p
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     return (
-        <ul className={twMerge('space-y-4', customClassName)}>
+        <ul className={twMerge('space-y-4', customClassName)} key={`${currentComponent?.operationName}_properties`}>
             {properties.map((property, index) => {
                 const {displayCondition, name} = property;
 
@@ -37,7 +37,7 @@ const Properties = ({control, customClassName, formState, operationName, path, p
                     <Property
                         control={control}
                         formState={formState}
-                        key={`${name}_${index}`}
+                        key={`${name}_${currentComponent?.operationName}_${index}`}
                         operationName={operationName}
                         path={path}
                         property={property}
