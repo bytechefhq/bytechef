@@ -1,7 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -9,7 +8,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import Editor from '@monaco-editor/react';
-import {Cross2Icon} from '@radix-ui/react-icons';
 import {useState} from 'react';
 
 const sampleOutput = {
@@ -42,10 +40,6 @@ const OutputTabSampleDataDialog = ({
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle>Upload Sample Output Data</DialogTitle>
-
-                        <DialogClose asChild>
-                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
-                        </DialogClose>
                     </div>
 
                     <DialogDescription>
