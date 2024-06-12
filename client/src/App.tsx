@@ -108,8 +108,14 @@ function App() {
         }
     }, [showLogin, navigate]);
 
+    useEffect(() => {
+        if (!authenticated) {
+            navigate('/login');
+        }
+    }, [authenticated, navigate]);
+
     if (!authenticated) {
-        navigate('/login');
+        return <></>;
     }
 
     return (
