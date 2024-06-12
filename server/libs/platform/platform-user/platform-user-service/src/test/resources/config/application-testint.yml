@@ -1,6 +1,6 @@
 spring:
   liquibase:
-    contexts: configuration
+    contexts: user
 
 bytechef:
   mail:

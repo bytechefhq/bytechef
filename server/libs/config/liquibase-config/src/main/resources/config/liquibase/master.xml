@@ -7,16 +7,19 @@
     <!-- core -->
     <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection" />
 
+    <!-- user -->
+    <includeAll path="classpath:config/liquibase/changelog/platform/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user" />
+    <includeAll path="classpath:config/liquibase/changelog/embedded/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user" />
+    <includeAll path="classpath:config/liquibase/changelog/embedded/connected_user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or user" />
+
     <!-- connection -->
     <includeAll path="classpath:config/liquibase/changelog/platform/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection" />
     <includeAll path="classpath:config/liquibase/changelog/automation/connection/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or connection" />
 
     <!-- configuration -->
     <includeAll path="classpath:config/liquibase/changelog/atlas/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
-    <includeAll path="classpath:config/liquibase/changelog/platform/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
     <includeAll path="classpath:config/liquibase/changelog/platform/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
     <includeAll path="classpath:config/liquibase/changelog/automation/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
-    <includeAll path="classpath:config/liquibase/changelog/embedded/user/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
     <includeAll path="classpath:config/liquibase/changelog/embedded/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
 
     <!-- execution -->

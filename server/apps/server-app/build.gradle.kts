@@ -58,6 +58,8 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
+    implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
+    implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-public-rest:embedded-configuration-public-rest-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))

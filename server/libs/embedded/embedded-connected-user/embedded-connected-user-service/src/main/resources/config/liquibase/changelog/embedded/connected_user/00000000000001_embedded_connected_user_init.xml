@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="connected_user">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_id" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)" />
+            <column name="email" type="VARCHAR(256)" />
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="connected_user_metadata">
+            <column name="connected_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="connected_user_metadata" columnNames="connected_user_id,key"/>
+
+        <addForeignKeyConstraint
+            baseColumnNames="connected_user_id"
+            baseTableName="connected_user_metadata"
+            constraintName="fk_connected_user_metadata_connected_user"
+            referencedColumnNames="id"
+            referencedTableName="connected_user"/>
+    </changeSet>
+</databaseChangeLog>
