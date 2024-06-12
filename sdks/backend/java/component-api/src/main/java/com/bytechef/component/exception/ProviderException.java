@@ -80,11 +80,12 @@ public abstract class ProviderException extends RuntimeException {
     public static boolean hasAuthorizationFailedExceptionContent(@Nonnull Exception exception) {
         ProviderException providerException = fromExceptionMessage(exception.getMessage());
 
-        if (Objects.equals(AuthorizationFailedException.class, providerException.getClass())) {
-            return true;
+        if ((providerException == null)
+            || !Objects.equals(AuthorizationFailedException.class, providerException.getClass())) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public static String getComponentName(@Nonnull Exception exception) {
