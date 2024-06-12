@@ -545,7 +545,7 @@ const ConnectionDialog = ({
                                     />
                                 )}
 
-                                {showAuthorizations && (
+                                {!connection?.id && showAuthorizations && (
                                     <FormField
                                         control={control}
                                         name="authorizationName"
