@@ -1,6 +1,5 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))

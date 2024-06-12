@@ -37,7 +37,6 @@ tasks.register("generateOpenAPI") {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")

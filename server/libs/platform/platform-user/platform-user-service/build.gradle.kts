@@ -4,7 +4,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.commons.validator)
     implementation("org.eclipse.angus:angus-mail")
-    implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-context-support")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
