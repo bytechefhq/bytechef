@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-11T06:18:18.587922+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-06-12T12:40:30.201521+02:00[Europe/Zagreb]", comments = "Generator version: 7.5.0")
 public class JobParametersModel {
 
   @Valid
